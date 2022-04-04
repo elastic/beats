@@ -1,0 +1,53 @@
+- name: blkio
+  type: group
+  release: beta
+  description: >
+    Block I/O metrics.
+  fields:
+    - name: device
+      type: keyword
+      description: >
+        Name of block device
+    - name: read
+      type: group
+      description: >
+        Accumulated reads during the life of the container
+      fields:
+        - name: ops
+          type: long
+          description: >
+            Number of reads during the life of the container
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes read during the life of the container
+    - name: write
+      type: group
+      description: >
+        Accumulated writes during the life of the container
+      fields:
+        - name: ops
+          type: long
+          description: >
+            Number of writes during the life of the container
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes written during the life of the container
+    - name: summary
+      type: group
+      description: >
+        Accumulated reads and writes during the life of the container
+      fields:
+        - name: ops
+          type: long
+          description: >
+            Number of I/O operations during the life of the container
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes read and written during the life of the container
+

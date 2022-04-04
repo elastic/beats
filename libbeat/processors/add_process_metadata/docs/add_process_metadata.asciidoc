@@ -25,8 +25,14 @@ The fields added to the event look as follows:
   "exe":   "/usr/lib/systemd/systemd",
   "args":  ["/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"],
   "pid":   1,
-  "ppid":  0,
+  "parent": {
+    "pid": 0
+  },
   "start_time": "2018-08-22T08:44:50.684Z",
+  "owner": {
+    "name": "root",
+    "id": "0"
+  }
 },
 "container": {
   "id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"

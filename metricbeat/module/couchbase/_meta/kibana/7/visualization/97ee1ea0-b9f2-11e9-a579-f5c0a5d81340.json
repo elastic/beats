@@ -1,0 +1,69 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Bucket Item Count [Metricbeat Couchbase] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "5b94e6a0-b9f2-11e9-9c08-535482acfc9e",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,196,0,1)",
+                        "fill": "0.1",
+                        "formatter": "number",
+                        "id": "5b94e6a1-b9f2-11e9-9c08-535482acfc9e",
+                        "label": "items",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchbase.bucket.item_count",
+                                "id": "5b94e6a2-b9f2-11e9-9c08-535482acfc9e",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "couchbase.bucket.name",
+                        "terms_order_by": "5b94e6a2-b9f2-11e9-9c08-535482acfc9e",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Bucket Item Count [Metricbeat Couchbase] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "97ee1ea0-b9f2-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:05.507Z",
+    "version": "WzM3NDYsMV0="
+}

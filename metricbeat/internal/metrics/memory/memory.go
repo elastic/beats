@@ -21,18 +21,19 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Memory holds os-specifc memory usage data
 // The vast majority of these values are cross-platform
 // However, we're wrapping all them for the sake of safety, and for the more variable swap metrics
 type Memory struct {
-	Total metrics.OptUint `struct:"total,omitempty"`
-	Used  UsedMemStats    `struct:"used,omitempty"`
+	Total opt.Uint     `struct:"total,omitempty"`
+	Used  UsedMemStats `struct:"used,omitempty"`
 
-	Free   metrics.OptUint `struct:"free,omitempty"`
-	Cached metrics.OptUint `struct:"cached,omitempty"`
+	Free   opt.Uint `struct:"free,omitempty"`
+	Cached opt.Uint `struct:"cached,omitempty"`
 	// "Actual" values are, technically, a linux-only concept
 	// For better or worse we've expanded it to include "derived"
 	// Memory values on other platforms, which we should
@@ -47,25 +48,25 @@ type Memory struct {
 
 // UsedMemStats wraps used.* memory metrics
 type UsedMemStats struct {
-	Pct   metrics.OptFloat `struct:"pct,omitempty"`
-	Bytes metrics.OptUint  `struct:"bytes,omitempty"`
+	Pct   opt.Float `struct:"pct,omitempty"`
+	Bytes opt.Uint  `struct:"bytes,omitempty"`
 }
 
 // ActualMemoryMetrics wraps the actual.* memory metrics
 type ActualMemoryMetrics struct {
-	Free metrics.OptUint `struct:"free,omitempty"`
-	Used UsedMemStats    `struct:"used,omitempty"`
+	Free opt.Uint     `struct:"free,omitempty"`
+	Used UsedMemStats `struct:"used,omitempty"`
 }
 
 // SwapMetrics wraps swap.* memory metrics
 type SwapMetrics struct {
-	Total metrics.OptUint `struct:"total,omitempty"`
-	Used  UsedMemStats    `struct:"used,omitempty"`
-	Free  metrics.OptUint `struct:"free,omitempty"`
+	Total opt.Uint     `struct:"total,omitempty"`
+	Used  UsedMemStats `struct:"used,omitempty"`
+	Free  opt.Uint     `struct:"free,omitempty"`
 }
 
 // Get returns platform-independent memory metrics.
-func Get(procfs string) (Memory, error) {
+func Get(procfs resolve.Resolver) (Memory, error) {
 	base, err := get(procfs)
 	if err != nil {
 		return Memory{}, errors.Wrap(err, "error getting system memory info")
@@ -89,14 +90,14 @@ func (base *Memory) fillPercentages() {
 	// In theory, `Used` and `Total` are available everywhere, so assume values are good.
 	if base.Total.Exists() && base.Total.ValueOr(0) != 0 {
 		percUsed := float64(base.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(1))
-		base.Used.Pct = metrics.OptFloatWith(common.Round(percUsed, common.DefaultDecimalPlacesCount))
+		base.Used.Pct = opt.FloatWith(common.Round(percUsed, common.DefaultDecimalPlacesCount))
 
 		actualPercUsed := float64(base.Actual.Used.Bytes.ValueOr(0)) / float64(base.Total.ValueOr(0))
-		base.Actual.Used.Pct = metrics.OptFloatWith(common.Round(actualPercUsed, common.DefaultDecimalPlacesCount))
+		base.Actual.Used.Pct = opt.FloatWith(common.Round(actualPercUsed, common.DefaultDecimalPlacesCount))
 	}
 
 	if base.Swap.Total.ValueOr(0) != 0 && base.Swap.Used.Bytes.Exists() {
 		perc := float64(base.Swap.Used.Bytes.ValueOr(0)) / float64(base.Swap.Total.ValueOr(0))
-		base.Swap.Used.Pct = metrics.OptFloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
+		base.Swap.Used.Pct = opt.FloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
 	}
 }

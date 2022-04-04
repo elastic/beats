@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Auth Cache Hit/Miss [Metricbeat CouchDB] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "couchdb"
+                },
+                "id": "7ccd9c50-b951-11e9-8e1d-17d2519ede48",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(179,101,87,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "7ccd9c51-b951-11e9-8e1d-17d2519ede48",
+                        "label": "auth_cache_misses",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.couchdb.auth_cache_misses",
+                                "id": "7ccd9c52-b951-11e9-8e1d-17d2519ede48",
+                                "type": "max"
+                            },
+                            {
+                                "field": "7ccd9c52-b951-11e9-8e1d-17d2519ede48",
+                                "id": "7ccd9c54-b951-11e9-8e1d-17d2519ede48",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "7ccd9c54-b951-11e9-8e1d-17d2519ede48",
+                                "id": "7ccd9c53-b951-11e9-8e1d-17d2519ede48",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(129,169,80,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "7ccd9c55-b951-11e9-8e1d-17d2519ede48",
+                        "label": "auth_cache_hits",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.couchdb.auth_cache_hits",
+                                "id": "7ccd9c56-b951-11e9-8e1d-17d2519ede48",
+                                "type": "max"
+                            },
+                            {
+                                "field": "7ccd9c56-b951-11e9-8e1d-17d2519ede48",
+                                "id": "7ccd9c58-b951-11e9-8e1d-17d2519ede48",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "7ccd9c58-b951-11e9-8e1d-17d2519ede48",
+                                "id": "7ccd9c57-b951-11e9-8e1d-17d2519ede48",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Auth Cache Hit/Miss [Metricbeat CouchDB] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "abfaf130-b951-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:06.496Z",
+    "version": "WzM3NTUsMV0="
+}

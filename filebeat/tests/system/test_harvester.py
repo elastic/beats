@@ -493,11 +493,11 @@ class Test(BaseTest):
         filebeat = self.start_beat(output=fb_encoding + ".log")
 
         self.wait_until(
-            lambda: self.output_has(lines=1, output_file="output/" + fb_encoding),
+            lambda: self.output_has(lines=1, output_file="output/" + fb_encoding + "-" + self.today + ".ndjson"),
             max_timeout=10)
 
         # Verify that output does not contain bom
-        output = self.read_output_json(output_file="output/" + fb_encoding)
+        output = self.read_output_json(output_file="output/" + fb_encoding + "-" + self.today + ".ndjson")
         assert output[0]["message"] == message
 
         filebeat.kill_and_wait()

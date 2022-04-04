@@ -1,0 +1,225 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
+            }
+        },
+        "title": " Database Account Requests By Status Code [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Total Requests",
+                        "field": "azure.database_account.total_requests.count"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Status Codes",
+                        "field": "azure.dimensions.status_code",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "_key",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Database",
+                        "field": "azure.dimensions.database_name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "_key",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "split",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": false,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "Status Codes",
+                            "params": {}
+                        }
+                    ],
+                    "splitColumn": [
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "Database",
+                            "params": {}
+                        }
+                    ],
+                    "x": null,
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "avg",
+                            "format": {
+                                "id": "number",
+                                "params": {
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "Total Requests",
+                            "params": {}
+                        }
+                    ]
+                },
+                "grid": {
+                    "categoryLines": false
+                },
+                "isVislibVis": true,
+                "labels": {
+                    "show": false
+                },
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "row": false,
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Total Requests"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "lineWidth": 2,
+                        "mode": "stacked",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "histogram",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "thresholdLine": {
+                    "color": "#E7664C",
+                    "show": false,
+                    "style": "full",
+                    "value": 10,
+                    "width": 1
+                },
+                "times": [],
+                "type": "histogram",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Total Requests"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": " Database Account Requests By Status Code [Metricbeat Azure]",
+            "type": "histogram"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "037382e0-856e-11ea-91bc-ab084c7ec0e7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:49.091Z",
+    "version": "WzM1NDgsMV0="
+}

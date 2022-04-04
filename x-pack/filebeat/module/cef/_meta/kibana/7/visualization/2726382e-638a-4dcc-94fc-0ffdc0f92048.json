@@ -1,0 +1,117 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 15 Event Types by Events [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Event Types",
+                        "field": "cef.extensions.categoryBehavior",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 15
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Source Users",
+                        "field": "source.user.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Destination Users",
+                        "field": "destination.user.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "customLabel": "Source Hosts",
+                        "field": "source.domain"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "customLabel": "Destination Hosts",
+                        "field": "destination.domain"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "perPage": 15,
+                "showMeticsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Top 15 Event Types by Events [Filebeat CEF]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2726382e-638a-4dcc-94fc-0ffdc0f92048",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "e6cf2383-71f4-4db1-a791-1a7d4f110194",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:36.211Z",
+    "version": "WzQ3MDMsMV0="
+}

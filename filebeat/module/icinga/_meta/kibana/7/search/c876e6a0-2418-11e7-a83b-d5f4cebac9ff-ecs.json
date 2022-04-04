@@ -1,0 +1,109 @@
+{
+    "attributes": {
+        "columns": [
+            "icinga.debug.facility",
+            "log.level",
+            "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "icinga",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "icinga"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "icinga",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "fileset.name",
+                            "negate": false,
+                            "params": {
+                                "query": "debug",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "debug"
+                        },
+                        "query": {
+                            "match": {
+                                "fileset.name": {
+                                    "query": "debug",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Debug Log [Filebeat Icinga] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:06.551Z",
+    "version": "WzQ0MjAsMV0="
+}

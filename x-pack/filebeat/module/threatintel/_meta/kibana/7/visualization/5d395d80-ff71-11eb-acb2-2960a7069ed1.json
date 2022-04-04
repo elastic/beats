@@ -1,0 +1,77 @@
+{
+    "attributes": {
+        "description": "This is a datatable of Adversaries with the most number of links to indicators.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "ThreatQ Most Linked Adversaries Datatable [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Most Linked Adversaries",
+                        "field": "threatq.adversaries",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 100
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "perPage": 10,
+                "percentageCol": "",
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": false,
+                "showTotal": false,
+                "totalFunc": "sum"
+            },
+            "title": "ThreatQ Most Linked Adversaries Datatable [Filebeat Threat Intel]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "5d395d80-ff71-11eb-acb2-2960a7069ed1",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-10-11T08:02:55.512Z",
+    "version": "WzUyNiwxXQ=="
+}

@@ -1,0 +1,103 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "exists": {
+                            "field": "coredns.stats.dns.request.do.count"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "coredns.stats.dns.request.do.count",
+                            "negate": false,
+                            "type": "exists",
+                            "value": "exists"
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                }
+            }
+        },
+        "title": "DO Count [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "DO Count",
+                        "field": "coredns.stats.dns.request.do.count",
+                        "percents": [
+                            100
+                        ]
+                    },
+                    "schema": "metric",
+                    "type": "percentiles"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "metric": {
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 10000
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": false
+                    },
+                    "metricColorMode": "None",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "DO Count [Metricbeat CoreDNS] ECS",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a19df590-53c4-11e9-b466-9be470bbd327-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:04.459Z",
+    "version": "WzM3MzEsMV0="
+}

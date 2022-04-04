@@ -1,7 +1,6 @@
 - name: checkpoint
   type: group
-  release: beta
-  default_field: false
+  release: ga
   description: >
     Module for parsing Checkpoint syslog.
   fields:

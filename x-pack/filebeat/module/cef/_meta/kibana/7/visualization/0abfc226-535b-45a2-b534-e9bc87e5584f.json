@@ -1,0 +1,114 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Bandwidth Utilization [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color": null,
+                "bar_color_rules": [
+                    {
+                        "id": "23db5bf6-f787-474e-86ab-76362432e984"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\" "
+                },
+                "id": "ec53a1d3-213c-4b0f-a074-5005a84cdb83",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "d27f09dc-b07e-493f-a223-a85033ad6548",
+                        "label": "Inbound",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "source.bytes",
+                                "id": "9ce9ec3a-2f11-4935-91b2-531494d2a619",
+                                "type": "sum"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "observer.hostname",
+                        "terms_order_by": "_count"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "b1ef2c75-5916-469d-8790-5b213367a5a0",
+                        "label": "Outbound",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "destination.bytes",
+                                "id": "11b1852f-9b62-4e96-8128-522e6c5bf16d",
+                                "type": "sum"
+                            },
+                            {
+                                "id": "2a6b00bf-1658-4d02-b4e2-61ad6e4c3a9b",
+                                "script": "params.outbound > 0 ? params.outbound * -1 : 0",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "11b1852f-9b62-4e96-8128-522e6c5bf16d",
+                                        "id": "c57067f2-2927-41d8-97f4-9f47b3b3bcae",
+                                        "name": "outbound"
+                                    }
+                                ]
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Bandwidth Utilization [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0abfc226-535b-45a2-b534-e9bc87e5584f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:39.286Z",
+    "version": "WzQ3NDcsMV0="
+}

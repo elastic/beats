@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package guess
@@ -9,8 +10,8 @@ package guess
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -104,13 +105,13 @@ func (g *guessInetSockIPv4) Prepare(ctx Context) (err error) {
 		g.remote.Addr = randomLocalIP()
 	}
 	if g.server, g.local, err = createSocket(g.local); err != nil {
-		return errors.Wrap(err, "error creating server")
+		return fmt.Errorf("error creating server: %w", err)
 	}
 	if g.client, g.remote, err = createSocket(g.remote); err != nil {
-		return errors.Wrap(err, "error creating client")
+		return fmt.Errorf("error creating client: %w", err)
 	}
 	if err = unix.Listen(g.server, 1); err != nil {
-		return errors.Wrap(err, "error in listen")
+		return fmt.Errorf("error in listen: %w", err)
 	}
 	return nil
 }
@@ -203,7 +204,8 @@ func (g *guessInetSockIPv4) Reduce(results []common.MapStr) (result common.MapSt
 
 	for _, key := range []string{
 		"INET_SOCK_LADDR", "INET_SOCK_LPORT",
-		"INET_SOCK_RADDR", "INET_SOCK_RPORT"} {
+		"INET_SOCK_RADDR", "INET_SOCK_RPORT",
+	} {
 		list, err := getListField(result, key)
 		if err != nil {
 			return nil, err

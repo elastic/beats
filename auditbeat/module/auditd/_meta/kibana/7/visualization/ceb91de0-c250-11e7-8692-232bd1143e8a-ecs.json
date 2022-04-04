@@ -1,0 +1,102 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd] ECS",
+        "uiStateJSON": {
+            "spy": {
+                "mode": {
+                    "fill": false,
+                    "name": null
+                }
+            },
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Unique Addresses",
+                        "field": "auditd.summary.object.primary"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Exe",
+                        "field": "process.executable",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 50
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Syscall",
+                        "field": "auditd.data.syscall",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "perPage": 10,
+                "showMeticsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd] ECS",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ceb91de0-c250-11e7-8692-232bd1143e8a-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "e8734160-c24c-11e7-8692-232bd1143e8a-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:35:59.895Z",
+    "version": "WzQ5NzcsMV0="
+}

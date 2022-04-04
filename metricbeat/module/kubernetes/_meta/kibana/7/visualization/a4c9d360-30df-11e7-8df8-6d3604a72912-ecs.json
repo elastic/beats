@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Top memory intensive pods  [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "802104d0-2bfc-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:kubernetes AND metricset.name:container"
+                },
+                "hide_last_value_indicator": true,
+                "id": "5d3692a0-2bfc-11e7-859b-f78b612cde28",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "5d3692a1-2bfc-11e7-859b-f78b612cde28",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.container.memory.usage.bytes",
+                                "id": "5d3692a2-2bfc-11e7-859b-f78b612cde28",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "5d3692a2-2bfc-11e7-859b-f78b612cde28",
+                                "id": "3972e9f0-256f-11e8-84e6-87221f87ae3b",
+                                "type": "cumulative_sum"
+                            },
+                            {
+                                "field": "3972e9f0-256f-11e8-84e6-87221f87ae3b",
+                                "id": "3e9fd5a0-256f-11e8-84e6-87221f87ae3b",
+                                "type": "derivative",
+                                "unit": "10s"
+                            }
+                        ],
+                        "offset_time": "",
+                        "override_index_pattern": 0,
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.pod.name",
+                        "terms_order_by": "5d3692a2-2bfc-11e7-859b-f78b612cde28",
+                        "terms_size": "10",
+                        "value_template": ""
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Top memory intensive pods  [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "a4c9d360-30df-11e7-8df8-6d3604a72912-ecs",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-03-24T09:43:55.002Z",
+    "version": "WzYzNDcsM10="
+}

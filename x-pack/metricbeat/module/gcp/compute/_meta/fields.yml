@@ -1,77 +1,62 @@
 - name: compute
+  description: Google Cloud Compute metrics
   release: beta
   type: group
-  description: Google Cloud Compute metrics
   fields:
-    - name: instance
-      type: group
-      fields:
-        - name: firewall
-          type: group
-          fields:
-            - name: dropped_bytes_count.value
-              type: long
-              description: Incoming bytes dropped by the firewall
-            - name: dropped_packets_count.value
-              type: long
-              description: Incoming packets dropped by the firewall
-        - name: cpu
-          type: group
-          fields:
-            - name: reserved_cores.value
-              type: double
-              description: Number of cores reserved on the host of the instance
-            - name: utilization.value
-              type: double
-              description: The fraction of the allocated CPU that is currently in use on the instance
-            - name: usage_time.value
-              type: double
-              description: Usage for all cores in seconds
-        - name: disk
-          type: group
-          fields:
-            - name: read_bytes_count.value
-              type: long
-              description: Count of bytes read from disk
-            - name: read_ops_count.value
-              type: long
-              description: Count of disk read IO operations
-            - name: write_bytes_count.value
-              type: long
-              description: Count of bytes written to disk
-            - name: write_ops_count.value
-              type: long
-              description: Count of disk write IO operations
-        - name: uptime.value
-          type: long
-          description: How long the VM has been running, in seconds
-        - name: network
-          type: group
-          fields:
-            - name: received_bytes_count.value
-              type: long
-              description: Count of bytes received from the network
-            - name: received_packets_count.value
-              type: long
-              description: Count of packets received from the network
-            - name: sent_bytes_count.value
-              type: long
-              description: Count of bytes sent over the network
-            - name: sent_packets_count.value
-              type: long
-              description: Count of packets sent over the network
-        - name: memory.balloon
-          type: group
-          fields:
-            - name: ram_size.value
-              type: long
-              description: The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
-            - name: ram_used.value
-              type: long
-              description: Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
-            - name: swap_in_bytes_count.value
-              type: long
-              description: The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
-            - name: swap_out_bytes_count.value
-              type: long
-              description: The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+  - name: firewall.dropped.bytes
+    type: long
+    description: Incoming bytes dropped by the firewall
+  - name: firewall.dropped_packets_count.value
+    type: long
+    description: Incoming packets dropped by the firewall
+  - name: instance.cpu.reserved_cores.value
+    type: double
+    description: Number of cores reserved on the host of the instance
+  - name: instance.cpu.usage_time.sec
+    type: double
+    description: Usage for all cores in seconds
+  - name: instance.cpu.usage.pct
+    type: double
+    description: The fraction of the allocated CPU that is currently in use on the instance
+  - name: instance.disk.read.bytes
+    type: long
+    description: Count of bytes read from disk
+  - name: instance.disk.read_ops_count.value
+    type: long
+    description: Count of disk read IO operations
+  - name: instance.disk.write.bytes
+    type: long
+    description: Count of bytes written to disk
+  - name: instance.disk.write_ops_count.value
+    type: long
+    description: Count of disk write IO operations
+  - name: instance.memory.balloon.ram_size.value
+    type: long
+    description: The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+  - name: instance.memory.balloon.ram_used.value
+    type: long
+    description: Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+  - name: instance.memory.balloon.swap_in.bytes
+    type: long
+    description: The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+  - name: instance.memory.balloon.swap_out.bytes
+    type: long
+    description: The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+  - name: instance.network.ingress.bytes
+    type: long
+    description: Count of bytes received from the network
+  - name: instance.network.ingress.packets.count
+    type: long
+    description: Count of packets received from the network
+  - name: instance.network.egress.bytes
+    type: long
+    description: Count of bytes sent over the network
+  - name: instance.network.egress.packets.count
+    type: long
+    description: Count of packets sent over the network
+  - name: instance.uptime.sec
+    type: long
+    description: Number of seconds the VM has been running.
+  - name: instance.uptime_total.sec
+    type: long
+    description: Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.

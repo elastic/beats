@@ -1,6 +1,5 @@
 - name: x509
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek x509 log.
   fields:

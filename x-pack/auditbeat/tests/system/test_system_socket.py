@@ -200,6 +200,13 @@ def pretty_print_json(d):
     return json.dumps(d, indent=3, default=lambda o: o.to_json(), sort_keys=True)
 
 
+def is_length(a, n):
+    try:
+        return len(a) == n
+    except TypeError:
+        return False
+
+
 class TCP4TestCase:
     def __init__(self):
         pass
@@ -238,6 +245,7 @@ class TCP4TestCase:
             "group.id": str(os.getgid()),
             "user.id": str(os.getuid()),
             "process.pid": os.getpid(),
+            "process.entity_id": Comparison(is_length, 16),
         })
 
 
@@ -270,6 +278,7 @@ class UDP4TestCase:
             "network.transport": "udp",
             "network.type": "ipv4",
             "process.pid": os.getpid(),
+            "process.entity_id": Comparison(is_length, 16),
             "server.ip": self.server_addr[0],
             "server.port": self.server_addr[1],
             "source.bytes": Comparison(operator.gt, 90),
@@ -313,6 +322,7 @@ class ConnectedUDP4TestCase:
             "network.transport": "udp",
             "network.type": "ipv4",
             "process.pid": os.getpid(),
+            "process.entity_id": Comparison(is_length, 16),
             "client.ip": self.server_addr[0],
             "client.port": self.server_addr[1],
             "destination.bytes": Comparison(operator.gt, 60),
@@ -360,6 +370,7 @@ class ConnectedUDP6TestCase:
             "network.transport": "udp",
             "network.type": "ipv6",
             "process.pid": os.getpid(),
+            "process.entity_id": Comparison(is_length, 16),
             "client.ip": self.server_addr[0],
             "client.port": self.server_addr[1],
             "destination.bytes": Comparison(operator.gt, 100),
@@ -403,6 +414,7 @@ class UDP6TestCase:
             "network.transport": "udp",
             "network.type": "ipv6",
             "process.pid": os.getpid(),
+            "process.entity_id": Comparison(is_length, 16),
             "server.ip": self.server_addr[0],
             "server.port": self.server_addr[1],
             "source.bytes": Comparison(operator.gt, 150),
@@ -444,6 +456,7 @@ class MultiUDP4TestCase:
                 "network.transport": "udp",
                 "network.type": "ipv4",
                 "process.pid": os.getpid(),
+                "process.entity_id": Comparison(is_length, 16),
                 "server.ip": self.server_addr[0][0],
                 "server.port": self.server_addr[0][1],
                 "source.bytes": Comparison(operator.gt, 30),
@@ -465,6 +478,7 @@ class MultiUDP4TestCase:
                 "network.transport": "udp",
                 "network.type": "ipv4",
                 "process.pid": os.getpid(),
+                "process.entity_id": Comparison(is_length, 16),
                 "server.ip": self.server_addr[1][0],
                 "server.port": self.server_addr[1][1],
                 "source.bytes": Comparison(operator.gt, 30),
@@ -486,6 +500,7 @@ class MultiUDP4TestCase:
                 "network.transport": "udp",
                 "network.type": "ipv4",
                 "process.pid": os.getpid(),
+                "process.entity_id": Comparison(is_length, 16),
                 "server.ip": self.server_addr[2][0],
                 "server.port": self.server_addr[2][1],
                 "source.bytes": Comparison(operator.gt, 30),
@@ -627,6 +642,7 @@ class DNSTestCase:
                 "network.transport": "udp",
                 "network.type": self.socket_factory.network,
                 "process.pid": os.getpid(),
+                "process.entity_id": Comparison(is_length, 16),
                 "server.bytes": Comparison(operator.gt, 30),
                 "server.ip": self.dns_server_addr[0],
                 "server.packets": 1,
@@ -658,6 +674,7 @@ class DNSTestCase:
                 "network.transport": self.socket_factory.transport,
                 "network.type": self.socket_factory.network,
                 "process.pid": os.getpid(),
+                "process.entity_id": Comparison(is_length, 16),
                 "server.bytes": server_bytes,
                 "server.domain": "elastic.co",
                 "server.ip": self.server_addr[0],

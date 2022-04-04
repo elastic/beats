@@ -6,6 +6,7 @@
   release: experimental
   fields:
     - name: aws.ec2
+      default_field: true
       type: group
       description: >
         Represents an AWS EC2 Listener, e.g. state of an EC2.

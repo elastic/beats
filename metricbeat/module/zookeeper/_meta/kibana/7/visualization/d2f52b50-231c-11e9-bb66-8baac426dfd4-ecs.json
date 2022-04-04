@@ -1,0 +1,103 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "0,0.[00]",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Packets received",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "zookeeper.mntr.packets.received",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "34949540-231c-11e9-9707-f128cdaa3bf2",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "id": "5811d190-231c-11e9-9707-f128cdaa3bf2"
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0",
+                        "formatter": "0,0.[00]",
+                        "id": "753b2e60-231c-11e9-9707-f128cdaa3bf2",
+                        "label": "Packets sent",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "zookeeper.mntr.packets.sent",
+                                "id": "753b2e61-231c-11e9-9707-f128cdaa3bf2",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "753b2e61-231c-11e9-9707-f128cdaa3bf2",
+                                "id": "7ed33c60-231c-11e9-9707-f128cdaa3bf2",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:53.758Z",
+    "version": "WzQxNzYsMV0="
+}

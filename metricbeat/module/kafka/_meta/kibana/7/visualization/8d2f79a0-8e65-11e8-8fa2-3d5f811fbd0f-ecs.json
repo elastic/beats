@@ -1,0 +1,71 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Kafka Controls [Metricbeat Kafka] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "kafka.topic.name",
+                        "id": "1532342651170",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Topic Name",
+                        "options": {
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 10,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kafka.partition.id",
+                        "id": "1539799686678",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Partition",
+                        "options": {
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1532342651170",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "Kafka Controls [Metricbeat Kafka] ECS",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:34.185Z",
+    "version": "WzM5OTAsMV0="
+}

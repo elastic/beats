@@ -1,0 +1,156 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Proxy process [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "30s",
+                "markdown": "\n|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_proxy_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ average_of_kubernetes_proxy_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_proxy_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n\n",
+                "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
+                "markdown_less": "\ntable, tr, td, th {\n    border: none;\n}\n\n",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.process.started.sec",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "script": "",
+                                "type": "max",
+                                "variables": [
+                                    {
+                                        "id": "1bbc4a20-99ac-11e9-8beb-c3bf9b9dfc43",
+                                        "name": "v"
+                                    }
+                                ]
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "1f34f620-99ac-11e9-8beb-c3bf9b9dfc43",
+                                "script": "round( (params._timestamp /1000 - params.started) / 86400, 2)",
+                                "type": "math",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "1f371900-99ac-11e9-8beb-c3bf9b9dfc43",
+                                        "name": "started"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "var_name": "started"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "cc3b1700-99ac-11e9-8beb-c3bf9b9dfc43",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.process.fds.open.count",
+                                "id": "cc3b1701-99ac-11e9-8beb-c3bf9b9dfc43",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "var_name": "fds"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "da1b1270-99ad-11e9-8beb-c3bf9b9dfc43",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.process.memory.resident.bytes",
+                                "id": "da1b1271-99ad-11e9-8beb-c3bf9b9dfc43",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "var_name": "resident_memory"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "50f54000-99ae-11e9-8beb-c3bf9b9dfc43",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.process.memory.virtual.bytes",
+                                "id": "50f54001-99ae-11e9-8beb-c3bf9b9dfc43",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "var_name": "virtual_memory"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "markdown",
+                "use_kibana_indexes": false
+            },
+            "title": "Proxy process [Metricbeat Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "09b404f0-99af-11e9-ba57-b7ab4e2d4b58",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:38.365Z",
+    "version": "WzQwMzAsMV0="
+}

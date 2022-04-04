@@ -1,0 +1,388 @@
+{
+    "attributes": {
+        "description": "Overview of MySQL server",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "14",
+                    "w": 16,
+                    "x": 15,
+                    "y": 38
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "title": "Open Tables, Files, Streams",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "050b110b-0b4d-404a-86c0-fa97f7eed2a0",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "050b110b-0b4d-404a-86c0-fa97f7eed2a0",
+                "panelRefName": "panel_050b110b-0b4d-404a-86c0-fa97f7eed2a0",
+                "title": "Rate of Questions",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "988a61d7-ac3e-481e-a6ae-aa75aaa32a3a",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "988a61d7-ac3e-481e-a6ae-aa75aaa32a3a",
+                "panelRefName": "panel_988a61d7-ac3e-481e-a6ae-aa75aaa32a3a",
+                "title": "Rate of SELECT statements",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "a1f8fa38-a62f-4e05-adde-e995dae9ad83",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "a1f8fa38-a62f-4e05-adde-e995dae9ad83",
+                "panelRefName": "panel_a1f8fa38-a62f-4e05-adde-e995dae9ad83",
+                "title": "Rate of INSERT, UPDATE, DELETE",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "d126fb61-605f-43af-b5d5-3fa3c128f726",
+                    "w": 6,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "d126fb61-605f-43af-b5d5-3fa3c128f726",
+                "panelRefName": "panel_d126fb61-605f-43af-b5d5-3fa3c128f726",
+                "title": "Connected Threads",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "59586d96-3abd-48a3-a258-cfd620826ec2",
+                    "w": 14,
+                    "x": 6,
+                    "y": 12
+                },
+                "panelIndex": "59586d96-3abd-48a3-a258-cfd620826ec2",
+                "panelRefName": "panel_59586d96-3abd-48a3-a258-cfd620826ec2",
+                "title": "Connections",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "dd0cf202-fe22-4daf-8f25-09c64d412bf3",
+                    "w": 14,
+                    "x": 20,
+                    "y": 12
+                },
+                "panelIndex": "dd0cf202-fe22-4daf-8f25-09c64d412bf3",
+                "panelRefName": "panel_dd0cf202-fe22-4daf-8f25-09c64d412bf3",
+                "title": "Aborted Connections Rate",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "ead16a55-a2d3-49ae-a09b-a0b03560e9a0",
+                    "w": 14,
+                    "x": 34,
+                    "y": 12
+                },
+                "panelIndex": "ead16a55-a2d3-49ae-a09b-a0b03560e9a0",
+                "panelRefName": "panel_ead16a55-a2d3-49ae-a09b-a0b03560e9a0",
+                "title": "Thread Activity",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "24fc2926-610d-4910-8f3e-eb63ca69788c",
+                    "w": 15,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "24fc2926-610d-4910-8f3e-eb63ca69788c",
+                "panelRefName": "panel_24fc2926-610d-4910-8f3e-eb63ca69788c",
+                "title": "Buffer Pool Pages",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "33c10c95-be67-492e-afb5-863f375cffc2",
+                    "w": 16,
+                    "x": 15,
+                    "y": 24
+                },
+                "panelIndex": "33c10c95-be67-492e-afb5-863f375cffc2",
+                "panelRefName": "panel_33c10c95-be67-492e-afb5-863f375cffc2",
+                "title": "Buffer Pool Utilization",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "d35d7c5e-8832-40e2-8c77-953ad320c853",
+                    "w": 17,
+                    "x": 31,
+                    "y": 24
+                },
+                "panelIndex": "d35d7c5e-8832-40e2-8c77-953ad320c853",
+                "panelRefName": "panel_d35d7c5e-8832-40e2-8c77-953ad320c853",
+                "title": "Buffer Pool Efficiency",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3cd58868-0d03-4715-9ecc-9fba3cde47c1",
+                    "w": 15,
+                    "x": 0,
+                    "y": 38
+                },
+                "panelIndex": "3cd58868-0d03-4715-9ecc-9fba3cde47c1",
+                "panelRefName": "panel_3cd58868-0d03-4715-9ecc-9fba3cde47c1",
+                "title": "Network Traffic",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "277c8209-3c5f-41f5-95f4-de0782917fba",
+                    "w": 17,
+                    "x": 31,
+                    "y": 38
+                },
+                "panelIndex": "277c8209-3c5f-41f5-95f4-de0782917fba",
+                "panelRefName": "panel_277c8209-3c5f-41f5-95f4-de0782917fba",
+                "title": "Open Tables Cache",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "9487b742-3e7f-4d57-af32-014ad360235c",
+                    "w": 13,
+                    "x": 0,
+                    "y": 53
+                },
+                "panelIndex": "9487b742-3e7f-4d57-af32-014ad360235c",
+                "panelRefName": "panel_9487b742-3e7f-4d57-af32-014ad360235c",
+                "title": "Connection Errors",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
+                    "w": 20,
+                    "x": 13,
+                    "y": 53
+                },
+                "panelIndex": "00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
+                "panelRefName": "panel_00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
+                "title": "Commands Operations",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "cd4deb30-c0dd-4f23-8868-ecffd73b2406",
+                    "w": 15,
+                    "x": 33,
+                    "y": 53
+                },
+                "panelIndex": "cd4deb30-c0dd-4f23-8868-ecffd73b2406",
+                "panelRefName": "panel_cd4deb30-c0dd-4f23-8868-ecffd73b2406",
+                "title": "SSL Cache",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat MySQL] Database Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "57b3fb50-6309-11ea-a83e-25b8612d00cc",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "4fa69a10-630b-11ea-a83e-25b8612d00cc",
+            "name": "050b110b-0b4d-404a-86c0-fa97f7eed2a0:panel_050b110b-0b4d-404a-86c0-fa97f7eed2a0",
+            "type": "visualization"
+        },
+        {
+            "id": "7ea77d30-630a-11ea-a83e-25b8612d00cc",
+            "name": "988a61d7-ac3e-481e-a6ae-aa75aaa32a3a:panel_988a61d7-ac3e-481e-a6ae-aa75aaa32a3a",
+            "type": "visualization"
+        },
+        {
+            "id": "779ee920-6309-11ea-a83e-25b8612d00cc",
+            "name": "a1f8fa38-a62f-4e05-adde-e995dae9ad83:panel_a1f8fa38-a62f-4e05-adde-e995dae9ad83",
+            "type": "visualization"
+        },
+        {
+            "id": "fc6b5a40-630d-11ea-a83e-25b8612d00cc",
+            "name": "d126fb61-605f-43af-b5d5-3fa3c128f726:panel_d126fb61-605f-43af-b5d5-3fa3c128f726",
+            "type": "visualization"
+        },
+        {
+            "id": "493e8460-630d-11ea-a83e-25b8612d00cc",
+            "name": "59586d96-3abd-48a3-a258-cfd620826ec2:panel_59586d96-3abd-48a3-a258-cfd620826ec2",
+            "type": "visualization"
+        },
+        {
+            "id": "bf60bc10-639b-11ea-a83e-25b8612d00cc",
+            "name": "dd0cf202-fe22-4daf-8f25-09c64d412bf3:panel_dd0cf202-fe22-4daf-8f25-09c64d412bf3",
+            "type": "visualization"
+        },
+        {
+            "id": "822df290-630f-11ea-a83e-25b8612d00cc",
+            "name": "ead16a55-a2d3-49ae-a09b-a0b03560e9a0:panel_ead16a55-a2d3-49ae-a09b-a0b03560e9a0",
+            "type": "visualization"
+        },
+        {
+            "id": "98c7bca0-63a2-11ea-a83e-25b8612d00cc",
+            "name": "24fc2926-610d-4910-8f3e-eb63ca69788c:panel_24fc2926-610d-4910-8f3e-eb63ca69788c",
+            "type": "visualization"
+        },
+        {
+            "id": "96d46630-63a4-11ea-a83e-25b8612d00cc",
+            "name": "33c10c95-be67-492e-afb5-863f375cffc2:panel_33c10c95-be67-492e-afb5-863f375cffc2",
+            "type": "visualization"
+        },
+        {
+            "id": "a1e00160-63a4-11ea-a83e-25b8612d00cc",
+            "name": "d35d7c5e-8832-40e2-8c77-953ad320c853:panel_d35d7c5e-8832-40e2-8c77-953ad320c853",
+            "type": "visualization"
+        },
+        {
+            "id": "c8661020-6310-11ea-a83e-25b8612d00cc",
+            "name": "3cd58868-0d03-4715-9ecc-9fba3cde47c1:panel_3cd58868-0d03-4715-9ecc-9fba3cde47c1",
+            "type": "visualization"
+        },
+        {
+            "id": "cd72e030-c6a6-11ea-a106-5be590f42b74",
+            "name": "277c8209-3c5f-41f5-95f4-de0782917fba:panel_277c8209-3c5f-41f5-95f4-de0782917fba",
+            "type": "visualization"
+        },
+        {
+            "id": "0774bbb0-c69c-11ea-a106-5be590f42b74",
+            "name": "9487b742-3e7f-4d57-af32-014ad360235c:panel_9487b742-3e7f-4d57-af32-014ad360235c",
+            "type": "visualization"
+        },
+        {
+            "id": "3e5c4490-c6a1-11ea-a106-5be590f42b74",
+            "name": "00cd9f15-01bd-43f3-a8c5-43d6ff17dad3:panel_00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
+            "type": "visualization"
+        },
+        {
+            "id": "8b276c80-c6ad-11ea-a106-5be590f42b74",
+            "name": "cd4deb30-c0dd-4f23-8868-ecffd73b2406:panel_cd4deb30-c0dd-4f23-8868-ecffd73b2406",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:43.489Z",
+    "version": "WzQwNjgsMV0="
+}

@@ -31,6 +31,7 @@ func init() {
 
 	RootCmd.RemoveCommand(RootCmd.RunCmd)
 	RootCmd.Run = func(_ *cobra.Command, _ []string) {
+
 		RootCmd.Usage()
 		os.Exit(1)
 	}

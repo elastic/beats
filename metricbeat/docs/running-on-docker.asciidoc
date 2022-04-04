@@ -28,16 +28,16 @@ are isolated as much as possible from the host, the data inside of the
 container's `/proc` is different than the host's `/proc`. To account for this, you
 can mount the host's `/proc` filesystem inside of the container and tell
 Metricbeat to look inside the `/hostfs` directory when looking for `/proc` by
-using the `-system.hostfs=/hostfs` CLI flag.
+using the `hostfs=/hostfs` config value.
 <2> By default, cgroup reporting is enabled for the
 <<metricbeat-metricset-system-process,system process metricset>>, so you need
 to mount the host's cgroup mountpoints within the container. They need to be
-mounted inside the directory specified by the `-system.hostfs` CLI flag.
+mounted inside the directory specified by the `hostfs` config value.
 <3> If you want to be able to monitor filesystems from the host by using the
 <<metricbeat-metricset-system-filesystem,system filesystem metricset>>, then those filesystems need to be mounted inside
 of the container. They can be mounted at any location.
 <4> The <<metricbeat-metricset-system-network,system network metricset>> uses data from `/proc/net/dev`, or
-`/hostfs/proc/net/dev` when using `-system.hostfs=/hostfs`. The only way
+`/hostfs/proc/net/dev` when using `hostfs=/hostfs`. The only way
 to make this file contain the host's network devices is to use the `--net=host`
 flag. This is due to Linux namespacing; simply bind mounting the host's `/proc`
 to `/hostfs/proc` is not sufficient.

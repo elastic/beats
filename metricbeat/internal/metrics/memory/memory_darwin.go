@@ -39,7 +39,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 type xswUsage struct {
@@ -47,7 +48,7 @@ type xswUsage struct {
 }
 
 // get is the darwin implementation for fetching Memory data
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 	var vmstat C.vm_statistics_data_t
 
 	mem := Memory{}
@@ -57,7 +58,7 @@ func get(_ string) (Memory, error) {
 	if err := sysctlbyname("hw.memsize", &total); err != nil {
 		return Memory{}, errors.Wrap(err, "error getting memsize")
 	}
-	mem.Total = metrics.OptUintWith(total)
+	mem.Total = opt.UintWith(total)
 
 	if err := vmInfo(&vmstat); err != nil {
 		return Memory{}, errors.Wrap(err, "error getting VM info")
@@ -66,11 +67,11 @@ func get(_ string) (Memory, error) {
 	kern := uint64(vmstat.inactive_count) << 12
 	free := uint64(vmstat.free_count) << 12
 
-	mem.Free = metrics.OptUintWith(free)
-	mem.Used.Bytes = metrics.OptUintWith(total - free)
+	mem.Free = opt.UintWith(free)
+	mem.Used.Bytes = opt.UintWith(total - free)
 
-	mem.Actual.Free = metrics.OptUintWith(free + kern)
-	mem.Actual.Used.Bytes = metrics.OptUintWith((total - free) - kern)
+	mem.Actual.Free = opt.UintWith(free + kern)
+	mem.Actual.Used.Bytes = opt.UintWith((total - free) - kern)
 
 	var err error
 	mem.Swap, err = getSwap()
@@ -90,9 +91,9 @@ func getSwap() (SwapMetrics, error) {
 		return swap, errors.Wrap(err, "error getting swap usage")
 	}
 
-	swap.Total = metrics.OptUintWith(swUsage.Total)
-	swap.Used.Bytes = metrics.OptUintWith(swUsage.Used)
-	swap.Free = metrics.OptUintWith(swUsage.Avail)
+	swap.Total = opt.UintWith(swUsage.Total)
+	swap.Used.Bytes = opt.UintWith(swUsage.Used)
+	swap.Free = opt.UintWith(swUsage.Avail)
 
 	return swap, nil
 }

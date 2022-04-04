@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "User Logon Dashboard [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "## **Logon Information Dashboard**",
+                "openLinksInNewTab": false
+            },
+            "title": "User Logon Dashboard [Winlogbeat Security] ",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "18348f30-a24d-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:58.346Z",
+    "version": "WzIyNjcsMl0="
+}

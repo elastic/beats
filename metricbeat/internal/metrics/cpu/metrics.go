@@ -21,7 +21,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // CPU manages the CPU metrics from /proc/stat
@@ -30,14 +31,14 @@ import (
 // should assume that any value can be null.
 // The values are in "ticks", which translates to milliseconds of CPU time
 type CPU struct {
-	User    metrics.OptUint `struct:"user,omitempty"`
-	Sys     metrics.OptUint `struct:"system,omitempty"`
-	Idle    metrics.OptUint `struct:"idle,omitempty"`
-	Nice    metrics.OptUint `struct:"nice,omitempty"`    // Linux, Darwin, BSD
-	Irq     metrics.OptUint `struct:"irq,omitempty"`     // Linux and openbsd
-	Wait    metrics.OptUint `struct:"iowait,omitempty"`  // Linux and AIX
-	SoftIrq metrics.OptUint `struct:"softirq,omitempty"` // Linux only
-	Stolen  metrics.OptUint `struct:"steal,omitempty"`   // Linux only
+	User    opt.Uint `struct:"user,omitempty"`
+	Sys     opt.Uint `struct:"system,omitempty"`
+	Idle    opt.Uint `struct:"idle,omitempty"`
+	Nice    opt.Uint `struct:"nice,omitempty"`    // Linux, Darwin, BSD
+	Irq     opt.Uint `struct:"irq,omitempty"`     // Linux and openbsd
+	Wait    opt.Uint `struct:"iowait,omitempty"`  // Linux and AIX
+	SoftIrq opt.Uint `struct:"softirq,omitempty"` // Linux only
+	Stolen  opt.Uint `struct:"steal,omitempty"`   // Linux only
 }
 
 // MetricOpts defines the fields that are passed along to the formatted output
@@ -58,7 +59,7 @@ type CPUMetrics struct {
 func (cpu CPU) Total() uint64 {
 	// it's generally safe to blindly sum these up,
 	// As we're just trying to get a total of all CPU time.
-	return metrics.SumOptUint(cpu.User, cpu.Nice, cpu.Sys, cpu.Idle, cpu.Wait, cpu.Irq, cpu.SoftIrq, cpu.Stolen)
+	return opt.SumOptUint(cpu.User, cpu.Nice, cpu.Sys, cpu.Idle, cpu.Wait, cpu.Irq, cpu.SoftIrq, cpu.Stolen)
 }
 
 /*
@@ -69,12 +70,12 @@ calculate CPU percentages, as we average usage across a time period.
 // Monitor is used to monitor the overall CPU usage of the system over time.
 type Monitor struct {
 	lastSample CPUMetrics
-	Hostfs     string
+	Hostfs     resolve.Resolver
 }
 
 // New returns a new CPU metrics monitor
 // Hostfs is only relevant on linux and freebsd.
-func New(hostfs string) *Monitor {
+func New(hostfs resolve.Resolver) *Monitor {
 	return &Monitor{Hostfs: hostfs}
 }
 
@@ -140,7 +141,7 @@ func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 
 	formattedMetrics := common.MapStr{}
 
-	reportOptMetric := func(name string, current, previous metrics.OptUint, norm int) {
+	reportOptMetric := func(name string, current, previous opt.Uint, norm int) {
 		if !current.IsZero() {
 			formattedMetrics[name] = fillMetric(opts, current, previous, timeDelta, norm)
 		}
@@ -175,7 +176,7 @@ func createTotal(prev, cur CPU, timeDelta uint64, numCPU int) float64 {
 	return common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
 }
 
-func fillMetric(opts MetricOpts, cur, prev metrics.OptUint, timeDelta uint64, numCPU int) common.MapStr {
+func fillMetric(opts MetricOpts, cur, prev opt.Uint, timeDelta uint64, numCPU int) common.MapStr {
 	event := common.MapStr{}
 	if opts.Ticks {
 		event.Put("ticks", cur.ValueOr(0))
@@ -196,7 +197,7 @@ func (m *Metrics) CPUCount() int {
 }
 
 // cpuMetricTimeDelta is a helper used by fillTicks to calculate the delta between two CPU tick values
-func cpuMetricTimeDelta(prev, current metrics.OptUint, timeDelta uint64, numCPU int) float64 {
+func cpuMetricTimeDelta(prev, current opt.Uint, timeDelta uint64, numCPU int) float64 {
 	cpuDelta := int64(current.ValueOr(0) - prev.ValueOr(0))
 	pct := float64(cpuDelta) / float64(timeDelta)
 	return common.Round(pct*float64(numCPU), common.DefaultDecimalPlacesCount)

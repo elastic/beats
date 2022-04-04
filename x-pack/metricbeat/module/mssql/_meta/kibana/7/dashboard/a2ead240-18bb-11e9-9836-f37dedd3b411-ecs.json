@@ -1,0 +1,152 @@
+{
+    "attributes": {
+        "description": "A dashboard with key metrics about a MSSQL instance performance",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "title": "User Connections",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 32,
+                    "x": 16,
+                    "y": 15
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_1",
+                "title": "Transactions",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_2",
+                "title": "Lock Waits/sec",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_3",
+                "title": "Batch Requests/sec",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 16,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_4",
+                "title": "Buffer Cache Hit Ratio",
+                "version": "7.0.0-alpha2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat MSSQL] Performance ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a2ead240-18bb-11e9-9836-f37dedd3b411-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "7784db10-18ba-11e9-9836-f37dedd3b411-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "910f3f30-18ba-11e9-9836-f37dedd3b411-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "b29a2160-18ba-11e9-9836-f37dedd3b411-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "2e795230-1b2a-11e9-8b36-136038bb307a-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:41.416Z",
+    "version": "WzQwNTgsMV0="
+}

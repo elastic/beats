@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: awsfargate
+
 [[metricbeat-module-awsfargate]]
 [role="xpack"]
 == AWS Fargate module

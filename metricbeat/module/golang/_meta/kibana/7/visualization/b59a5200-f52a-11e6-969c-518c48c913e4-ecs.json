@@ -1,0 +1,35 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Objects [Metricbeat Golang] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "expression": ".es(index=\"metricbeat*\",metric=\"max:golang.heap.allocations.objects\").label(\"Object Count(avg)\").yaxis(1,label=\"Count\").movingaverage(30),.es(index=\"metricbeat*\",metric=\"max:golang.heap.allocations.total\").derivative().label(\"Allocation Rate\").yaxis(2,label=\"Rate\").movingaverage(30)",
+                "interval": "10s"
+            },
+            "title": "Objects [Metricbeat Golang] ECS",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b59a5200-f52a-11e6-969c-518c48c913e4-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:15.764Z",
+    "version": "WzM4MjUsMV0="
+}

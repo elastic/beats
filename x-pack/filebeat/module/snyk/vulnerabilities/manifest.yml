@@ -16,6 +16,7 @@ var:
   - name: orgs
   - name: included_severity
     default:
+      - critical
       - high
       - medium
       - low
@@ -29,6 +30,7 @@ var:
     default:
       - vuln
       - license
+      - configuration
   - name: languages
     default:
       - javascript
@@ -39,8 +41,13 @@ var:
       - golang
       - php
       - dotnet
-      - swift
+      - swift-objective-c
+      - elixir
       - docker
+      - terraform
+      - kubernetes
+      - helm
+      - cloudformation
   - name: identifier
     default: ""
   - name: ignored

@@ -127,14 +127,19 @@ visualizing your data. To load these assets:
 include::{libbeat-dir}/tab-widgets/setup.asciidoc[tag=win]
 --
 
-This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}
-and deploys the sample dashboards for visualizing the data in {kib}.
+This step loads the recommended {ref}/index-templates.html[index
+template] for writing to {es} , loads the ingest pipelines to parse
+the events (x-pack only), and deploys the sample dashboards for
+visualizing the data in {kib}.
 
 [TIP]
 =====
 A connection to {es} (or {ess}) is required to set up the initial
-environment. If you're using a different output, such as {ls}, see
-<<load-template-manually>> and <<load-kibana-dashboards>>.
+environment. If you're using a different output, such as {ls}, see:
+
+* <<load-template-manually>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>> (x-pack only)
 =====
 
 [float]
@@ -192,6 +197,3 @@ Now that you have your logs streaming into {es}, learn how to unify your logs,
 metrics, uptime, and application performance data.
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[]
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]

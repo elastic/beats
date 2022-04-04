@@ -1,0 +1,220 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "CPU/RAM/Network per VM [Metricbeat VSphere] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Name",
+                        "field": "vsphere.virtualmachine.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 50
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "customLabel": "Used CPU",
+                        "field": "vsphere.virtualmachine.cpu.used.mhz",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderAgg": {
+                            "enabled": true,
+                            "id": "5-orderAgg",
+                            "params": {
+                                "field": "vsphere.virtualmachine.cpu.used.mhz"
+                            },
+                            "schema": "orderAgg",
+                            "type": "max"
+                        },
+                        "orderBy": "custom",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Total RAM",
+                        "field": "vsphere.virtualmachine.memory.total.guest.bytes",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderAgg": {
+                            "enabled": true,
+                            "id": "3-orderAgg",
+                            "params": {
+                                "field": "vsphere.virtualmachine.memory.total.guest.bytes"
+                            },
+                            "schema": "orderAgg",
+                            "type": "max"
+                        },
+                        "orderBy": "custom",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 15
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Networks",
+                        "field": "vsphere.virtualmachine.network_names",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "number",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "bytes",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 3,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        }
+                    ],
+                    "metrics": [
+                        {
+                            "accessor": 4,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "perPage": 10,
+                "percentageCol": "",
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "CPU/RAM/Network per VM [Metricbeat VSphere] ECS",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dae93d90-f041-11e9-aaf3-15199b632da7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "1411b690-f017-11e9-aaf3-15199b632da7",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:59.928Z",
+    "version": "WzQyMTksMV0="
+}

@@ -2,19 +2,21 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package afpacket
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net"
 	"os"
 	"time"
 
 	"github.com/dustin/go-humanize"
 	"github.com/miekg/dns"
-	"github.com/pkg/errors"
 	"golang.org/x/net/bpf"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -58,7 +60,7 @@ func init() {
 func newAFPacketSniffer(base mb.BaseMetricSet, log *logp.Logger) (parent.Sniffer, error) {
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack af_packet config")
+		return nil, fmt.Errorf("failed to unpack af_packet config: %w", err)
 	}
 
 	frameSize, blockSize, numBlocks, err := afpacketComputeSize(8*humanize.MiByte, config.Snaplen, os.Getpagesize())
@@ -82,12 +84,12 @@ func newAFPacketSniffer(base mb.BaseMetricSet, log *logp.Logger) (parent.Sniffer
 
 	tPacket, err := afpacket.NewTPacket(opts...)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed creating af_packet sniffer")
+		return nil, fmt.Errorf("failed creating af_packet sniffer: %w", err)
 	}
 
 	if err = tPacket.SetBPF(udpSrcPort53Filter); err != nil {
 		tPacket.Close()
-		return nil, errors.Wrapf(err, "failed setting BPF filter")
+		return nil, fmt.Errorf("failed setting BPF filter: %w", err)
 	}
 
 	c := &dnsCapture{
@@ -225,8 +227,8 @@ func (c *dnsCapture) run(ctx context.Context, consumer parent.Consumer) {
 // The restriction is that the block_size must be divisible by both the
 // frame size and page size.
 func afpacketComputeSize(targetSize int, snaplen int, pageSize int) (
-	frameSize int, blockSize int, numBlocks int, err error) {
-
+	frameSize int, blockSize int, numBlocks int, err error,
+) {
 	if snaplen < pageSize {
 		frameSize = pageSize / (pageSize / snaplen)
 	} else {

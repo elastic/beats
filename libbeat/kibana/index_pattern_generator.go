@@ -80,15 +80,10 @@ func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
 
 func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapStr {
 	out := common.MapStr{
-		"version": i.beatVersion,
-		"objects": []common.MapStr{
-			common.MapStr{
-				"type":       "index-pattern",
-				"id":         i.indexName,
-				"version":    "1",
-				"attributes": attrs,
-			},
-		},
+		"type":       "index-pattern",
+		"id":         i.indexName,
+		"version":    i.beatVersion,
+		"attributes": attrs,
 	}
 
 	return out

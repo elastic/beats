@@ -1,0 +1,194 @@
+{
+    "attributes": {
+        "description": "Overview of AWS S3 Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "S3 Daily Storage Bucket Size in Bytes",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 6
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "S3 Daily Storage Number of Objects",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 13
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "S3 Request Latency Total Request in ms",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "4",
+                    "w": 13,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "S3 Total Error 4xx",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "5",
+                    "w": 11,
+                    "x": 37,
+                    "y": 0
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "S3 Total Error 5xx",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "S3 Filters",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 13
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "S3 Total Requests",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 0
+        },
+        "timeFrom": "now-1d",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Metricbeat AWS] S3 Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a096b830-4762-11e9-8062-c98a86cb6f94",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "2dbb8f90-4760-11e9-8062-c98a86cb6f94",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "3a3914d0-4761-11e9-8062-c98a86cb6f94",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "2b2d58b0-4762-11e9-8062-c98a86cb6f94",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "81d83c70-4762-11e9-8062-c98a86cb6f94",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "8b34a100-4762-11e9-8062-c98a86cb6f94",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "6e3285d0-4763-11e9-8062-c98a86cb6f94",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "d186fd50-4763-11e9-8062-c98a86cb6f94",
+            "name": "7:panel_7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:35.750Z",
+    "version": "WzM0MjMsMV0="
+}

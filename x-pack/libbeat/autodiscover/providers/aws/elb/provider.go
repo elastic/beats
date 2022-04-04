@@ -54,7 +54,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+	awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 		AccessKeyID:     config.AWSConfig.AccessKeyID,
 		SecretAccessKey: config.AWSConfig.SecretAccessKey,
 		SessionToken:    config.AWSConfig.SessionToken,
@@ -63,8 +63,9 @@ func AutodiscoverBuilder(
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
+		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsCfg.Region)
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
+			config.AWSConfig.Endpoint, ec2ServiceName, awsCfg.Region, awsCfg))
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
@@ -76,7 +77,7 @@ func AutodiscoverBuilder(
 
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
-		awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
 			SessionToken:    config.AWSConfig.SessionToken,
@@ -86,8 +87,9 @@ func AutodiscoverBuilder(
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 		}
 		awsCfg.Region = region
+		elbServiceName := awscommon.CreateServiceName("elasticloadbalancing", config.AWSConfig.FIPSEnabled, region)
 		clients = append(clients, elasticloadbalancingv2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, "elasticloadbalancing", region, awsCfg)))
+			config.AWSConfig.Endpoint, elbServiceName, region, awsCfg)))
 	}
 
 	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)

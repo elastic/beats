@@ -1,0 +1,124 @@
+{
+    "attributes": {
+        "description": "HAProxy overview",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "2",
+                    "w": 16,
+                    "x": 32,
+                    "y": 8
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Servers",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "3",
+                    "w": 16,
+                    "x": 16,
+                    "y": 8
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Backends",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "4",
+                    "w": 16,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Frontends",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat HAProxy] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4b555c30-47dd-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "79350d50-47db-11e8-bc13-1397384faad3-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "8c8f0300-47dc-11e8-bc13-1397384faad3-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "f1e27ed0-47dc-11e8-bc13-1397384faad3-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:21.953Z",
+    "version": "WzM4MzUsMV0="
+}

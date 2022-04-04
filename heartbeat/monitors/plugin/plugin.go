@@ -25,23 +25,65 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/plugin"
 )
 
+// PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
 type PluginFactory struct {
 	Name    string
 	Aliases []string
-	Builder PluginFactoryCreate
+	Make    PluginMake
 	Stats   RegistryRecorder
 }
 
-type PluginFactoryCreate func(string, *common.Config) (p Plugin, err error)
+type PluginMake func(string, *common.Config) (p Plugin, err error)
 
+// Plugin describes a configured instance of a plug-in with its jobs already instantiated.
 type Plugin struct {
 	Jobs      []jobs.Job
-	Close     func() error
+	DoClose   func() error
 	Endpoints int
+}
+
+// Close closes the plugin, invoking any DoClose hooks if avialable.
+func (p Plugin) Close() error {
+	if p.DoClose != nil {
+		return p.DoClose()
+	}
+	return nil
+}
+
+// RunWrapped runs the plug-in with the provided wrappers returning a channel of resultant events.
+func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
+	wj := wrappers.WrapCommon(p.Jobs, fields)
+	results := make(chan *beat.Event)
+
+	var runJob func(j jobs.Job)
+	runJob = func(j jobs.Job) {
+		e := &beat.Event{}
+		conts, err := j(e)
+		// No error handling since WrapCommon handles all errors
+		if err != nil {
+			panic(fmt.Sprintf("unexpected error on wrapped job!: %s", err))
+		}
+		results <- e
+		for _, c := range conts {
+			runJob(c)
+		}
+	}
+
+	go func() {
+		for _, j := range wj {
+			runJob(j)
+		}
+		close(results)
+	}()
+
+	return results
 }
 
 var pluginKey = "heartbeat.monitor"
@@ -70,7 +112,7 @@ func init() {
 		}
 
 		stats := statsForPlugin(p.Name)
-		return GlobalPluginsReg.Register(PluginFactory{p.Name, p.Aliases, p.Builder, stats})
+		return GlobalPluginsReg.Register(PluginFactory{p.Name, p.Aliases, p.Make, stats})
 	})
 }
 
@@ -98,9 +140,9 @@ func NewPluginsReg() *PluginsReg {
 }
 
 // Register registers a new active (as opposed to passive) monitor.
-func Register(name string, builder PluginFactoryCreate, aliases ...string) {
+func Register(name string, make PluginMake, aliases ...string) {
 	stats := statsForPlugin(name)
-	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, builder, stats}); err != nil {
+	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, make, stats}); err != nil {
 		panic(err)
 	}
 }
@@ -161,5 +203,5 @@ func (r *PluginsReg) MonitorNames() []string {
 }
 
 func (e *PluginFactory) Create(cfg *common.Config) (p Plugin, err error) {
-	return e.Builder(e.Name, cfg)
+	return e.Make(e.Name, cfg)
 }

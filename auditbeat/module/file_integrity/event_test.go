@@ -47,7 +47,7 @@ func testEvent() *Event {
 			Inode:  123,
 			UID:    500,
 			GID:    500,
-			Mode:   0600,
+			Mode:   0o600,
 			CTime:  testEventTime,
 			MTime:  testEventTime,
 			SetGID: true,
@@ -94,7 +94,7 @@ func TestDiffEvents(t *testing.T) {
 
 	t.Run("updated metadata", func(t *testing.T) {
 		e := testEvent()
-		e.Info.Mode = 0644
+		e.Info.Mode = 0o644
 
 		action, changed := diffEvents(testEvent(), e)
 		assert.True(t, changed)
@@ -411,9 +411,6 @@ func TestBuildEvent(t *testing.T) {
 
 		assertHasKey(t, fields, "file.hash.sha1")
 		assertHasKey(t, fields, "file.hash.sha256")
-		// Remove in 8.x
-		assertHasKey(t, fields, "hash.sha1")
-		assertHasKey(t, fields, "hash.sha256")
 	})
 	if runtime.GOOS == "windows" {
 		t.Run("drive letter", func(t *testing.T) {

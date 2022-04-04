@@ -1,30 +1,17 @@
 [id="change-index-name"]
 == Change the index name
 
-ifndef::no_ilm[]
-TIP: If you're sending events to a cluster that supports index lifecycle
-management, see <<ilm>> to learn how to change the index name.
-endif::no_ilm[]
-
-{beatname_uc} uses time series indices, by default, when index lifecycle
-management is disabled or unsupported. The indices are named
-+{beatname_lc}-{version}-yyyy.MM.dd+, where `yyyy.MM.dd` is the date when the
-events were indexed. To use a different name, set the
-<<index-option-es,`index`>> option in the {es} output. The value that
-you specify should include the root name of the index plus version and date
-information. You also need to configure the `setup.template.name` and
+{beatname_uc} uses data streams named +{beatname_lc}-{version}+.
+To use a different name, set the <<index-option-es,`index`>> option
+in the {es} output. You also need to configure the `setup.template.name` and
 `setup.template.pattern` options to match the new name. For example:
 
 ["source","sh",subs="attributes,callouts"]
 -----
-output.elasticsearch.index: "customname-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
+output.elasticsearch.index: "customname-%{[{beat_version_key}]}"
 setup.template.name: "customname"
-setup.template.pattern: "customname-*"
+setup.template.pattern: "customname-%{[{beat_version_key}]}"
 -----
-
-ifndef::no_ilm[]
-WARNING: If <<ilm,index lifecycle management>> is enabled (which is typically the default), `setup.template.name` and `setup.template.pattern` are ignored.
-endif::no_ilm[]
 
 ifndef::no_dashboards[]
 If you're using pre-built Kibana dashboards, also set the

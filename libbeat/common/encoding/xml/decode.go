@@ -80,7 +80,7 @@ func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]interface{}, erro
 			// Add the data to the current object while taking into account
 			// if the current key already exists (in the case of lists).
 			key := d.key(elem.Name.Local)
-			value := elements[elem.Name.Local]
+			value := elements[key]
 			switch v := value.(type) {
 			case nil:
 				elements[key] = add

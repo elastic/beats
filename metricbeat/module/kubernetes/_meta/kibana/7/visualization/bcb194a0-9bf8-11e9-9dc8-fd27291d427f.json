@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Host selector [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "host.hostname",
+                        "id": "1561982488150",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Hostname",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "service.address",
+                        "id": "1561982723711",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Service address",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": false,
+                "useTimeFilter": false
+            },
+            "title": "Host selector [Metricbeat Kubernetes]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "bcb194a0-9bf8-11e9-9dc8-fd27291d427f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:39.447Z",
+    "version": "WzQwMzYsMV0="
+}

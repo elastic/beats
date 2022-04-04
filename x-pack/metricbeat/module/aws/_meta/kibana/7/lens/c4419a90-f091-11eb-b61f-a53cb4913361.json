@@ -1,0 +1,147 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "dd0a4706-5286-4976-9bc4-f5e7a4964bf6": {
+                            "columnOrder": [
+                                "a2bb9c7a-0ddc-4bf7-ae24-98a535a916cc",
+                                "103900c0-dcfa-416f-a272-6efa09c84fce",
+                                "18e6079e-e955-41d0-8196-d2b932cf1fa6",
+                                "18e6079e-e955-41d0-8196-d2b932cf1fa6X0"
+                            ],
+                            "columns": {
+                                "103900c0-dcfa-416f-a272-6efa09c84fce": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "18e6079e-e955-41d0-8196-d2b932cf1fa6": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": " average(aws.rds.cpu.total.pct)",
+                                    "operationType": "formula",
+                                    "params": {
+                                        "formula": "average(aws.rds.cpu.total.pct)",
+                                        "isFormulaBroken": false
+                                    },
+                                    "references": [
+                                        "18e6079e-e955-41d0-8196-d2b932cf1fa6X0"
+                                    ],
+                                    "scale": "ratio"
+                                },
+                                "18e6079e-e955-41d0-8196-d2b932cf1fa6X0": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Part of  ",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.cpu.total.pct"
+                                },
+                                "a2bb9c7a-0ddc-4bf7-ae24-98a535a916cc": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "18e6079e-e955-41d0-8196-d2b932cf1fa6"
+                        ],
+                        "layerId": "dd0a4706-5286-4976-9bc4-f5e7a4964bf6",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "a2bb9c7a-0ddc-4bf7-ae24-98a535a916cc",
+                        "xAccessor": "103900c0-dcfa-416f-a272-6efa09c84fce"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                }
+            }
+        },
+        "title": "RDS CPU Total Pct [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "c4419a90-f091-11eb-b61f-a53cb4913361",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-dd0a4706-5286-4976-9bc4-f5e7a4964bf6",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MTcsMl0="
+}

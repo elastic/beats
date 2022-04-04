@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Total Threads [Metricbeat Tomcat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hide_in_legend": 0,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Total",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.threading.total",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "tomcat.threading.mbean"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "2e15eea0-ec32-11e9-a38d-abb22848ef7c",
+                        "label": "Peak",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.threading.peak",
+                                "id": "2e15eea1-ec32-11e9-a38d-abb22848ef7c",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Total Threads [Metricbeat Tomcat]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "17ec8fd0-ec32-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:22.513Z",
+    "version": "WzMyODgsMV0="
+}

@@ -19,13 +19,14 @@ package cpu
 
 import (
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/v3/cpu"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Get is the Darwin implementation of Get
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 	// We're using the gopsutil library here.
 	// The code used by both gosigar and go-sysinfo appears to be
 	// the same code as gopsutil, including copy-pasted comments.
@@ -48,10 +49,10 @@ func Get(_ string) (CPUMetrics, error) {
 
 func fillCPU(raw cpu.TimesStat) CPU {
 	totalCPU := CPU{
-		Sys:  metrics.OptUintWith(uint64(raw.System)),
-		User: metrics.OptUintWith(uint64(raw.User)),
-		Idle: metrics.OptUintWith(uint64(raw.Idle)),
-		Nice: metrics.OptUintWith(uint64(raw.Nice)),
+		Sys:  opt.UintWith(uint64(raw.System)),
+		User: opt.UintWith(uint64(raw.User)),
+		Idle: opt.UintWith(uint64(raw.Idle)),
+		Nice: opt.UintWith(uint64(raw.Nice)),
 	}
 	return totalCPU
 }

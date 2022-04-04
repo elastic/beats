@@ -1,0 +1,10 @@
+10:net_prio:/docker/123
+9:perf_event:/docker/123
+8:net_cls:/docker/123
+7:freezer:/docker/123
+6:devices:/docker/123
+5:memory:/docker/123
+4:blkio:/docker/123
+3:cpuacct:/docker/123
+2:cpu:/docker/123
+1:cpuset:/docker/123

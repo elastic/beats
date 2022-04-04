@@ -42,6 +42,8 @@ class TestVsphere(metricbeat.BaseTest):
 
         self.assertCountEqual(self.de_dot(VSPHERE_FIELDS), evt.keys(), evt)
 
+        self.assertEqual(evt["service"]["address"], self.get_hosts()[0])
+
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -71,6 +73,8 @@ class TestVsphere(metricbeat.BaseTest):
 
         self.assertCountEqual(self.de_dot(VSPHERE_FIELDS), evt.keys(), evt)
 
+        self.assertEqual(evt["service"]["address"], self.get_hosts()[0])
+
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -99,5 +103,7 @@ class TestVsphere(metricbeat.BaseTest):
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(VSPHERE_FIELDS), evt.keys(), evt)
+
+        self.assertEqual(evt["service"]["address"], self.get_hosts()[0])
 
         self.assert_fields_are_documented(evt)

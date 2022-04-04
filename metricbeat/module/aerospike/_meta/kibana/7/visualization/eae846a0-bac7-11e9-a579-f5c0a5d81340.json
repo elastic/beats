@@ -1,0 +1,180 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Client Read Rates [Metricbeat Aerospike] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "98667320-bac7-11e9-9324-49d4f7fb9626",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "98667321-bac7-11e9-9324-49d4f7fb9626",
+                        "label": "success",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.read.success",
+                                "id": "98667322-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "max"
+                            },
+                            {
+                                "field": "98667322-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "98667324-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "98667324-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "98667323-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#DB1374",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "98667325-bac7-11e9-9324-49d4f7fb9626",
+                        "label": "error",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.read.error",
+                                "id": "98667326-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "max"
+                            },
+                            {
+                                "field": "98667326-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "98667328-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "98667328-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "98667327-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#00B3A4",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "98667329-bac7-11e9-9324-49d4f7fb9626",
+                        "label": "not_found",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.read.not_found",
+                                "id": "9866732a-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "max"
+                            },
+                            {
+                                "field": "9866732a-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "9866732c-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "9866732c-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "9866732b-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#490092",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "9866732d-bac7-11e9-9324-49d4f7fb9626",
+                        "label": "timeout",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.read.timeout",
+                                "id": "9866732e-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "max"
+                            },
+                            {
+                                "field": "9866732e-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "98667330-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "98667330-bac7-11e9-9324-49d4f7fb9626",
+                                "id": "9866732f-bac7-11e9-9324-49d4f7fb9626",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Client Read Rates [Metricbeat Aerospike] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "eae846a0-bac7-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:23.479Z",
+    "version": "WzMzMDMsMV0="
+}

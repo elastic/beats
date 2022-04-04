@@ -62,6 +62,20 @@ func (s *Suite) Params() map[string]interface{} {
 	return s.suiteCfg.Params
 }
 
+func (s *Suite) FilterJourneys() synthexec.FilterJourneyConfig {
+	return s.suiteCfg.FilterJourneys
+}
+
+func (s *Suite) Fields() synthexec.StdSuiteFields {
+	_, isInline := s.InlineSource()
+	return synthexec.StdSuiteFields{
+		Name:     s.suiteCfg.Name,
+		Id:       s.suiteCfg.Id,
+		IsInline: isInline,
+		Type:     "browser",
+	}
+}
+
 func (s *Suite) Close() error {
 	if s.suiteCfg.Source.ActiveMemo != nil {
 		s.suiteCfg.Source.ActiveMemo.Close()
@@ -72,11 +86,24 @@ func (s *Suite) Close() error {
 
 func (s *Suite) extraArgs() []string {
 	extraArgs := s.suiteCfg.SyntheticsArgs
+	if s.suiteCfg.IgnoreHTTPSErrors {
+		extraArgs = append(extraArgs, "--ignore-https-errors")
+	}
 	if s.suiteCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
 	if s.suiteCfg.Screenshots != "" {
 		extraArgs = append(extraArgs, "--screenshots", s.suiteCfg.Screenshots)
+	}
+	if s.suiteCfg.Throttling != nil {
+		switch t := s.suiteCfg.Throttling.(type) {
+		case bool:
+			if !t {
+				extraArgs = append(extraArgs, "--no-throttling")
+			}
+		case string:
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", s.suiteCfg.Throttling))
+		}
 	}
 
 	return extraArgs
@@ -85,14 +112,14 @@ func (s *Suite) extraArgs() []string {
 func (s *Suite) jobs() []jobs.Job {
 	var j jobs.Job
 	if src, ok := s.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.extraArgs()...)
+		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.Fields(), s.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := s.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.extraArgs()...)
+			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
@@ -105,7 +132,7 @@ func (s *Suite) jobs() []jobs.Job {
 func (s *Suite) plugin() plugin.Plugin {
 	return plugin.Plugin{
 		Jobs:      s.jobs(),
-		Close:     s.Close,
+		DoClose:   s.Close,
 		Endpoints: 1,
 	}
 }

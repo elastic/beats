@@ -7,6 +7,8 @@
 
 beta[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for Office 365 logs received via one of the Office 365 API
 endpoints. It currently supports user, admin, system, and policy actions and
 events from Office 365 and Azure AD activity logs exposed by the Office 365

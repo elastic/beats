@@ -14,6 +14,8 @@
   metricsets:
     - pubsub
     - loadbalancing
+    - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -43,6 +45,14 @@
         - "instance/cpu/usage_time"
         - "instance/cpu/utilization"
         - "instance/uptime"
+
+- module: gcp
+  metricsets:
+    - gke
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
 
 - module: gcp
   metricsets:

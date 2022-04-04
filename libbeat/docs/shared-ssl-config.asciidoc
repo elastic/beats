@@ -32,9 +32,9 @@ Example output config with SSL enabled:
 [source,yaml]
 ----
 output.elasticsearch.hosts: ["https://192.168.1.42:9200"]
-output.elasticsearch.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
-output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
+output.elasticsearch.ssl.certificate_authorities: ["/etc/client/ca.pem"]
+output.elasticsearch.ssl.certificate: "/etc/client/cert.pem"
+output.elasticsearch.ssl.key: "/etc/client/cert.key"
 ----
 
 ifndef::no-output-logstash[]
@@ -48,9 +48,9 @@ Example Kibana endpoint config with SSL enabled:
 ----
 setup.kibana.host: "https://192.0.2.255:5601"
 setup.kibana.ssl.enabled: true
-setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
-setup.kibana.ssl.key: "/etc/pki/client/cert.key"
+setup.kibana.ssl.certificate_authorities: ["/etc/client/ca.pem"]
+setup.kibana.ssl.certificate: "/etc/client/cert.pem"
+setup.kibana.ssl.key: "/etc/client/cert.key"
 ----
 endif::no_kibana[]
 
@@ -120,7 +120,7 @@ SSL settings are disabled if either `enabled` is set to `false` or the
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
+`TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
 `TLSv1.3`.
 
 The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
@@ -131,8 +131,9 @@ The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
 
 The list of cipher suites to use. The first entry has the highest priority.
 If this option is omitted, the Go crypto library's https://golang.org/pkg/crypto/tls/[default suites]
-are used (recommended). Note that TLS 1.3 cipher suites are not
-individually configurable in Go, so they are not included in this list.
+are used (recommended).
+
+Note that if TLS 1.3 is enabled (which is true by default), then the default TLS 1.3 cipher suites are always included, because Go's standard library adds them to all connections. In order to exclude the default TLS 1.3 ciphers, TLS 1.3 must also be disabled, e.g. with the setting `ssl.supported_protocols = [TLSv1.2]`.
 
 // tag::cipher_suites[]
 The following cipher suites are available:
@@ -264,7 +265,7 @@ certificate_authorities:
 
 [float]
 [[client-certificate]]
-==== `certificate: "/etc/pki/client/cert.pem"`
+==== `certificate: "/etc/client/cert.pem"`
 
 The path to the certificate for SSL client authentication is only required if
 `client_authentication` is specified. If the certificate
@@ -302,7 +303,7 @@ certificate: |
 
 [float]
 [[client-key]]
-==== `key: "/etc/pki/client/cert.key"`
+==== `key: "/etc/client/cert.key"`
 
 The client certificate key used for client authentication and is only required
 if `client_authentication` is configured. The key option support embedding of the private key:
@@ -377,6 +378,15 @@ production environments is strongly discouraged.
 +
 The default value is `full`.
 
+[float]
+[[ca_trusted_fingerprint]]
+==== `ca_trusted_fingerprint`
+A HEX encoded SHA-256 of a CA certificate. If this certificate is
+present in the chain during the handshake, it will be added to the
+`certificate_authorities` list and the handshake will continue
+normaly.
+
+
 [discrete]
 [[ssl-server-config]]
 === Server configuration options
@@ -423,7 +433,7 @@ certificate_authorities:
 
 [float]
 [[server-certificate]]
-==== `certificate: "/etc/pki/server/cert.pem"`
+==== `certificate: "/etc/server/cert.pem"`
 
 For server authentication, the path to the SSL authentication certificate must
 be specified for TLS. If the certificate is not specified, startup will fail.
@@ -457,7 +467,7 @@ certificate: |
 
 [float]
 [[server-key]]
-==== `key: "/etc/pki/server/cert.key"`
+==== `key: "/etc/server/cert.key"`
 
 The server certificate key used for authentication is required.
 The key option support embedding of the private key:

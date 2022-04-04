@@ -1,2 +1,3 @@
+dashboards:
 - id: Filebeat-aws-cloudtrail-Dashboard
   file: Filebeat-aws-cloudtrail.json

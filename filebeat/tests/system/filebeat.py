@@ -3,7 +3,7 @@ import os
 import stat
 import sys
 
-from beat.beat import TestCase, TimeoutError, REGEXP_TYPE
+from beat.beat import TestCase, REGEXP_TYPE
 
 default_registry_path = 'registry/filebeat'
 
@@ -15,7 +15,8 @@ class BaseTest(TestCase):
         if not hasattr(self, "beat_name"):
             self.beat_name = "filebeat"
         if not hasattr(self, "beat_path"):
-            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+            self.beat_path = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "../../"))
 
         super(BaseTest, self).setUpClass()
 
@@ -36,7 +37,7 @@ class BaseTest(TestCase):
         return Registry(data_path, name)
 
     def log_access(self, file=None):
-        file = file if file else self.beat_name + ".log"
+        file = file if file else self.beat_name + "-" + self.today + ".ndjson"
         return LogState(os.path.join(self.working_dir, file))
 
     def has_registry(self, name=None, data_path=None):
@@ -75,6 +76,21 @@ class BaseTest(TestCase):
     def file_permissions(self, path):
         full_path = os.path.join(self.working_dir, path)
         return oct(stat.S_IMODE(os.lstat(full_path).st_mode))
+
+    def render_template(self, template_path,
+                        output, **kargs):
+        """
+        render_template fetches a given jinja2 template and writes the formatted template
+        """
+        template = self.template_env.get_template(template_path)
+
+        kargs["beat"] = self
+        output_str = template.render(**kargs)
+
+        output_path = os.path.join(self.working_dir, output)
+        with open(output_path, "wb") as beat_output:
+            os.chmod(output_path, 0o600)
+            beat_output.write(output_str.encode('utf_8'))
 
 
 class InputLogs:

@@ -1,0 +1,115 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Database Transactions [Metricbeat PostgreSQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "7af01590-b797-11e9-8816-2992f1df7a62",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "7af01591-b797-11e9-8816-2992f1df7a62",
+                        "label": "committed",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.transactions.commit",
+                                "id": "7af01592-b797-11e9-8816-2992f1df7a62",
+                                "type": "max"
+                            },
+                            {
+                                "field": "7af01592-b797-11e9-8816-2992f1df7a62",
+                                "id": "7af01594-b797-11e9-8816-2992f1df7a62",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "7af01594-b797-11e9-8816-2992f1df7a62",
+                                "id": "7af01593-b797-11e9-8816-2992f1df7a62",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(254,146,0,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "7af01595-b797-11e9-8816-2992f1df7a62",
+                        "label": "rolled back",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.transactions.rollback",
+                                "id": "7af01596-b797-11e9-8816-2992f1df7a62",
+                                "type": "max"
+                            },
+                            {
+                                "field": "7af01596-b797-11e9-8816-2992f1df7a62",
+                                "id": "7af01598-b797-11e9-8816-2992f1df7a62",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "7af01598-b797-11e9-8816-2992f1df7a62",
+                                "id": "7af01597-b797-11e9-8816-2992f1df7a62",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Database Transactions [Metricbeat PostgreSQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d733c630-b797-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDMsMV0="
+}

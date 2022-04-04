@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "Overview of services on an individual host.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "023b7623-9610-47ee-a10c-64ee8d2ccfa1",
+                    "w": 14,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "023b7623-9610-47ee-a10c-64ee8d2ccfa1",
+                "panelRefName": "panel_023b7623-9610-47ee-a10c-64ee8d2ccfa1",
+                "title": "Running Services",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "40ebab84-f48f-4060-a7af-3ffdf833ad3a",
+                    "w": 12,
+                    "x": 14,
+                    "y": 0
+                },
+                "panelIndex": "40ebab84-f48f-4060-a7af-3ffdf833ad3a",
+                "panelRefName": "panel_40ebab84-f48f-4060-a7af-3ffdf833ad3a",
+                "title": "Service States",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "0ad1caa8-2a3f-4429-9631-42d1c57a9e64",
+                    "w": 12,
+                    "x": 26,
+                    "y": 0
+                },
+                "panelIndex": "0ad1caa8-2a3f-4429-9631-42d1c57a9e64",
+                "panelRefName": "panel_0ad1caa8-2a3f-4429-9631-42d1c57a9e64",
+                "title": "Service Sub-State",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "9e37921b-da6f-464d-9683-5c9bd550640b",
+                    "w": 10,
+                    "x": 38,
+                    "y": 0
+                },
+                "panelIndex": "9e37921b-da6f-464d-9683-5c9bd550640b",
+                "panelRefName": "panel_9e37921b-da6f-464d-9683-5c9bd550640b",
+                "title": "Return Codes Of Exited Services",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "e3ec1fe3-a03a-466e-8bc2-69136e3e6302",
+                    "w": 24,
+                    "x": 0,
+                    "y": 11
+                },
+                "panelIndex": "e3ec1fe3-a03a-466e-8bc2-69136e3e6302",
+                "panelRefName": "panel_e3ec1fe3-a03a-466e-8bc2-69136e3e6302",
+                "title": "Top Services By Memory Usage",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "cc928f52-22c9-402d-a7a1-4f32720a4290",
+                    "w": 24,
+                    "x": 24,
+                    "y": 11
+                },
+                "panelIndex": "cc928f52-22c9-402d-a7a1-4f32720a4290",
+                "panelRefName": "panel_cc928f52-22c9-402d-a7a1-4f32720a4290",
+                "title": "Top Services By Task Count",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "c83f16cd-286f-411b-bae9-bade176a8db2",
+                    "w": 48,
+                    "x": 0,
+                    "y": 22
+                },
+                "panelIndex": "c83f16cd-286f-411b-bae9-bade176a8db2",
+                "panelRefName": "panel_c83f16cd-286f-411b-bae9-bade176a8db2",
+                "title": "Service Memory Use Over Time",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat System] Host Services Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c431f410-f9ac-11e9-90e8-1fb18e796788",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "a30871f0-f98f-11e9-90e8-1fb18e796788",
+            "name": "023b7623-9610-47ee-a10c-64ee8d2ccfa1:panel_023b7623-9610-47ee-a10c-64ee8d2ccfa1",
+            "type": "visualization"
+        },
+        {
+            "id": "bb3a8720-f991-11e9-90e8-1fb18e796788",
+            "name": "40ebab84-f48f-4060-a7af-3ffdf833ad3a:panel_40ebab84-f48f-4060-a7af-3ffdf833ad3a",
+            "type": "visualization"
+        },
+        {
+            "id": "e6e639e0-f992-11e9-90e8-1fb18e796788",
+            "name": "0ad1caa8-2a3f-4429-9631-42d1c57a9e64:panel_0ad1caa8-2a3f-4429-9631-42d1c57a9e64",
+            "type": "visualization"
+        },
+        {
+            "id": "9c69cad0-f9b0-11e9-90e8-1fb18e796788",
+            "name": "9e37921b-da6f-464d-9683-5c9bd550640b:panel_9e37921b-da6f-464d-9683-5c9bd550640b",
+            "type": "visualization"
+        },
+        {
+            "id": "8c071e20-f999-11e9-90e8-1fb18e796788",
+            "name": "e3ec1fe3-a03a-466e-8bc2-69136e3e6302:panel_e3ec1fe3-a03a-466e-8bc2-69136e3e6302",
+            "type": "visualization"
+        },
+        {
+            "id": "4b254630-f998-11e9-90e8-1fb18e796788",
+            "name": "cc928f52-22c9-402d-a7a1-4f32720a4290:panel_cc928f52-22c9-402d-a7a1-4f32720a4290",
+            "type": "visualization"
+        },
+        {
+            "id": "d3f51850-f9b6-11e9-90e8-1fb18e796788",
+            "name": "c83f16cd-286f-411b-bae9-bade176a8db2:panel_c83f16cd-286f-411b-bae9-bade176a8db2",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:18.402Z",
+    "version": "WzMyNTMsMV0="
+}

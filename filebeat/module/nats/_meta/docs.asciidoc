@@ -1,9 +1,11 @@
 :modulename: nats
 :has-dashboards: false
 
-== nats module
+== NATS module
 
-This is the nats module.
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is the NATS module.
 
 include::../include/what-happens.asciidoc[]
 
@@ -30,7 +32,7 @@ include::../include/var-paths.asciidoc[]
 [float]
 === Dashboard
 
-The Nats module comes with a predefined dashboard. For example:
+The +{modulename}+ module comes with a predefined dashboard. For example:
 
 image::./images/filebeat_nats_dashboard.png[]
 

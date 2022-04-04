@@ -1,0 +1,73 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Buckets RAM Used [Metricbeat Couchbase] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "1ad80860-b9dc-11e9-a74b-270ba78f4926",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": "0.1",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "bytes",
+                        "id": "1ad80861-b9dc-11e9-a74b-270ba78f4926",
+                        "label": " RAM used",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchbase.bucket.memory.used.bytes",
+                                "id": "1ad80862-b9dc-11e9-a74b-270ba78f4926",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "couchbase.bucket.name",
+                        "terms_order_by": "1ad80862-b9dc-11e9-a74b-270ba78f4926",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Buckets RAM Used [Metricbeat Couchbase] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e781add0-b9dc-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:05.507Z",
+    "version": "WzM3MzksMV0="
+}

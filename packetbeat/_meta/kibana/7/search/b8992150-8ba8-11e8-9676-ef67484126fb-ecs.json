@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "columns": [
+            "dhcpv4.transaction_id",
+            "dhcpv4.op_code",
+            "dhcpv4.option.message_type",
+            "source.ip",
+            "destination.ip",
+            "dhcpv4.client_mac",
+            "dhcpv4.option.hostname",
+            "dhcpv4.option.class_identifier"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.dataset\",\"negate\":false,\"params\":{\"query\":\"dhcpv4\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"dhcpv4\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"event.dataset\":{\"query\":\"dhcpv4\",\"type\":\"phrase\"}}}}],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "DHCPv4 [Packetbeat] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:28:36.983Z",
+    "version": "WzMxMjMsMV0="
+}

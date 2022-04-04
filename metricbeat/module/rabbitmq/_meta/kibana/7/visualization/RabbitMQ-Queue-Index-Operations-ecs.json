@@ -1,0 +1,163 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Queue Index Operations [Metricbeat RabbitMQ] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Queue Index Read",
+                        "field": "rabbitmq.node.queue.index.read.count"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "30s",
+                        "min_doc_count": 1
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Queue Index Jornal Write",
+                        "field": "rabbitmq.node.queue.index.journal_write.count"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Queue Index Write",
+                        "field": "rabbitmq.node.queue.index.write.count"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "defaultYExtents": false,
+                "detailedTooltip": true,
+                "drawLinesBetweenPoints": true,
+                "fittingFunction": "zero",
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "interpolate": "linear",
+                "isVislibVis": true,
+                "legendPosition": "top",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "radiusRatio": 9,
+                "scale": "linear",
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "normal",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "setYExtents": false,
+                "shareYAxis": true,
+                "showCircles": false,
+                "smoothLines": false,
+                "times": [],
+                "type": "line",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Count"
+                        },
+                        "type": "value"
+                    }
+                ],
+                "yAxis": {}
+            },
+            "title": "Queue Index Operations [Metricbeat RabbitMQ] ECS",
+            "type": "line"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "RabbitMQ-Queue-Index-Operations-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Metricbeat-Rabbitmq-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:47.567Z",
+    "version": "WzQxMjQsMV0="
+}

@@ -1,0 +1,84 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Socket Syscalls Time Series [Auditbeat Auditd] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "95b603d0-c252-11e7-8a68-93ffe9ec5950"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "2cebb0c0-c252-11e7-8a68-93ffe9ec5950"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "auditd.summary.object.type:socket"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "6c891740-c252-11e7-8a68-93ffe9ec5950"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "auditbeat-*",
+                "interval": "auto",
+                "legend_position": "left",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "syscall",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "auditd.data.syscall"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Socket Syscalls Time Series [Auditbeat Auditd] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b21e0c70-c252-11e7-8692-232bd1143e8a-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:35:59.895Z",
+    "version": "WzQ5NzgsMV0="
+}

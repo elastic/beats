@@ -1,0 +1,137 @@
+{
+    "attributes": {
+        "description": "Filebeat Kafka module dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "kafka.log.class",
+                        "kafka.log.trace.class",
+                        "kafka.log.trace.full"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "search",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "log.level",
+                        "kafka.log.component",
+                        "message"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "3",
+                    "w": 48,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "search",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Kafka] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "943caca0-87ee-11e7-ad9c-db80de0bf8d3-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "number-of-kafka-stracktraces-by-class-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "Kafka stacktraces-ecs",
+            "name": "2:panel_2",
+            "type": "search"
+        },
+        {
+            "id": "All Kafka logs-ecs",
+            "name": "3:panel_3",
+            "type": "search"
+        },
+        {
+            "id": "3f7c33c0-87ee-11e7-ad9c-db80de0bf8d3-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:46.165Z",
+    "version": "WzQyOTUsMV0="
+}

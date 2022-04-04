@@ -44,12 +44,12 @@ func (m *mockCloudformationStack) CreateStackRequest(
 	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.CreateStackRequest{
-			Request: &aws.Request{Data: m.respCreateStackOutput, Error: m.err, HTTPRequest: httpReq},
+			Request: &aws.Request{Data: m.respCreateStackOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 		}
 	}
 
 	return cloudformation.CreateStackRequest{
-		Request: &aws.Request{Data: m.respCreateStackOutput, HTTPRequest: httpReq},
+		Request: &aws.Request{Data: m.respCreateStackOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 	}
 }
 
@@ -63,12 +63,12 @@ func (m *mockCloudformationStack) DeleteStackRequest(
 	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.DeleteStackRequest{
-			Request: &aws.Request{Data: m.respDeleteStackOutput, Error: m.err, HTTPRequest: httpReq},
+			Request: &aws.Request{Data: m.respDeleteStackOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 		}
 	}
 
 	return cloudformation.DeleteStackRequest{
-		Request: &aws.Request{Data: m.respDeleteStackOutput, HTTPRequest: httpReq},
+		Request: &aws.Request{Data: m.respDeleteStackOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 	}
 }
 
@@ -82,12 +82,12 @@ func (m *mockCloudformationStack) DescribeStacksRequest(
 	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.DescribeStacksRequest{
-			Request: &aws.Request{Data: m.respDescribeStacksOutput, Error: m.err, HTTPRequest: httpReq},
+			Request: &aws.Request{Data: m.respDescribeStacksOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 		}
 	}
 
 	return cloudformation.DescribeStacksRequest{
-		Request: &aws.Request{Data: m.respDescribeStacksOutput, HTTPRequest: httpReq},
+		Request: &aws.Request{Data: m.respDescribeStacksOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 	}
 }
 
@@ -101,12 +101,12 @@ func (m *mockCloudformationStack) UpdateStackRequest(
 	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.UpdateStackRequest{
-			Request: &aws.Request{Data: m.respUpdateStackOutput, Error: m.err, HTTPRequest: httpReq},
+			Request: &aws.Request{Data: m.respUpdateStackOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 		}
 	}
 
 	return cloudformation.UpdateStackRequest{
-		Request: &aws.Request{Data: m.respUpdateStackOutput, HTTPRequest: httpReq},
+		Request: &aws.Request{Data: m.respUpdateStackOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 	}
 }
 

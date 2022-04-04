@@ -33,7 +33,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -103,7 +103,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 		}
 
 		if pod.StartTime != "" {
-			podEvent.Put("start_time", pod.StartTime)
+			_, _ = podEvent.Put("start_time", pod.StartTime)
 		}
 
 		if coresLimit > nodeCores {
@@ -115,32 +115,54 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 		}
 
 		if nodeCores > 0 {
-			podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
+			_, _ = podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
 		}
 
 		if coresLimit > 0 {
-			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
+			_, _ = podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
-				podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
+				_, _ = podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
 			}
 			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
+				_, _ = podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
+				_, _ = podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
+
 			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
 			if nodeMem > 0 {
-				podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
+				_, _ = podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
 			}
 			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
+				_, _ = podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
+				_, _ = podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
 			}
 		}
 
 		events = append(events, podEvent)
 	}
 	return events, nil
+}
+
+// ecsfields maps pod events fields to container ecs fields
+func ecsfields(podEvent common.MapStr) common.MapStr {
+	ecsfields := common.MapStr{}
+
+	egressBytes, err := podEvent.GetValue("network.tx.bytes")
+	if err == nil {
+		_, _ = ecsfields.Put("network.egress.bytes", egressBytes)
+
+	}
+
+	ingressBytes, err := podEvent.GetValue("network.rx.bytes")
+	if err == nil {
+		_, _ = ecsfields.Put("network.ingress.bytes", ingressBytes)
+
+	}
+
+	return ecsfields
 }

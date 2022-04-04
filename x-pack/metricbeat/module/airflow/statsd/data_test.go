@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"net"
 	"runtime"
+	"sync"
 	"testing"
-	"time"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
 
 	"github.com/stretchr/testify/require"
 
@@ -36,6 +38,7 @@ func getConfig() map[string]interface{} {
 		"host":       STATSD_HOST,
 		"port":       STATSD_PORT,
 		"period":     "100ms",
+		"ttl":        "1ms",
 	}
 }
 
@@ -57,12 +60,22 @@ func TestData(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
 	var events []mb.Event
+	var reporter mb.PushReporterV2
 	done := make(chan interface{})
-	go func() {
-		events = mbtest.RunPushMetricSetV2(5*time.Second, 1, ms)
-		close(done)
-	}()
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	go func(wg *sync.WaitGroup) {
+		reporter = mbtest.GetCapturingPushReporterV2()
+		ms.(*server.MetricSet).ServerStart()
+		wg.Done()
 
+		go ms.Run(reporter)
+		events = reporter.(*mbtest.CapturingPushReporterV2).BlockingCapture(1)
+
+		close(done)
+	}(wg)
+
+	wg.Wait()
 	createEvent(t)
 	<-done
 

@@ -34,9 +34,7 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 	fn := distro.OsquerydDistroFilename()
 	var installFunc func(context.Context, string, string, bool) error
 
-	if runtime.GOOS == "windows" {
-		installFunc = install.InstallFromMSI
-	} else if runtime.GOOS == "darwin" {
+	if runtime.GOOS == "darwin" {
 		installFunc = install.InstallFromPkg
 	}
 
@@ -64,6 +62,9 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 	if installing {
 		// Check that osqueryd file is now installed
 		osqfn := distro.OsquerydFilename()
+		if runtime.GOOS == "darwin" {
+			osqfn = distro.OsquerydDarwinApp()
+		}
 		flog := log.With("file", osqfn)
 		exists, err := fileutil.FileExists(osqfn)
 		if err != nil {

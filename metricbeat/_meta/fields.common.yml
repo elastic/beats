@@ -20,11 +20,6 @@
       description: >
         Current data collection period for this event in milliseconds.
 
-    - name: service.address
-      description: >
-        Address of the machine where the service is running. This
-        field may not be present when the data was collected locally.
-
     - name: service.hostname
       description: >
         Host name of the machine where the service is running.

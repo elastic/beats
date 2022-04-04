@@ -81,7 +81,7 @@ pipeline {
           when {
             beforeAgent true
             anyOf {
-              branch 'master'
+              branch 'main'
               branch "\\d+\\.\\d+"
               branch "v\\d?"
               tag "v\\d+\\.\\d+\\.\\d+*"
@@ -119,14 +119,17 @@ def beatsUpdate() {
     }
     dir("${BASE_DIR}"){
       git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
-        url:  "git@github.com:elastic/${env.REPO}.git")
+        url:  "git@github.com:elastic/${env.REPO}.git",
+        branch: env.BRANCH_NAME)
       sh(label: 'Update Beats script', script: """
         git config --global user.email "none@example.com"
         git config --global user.name "None"
         git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        go mod tidy
         echo '{"name": "${GOPATH}/src/github.com/elastic/beats-local", "licenceType": "Elastic"}' >> \${GOPATH}/src/github.com/elastic/beats-local/dev-tools/notice/overrides.json
+
         make update
         git commit -a -m beats-update
 

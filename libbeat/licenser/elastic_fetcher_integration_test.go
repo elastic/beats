@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package licenser
@@ -42,8 +43,8 @@ func getTestClient() *eslegclient.Connection {
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              host,
-		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
-		Password:         "changeme",
+		Username:         "admin",
+		Password:         "testing",
 		CompressionLevel: 3,
 		Transport:        transport,
 	})

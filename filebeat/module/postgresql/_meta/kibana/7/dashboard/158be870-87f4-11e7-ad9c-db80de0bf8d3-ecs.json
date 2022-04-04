@@ -1,0 +1,117 @@
+{
+    "attributes": {
+        "description": "Overview dashboard for the Filebeat PostgreSQL module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "user.name",
+                        "postgresql.log.database",
+                        "log.level",
+                        "message",
+                        "postgresql.log.query"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "2",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "search",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3",
+                    "w": 36,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat PostgreSQL] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "PostgreSQL Log Level Count-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "PostgreSQL All Logs-ecs",
+            "name": "2:panel_2",
+            "type": "search"
+        },
+        {
+            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:50.312Z",
+    "version": "WzQzMTIsMV0="
+}

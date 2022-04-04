@@ -24,13 +24,14 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
-//This reflects allowed attributes for field definitions in the fields.yml.
-//No logic is put into this data structure.
-//The purpose is to enable using different kinds of transformation, on top of the same data structure.
-//Current transformation:
+// This reflects allowed attributes for field definitions in the fields.yml.
+// No logic is put into this data structure.
+// The purpose is to enable using different kinds of transformation, on top of the same data structure.
+// Current transformation:
 //  -ElasticSearch Template
 //  -Kibana Index Pattern
 
@@ -44,8 +45,8 @@ type Field struct {
 	Fields         Fields      `config:"fields"`
 	MultiFields    Fields      `config:"multi_fields"`
 	Enabled        *bool       `config:"enabled"`
-	Analyzer       string      `config:"analyzer"`
-	SearchAnalyzer string      `config:"search_analyzer"`
+	Analyzer       Analyzer    `config:"analyzer"`
+	SearchAnalyzer Analyzer    `config:"search_analyzer"`
 	Norms          bool        `config:"norms"`
 	Dynamic        DynamicType `config:"dynamic"`
 	Index          *bool       `config:"index"`
@@ -125,6 +126,35 @@ func (d *DynamicType) Unpack(s string) error {
 	return nil
 }
 
+type Analyzer struct {
+	Name       string
+	Definition interface{}
+}
+
+func (a *Analyzer) Unpack(v interface{}) error {
+	var m common.MapStr
+	switch v := v.(type) {
+	case string:
+		a.Name = v
+		return nil
+	case common.MapStr:
+		m = v
+	case map[string]interface{}:
+		m = common.MapStr(v)
+	default:
+		return fmt.Errorf("'%v' is invalid analyzer setting", v)
+	}
+
+	if len(m) != 1 {
+		return fmt.Errorf("'%v' is invalid analyzer setting", v)
+	}
+	for a.Name, a.Definition = range m {
+		break
+	}
+
+	return nil
+}
+
 // Validate ensures objectTypeParams are not mixed with top level objectType configuration
 func (f *Field) Validate() error {
 	if err := f.validateType(); err != nil {
@@ -141,7 +171,7 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	var allowedFormatters, allowedMetricTypes, allowedUnits []string
 	switch strings.ToLower(f.Type) {
-	case "text", "keyword", "wildcard", "constant_keyword":
+	case "text", "keyword", "wildcard", "constant_keyword", "match_only_text":
 		allowedFormatters = []string{"string", "url"}
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float", "histogram":
 		allowedFormatters = []string{"string", "url", "bytes", "duration", "number", "percent", "color"}
@@ -264,7 +294,6 @@ func (f Fields) HasKey(key string) bool {
 func (f Fields) GetField(key string) *Field {
 	keys := strings.Split(key, ".")
 	return f.getField(keys)
-
 }
 
 // HasNode checks if inside fields the given node exists
@@ -276,7 +305,6 @@ func (f Fields) HasNode(key string) bool {
 }
 
 func (f Fields) hasNode(keys []string) bool {
-
 	// Nothing to compare, so does not contain it
 	if len(keys) == 0 {
 		return false
@@ -286,7 +314,6 @@ func (f Fields) hasNode(keys []string) bool {
 	keys = keys[1:]
 
 	for _, field := range f {
-
 		if field.Name == key {
 
 			//// It's the last key to compare
@@ -373,7 +400,6 @@ func (f Fields) GetKeys() []string {
 }
 
 func (f Fields) getKeys(namespace string) []string {
-
 	var keys []string
 
 	for _, field := range f {

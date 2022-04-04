@@ -1,0 +1,128 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "SSL Cache [Metricbeat MySQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Hits",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.cache.ssl.hits",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "1a353d40-c6ad-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(253,161,255,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "2dd02900-c6ad-11ea-880f-352bebf10188",
+                        "label": "Misses",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.cache.ssl.misses",
+                                "id": "2dd02901-c6ad-11ea-880f-352bebf10188",
+                                "type": "max"
+                            },
+                            {
+                                "field": "2dd02901-c6ad-11ea-880f-352bebf10188",
+                                "id": "327cc120-c6ad-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,204,202,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "3f459cb0-c6ad-11ea-880f-352bebf10188",
+                        "label": "Size",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.cache.ssl.size",
+                                "id": "3f459cb1-c6ad-11ea-880f-352bebf10188",
+                                "type": "max"
+                            },
+                            {
+                                "field": "3f459cb1-c6ad-11ea-880f-352bebf10188",
+                                "id": "426ccd50-c6ad-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "SSL Cache [Metricbeat MySQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8b276c80-c6ad-11ea-a106-5be590f42b74",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:43.489Z",
+    "version": "WzQwODQsMV0="
+}

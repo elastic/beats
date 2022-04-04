@@ -1,0 +1,134 @@
+{
+    "attributes": {
+        "description": "Microsoft Defender ATP Counter for new incidents",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "microsoft"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.module": "microsoft"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "microsoft.defender_atp"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "microsoft.defender_atp"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:\"microsoft.defender_atp\" "
+                }
+            }
+        },
+        "title": "ATP New Incidents Counter [Filebeat Microsoft]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "New Incidents",
+                        "field": "microsoft.defender_atp.incidentId"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "metric": {
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 1
+                        },
+                        {
+                            "from": 1,
+                            "to": 10000
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "None",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 30,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "ATP New Incidents Counter [Filebeat Microsoft]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3c64f400-ca68-11ea-9d4d-9737a63aaa55",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:12.667Z",
+    "version": "WzQ0NDcsMV0="
+}

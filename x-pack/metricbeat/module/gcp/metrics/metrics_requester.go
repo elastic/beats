@@ -7,7 +7,6 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -36,14 +35,14 @@ type timeSeriesWithAligner struct {
 	aligner    string
 }
 
-func (r *metricsRequester) Metric(ctx context.Context, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
+func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
 	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: timeInterval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   r.getFilterForMetric(metricType),
+		Filter:   r.getFilterForMetric(serviceName, metricType),
 		Aggregation: &monitoringpb.Aggregation{
 			PerSeriesAligner: gcp.AlignersMapToGCP[aligner],
 			AlignmentPeriod:  r.config.period,
@@ -70,22 +69,21 @@ func (r *metricsRequester) Metric(ctx context.Context, metricType string, timeIn
 	return
 }
 
-func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
+func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
 
-	aligner := sdc.Aligner
-	for mt, meta := range metricsMeta {
+	for mt, meta := range metricsToCollect {
 		wg.Add(1)
 
 		metricMeta := meta
 		go func(mt string) {
 			defer wg.Done()
 
-			r.logger.Debugf("For metricType %s, metricMeta = %d", mt, metricMeta)
+			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s", mt, metricMeta, aligner)
 			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-			ts := r.Metric(ctx, mt, interval, aligner)
+			ts := r.Metric(ctx, serviceName, mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)
@@ -96,20 +94,37 @@ func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metri
 	return results, nil
 }
 
-var serviceRegexp = regexp.MustCompile(`^(?P<service>[a-z]+)\.googleapis.com.*`)
-
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
-func (r *metricsRequester) getFilterForMetric(m string) (f string) {
+func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) {
 	f = fmt.Sprintf(`metric.type="%s"`, m)
 	if r.config.Zone == "" && r.config.Region == "" {
 		return
 	}
 
-	service := serviceRegexp.ReplaceAllString(m, "${service}")
+	switch serviceName {
+	case gcp.ServiceGKE:
+		if r.config.Region != "" && r.config.Zone != "" {
+			r.logger.Warnf("when region %s and zone %s config parameter "+
+				"both are provided, only use region", r.config.Region, r.config.Zone)
+		}
 
-	switch service {
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
+		region := r.config.Region
+		if region != "" {
+			if strings.HasSuffix(region, "*") {
+				region = strings.TrimSuffix(region, "*")
+			}
+			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
+			break
+		}
+		zone := r.config.Zone
+		if zone != "" {
+			if strings.HasSuffix(zone, "*") {
+				zone = strings.TrimSuffix(zone, "*")
+			}
+			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
+		}
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore, gcp.ServiceDataproc:
 		return
 	case gcp.ServiceStorage:
 		if r.config.Region == "" {

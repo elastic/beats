@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "This Ceph dashboard that shows the most important cluster metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 18,
+                    "x": 30,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Cluster Disk Stats",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Throughput",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "IOPS",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "4",
+                    "w": 6,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "OSD Disk Usage",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "5",
+                    "w": 5,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Pools",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "6",
+                    "w": 19,
+                    "x": 5,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Pool Objects",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Ceph] Cluster Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c93f2c30-b473-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "054a0900-b467-11e9-a579-f5c0a5d81340",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "88d48440-b46b-11e9-a579-f5c0a5d81340",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "346d00d0-b46b-11e9-a579-f5c0a5d81340",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "13efa190-b46c-11e9-a579-f5c0a5d81340",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "393df790-b470-11e9-a579-f5c0a5d81340",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "aa9c2f10-b470-11e9-a579-f5c0a5d81340",
+            "name": "6:panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:57.280Z",
+    "version": "WzM2MjksMV0="
+}

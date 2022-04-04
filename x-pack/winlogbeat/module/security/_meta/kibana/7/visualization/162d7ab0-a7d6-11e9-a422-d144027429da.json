@@ -1,0 +1,246 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "winlog.provider_name",
+                            "negate": false,
+                            "params": {
+                                "query": "Microsoft-Windows-Security-Auditing"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "winlog.provider_name": "Microsoft-Windows-Security-Auditing"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Logon Successful - Logon Failed Timeline [Winlogbeat Security]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "Login Failed": "#F9934E",
+                    "Login OK": "#9AC48A",
+                    "Logon Failed": "#EF843C",
+                    "Logon Successful": "#9AC48A"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "scaleMetricValues": false,
+                        "timeRange": {
+                            "from": "2020-05-17T09:37:55.995Z",
+                            "to": "2020-05-22T03:09:27.260Z"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "lucene",
+                                    "query": "event.code: 4624"
+                                },
+                                "label": "Logon Successful"
+                            },
+                            {
+                                "input": {
+                                    "language": "lucene",
+                                    "query": "event.code: 4625"
+                                },
+                                "label": "Logon Failed"
+                            }
+                        ]
+                    },
+                    "schema": "group",
+                    "type": "filters"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 1,
+                            "aggType": "filters",
+                            "format": {},
+                            "params": {}
+                        }
+                    ],
+                    "x": {
+                        "accessor": 0,
+                        "aggType": "date_histogram",
+                        "format": {
+                            "id": "date",
+                            "params": {
+                                "pattern": "HH:mm"
+                            }
+                        },
+                        "params": {
+                            "bounds": {
+                                "max": "2019-07-16T14:30:11.515Z",
+                                "min": "2019-07-16T12:30:11.514Z"
+                            },
+                            "date": true,
+                            "format": "HH:mm",
+                            "interval": "PT1M"
+                        }
+                    },
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "grid": {
+                    "categoryLines": false
+                },
+                "isVislibVis": true,
+                "labels": {
+                    "show": false
+                },
+                "legendPosition": "bottom",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "stacked",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "histogram",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "thresholdLine": {
+                    "color": "#E7664C",
+                    "show": false,
+                    "style": "full",
+                    "value": 10,
+                    "width": 1
+                },
+                "times": [],
+                "type": "histogram",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Count"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Logon Successful - Logon Failed Timeline [Winlogbeat Security]",
+            "type": "histogram"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "162d7ab0-a7d6-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIxOTYsMl0="
+}

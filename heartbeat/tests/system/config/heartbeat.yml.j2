@@ -8,6 +8,10 @@ heartbeat.monitors:
   timeout: {{monitor.timeout}}
   {% endif -%}
 
+  {%- if monitor.enabled is defined %}
+  enabled: {{monitor.enabled}}
+  {% endif -%}
+
   {%- if monitor.tags is defined %}
   tags:
     {% for tag in monitor.tags -%}
@@ -45,6 +49,10 @@ heartbeat.monitors:
     {% endfor %}
   {% endif %}
 {% endfor -%}
+
+{%- if run_once is defined %}
+heartbeat.run_once: {{run_once}}
+{% endif -%}
 
 {% if reload or reload_path -%}
 heartbeat.config.monitors:
@@ -97,6 +105,8 @@ queue.mem:
 {%- if elasticsearch %}
 output.elasticsearch:
   hosts: ["{{ elasticsearch.host }}"]
+  username: {{ elasticsearch.user }}
+  password: {{ elasticsearch.pass }}
 {%- else %}
 output.file:
   path: '{{ output_file_path|default(beat.working_dir + "/output") }}'

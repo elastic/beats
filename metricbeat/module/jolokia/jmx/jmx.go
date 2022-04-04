@@ -32,9 +32,9 @@ var (
 
 // init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("jolokia", "jmx", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("jolokia", "jmx", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 const (

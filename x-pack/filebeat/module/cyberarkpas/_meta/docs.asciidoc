@@ -7,6 +7,8 @@
 
 beta[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for receiving CyberArk Privileged Account Security (PAS) logs over Syslog or a file.
 
 The {plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugin is required to run this module.

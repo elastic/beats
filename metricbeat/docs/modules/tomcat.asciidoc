@@ -2,11 +2,17 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: tomcat
+
 [[metricbeat-module-tomcat]]
 [role="xpack"]
 == Tomcat module
 
 beta[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches JMX metrics from Apache Tomcat.
 

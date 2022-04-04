@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package guess
@@ -9,8 +10,8 @@ package guess
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -91,13 +92,13 @@ func (g *guessSockaddrIn) Prepare(ctx Context) (err error) {
 		g.remote.Addr = randomLocalIP()
 	}
 	if g.server, g.local, err = createSocket(g.local); err != nil {
-		return errors.Wrap(err, "error creating server")
+		return fmt.Errorf("error creating server: %w", err)
 	}
 	if g.client, g.remote, err = createSocket(g.remote); err != nil {
-		return errors.Wrap(err, "error creating client")
+		return fmt.Errorf("error creating client: %w", err)
 	}
 	if err = unix.Listen(g.server, 1); err != nil {
-		return errors.Wrap(err, "error in listen")
+		return fmt.Errorf("error in listen: %w", err)
 	}
 	return nil
 }

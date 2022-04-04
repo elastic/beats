@@ -7,7 +7,8 @@
 <titleabbrev>Syslog</titleabbrev>
 ++++
 
-The `syslog` input reads Syslog events as specified by RFC 3164 and RFC 5424, over TCP, UDP, or a Unix stream socket.
+The `syslog` input reads Syslog events as specified by RFC 3164 and RFC 5424,
+over TCP, UDP, or a Unix stream socket.
 
 Example configurations:
 
@@ -40,12 +41,21 @@ Example configurations:
 
 ==== Configuration options
 
-The `syslog` input configuration includes format, protocol specific options, and the
-<<{beatname_lc}-input-{type}-common-options>> described later.
+The `syslog` input configuration includes format, protocol specific options, and
+the <<{beatname_lc}-input-{type}-common-options>> described later.
 
 ===== `format`
 
-The syslog variant to use, `rfc3164` or `rfc5424`. To automatically detect the format from the log entries, set this option to `auto`. The default is `rfc3164`.
+The syslog variant to use, `rfc3164` or `rfc5424`. To automatically detect the
+format from the log entries, set this option to `auto`. The default is
+`rfc3164`.
+
+===== `timezone`
+
+IANA time zone name (e.g. `America/New_York`) or fixed time offset (e.g.
+`+0200`) to use when parsing syslog timestamps that do not contain a time zone.
+`Local` may be specified to use the machine's local time zone. Defaults to
+`Local`.
 
 ===== Protocol `udp`:
 

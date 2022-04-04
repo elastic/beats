@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "This CouchDB dashboard visualizes the most important CouchDB server metrics.\n\n",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "HTTP Status Codes",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 10
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "HTTP Request Methods",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Open Databases",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "4",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Database Read/Writes",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 25
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Auth Cache Hit/Miss",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "6",
+                    "w": 14,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Number of HTTP Requests",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "7",
+                    "w": 24,
+                    "x": 0,
+                    "y": 25
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Number of View Reads",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat CouchDB] Database Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a3ab9a60-b952-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "8e15ece0-b94e-11e9-a579-f5c0a5d81340",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "1b60bb70-b94f-11e9-a579-f5c0a5d81340",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "f8c29f10-b94f-11e9-a579-f5c0a5d81340",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "702584a0-b950-11e9-a579-f5c0a5d81340",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "abfaf130-b951-11e9-a579-f5c0a5d81340",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "06018310-b952-11e9-a579-f5c0a5d81340",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "496910f0-b952-11e9-a579-f5c0a5d81340",
+            "name": "7:panel_7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:06.496Z",
+    "version": "WzM3NTAsMV0="
+}

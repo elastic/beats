@@ -54,6 +54,15 @@ func TestWithConfig(t *testing.T) {
 			},
 			want: "14a0364b79acbe4c78dd5e77db2c93ae8c750518b32581927d50b3eef407184e",
 		},
+		"with @timestamp": {
+			config: common.MapStr{
+				"fields": []string{"@timestamp", "message"},
+			},
+			input: common.MapStr{
+				"message": `test message "hello world"`,
+			},
+			want: "081da76e049554943843b83948ac83ab7aa79fd2849331813e02042586021c26",
+		},
 	}
 
 	for name, test := range cases {
@@ -63,7 +72,7 @@ func TestWithConfig(t *testing.T) {
 			require.NoError(t, err)
 
 			testEvent := &beat.Event{
-				Timestamp: time.Now(),
+				Timestamp: time.Unix(1635443183, 0),
 				Fields:    test.input.Clone(),
 			}
 			newEvent, err := p.Run(testEvent)
@@ -72,6 +81,31 @@ func TestWithConfig(t *testing.T) {
 			assert.Equal(t, test.want, v)
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		config := common.MustNewConfigFrom(common.MapStr{
+			"fields":       []string{"@metadata.message"},
+			"target_field": "@metadata.fingerprint",
+		})
+		p, err := New(config)
+		require.NoError(t, err)
+
+		testEvent := &beat.Event{
+			Timestamp: time.Unix(1635443183, 0),
+			Meta: common.MapStr{
+				"message": "hello world",
+			},
+		}
+
+		expMeta := common.MapStr{
+			"message":     "hello world",
+			"fingerprint": "1a3fe8251076ed8de5fd99ce529d2b9971c54851d4d45f5a576bed91d0cc4202",
+		}
+		newEvent, err := p.Run(testEvent)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, testEvent.Fields, newEvent.Fields)
+	})
 }
 
 func TestHashMethods(t *testing.T) {

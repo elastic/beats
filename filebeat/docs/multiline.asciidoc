@@ -220,6 +220,21 @@ multiline.flush_pattern: 'End event'
 
 The `flush_pattern` option, specifies a regex at which the current multiline will be flushed. If you think of the `pattern` option specifying the beginning of an event, the `flush_pattern` option will specify the end or last line of the event.
 
+NOTE: This example will not work correctly if start/end log blocks are mixed with non-multiline logs, or if different start/end log blocks overlap with each other. For instance, `Some other log` log lines in the following example will be merged into a _single_ multiline document because they neither match `multiline.pattern` nor `multiline.flush_pattern`, and `multiline.negate` is set to `true`.
+
+[source,shell]
+-------------------------------------------------------------------------------------
+[2015-08-24 11:49:14,389] Start new event
+[2015-08-24 11:49:14,395] Content of processing something
+[2015-08-24 11:49:14,399] End event
+[2015-08-24 11:50:14,389] Some other log
+[2015-08-24 11:50:14,395] Some other log
+[2015-08-24 11:50:14,399] Some other log
+[2015-08-24 11:51:14,389] Start new event
+[2015-08-24 11:51:14,395] Content of processing something
+[2015-08-24 11:51:14,399] End event
+-------------------------------------------------------------------------------------
+
 ==== Test your regexp pattern for multiline
 
 To make it easier for you to test the regexp patterns in your multiline config, we've created a
@@ -228,5 +243,4 @@ the `multiline.negate` setting that you plan to use, and paste a sample message 
 Then click Run, and you'll see which lines in the message match your specified configuration. For example:
 
 image:images/go-playground.png[]
-
 

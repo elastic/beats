@@ -1,0 +1,137 @@
+{
+    "attributes": {
+        "description": "This dashboard shows data collected by the OSSEC rootkit pack from osquery",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 2,
+                    "i": "1",
+                    "w": 4,
+                    "x": 8,
+                    "y": 1
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "version": "6.1.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 2,
+                    "i": "2",
+                    "w": 4,
+                    "x": 4,
+                    "y": 1
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_1",
+                "version": "6.1.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 2,
+                    "i": "3",
+                    "w": 4,
+                    "x": 0,
+                    "y": 1
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_2",
+                "version": "6.1.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 1,
+                    "i": "4",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_3",
+                "version": "6.1.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "5",
+                    "w": 12,
+                    "x": 0,
+                    "y": 3
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_4",
+                "version": "6.1.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Osquery] OSSEC rootkit pack ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "6ec10290-f4aa-11e7-8647-534bb4c21040-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "ab587180-f4a9-11e7-8647-534bb4c21040-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs",
+            "name": "panel_4",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:55.664Z",
+    "version": "WzQ5MzgsMV0="
+}

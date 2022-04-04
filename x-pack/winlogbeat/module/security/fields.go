@@ -17,7 +17,7 @@ func init() {
 }
 
 // AssetSecurity returns asset data.
-// This is the base64 encoded gzipped contents of module/security.
+// This is the base64 encoded zlib format compressed contents of module/security.
 func AssetSecurity() string {
 	return "eJy0k79u3DAMxnc/xYfs8QN4KFAgS4BOzQEdc7RFx0RkyZCou/PbF5J9f5wcMhSpN1Pi7+NHUo9457lB5C4F0bkCVNRyg4eXNYTRm2T5oQIMxy7IpOJdgx8VAOwGjgwKDB0YfGCn6IWtiYgTd9JLB/XlcOGg96H8XvjWv9UVENgyRW7QslKFldJUReYRjkZucBSXr1v/5l05AHSeuMFb8GlaI5syn0gps0nZ5EoIf8QZf4wokHrNOath/c6CmX4JnsXeeT76YG7idzpz/n5lmZJYkDV2g0RILE245B0YBw5RvIPv89GGsV99l/6+GlKqC3Y3T7yHD0Yc2SuZHNgF6YYxj4OMYbPBtfN2Astk6ps7fKJxymvwm0ev/OyUA3W5zOpTi8R8R4Oen6ADKTpyaBkpruOK0XdCmvdL1pnhKDrA68Bh2bi44d0MO7uMNPKaFznmDtefPfQkNgWuA1O8bNY/+tkNjIVT9BfpLMDmC+WopCn+P+Xr2vFJE9lbDlrK7d4YR0EcyCZeNxIDn8hwJyNZ7F9Kvfvl4XzlK7Wv3+HtpzGS42QhrvdhpFI5tT7pB7dZ9voWzoY3tHvm7xqWq+HUfvD8NwAA//9mgpdN"
 }

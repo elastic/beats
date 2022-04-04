@@ -1,0 +1,125 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
+                            "columnOrder": [
+                                "19e03939-49d0-48f7-b76c-d70142001365",
+                                "7cd103e8-3dd3-4fa2-8c13-bc9f80617367",
+                                "36345734-4c23-4815-8a5e-b63c20cac94d"
+                            ],
+                            "columns": {
+                                "19e03939-49d0-48f7-b76c-d70142001365": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "36345734-4c23-4815-8a5e-b63c20cac94d": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "PutRecord Bytes",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.kinesis.metrics.PutRecords_Bytes.avg"
+                                },
+                                "7cd103e8-3dd3-4fa2-8c13-bc9f80617367": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.dimensions.StreamName",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "36345734-4c23-4815-8a5e-b63c20cac94d",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.dimensions.StreamName"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "36345734-4c23-4815-8a5e-b63c20cac94d"
+                        ],
+                        "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "7cd103e8-3dd3-4fa2-8c13-bc9f80617367",
+                        "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide"
+            }
+        },
+        "title": "AWS PutRecords Bytes [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:30.617Z",
+    "version": "WzMzNjksMV0="
+}

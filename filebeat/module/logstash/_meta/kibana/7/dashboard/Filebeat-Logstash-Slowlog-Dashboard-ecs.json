@@ -1,0 +1,139 @@
+{
+    "attributes": {
+        "description": "Overview of Logstash Slowlogs",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "log.level",
+                        "logstash.slowlog.plugin_type",
+                        "logstash.slowlog.plugin_name",
+                        "logstash.slowlog.message",
+                        "logstash.slowlog.plugin_params",
+                        "logstash.slowlog.execution_time_ns"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 36,
+                    "i": "1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "search",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": 3,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Logstash] Slowlogs ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Filebeat-Logstash-Slowlog-Dashboard-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "742e45d0-cbdd-11e7-9852-73e0a9df1bb6-ecs",
+            "name": "1:panel_1",
+            "type": "search"
+        },
+        {
+            "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "b3315630-cbdf-11e7-9852-73e0a9df1bb6-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:11.672Z",
+    "version": "WzQ0NDUsMV0="
+}

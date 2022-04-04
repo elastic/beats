@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -27,6 +28,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	// mage:import
@@ -37,21 +39,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-)
-
-// declare journald dependencies for cross build target
-var (
-	journaldPlatforms = []devtools.PlatformDescription{
-		devtools.Linux386, devtools.LinuxAMD64,
-		devtools.LinuxARM64, devtools.LinuxARM5, devtools.LinuxARM6, devtools.LinuxARM7,
-		devtools.LinuxMIPS, devtools.LinuxMIPSLE, devtools.LinuxMIPS64LE,
-		devtools.LinuxPPC64LE,
-		devtools.LinuxS390x,
-	}
-
-	journaldDeps = devtools.NewPackageInstaller().
-			AddEach(journaldPlatforms, "libsystemd-dev").
-			Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
 )
 
 func init() {
@@ -66,13 +53,10 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild builds the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	// XXX: enable once we have systemd available in the cross build image
-	// mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
-
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	return filebeat.GolangCrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -82,12 +66,19 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return filebeat.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.
@@ -123,6 +114,7 @@ func Update() {
 // modules.d directory.
 func Config() {
 	mg.Deps(devtools.GenerateDirModulesD, configYML)
+	mg.SerialDeps(devtools.ValidateDirModulesD, devtools.ValidateDirModulesDDatasetsDisabled)
 }
 
 func configYML() error {
@@ -216,7 +208,7 @@ func GoIntegTest(ctx context.Context) error {
 // Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.Deps(Fields, Dashboards)
 	}
 	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {

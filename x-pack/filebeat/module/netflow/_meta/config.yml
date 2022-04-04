@@ -1,6 +1,6 @@
 - module: netflow
   log:
-    enabled: true
+    enabled: false
     var:
       netflow_host: localhost
       netflow_port: 2055

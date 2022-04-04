@@ -1,0 +1,131 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Destinations by Traffic Size [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 18k": "rgb(247,251,255)",
+                    "108k - 126k": "rgb(74,152,201)",
+                    "126k - 144k": "rgb(46,126,188)",
+                    "144k - 162k": "rgb(23,100,171)",
+                    "162k - 180k": "rgb(8,74,145)",
+                    "18k - 36k": "rgb(227,238,249)",
+                    "36k - 54k": "rgb(208,225,242)",
+                    "54k - 72k": "rgb(182,212,233)",
+                    "72k - 90k": "rgb(148,196,223)",
+                    "90k - 108k": "rgb(107,174,214)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Bytes",
+                        "field": "source.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "lucene",
+                                    "query": "deviceDirection:\"0\""
+                                },
+                                "label": "Inbound"
+                            },
+                            {
+                                "input": {
+                                    "language": "lucene",
+                                    "query": "deviceDirection:\"1\""
+                                },
+                                "label": "Outbound"
+                            }
+                        ]
+                    },
+                    "schema": "segment",
+                    "type": "filters"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "destination.domain",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "colorSchema": "Blues",
+                "colorsNumber": 10,
+                "colorsRange": [
+                    {
+                        "from": 0,
+                        "to": null
+                    }
+                ],
+                "enableHover": true,
+                "invertColors": false,
+                "legendPosition": "top",
+                "percentageMode": false,
+                "setColorRange": false,
+                "times": [],
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "#555",
+                            "rotate": 0,
+                            "show": false
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Top Destinations by Traffic Size [Filebeat CEF]",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "566d8b4e-ec5c-4b8b-bd68-3cc9cb236110",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3MzMsMV0="
+}

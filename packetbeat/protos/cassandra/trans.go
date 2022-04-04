@@ -132,7 +132,6 @@ func (trans *transactions) onResponse(
 func (trans *transactions) tryMergeRequests(
 	prev, msg *message,
 ) (merged bool, err error) {
-
 	msg.isComplete = true
 	return false, nil
 }
@@ -150,7 +149,7 @@ func (trans *transactions) correlate() error {
 	if requests.empty() {
 		for !responses.empty() {
 
-			//if the response is EVENT, which pushed from server, we can accept that
+			// if the response is EVENT, which pushed from server, we can accept that
 			resp := responses.first()
 			if !resp.isComplete {
 				break

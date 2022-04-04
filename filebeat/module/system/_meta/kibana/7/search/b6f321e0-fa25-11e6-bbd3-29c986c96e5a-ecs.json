@@ -1,0 +1,46 @@
+{
+    "attributes": {
+        "columns": [
+            "user.name",
+            "system.auth.sudo.user",
+            "system.auth.sudo.pwd",
+            "system.auth.sudo.command"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "system.auth.sudo:*"
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Sudo commands [Filebeat System] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:57.403Z",
+    "version": "WzQzNTcsMV0="
+}

@@ -1,0 +1,56 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": "Destination Count [Filebeat Netflow]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Destinations",
+                        "field": "destination.ip"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "fontSize": "32",
+                "handleNoResults": true
+            },
+            "title": "Destination Count [Filebeat Netflow]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e99dc327-03de-4561-9e0c-f550710125c2",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:49.565Z",
+    "version": "WzQ4NjgsMV0="
+}

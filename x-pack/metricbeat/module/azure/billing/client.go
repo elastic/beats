@@ -12,7 +12,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -25,7 +26,7 @@ type Client struct {
 }
 
 type Usage struct {
-	UsageDetails  []consumption.UsageDetail
+	UsageDetails  []prevConsumption.UsageDetail
 	ActualCosts   []consumption.Forecast
 	ForecastCosts []consumption.Forecast
 }
@@ -46,10 +47,17 @@ func NewClient(config azure.Config) (*Client, error) {
 
 // GetMetrics returns the usage detail and forecast values.
 func (client *Client) GetMetrics() (Usage, error) {
+
 	var usage Usage
+	scope := fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId)
+	if client.Config.BillingScopeDepartment != "" {
+		scope = fmt.Sprintf("/providers/Microsoft.Billing/departments/%s", client.Config.BillingScopeDepartment)
+	} else if client.Config.BillingScopeAccountId != "" {
+		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
+	}
 	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
-	usageDetails, err := client.BillingService.GetUsageDetails(fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId), "properties/meterDetails",
+	usageDetails, err := client.BillingService.GetUsageDetails(scope, "properties/meterDetails",
 		fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano)),
 		"", nil, "properties/instanceLocation")
 	if err != nil {

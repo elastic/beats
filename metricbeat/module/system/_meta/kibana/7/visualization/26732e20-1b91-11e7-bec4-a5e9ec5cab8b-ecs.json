@@ -1,0 +1,75 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Load Gauge [Metricbeat System] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "feefabd0-1b90-11e7-bec4-a5e9ec5cab8b"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "ffd94880-1b90-11e7-bec4-a5e9ec5cab8b"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "fdcc6180-1b90-11e7-bec4-a5e9ec5cab8b",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "fdcc6181-1b90-11e7-bec4-a5e9ec5cab8b",
+                        "label": "5m Load",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "system.load.5",
+                                "id": "fdcc6182-1b90-11e7-bec4-a5e9ec5cab8b",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Load Gauge [Metricbeat System] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "26732e20-1b91-11e7-bec4-a5e9ec5cab8b-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:24.050Z",
+    "version": "WzM4NjAsMV0="
+}

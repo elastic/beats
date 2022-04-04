@@ -1,0 +1,104 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Connections [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "4e35d500-471b-11e8-a520-3f46123ab5eb"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "69899960-4719-11e8-a520-3f46123ab5eb"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "haproxy.stat.component_type:(0 OR 1)"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "6f171ba0-4719-11e8-a520-3f46123ab5eb"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": "",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Number of connections",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.connection.total",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "41ff3940-4719-11e8-a520-3f46123ab5eb",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "41ff3940-4719-11e8-a520-3f46123ab5eb",
+                                "id": "456a5fa0-4738-11e8-8633-8f8b3acf1566",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "series_drop_last_bucket": 1,
+                        "split_color_mode": "rainbow",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "id": "0ceb7740-471a-11e8-a520-3f46123ab5eb"
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "haproxy.stat.proxy.name"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy connections ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4MzYsMV0="
+}

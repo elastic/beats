@@ -1,0 +1,138 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "winlog.provider_name : \"PowerShell\" or winlog.provider_name : \"Microsoft-Windows-PowerShell\" "
+                }
+            }
+        },
+        "title": "Connected users [Winlogbeat powershell]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "User",
+                        "field": "powershell.connected_user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "4",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Host count",
+                        "field": "host.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "params": {
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://192.168.1.48:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "User",
+                            "params": {}
+                        }
+                    ],
+                    "metrics": [
+                        {
+                            "accessor": 1,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "label": "Count",
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "cardinality",
+                            "format": {
+                                "id": "number"
+                            },
+                            "label": "Unique count of host.name",
+                            "params": {}
+                        }
+                    ]
+                },
+                "perPage": 10,
+                "percentageCol": "",
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Connected users [Winlogbeat powershell]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "9ec52c30-9e91-11ea-af6f-cfdb1ee1d6c8",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:51.383Z",
+    "version": "WzIxNTUsMl0="
+}

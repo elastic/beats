@@ -1,0 +1,113 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Database Account Filters [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "azure.subscription_id",
+                        "id": "1584710440054",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Subscription",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.resource.group",
+                        "id": "1584710497045",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Resource Group",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.resource.name",
+                        "id": "1584710535722",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Resource",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.dimensions.database_name",
+                        "id": "1587643606086",
+                        "indexPatternRefName": "control_3_index_pattern",
+                        "label": "Database",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1584710535722",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "Database Account Filters [Metricbeat Azure]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "674c1d70-83cc-11ea-be84-f5d4d6b9a792",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_3_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:49.091Z",
+    "version": "WzM1NDQsMV0="
+}

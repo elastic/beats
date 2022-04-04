@@ -1,0 +1,96 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Destination Geo [Filebeat Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "autoPrecision": true,
+                        "field": "destination.geo.location",
+                        "isFilteredByCollar": true,
+                        "mapCenter": [
+                            0,
+                            0
+                        ],
+                        "mapZoom": 2,
+                        "precision": 2,
+                        "useGeocentroid": true
+                    },
+                    "schema": "segment",
+                    "type": "geohash_grid"
+                }
+            ],
+            "params": {
+                "addTooltip": true,
+                "colorSchema": "Yellow to Red",
+                "dimensions": {
+                    "geocentroid": null,
+                    "geohash": null,
+                    "metric": {
+                        "accessor": 0,
+                        "aggType": "count",
+                        "format": {
+                            "id": "number"
+                        },
+                        "params": {}
+                    }
+                },
+                "heatClusterSize": 1.5,
+                "isDesaturated": true,
+                "legendPosition": "bottomright",
+                "mapCenter": [
+                    0,
+                    0
+                ],
+                "mapType": "Scaled Circle Markers",
+                "mapZoom": 2,
+                "wms": {
+                    "enabled": false,
+                    "options": {
+                        "format": "image/png",
+                        "transparent": true
+                    }
+                }
+            },
+            "title": "Destination Geo [Filebeat Zeek]",
+            "type": "tile_map"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f469f230-370c-11e9-aa6d-ff445a78330c",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:52.321Z",
+    "version": "WzQzMjEsMV0="
+}

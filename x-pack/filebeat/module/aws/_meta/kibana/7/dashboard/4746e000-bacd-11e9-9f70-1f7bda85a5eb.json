@@ -1,0 +1,100 @@
+{
+    "attributes": {
+        "description": "Filebeat AWS S3 Server Access Log Overview Dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Top URLs",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Http Status over time",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Error Logs",
+                "type": "search",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat AWS] S3 Server Access Log Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4746e000-bacd-11e9-9f70-1f7bda85a5eb",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "99ffdb00-bacb-11e9-9f70-1f7bda85a5eb",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "5c93cd10-bac3-11e9-9f70-1f7bda85a5eb",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "5e5a3c90-bac0-11e9-9f70-1f7bda85a5eb",
+            "name": "3:panel_3",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:59.495Z",
+    "version": "WzQzNjksMV0="
+}

@@ -1,0 +1,78 @@
+{
+    "attributes": {
+        "columns": [
+            "user.name",
+            "winlog.logon.type",
+            "source.domain",
+            "source.ip",
+            "winlog.logon.id"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": {
+                                "query": "4624"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match": {
+                                "event.code": {
+                                    "query": "4624",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "User Logons [Winlogbeat Security]",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "ce71c9a0-a25e-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-11T13:18:58.346Z",
+    "version": "WzIyNjgsMl0="
+}

@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": "Destination and Source ASs (flow records) [Filebeat Netflow]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Flow Records"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Destination AS",
+                        "field": "destination.as.organization.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 50
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Source AS",
+                        "field": "source.as.organization.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 50
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": true,
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                }
+            },
+            "title": "Destination and Source ASs (flow records) [Filebeat Netflow]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f7808e70-df2a-4532-a350-966704567c24",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:42.347Z",
+    "version": "WzQ3OTIsMV0="
+}

@@ -1,0 +1,210 @@
+{
+    "attributes": {
+        "description": "Various stats for Prometheus Server",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "HTTP Requests",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Query Durations",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Number of Targets",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 22
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Head Chunks",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "5",
+                    "w": 11,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "WAL Stats",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "6",
+                    "w": 13,
+                    "x": 11,
+                    "y": 15
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Reload Count",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7",
+                    "w": 10,
+                    "x": 24,
+                    "y": 22
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Remote API Reads",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8",
+                    "w": 14,
+                    "x": 34,
+                    "y": 22
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Alert Notifications",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Prometheus] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6a9b80c0-b2ed-11e9-9a23-67ee28886a4b",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "19886730-b2e7-11e9-9a23-67ee28886a4b",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "f77c5900-b2e4-11e9-9a23-67ee28886a4b",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "ffb70040-b2ec-11e9-9a23-67ee28886a4b",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "79345b00-b2e5-11e9-9a23-67ee28886a4b",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "138704c0-b2f8-11e9-9a23-67ee28886a4b",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "d7740b40-b2fc-11e9-9a23-67ee28886a4b",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "edd33100-b305-11e9-9a23-67ee28886a4b",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "0b356630-b308-11e9-9a23-67ee28886a4b",
+            "name": "8:panel_8",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:46.559Z",
+    "version": "WzQxMTIsMV0="
+}

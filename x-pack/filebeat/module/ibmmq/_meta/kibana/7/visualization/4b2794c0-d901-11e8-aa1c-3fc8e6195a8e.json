@@ -1,0 +1,67 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Errors over time by Queue Manager [Filebeat IBM MQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:ibmmq"
+                },
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "stacked",
+                        "terms_field": "ibmmq.errorlog.qmgr",
+                        "terms_size": "50",
+                        "value_template": "{{value}} Errors"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Errors over time by Queue Manager [Filebeat IBM MQ]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4b2794c0-d901-11e8-aa1c-3fc8e6195a8e",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:43.104Z",
+    "version": "WzQyNjQsMV0="
+}

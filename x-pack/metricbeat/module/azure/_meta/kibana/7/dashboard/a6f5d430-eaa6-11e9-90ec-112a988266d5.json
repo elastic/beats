@@ -1,0 +1,210 @@
+{
+    "attributes": {
+        "description": "This dashboards shows ASP.NET and SQL Server specific metrics extracted from the azure.vm.windows.guestmetrics namespace",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "b7b8bcc1-f776-45cf-a149-36665f2de746",
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "b7b8bcc1-f776-45cf-a149-36665f2de746",
+                "panelRefName": "panel_b7b8bcc1-f776-45cf-a149-36665f2de746",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "bc65dd87-08f6-49f7-b8bf-0d371431ad4d",
+                    "w": 18,
+                    "x": 6,
+                    "y": 0
+                },
+                "panelIndex": "bc65dd87-08f6-49f7-b8bf-0d371431ad4d",
+                "panelRefName": "panel_bc65dd87-08f6-49f7-b8bf-0d371431ad4d",
+                "title": "Applications Running",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "6a5abca9-1cfd-45ef-aa88-9b4a72ce2dca",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "6a5abca9-1cfd-45ef-aa88-9b4a72ce2dca",
+                "panelRefName": "panel_6a5abca9-1cfd-45ef-aa88-9b4a72ce2dca",
+                "title": "SQL Server User Connections",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "5c0158cc-c884-4665-8bbf-7fc34d885d55",
+                    "w": 12,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "5c0158cc-c884-4665-8bbf-7fc34d885d55",
+                "panelRefName": "panel_5c0158cc-c884-4665-8bbf-7fc34d885d55",
+                "title": "Application Requests",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "03c9cff0-b2ec-4dd1-9a2f-db7f441e5e71",
+                    "w": 12,
+                    "x": 12,
+                    "y": 12
+                },
+                "panelIndex": "03c9cff0-b2ec-4dd1-9a2f-db7f441e5e71",
+                "panelRefName": "panel_03c9cff0-b2ec-4dd1-9a2f-db7f441e5e71",
+                "title": "Application Error Rates",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "aaa96404-80de-44dc-990c-76bf40d3827b",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "aaa96404-80de-44dc-990c-76bf40d3827b",
+                "panelRefName": "panel_aaa96404-80de-44dc-990c-76bf40d3827b",
+                "title": "SQL Server Total Server Memory",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "b89c7551-e0e1-4642-ac18-01322ea72db8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "b89c7551-e0e1-4642-ac18-01322ea72db8",
+                "panelRefName": "panel_b89c7551-e0e1-4642-ac18-01322ea72db8",
+                "title": "Application Sessions",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "43effd82-fc6a-4d11-bd1e-d3b12a34cbce",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "43effd82-fc6a-4d11-bd1e-d3b12a34cbce",
+                "panelRefName": "panel_43effd82-fc6a-4d11-bd1e-d3b12a34cbce",
+                "title": "SQL Server Page Reads/Writes",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] VM Guest Metrics Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a6f5d430-eaa6-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "5031b220-eb61-11e9-90ec-112a988266d5",
+            "name": "b7b8bcc1-f776-45cf-a149-36665f2de746:panel_b7b8bcc1-f776-45cf-a149-36665f2de746",
+            "type": "visualization"
+        },
+        {
+            "id": "1f5c1cd0-eaa3-11e9-90ec-112a988266d5",
+            "name": "bc65dd87-08f6-49f7-b8bf-0d371431ad4d:panel_bc65dd87-08f6-49f7-b8bf-0d371431ad4d",
+            "type": "visualization"
+        },
+        {
+            "id": "0aacc190-eaa8-11e9-90ec-112a988266d5",
+            "name": "6a5abca9-1cfd-45ef-aa88-9b4a72ce2dca:panel_6a5abca9-1cfd-45ef-aa88-9b4a72ce2dca",
+            "type": "visualization"
+        },
+        {
+            "id": "097bc300-eaa5-11e9-90ec-112a988266d5",
+            "name": "5c0158cc-c884-4665-8bbf-7fc34d885d55:panel_5c0158cc-c884-4665-8bbf-7fc34d885d55",
+            "type": "visualization"
+        },
+        {
+            "id": "6d52a660-eaa4-11e9-90ec-112a988266d5",
+            "name": "03c9cff0-b2ec-4dd1-9a2f-db7f441e5e71:panel_03c9cff0-b2ec-4dd1-9a2f-db7f441e5e71",
+            "type": "visualization"
+        },
+        {
+            "id": "d7ea4290-eaa8-11e9-90ec-112a988266d5",
+            "name": "aaa96404-80de-44dc-990c-76bf40d3827b:panel_aaa96404-80de-44dc-990c-76bf40d3827b",
+            "type": "visualization"
+        },
+        {
+            "id": "b9aa9b20-eaa5-11e9-90ec-112a988266d5",
+            "name": "b89c7551-e0e1-4642-ac18-01322ea72db8:panel_b89c7551-e0e1-4642-ac18-01322ea72db8",
+            "type": "visualization"
+        },
+        {
+            "id": "787a0a20-eaa8-11e9-90ec-112a988266d5",
+            "name": "43effd82-fc6a-4d11-bd1e-d3b12a34cbce:panel_43effd82-fc6a-4d11-bd1e-d3b12a34cbce",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:54.175Z",
+    "version": "WzM2MDAsMV0="
+}

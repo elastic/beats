@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Network out by node  [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "12c1f2f0-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:kubernetes AND metricset.name:pod"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "0d5c6b10-2bf2-11e7-859b-f78b612cde28",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "0d5c9220-2bf2-11e7-859b-f78b612cde28",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.pod.network.tx.bytes",
+                                "id": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                                "type": "max"
+                            },
+                            {
+                                "field": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                                "id": "494fc310-2bf7-11e7-859b-f78b612cde28",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "494fc310-2bf7-11e7-859b-f78b612cde28",
+                                "id": "244c70e0-3598-11e7-aa4a-8313a0c92a88",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "stacked",
+                        "terms_field": "kubernetes.node.name",
+                        "terms_order_by": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                        "terms_size": "10000"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Network out by node  [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "294546b0-30d6-11e7-8df8-6d3604a72912-ecs",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-03-24T09:43:55.002Z",
+    "version": "WzYzNDQsM10="
+}

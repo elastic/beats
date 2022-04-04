@@ -8,7 +8,7 @@ import unittest
 
 REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
 
-REDIS_INFO_FIELDS = ["clients", "cluster", "cpu", "memory",
+REDIS_INFO_FIELDS = ["clients", "cluster", "commandstats", "cpu", "memory",
                      "persistence", "replication", "server", "stats", "slowlog"]
 
 REDIS_KEYSPACE_FIELDS = ["keys", "expires", "id", "avg_ttl"]
@@ -16,8 +16,7 @@ REDIS_KEYSPACE_FIELDS = ["keys", "expires", "id", "avg_ttl"]
 CPU_FIELDS = ["used.sys", "used.sys_children", "used.user",
               "used.user_children"]
 
-CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
-                  "longest_output_list", "connected",
+CLIENTS_FIELDS = ["blocked", "connected",
                   "max_input_buffer", "max_output_buffer"]
 
 

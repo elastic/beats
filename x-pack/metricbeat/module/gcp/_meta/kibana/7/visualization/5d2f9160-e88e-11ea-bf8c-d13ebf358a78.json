@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Account ID Filter [Metricbeat GCP]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "cloud.provider",
+                        "id": "1598550838945",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Cloud Provider ",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "cloud.account.id",
+                        "id": "1598893530938",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Account ID",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1598550838945",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "gcp.billing.invoice_month",
+                        "id": "1598988595566",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Invoice Month",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": false,
+                "useTimeFilter": false
+            },
+            "title": "Account ID Filter [Metricbeat GCP]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5d2f9160-e88e-11ea-bf8c-d13ebf358a78",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NjgsMV0="
+}

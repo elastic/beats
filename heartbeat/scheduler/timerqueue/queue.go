@@ -88,7 +88,7 @@ func (tq *TimerQueue) Start() {
 				if tq.th.Len() > 0 {
 					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
-					tq.timer.Reset(nr.Sub(time.Now()))
+					tq.timer.Reset(time.Until(nr))
 				} else {
 					tq.timer.Stop()
 					tq.nextRunAt = nil
@@ -104,14 +104,10 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
-		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
-		// channel is empty (and thus would block)
 		if tq.nextRunAt != nil && !tq.timer.Stop() {
 			<-tq.timer.C
 		}
-		tq.timer.Reset(tt.runAt.Sub(time.Now()))
-
+		tq.timer.Reset(time.Until(tt.runAt))
 		tq.nextRunAt = &tt.runAt
 	}
 }

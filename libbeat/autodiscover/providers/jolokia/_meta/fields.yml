@@ -4,30 +4,37 @@
     Metadata from Jolokia Discovery added by the jolokia provider.
   fields:
     - name: jolokia.agent.version
+      default_field: true
       type: keyword
       description: >
         Version number of jolokia agent.
     - name: jolokia.agent.id
+      default_field: true
       type: keyword
       description: >
         Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
     - name: jolokia.server.product
+      default_field: true
       type: keyword
       description: >
         The container product if detected.
     - name: jolokia.server.version
+      default_field: true
       type: keyword
       description: >
         The container's version (if detected).
     - name: jolokia.server.vendor
+      default_field: true
       type: keyword
       description: >
         The vendor of the container the agent is running in.
     - name: jolokia.url
+      default_field: true
       type: keyword
       description: >
         The URL how this agent can be contacted.
     - name: jolokia.secured
+      default_field: true
       type: boolean
       description: >
         Whether the agent was configured for authentication or not.

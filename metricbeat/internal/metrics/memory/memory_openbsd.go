@@ -35,7 +35,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Uvmexp wraps memory data from sysctl
@@ -157,7 +158,7 @@ type Swapent struct {
 	sw_path     []byte
 }
 
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 
 	memData := Memory{}
 
@@ -191,12 +192,12 @@ func get(_ string) (Memory, error) {
 	memFree := uint64(uvmexp.free) << uvmexp.pageshift
 	memUsed := uint64(uvmexp.npages-uvmexp.free) << uvmexp.pageshift
 
-	memData.Total = metrics.OptUintWith(uint64(uvmexp.npages) << uvmexp.pageshift)
-	memData.Used.Bytes = metrics.OptUintWith(memUsed)
-	memData.Free = metrics.OptUintWith(memFree)
+	memData.Total = opt.UintWith(uint64(uvmexp.npages) << uvmexp.pageshift)
+	memData.Used.Bytes = opt.UintWith(memUsed)
+	memData.Free = opt.UintWith(memFree)
 
-	memData.Actual.Free = metrics.OptUintWith(memFree + (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
-	memData.Actual.Used.Bytes = metrics.OptUintWith(memUsed - (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
+	memData.Actual.Free = opt.UintWith(memFree + (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
+	memData.Actual.Used.Bytes = opt.UintWith(memUsed - (uint64(bcachestats.numbufpages) << uvmexp.pageshift))
 
 	var err error
 	memData.Swap, err = getSwap()
@@ -225,12 +226,12 @@ func getSwap() (SwapMetrics, error) {
 
 	for i := 0; i < int(nswap); i++ {
 		if swdev[i].se_flags&C.SWF_ENABLE == 2 {
-			swapData.Used.Bytes = metrics.OptUintWith(swapData.Used.Bytes.ValueOr(0) + uint64(swdev[i].se_inuse/(1024/C.DEV_BSIZE)))
-			swapData.Total = metrics.OptUintWith(swapData.Total.ValueOr(0) + uint64(swdev[i].se_nblks/(1024/C.DEV_BSIZE)))
+			swapData.Used.Bytes = opt.UintWith(swapData.Used.Bytes.ValueOr(0) + uint64(swdev[i].se_inuse/(1024/C.DEV_BSIZE)))
+			swapData.Total = opt.UintWith(swapData.Total.ValueOr(0) + uint64(swdev[i].se_nblks/(1024/C.DEV_BSIZE)))
 		}
 	}
 
-	swapData.Free = metrics.OptUintWith(swapData.Total.ValueOr(0) - swapData.Used.Bytes.ValueOr(0))
+	swapData.Free = opt.UintWith(swapData.Total.ValueOr(0) - swapData.Used.Bytes.ValueOr(0))
 
 	return swapData, nil
 }

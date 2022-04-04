@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package kubernetes
@@ -106,7 +107,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, errWrap(err)
 	}

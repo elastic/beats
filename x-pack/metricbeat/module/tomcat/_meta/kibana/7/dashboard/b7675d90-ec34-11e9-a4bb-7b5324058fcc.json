@@ -1,0 +1,210 @@
+{
+    "attributes": {
+        "description": "An overview dashboards of all key metrics included in the Tomcat Metricbeat module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "1",
+                    "w": 18,
+                    "x": 16,
+                    "y": 18
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Other Memory usage",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "2",
+                    "w": 25,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Heap memory usage",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "3",
+                    "w": 16,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Total Threads",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "5",
+                    "w": 14,
+                    "x": 34,
+                    "y": 18
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Cache Size",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "6",
+                    "w": 23,
+                    "x": 25,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Total requests",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "7",
+                    "w": 16,
+                    "x": 0,
+                    "y": 9
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Bytes sent/received",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "8",
+                    "w": 18,
+                    "x": 16,
+                    "y": 9
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Processing time ms",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "9",
+                    "w": 14,
+                    "x": 34,
+                    "y": 9
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "Cache Hit Total",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Tomcat] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b7675d90-ec34-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "618130c0-ec31-11e9-a4bb-7b5324058fcc",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "e037f620-ec30-11e9-a4bb-7b5324058fcc",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "17ec8fd0-ec32-11e9-a4bb-7b5324058fcc",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "b3e833d0-ec32-11e9-a4bb-7b5324058fcc",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "9d0616e0-ec33-11e9-a4bb-7b5324058fcc",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "7bcc3ae0-ec33-11e9-a4bb-7b5324058fcc",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "9343a810-ec34-11e9-a4bb-7b5324058fcc",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "38f55440-ec33-11e9-a4bb-7b5324058fcc",
+            "name": "9:panel_9",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:22.513Z",
+    "version": "WzMyODUsMV0="
+}

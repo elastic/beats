@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"context"
 	"errors"
 	"io"
 	"os"
@@ -136,14 +137,14 @@ func (f *logFile) Read(buf []byte) (int, error) {
 
 func (f *logFile) startFileMonitoringIfNeeded() {
 	if f.closeInactive > 0 || f.closeRemoved || f.closeRenamed {
-		f.tg.Go(func(ctx unison.Canceler) error {
+		f.tg.Go(func(ctx context.Context) error {
 			f.periodicStateCheck(ctx)
 			return nil
 		})
 	}
 
 	if f.closeAfterInterval > 0 {
-		f.tg.Go(func(ctx unison.Canceler) error {
+		f.tg.Go(func(ctx context.Context) error {
 			f.closeIfTimeout(ctx)
 			return nil
 		})
@@ -174,7 +175,6 @@ func (f *logFile) shouldBeClosed() bool {
 
 	if !f.closeRemoved && !f.closeRenamed {
 		return false
-
 	}
 
 	info, statErr := f.file.Stat()

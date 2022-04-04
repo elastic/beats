@@ -1,161 +1,149 @@
 - name: pubsub
+  description: Google Cloud PubSub metrics
   release: beta
   type: group
-  description: Google Cloud PubSub metrics
   fields:
-    - name: subscription
-      type: group
-      description: Suscription related metrics
-      fields:
-        - name: ack_message_count.value
-          type: long
-          description: Cumulative count of messages acknowledged by Acknowledge requests, grouped by delivery type.
-        - name: backlog_bytes.value
-          type: long
-          description: Total byte size of the unacknowledged messages (a.k.a. backlog messages) in a subscription.
-        - name: num_outstanding_messages.value
-          type: long
-          description: Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
-        - name: num_undelivered_messages.value
-          type: long
-          description: Number of unacknowledged messages (a.k.a. backlog messages) in a subscription.
-        - name: oldest_unacked_message_age.value
-          type: long
-          description: Age (in seconds) of the oldest unacknowledged message (a.k.a. backlog message) in a subscription.
-        - name: pull_ack_message_operation_count.value
-          type: long
-          description: Cumulative count of acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-        - name: pull_ack_request_count.value
-          type: long
-          description: Cumulative count of acknowledge requests, grouped by result.
-        - name: pull_message_operation_count.value
-          type: long
-          description: Cumulative count of pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-        - name: pull_request_count.value
-          type: long
-          description: Cumulative count of pull requests, grouped by result.
-        - name: push_request_count.value
-          type: long
-          description: Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
-        - name: push_request_latencies.value
-          type: long
-          description: Distribution of push request latencies (in microseconds), grouped by result.
-        - name: sent_message_count.value
-          type: long
-          description: Cumulative count of messages sent by Cloud Pub/Sub to subscriber clients, grouped by delivery type.
-        - name: streaming_pull_ack_message_operation_count.value
-          type: long
-          description: Cumulative count of StreamingPull acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-        - name: streaming_pull_ack_request_count.value
-          type: long
-          description: Cumulative count of streaming pull requests with non-empty acknowledge ids, grouped by result.
-        - name: streaming_pull_message_operation_count.value
-          type: long
-          description: Cumulative count of streaming pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric <code>subscription/mod_ack_deadline_message_operation_count
-        - name: streaming_pull_response_count.value
-          type: long
-          description: Cumulative count of streaming pull responses, grouped by result.
-        - name: dead_letter_message_count.value
-          type: long
-          description: Cumulative count of messages published to dead letter topic, grouped by result.
-        - name: mod_ack_deadline_message_count.value
-          type: long
-          description: Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
-        - name: mod_ack_deadline_message_operation_count.value
-          type: long
-          description: Cumulative count of ModifyAckDeadline message operations, grouped by result.
-        - name: mod_ack_deadline_request_count.value
-          type: long
-          description: Cumulative count of ModifyAckDeadline requests, grouped by result.
-        - name: oldest_retained_acked_message_age.value
-          type: long
-          description: Age (in seconds) of the oldest acknowledged message retained in a subscription.
-        - name: oldest_retained_acked_message_age_by_region.value
-          type: long
-          description: Age (in seconds) of the oldest acknowledged message retained in a subscription, broken down by Cloud region.
-        - name: oldest_unacked_message_age_by_region.value
-          type: long
-          description: Age (in seconds) of the oldest unacknowledged message in a subscription, broken down by Cloud region.
-        - name: retained_acked_bytes.value
-          type: long
-          description: Total byte size of the acknowledged messages retained in a subscription.
-        - name: retained_acked_bytes_by_region.value
-          type: long
-          description: Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
-        - name: seek_request_count.value
-          type: long
-          description: Cumulative count of seek attempts, grouped by result.
-        - name: streaming_pull_mod_ack_deadline_message_operation_count.value
-          type: long
-          description: Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
-        - name: streaming_pull_mod_ack_deadline_request_count.value
-          type: long
-          description: Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
-        - name: byte_cost.value
-          type: long
-          description: Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
-        - name: config_updates_count.value
-          type: long
-          description: Cumulative count of configuration changes for each subscription, grouped by operation type and result.
-        - name: unacked_bytes_by_region.value
-          type: long
-          description: Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
-    - name: topic
-      type: group
-      description: Topic related metrics
-      fields:
-        - name: streaming_pull_response_count.value
-          type: long
-          description: Cumulative count of streaming pull responses, grouped by result.
-        - name: send_message_operation_count.value
-          type: long
-          description: Cumulative count of publish message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-        - name: send_request_count.value
-          type: long
-          description: Cumulative count of publish requests, grouped by result.
-        - name: oldest_retained_acked_message_age_by_region.value
-          type: long
-          description: Age (in seconds) of the oldest acknowledged message retained in a topic, broken down by Cloud region.
-        - name: oldest_unacked_message_age_by_region.value
-          type: long
-          description: Age (in seconds) of the oldest unacknowledged message in a topic, broken down by Cloud region.
-        - name: retained_acked_bytes_by_region.value
-          type: long
-          description: Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
-        - name: byte_cost.value
-          type: long
-          description: Cost of operations, measured in bytes. This is used to measure utilization for quotas.
-        - name: config_updates_count.value
-          type: long
-          description: Cumulative count of configuration changes, grouped by operation type and result.
-        - name: message_sizes.value
-          type: long
-          description: Distribution of publish message sizes (in bytes)
-        - name: unacked_bytes_by_region.value
-          type: long
-          description: Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
-    - name: snapshot
-      type: group
-      description: Snapshot related metrics
-      fields:
-        - name: oldest_message_age.value
-          type: long
-          description: Age (in seconds) of the oldest message retained in a snapshot.
-        - name: oldest_message_age_by_region.value
-          type: long
-          description: Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
-        - name: backlog_bytes.value
-          type: long
-          description: Total byte size of the messages retained in a snapshot.
-        - name: backlog_bytes_by_region.value
-          type: long
-          description: Total byte size of the messages retained in a snapshot, broken down by Cloud region.
-        - name: num_messages.value
-          type: long
-          description: Number of messages retained in a snapshot.
-        - name: num_messages_by_region.value
-          type: long
-          description: Number of messages retained in a snapshot, broken down by Cloud region.
-        - name: config_updates_count.value
-          type: long
-          description: Cumulative count of configuration changes, grouped by operation type and result.
+  - name: snapshot.backlog.bytes
+    type: long
+    description: Total byte size of the messages retained in a snapshot.
+  - name: snapshot.backlog_bytes_by_region.bytes
+    type: long
+    description: Total byte size of the messages retained in a snapshot, broken down by Cloud region.
+  - name: snapshot.config_updates.count
+    type: long
+    description: Cumulative count of configuration changes, grouped by operation type and result.
+  - name: snapshot.num_messages.value
+    type: long
+    description: Number of messages retained in a snapshot.
+  - name: snapshot.num_messages_by_region.value
+    type: long
+    description: Number of messages retained in a snapshot, broken down by Cloud region.
+  - name: snapshot.oldest_message_age.sec
+    type: long
+    description: Age (in seconds) of the oldest message retained in a snapshot.
+  - name: snapshot.oldest_message_age_by_region.sec
+    type: long
+    description: Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
+  - name: subscription.ack_message.count
+    type: long
+    description: Cumulative count of messages acknowledged by Acknowledge requests, grouped by delivery type.
+  - name: subscription.backlog.bytes
+    type: long
+    description: Total byte size of the unacknowledged messages (a.k.a. backlog messages) in a subscription.
+  - name: subscription.byte_cost.bytes
+    type: long
+    description: Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
+  - name: subscription.config_updates.count
+    type: long
+    description: Cumulative count of configuration changes for each subscription, grouped by operation type and result.
+  - name: subscription.dead_letter_message.count
+    type: long
+    description: Cumulative count of messages published to dead letter topic, grouped by result.
+  - name: subscription.mod_ack_deadline_message.count
+    type: long
+    description: Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
+  - name: subscription.mod_ack_deadline_message_operation.count
+    type: long
+    description: Cumulative count of ModifyAckDeadline message operations, grouped by result.
+  - name: subscription.mod_ack_deadline_request.count
+    type: long
+    description: Cumulative count of ModifyAckDeadline requests, grouped by result.
+  - name: subscription.num_outstanding_messages.value
+    type: long
+    description: Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
+  - name: subscription.num_undelivered_messages.value
+    type: long
+    description: Number of unacknowledged messages (a.k.a. backlog messages) in a subscription.
+  - name: subscription.oldest_retained_acked_message_age.sec
+    type: long
+    description: Age (in seconds) of the oldest acknowledged message retained in a subscription.
+  - name: subscription.oldest_retained_acked_message_age_by_region.value
+    type: long
+    description: Age (in seconds) of the oldest acknowledged message retained in a subscription, broken down by Cloud region.
+  - name: subscription.oldest_unacked_message_age.sec
+    type: long
+    description: Age (in seconds) of the oldest unacknowledged message (a.k.a. backlog message) in a subscription.
+  - name: subscription.oldest_unacked_message_age_by_region.value
+    type: long
+    description: Age (in seconds) of the oldest unacknowledged message in a subscription, broken down by Cloud region.
+  - name: subscription.pull_ack_message_operation.count
+    type: long
+    description: Cumulative count of acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+  - name: subscription.pull_ack_request.count
+    type: long
+    description: Cumulative count of acknowledge requests, grouped by result.
+  - name: subscription.pull_message_operation.count
+    type: long
+    description: Cumulative count of pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+  - name: subscription.pull_request.count
+    type: long
+    description: Cumulative count of pull requests, grouped by result.
+  - name: subscription.push_request.count
+    type: long
+    description: Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
+  - name: subscription.push_request_latencies.value
+    type: long
+    description: Distribution of push request latencies (in microseconds), grouped by result.
+  - name: subscription.retained_acked.bytes
+    type: long
+    description: Total byte size of the acknowledged messages retained in a subscription.
+  - name: subscription.retained_acked_bytes_by_region.bytes
+    type: long
+    description: Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
+  - name: subscription.seek_request.count
+    type: long
+    description: Cumulative count of seek attempts, grouped by result.
+  - name: subscription.sent_message.count
+    type: long
+    description: Cumulative count of messages sent by Cloud Pub/Sub to subscriber clients, grouped by delivery type.
+  - name: subscription.streaming_pull_ack_message_operation.count
+    type: long
+    description: Cumulative count of StreamingPull acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+  - name: subscription.streaming_pull_ack_request.count
+    type: long
+    description: Cumulative count of streaming pull requests with non-empty acknowledge ids, grouped by result.
+  - name: subscription.streaming_pull_message_operation.count
+    type: long
+    description: Cumulative count of streaming pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric <code>subscription/mod_ack_deadline_message_operation_count
+  - name: subscription.streaming_pull_mod_ack_deadline_message_operation.count
+    type: long
+    description: Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
+  - name: subscription.streaming_pull_mod_ack_deadline_request.count
+    type: long
+    description: Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
+  - name: subscription.streaming_pull_response.count
+    type: long
+    description: Cumulative count of streaming pull responses, grouped by result.
+  - name: subscription.unacked_bytes_by_region.bytes
+    type: long
+    description: Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
+  - name: topic.byte_cost.bytes
+    type: long
+    description: Cost of operations, measured in bytes. This is used to measure utilization for quotas.
+  - name: topic.config_updates.count
+    type: long
+    description: Cumulative count of configuration changes, grouped by operation type and result.
+  - name: topic.message_sizes.bytes
+    type: long
+    description: Distribution of publish message sizes (in bytes)
+  - name: topic.oldest_retained_acked_message_age_by_region.value
+    type: long
+    description: Age (in seconds) of the oldest acknowledged message retained in a topic, broken down by Cloud region.
+  - name: topic.oldest_unacked_message_age_by_region.value
+    type: long
+    description: Age (in seconds) of the oldest unacknowledged message in a topic, broken down by Cloud region.
+  - name: topic.retained_acked_bytes_by_region.bytes
+    type: long
+    description: Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
+  - name: topic.send_message_operation.count
+    type: long
+    description: Cumulative count of publish message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+  - name: topic.send_request.count
+    type: long
+    description: Cumulative count of publish requests, grouped by result.
+  - name: topic.streaming_pull_response.count
+    type: long
+    description: Cumulative count of streaming pull responses, grouped by result.
+  - name: topic.unacked_bytes_by_region.bytes
+    type: long
+    description: Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.

@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func DefaultConfig() *Config {
@@ -26,10 +27,13 @@ type Config struct {
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
-	Id             string   `config:"id"`
-	Sandbox        bool     `config:"sandbox"`
-	Screenshots    string   `config:"screenshots"`
-	SyntheticsArgs []string `config:"synthetics_args"`
+	Id                string                        `config:"id"`
+	Sandbox           bool                          `config:"sandbox"`
+	Throttling        interface{}                   `config:"throttling"`
+	Screenshots       string                        `config:"screenshots"`
+	SyntheticsArgs    []string                      `config:"synthetics_args"`
+	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
+	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

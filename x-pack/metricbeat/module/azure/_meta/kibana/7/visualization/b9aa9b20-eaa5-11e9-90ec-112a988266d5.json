@@ -1,0 +1,138 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "ASP.NET Application Sessions [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "azure.resource.type : \"Microsoft.Compute/virtualMachines\" "
+                },
+                "id": "6d6575a0-eaa5-11e9-84ad-5919a47b8f34",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "6d6575a1-eaa5-11e9-84ad-5919a47b8f34",
+                        "label": "active",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.asp_net_applications_sessions_active.avg",
+                                "id": "6d6575a2-eaa5-11e9-84ad-5919a47b8f34",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#DB1374",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "6d6575a3-eaa5-11e9-84ad-5919a47b8f34",
+                        "label": "timed out",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.asp_net_applications_sessions_timed_out.avg",
+                                "id": "6d6575a4-eaa5-11e9-84ad-5919a47b8f34",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#00B3A4",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "6d6575a5-eaa5-11e9-84ad-5919a47b8f34",
+                        "label": "abandoned",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.asp_net_applications_sessions_abandoned.avg",
+                                "id": "6d6575a6-eaa5-11e9-84ad-5919a47b8f34",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#490092",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "6d6575a7-eaa5-11e9-84ad-5919a47b8f34",
+                        "label": "total",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.asp_net_applications_sessions_total.avg",
+                                "id": "6d6575a8-eaa5-11e9-84ad-5919a47b8f34",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "ASP.NET Application Sessions [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b9aa9b20-eaa5-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:54.175Z",
+    "version": "WzM2MDcsMV0="
+}

@@ -28,7 +28,7 @@ func TestCursor_IsNew(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
 
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 		require.True(t, cursor.IsNew())
 	})
 
@@ -38,7 +38,7 @@ func TestCursor_IsNew(t *testing.T) {
 		}))
 		defer store.Release()
 
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 		require.True(t, cursor.IsNew())
 	})
 
@@ -48,7 +48,7 @@ func TestCursor_IsNew(t *testing.T) {
 		}))
 		defer store.Release()
 
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 		require.False(t, cursor.IsNew())
 	})
 
@@ -59,11 +59,11 @@ func TestCursor_IsNew(t *testing.T) {
 		defer store.Release()
 
 		res := store.Get("test::key")
-		op, err := createUpdateOp(store, res, "test-state-update")
+		op, err := createUpdateOp(res, "test-state-update")
 		require.NoError(t, err)
 		defer op.done(1)
 
-		cursor := makeCursor(store, res)
+		cursor := makeCursor(res)
 		require.False(t, cursor.IsNew())
 	})
 }
@@ -74,7 +74,7 @@ func TestCursor_Unpack(t *testing.T) {
 		defer store.Release()
 
 		var st string
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 
 		require.NoError(t, cursor.Unpack(&st))
 		require.Equal(t, "", st)
@@ -87,7 +87,7 @@ func TestCursor_Unpack(t *testing.T) {
 		defer store.Release()
 
 		var st struct{ A uint }
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 		require.Error(t, cursor.Unpack(&st))
 	})
 
@@ -98,7 +98,7 @@ func TestCursor_Unpack(t *testing.T) {
 		defer store.Release()
 
 		var st string
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 
 		require.NoError(t, cursor.Unpack(&st))
 		require.Equal(t, "test", st)
@@ -111,12 +111,12 @@ func TestCursor_Unpack(t *testing.T) {
 		defer store.Release()
 
 		res := store.Get("test::key")
-		op, err := createUpdateOp(store, res, "test-state-update")
+		op, err := createUpdateOp(res, "test-state-update")
 		require.NoError(t, err)
 		defer op.done(1)
 
 		var st string
-		cursor := makeCursor(store, store.Get("test::key"))
+		cursor := makeCursor(store.Get("test::key"))
 
 		require.NoError(t, cursor.Unpack(&st))
 		require.Equal(t, "test-state-update", st)

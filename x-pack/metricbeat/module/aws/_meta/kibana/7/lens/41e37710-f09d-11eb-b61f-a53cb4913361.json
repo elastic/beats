@@ -1,0 +1,147 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "8682174a-4cff-4d95-b719-1fc306f5b33a": {
+                            "columnOrder": [
+                                "bc08fa3e-ce15-4acd-a0fd-c5c5c5452441",
+                                "f45a0753-4e23-43c4-80f7-4a9aa9548a6e",
+                                "85980678-0e26-4f77-b735-7ec5ebbc472e",
+                                "85980678-0e26-4f77-b735-7ec5ebbc472eX0"
+                            ],
+                            "columns": {
+                                "85980678-0e26-4f77-b735-7ec5ebbc472e": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Write Throughput MB/Second",
+                                    "operationType": "formula",
+                                    "params": {
+                                        "formula": "average(aws.rds.throughput.write)",
+                                        "isFormulaBroken": false
+                                    },
+                                    "references": [
+                                        "85980678-0e26-4f77-b735-7ec5ebbc472eX0"
+                                    ],
+                                    "scale": "ratio"
+                                },
+                                "85980678-0e26-4f77-b735-7ec5ebbc472eX0": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Part of Select Throughput Count/Second",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.throughput.write"
+                                },
+                                "bc08fa3e-ce15-4acd-a0fd-c5c5c5452441": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                },
+                                "f45a0753-4e23-43c4-80f7-4a9aa9548a6e": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "85980678-0e26-4f77-b735-7ec5ebbc472e"
+                        ],
+                        "layerId": "8682174a-4cff-4d95-b719-1fc306f5b33a",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "bc08fa3e-ce15-4acd-a0fd-c5c5c5452441",
+                        "xAccessor": "f45a0753-4e23-43c4-80f7-4a9aa9548a6e"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                }
+            }
+        },
+        "title": "RDS Write Throughput[Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "41e37710-f09d-11eb-b61f-a53cb4913361",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-8682174a-4cff-4d95-b719-1fc306f5b33a",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-25T14:42:42.329Z",
+    "version": "Wzc1NDMsMl0="
+}

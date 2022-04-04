@@ -1,0 +1,124 @@
+{
+    "attributes": {
+        "description": "Overview of RabbitMQ status",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 12,
+                    "x": 28,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "9",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "10",
+                    "w": 24,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat RabbitMQ] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "AV4YobKIge1VCbKU_qVo-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Rabbitmq-Number-of-Nodes-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "RabbitMQ-Memory-Usage-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "RabbitMQ-Queue-Index-Operations-ecs",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "RabbitMQ-Erlang-Process-Usage-ecs",
+            "name": "10:panel_10",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:47.567Z",
+    "version": "WzQxMjYsMV0="
+}

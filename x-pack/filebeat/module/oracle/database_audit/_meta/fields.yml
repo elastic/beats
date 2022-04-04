@@ -1,6 +1,5 @@
 - name: database_audit
   type: group
-  release: beta
   description: >
     Module for parsing Oracle Database audit logs
   fields:

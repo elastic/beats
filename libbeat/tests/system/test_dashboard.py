@@ -1,9 +1,11 @@
 import os
 import os.path
 import pytest
+import json
 import re
 import requests
 import semver
+import shutil
 import subprocess
 import unittest
 
@@ -31,7 +33,11 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
 
@@ -56,10 +62,13 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
-
         beat.check_wait(exit_code=0)
 
         assert self.log_contains("Kibana dashboards successfully loaded") is True
@@ -89,8 +98,12 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "setup.kibana.space.id=foo-bar",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
 
@@ -116,37 +129,17 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
 
         beat.check_wait(exit_code=0)
 
         assert self.log_contains("Kibana dashboards successfully loaded") is True
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_export_dashboard_cmd_export_dashboard_by_id_and_decoding(self):
-        """
-        Test testbeat export dashboard can export dashboards
-        and removes unsupported characters
-        """
-        self.render_config_template()
-        self.test_load_dashboard()
-        beat = self.start_beat(
-            logging_args=["-e", "-d", "*"],
-            extra_args=["export",
-                        "dashboard",
-                        "-E", "setup.kibana.protocol=http",
-                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
-                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
-                        "-decode",
-                        "-id", "Metricbeat-system-overview"]
-        )
-
-        beat.check_wait(exit_code=0)
-
-        assert self.log_contains("\"id\": \"Metricbeat-system-overview\",") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -163,12 +156,14 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
-                        "-id", "Metricbeat-system-overview"]
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
+                        "-id", "Metricbeat-system-overview",
+                        "-folder", "system-overview"]
         )
 
         beat.check_wait(exit_code=0)
-
-        assert self.log_contains("\"id\": \"Metricbeat-system-overview\",") is True
+        self._check_if_dashboard_exported("system-overview")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -184,68 +179,16 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
-                        "-id", "No-such-dashboard"]
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
+                        "-id", "No-such-dashboard",
+                        "-folder", "system-overview"]
         )
 
         beat.check_wait(exit_code=1)
 
         expected_error = re.compile("error exporting dashboard:.*not found", re.IGNORECASE)
         assert self.log_contains(expected_error)
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_export_dashboard_cmd_export_dashboard_from_yml(self):
-        """
-        Test testbeat export dashboard can export dashboards from dashboards YAML file
-        and removes unsupported characters
-        """
-
-        self.render_config_template()
-        self.test_load_dashboard()
-        beat = self.start_beat(
-            logging_args=["-e", "-d", "*"],
-            extra_args=["export",
-                        "dashboard",
-                        "-E", "setup.kibana.protocol=http",
-                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
-                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
-                        "-yml", os.path.join(self.beat_path, "tests", "files", "dashboards.yml")]
-        )
-
-        beat.check_wait(exit_code=0)
-
-        version = self.get_version()
-        kibana_semver = semver.VersionInfo.parse(version)
-        exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
-                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
-
-        with open(exported_dashboard_path) as f:
-            content = f.read()
-            assert "Metricbeat-system-overview" in content
-
-        os.remove(exported_dashboard_path)
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_export_dashboard_cmd_export_dashboard_from_not_existent_yml(self):
-        """
-        Test testbeat export dashboard fails gracefully when cannot find YAML file
-        """
-
-        self.render_config_template()
-        beat = self.start_beat(
-            logging_args=["-e", "-d", "*"],
-            extra_args=["export",
-                        "dashboard",
-                        "-E", "setup.kibana.protocol=http",
-                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
-                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
-                        "-yml", os.path.join(self.beat_path, "tests", "files", "no-such-file.yml")]
-        )
-
-        beat.check_wait(exit_code=1)
-        assert self.log_contains("Error exporting dashboards from yml")
-        assert self.log_contains("error opening the list of dashboards")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -256,22 +199,16 @@ class Test(BaseTest):
 
         self.test_load_dashboard()
 
+        folder_name = "system-overview"
         path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
         command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
-        command = "go run " + command + " -dashboard Metricbeat-system-overview"
+        command = "go run " + command + " -dashboard Metricbeat-system-overview -folder " + folder_name
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         content, err = p.communicate()
-
         assert p.returncode == 0
 
-        assert os.path.isfile("output.json") is True
-
-        with open('output.json') as f:
-            content = f.read()
-            assert "Metricbeat-system-overview" in content
-
-        os.remove("output.json")
+        self._check_if_dashboard_exported(folder_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -289,6 +226,7 @@ class Test(BaseTest):
 
         assert p.returncode != 0
 
+    @unittest.skip("Failing test: https://github.com/elastic/beats/issues/29327")
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
     def test_dev_tool_export_dashboard_by_id_from_space(self):
@@ -303,52 +241,28 @@ class Test(BaseTest):
 
         self.test_load_dashboard_into_space(False)
 
+        folder_name = "system-overview"
         path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
         command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
-        command = "go run " + command + " -dashboard Metricbeat-system-overview -space-id foo-bar"
+        command = "go run " + command + " -dashboard Metricbeat-system-overview -space-id foo-bar -folder " + folder_name
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         content, err = p.communicate()
 
         assert p.returncode == 0
 
-        assert os.path.isfile("output.json") is True
+        self._check_if_dashboard_exported(folder_name)
 
-        with open('output.json') as f:
+    def _check_if_dashboard_exported(self, folder_name):
+        kibana_semver = semver.VersionInfo.parse(self.get_version())
+        dashboard_folder = os.path.join(folder_name, "_meta", "kibana", str(kibana_semver.major), "dashboard")
+        assert os.path.isdir(dashboard_folder)
+
+        with open(os.path.join(dashboard_folder, "Metricbeat-system-overview.json")) as f:
             content = f.read()
             assert "Metricbeat-system-overview" in content
 
-        os.remove("output.json")
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_dev_tool_export_dashboard_from_yml(self):
-        """
-        Test dev-tools/cmd/dashboards exports dashboard from dashboards YAML file
-        and removes unsupported characters
-        """
-
-        self.test_load_dashboard()
-
-        path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
-        command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
-        command = "go run " + command + " -yml " + os.path.join(self.beat_path, "tests", "files", "dashboards.yml")
-
-        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        content, err = p.communicate()
-
-        assert p.returncode == 0
-
-        version = self.get_version()
-        kibana_semver = semver.VersionInfo.parse(version)
-        exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
-                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
-
-        with open(exported_dashboard_path) as f:
-            content = f.read()
-            assert "Metricbeat-system-overview" in content
-
-        os.remove(exported_dashboard_path)
+        shutil.rmtree(folder_name)
 
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
@@ -371,7 +285,7 @@ class Test(BaseTest):
             "kbn-xsrf": "1"
         }
 
-        r = requests.post(url, json=data, headers=headers)
+        r = requests.post(url, json=data, headers=headers, auth=("beats", "testing"))
         if r.status_code != 200 and r.status_code != 409:
             self.fail('Bad Kibana status code when creating space: {}'.format(r.status_code))
 
@@ -379,7 +293,7 @@ class Test(BaseTest):
         url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \
             "/api/status"
 
-        r = requests.get(url)
+        r = requests.get(url, auth=("beats", "testing"))
         body = r.json()
         version = body["version"]["number"]
 

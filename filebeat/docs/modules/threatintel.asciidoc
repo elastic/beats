@@ -17,7 +17,7 @@ https://www.elastic.co/guide/en/security/current/rules-ui-create.html#create-ind
 Match rules], but is also compatible with other features like
 https://www.elastic.co/guide/en/elasticsearch/reference/current/enrich-processor.html[Enrich
 Processors]. The related threat intel attribute that is meant to be used for
-matching incoming source data is stored under the `threatintel.indicator.*`
+matching incoming source data is stored under the `threat.indicator.*`
 fields.
 
 The available filesets are:
@@ -29,7 +29,7 @@ The available filesets are:
 * <<otx,otx>>: Supports gathering threat intel attributes from AlientVault OTX.
 * <<anomali,anomali>>: Supports gathering threat intel attributes from Anomali Limo.
 * <<anomalithreatstream,anomalithreatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
-* <<recordedfuture,recordedfuture>>: Supports gathering threat intel attributes from Recorded Future.
+* <<threatq,threatq>>: Supports gathering threat intel attributes from ThreatQuotient.
 
 include::../include/gs-link.asciidoc[]
 
@@ -63,6 +63,10 @@ The URL of the API endpoint to connect with.
 
 How often the API is polled for updated information.
 
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
 Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 
 [options="header"]
@@ -70,7 +74,7 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 | URL Threat Intel Fields    | ECS Fields
 | url                        | threat.indicator.url.full
 | date_added                 | @timestamp
-| host                       | threatintel.indicator.ip/domain
+| host                       | threat.indicator.ip/domain
 |==============================================================
 
 [[abusemalware]]
@@ -103,14 +107,18 @@ The URL of the API endpoint to connect with.
 
 How often the API is polled for updated information.
 
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
 Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 
 [options="header"]
 |================================================================
 | Malware Threat IntelFields | ECS Fields
-| md5_hash                   | threatintel.indicator.file.hash.md5
-| sha256_hash                | threatintel.indicator.file.hash.sha256
-| file_size                  | threatintel.indicator.file.size
+| md5_hash                   | threat.indicator.file.hash.md5
+| sha256_hash                | threat.indicator.file.hash.sha256
+| file_size                  | threat.indicator.file.size
 |================================================================
 
 [[malwarebazaar]]
@@ -143,29 +151,34 @@ The URL of the API endpoint to connect with.
 
 How often the API is polled for updated information.
 
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
 Malware Bazaar Threat Intel is mapped to the following ECS fields.
 
 [options="header"]
 |================================================================
 | Malware Threat IntelFields | ECS Fields
-| md5_hash                   | threatintel.indicator.file.hash.md5
-| sha256_hash                | threatintel.indicator.file.hash.sha256
-| tlsh                       | threatintel.indicator.file.hash.tlsh
-| ssdeep                     | threatintel.indicator.file.hash.ssdeep
-| imphash                    | threatintel.indicator.file.pe.imphash
-| file_size                  | threatintel.indicator.file.size
-| file_name                  | threatintel.indicator.file.name
-| file_type_mime             | threatintel.indicator.file.mime_type
-| file_type                  | threatintel.indicator.file.type
-| reporter                   | threatintel.indicator.provider
-| origin_country             | threatintel.indicator.geo.country_iso_code
-| signature                  | threatintel.indicator.signature
-| code_sign.subject_cn       | threatintel.indicator.file.x509.subject.common_name
-| code_sign.issuer_cn        | threatintel.indicator.file.x509.issuer.common_name
-| code_sign.algorithm        | threatintel.indicator.file.x509.public_key_algorithm
-| code_sign.valid_from       | threatintel.indicator.file.x509.not_before
-| code_sign.valid_to         | threatintel.indicator.file.x509.not_after
-| code_sign.serial_number    | threatintel.indicator.file.x509.serial_number
+| md5_hash                   | threat.indicator.file.hash.md5
+| sha256_hash                | threat.indicator.file.hash.sha256
+| sha384_hash                | threat.indicator.file.hash.sha384
+| tlsh                       | threat.indicator.file.hash.tlsh
+| ssdeep                     | threat.indicator.file.hash.ssdeep
+| imphash                    | threat.indicator.file.pe.imphash
+| file_size                  | threat.indicator.file.size
+| file_name                  | threat.indicator.file.name
+| file_type_mime             | threat.indicator.file.mime_type
+| file_type                  | threat.indicator.file.type
+| reporter                   | threat.indicator.provider
+| origin_country             | threat.indicator.geo.country_iso_code
+| signature                  | threat.indicator.signature
+| code_sign.subject_cn       | threat.indicator.file.x509.subject.common_name
+| code_sign.issuer_cn        | threat.indicator.file.x509.issuer.common_name
+| code_sign.algorithm        | threat.indicator.file.x509.public_key_algorithm
+| code_sign.valid_from       | threat.indicator.file.x509.not_before
+| code_sign.valid_to         | threat.indicator.file.x509.not_after
+| code_sign.serial_number    | threat.indicator.file.x509.serial_number
 |================================================================
 
 [[misp]]
@@ -233,15 +246,19 @@ from the last response as the filter when retrieving new events.
 List of filters to apply when retrieving new events from the MISP server, this
 field is optional and defaults to all events.
 
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
 MISP Threat Intel is mapped to the following ECS fields.
 
 [options="header"]
 |==============================================================
 | Malware Threat IntelFields | ECS Fields
-| misp.first_seen            | threatintel.indicator.first_seen
-| misp.last_seen             | threatintel.indicator.last_seen
+| misp.first_seen            | threat.indicator.first_seen
+| misp.last_seen             | threat.indicator.last_seen
 | misp.tag                   | tag
-| misp.value                 | threatintel.indicator.*
+| misp.value                 | threat.indicator.*
 |==============================================================
 
 `misp.value` is mapped to the appropriate field dependent on attribute type.
@@ -309,15 +326,19 @@ possible types to filter on can be found in the
 https://cybersecurity.att.com/documentation/usm-appliance/otx/about-otx.htm[AlientVault
 OTX documentation].
 
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
 
 OTX Threat Intel is mapped to the following ECS fields.
 
 [options="header"]
 |============================================================
 | Malware Threat Intel  Fields | ECS Fields
-| otx.type                     | threatintel.indicator.type
-| otx.description              | threatintel.indicator.description
-| otx.indicator                | threatintel.indicator.*
+| otx.type                     | threat.indicator.type
+| otx.description              | threat.indicator.description
+| otx.indicator                | threat.indicator.*
 |============================================================
 
 `otx.indicator` is mapped to the appropriate field dependent on attribute type.
@@ -390,15 +411,19 @@ possible types to filter on can be found on the
 https://oasis-open.github.io/cti-documentation/stix/intro.html#stix-21-objects[Stix
 2.1 Object types] page.
 
+*`var.proxy_url`*::
+
+Optional URL to use as HTTP proxy.
+
 Anomali Threat Intel is mapped to the following ECS fields.
 
 [options="header"]
 |=============================================================
 | Malware Threat Intel Fields | ECS Fields
-| anomali.description         | threatintel.indicator.description
-| anomali.created             | threatintel.indicator.first_seen
-| anomali.modified            | threatintel.indicator.last_seen
-| anomali.pattern             | threatintel.indicator.*
+| anomali.description         | threat.indicator.description
+| anomali.created             | threat.indicator.first_seen
+| anomali.modified            | threat.indicator.last_seen
+| anomali.pattern             | threat.indicator.*
 | anomali.labels              | tags
 |=============================================================
 
@@ -466,115 +491,131 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 [options="header"]
 |=============================================================
 | ThreatStream fields | ECS Fields
-| asn         | threatintel.indicator.as.number
-| classification<<a,[1]>> | threatintel.indicator.marking.tlp
-| confidence<<a,[1]>> | threatintel.indicator.confidence
-| country     | threatintel.indicator.geo.country_iso_code
-| date_first  | threatintel.indicator.first_seen
-| date_last   | threatintel.indicator.last_seen
+| asn         | threat.indicator.as.number
+| classification<<a,[1]>> | threat.indicator.marking.tlp
+| confidence<<a,[1]>> | threat.indicator.confidence
+| country     | threat.indicator.geo.country_iso_code
+| date_first  | threat.indicator.first_seen
+| date_last   | threat.indicator.last_seen
 | detail      | tags
-| domain      | threatintel.indicator.domain
-| email       | threatintel.indicator.email.address
-| itype<<a,[1]>> | threatintel.indicator.type
-| lat         | threatintel.indicator.geo.location.lat
-| lon         | threatintel.indicator.geo.location.lon
-| md5         | threatintel.indicator.file.hash
-| org         | threatintel.indicator.as.organization.name
+| domain      | threat.indicator.url.domain
+| email       | threat.indicator.email.address
+| itype<<a,[1]>> | threat.indicator.type
+| lat         | threat.indicator.geo.location.lat
+| lon         | threat.indicator.geo.location.lon
+| md5         | threat.indicator.file.hash
+| org         | threat.indicator.as.organization.name
 | severity<<a,[1]>> | event.severity
-| source      | threatintel.indicator.provider
-| srcip       | threatintel.indicator.ip
-| url         | threatintel.indicator.url.original
+| source      | threat.indicator.provider
+| srcip       | threat.indicator.ip
+| url         | threat.indicator.url.original
 |=============================================================
 
 [[a]]
 [small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.#
 
-[[recordedfuture]]
 [float]
-==== `recordedfuture` fileset settings
+=== Dashboards
 
-The `recordedfuture` fileset fetches intelligence from the Recorded Future Connect API.
-It supports `domain`, `hash`, `ip` and `url` data types.
+This module comes with dashboards for the threat information feeds.
 
-To enable it you need to define the URL to fetch data from. You can construct this URL
-using the https://api.recordedfuture.com/index.html[Recorded Future API Explorer.] The URL
-must point to the `/search` endpoint and contain a suitable `limit`
-(how many records to return from a single request) and `fields` parameters.
-The `entity` and `timestamps` fields are required.
+[role="screenshot"]
+image::./images/filebeat-threatintel-overview.png[]
+
+[float]
+Overview of the information provided, and the health of, the Threat Intel module.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-abuse-malware.png[]
+
+[float]
+Overview of the information provided by the Abuse.ch Malware feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-abuse-url.png[]
+
+[float]
+Overview of the information provided by the Abuse.ch URL feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-alienvault-otx.png[]
+
+[float]
+Overview of the information provided by the AlienVault OTX feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-anomali.png[]
+
+[float]
+Overview of the information provided by the Anomali Limo and
+Anomali ThreatStream feeds.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-misp.png[]
+
+[float]
+Overview of the information provided by the MISP feed.
+
+[[threatq]]
+[float]
+==== `threatq` fileset settings
+
+The `threatq` fileset fetches intelligence from the ThreatQuotient API.
+
+The ThreatQ module requires you to set a valid URL, combination of Oauth2 credentials and the ID of the collection to retrieve
+indicators from.
+By default the indicators will be collected every 1 minute, and deduplication is handled by the API itself.
 
 Sample configuration:
 [source,yaml]
 ----
 - module: threatintel
-  recordedfuture:
+  threatq:
     enabled: true
     var.input: httpjson
-    var.interval: 5m
-    var.first_interval: 168h
-    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-    var.api_token: "<RF_TOKEN>"
-----
-
-To fetch threat intelligence from multiple data types, you must define more than
-one instance of the module:
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 5m
-    var.first_interval: 168h
-    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-    var.api_token: "<RF_TOKEN>"
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
+    var.host: https://testurl.threatq.com/
+    var.token_url: https://testurl.threatq.com/api/token
+    var.client_id: oauthclient
+    var.client_secret: 123abcd
     var.interval: 1m
-    var.first_interval: 168h
-    var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
-    var.api_token: "<RF_TOKEN>"
+    var.data_collection_id: "fsd2f54fsg2sf"
 ----
 
 *`var.url`*::
 
 The URL of the API endpoint to connect with.
 
-*`var.api_token`*::
+*`var.client_id`*::
 
-The API token used to access Recorded Future API.
+The Oauth2 client ID to be used for authentication.
+
+*`var.client_secret`*::
+
+The Oauth2 secret related to the client_id.
 
 *`var.interval`*::
 
 How often the API is polled for updated information.
 
-*`var.first_interval`*::
-
-How far back to search when retrieving events the first time {beatname_uc} starts up.
-After the first interval has passed the module itself will use the timestamp
-from the last response as the filter when retrieving new events.
-
 *`var.proxy_url`*::
 
 Optional URL to use as HTTP proxy.
+
+*`var.http_client_timeout`*::
+
+Optional value to override the default HTTP timeout of 30 seconds.
 
 
 Recorded Future fields are mapped to the following ECS fields:
 
 [options="header"]
 |=============================================================
-| Recorded Future fields | ECS Fields
-| entity.name            | threatintel.indicator.{url,ip,domain,file.hash}
-| entity.type            | threatintel.indicator.type
-| fileHashes             | threatintel.indicator.file.hash
-| intelCard              | event.reference
-| location.asn           | threatintel.indicator.as.number
-| location.location      | threatintel.indicator.geo
-| location.organization  | threatintel.indicator.as.organization.name
-| risk.score             | event.risk_score
-| timestamps.firstSeen   | threatintel.indicator.first_seen
-| timestamps.lastSeen    | threatintel.indicator.last_seen
+| ThreatQ fields         | ECS Fields
+| type.name              | threat.indicator.type
+| description            | threat.indicator.description
+| score                  | threat.indicator.confidence
+| value                  | threat.indicator.{url,ip,domain,file.hash}
+| sources                | threat.indicator.provider
 |=============================================================
 
 :has-dashboards!:
@@ -622,10 +663,10 @@ image::./images/filebeat-threatintel-misp.png[]
 Overview of the information provided by the MISP feed.
 
 [role="screenshot"]
-image::./images/filebeat-threatintel-recordedfuture.png[]
+image::./images/filebeat-threatintel-threatq.png[]
 
 [float]
-Overview of the information provided by the Recorded Future feed.
+Overview of the information provided by the ThreatQuotient feed.
 
 :modulename!:
 

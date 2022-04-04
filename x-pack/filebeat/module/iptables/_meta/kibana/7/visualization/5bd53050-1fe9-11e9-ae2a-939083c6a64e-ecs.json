@@ -1,0 +1,91 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "autoPrecision": true,
+                        "field": "source.geo.location",
+                        "isFilteredByCollar": true,
+                        "mapCenter": [
+                            0,
+                            0
+                        ],
+                        "mapZoom": 2,
+                        "precision": 2,
+                        "useGeocentroid": true
+                    },
+                    "schema": "segment",
+                    "type": "geohash_grid"
+                }
+            ],
+            "params": {
+                "addTooltip": true,
+                "colorSchema": "Yellow to Red",
+                "heatClusterSize": 1.5,
+                "isDesaturated": true,
+                "legendPosition": "bottomright",
+                "mapCenter": [
+                    0,
+                    0
+                ],
+                "mapType": "Scaled Circle Markers",
+                "mapZoom": 2,
+                "wms": {
+                    "enabled": false,
+                    "options": {
+                        "format": "image/png",
+                        "transparent": true
+                    },
+                    "selectedTmsLayer": {
+                        "attribution": "<p>&#169; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors | <a href=\"https://www.elastic.co/elastic-maps-service\">Elastic Maps Service</a></p>&#10;",
+                        "id": "road_map",
+                        "maxZoom": 18,
+                        "minZoom": 0,
+                        "origin": "elastic_maps_service"
+                    }
+                }
+            },
+            "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables] ECS",
+            "type": "tile_map"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "7862cab0-1fdb-11e9-ae2a-939083c6a64e-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:45.146Z",
+    "version": "WzQyODMsMV0="
+}

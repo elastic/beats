@@ -8,12 +8,18 @@ input:
     - resource_group: ""
       resource_type: "Microsoft.ContainerRegistry/registries"
       metrics:
-      - name: "*"
+      - name: ["TotalPullCount", "SuccessfulPullCount", "TotalPushCount", "SuccessfulPushCount","RunDuration", "AgentPoolCPUTime"]
         namespace: "Microsoft.ContainerRegistry/registries"
         timegrain: "PT5M"
+      - name: ["StorageUsed"]
+        namespace: "Microsoft.ContainerRegistry/registries"
+        timegrain: "PT1H"
     - resource_id: ""
       timegrain: "PT5M"
       metrics:
-      - name: "*"
+      - name: ["TotalPullCount", "SuccessfulPullCount", "TotalPushCount", "SuccessfulPushCount","RunDuration", "AgentPoolCPUTime"]
         namespace: "Microsoft.ContainerRegistry/registries"
         timegrain: "PT5M"
+      - name: ["StorageUsed"]
+        namespace: "Microsoft.ContainerRegistry/registries"
+        timegrain: "PT1H"

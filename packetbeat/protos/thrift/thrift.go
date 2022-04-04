@@ -656,8 +656,8 @@ func (thrift *thriftPlugin) readStruct(data []byte) (value string, ok bool, comp
 }
 
 func (thrift *thriftPlugin) formatStruct(fields []thriftField, resolveNames bool,
-	fieldnames []*string) string {
-
+	fieldnames []*string,
+) string {
 	toJoin := []string{}
 	for i, field := range fields {
 		if i == thrift.collectionMaxSize {
@@ -746,7 +746,7 @@ func (thrift *thriftPlugin) readField(s *thriftStream) (ok bool, complete bool, 
 
 func (thrift *thriftPlugin) messageParser(s *thriftStream) (bool, bool) {
 	var ok, complete bool
-	var m = s.message
+	m := s.message
 
 	logp.Debug("thriftdetailed", "messageParser called parseState=%v offset=%v",
 		s.parseState, s.parseOffset)
@@ -860,7 +860,7 @@ func (stream *thriftStream) prepareForNewMessage(flush bool) {
 	} else {
 		stream.data = stream.data[stream.parseOffset:]
 	}
-	//logp.Debug("thrift", "remaining data: [%s]", stream.data)
+	// logp.Debug("thrift", "remaining data: [%s]", stream.data)
 	stream.parseOffset = 0
 	stream.message = nil
 	stream.parseState = thriftStartState
@@ -871,8 +871,8 @@ type thriftPrivateData struct {
 }
 
 func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8,
-	stream *thriftStream, priv *thriftPrivateData) {
-
+	stream *thriftStream, priv *thriftPrivateData,
+) {
 	flush := false
 
 	if stream.message.isRequest {
@@ -906,7 +906,6 @@ func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8
 
 	// and reset message
 	stream.prepareForNewMessage(flush)
-
 }
 
 func (thrift *thriftPlugin) ConnectionTimeout() time.Duration {
@@ -914,8 +913,8 @@ func (thrift *thriftPlugin) ConnectionTimeout() time.Duration {
 }
 
 func (thrift *thriftPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParseThrift exception")
 
 	priv := thriftPrivateData{}
@@ -1040,8 +1039,8 @@ func (thrift *thriftPlugin) receivedReply(msg *thriftMessage) {
 }
 
 func (thrift *thriftPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	trans := thrift.getTransaction(tcptuple.Hashable())
 	if trans != nil {
 		if trans.request != nil && trans.reply == nil {
@@ -1055,8 +1054,8 @@ func (thrift *thriftPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 }
 
 func (thrift *thriftPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	defer logp.Recover("GapInStream(thrift) exception")
 	logp.Debug("thriftdetailed", "GapInStream called")
 

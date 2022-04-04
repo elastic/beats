@@ -1,0 +1,157 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Sources by Size [Filebeat CEF]",
+        "uiStateJSON": {
+            "P-11": {
+                "vis": {
+                    "params": {
+                        "sort": {
+                            "columnIndex": null,
+                            "direction": null
+                        }
+                    }
+                }
+            },
+            "P-13": {
+                "vis": {
+                    "params": {
+                        "sort": {
+                            "columnIndex": null,
+                            "direction": null
+                        }
+                    }
+                }
+            },
+            "P-2": {
+                "mapCenter": [
+                    -0.17578097424708533,
+                    0
+                ],
+                "mapZoom": 0
+            },
+            "P-3": {
+                "vis": {
+                    "defaultColors": {
+                        "0 - 100": "rgb(0,104,55)"
+                    }
+                }
+            },
+            "P-4": {
+                "mapCenter": [
+                    -0.17578097424708533,
+                    0
+                ],
+                "mapZoom": 0
+            },
+            "P-5": {
+                "vis": {
+                    "defaultColors": {
+                        "0 - 18,000": "rgb(247,251,255)",
+                        "108,000 - 126,000": "rgb(74,152,201)",
+                        "126,000 - 144,000": "rgb(46,126,188)",
+                        "144,000 - 162,000": "rgb(23,100,171)",
+                        "162,000 - 180,000": "rgb(8,74,145)",
+                        "18,000 - 36,000": "rgb(227,238,249)",
+                        "36,000 - 54,000": "rgb(208,225,242)",
+                        "54,000 - 72,000": "rgb(182,212,233)",
+                        "72,000 - 90,000": "rgb(148,196,223)",
+                        "90,000 - 108,000": "rgb(107,174,214)"
+                    },
+                    "legendOpen": false
+                }
+            },
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Sources",
+                        "field": "source.domain",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Bytes",
+                        "field": "source.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Destinations",
+                        "field": "destination.domain"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Count"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "perPage": 10,
+                "showMeticsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Top 10 Sources by Size [Filebeat CEF]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "26a65f68-d7a6-4b47-befc-c5a6819bb91b",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3MzksMV0="
+}

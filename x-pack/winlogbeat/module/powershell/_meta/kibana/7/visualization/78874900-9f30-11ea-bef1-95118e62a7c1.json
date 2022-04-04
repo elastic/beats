@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "winlog.provider_name : \"PowerShell\" or winlog.provider_name : \"Microsoft-Windows-PowerShell\" "
+                }
+            }
+        },
+        "title": "Total remote commands [Winlogbeat powershell]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "process.title:\"ServerRemoteHost\" "
+                                },
+                                "label": "Remote commands"
+                            }
+                        ]
+                    },
+                    "schema": "group",
+                    "type": "filters"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "bucket": {
+                        "accessor": 0,
+                        "format": {
+                            "id": "string",
+                            "params": {}
+                        },
+                        "type": "vis_dimension"
+                    },
+                    "metrics": [
+                        {
+                            "accessor": 1,
+                            "format": {
+                                "id": "number",
+                                "params": {}
+                            },
+                            "type": "vis_dimension"
+                        }
+                    ]
+                },
+                "metric": {
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 10000,
+                            "type": "range"
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "None",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 32,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Total remote commands [Winlogbeat powershell]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "78874900-9f30-11ea-bef1-95118e62a7c1",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:51.383Z",
+    "version": "WzIxNTgsMl0="
+}

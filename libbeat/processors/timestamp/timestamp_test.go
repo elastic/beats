@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -117,7 +118,7 @@ func TestParseNoYear(t *testing.T) {
 	c := defaultConfig()
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.StampMilli)
-	c.Timezone = "EST"
+	c.Timezone = cfgtype.MustNewTimezone("EST")
 
 	p, err := newFromConfig(c)
 	if err != nil {
@@ -261,7 +262,7 @@ func TestTimezone(t *testing.T) {
 			Error:    true,
 		},
 		"non-existing location": {
-			Timezone: "Kalimdor/Orgrimmar",
+			Timezone: "Equatorial/Kundu",
 			Error:    true,
 		},
 		"incomplete offset": {
@@ -272,12 +273,13 @@ func TestTimezone(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config := defaultConfig()
-			config.Field = "ts"
-			config.Timezone = c.Timezone
-			config.Layouts = append(config.Layouts, time.ANSIC)
+			config := common.MustNewConfigFrom(map[string]interface{}{
+				"field":    "ts",
+				"timezone": c.Timezone,
+				"layouts":  []string{time.ANSIC},
+			})
 
-			processor, err := newFromConfig(config)
+			processor, err := New(config)
 			if c.Error {
 				require.Error(t, err)
 				return
@@ -290,7 +292,7 @@ func TestTimezone(t *testing.T) {
 
 			event := &beat.Event{
 				Fields: common.MapStr{
-					config.Field: originalTimestamp,
+					"ts": originalTimestamp,
 				},
 			}
 
@@ -299,4 +301,39 @@ func TestTimezone(t *testing.T) {
 			assert.Equal(t, c.Expected, event.Timestamp)
 		})
 	}
+}
+
+func TestMetadataTarget(t *testing.T) {
+	datetime := "2006-01-02T15:04:05Z"
+	c := defaultConfig()
+	c.Field = "@metadata.time"
+	c.TargetField = "@metadata.ts"
+	c.Layouts = append(c.Layouts, time.RFC3339)
+	c.Timezone = cfgtype.MustNewTimezone("EST")
+
+	p, err := newFromConfig(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt := &beat.Event{
+		Meta: common.MapStr{
+			"time": datetime,
+		},
+	}
+
+	newEvt, err := p.Run(evt)
+	assert.NoError(t, err)
+
+	expTs, err := time.Parse(time.RFC3339, datetime)
+	assert.NoError(t, err)
+
+	expMeta := common.MapStr{
+		"time": datetime,
+		"ts":   expTs.UTC(),
+	}
+
+	assert.Equal(t, expMeta, newEvt.Meta)
+	assert.Equal(t, evt.Fields, newEvt.Fields)
+	assert.Equal(t, evt.Timestamp, newEvt.Timestamp)
 }

@@ -5,6 +5,7 @@
 package mage
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -23,20 +24,20 @@ import (
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build
 func FetchOsqueryDistros() error {
-	osArchs := osArchs(devtools.Platforms)
+	osArchs := OSArchs(devtools.Platforms)
 	log.Printf("Fetch Osquery distros for %v", osArchs)
 
 	for _, osarch := range osArchs {
 		spec, err := distro.GetSpec(osarch)
 		if err != nil {
 			if errors.Is(err, distro.ErrUnsupportedOS) {
-				log.Printf("The build spec %v is not supported, continue", spec)
+				log.Printf("The build spec %v is not supported, continue\n", spec)
 				continue
 			} else {
 				return err
 			}
 		}
-		log.Print("Found spec:", spec)
+		log.Println("Found spec:", spec)
 
 		fetched, err := checkCacheAndFetch(osarch, spec)
 		if err != nil {
@@ -65,7 +66,7 @@ func FetchOsqueryDistros() error {
 	return nil
 }
 
-func osArchs(platforms devtools.BuildPlatformList) []distro.OSArch {
+func OSArchs(platforms devtools.BuildPlatformList) []distro.OSArch {
 	mp := make(map[distro.OSArch]struct{})
 
 	for _, platform := range platforms {
@@ -121,7 +122,7 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 		log.Printf("Hash mismatch, expected: %s, got: %s.", specHash, fileHash)
 	}
 
-	fileHash, err = fetch.Download(url, fp)
+	fileHash, err = fetch.Download(context.Background(), url, fp)
 	if err != nil {
 		log.Printf("File %s fetch failed, err: %v", url, err)
 		return
@@ -160,7 +161,7 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		}
 		defer os.RemoveAll(tmpdir)
 
-		osdp := distro.OsquerydDistroPath()
+		osdp := distro.OsquerydLinuxDistroPath()
 		if err := tar.ExtractFile(src, tmpdir, osdp); err != nil {
 			return err
 		}

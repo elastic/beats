@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "description": "Overview of DNS request and response metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+        },
+        "optionsJSON": "{\"darkTheme\": false, \"hidePanelTitles\": false, \"useMargins\": true}",
+        "panelsJSON": "[{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"1\",\"w\":24,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_0\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"2\",\"w\":24,\"x\":24,\"y\":0},\"panelIndex\":\"2\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"3\",\"w\":13,\"x\":0,\"y\":15},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"5\",\"w\":24,\"x\":0,\"y\":30},\"panelIndex\":\"5\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"6\",\"w\":24,\"x\":24,\"y\":30},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_4\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"7\",\"w\":24,\"x\":24,\"y\":15},\"panelIndex\":\"7\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_5\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"8\",\"w\":11,\"x\":13,\"y\":15},\"panelIndex\":\"8\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_6\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] DNS Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "65120940-1454-11e9-9de0-f98d1808db8e-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "DNS-Query-Summary-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "DNS-Request-Status-Over-Time-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "DNS-Question-Types-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "DNS-Top-10-Questions-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "DNS-Response-Codes-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
+            "name": "panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:28:38.010Z",
+    "version": "WzMxMzYsMV0="
+}

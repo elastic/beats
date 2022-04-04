@@ -54,7 +54,7 @@ func makeErrConfigUnpack(cause error) errConfigUnpack {
 	return errConfigUnpack{cause}
 }
 func (e errConfigUnpack) Error() string {
-	return fmt.Sprintf("failed to unpack %v processor configuration: %v", processorName, e.cause)
+	return fmt.Sprintf("failed to unpack %v processor configuration: %v", procName, e.cause)
 }
 
 func makeErrComputeFingerprint(cause error) errComputeFingerprint {

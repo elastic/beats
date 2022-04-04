@@ -3,17 +3,24 @@
 
 - module: cisco
   asa:
-    enabled: true
+    enabled: false
 
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
+    # Set which input to use between udp (default), tcp or file.
+    #var.input: udp
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to udp or tcp syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    # The port to listen for udp or tcp syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
 
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
@@ -29,17 +36,24 @@
     #var.external_zones: [ "External" ]
 
   ftd:
-    enabled: true
+    enabled: false
 
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
+    # Set which input to use between udp (default), tcp or file.
+    #var.input: udp
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to tcp or udp syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9003.
+    # The UDP port to listen for tcp or udp syslog traffic. Defaults to 9003.
     #var.syslog_port: 9003
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
 
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
@@ -55,24 +69,27 @@
     #var.external_zones: [ "External" ]
 
   ios:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9002.
+    # The port to listen on for syslog traffic. Defaults to 9002.
     #var.syslog_port: 9002
+
+    # Set which protocol to use between udp (default) or tcp.
+    #var.syslog_protocol: udp
 
     # Set custom paths for the log files when using file input. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   nexus:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -91,7 +108,7 @@
     # var.tz_offset: local
 
   meraki:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -110,7 +127,7 @@
     # var.tz_offset: local
 
   umbrella:
-    enabled: true
+    enabled: false
 
     #var.input: aws-s3
     # AWS SQS queue url
@@ -125,7 +142,7 @@
     #var.api_timeout: 120s
 
   amp:
-    enabled: true
+    enabled: false
 
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson

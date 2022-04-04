@@ -2,3 +2,6 @@
 [2018-04-23T16:40:13,862][WARN ][o.e.d.a.a.i.t.p.PutIndexTemplateRequest] Deprecated field [template] used, replaced by [index_patterns]
 [2018-04-23T16:40:14,792][WARN ][o.e.d.a.a.i.t.p.PutIndexTemplateRequest] Deprecated field [template] used, replaced by [index_patterns]
 [2018-04-23T16:40:15,127][WARN ][o.e.d.a.a.i.t.p.PutIndexTemplateRequest] Deprecated field [template] used, replaced by [index_patterns]
+[2021-07-09T10:33:11,962][DEPRECATION][o.e.d.r.RestController   ] [ecenter.local] Legacy index templates are deprecated in favor of composable templates.
+[2021-07-09T10:42:03,065][DEPRECATION][o.e.d.c.m.MetadataCreateIndexService] [ecenter.local] index name [.kibana-event-log-7.13.3-000001] starts with a dot '.', in the next major version, index names starting with a dot are reserved for hidden indices and system indices
+[2021-07-09T10:48:46,329][DEPRECATION][o.e.d.c.m.IndexNameExpressionResolver] [ecenter.local] this request accesses system indices: [.apm-agent-configuration, .apm-custom-link, .async-search, .kibana_7.13.3_001, .kibana_task_manager_7.13.3_001], but in a future major version, direct access to system indices will be prevented by default

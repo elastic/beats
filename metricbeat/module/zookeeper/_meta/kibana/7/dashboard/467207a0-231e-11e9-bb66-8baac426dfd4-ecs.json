@@ -1,0 +1,140 @@
+{
+    "attributes": {
+        "description": "Overview of Zookeeper",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 15,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "title": "Approximate data size",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 17,
+                    "x": 15,
+                    "y": 15
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_1",
+                "title": "Latency",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 16,
+                    "x": 32,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_2",
+                "title": "Alive Connections",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 25,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_3",
+                "title": "Used file descriptors",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 23,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_4",
+                "title": "Packets received / sent",
+                "version": "7.0.0-alpha2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Zookeeper] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "467207a0-231e-11e9-bb66-8baac426dfd4-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:53.758Z",
+    "version": "WzQxNzcsMV0="
+}

@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 request.method: POST
@@ -13,18 +12,24 @@ request.proxy_url: {{ .proxy_url }}
 {{ end }}
 request.url: {{ .url }}
 request.body:
-    limit: 100
-    page: 1
-    returnFormat: json
-{{if .filters}}
-    {{ range $key, $value := .filters}}{{$key}}: {{$value | tojson}}{{end}}
-{{end}}
+{{ if .filters }}
+  {{ .filters | tojson}}
+{{ end }}
 request.transforms:
 {{ if .api_token }}
 - set:
     target: header.Authorization
     value: {{ .api_token }}
-{{end}}
+{{ end }}
+- set:
+    target: body.page
+    value: 1
+- set:
+    target: body.limit
+    value: 10
+- set:
+    target: body.returnFormat
+    value: json
 - set:
     target: body.timestamp
     value: '[[.cursor.timestamp]]'
@@ -34,12 +39,20 @@ response.split:
   target: body.response
   split:
     target: body.Event.Attribute
+    ignore_empty_value: true
     keep_parent: true
+    split:
+      target: body.Event.Object
+      keep_parent: true
+      split:
+        target: body.Event.Object.Attribute
+        keep_parent: true
 response.request_body_on_pagination: true
 response.pagination:
 - set:
     target: body.page
     value: '[[add .last_response.page 1]]'
+    fail_on_template_error: true
 cursor:
   timestamp:
     value: '[[.last_event.Event.timestamp]]'
@@ -56,22 +69,19 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags | tojson}}
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
+
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - decode_json_fields:
-      fields: [message]
-      document_id: Event.Attribute.uuid
-      target: json
-  - script:
-      lang: javascript
-      id: my_filter
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
+  - add_locale: ~
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
+        ecs.version: 1.12.0

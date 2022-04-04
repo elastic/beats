@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
 HTTPD] servers. The default metricset is `status`.
 

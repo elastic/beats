@@ -1,0 +1,21 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{}"
+        },
+        "title": "Message Types over Time [Packetbeat DHCPv4] ECS",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[],\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"background_color_rules\":[{\"id\":\"c2cf4410-8ba8-11e8-ae15-bdcba81344e6\"}],\"drop_last_bucket\":1,\"filter\":{\"query\":\"type:dhcpv4\",\"language\":\"lucene\"},\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"ignore_global_filter\":0,\"index_pattern\":\"packetbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"filter\":{\"query\":\"NOT dhcpv4.option.message_type:nak NOT dhcpv4.option.message_type:decline\",\"language\":\"lucene\"},\"formatter\":\"number\",\"id\":\"8abe6eb0-8ba9-11e8-ae15-bdcba81344e6\",\"label\":\"Response\",\"line_width\":1,\"metrics\":[{\"id\":\"8abe6eb1-8ba9-11e8-ae15-bdcba81344e6\",\"type\":\"count\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"terms_field\":\"dhcpv4.option.message_type\",\"split_color_mode\":\"gradient\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(244,78,59,1)\",\"fill\":0.5,\"filter\":{\"query\":\"dhcpv4.option.message_type:nak\",\"language\":\"lucene\"},\"formatter\":\"number\",\"id\":\"ae5610d0-8ba9-11e8-ae15-bdcba81344e6\",\"label\":\"nak\",\"line_width\":\"4\",\"metrics\":[{\"id\":\"ae5610d1-8ba9-11e8-ae15-bdcba81344e6\",\"type\":\"count\"}],\"point_size\":\"3\",\"seperate_axis\":0,\"series_drop_last_bucket\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"split_color_mode\":\"gradient\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(244,78,59,1)\",\"fill\":0.5,\"filter\":{\"query\":\"dhcpv4.option.message_type:decline\",\"language\":\"lucene\"},\"formatter\":\"number\",\"id\":\"cf7ba180-8ba9-11e8-ae15-bdcba81344e6\",\"label\":\"decline\",\"line_width\":\"4\",\"metrics\":[{\"id\":\"cf7ba181-8ba9-11e8-ae15-bdcba81344e6\",\"type\":\"count\"}],\"point_size\":\"3\",\"seperate_axis\":0,\"series_drop_last_bucket\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"split_color_mode\":\"gradient\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\",\"use_kibana_indexes\":false},\"title\":\"Message Types over Time [Packetbeat DHCPv4] ECS\",\"type\":\"metrics\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8460fcd0-8baa-11e8-9676-ef67484126fb-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:36.983Z",
+    "version": "WzMxMjAsMV0="
+}

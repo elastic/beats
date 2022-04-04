@@ -1,0 +1,208 @@
+{
+    "attributes": {
+        "description": "Origin country of the indicator ingested by the threat intel Filebeat module.",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "ea2479ec-b43e-4377-a068-91d93265081d",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {
+                    "type": "TILE"
+                },
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "66df8b3a-7f7c-4969-929e-2c1ac5b64584",
+                "joins": [
+                    {
+                        "leftField": "iso2",
+                        "right": {
+                            "applyGlobalQuery": true,
+                            "applyGlobalTime": true,
+                            "id": "81d209f7-b068-4b0d-90f4-baf9a3eefb55",
+                            "indexPatternRefName": "layer_1_join_0_index_pattern",
+                            "indexPatternTitle": "filebeat-*",
+                            "metrics": [
+                                {
+                                    "type": "count"
+                                }
+                            ],
+                            "term": "threat.indicator.geo.country_iso_code",
+                            "type": "ES_TERM_SOURCE"
+                        }
+                    }
+                ],
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "id": "world_countries",
+                    "tooltipProperties": [
+                        "name"
+                    ],
+                    "type": "EMS_FILE"
+                },
+                "style": {
+                    "isTimeAware": true,
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "Yellow to Red",
+                                "colorCategory": "palette_0",
+                                "field": {
+                                    "name": "__kbnjoin__count__81d209f7-b068-4b0d-90f4-baf9a3eefb55",
+                                    "origin": "join"
+                                },
+                                "fieldMetaOptions": {
+                                    "isEnabled": true,
+                                    "sigma": 3
+                                },
+                                "type": "ORDINAL"
+                            },
+                            "type": "DYNAMIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "marker"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 6
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderColor": {
+                            "options": {
+                                "color": "#FFFFFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderSize": {
+                            "options": {
+                                "size": "SMALL"
+                            }
+                        },
+                        "labelColor": {
+                            "options": {
+                                "color": "#000000"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelSize": {
+                            "options": {
+                                "size": 14
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelText": {
+                            "options": {
+                                "value": ""
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#3d3d3d"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 19.94277,
+                "lon": 0
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": true
+            },
+            "settings": {
+                "autoFitToDataBounds": false,
+                "backgroundColor": "#ffffff",
+                "browserLocation": {
+                    "zoom": 2
+                },
+                "fixedLocation": {
+                    "lat": 0,
+                    "lon": 0,
+                    "zoom": 2
+                },
+                "initialLocation": "LAST_SAVED_LOCATION",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "showSpatialFilters": true,
+                "spatialFiltersAlpa": 0.3,
+                "spatialFiltersFillColor": "#DA8B45",
+                "spatialFiltersLineColor": "#DA8B45"
+            },
+            "timeFilters": {
+                "from": "now-30d",
+                "to": "now"
+            },
+            "zoom": 2.08
+        },
+        "title": "Indicator Origin Country [Filebeat Threat Intel]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "63365b50-82aa-11eb-ac13-d5ca87cb8fa2",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_join_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:34:30.070Z",
+    "version": "WzQ2MTksMV0="
+}

@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Navigation Queue Storage Overview [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "### Azure Storage\n\n[Overview](#/dashboard/1a151f80-32db-11ea-a83e-25b8612d00cc) | [Blob](#/dashboard/b165ef60-32f7-11ea-a83e-25b8612d00cc) | [File](#/dashboard/dff7a080-32f7-11ea-a83e-25b8612d00cc) | [Table](#/dashboard/ff2fe020-32f7-11ea-a83e-25b8612d00cc) | [**Queue**](#/dashboard/10efa340-32f8-11ea-a83e-25b8612d00cc) ",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation Queue Storage Overview [Metricbeat Azure]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "09f05e00-32f7-11ea-a83e-25b8612d00cc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:51.088Z",
+    "version": "WzM1NjQsMV0="
+}

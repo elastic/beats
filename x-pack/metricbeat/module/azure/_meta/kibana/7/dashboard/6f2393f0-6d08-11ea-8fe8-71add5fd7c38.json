@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "This dashboard shows metrics for the container registry in Azure.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "51fee31f-97e1-4f8e-aeb2-daeca1ccf9be",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "51fee31f-97e1-4f8e-aeb2-daeca1ccf9be",
+                "panelRefName": "panel_51fee31f-97e1-4f8e-aeb2-daeca1ccf9be",
+                "title": "",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "dde974c7-6d81-4580-9b7f-c7a999ecc19e",
+                    "w": 18,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "dde974c7-6d81-4580-9b7f-c7a999ecc19e",
+                "panelRefName": "panel_dde974c7-6d81-4580-9b7f-c7a999ecc19e",
+                "title": "Container Registry Successful Pull Count",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "25a02616-f735-494a-97f7-4a56531e9e5e",
+                    "w": 21,
+                    "x": 27,
+                    "y": 0
+                },
+                "panelIndex": "25a02616-f735-494a-97f7-4a56531e9e5e",
+                "panelRefName": "panel_25a02616-f735-494a-97f7-4a56531e9e5e",
+                "title": "Container Registry Successful Push Count",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "ec183a66-545b-4a67-bfb4-568def660612",
+                    "w": 9,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "ec183a66-545b-4a67-bfb4-568def660612",
+                "panelRefName": "panel_ec183a66-545b-4a67-bfb4-568def660612",
+                "title": "Containers Filters",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7f508c43-afd7-4874-86ef-c6976700759b",
+                    "w": 24,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "7f508c43-afd7-4874-86ef-c6976700759b",
+                "panelRefName": "panel_7f508c43-afd7-4874-86ef-c6976700759b",
+                "title": "Container Registry Total Pull Count",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "97a048da-9b56-420b-af8c-1f0d568f0f94",
+                    "w": 24,
+                    "x": 24,
+                    "y": 16
+                },
+                "panelIndex": "97a048da-9b56-420b-af8c-1f0d568f0f94",
+                "panelRefName": "panel_97a048da-9b56-420b-af8c-1f0d568f0f94",
+                "title": "Container Registry Total Push Count",
+                "type": "visualization",
+                "version": "7.6.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] Container Registry Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6f2393f0-6d08-11ea-8fe8-71add5fd7c38",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "1e70dc50-6d22-11ea-8fe8-71add5fd7c38",
+            "name": "51fee31f-97e1-4f8e-aeb2-daeca1ccf9be:panel_51fee31f-97e1-4f8e-aeb2-daeca1ccf9be",
+            "type": "visualization"
+        },
+        {
+            "id": "7972b260-6d07-11ea-8fe8-71add5fd7c38",
+            "name": "dde974c7-6d81-4580-9b7f-c7a999ecc19e:panel_dde974c7-6d81-4580-9b7f-c7a999ecc19e",
+            "type": "visualization"
+        },
+        {
+            "id": "b88b7f90-6d07-11ea-8fe8-71add5fd7c38",
+            "name": "25a02616-f735-494a-97f7-4a56531e9e5e:panel_25a02616-f735-494a-97f7-4a56531e9e5e",
+            "type": "visualization"
+        },
+        {
+            "id": "0fa31060-6aae-11ea-af5c-73e8f396b3e9",
+            "name": "ec183a66-545b-4a67-bfb4-568def660612:panel_ec183a66-545b-4a67-bfb4-568def660612",
+            "type": "visualization"
+        },
+        {
+            "id": "ff303710-6d07-11ea-8fe8-71add5fd7c38",
+            "name": "7f508c43-afd7-4874-86ef-c6976700759b:panel_7f508c43-afd7-4874-86ef-c6976700759b",
+            "type": "visualization"
+        },
+        {
+            "id": "ddea7430-6d07-11ea-8fe8-71add5fd7c38",
+            "name": "97a048da-9b56-420b-af8c-1f0d568f0f94:panel_97a048da-9b56-420b-af8c-1f0d568f0f94",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:46.992Z",
+    "version": "WzM1MjUsMV0="
+}

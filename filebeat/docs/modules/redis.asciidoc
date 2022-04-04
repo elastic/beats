@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Redis module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module parses logs and slowlogs created by
 https://redis.io/[Redis].
 

@@ -41,13 +41,11 @@ const (
 	identitySep           = "::"
 )
 
-var (
-	identifierFactories = map[string]identifierFactory{
-		nativeName:      newINodeDeviceIdentifier,
-		pathName:        newPathIdentifier,
-		inodeMarkerName: newINodeMarkerIdentifier,
-	}
-)
+var identifierFactories = map[string]identifierFactory{
+	nativeName:      newINodeDeviceIdentifier,
+	pathName:        newPathIdentifier,
+	inodeMarkerName: newINodeMarkerIdentifier,
+}
 
 type identifierFactory func(*common.Config) (fileIdentifier, error)
 
@@ -76,9 +74,13 @@ func (f fileSource) Name() string {
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
-func newFileIdentifier(ns *common.ConfigNamespace) (fileIdentifier, error) {
+func newFileIdentifier(ns *common.ConfigNamespace, suffix string) (fileIdentifier, error) {
 	if ns == nil {
-		return newINodeDeviceIdentifier(nil)
+		i, err := newINodeDeviceIdentifier(nil)
+		if err != nil {
+			return nil, err
+		}
+		return withSuffix(i, suffix), nil
 	}
 
 	identifierType := ns.Name()
@@ -87,7 +89,11 @@ func newFileIdentifier(ns *common.ConfigNamespace) (fileIdentifier, error) {
 		return nil, fmt.Errorf("no such file_identity generator: %s", identifierType)
 	}
 
-	return f(ns.Config())
+	i, err := f(ns.Config())
+	if err != nil {
+		return nil, err
+	}
+	return withSuffix(i, suffix), nil
 }
 
 type inodeDeviceIdentifier struct {
@@ -157,6 +163,32 @@ func (p *pathIdentifier) Name() string {
 
 func (p *pathIdentifier) Supports(f identifierFeature) bool {
 	return false
+}
+
+type suffixIdentifier struct {
+	i      fileIdentifier
+	suffix string
+}
+
+func withSuffix(inner fileIdentifier, suffix string) fileIdentifier {
+	if suffix == "" {
+		return inner
+	}
+	return &suffixIdentifier{i: inner, suffix: suffix}
+}
+
+func (s *suffixIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	fs := s.i.GetSource(e)
+	fs.name += "-" + s.suffix
+	return fs
+}
+
+func (s *suffixIdentifier) Name() string {
+	return s.i.Name()
+}
+
+func (s *suffixIdentifier) Supports(f identifierFeature) bool {
+	return s.i.Supports(f)
 }
 
 // mockIdentifier is used for testing

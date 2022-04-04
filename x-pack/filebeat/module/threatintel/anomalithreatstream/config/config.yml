@@ -1,7 +1,6 @@
 {{ if eq .input "http_endpoint" }}
 
 type: http_endpoint
-enabled: true
 
 listen_address: {{ .listen_address }}
 listen_port: {{ .listen_port }}
@@ -16,12 +15,12 @@ hmac:
   prefix: sha256=
 {{ end }}
 
-{{ if .ssl_certificate }}
-ssl:
-  enabled: true
-  certificate: {{ .ssl_certificate }}
-  key: {{ .ssl_key }}
-  verification_mode: none
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
+{{ if .preserve_original_event }}
+preserve_original_event: true
 {{ end }}
 
 {{ else if eq .input "file" }}
@@ -35,24 +34,19 @@ exclude_files: [".gz$"]
 json.add_error_key: true
 {{ end }}
 
-tags: {{.tags | tojson}}
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
+
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
+  - add_locale: ~
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
-  - fingerprint:
-      fields:
-        - event.dataset
-        - json.id
-      target_field: '@metadata._id'
-      encoding: base64
-  - script:
-      lang: javascript
-      id: my_filter
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
-
+        ecs.version: 1.12.0

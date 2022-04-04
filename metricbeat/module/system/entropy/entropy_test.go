@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
 // +build linux
 
 package entropy
@@ -24,19 +25,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestData(t *testing.T) {
-	testPath := paths.Path{
-		Hostfs: "./_meta/testdata",
-	}
 
-	if err := paths.InitPaths(&testPath); err != nil {
-		t.Errorf("error setting default paths: %+v", err)
-		t.FailNow()
-	}
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
@@ -45,14 +39,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	testPath := paths.Path{
-		Hostfs: "./_meta/testdata",
-	}
 
-	if err := paths.InitPaths(&testPath); err != nil {
-		t.Errorf("error setting default paths: %+v", err)
-		t.FailNow()
-	}
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -67,5 +54,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
 		"metricsets": []string{"entropy"},
+		"hostfs":     "./_meta/testdata",
 	}
 }

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package container
@@ -68,10 +69,11 @@ func TestEventMapping(t *testing.T) {
 		"memory.majorpagefaults":  0,
 
 		// calculated pct fields:
-		"cpu.usage.node.pct":     0.005631997,
-		"cpu.usage.limit.pct":    0.005631997,
-		"memory.usage.node.pct":  0.01,
-		"memory.usage.limit.pct": 0.1,
+		"cpu.usage.node.pct":          0.005631997,
+		"cpu.usage.limit.pct":         0.005631997,
+		"memory.usage.node.pct":       0.01,
+		"memory.usage.limit.pct":      0.1,
+		"memory.workingset.limit.pct": 0.09943977591036414,
 
 		"name": "nginx",
 
@@ -83,6 +85,16 @@ func TestEventMapping(t *testing.T) {
 
 	for k, v := range testCases {
 		testValue(t, events[0], k, v)
+	}
+
+	containerEcsFields := ecsfields(events[0])
+	testEcs := map[string]interface{}{
+		"cpu.usage":    0.005631997,
+		"memory.usage": 0.01,
+		"name":         "nginx",
+	}
+	for k, v := range testEcs {
+		testValue(t, containerEcsFields, k, v)
 	}
 }
 

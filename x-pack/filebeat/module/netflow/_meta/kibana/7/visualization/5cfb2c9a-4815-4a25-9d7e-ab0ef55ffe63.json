@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "query_string": {
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": "Countries (bytes) [Filebeat Netflow]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.geo.country_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.country_name:(.+) > .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
+                "interval": "auto"
+            },
+            "title": "Countries (bytes) [Filebeat Netflow]",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5cfb2c9a-4815-4a25-9d7e-ab0ef55ffe63",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:49.565Z",
+    "version": "WzQ4NDksMV0="
+}

@@ -1,0 +1,123 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Cursors cache hit ratio gauge [Metricbeat Oracle]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 50": "rgb(0,104,55)",
+                    "50 - 75": "rgb(255,255,190)",
+                    "75 - 100": "rgb(165,0,38)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Cursors cache hit ratio",
+                        "field": "oracle.performance.cursors.cache_hit.pct"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "x": null,
+                    "y": [
+                        {
+                            "accessor": 0,
+                            "aggType": "avg",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "gauge": {
+                    "alignment": "automatic",
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 0.5
+                        },
+                        {
+                            "from": 0.5,
+                            "to": 0.75
+                        },
+                        {
+                            "from": 0.75,
+                            "to": 1
+                        }
+                    ],
+                    "extendRange": true,
+                    "gaugeColorMode": "Labels",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Arc",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": false
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": true,
+                    "scale": {
+                        "color": "rgba(105,112,125,0.2)",
+                        "labels": false,
+                        "show": true
+                    },
+                    "style": {
+                        "bgColor": true,
+                        "bgFill": "rgba(105,112,125,0.2)",
+                        "bgMask": false,
+                        "bgWidth": 0.9,
+                        "fontSize": 60,
+                        "mask": false,
+                        "maskBars": 50,
+                        "subText": "",
+                        "width": 0.9
+                    },
+                    "type": "meter"
+                },
+                "isDisplayWarning": false,
+                "type": "gauge"
+            },
+            "title": "Cursors cache hit ratio gauge [Metricbeat Oracle]",
+            "type": "gauge"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "bc977600-ec12-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:19.365Z",
+    "version": "WzMyNzUsMV0="
+}

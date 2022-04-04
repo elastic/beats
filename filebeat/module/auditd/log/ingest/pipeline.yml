@@ -2050,14 +2050,14 @@ processors:
 - rename:
     ignore_failure: true
     field: auditd.log.ppid
-    target_field: process.ppid
+    target_field: process.parent.pid
 - convert:
     ignore_missing: true
     field: process.pid
     type: long
 - convert:
     ignore_missing: true
-    field: process.ppid
+    field: process.parent.pid
     type: long
 - rename:
     ignore_failure: true
@@ -2102,6 +2102,57 @@ processors:
     ignore_failure: true
     field: auditd.log.msg
     target_field: message
+
+# The processor below populates process.args list from argN fields.
+#
+# It handles the common case of a complete record: Contains argc=N and a0 to aN-1,
+# and the truncated case: Contains aI, aI+1, ..., aN-1, for I>0, and no argc.
+- script:
+    lang: painless
+    description: Extracts process arguments from EXECVE calls.
+    if: 'ctx.auditd?.log?.record_type == "EXECVE"'
+    source: >-
+      /* Want to capture all aNN fields, including aN_len and aN[x] */
+      Pattern argRegex = /^a([0-9]+)(.*)$/;
+
+      List keys = ctx.auditd.log.keySet().stream()
+                  /* From List of keys to list of matchers */
+                  .map(x -> argRegex.matcher(x))
+                  /* Drop elements that didn't match the regex */
+                  .filter(x -> x.matches())
+                  /* Must save to a list because it needs to remove keys in auditd.log,
+                     which cannot be done while streaming from this source */
+                  .collect(Collectors.toList());
+
+      List args = keys.stream()
+                  /* List<Matcher> to List<[Matcher, Value for given key]>
+                     with side effect of removing the key */
+                  .map(x -> [x, ctx.auditd.log.remove(x.group(0))])
+                  /* Drop elements that end in _len, just wanted to remove them */
+                  .filter(x -> x[0].group(2) != "_len")
+                  /* List<Matcher, Value> to List<[Int, Value]>
+                     where the Int is the argument index */
+                  .map(x -> [Integer.parseInt(x[0].group(1)), x[1]])
+                  /* Sort by numeric argument index */
+                  .sorted((lhs, rhs) -> lhs[0].compareTo(rhs[0]))
+                  /* Save as List<[Index, Value]> */
+                  .collect(Collectors.toList());
+
+      if (args.isEmpty()) return;
+      if (ctx.process == null) ctx.process = new HashMap();
+      ctx.process.args = args.stream().map(x -> x[1]).collect(Collectors.toList());
+      def firstIndex = args[0][0];
+      if (firstIndex == 0) {
+        ctx.process.executable = ctx.process.args[0];
+      } else {
+        ctx.process.args.add(0, "[... " + firstIndex + " truncated arguments ...]");
+      }
+
+    on_failure:
+      - append:
+          field: error.message
+          value: "failed extracting process arguments: {{{ _ingest.on_failure_message }}}"
+
 - rename:
     ignore_failure: true
     field: auditd.log.res
@@ -2160,6 +2211,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
 on_failure:
-- set:
+- append:
     field: error.message
     value: "{{ _ingest.on_failure_message }}"

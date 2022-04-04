@@ -1,0 +1,133 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "osquery.result.columns.status",
+                            "negate": false,
+                            "params": {
+                                "query": "Live",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "Live"
+                        },
+                        "query": {
+                            "match": {
+                                "osquery.result.columns.status": {
+                                    "query": "Live",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Number of Kernel modules [Filebeat Osquery] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 100": "rgb(0,104,55)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Live Kernel modules",
+                        "field": "osquery.result.columns.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "gauge": {
+                    "alignment": "horizontal",
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 100
+                        }
+                    ],
+                    "extendRange": true,
+                    "gaugeColorMode": "Labels",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Arc",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": false,
+                    "scale": {
+                        "color": "#333",
+                        "labels": false,
+                        "show": true
+                    },
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#eee",
+                        "bgMask": false,
+                        "bgWidth": 0.9,
+                        "fontSize": 60,
+                        "labelColor": true,
+                        "mask": false,
+                        "maskBars": 50,
+                        "subText": "",
+                        "width": 0.9
+                    },
+                    "type": "meter"
+                },
+                "isDisplayWarning": false,
+                "type": "gauge"
+            },
+            "title": "Number of Kernel modules [Filebeat Osquery] ECS",
+            "type": "gauge"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "240f3630-eb05-11e7-8f04-51231daa5b05-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "f59e21e0-eb03-11e7-8f04-51231daa5b05-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:54.660Z",
+    "version": "WzQ5MjgsMV0="
+}

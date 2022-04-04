@@ -1,0 +1,154 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "CPU usage by node  [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "12c1f2f0-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "0d5c6b10-2bf2-11e7-859b-f78b612cde28",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0.5",
+                        "formatter": "0.0a",
+                        "id": "0d5c9220-2bf2-11e7-859b-f78b612cde28",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.container.cpu.usage.nanocores",
+                                "id": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "metricset.period",
+                                "id": "8b346300-bf95-11ea-a07c-851701f0d645",
+                                "type": "avg"
+                            },
+                            {
+                                "id": "25ae6580-bf95-11ea-a07c-851701f0d645",
+                                "script": "params.sum_nanocores / (params._interval / params.avg_period)",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                                        "id": "39e40aa0-bf95-11ea-a07c-851701f0d645",
+                                        "name": "sum_nanocores"
+                                    },
+                                    {
+                                        "field": "8b346300-bf95-11ea-a07c-851701f0d645",
+                                        "id": "85213600-bf95-11ea-a07c-851701f0d645",
+                                        "name": "avg_period"
+                                    }
+                                ]
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "series_interval": "10s",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.node.name",
+                        "terms_order_by": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                        "terms_size": "10000",
+                        "value_template": "{{value}} nanocores"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": "0",
+                        "formatter": "0.0a",
+                        "hide_in_legend": 1,
+                        "id": "22f65d40-31a7-11e7-84cc-096d2b38e6e5",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.node.cpu.capacity.cores",
+                                "id": "22f65d41-31a7-11e7-84cc-096d2b38e6e5",
+                                "type": "avg"
+                            },
+                            {
+                                "id": "4af4c390-34d6-11e7-be88-cb6a123dc1bb",
+                                "script": "params.cores * 1000000000",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "22f65d41-31a7-11e7-84cc-096d2b38e6e5",
+                                        "id": "4cd32080-34d6-11e7-be88-cb6a123dc1bb",
+                                        "name": "cores"
+                                    }
+                                ]
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "point_size": "0",
+                        "seperate_axis": 0,
+                        "series_interval": "10s",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.node.name",
+                        "terms_order_by": "22f65d41-31a7-11e7-84cc-096d2b38e6e5",
+                        "terms_size": "10000",
+                        "value_template": "{{value}} nanocores"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "CPU usage by node  [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "44f12b40-2bf4-11e7-859b-f78b612cde28-ecs",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-03-24T09:43:55.002Z",
+    "version": "WzYzMzksM10="
+}

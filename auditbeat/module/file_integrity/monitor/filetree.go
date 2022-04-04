@@ -34,10 +34,8 @@ const (
 	PostOrder
 )
 
-var (
-	// PathSeparator can be used to override the operating system separator.
-	PathSeparator = string(os.PathSeparator)
-)
+// PathSeparator can be used to override the operating system separator.
+var PathSeparator = string(os.PathSeparator)
 
 // FileTree represents a directory in a filesystem-tree structure.
 type FileTree map[string]FileTree

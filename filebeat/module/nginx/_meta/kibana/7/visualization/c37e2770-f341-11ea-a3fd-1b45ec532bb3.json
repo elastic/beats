@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Dashboards Ingress Controller [Filebeat Nginx] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "[Nginx Ingress Controller logs overview](#/dashboard/dfbc0840-f340-11ea-a3fd-1b45ec532bb3) | [Nginx Ingress Controller access and error logs](#/dashboard/0b3dba40-f341-11ea-a3fd-1b45ec532bb3)",
+                "openLinksInNewTab": false
+            },
+            "title": "Dashboards Ingress Controller [Filebeat Nginx] ECS",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c37e2770-f341-11ea-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:17.806Z",
+    "version": "WzQ0OTEsMV0="
+}

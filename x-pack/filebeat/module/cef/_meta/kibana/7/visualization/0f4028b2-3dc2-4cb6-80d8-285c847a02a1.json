@@ -1,0 +1,117 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Outcomes [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
+                },
+                "id": "74716d29-91c6-4095-bc7d-7f6700f12b1f",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "hide_in_legend": 0,
+                        "id": "932c5de4-f841-4f27-99e4-60d95d3aa16c",
+                        "label": "Event Outcomes",
+                        "line_width": "3",
+                        "metrics": [
+                            {
+                                "id": "4c263b6d-8117-43c6-b83f-5c4145f43cfc",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(244,78,59,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryOutcome:\"/Failure\""
+                                },
+                                "id": "94371b84-a7aa-4824-b4d1-217ecbe725a5",
+                                "label": "Failure"
+                            },
+                            {
+                                "color": "rgba(104,188,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryOutcome:\"/Success\""
+                                },
+                                "id": "31564794-9278-4f2e-bb20-557f5cfbea79",
+                                "label": "Success"
+                            },
+                            {
+                                "color": "rgba(251,158,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryOutcome:\"/Attempt\""
+                                },
+                                "id": "10c0f919-0853-41b5-94b4-2e39932e7aa0",
+                                "label": "Attempt"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "none",
+                        "terms_field": "cef.extensions.categoryOutcome",
+                        "terms_size": "3"
+                    },
+                    {
+                        "axis_position": "left",
+                        "chart_type": "bar",
+                        "color": "rgba(104,182,204,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "c9eca9d0-c2e0-45e6-a3ce-f158c40fdd74",
+                        "label": "Event Count",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "6d8513ca-cc72-4b27-91b6-6b689558cdcb",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Outcomes [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0f4028b2-3dc2-4cb6-80d8-285c847a02a1",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:36.211Z",
+    "version": "WzQ3MDEsMV0="
+}

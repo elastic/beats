@@ -18,6 +18,7 @@
 package eventlog
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -29,8 +30,10 @@ import (
 // EventLog. Each implementation is free to support additional configuration
 // options.
 type ConfigCommon struct {
-	API  string `config:"api"`  // Name of the API to use. Optional.
-	Name string `config:"name"` // Name of the event log or channel or file.
+	API      string `config:"api"`       // Name of the API to use. Optional.
+	Name     string `config:"name"`      // Name of the event log or channel or file.
+	ID       string `config:"id"`        // Identifier for the event log.
+	XMLQuery string `config:"xml_query"` // Custom query XML. Must not be used with the keys from eventlog.query.
 }
 
 type validator interface {
@@ -90,7 +93,7 @@ func Register(apiName string, priority int, producer producer, channels channels
 // and the registered EventLog producers.
 func New(options *common.Config) (EventLog, error) {
 	if len(eventLogs) == 0 {
-		return nil, fmt.Errorf("No event log API is available on this system")
+		return nil, errors.New("No event log API is available on this system")
 	}
 
 	var config ConfigCommon

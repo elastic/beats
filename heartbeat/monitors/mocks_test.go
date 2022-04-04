@@ -99,24 +99,28 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	return c, nil
 }
 
-func mockEventMonitorValidator(id string) validator.Validator {
+func baseMockEventMonitorValidator(id string, name string, status string) validator.Validator {
 	var idMatcher isdef.IsDef
 	if id == "" {
 		idMatcher = isdef.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
 	} else {
 		idMatcher = isdef.IsEqual(id)
 	}
+	return lookslike.MustCompile(map[string]interface{}{
+		"monitor": map[string]interface{}{
+			"id":          idMatcher,
+			"name":        name,
+			"type":        "test",
+			"duration.us": isdef.IsDuration,
+			"status":      status,
+			"check_group": isdef.IsString,
+		},
+	})
+}
+
+func mockEventMonitorValidator(id string, name string) validator.Validator {
 	return lookslike.Strict(lookslike.Compose(
-		lookslike.MustCompile(map[string]interface{}{
-			"monitor": map[string]interface{}{
-				"id":          idMatcher,
-				"name":        "",
-				"type":        "test",
-				"duration.us": isdef.IsDuration,
-				"status":      "up",
-				"check_group": isdef.IsString,
-			},
-		}),
+		baseMockEventMonitorValidator(id, name, "up"),
 		hbtestllext.MonitorTimespanValidator,
 		hbtest.SummaryChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
@@ -145,22 +149,26 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Builder: func(s string, config *common.Config) (plugin.Plugin, error) {
+			Make: func(s string, config *common.Config) (plugin.Plugin, error) {
 				built.Inc()
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
 					URLs []string `config:"urls" validate:"required"`
 				}{}
-				err := config.Unpack(&unpacked)
-				if err != nil {
-					return plugin.Plugin{}, err
-				}
-				j, err := createMockJob()
+
+				// track all closes, even on error
 				closer := func() error {
 					closed.Inc()
 					return nil
 				}
-				return plugin.Plugin{Jobs: j, Close: closer, Endpoints: 1}, err
+
+				err := config.Unpack(&unpacked)
+				if err != nil {
+					return plugin.Plugin{DoClose: closer}, err
+				}
+				j, err := createMockJob()
+
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, err
 			},
 			Stats: plugin.NewPluginCountersRecorder("test", reg)},
 		built,
@@ -174,13 +182,15 @@ func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.I
 	return reg, built, closed
 }
 
-func mockPluginConf(t *testing.T, id string, schedule string, url string) *common.Config {
+func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *common.Config {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
 		"schedule": schedule,
+		"name":     name,
 	}
 
+	// Optional to let us simulate this key missing
 	if id != "" {
 		confMap["id"] = id
 	}
@@ -197,7 +207,6 @@ func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config 
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},
-		"schedule":    schedule,
 	}
 
 	if id != "" {
@@ -210,11 +219,23 @@ func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config 
 	return conf
 }
 
-// mockInvalidPlugin conf returns a config that invalid at the basic level of
-// what's expected in heartbeat, i.e. no type.
 func mockInvalidPluginConf(t *testing.T) *common.Config {
 	confMap := map[string]interface{}{
 		"hoeutnheou": "oueanthoue",
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *common.Config {
+	confMap := map[string]interface{}{
+		"type":     "test",
+		"id":       id,
+		"name":     name,
+		"schedule": schedule,
 	}
 
 	conf, err := common.NewConfigFrom(confMap)

@@ -98,3 +98,19 @@ The default is 0.
 *`process.include_top_n.by_memory`*:: How many processes to include from the top
 by memory. The processes are sorted by the `system.process.memory.rss.bytes`
 field. The default is 0.
+
+[float]
+=== Monitoring Hybrid Hierarchy Cgroups
+
+The process metricset supports both V1 and V2 (sometimes called unfied) cgroups controllers.
+However, on systems that are running a hybrid hierarchy, with both V1 and V2 controllers,
+metricbeat will only report one of the hierarchies for a given process. Is a process 
+has both V1 and V2 hierarchies associated with it, metricbeat will check to see if the process
+is attached to any V2 controllers. If it is, it will report cgroups V2 metrics. If not,
+it will report V1 metrics.
+
+A workaround is also required if metricbeat is running inside docker on a hybrid system.
+Within docker, metricbeat won't be able to see any V2 cgroups components. If you wish
+to monitor cgroups V2 from within docker on a hybrid system, you must mount the unified
+sysfs hierarchy (usually `/sys/fs/cgroups/unified`) inside the container, and then use
+`system.hostfs` to specify the filesystem root within the container.

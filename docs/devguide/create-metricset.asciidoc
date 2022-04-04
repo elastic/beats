@@ -1,9 +1,10 @@
 [[creating-metricsets]]
 === Creating a Metricset
 
+include::generator-support-note.asciidoc[tag=metricset-generator]
+
 A metricset is the part of a Metricbeat module that fetches and structures the
-data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset. If you want to create
-your own Beat that uses Metricbeat as a library, see <<creating-beat-from-metricbeat>>.
+data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset.
 
 When creating a metricset for the first time, it generally helps to look at the
 implementation of existing metricsets for inspiration.
@@ -62,7 +63,7 @@ The first file is `{metricset}.go`. It contains the logic on how to fetch data f
 
 The generated file looks like this:
 
-https://github.com/elastic/beats/blob/master/metricbeat/scripts/module/metricset/metricset.go.tmpl
+https://github.com/elastic/beats/blob/main/metricbeat/scripts/module/metricset/metricset.go.tmpl
 
 [source,go]
 ----
@@ -78,14 +79,12 @@ modify this part of the file if your implementation requires more imports.
 The init method registers the metricset with the central registry. In Go the `init()` function is called
 before the execution of all other code. This means the module will be automatically registered with the global registry.
 
-The `New` method, which is passed to `AddMetricSet`, will be called after the setup of the module and before starting to fetch data. You normally don't need to change this part of the file.
+The `New` method, which is passed to `MustAddMetricSet`, will be called after the setup of the module and before starting to fetch data. You normally don't need to change this part of the file.
 
 [source,go]
 ----
 func init() {
-	if err := mb.Registry.AddMetricSet("{module}", "{metricset}", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("{module}", "{metricset}", New)
 }
 ----
 

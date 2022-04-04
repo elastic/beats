@@ -7,16 +7,10 @@
 ++++
 
 Use the {ref}/getting-started-index-lifecycle-management.html[index lifecycle
-management] (ILM) feature in {es} to manage your {beatname_uc} indices as they age.
-For example, instead of creating daily indices where index size can vary based
-on the number of Beats and number of events sent, use an index lifecycle policy
-to automate a rollover to a new index when the existing index reaches a
-specified size or age.
-
-Starting with version 7.0, {beatname_uc} uses index lifecycle management by
-default when it connects to a cluster that supports lifecycle management.
-{beatname_uc} loads the default policy automatically and applies it to any
-indices created by {beatname_uc}.
+management] (ILM) feature in {es} to manage your {beatname_uc}
+their backing indices of your data streams as they age. {beatname_uc} loads
+the default policy automatically and applies it to any
+data streams created by {beatname_uc}.
 
 You can view and edit the policy in the *Index lifecycle policies* UI in {kib}.
 For more information about working with the UI, see
@@ -26,13 +20,8 @@ Example configuration:
 
 ["source","yaml",subs="attributes"]
 ----
-setup.ilm.enabled: auto
-setup.ilm.rollover_alias: "{beatname_lc}"
-setup.ilm.pattern: "{now/d}-000001" <1>
+setup.ilm.enabled: true
 ----
-<1> Date math is supported here. For more information, see
-{ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
-date math with the rollover API].
 
 WARNING: If <<ilm,index lifecycle management>> is enabled (which is typically the default), `setup.template.name` and `setup.template.pattern` are ignored.
 
@@ -47,42 +36,7 @@ You can specify the following settings in the `setup.ilm` section of the
 ==== `setup.ilm.enabled`
 
 Enables or disables index lifecycle management on any new indices created by
-{beatname_uc}. Valid values are `true`, `false`, and `auto`. When `auto` (the
-default) is specified on version 7.0 and later, {beatname_uc} automatically uses
-index lifecycle management if the feature is enabled in {es} and has the
-required license; otherwise, {beatname_uc} creates daily indices.
-
-[float]
-[[setup-ilm-rollover_alias-option]]
-==== `setup.ilm.rollover_alias`
-
-The index lifecycle write alias name. The default is
-+{beatname_lc}-%{[{beat_version_key}]}+. Setting this option changes the alias name.
-
-NOTE: If you modify this setting after loading the index template, you must
-overwrite the template to apply the changes.
-
-[float]
-[[setup-ilm-pattern-option]]
-==== `setup.ilm.pattern`
-
-The rollover index pattern. The default is `%{now/d}-000001`.
-
-Date math is supported in this setting. For example:
-
-[source,yaml]
-----
-setup.ilm.pattern: "{now/M{yyyy.MM}}-000001"
-----
-
-For more information, see
-{ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
-date math with the rollover API].
-
-NOTE: Before modifying this setting for an existing ILM setup, you must manually
-remove any aliases related to the previous pattern, then overwrite the policy.
-Existing indices that don't match the new pattern might no longer be subject to
-index lifecycle management.
+{beatname_uc}. Valid values are `true` and `false`.
 
 [float]
 [[setup-ilm-policy_name-option]]
@@ -110,8 +64,8 @@ When set to `false`, disables the check for an existing lifecycle policy. The
 default is `true`. You need to disable this check if the {beatname_uc}
 user connecting to a secured cluster doesn't have the `read_ilm` privilege.
 
-If you set this option to `false`, set `setup.ilm.overwrite: true` so the
-lifecycle policy can be installed.
+If you set this option to `false`, lifecycle policy will not be installed, even if
+`setup.ilm.overwrite` is set to `true`.
 
 [float]
 [[setup-ilm-overwrite-option]]

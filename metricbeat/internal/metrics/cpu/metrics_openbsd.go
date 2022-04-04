@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build openbsd
 // +build openbsd
 
 package cpu
@@ -35,11 +36,12 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Get is the OpenBSD implementation of get
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 
 	// see man 2 sysctl
 	loadGlobal := [C.CPUSTATES]C.long{
@@ -56,11 +58,11 @@ func Get(_ string) (CPUMetrics, error) {
 		return CPUMetrics{}, err
 	}
 	self := CPU{}
-	self.User = metrics.OptUintWith(loadGlobal[0])
-	self.Nice = metrics.OptUintWith(loadGlobal[1])
-	self.Sys = metrics.OptUintWith(loadGlobal[2])
-	self.Irq = metrics.OptUintWith(loadGlobal[3])
-	self.Idle = metrics.OptUintWith(loadGlobal[4])
+	self.User = opt.UintWith(loadGlobal[0])
+	self.Nice = opt.UintWith(loadGlobal[1])
+	self.Sys = opt.UintWith(loadGlobal[2])
+	self.Irq = opt.UintWith(loadGlobal[3])
+	self.Idle = opt.UintWith(loadGlobal[4])
 	// Get count of available CPUs
 	ncpuMIB := [2]int32{C.CTL_HW, C.HW_NCPU}
 	callSize := uintptr(0)
@@ -92,11 +94,11 @@ func Get(_ string) (CPUMetrics, error) {
 	// iterate over metrics for each CPU
 	for i := 0; i < ncpu; i++ {
 		sysctlGetCPUTimes(ncpu, i, &loadPerCPU)
-		perCPU[i].User = metrics.OptUintWith(loadGlobal[0])
-		perCPU[i].Nice = metrics.OptUintWith(loadGlobal[1])
-		perCPU[i].Sys = metrics.OptUintWith(loadGlobal[2])
-		perCPU[i].Irq = metrics.OptUintWith(loadGlobal[3])
-		perCPU[i].Idle = metrics.OptUintWith(loadGlobal[4])
+		perCPU[i].User = opt.UintWith(loadGlobal[0])
+		perCPU[i].Nice = opt.UintWith(loadGlobal[1])
+		perCPU[i].Sys = opt.UintWith(loadGlobal[2])
+		perCPU[i].Irq = opt.UintWith(loadGlobal[3])
+		perCPU[i].Idle = opt.UintWith(loadGlobal[4])
 	}
 
 	metrics := CPUMetrics{totals: self, list: perCPU}

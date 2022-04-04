@@ -1,8 +1,8 @@
-FROM golang:1.16.5
+FROM golang:1.17.8
 
 RUN \
     apt-get update \
-      && apt-get install -y --no-install-recommends \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          netcat \
          python3 \
          python3-pip \

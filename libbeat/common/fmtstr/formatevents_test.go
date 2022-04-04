@@ -109,7 +109,7 @@ func TestEventFormatString(t *testing.T) {
 			"test timestamp formatter",
 			"%{[key]}: %{+YYYY.MM.dd}",
 			beat.Event{
-				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
 				Fields: common.MapStr{
 					"key": "timestamp",
 				},
@@ -121,7 +121,7 @@ func TestEventFormatString(t *testing.T) {
 			"test timestamp formatter",
 			"%{[@timestamp]}: %{+YYYY.MM.dd}",
 			beat.Event{
-				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
 				Fields: common.MapStr{
 					"key": "timestamp",
 				},

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package fileset
@@ -61,7 +62,7 @@ func TestLoadPipeline(t *testing.T) {
 	}
 
 	log := logp.NewLogger(logName)
-	err := loadPipeline(client, "my-pipeline-id", content, false, log)
+	err := LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 
 	status, _, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
@@ -70,12 +71,12 @@ func TestLoadPipeline(t *testing.T) {
 
 	// loading again shouldn't actually update the pipeline
 	content["description"] = "describe pipeline 2"
-	err = loadPipeline(client, "my-pipeline-id", content, false, log)
+	err = LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline")
 
 	// loading again updates the pipeline
-	err = loadPipeline(client, "my-pipeline-id", content, true, log)
+	err = LoadPipeline(client, "my-pipeline-id", content, true, log)
 	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline 2")
 }
@@ -105,7 +106,13 @@ func TestSetupNginx(t *testing.T) {
 	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
-		{Module: "nginx"},
+		{
+			Module: "nginx",
+			Filesets: map[string]*FilesetConfig{
+				"error":  {},
+				"access": {},
+			},
+		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"))
@@ -184,7 +191,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		"multibad": {Enabled: &disabled},
 	}
 	configs := []*ModuleConfig{
-		&ModuleConfig{"foo", &enabled, filesetConfigs},
+		{"foo", &enabled, filesetConfigs},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))
@@ -251,7 +258,9 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL: eslegtest.GetURL(),
+		URL:      eslegtest.GetURL(),
+		Username: eslegtest.GetUser(),
+		Password: eslegtest.GetPass(),
 	})
 	if err != nil {
 		t.Fatal(err)

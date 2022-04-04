@@ -120,11 +120,6 @@ func (e *eventLogger) run(
 		client.Close()
 	}()
 
-	err = api.Open(state)
-	if err != nil {
-		e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
-		return
-	}
 	defer func() {
 		e.log.Info("Stop processing.")
 
@@ -134,36 +129,58 @@ func (e *eventLogger) run(
 		}
 	}()
 
-	e.log.Debug("Opened successfully.")
-
+runLoop:
 	for stop := false; !stop; {
-		select {
-		case <-done:
-			return
-		default:
-		}
-
-		// Read from the event.
-		records, err := api.Read()
-		switch err {
-		case nil:
-		case io.EOF:
-			// Graceful stop.
-			stop = true
-		default:
-			e.log.Warnw("Read() error.", "error", err)
-			return
-		}
-
-		e.log.Debugf("Read() returned %d records.", len(records))
-		if len(records) == 0 {
-			time.Sleep(time.Second)
+		err = api.Open(state)
+		if eventlog.IsRecoverable(err) {
+			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err)
+			time.Sleep(time.Second * 5)
 			continue
+		} else if err != nil {
+			e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
+			return
 		}
+		e.log.Debug("Opened successfully.")
 
-		eventACKer.Add(len(records))
-		for _, lr := range records {
-			client.Publish(lr.ToEvent())
+		for !stop {
+			select {
+			case <-done:
+				return
+			default:
+			}
+
+			// Read from the event.
+			records, err := api.Read()
+			if eventlog.IsRecoverable(err) {
+				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err)
+				if closeErr := api.Close(); closeErr != nil {
+					e.log.Warnw("Close() error.", "error", err)
+				}
+				continue runLoop
+			}
+			switch err {
+			case nil:
+			case io.EOF:
+				// Graceful stop.
+				stop = true
+			default:
+				e.log.Warnw("Read() error.", "error", err)
+				return
+			}
+
+			e.log.Debugf("Read() returned %d records.", len(records))
+			if len(records) == 0 {
+				time.Sleep(time.Second)
+				if stop {
+					return
+				}
+				continue
+			}
+
+			eventACKer.Add(len(records))
+			for _, lr := range records {
+				client.Publish(lr.ToEvent())
+			}
 		}
 	}
 }
@@ -178,8 +195,7 @@ func processorsForConfig(
 	// added before the user processors.
 	if !config.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
 			return nil, err
 		}

@@ -1,0 +1,95 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Clients [Metricbeat Redis] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 100": "rgb(0,104,55)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Connected clients",
+                        "field": "redis.info.clients.connected"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "fontSize": 60,
+                "gauge": {
+                    "autoExtend": false,
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 100
+                        }
+                    ],
+                    "gaugeColorMode": "None",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Metric",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": false,
+                    "scale": {
+                        "color": "#333",
+                        "labels": false,
+                        "show": false,
+                        "width": 2
+                    },
+                    "style": {
+                        "bgColor": false,
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "type": "simple",
+                    "useRange": false,
+                    "verticalSplit": false
+                },
+                "handleNoResults": true,
+                "type": "gauge"
+            },
+            "title": "Clients [Metricbeat Redis] ECS",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Redis-Clients-Metrics-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Metricbeat-Redis-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:49.646Z",
+    "version": "WzQxMzMsMV0="
+}

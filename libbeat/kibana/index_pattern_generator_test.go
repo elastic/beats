@@ -18,6 +18,7 @@
 package kibana
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -95,7 +96,7 @@ func TestGenerate(t *testing.T) {
 
 	tests := []compare{
 		{
-			existing: "testdata/beat-6.json",
+			existing: "testdata/beat-6.ndjson",
 			created:  d,
 		},
 	}
@@ -134,7 +135,7 @@ func TestGenerateExtensive(t *testing.T) {
 
 	tests := []compare{
 		{
-			existing: "testdata/extensive/metricbeat-6.json",
+			existing: "testdata/extensive/metricbeat-6.ndjson",
 			created:  d,
 		},
 	}
@@ -144,75 +145,72 @@ func TestGenerateExtensive(t *testing.T) {
 func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 	for _, test := range tests {
 		// compare default
-		existing, err := readJson(test.existing)
+		existing, err := readNDJSON(test.existing)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		var attrExisting, attrCreated common.MapStr
+		for _, ex := range existing {
+			var attrExisting, attrCreated common.MapStr
 
-		if strings.Contains(test.existing, "6") {
-			assert.Equal(t, existing["version"], test.created["version"])
+			if strings.Contains(test.existing, "6") {
+				assert.Equal(t, ex["version"], test.created["version"])
+				assert.Equal(t, ex["id"], test.created["id"])
+				assert.Equal(t, ex["type"], test.created["type"])
 
-			objExisting := existing["objects"].([]interface{})[0].(map[string]interface{})
-			objCreated := test.created["objects"].([]common.MapStr)[0]
+				attrExisting = ex["attributes"].(map[string]interface{})
+				attrCreated = test.created["attributes"].(common.MapStr)
+			} else {
+				attrExisting = ex
+				attrCreated = test.created
+			}
 
-			assert.Equal(t, objExisting["version"], objCreated["version"])
-			assert.Equal(t, objExisting["id"], objCreated["id"])
-			assert.Equal(t, objExisting["type"], objCreated["type"])
-
-			attrExisting = objExisting["attributes"].(map[string]interface{})
-			attrCreated = objCreated["attributes"].(common.MapStr)
-		} else {
-			attrExisting = existing
-			attrCreated = test.created
-		}
-
-		// check fieldFormatMap
-		var ffmExisting, ffmCreated map[string]interface{}
-		err = json.Unmarshal([]byte(attrExisting["fieldFormatMap"].(string)), &ffmExisting)
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = json.Unmarshal([]byte(attrCreated["fieldFormatMap"].(string)), &ffmCreated)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, ffmExisting, ffmCreated)
-
-		// check fields
-		var fieldsExisting, fieldsCreated []map[string]interface{}
-		err = json.Unmarshal([]byte(attrExisting["fields"].(string)), &fieldsExisting)
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = json.Unmarshal([]byte(attrCreated["fields"].(string)), &fieldsCreated)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
-		for _, e := range fieldsExisting {
-			idx := find(fieldsCreated, "name", e["name"].(string))
-			assert.NotEqual(t, -1, idx)
-			assert.Equal(t, e, fieldsCreated[idx])
-		}
-
-		// check sourceFilters
-		if sourceFilters {
-			var sfExisting, sfCreated []map[string]interface{}
-			err = json.Unmarshal([]byte(attrExisting["sourceFilters"].(string)), &sfExisting)
+			// check fieldFormatMap
+			var ffmExisting, ffmCreated map[string]interface{}
+			err = json.Unmarshal([]byte(attrExisting["fieldFormatMap"].(string)), &ffmExisting)
 			if err != nil {
 				t.Fatal(err)
 			}
-			err = json.Unmarshal([]byte(attrCreated["sourceFilters"].(string)), &sfCreated)
+			err = json.Unmarshal([]byte(attrCreated["fieldFormatMap"].(string)), &ffmCreated)
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, len(sfExisting), len(sfCreated))
-			for _, e := range sfExisting {
-				idx := find(sfCreated, "value", e["value"].(string))
+			assert.Equal(t, ffmExisting, ffmCreated)
+
+			// check fields
+			var fieldsExisting, fieldsCreated []map[string]interface{}
+			err = json.Unmarshal([]byte(attrExisting["fields"].(string)), &fieldsExisting)
+			if err != nil {
+				t.Fatal(err)
+			}
+			err = json.Unmarshal([]byte(attrCreated["fields"].(string)), &fieldsCreated)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
+			for _, e := range fieldsExisting {
+				idx := find(fieldsCreated, "name", e["name"].(string))
 				assert.NotEqual(t, -1, idx)
-				assert.Equal(t, e, sfCreated[idx])
+				assert.Equal(t, e, fieldsCreated[idx])
+			}
+
+			// check sourceFilters
+			if sourceFilters {
+				var sfExisting, sfCreated []map[string]interface{}
+				err = json.Unmarshal([]byte(attrExisting["sourceFilters"].(string)), &sfExisting)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = json.Unmarshal([]byte(attrCreated["sourceFilters"].(string)), &sfCreated)
+				if err != nil {
+					t.Fatal(err)
+				}
+				assert.Equal(t, len(sfExisting), len(sfCreated))
+				for _, e := range sfExisting {
+					idx := find(sfCreated, "value", e["value"].(string))
+					assert.NotEqual(t, -1, idx)
+					assert.Equal(t, e, sfCreated[idx])
+				}
 			}
 		}
 	}
@@ -227,16 +225,21 @@ func find(a []map[string]interface{}, key, val string) int {
 	return -1
 }
 
-func readJson(path string) (map[string]interface{}, error) {
+func readNDJSON(path string) ([]map[string]interface{}, error) {
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var data map[string]interface{}
-	err = json.Unmarshal(f, &data)
-	if err != nil {
-		return nil, err
+	data := make([]map[string]interface{}, 0)
+	d := json.NewDecoder(bytes.NewReader(f))
+	for d.More() {
+		var dd map[string]interface{}
+		err = d.Decode(&dd)
+		if err != nil {
+			return nil, fmt.Errorf("error reading ndjson: %+v", err)
+		}
+		data = append(data, dd)
 	}
 	return data, nil
 }

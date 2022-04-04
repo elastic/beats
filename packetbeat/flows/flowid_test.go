@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package flows
@@ -50,14 +51,6 @@ func addVLan(u []byte) applyAddr {
 	id := binary.LittleEndian.Uint16(u)
 	return func(f *FlowID) {
 		f.AddVLan(id)
-	}
-}
-
-func addUDP(a, b []byte) applyAddr {
-	src := binary.LittleEndian.Uint16(a)
-	dst := binary.LittleEndian.Uint16(b)
-	return func(f *FlowID) {
-		f.AddUDP(src, dst)
 	}
 }
 

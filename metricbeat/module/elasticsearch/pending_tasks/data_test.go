@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package pending_tasks
@@ -46,7 +47,7 @@ func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.NoError(t, err)
 }
 
@@ -56,7 +57,7 @@ func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.NoError(t, err)
 	require.True(t, len(reporter.GetEvents()) >= 1)
 	require.Zero(t, len(reporter.GetErrors()))
@@ -68,7 +69,7 @@ func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.Zero(t, len(reporter.GetEvents()))
 	require.Zero(t, len(reporter.GetErrors()))
 }
@@ -79,7 +80,7 @@ func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.Equal(t, 3, len(reporter.GetEvents()))
 	require.Zero(t, len(reporter.GetErrors()))
 }
@@ -90,7 +91,7 @@ func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.Error(t, err)
 }
 
@@ -100,7 +101,7 @@ func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.Error(t, err)
 }
 
@@ -197,16 +198,16 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 		}},
 	}
 
-	for _, testCase := range testCases {
+	for iter, testCase := range testCases {
 		content, err := ioutil.ReadFile(testCase.given)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventsMapping(reporter, info, content)
+		err = eventsMapping(reporter, info, content, false)
 
 		events := reporter.GetEvents()
 		if !reflect.DeepEqual(testCase.expected, events) {
-			t.Errorf("Expected %v, actual: %v", testCase.expected, events)
+			t.Errorf("Iteration %d, Given '%s'. Expected %v, actual: %v", iter, testCase.given, testCase.expected, events)
 		}
 	}
 }

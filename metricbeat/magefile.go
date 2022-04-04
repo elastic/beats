@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -133,7 +134,17 @@ func MockedTests(ctx context.Context) error {
 
 // Fields generates a fields.yml and fields.go for each module.
 func Fields() {
-	mg.Deps(fieldsYML, moduleFieldsGo)
+	mg.Deps(libbeatAndMetricbeatCommonFieldsGo, moduleFieldsGo)
+	mg.Deps(fieldsYML)
+}
+
+// libbeatAndMetricbeatCommonFieldsGo generates a fields.go containing both
+// libbeat and metricbeat's common fields.
+func libbeatAndMetricbeatCommonFieldsGo() error {
+	if err := devtools.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return devtools.GenerateMetricbeatAllInOneFieldsGo()
 }
 
 func fieldsYML() error {
@@ -169,6 +180,15 @@ func FieldsDocs() error {
 // CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
+}
+
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return devtools.ExportDashboard()
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

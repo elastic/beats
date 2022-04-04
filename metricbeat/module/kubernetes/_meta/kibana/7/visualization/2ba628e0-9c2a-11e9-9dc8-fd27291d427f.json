@@ -1,0 +1,84 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Controller Memory [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(251,158,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Resident",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.controllermanager.process.memory.resident.bytes",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "ac896b30-9c29-11e9-92c1-f7d03186c592",
+                        "label": "Virtual",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.controllermanager.process.memory.virtual.bytes",
+                                "id": "ac896b31-9c29-11e9-92c1-f7d03186c592",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Controller Memory [Metricset Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2ba628e0-9c2a-11e9-9dc8-fd27291d427f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:36.329Z",
+    "version": "WzQwMDgsMV0="
+}

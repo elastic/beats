@@ -1,0 +1,146 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "controlledBy": "1532342651170",
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "azure.application_id",
+                            "negate": false,
+                            "params": {
+                                "query": "42cb59a9-d5be-400b-a5c4-69b0a0026ac6"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "azure.application_id": "42cb59a9-d5be-400b-a5c4-69b0a0026ac6"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "App State Filters [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "azure.application_id",
+                        "id": "1532342651170",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Application ID",
+                        "options": {
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 10,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.dimensions.request_url_host",
+                        "id": "1601559750853",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Host URL",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1532342651170",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.dimensions.cloud_role_name",
+                        "id": "1601640368472",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1532342651170",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.dimensions.browser_timing_url_host",
+                        "id": "1601640439434",
+                        "indexPatternRefName": "control_3_index_pattern",
+                        "label": "Browser URL Host",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1532342651170",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "App State Filters [Metricbeat Azure]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2e5183a0-03da-11eb-8034-63f2039e9d3f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_3_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:42.950Z",
+    "version": "WzM0ODgsMV0="
+}

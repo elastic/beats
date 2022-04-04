@@ -1,0 +1,75 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Clock Offset [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "annotations": [],
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(84,179,153,1)",
+                        "fill": 0.5,
+                        "formatter": "ns,ms,3",
+                        "id": "88d6bda0-9760-11e9-b3d5-07b0ab7d6354",
+                        "label": "Clock Offsets",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "stacked",
+                        "terms_field": null,
+                        "terms_order_by": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                        "type": "timeseries",
+                        "value_template": "{{value}} ms"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Clock Offset [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:00.377Z",
+    "version": "WzM3MDYsMV0="
+}

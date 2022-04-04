@@ -16,7 +16,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
-  * <<filebeat-module-cyberark>>
   * <<filebeat-module-cyberarkpas>>
   * <<filebeat-module-cylance>>
   * <<filebeat-module-elasticsearch>>
@@ -25,7 +24,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-fortinet>>
   * <<filebeat-module-gcp>>
   * <<filebeat-module-google_workspace>>
-  * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-ibmmq>>
   * <<filebeat-module-icinga>>
@@ -91,7 +89,6 @@ include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
-include::modules/cyberark.asciidoc[]
 include::modules/cyberarkpas.asciidoc[]
 include::modules/cylance.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
@@ -100,7 +97,6 @@ include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
 include::modules/gcp.asciidoc[]
 include::modules/google_workspace.asciidoc[]
-include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
 include::modules/icinga.asciidoc[]

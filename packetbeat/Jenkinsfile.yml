@@ -13,7 +13,7 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
+    checks:
         make: |
           make -C packetbeat check;
           make -C packetbeat update;
@@ -21,7 +21,7 @@ stages:
           cd x-pack/packetbeat;
           mage check;
           mage update;
-        stage: lint
+        stage: checks
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -36,13 +36,13 @@ stages:
             branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
-    build:
-        mage: "mage build test"
+    unitTest:
+        mage: "mage build unitTest"
         stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "macosx&&x86_64"
+          - "orka && darwin && poc"
         when:                  ## Override the top-level when.
             comments:
                 - "/test packetbeat for macos"
@@ -50,54 +50,49 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
-    windows:
+    windows-2022:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2022"
+        stage: mandatory
+    windows-2019:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-        stage: mandatory
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: extended
+        stage: mandatory
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        stage: extended
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
-    windows-2008:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2008-r2"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
-    windows-7:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7"
-        stage: extended
-    windows-7-32:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7-32-bit"
-        stage: extended
+        stage: extended_win
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
             enabled: false
         stage: packaging
+        when:
+            branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^packetbeat/.*"
+              - "@oss"               ## special token regarding the changeset for the oss
     packaging-arm:
         packaging-arm: "mage package"
         e2e:
@@ -105,3 +100,9 @@ stages:
         platforms:             ## override default label in this specific stage.
           - "arm"
         stage: packaging
+        when:
+            branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^packetbeat/.*"
+              - "@oss"               ## special token regarding the changeset for the oss

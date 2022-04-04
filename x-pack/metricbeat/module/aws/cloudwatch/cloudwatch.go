@@ -17,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -65,25 +64,11 @@ type Dimension struct {
 
 // Config holds a configuration specific for cloudwatch metricset.
 type Config struct {
-	Namespace          string      `config:"namespace" validate:"nonzero,required"`
-	MetricName         []string    `config:"name"`
-	Dimensions         []Dimension `config:"dimensions"`
-	ResourceTypeFilter string      `config:"tags.resource_type_filter"` // Deprecated.
-	ResourceType       string      `config:"resource_type"`
-	Statistic          []string    `config:"statistic"`
-	Tags               []aws.Tag   `config:"tags"` // Deprecated.
-}
-
-// Validate checks for deprecated config options
-func (c Config) Validate() error {
-	if c.Tags != nil {
-		cfgwarn.Deprecate("8.0.0", "tags is deprecated. Use tags_filter instead")
-	}
-
-	if c.ResourceTypeFilter != "" {
-		cfgwarn.Deprecate("8.0.0", "tags.resource_type_filter is deprecated. Use resource_type instead")
-	}
-	return nil
+	Namespace    string      `config:"namespace" validate:"nonzero,required"`
+	MetricName   []string    `config:"name"`
+	Dimensions   []Dimension `config:"dimensions"`
+	ResourceType string      `config:"resource_type"`
+	Statistic    []string    `config:"statistic"`
 }
 
 type metricsWithStatistics struct {
@@ -155,18 +140,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	m.logger.Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
 	m.logger.Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
 
+	var config aws.Config
+	err = m.Module().UnpackConfig(&config)
+	if err != nil {
+		return err
+	}
+
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
 		for _, regionName := range m.MetricSet.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
+			monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 
 			svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-				m.Endpoint, "monitoring", regionName, awsConfig))
+				m.Endpoint, monitoringServiceName, regionName, awsConfig))
 
 			svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
-				m.Endpoint, "tagging", regionName, awsConfig))
+				m.Endpoint, "tagging", regionName, awsConfig)) //Does not support FIPS
 
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
 			if err != nil {
@@ -188,11 +180,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 
+		monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, "monitoring", regionName, awsConfig))
+			m.Endpoint, monitoringServiceName, regionName, awsConfig))
 
 		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, "tagging", regionName, awsConfig))
+			m.Endpoint, "tagging", regionName, awsConfig)) //Does not support FIPS
 
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
@@ -219,7 +212,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			err = reportEvents(addMetadata(namespace, m.Endpoint, regionName, awsConfig, eventsWithIdentifier), report)
+			err = reportEvents(addMetadata(namespace, m.Endpoint, regionName, awsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier), report)
 			if err != nil {
 				return errors.Wrap(err, "reportEvents failed")
 			}
@@ -318,13 +311,6 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	resourceTypesWithTags := map[string][]aws.Tag{}
 
 	for _, config := range m.CloudwatchConfigs {
-		// If tags_filter on metricset level is given, overwrite tags in
-		// cloudwatch metrics with tags_filter.
-		tagsFilter := config.Tags
-		if m.MetricSet.TagsFilter != nil {
-			tagsFilter = m.MetricSet.TagsFilter
-		}
-
 		// If there is no statistic method specified, then use the default.
 		if config.Statistic == nil {
 			config.Statistic = defaultStatistics
@@ -358,9 +344,9 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 			if config.ResourceType != "" {
 				if _, ok := resourceTypesWithTags[config.ResourceType]; ok {
-					resourceTypesWithTags[config.ResourceType] = tagsFilter
+					resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
 				} else {
-					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], tagsFilter...)
+					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], m.MetricSet.TagsFilter...)
 				}
 			}
 			continue
@@ -368,7 +354,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               tagsFilter,
+			tags:               m.MetricSet.TagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,

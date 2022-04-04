@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !aix
+// +build !aix
+
 package azureeventhub
 
 import (
@@ -37,7 +40,6 @@ func (conf *azureInputConfig) Validate() error {
 	}
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
-
 	}
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {

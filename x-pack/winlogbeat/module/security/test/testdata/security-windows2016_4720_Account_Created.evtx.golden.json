@@ -31,7 +31,12 @@
     "user": {
       "domain": "WIN-41OB2LO92CR",
       "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator"
+      "name": "Administrator",
+      "target": {
+        "domain": "WIN-41OB2LO92CR",
+        "id": "S-1-5-21-101361758-2486510592-3018839910-1005",
+        "name": "elastictest1"
+      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -126,7 +131,12 @@
     "user": {
       "domain": "WIN-41OB2LO92CR",
       "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator"
+      "name": "Administrator",
+      "target": {
+        "domain": "WIN-41OB2LO92CR",
+        "id": "S-1-5-21-101361758-2486510592-3018839910-1006",
+        "name": "audittest0609"
+      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",

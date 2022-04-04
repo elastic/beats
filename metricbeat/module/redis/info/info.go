@@ -59,8 +59,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}()
 
-	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("default", conn)
+	// Fetch all INFO.
+	info, err := redis.FetchRedisInfo("all", conn)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch redis info")
 	}
@@ -73,10 +73,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		{"client_biggest_input_buf", "client_recent_max_input_buffer"},
 	}
 	for _, r := range renamings {
-		if v, ok := info[r.new]; ok {
-			info[r.old] = v
-		} else {
-			info[r.new] = info[r.old]
+		if v, ok := info[r.old]; ok {
+			info[r.new] = v
+			delete(info, r.old)
 		}
 	}
 

@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Microsoft module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for ingesting data from the different Microsoft Products. Currently supports these filesets:
 
 - `defender_atp` fileset: Supports Microsoft Defender for Endpoint (Microsoft Defender ATP)
@@ -222,7 +224,7 @@ include::../include/var-paths.asciidoc[]
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 

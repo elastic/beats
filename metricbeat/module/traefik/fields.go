@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetTraefik returns asset data.
-// This is the base64 encoded gzipped contents of module/traefik.
+// This is the base64 encoded zlib format compressed contents of module/traefik.
 func AssetTraefik() string {
 	return "eJy00bFu2zAQBuBdT/FDS4GidncNBTx2aFEU7RQEBkWdZMYUSfBORvz2AWXJkRXFMRLkRp599+m/FfZ0LCBRUW32GSBGLBXI/51e8gyoiHU0QYx3BX5kADB0EelAkQkh+scjvsN6VaFUVjlNES1JNJozIJIlxVSgURnAJGJcwwXucmabf0O+Ewn5fQbUhmzFRb9lBadamupSyTGkQdF3YXhZAL4HmWq6fkrYkbKyOz8vKa5IUv067YEvRRlHFero29H4hYcN2Pz5CXJV8MbJ5P+XAY41107FXRDT0ppJX7RHufWumTWu4FP97wfC1+dgjWNJIcI4MGnvKl6kROLgHdMiZB7hDZK/w7zZ7a6lMuVo311k+2YwN5BS/e7akmIKaPzguezZoA7Ntr9P9/I3H5dsDhRVQ2cH+ssZh9bo6JdONbWxKOl4q31FvP76Ks+XD6SXcjw1tp8QJwLFgYfEy54CAAD//+cgQmw="
 }

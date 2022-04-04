@@ -1,0 +1,131 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Diego cell remaining disk [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "id": "9c8666fc-f84e-11ea-a43e-0f7a3a14396c"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "9cb8a18a-f84e-11ea-bd11-836ecccfc401"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: \"cloudfoundry\" and cloudfoundry.envelope.origin : \"rep\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "9ca68d56-f84e-11ea-a6bb-f3164c0bb859",
+                        "text": null,
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "300000",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "9c8aab7c-f84e-11ea-b4a3-e31a518913fa",
+                "ignore_global_filter": 0,
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name: \"CapacityRemainingDisk\"  "
+                        },
+                        "formatter": "bytes",
+                        "hidden": false,
+                        "hide_in_legend": 1,
+                        "id": "9c8c18f4-f84e-11ea-97ff-b32117553dae",
+                        "label": "Remaining Disk",
+                        "line_width": "01",
+                        "metrics": [
+                            {
+                                "field": "cloudfoundry.value.value",
+                                "id": "9c8d7514-f84e-11ea-9457-93fdc9395544",
+                                "type": "avg"
+                            },
+                            {
+                                "id": "9c79728a-f84e-11ea-a0b0-cbbc2af24ed3",
+                                "script": "params.megabytes * 1024 * 1024",
+                                "type": "math",
+                                "variables": [
+                                    {
+                                        "field": "9c8d7514-f84e-11ea-9457-93fdc9395544",
+                                        "id": "9c8030c0-f84e-11ea-acf6-13a6b4ddcd67",
+                                        "name": "megabytes"
+                                    }
+                                ]
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "9c753c7e-f84e-11ea-96e9-33ff984da2c7",
+                                "label": ""
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "cloudfoundry.envelope.ip",
+                        "terms_include": "",
+                        "terms_order_by": "_key",
+                        "type": "timeseries",
+                        "value_template": ""
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Diego cell remaining disk [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9c948fb6-f84e-11ea-96f5-dff115716ba4",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:58.327Z",
+    "version": "WzM2NjAsMV0="
+}

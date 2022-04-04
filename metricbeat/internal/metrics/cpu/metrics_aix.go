@@ -38,7 +38,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 func init() {
@@ -59,7 +60,7 @@ func tick2msec(val uint64) uint64 {
 }
 
 // Get returns a metrics object for CPU data
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 
 	totals, err := getCPUTotals()
 	if err != nil {
@@ -84,10 +85,10 @@ func getCPUTotals() (CPU, error) {
 	}
 
 	totals := CPU{}
-	totals.User = metrics.OptUintWith((uint64(cpudata.user)))
-	totals.Sys = metrics.OptUintWith(tick2msec(uint64(cpudata.sys)))
-	totals.Idle = metrics.OptUintWith(tick2msec(uint64(cpudata.idle)))
-	totals.Wait = metrics.OptUintWith(tick2msec(uint64(cpudata.wait)))
+	totals.User = opt.UintWith((uint64(cpudata.user)))
+	totals.Sys = opt.UintWith(tick2msec(uint64(cpudata.sys)))
+	totals.Idle = opt.UintWith(tick2msec(uint64(cpudata.idle)))
+	totals.Wait = opt.UintWith(tick2msec(uint64(cpudata.wait)))
 
 	return totals, nil
 }
@@ -111,10 +112,10 @@ func getPerCPUMetrics() ([]CPU, error) {
 		}
 
 		cpu := CPU{}
-		cpu.User = metrics.OptUintWith(tick2msec(uint64(cpudata.user)))
-		cpu.Sys = metrics.OptUintWith(tick2msec(uint64(cpudata.sys)))
-		cpu.Idle = metrics.OptUintWith(tick2msec(uint64(cpudata.idle)))
-		cpu.Wait = metrics.OptUintWith(tick2msec(uint64(cpudata.wait)))
+		cpu.User = opt.UintWith(tick2msec(uint64(cpudata.user)))
+		cpu.Sys = opt.UintWith(tick2msec(uint64(cpudata.sys)))
+		cpu.Idle = opt.UintWith(tick2msec(uint64(cpudata.idle)))
+		cpu.Wait = opt.UintWith(tick2msec(uint64(cpudata.wait)))
 
 		list = append(list, cpu)
 

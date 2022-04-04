@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
 // +build windows
 
 package application_pool
@@ -144,7 +145,7 @@ func (r *Reader) read() ([]mb.Event, error) {
 	// Get the values.
 	values, err := r.query.GetFormattedCounterValues()
 	if err != nil {
-		r.query.Close()
+		r.close()
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event

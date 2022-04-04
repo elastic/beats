@@ -8,7 +8,9 @@
 ++++
 
 You can configure modules in the `modules.d` directory (recommended), or in the
-{beatname_uc} configuration file.
+{beatname_uc} configuration file. Settings for enabled modules in the
+`modules.d` directory take precedence over module settings in the {beatname_uc}
+configuration file.
 
 Before running {beatname_uc} with modules enabled, make sure you also set up the
 environment to use {kib} dashboards. See
@@ -60,7 +62,6 @@ See <<config-combos>> for additional configuration examples.
 [[configure-modules-config-file]]
 === Configure modules in the +{beatname_lc}.yml+ file
 
-
 When possible, you should use the config files in the `modules.d` directory.
 
 However, configuring <<{beatname_lc}-modules,modules>> directly in the config
@@ -73,6 +74,11 @@ configurations because the command requires the `modules.d` layout.
 To enable specific modules and metricsets in the +{beatname_lc}.yml+ config
 file, add entries to the +{beatname_lc}.modules+ list. Each entry in the
 list begins with a dash (-) and is followed by settings for that module.
+
+TIP: Check the `modules.d` directory to verify that the modules you've
+specified in +{beatname_lc}.yml+ are disabled (filename ends with
+`.disabled`). If they aren't, disable them now by running
++{beatname_lc} modules disable <modulename>+.
 
 The following example shows a configuration where the `apache` and `mysql`
 modules are enabled:
@@ -321,6 +327,3 @@ query:
   - -15
 ----
 :modulename!:
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]

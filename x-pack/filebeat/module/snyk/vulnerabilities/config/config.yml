@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 request.url: {{ .url }}
@@ -59,10 +58,12 @@ request.body:
       min: {{ .min_priority_score }}
       max: {{ .max_priority_score }}
 
+response.request_body_on_pagination: true
 response.pagination:
 - set:
-    target: url.value
-    value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
+    target: url.params.page
+    value: '[[add .last_response.page 1]]'
+    fail_on_template_error: true
 
 response.split:
   target: body.results
@@ -89,14 +90,7 @@ processors:
   - fingerprint:
       fields: ["json.issue.id"]
       target_field: "@metadata._id"
-  - script:
-      lang: javascript
-      id: my_filter
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
+        ecs.version: 1.12.0

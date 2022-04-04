@@ -1,0 +1,258 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.category",
+                            "negate": false,
+                            "params": {
+                                "query": "authentication"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.category": "authentication"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Authentication Failures [Filebeat o365]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "failure": "#E24D42",
+                    "success": "#629E51"
+                },
+                "legendOpen": true
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": ""
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "event.outcome",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "asc",
+                        "orderBy": "_key",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 2
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 15
+                    },
+                    "schema": "split",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 200
+                        },
+                        "position": "left",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "event.outcome: Ascending",
+                            "params": {}
+                        }
+                    ],
+                    "splitRow": [
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "user.name: Descending",
+                            "params": {}
+                        }
+                    ],
+                    "x": null,
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "label": "Count",
+                            "params": {}
+                        }
+                    ]
+                },
+                "grid": {
+                    "categoryLines": false,
+                    "valueAxis": ""
+                },
+                "isVislibVis": true,
+                "labels": {
+                    "show": true
+                },
+                "legendPosition": "bottom",
+                "orderBucketsBySum": true,
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "row": true,
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "lineWidth": 2,
+                        "mode": "stacked",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "histogram",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "thresholdLine": {
+                    "color": "#E7664C",
+                    "show": false,
+                    "style": "full",
+                    "value": 10,
+                    "width": 1
+                },
+                "times": [],
+                "type": "histogram",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "rotate": 75,
+                            "show": false,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "bottom",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "style": {},
+                        "title": {
+                            "text": "Count"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Top Authentication Failures [Filebeat o365]",
+            "type": "horizontal_bar"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "897d0c70-6869-11ea-8d6a-292ef5d68366",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "fdc14020-6859-11ea-8d6a-292ef5d68366",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:49.253Z",
+    "version": "WzQzMDgsMV0="
+}

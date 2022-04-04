@@ -22,7 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 /*
@@ -38,7 +39,7 @@ import (
 */
 import "C"
 
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 	val := C.uint32_t(0)
 	sc := C.size_t(4)
 
@@ -68,7 +69,7 @@ func get(_ string) (Memory, error) {
 	}
 
 	memFree := uint64(val) * pagesize
-	memData.Free = metrics.OptUintWith(memFree)
+	memData.Free = opt.UintWith(memFree)
 
 	name = C.CString("vm.stats.vm.v_inactive_count")
 	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
@@ -80,11 +81,11 @@ func get(_ string) (Memory, error) {
 
 	memTotal := uint64(pagecount * pagesize)
 
-	memData.Total = metrics.OptUintWith(memTotal)
+	memData.Total = opt.UintWith(memTotal)
 
-	memData.Used.Bytes = metrics.OptUintWith(memTotal - memFree)
-	memData.Actual.Free = metrics.OptUintWith(memFree + (kern * pagesize))
-	memData.Actual.Used.Bytes = metrics.OptUintWith((memTotal - memFree) - (kern * pagesize))
+	memData.Used.Bytes = opt.UintWith(memTotal - memFree)
+	memData.Actual.Free = opt.UintWith(memFree + (kern * pagesize))
+	memData.Actual.Used.Bytes = opt.UintWith((memTotal - memFree) - (kern * pagesize))
 
 	return memData, nil
 }

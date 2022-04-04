@@ -5,8 +5,9 @@
 package cloudfoundry
 
 import (
-	"fmt"
+	"crypto/tls"
 	"net/http"
+	"net/url"
 	"regexp"
 	"sync"
 
@@ -37,13 +38,8 @@ type DopplerConsumer struct {
 	started bool
 }
 
-func newDopplerConsumer(address string, id string, log *logp.Logger, client *http.Client, tr *TokenRefresher, callbacks DopplerCallbacks) (*DopplerConsumer, error) {
-	transport, ok := client.Transport.(*http.Transport)
-	if !ok {
-		return nil, fmt.Errorf("expected http transport on client")
-	}
-
-	c := consumer.New(address, transport.TLSClientConfig, transport.Proxy)
+func newDopplerConsumer(address string, id string, log *logp.Logger, tlsConfig *tls.Config, proxy func(*http.Request) (*url.URL, error), tr *TokenRefresher, callbacks DopplerCallbacks) (*DopplerConsumer, error) {
+	c := consumer.New(address, tlsConfig, proxy)
 	c.RefreshTokenFrom(tr)
 	c.SetDebugPrinter(newLogpDebugPrinter(log))
 

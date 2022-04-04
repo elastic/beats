@@ -18,26 +18,9 @@
 package template
 
 import (
-	"fmt"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
-
-const (
-	IndexTemplateLegacy IndexTemplateType = iota
-	IndexTemplateComponent
-	IndexTemplateIndex
-)
-
-var (
-	templateTypes = map[string]IndexTemplateType{
-		"legacy":    IndexTemplateLegacy,
-		"component": IndexTemplateComponent,
-		"index":     IndexTemplateIndex,
-	}
-)
-
-type IndexTemplateType uint8
 
 // TemplateConfig holds config information about the Elasticsearch template
 type TemplateConfig struct {
@@ -50,12 +33,10 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields mapping.Fields    `config:"append_fields"`
-	Overwrite    bool              `config:"overwrite"`
-	Settings     TemplateSettings  `config:"settings"`
-	Order        int               `config:"order"`
-	Priority     int               `config:"priority"`
-	Type         IndexTemplateType `config:"type"`
+	AppendFields mapping.Fields   `config:"append_fields"`
+	Overwrite    bool             `config:"overwrite"`
+	Settings     TemplateSettings `config:"settings"`
+	Priority     int              `config:"priority"`
 }
 
 // TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
@@ -65,28 +46,12 @@ type TemplateSettings struct {
 }
 
 // DefaultConfig for index template
-func DefaultConfig() TemplateConfig {
+func DefaultConfig(info beat.Info) TemplateConfig {
 	return TemplateConfig{
+		Name:     info.Beat + "-" + info.Version,
+		Pattern:  info.Beat + "-" + info.Version,
 		Enabled:  true,
 		Fields:   "",
-		Type:     IndexTemplateLegacy,
-		Order:    1,
 		Priority: 150,
 	}
-}
-
-func (t *IndexTemplateType) Unpack(v string) error {
-	if v == "" {
-		*t = IndexTemplateLegacy
-		return nil
-	}
-
-	var tt IndexTemplateType
-	var ok bool
-	if tt, ok = templateTypes[v]; !ok {
-		return fmt.Errorf("unknown index template type: %s", v)
-	}
-	*t = tt
-
-	return nil
 }

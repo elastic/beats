@@ -1,6 +1,0 @@
-This is the App Search module.
-
-[NOTE]
-=====
-This module does not support collecting data from App Search running on {ecloud}.
-=====

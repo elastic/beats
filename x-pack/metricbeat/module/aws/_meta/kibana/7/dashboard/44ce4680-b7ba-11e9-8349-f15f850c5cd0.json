@@ -1,0 +1,253 @@
+{
+    "attributes": {
+        "description": "[Metricbeat AWS] Overview of EBS Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 10
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Volume Write Ops",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Volume Read Ops",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 20
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Volume Write Bytes",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Volume Read Bytes",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5",
+                    "w": 19,
+                    "x": 8,
+                    "y": 0
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Volume Queue Length",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Volume Total Write Time",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "7",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Volume Total Read Time",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "8",
+                    "w": 21,
+                    "x": 27,
+                    "y": 0
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Volume Idle Time",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "9",
+                    "w": 8,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "EBS Volume ID Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "10",
+                    "w": 8,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] EBS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "44ce4680-b7ba-11e9-8349-f15f850c5cd0",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f6831f30-b7b6-11e9-8349-f15f850c5cd0",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "bb3a6cd0-b7b6-11e9-8349-f15f850c5cd0",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "c0e32d50-b7b8-11e9-8349-f15f850c5cd0",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "b00c4390-b7b8-11e9-8349-f15f850c5cd0",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "fe0581b0-b7b8-11e9-8349-f15f850c5cd0",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "25384bf0-b7b9-11e9-8349-f15f850c5cd0",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "12eff7e0-b7b9-11e9-8349-f15f850c5cd0",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "67f43080-b7b9-11e9-8349-f15f850c5cd0",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "d045d120-b7b9-11e9-8349-f15f850c5cd0",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "b5308940-7347-11e9-816b-07687310a99a",
+            "name": "10:panel_10",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:27.567Z",
+    "version": "WzMzMzMsMV0="
+}

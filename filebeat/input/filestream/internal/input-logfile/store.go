@@ -97,11 +97,6 @@ type resource struct {
 	// in the persistent state.
 	invalid bool
 
-	// internalInSync is true if all 'Internal' metadata like TTL or update timestamp are in sync.
-	// Normally resources are added when being created. But if operations failed we will retry inserting
-	// them on each update operation until we eventually succeeded
-	internalInSync bool
-
 	activeCursorOperations uint
 	internalState          stateInternal
 
@@ -112,9 +107,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor        interface{}
-	pendingCursor interface{}
-	cursorMeta    interface{}
+	cursor             interface{}
+	pendingCursorValue interface{}
+	pendingUpdate      interface{} // delta value of most recent pending updateOp
+	cursorMeta         interface{}
 }
 
 type (
@@ -215,6 +211,50 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	}
 }
 
+// FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal.
+func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		res.lock.Lock()
+
+		newKey, updatedMeta := getNewID(res)
+		if len(newKey) > 0 && res.internalState.TTL > 0 {
+			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
+				res.lock.Unlock()
+				continue
+			}
+
+			// Pending updates due to events that have not yet been ACKed
+			// are not included in the copy. Collection on
+			// the copy start from the last known ACKed position.
+			// This might lead to data duplication because the harvester
+			// will pickup from the last ACKed position using the new key
+			// and the pending updates will affect the entry with the oldKey.
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			r.stored = false
+			s.store.writeState(r)
+
+			// Add the new resource to the ephemeralStore so the rest of the
+			// codebase can have access to the new value
+			s.store.ephemeralStore.table[newKey] = r
+
+			// Remove the old key from the store
+			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
+		}
+
+		res.lock.Unlock()
+	}
+}
+
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
 func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
@@ -240,8 +280,9 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// Pending updates due to events that have not yet been ACKed
 			// are not included in the copy. Collection on
 			// the copy start from the last known ACKed position.
-			// This might lead to duplicates if configurations are adapted
-			// for inputs with the same ID are changed.
+			// This might lead to data duplication because the harvester
+			// will pickup from the last ACKed position using the new key
+			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
@@ -303,12 +344,9 @@ func (s *store) writeState(r *resource) {
 	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
 	if err != nil {
 		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
-		r.internalInSync = false
 	} else {
 		r.stored = true
-		r.internalInSync = true
 	}
-
 }
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
@@ -326,8 +364,9 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.version++
 	r.UpdatesReleaseN(r.activeCursorOperations)
 	r.activeCursorOperations = 0
-	r.pendingCursor = nil
-	typeconv.Convert(&r.cursor, cur)
+	r.pendingCursorValue = nil
+	r.pendingUpdate = nil
+	typeconv.Convert(&r.cursor, cur) //nolint: errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
 
@@ -371,7 +410,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		// instances do not overwrite the removal of the entry
 		resource.version++
 		// invalidate it after it has been persisted to make sure it cannot
-		//be overwritten in the persistent store
+		// be overwritten in the persistent store
 		resource.invalid = true
 	}
 }
@@ -406,7 +445,7 @@ func (s *states) Find(key string, create bool) *resource {
 func (r *resource) IsNew() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	return r.pendingCursor == nil && r.cursor == nil
+	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
 func (r *resource) isDeleted() bool {
@@ -434,10 +473,7 @@ func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 func (r *resource) UnpackCursor(to interface{}) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	if r.activeCursorOperations == 0 {
-		return typeconv.Convert(to, r.cursor)
-	}
-	return typeconv.Convert(to, r.pendingCursor)
+	return typeconv.Convert(to, r.activeCursor())
 }
 
 func (r *resource) UnpackCursorMeta(to interface{}) error {
@@ -466,13 +502,14 @@ func (r *resource) copyInto(dst *resource) {
 	// time. If removed the whole file is resent to the output when found/updated.
 	internalState.Updated = time.Now()
 	dst.stored = r.stored
-	dst.internalInSync = true
 	dst.internalState = internalState
 	dst.activeCursorOperations = r.activeCursorOperations
 	dst.cursor = r.cursor
-	dst.pendingCursor = nil
+	dst.pendingCursorValue = nil
+	dst.pendingUpdate = nil
 	dst.cursorMeta = r.cursorMeta
-	dst.lock = unison.MakeMutex()
+	// dst.lock should not be overwritten here because it's supposed to be locked
+	// before this function call and it's important to preserve the previous value.
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
@@ -486,28 +523,46 @@ func (r *resource) copyWithNewKey(key string) *resource {
 	return &resource{
 		key:                    key,
 		stored:                 r.stored,
-		internalInSync:         true,
 		internalState:          internalState,
 		activeCursorOperations: r.activeCursorOperations,
 		cursor:                 r.cursor,
-		pendingCursor:          nil,
+		pendingCursorValue:     nil,
+		pendingUpdate:          nil,
 		cursorMeta:             r.cursorMeta,
 		lock:                   unison.MakeMutex(),
 	}
 }
 
+// pendingCursor returns the current published cursor state not yet ACKed.
+//
+// Note: The stateMutex must be locked when calling pendingCursor.
+//nolint: errcheck // not changing behaviour on this commit
+func (r *resource) pendingCursor() interface{} {
+	if r.pendingUpdate != nil {
+		var tmp interface{}
+		typeconv.Convert(&tmp, &r.cursor)
+		typeconv.Convert(&tmp, r.pendingUpdate)
+		r.pendingCursorValue = tmp
+		r.pendingUpdate = nil
+	}
+	return r.pendingCursorValue
+}
+
+// activeCursor
+func (r *resource) activeCursor() interface{} {
+	if r.activeCursorOperations != 0 {
+		return r.pendingCursor()
+	}
+	return r.cursor
+}
+
 // stateSnapshot returns the current in memory state, that already contains state updates
 // not yet ACKed.
 func (r *resource) stateSnapshot() state {
-	cursor := r.pendingCursor
-	if r.activeCursorOperations == 0 {
-		cursor = r.cursor
-	}
-
 	return state{
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
-		Cursor:  cursor,
+		Cursor:  r.activeCursor(),
 		Meta:    r.cursorMeta,
 	}
 }
@@ -519,7 +574,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 	}
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
+		if !strings.HasPrefix(key, keyPrefix) {
 			return true, nil
 		}
 
@@ -531,10 +586,9 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 		}
 
 		resource := &resource{
-			key:            key,
-			stored:         true,
-			lock:           unison.MakeMutex(),
-			internalInSync: true,
+			key:    key,
+			stored: true,
+			lock:   unison.MakeMutex(),
 			internalState: stateInternal{
 				TTL:     st.TTL,
 				Updated: st.Updated,
@@ -546,7 +600,6 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		return true, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

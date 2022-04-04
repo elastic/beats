@@ -1,7 +1,24 @@
 {{ if eq .input "aws-s3" }}
 
 type: aws-s3
+{{ if .queue_url }}
 queue_url: {{ .queue_url }}
+{{ end }}
+{{ if .bucket_arn }}
+bucket_arn: {{ .bucket_arn }}
+{{ end }}
+
+{{ if .number_of_workers }}
+number_of_workers: {{ .number_of_workers }}
+{{ end }}
+
+{{ if .bucket_list_interval }}
+bucket_list_interval: {{ .bucket_list_interval }}
+{{ end }}
+
+{{ if .bucket_list_prefix }}
+bucket_list_prefix: {{ .bucket_list_prefix }}
+{{ end }}
 
 {{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}
@@ -21,6 +38,10 @@ api_timeout: {{ .api_timeout }}
 
 {{ if .endpoint }}
 endpoint: {{ .endpoint }}
+{{ end }}
+
+{{ if .default_region }}
+default_region: {{ .default_region }}
 {{ end }}
 
 {{ if .access_key_id }}
@@ -47,6 +68,14 @@ fips_enabled: {{ .fips_enabled }}
 max_number_of_messages: {{ .max_number_of_messages }}
 {{ end }}
 
+{{ if .proxy_url }}
+proxy_url: {{ .proxy_url }}
+{{ end }}
+
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log
@@ -59,126 +88,3 @@ exclude_files: [".gz$"]
 {{ end }}
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
-
-processors:
-  - drop_event:
-      when.regexp.message: "^version"
-  - drop_event:
-      when.regexp.message: "^instance-id"
-
-  - script:
-      lang: javascript
-      source: >
-        function process(event) {
-            var message = event.Get("message");
-            var tokens = message.split(" ").length;
-            event.Put("@metadata.message_token_count", tokens);
-        }
-
-  # Default vpc flow log format
-  - dissect:
-      when:
-        equals:
-          '@metadata.message_token_count': 14
-      field: message
-      target_prefix: aws.vpcflow
-      tokenizer: '%{version} %{account_id} %{interface_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{packets} %{bytes} %{start} %{end} %{action} %{log_status}'
-
-  # Custom flow log for traffic through a NAT gateway
-  - dissect:
-      when:
-        equals:
-          '@metadata.message_token_count': 6
-      field: message
-      target_prefix: aws.vpcflow
-      tokenizer: '%{instance_id} %{interface_id} %{srcaddr} %{dstaddr} %{pkt_srcaddr} %{pkt_dstaddr}'
-
-  # Custom flow log for traffic through a transit gateway
-  - dissect:
-      when:
-        equals:
-          '@metadata.message_token_count': 17
-      field: message
-      target_prefix: aws.vpcflow
-      tokenizer: '%{version} %{interface_id} %{account_id} %{vpc_id} %{subnet_id} %{instance_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{tcp_flags} %{type} %{pkt_srcaddr} %{pkt_dstaddr} %{action} %{log_status}'
-
-  # TCP Flag Sequence
-  - dissect:
-      when:
-        equals:
-          '@metadata.message_token_count': 21
-      field: message
-      target_prefix: aws.vpcflow
-      tokenizer: '%{version} %{vpc_id} %{subnet_id} %{instance_id} %{interface_id} %{account_id} %{type} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{pkt_srcaddr} %{pkt_dstaddr} %{protocol} %{bytes} %{packets} %{start} %{end} %{action} %{tcp_flags} %{log_status}'
-
-  - convert:
-      ignore_missing: true
-      fields:
-        - {from: aws.vpcflow.srcaddr, to: source.address}
-        - {from: aws.vpcflow.srcaddr, to: source.ip, type: ip}
-        - {from: aws.vpcflow.srcport, to: source.port, type: long}
-        - {from: aws.vpcflow.dstaddr, to: destination.address}
-        - {from: aws.vpcflow.dstaddr, to: destination.ip, type: ip}
-        - {from: aws.vpcflow.dstport, to: destination.port, type: long}
-        - {from: aws.vpcflow.protocol, to: network.iana_number, type: string}
-        - {from: aws.vpcflow.packets, to: source.packets, type: long}
-        - {from: aws.vpcflow.bytes, to: source.bytes, type: long}
-        - {from: aws.vpcflow.packets, to: network.packets, type: long}
-        - {from: aws.vpcflow.bytes, to: network.bytes, type: long}
-
-  - drop_fields:
-      fields: ["aws.vpcflow.srcaddr", "aws.vpcflow.srcport", "aws.vpcflow.dstaddr", "aws.vpcflow.dstport", "aws.vpcflow.bytes", "aws.vpcflow.packets", "aws.vpcflow.protocol"]
-
-  - community_id: ~
-
-  # Use the aws.vpcflow.action value to set the event.outcome value to either "allow" or "deny".
-  - add_fields:
-      when.equals.aws.vpcflow.action: ACCEPT
-      target: event
-      fields: {outcome: allow}
-  - add_fields:
-      when.equals.aws.vpcflow.action: REJECT
-      target: event
-      fields: {outcome: deny}
-
-  - add_fields:
-      target: event
-      fields: {type: flow}
-  - add_fields:
-      target: event
-      fields: {category: network_traffic}
-
-  # Add network.type: ipv4 or ipv6
-  - if:
-      contains.source.ip: "."
-    then:
-      - add_fields:
-          target: network
-          fields: {type: ipv4}
-
-  - if:
-      contains.source.ip: ":"
-    then:
-      - add_fields:
-          target: network
-          fields: {type: ipv6}
-
-  # Add network.transport: based on IANA protocol number of the traffic
-  # http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
-  - if:
-      equals.network.iana_number: "6"
-    then:
-      - add_fields:
-          target: network
-          fields: {transport: tcp}
-  - if:
-      equals.network.iana_number: "17"
-    then:
-      - add_fields:
-          target: network
-          fields: {transport: udp}
-
-  - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.9.0

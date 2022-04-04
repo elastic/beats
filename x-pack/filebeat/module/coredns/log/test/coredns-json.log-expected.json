@@ -1,18 +1,7 @@
 [
     {
         "@timestamp": "2019-02-12T00:27:28.903Z",
-        "coredns.dnssec_ok": false,
-        "coredns.id": "21583",
-        "coredns.query.class": "IN",
-        "coredns.query.name": "httpbin.org.cluster.local.",
         "coredns.query.size": 43,
-        "coredns.query.type": "A",
-        "coredns.response.code": "NXDOMAIN",
-        "coredns.response.flags": [
-            "QR",
-            "RA",
-            "RD"
-        ],
         "coredns.response.size": 136,
         "dns.header_flags": [
             "QR",
@@ -64,18 +53,7 @@
     },
     {
         "@timestamp": "2019-03-19T02:57:23.213Z",
-        "coredns.dnssec_ok": false,
-        "coredns.id": "6966",
-        "coredns.query.class": "IN",
-        "coredns.query.name": "httpbin.org.",
         "coredns.query.size": 29,
-        "coredns.query.type": "A",
-        "coredns.response.code": "NOERROR",
-        "coredns.response.flags": [
-            "QR",
-            "RA",
-            "RD"
-        ],
         "coredns.response.size": 83,
         "dns.header_flags": [
             "QR",
@@ -127,18 +105,7 @@
     },
     {
         "@timestamp": "2019-03-11T07:16:34.013Z",
-        "coredns.dnssec_ok": false,
-        "coredns.id": "62762",
-        "coredns.query.class": "IN",
-        "coredns.query.name": "czbaoyu.com.",
         "coredns.query.size": 29,
-        "coredns.query.type": "AAAA",
-        "coredns.response.code": "NOERROR",
-        "coredns.response.flags": [
-            "QR",
-            "RA",
-            "RD"
-        ],
         "coredns.response.size": 100,
         "dns.header_flags": [
             "QR",

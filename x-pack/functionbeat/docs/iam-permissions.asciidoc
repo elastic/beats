@@ -7,11 +7,7 @@
 ++++
 
 This section describes the minimum privileges or roles required to deploy
-functions to your cloud provider:
-
-* <<iam-permissions-aws>>
-* <<iam-permissions-gcp>>
-
+functions to your cloud provider.
 
 [[iam-permissions-aws]]
 ==== Permissions required by AWS
@@ -67,7 +63,10 @@ function that collects events from CloudWatch logs.
                 "s3:DeleteObject",
                 "s3:ListBucket",
                 "s3:PutObject",
-                "s3:GetObject"
+                "s3:GetObject",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs"
             ],
             "Resource": "*"
         }
@@ -123,24 +122,13 @@ function that reads from SQS queues or Kinesis data streams.
                 "s3:DeleteObject",
                 "s3:ListBucket",
                 "s3:PutObject",
-                "s3:GetObject"
+                "s3:GetObject",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs"
             ],
             "Resource": "*"
         }
     ]
 }
 ----
-
-[[iam-permissions-gcp]]
-===== Roles required by Google Cloud Platform
-
-The following roles are required to deploy Cloud Functions to Google Cloud
-Platform:
-
-// tag::gcp-roles-deployment[] 
-* Cloud Functions Developer
-* Cloud Functions Service Agent
-* Service Account User
-* Storage Admin
-* Storage Object Admin
-// end::gcp-roles-deployment[] 

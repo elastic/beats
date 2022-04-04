@@ -15,14 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package diskio
 
 import (
-	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
+	"fmt"
 
+	"github.com/docker/docker/client"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
@@ -34,22 +37,45 @@ func init() {
 	)
 }
 
+// Config "imports" the base module-level config, plus our metricset options
+type Config struct {
+	TLS       *docker.TLSConfig `config:"ssl"`
+	DeDot     bool              `config:"labels.dedot"`
+	SkipMajor []uint64          `config:"skip_major"`
+}
+
+// The major devices we'll skip by default. 9 == mdraid, 253 == device-mapper
+var defaultMajorDev = []uint64{9, 253}
+
+func defaultConfig() Config {
+	//This is a bit awkward, but the config Unwrap() function is a bit awkward in that it will only partly overwrite
+	// an array value, which makes handling the `skip_major` array a bit annoying.
+	parentDefault := docker.DefaultConfig()
+	return Config{
+		TLS:   parentDefault.TLS,
+		DeDot: parentDefault.DeDot,
+	}
+}
+
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	blkioService *BlkioService
 	dockerClient *client.Client
-	dedot        bool
+	config       Config
 }
 
 // New create a new instance of the docker diskio MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.DefaultConfig()
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
-	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	if config.SkipMajor == nil {
+		config.SkipMajor = defaultMajorDev
+	}
+	logp.L().Debugf("Skipping major devices: %v", config.SkipMajor)
+	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{TLS: config.TLS, DeDot: config.DeDot})
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		dockerClient:  client,
 		blkioService:  NewBlkioService(),
-		dedot:         config.DeDot,
+		config:        config,
 	}, nil
 }
 
@@ -66,10 +92,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "failed to get docker stats")
+		return fmt.Errorf("failed to get docker stats: %w", err)
 	}
 
-	formattedStats := m.blkioService.getBlkioStatsList(stats, m.dedot)
+	formattedStats := m.blkioService.getBlkioStatsList(stats, m.config.DeDot, m.config.SkipMajor)
 	eventsMapping(r, formattedStats)
 
 	return nil

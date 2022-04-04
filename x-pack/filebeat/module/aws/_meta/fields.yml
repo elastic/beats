@@ -1,6 +1,6 @@
 - key: aws
   title: AWS
-  release: beta
+  release: ga
   description: >
     Module for handling logs from AWS.
   fields:

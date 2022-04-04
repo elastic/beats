@@ -1,0 +1,286 @@
+{
+    "attributes": {
+        "description": "The dashboard presents metric data describing IBM MQ persistent and non-persistent messages. Metric data are collected by a queue manager.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "31635dc4-663e-4ad1-adae-eb96687c7810",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "31635dc4-663e-4ad1-adae-eb96687c7810",
+                "panelRefName": "panel_31635dc4-663e-4ad1-adae-eb96687c7810",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "5452998b-5149-4ac6-93df-b3fccab74f58",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "5452998b-5149-4ac6-93df-b3fccab74f58",
+                "panelRefName": "panel_5452998b-5149-4ac6-93df-b3fccab74f58",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "0e58849b-8742-4ed4-aae2-33ca19553ac2",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "0e58849b-8742-4ed4-aae2-33ca19553ac2",
+                "panelRefName": "panel_0e58849b-8742-4ed4-aae2-33ca19553ac2",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "45cd1f23-ef32-4785-b8c0-dcd4cf4c0c1f",
+                    "w": 16,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "45cd1f23-ef32-4785-b8c0-dcd4cf4c0c1f",
+                "panelRefName": "panel_45cd1f23-ef32-4785-b8c0-dcd4cf4c0c1f",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2fbdb686-f624-4b2d-a26d-4e7f70e8d902",
+                    "w": 16,
+                    "x": 16,
+                    "y": 12
+                },
+                "panelIndex": "2fbdb686-f624-4b2d-a26d-4e7f70e8d902",
+                "panelRefName": "panel_2fbdb686-f624-4b2d-a26d-4e7f70e8d902",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "355b12f6-56cb-4b8c-8498-b379d3e7d8b0",
+                    "w": 16,
+                    "x": 32,
+                    "y": 12
+                },
+                "panelIndex": "355b12f6-56cb-4b8c-8498-b379d3e7d8b0",
+                "panelRefName": "panel_355b12f6-56cb-4b8c-8498-b379d3e7d8b0",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "c1eed75c-610c-4741-b384-de866f30b79b",
+                    "w": 16,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "c1eed75c-610c-4741-b384-de866f30b79b",
+                "panelRefName": "panel_c1eed75c-610c-4741-b384-de866f30b79b",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "78bd7680-0f3f-4d3f-994b-eeb58ef0a340",
+                    "w": 16,
+                    "x": 16,
+                    "y": 24
+                },
+                "panelIndex": "78bd7680-0f3f-4d3f-994b-eeb58ef0a340",
+                "panelRefName": "panel_78bd7680-0f3f-4d3f-994b-eeb58ef0a340",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "6edef0c3-4c5f-4d0a-8e58-076cb5249ca2",
+                    "w": 16,
+                    "x": 32,
+                    "y": 24
+                },
+                "panelIndex": "6edef0c3-4c5f-4d0a-8e58-076cb5249ca2",
+                "panelRefName": "panel_6edef0c3-4c5f-4d0a-8e58-076cb5249ca2",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "0ecb7983-d4f9-453d-ade4-d02dfa6b6c72",
+                    "w": 16,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "0ecb7983-d4f9-453d-ade4-d02dfa6b6c72",
+                "panelRefName": "panel_0ecb7983-d4f9-453d-ade4-d02dfa6b6c72",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1c8071e7-c89a-45b1-aae6-31471939b73c",
+                    "w": 16,
+                    "x": 32,
+                    "y": 36
+                },
+                "panelIndex": "1c8071e7-c89a-45b1-aae6-31471939b73c",
+                "panelRefName": "panel_1c8071e7-c89a-45b1-aae6-31471939b73c",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "e27955d6-ce96-48b9-b9d0-04f4d61a757f",
+                    "w": 16,
+                    "x": 16,
+                    "y": 36
+                },
+                "panelIndex": "e27955d6-ce96-48b9-b9d0-04f4d61a757f",
+                "panelRefName": "panel_e27955d6-ce96-48b9-b9d0-04f4d61a757f",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat IBM MQ] Messages Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d2112e90-36ea-11ea-9f7a-097fe7ab3ddd",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "49abed00-36eb-11ea-9f7a-097fe7ab3ddd",
+            "name": "31635dc4-663e-4ad1-adae-eb96687c7810:panel_31635dc4-663e-4ad1-adae-eb96687c7810",
+            "type": "visualization"
+        },
+        {
+            "id": "0abb72e0-36ec-11ea-9f7a-097fe7ab3ddd",
+            "name": "5452998b-5149-4ac6-93df-b3fccab74f58:panel_5452998b-5149-4ac6-93df-b3fccab74f58",
+            "type": "visualization"
+        },
+        {
+            "id": "195b5860-36ec-11ea-9f7a-097fe7ab3ddd",
+            "name": "0e58849b-8742-4ed4-aae2-33ca19553ac2:panel_0e58849b-8742-4ed4-aae2-33ca19553ac2",
+            "type": "visualization"
+        },
+        {
+            "id": "60b5a440-36ec-11ea-9f7a-097fe7ab3ddd",
+            "name": "45cd1f23-ef32-4785-b8c0-dcd4cf4c0c1f:panel_45cd1f23-ef32-4785-b8c0-dcd4cf4c0c1f",
+            "type": "visualization"
+        },
+        {
+            "id": "e98d7660-36ee-11ea-9f7a-097fe7ab3ddd",
+            "name": "2fbdb686-f624-4b2d-a26d-4e7f70e8d902:panel_2fbdb686-f624-4b2d-a26d-4e7f70e8d902",
+            "type": "visualization"
+        },
+        {
+            "id": "d82919b0-36ee-11ea-9f7a-097fe7ab3ddd",
+            "name": "355b12f6-56cb-4b8c-8498-b379d3e7d8b0:panel_355b12f6-56cb-4b8c-8498-b379d3e7d8b0",
+            "type": "visualization"
+        },
+        {
+            "id": "23c5f140-36ef-11ea-9f7a-097fe7ab3ddd",
+            "name": "c1eed75c-610c-4741-b384-de866f30b79b:panel_c1eed75c-610c-4741-b384-de866f30b79b",
+            "type": "visualization"
+        },
+        {
+            "id": "3ed28890-36ef-11ea-9f7a-097fe7ab3ddd",
+            "name": "78bd7680-0f3f-4d3f-994b-eeb58ef0a340:panel_78bd7680-0f3f-4d3f-994b-eeb58ef0a340",
+            "type": "visualization"
+        },
+        {
+            "id": "58abd000-36ef-11ea-9f7a-097fe7ab3ddd",
+            "name": "6edef0c3-4c5f-4d0a-8e58-076cb5249ca2:panel_6edef0c3-4c5f-4d0a-8e58-076cb5249ca2",
+            "type": "visualization"
+        },
+        {
+            "id": "67eeac40-36ef-11ea-9f7a-097fe7ab3ddd",
+            "name": "0ecb7983-d4f9-453d-ade4-d02dfa6b6c72:panel_0ecb7983-d4f9-453d-ade4-d02dfa6b6c72",
+            "type": "visualization"
+        },
+        {
+            "id": "96d27500-36ef-11ea-9f7a-097fe7ab3ddd",
+            "name": "1c8071e7-c89a-45b1-aae6-31471939b73c:panel_1c8071e7-c89a-45b1-aae6-31471939b73c",
+            "type": "visualization"
+        },
+        {
+            "id": "855debb0-36ef-11ea-9f7a-097fe7ab3ddd",
+            "name": "e27955d6-ce96-48b9-b9d0-04f4d61a757f:panel_e27955d6-ce96-48b9-b9d0-04f4d61a757f",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:26.059Z",
+    "version": "WzM4ODYsMV0="
+}

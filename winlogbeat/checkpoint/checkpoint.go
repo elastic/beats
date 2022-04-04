@@ -42,7 +42,6 @@ type Checkpoint struct {
 	file          string         // File where the state is persisted.
 	fileLock      sync.RWMutex   // Lock that protects concurrent reads/writes to file.
 	numUpdates    int            // Number of updates received since last persisting to disk.
-	maxUpdates    int            // Maximum number of updates to buffer before persisting to disk.
 	flushInterval time.Duration  // Maximum time interval that can pass before persisting to disk.
 	sort          []string       // Slice used for sorting states map (store to save on mallocs).
 
@@ -72,24 +71,16 @@ type EventLogState struct {
 // guarantee any in-memory state information is flushed to disk.
 //
 // file is the name of the file where event log state is persisted as YAML.
-// maxUpdates is the maximum number of updates checkpoint will accept before
-// triggering a flush to disk. interval is maximum amount of time that can
-// pass since the last flush before triggering a flush to disk (minimum value
-// is 1s).
-func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkpoint, error) {
+// interval is maximum amount of time that can pass since the last flush
+// before triggering a flush to disk (minimum value is 1s).
+func NewCheckpoint(file string, interval time.Duration) (*Checkpoint, error) {
 	c := &Checkpoint{
 		done:          make(chan struct{}),
 		file:          file,
-		maxUpdates:    maxUpdates,
 		flushInterval: interval,
 		sort:          make([]string, 0, 10),
 		states:        make(map[string]EventLogState),
 		save:          make(chan EventLogState, 1),
-	}
-
-	// Minimum batch size.
-	if c.maxUpdates < 1 {
-		c.maxUpdates = 1
 	}
 
 	// Minimum flush interval.
@@ -139,9 +130,6 @@ loop:
 			c.states[s.Name] = s
 			c.lock.Unlock()
 			c.numUpdates++
-			if c.numUpdates < c.maxUpdates {
-				continue
-			}
 		case <-flushTimer.C:
 		}
 
@@ -276,7 +264,7 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 	ps := &PersistedState{}
 	err = yaml.Unmarshal(contents, ps)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read persisted state: %w", err)
 	}
 
 	return ps, nil
@@ -287,5 +275,5 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 func (c *Checkpoint) createDir() error {
 	dir := filepath.Dir(c.file)
 	logp.Info("Creating %s if it does not exist.", dir)
-	return os.MkdirAll(dir, os.FileMode(0750))
+	return os.MkdirAll(dir, os.FileMode(0o750))
 }

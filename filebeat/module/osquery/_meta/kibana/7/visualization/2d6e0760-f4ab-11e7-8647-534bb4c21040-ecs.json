@@ -1,0 +1,29 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Navigation [Filebeat Osquery] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs)"
+            },
+            "title": "Navigation [Filebeat Osquery] ECS",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:55.664Z",
+    "version": "WzQ5MzYsMV0="
+}

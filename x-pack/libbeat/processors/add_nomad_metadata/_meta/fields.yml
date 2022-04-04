@@ -6,6 +6,7 @@
   anchor: nomad-processor
   fields:
     - name: nomad
+      default_field: true
       type: group
       fields:
         - name: allocation.id

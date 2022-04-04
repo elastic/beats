@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	fpmVersion = "1.11.0"
+	fpmVersion = "1.13.1"
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
 	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
@@ -63,8 +63,8 @@ var (
 	PLATFORMS    = EnvOr("PLATFORMS", "")
 	PACKAGES     = EnvOr("PACKAGES", "")
 
-	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
-	// the crossbuild images at /go/pkg/mod, read-only.
+	// CrossBuildMountModcache mounts $GOPATH/pkg/mod into
+	// the crossbuild images at /go/pkg/mod, read-only,  when set to true.
 	CrossBuildMountModcache = true
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
@@ -209,6 +209,7 @@ BeatUser         = {{.BeatUser}}
 VersionQualifier = {{.Qualifier}}
 PLATFORMS        = {{.PLATFORMS}}
 PACKAGES         = {{.PACKAGES}}
+CI               = {{.CI}}
 
 ## Functions
 

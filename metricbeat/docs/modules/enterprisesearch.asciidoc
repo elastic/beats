@@ -1,0 +1,68 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: enterprisesearch
+
+[[metricbeat-module-enterprisesearch]]
+[role="xpack"]
+== Enterprise Search module
+
+beta[]
+
+This module periodically fetches metrics and health information from Elastic Enterprise Search instances using HTTP APIs.
+
+[float]
+=== Compatibility
+The module has been tested with Enterprise Search versions 7.16.0 and higher. Versions below 7.16.0 are not expected to work due to a number of API-level incompatibilities.
+
+[float]
+=== Usage
+The Enterprise Search module requires a set of credentials (a username and a password) for an Elasticserch user for a user that has a `monitor` https://www.elastic.co/guide/en/elasticsearch/reference/current/security-privileges.html#privileges-list-cluster[cluster privilege].
+
+[float]
+=== Usage for {stack} Monitoring
+
+The Enterprise Search module can be used to collect metrics shown in our {stack-monitor-app}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` in configuration.
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].
+
+
+[float]
+=== Example configuration
+
+The Enterprise Search module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: enterprisesearch
+  metricsets: ["health", "stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  #username: "user"
+  #password: "secret"
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-enterprisesearch-health,health>>
+
+* <<metricbeat-metricset-enterprisesearch-stats,stats>>
+
+include::enterprisesearch/health.asciidoc[]
+
+include::enterprisesearch/stats.asciidoc[]
+

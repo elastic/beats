@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func TestValidLocal(t *testing.T) {
@@ -28,6 +29,10 @@ func TestValidLocal(t *testing.T) {
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
+		"filter_journeys": synthexec.FilterJourneyConfig{
+			Tags:  []string{"*"},
+			Match: "*",
+		},
 		"source": common.MapStr{
 			"local": common.MapStr{
 				"path": path,
@@ -136,6 +141,26 @@ func TestExtraArgs(t *testing.T) {
 			"sandbox",
 			&Config{Sandbox: true},
 			[]string{"--sandbox"},
+		},
+		{
+			"throttling truthy",
+			&Config{Throttling: true},
+			nil,
+		},
+		{
+			"disable throttling",
+			&Config{Throttling: false},
+			[]string{"--no-throttling"},
+		},
+		{
+			"override throttling",
+			&Config{Throttling: "10d/3u/20l"},
+			[]string{"--throttling", "10d/3u/20l"},
+		},
+		{
+			"ignore_https_errors",
+			&Config{IgnoreHTTPSErrors: true},
+			[]string{"--ignore-https-errors"},
 		},
 		{
 			"screenshots",

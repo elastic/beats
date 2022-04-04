@@ -10,6 +10,7 @@ This file is generated! See scripts/docs_collector.py
 
 == Google Cloud module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is a module for Google Cloud logs. It supports reading audit, VPC flow,
 and firewall logs that have been exported from Stackdriver to a

@@ -1,0 +1,198 @@
+{
+    "attributes": {
+        "description": "Geographic location of Anomali indicators ingested by the threat intel Filebeat module.",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "9027343a-f725-4467-9b08-8566ad0b2a52",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {
+                    "type": "TILE"
+                },
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "83ede860-fe89-43c9-8e74-fa2703efbb85",
+                "joins": [],
+                "label": "Indicator Geographic Location",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "applyGlobalTime": true,
+                    "filterByMapBounds": true,
+                    "geoField": "threat.indicator.geo.location",
+                    "id": "a3ecc6af-0299-4cb9-a29c-0b70f666b011",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "scalingType": "LIMIT",
+                    "sortField": "",
+                    "sortOrder": "desc",
+                    "tooltipProperties": [
+                        "threat.indicator.as.number",
+                        "threat.indicator.as.organization.name",
+                        "threat.indicator.geo.country_iso_code"
+                    ],
+                    "topHitsSize": 1,
+                    "topHitsSplitField": "",
+                    "type": "ES_SEARCH"
+                },
+                "style": {
+                    "isTimeAware": true,
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "#D36086"
+                            },
+                            "type": "STATIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "danger"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 6
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderColor": {
+                            "options": {
+                                "color": "#FFFFFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderSize": {
+                            "options": {
+                                "size": "SMALL"
+                            }
+                        },
+                        "labelColor": {
+                            "options": {
+                                "color": "#000000"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelSize": {
+                            "options": {
+                                "size": 14
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelText": {
+                            "options": {
+                                "value": ""
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#41937c"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 19.94277,
+                "lon": 0
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:\"threatintel.anomalithreatstream\" "
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": true
+            },
+            "settings": {
+                "autoFitToDataBounds": false,
+                "backgroundColor": "#ffffff",
+                "browserLocation": {
+                    "zoom": 2
+                },
+                "disableInteractive": false,
+                "disableTooltipControl": false,
+                "fixedLocation": {
+                    "lat": 0,
+                    "lon": 0,
+                    "zoom": 2
+                },
+                "hideLayerControl": false,
+                "hideToolbarOverlay": false,
+                "hideViewControl": false,
+                "initialLocation": "LAST_SAVED_LOCATION",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "showScaleControl": false,
+                "showSpatialFilters": true,
+                "spatialFiltersAlpa": 0.3,
+                "spatialFiltersFillColor": "#DA8B45",
+                "spatialFiltersLineColor": "#DA8B45"
+            },
+            "timeFilters": {
+                "from": "now-7d",
+                "to": "now"
+            },
+            "zoom": 2.08
+        },
+        "title": "Anomali Indicator Geographic Location [Filebeat Threat Intel]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ec5aa090-df42-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1ODgsMV0="
+}

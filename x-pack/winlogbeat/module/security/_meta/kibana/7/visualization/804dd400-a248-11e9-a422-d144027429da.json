@@ -1,0 +1,260 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4672"
+                            ],
+                            "type": "phrases",
+                            "value": "4672"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4672"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Logged on Administrators [Winlogbeat Security]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": ""
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Date",
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "scaleMetricValues": false,
+                        "timeRange": {
+                            "from": "2020-05-20T07:35:27.496Z",
+                            "to": "2020-05-22T00:01:10.239Z"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "bucket",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "customLabel": "user.name",
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "8",
+                    "params": {
+                        "customLabel": "# Thread",
+                        "field": "winlog.process.thread.id",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "9",
+                    "params": {
+                        "customLabel": "LogonID",
+                        "field": "winlog.logon.id",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 0,
+                            "aggType": "date_histogram",
+                            "format": {
+                                "id": "date",
+                                "params": {
+                                    "pattern": "YYYY-MM-DD HH:mm"
+                                }
+                            },
+                            "label": "Fecha - Hora ",
+                            "params": {}
+                        },
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "/s/siem",
+                                        "origin": "https://192.168.1.72:5601",
+                                        "pathname": "/s/siem/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "Usuario",
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "number",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "/s/siem",
+                                        "origin": "https://192.168.1.72:5601",
+                                        "pathname": "/s/siem/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "# Thread",
+                            "params": {}
+                        },
+                        {
+                            "accessor": 3,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "/s/siem",
+                                        "origin": "https://192.168.1.72:5601",
+                                        "pathname": "/s/siem/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "winlog.logon.id: Descending",
+                            "params": {}
+                        }
+                    ],
+                    "metrics": [
+                        {
+                            "accessor": 4,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "label": "Cantidad Eventos ",
+                            "params": {}
+                        }
+                    ]
+                },
+                "perPage": 10,
+                "percentageCol": "",
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Logged on Administrators [Winlogbeat Security]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "804dd400-a248-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:58.346Z",
+    "version": "WzIyNjUsMl0="
+}

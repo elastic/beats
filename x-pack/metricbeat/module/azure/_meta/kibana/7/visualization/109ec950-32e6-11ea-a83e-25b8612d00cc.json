@@ -1,0 +1,102 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Storage Used Capacity Resource Table [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "id": "71978870-32e4-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "f11cfd90-32e5-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "drilldown_url": "",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "9c09ed50-32e4-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "gauge_inner_color": null,
+                "gauge_inner_width": "6",
+                "gauge_style": "circle",
+                "gauge_width": "10",
+                "hide_last_value_indicator": true,
+                "id": "61fb4190-32e4-11ea-b9f8-4d0b340ad993",
+                "index_pattern": "metricbeat-*",
+                "interval": "60m",
+                "isModelInvalid": false,
+                "pivot_id": "azure.resource.name",
+                "pivot_label": "Resource Name",
+                "pivot_rows": "30",
+                "pivot_type": "string",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,204,202,1)",
+                        "fill": "1.2",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "bytes",
+                        "id": "61fb4191-32e4-11ea-b9f8-4d0b340ad993",
+                        "label": "Used Capacity",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.storage.used_capacity.avg",
+                                "id": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "azure.resource.name",
+                        "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Storage Used Capacity Resource Table [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "109ec950-32e6-11ea-a83e-25b8612d00cc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:52.180Z",
+    "version": "WzM1ODUsMV0="
+}

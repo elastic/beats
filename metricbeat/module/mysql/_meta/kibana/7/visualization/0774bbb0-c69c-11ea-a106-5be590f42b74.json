@@ -1,0 +1,194 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Connection Errors [Metricbeat MySQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Max",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.connection.errors.max",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "percentiles": [
+                                    {
+                                        "id": "968f0500-c69a-11ea-880f-352bebf10188",
+                                        "mode": "line",
+                                        "shade": 0.2,
+                                        "value": 50
+                                    }
+                                ],
+                                "type": "max"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "a088e210-c69a-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "a61998a0-c69a-11ea-880f-352bebf10188",
+                        "label": "Accept",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.connection.errors.accept",
+                                "id": "a61998a1-c69a-11ea-880f-352bebf10188",
+                                "type": "max"
+                            },
+                            {
+                                "field": "a61998a1-c69a-11ea-880f-352bebf10188",
+                                "id": "a8f8c3c0-c69a-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,196,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "b6a26260-c69a-11ea-880f-352bebf10188",
+                        "label": "Internal",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.connection.errors.internal",
+                                "id": "b6a26261-c69a-11ea-880f-352bebf10188",
+                                "type": "max"
+                            },
+                            {
+                                "field": "b6a26261-c69a-11ea-880f-352bebf10188",
+                                "id": "c09d02c0-c69a-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,204,202,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "c713d390-c69a-11ea-880f-352bebf10188",
+                        "label": "Select",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.connection.errors.select",
+                                "id": "c713d391-c69a-11ea-880f-352bebf10188",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c713d391-c69a-11ea-880f-352bebf10188",
+                                "id": "4ace8360-c69b-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(253,161,255,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "50c798b0-c69b-11ea-880f-352bebf10188",
+                        "label": "Peer Address",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "mysql.status.connection.errors.peer_address",
+                                "id": "50c798b1-c69b-11ea-880f-352bebf10188",
+                                "type": "max"
+                            },
+                            {
+                                "field": "50c798b1-c69b-11ea-880f-352bebf10188",
+                                "id": "78d49650-c69b-11ea-880f-352bebf10188",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Connection Errors [Metricbeat MySQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0774bbb0-c69c-11ea-a106-5be590f42b74",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:43.489Z",
+    "version": "WzQwODIsMV0="
+}

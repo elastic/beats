@@ -29,24 +29,14 @@ func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
 }
 
 func eventMapping(r mb.ReporterV2, stats *NetStats) {
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	_, _ = rootFields.Put("container.network.ingress.bytes", stats.Total.RxBytes)
+	_, _ = rootFields.Put("container.network.egress.bytes", stats.Total.TxBytes)
 	r.Event(mb.Event{
-		RootFields: stats.Container.ToMapStr(),
+		RootFields: rootFields,
 		MetricSetFields: common.MapStr{
 			"interface": stats.NameInterface,
-			// Deprecated
-			"in": common.MapStr{
-				"bytes":   stats.RxBytes,
-				"dropped": stats.RxDropped,
-				"errors":  stats.RxErrors,
-				"packets": stats.RxPackets,
-			},
-			// Deprecated
-			"out": common.MapStr{
-				"bytes":   stats.TxBytes,
-				"dropped": stats.TxDropped,
-				"errors":  stats.TxErrors,
-				"packets": stats.TxPackets,
-			},
 			"inbound": common.MapStr{
 				"bytes":   stats.Total.RxBytes,
 				"dropped": stats.Total.RxDropped,

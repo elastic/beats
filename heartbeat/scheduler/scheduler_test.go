@@ -20,6 +20,7 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -28,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
@@ -43,14 +44,8 @@ func tarawaTime() *time.Location {
 	return loc
 }
 
-func TestNew(t *testing.T) {
-	scheduler := New(123, monitoring.NewRegistry())
-	assert.Equal(t, int64(123), scheduler.limit)
-	assert.Equal(t, time.Local, scheduler.location)
-}
-
 func TestNewWithLocation(t *testing.T) {
-	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime())
+	scheduler := Create(123, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
@@ -82,23 +77,23 @@ func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 	}
 }
 
-func TestScheduler_Start(t *testing.T) {
+func TestSchedulerRun(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime())
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	defer s.Stop()
 
 	executed := make(chan string)
 
-	preAddEvents := uint32(10)
-	s.Add(testSchedule{0}, "preAdd", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
-		executed <- "preAdd"
+	initialEvents := uint32(10)
+	s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
+		executed <- "initial"
 		cont := func(_ context.Context) []TaskFunc {
-			executed <- "preAddCont"
+			executed <- "initialCont"
 			return nil
 		}
 		return []TaskFunc{cont}
-	}))
+	}), "http", nil)
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
@@ -113,28 +108,26 @@ func TestScheduler_Start(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn))
+	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http", nil)
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
-	s.Start()
-
-	postAddEvents := uint32(10)
-	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
-		executed <- "postAdd"
+	postRemoveEvents := uint32(10)
+	s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
+		executed <- "postRemove"
 		cont := func(_ context.Context) []TaskFunc {
-			executed <- "postAddCont"
+			executed <- "postRemoveCont"
 			return nil
 		}
 		return []TaskFunc{cont}
-	}))
+	}), "http", nil)
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
-	// Otherwise, we might only do 1 preAdd and 1 postAdd event
+	// Otherwise, we might only do 1 preAdd and 1 postRemove event
 	// We double the number of pre/post add events to account for their continuations
-	totalExpected := preAddEvents*2 + removedEvents + postAddEvents*2
+	totalExpected := initialEvents*2 + removedEvents + postRemoveEvents*2
 	for uint32(len(received)) < totalExpected {
 		select {
 		case got := <-executed:
@@ -146,102 +139,139 @@ func TestScheduler_Start(t *testing.T) {
 	}
 
 	// The removed callback should only have been executed once
-	counts := map[string]uint32{"preAdd": 0, "postAdd": 0, "preAddCont": 0, "postAddcont": 0, "removed": 0}
+	counts := map[string]uint32{"initial": 0, "initialCont": 0, "removed": 0, "postRemove": 0, "postRemoveCont": 0}
 	for _, s := range received {
 		counts[s]++
 	}
 
 	// convert with int() because the printed output is nicer than hex
-	assert.Equal(t, int(preAddEvents), int(counts["preAdd"]))
-	assert.Equal(t, int(preAddEvents), int(counts["preAddCont"]))
-	assert.Equal(t, int(postAddEvents), int(counts["postAdd"]))
-	assert.Equal(t, int(postAddEvents), int(counts["postAddCont"]))
+	assert.Equal(t, int(initialEvents), int(counts["initial"]))
+	assert.Equal(t, int(initialEvents), int(counts["initialCont"]))
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
+	assert.Equal(t, int(postRemoveEvents), int(counts["postRemove"]))
+	assert.Equal(t, int(postRemoveEvents), int(counts["postRemoveCont"]))
+}
+
+func TestScheduler_WaitForRunOnce(t *testing.T) {
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true)
+
+	defer s.Stop()
+
+	executed := new(uint32)
+	waits := new(uint32)
+
+	s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
+		cont := func(_ context.Context) []TaskFunc {
+			// Make sure we actually wait for the task!
+			time.Sleep(time.Millisecond * 250)
+			atomic.AddUint32(executed, 1)
+			return nil
+		}
+		return []TaskFunc{cont}
+	}, "http", func() { atomic.AddUint32(waits, 1) })
+
+	s.WaitForRunOnce()
+	require.Equal(t, uint32(1), atomic.LoadUint32(executed))
+	require.Equal(t, uint32(1), atomic.LoadUint32(waits))
 }
 
 func TestScheduler_Stop(t *testing.T) {
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime())
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	executed := make(chan struct{})
 
-	require.NoError(t, s.Start())
-	require.NoError(t, s.Stop())
+	s.Stop()
 
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
-	}))
+	}), "http", nil)
 
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
 
-func TestScheduler_runRecursiveTask(t *testing.T) {
-	cancelledCtx, cancel := context.WithCancel(context.Background())
-	cancel()
+func makeTasks(num int, callback func()) TaskFunc {
+	return func(ctx context.Context) []TaskFunc {
+		callback()
+		if num < 1 {
+			return nil
+		}
+		return []TaskFunc{makeTasks(num-1, callback)}
+	}
+}
 
-	testCases := []struct {
-		name          string
-		jobCtx        context.Context
-		overLimit     bool
-		shouldRunTask bool
+func TestSchedTaskLimits(t *testing.T) {
+	tests := []struct {
+		name    string
+		numJobs int
+		limit   int64
+		expect  func(events []int)
 	}{
 		{
-			"context not cancelled",
-			context.Background(),
-			false,
-			true,
+			name:    "runs more than 1 with limit of 1",
+			numJobs: 2,
+			limit:   1,
+			expect: func(events []int) {
+				mid := len(events) / 2
+				firstHalf := events[0:mid]
+				lastHalf := events[mid:]
+				for _, ele := range firstHalf {
+					assert.Equal(t, firstHalf[0], ele)
+				}
+				for _, ele := range lastHalf {
+					assert.Equal(t, lastHalf[0], ele)
+				}
+			},
 		},
 		{
-			"context cancelled",
-			cancelledCtx,
-			false,
-			false,
+			name:    "runs 50 interleaved without limit",
+			numJobs: 50,
+			limit:   math.MaxInt64,
+			expect: func(events []int) {
+				require.GreaterOrEqual(t, len(events), 50)
+			},
 		},
 		{
-			"context cancelled over limit",
-			cancelledCtx,
-			true,
-			false,
+			name:    "runs 100 with limit not configured",
+			numJobs: 100,
+			limit:   0,
+			expect: func(events []int) {
+				require.GreaterOrEqual(t, len(events), 100)
+			},
 		},
 	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			limit := int64(100)
-			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime())
-
-			if testCase.overLimit {
-				s.limitSem.Acquire(context.Background(), limit)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var jobConfigByType = map[string]config.JobLimit{}
+			jobType := "http"
+			if tt.limit > 0 {
+				jobConfigByType = map[string]config.JobLimit{
+					jobType: {Limit: tt.limit},
+				}
 			}
-
-			wg := &sync.WaitGroup{}
-			wg.Add(1)
-			executed := batomic.MakeBool(false)
-
-			tf := func(ctx context.Context) []TaskFunc {
-				executed.Store(true)
-				return nil
+			s := Create(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false)
+			var taskArr []int
+			wg := sync.WaitGroup{}
+			wg.Add(tt.numJobs)
+			for i := 0; i < tt.numJobs; i++ {
+				num := i
+				tf := makeTasks(4, func() {
+					taskArr = append(taskArr, num)
+				})
+				go func(tff TaskFunc) {
+					sj := newSchedJob(context.Background(), s, "myid", jobType, tff)
+					sj.run()
+					wg.Done()
+				}(tf)
 			}
-
-			beforeStart := time.Now()
-			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg)
-
-			// This will panic in the case where we don't check s.limitSem.Acquire
-			// for an error value and released an unacquired resource in scheduler.go.
-			// In that case this will release one more resource than allowed causing
-			// the panic.
-			if testCase.overLimit {
-				s.limitSem.Release(limit)
-			}
-
-			require.Equal(t, testCase.shouldRunTask, executed.Load())
-			require.True(t, startedAt.Equal(beforeStart) || startedAt.After(beforeStart))
+			wg.Wait()
+			tt.expect(taskArr)
 		})
 	}
 }
 
 func BenchmarkScheduler(b *testing.B) {
-	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime())
+	s := Create(0, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	sched := testSchedule{0}
 
@@ -250,19 +280,15 @@ func BenchmarkScheduler(b *testing.B) {
 		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
-		})
+		}, "http", nil)
 		assert.NoError(b, err)
 	}
 
-	err := s.Start()
 	defer s.Stop()
-	assert.NoError(b, err)
 
 	count := 0
 	for count < b.N {
-		select {
-		case <-executed:
-			count++
-		}
+		<-executed
+		count++
 	}
 }

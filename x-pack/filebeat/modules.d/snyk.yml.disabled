@@ -3,8 +3,7 @@
 
 - module: snyk
   audit:
-    enabled: true
-
+    enabled: false
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
     #
@@ -14,19 +13,15 @@
     # The ID related to the audit_type. If audit type is group, then this value should be
     # the group ID and if it is organization it should be the organization ID to collect from.
     #var.audit_id: 1235432-asdfdf-2341234-asdgjhg
-
     # How often the API should be polled, defaults to 1 hour.
     #var.interval: 1h
     # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
     #var.first_interval: 24h
-
     # The API token that is created for a specific user, found in the Snyk management dashboard.
     #var.api_token:
-
     # Event filtering.
     # All configuration items below is OPTIONAL and the default options will be overwritten
     # for each entry that is not commented out.
-
     # Will return only logs for this specific project.
     #var.project_id: ""
     # User public ID. Will fetch only audit logs originated from this user's actions.
@@ -37,34 +32,27 @@
     #var.email_address: ""
 
   vulnerabilities:
-    enabled: true
-
+    enabled: false
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
-
     # How often the API should be polled. Data from the Snyk API is automatically updated
     # once per day, so the default interval is 24 hours.
     #var.interval: 24h
-
     # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
     #var.first_interval: 24h
-
     # The API token that is created for a specific user, found in the Snyk management dashboard.
     #var.api_token:
-
     # The list of org IDs to filter the results by.
     # One organization ID per line, starting with a - sign
     #var.orgs:
     #  - 12354-asdfdf-123543-asdsdfg
     #  - 76554-jhggfd-654342-hgrfasd
-
-
     # Event filtering.
     # All configuration items below is OPTIONAL and the default options will be overwritten
     # for each entry that is not commented out.
-
     # The severity levels of issues to filter the results by.
     #var.included_severity:
+    #  - critical
     #  - high
     #  - medium
     #  - low
@@ -80,6 +68,7 @@
     #var.types:
     #  - vuln
     #  - license
+    #  - configuration
     #
     # The type of languages to filter the results by.
     #var.languages:
@@ -91,8 +80,13 @@
     #  - golang
     #  - php
     #  - dotnet
-    #  - swift
+    #  - swift-objective-c
+    #  - elixir
     #  - docker
+    #  - terraform
+    #  - kubernetes
+    #  - helm
+    #  - cloudformation
     #
     # Search term to filter issue name by, or an exact CVE or CWE.
     #var.identifier:
@@ -109,4 +103,3 @@
     # The priority score ranging between 0-1000
     #var.min_priority_score: 0
     #var.max_priority_score: 1000
-

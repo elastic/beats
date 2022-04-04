@@ -28,7 +28,7 @@ import (
 //
 // Proxy usage will be disabled in general if Disable is set.
 // If URL is not set, the proxy configuration will default
-// to HTTP_PROXY, HTTPS_PPROXY, and NO_PROXY.
+// to HTTP_PROXY, HTTPS_PROXY, and NO_PROXY.
 //
 // The default (and zero) value of HTTPClientProxySettings has Proxy support
 // enabled, and will select the proxy per URL based on the environment variables.
@@ -36,20 +36,36 @@ type HTTPClientProxySettings struct {
 	// Proxy URL to use for http connections. If the proxy url is configured,
 	// it is used for all connection attempts. All proxy related environment
 	// variables are ignored.
-	URL *url.URL `config:"proxy_url" yaml:"proxy_url,omitempty"`
+	URL *ProxyURI `config:"proxy_url" yaml:"proxy_url,omitempty"`
 
 	// Headers configures additonal headers that are send to the proxy
 	// during CONNECT requests.
-	Headers http.Header `config:"proxy_headers" yaml:"proxy_headers,omitempty"`
+	Headers ProxyHeaders `config:"proxy_headers" yaml:"proxy_headers,omitempty"`
 
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
 }
 
+// NewHTTPClientProxySettings creates a new proxy settings based on provided proxy information.
+func NewHTTPClientProxySettings(url string, headers map[string]string, disable bool) (*HTTPClientProxySettings, error) {
+	proxyURI, err := NewProxyURIFromString(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return &HTTPClientProxySettings{
+		URL:     proxyURI,
+		Headers: ProxyHeaders(headers),
+		Disable: disable,
+	}, nil
+}
+
 // DefaultHTTPClientProxySettings returns the default HTTP proxy setting.
 func DefaultHTTPClientProxySettings() HTTPClientProxySettings {
-	return HTTPClientProxySettings{}
+	return HTTPClientProxySettings{
+		Headers: make(ProxyHeaders),
+	}
 }
 
 // Unpack sets the proxy settings from a config object.
@@ -66,24 +82,12 @@ func (settings *HTTPClientProxySettings) Unpack(cfg *common.Config) error {
 		return err
 	}
 
-	url, err := common.ParseURL(tmp.URL)
+	s, err := NewHTTPClientProxySettings(tmp.URL, tmp.Headers, tmp.Disable)
 	if err != nil {
 		return err
 	}
 
-	var headers http.Header
-	if len(tmp.Headers) > 0 {
-		headers = http.Header{}
-		for k, v := range tmp.Headers {
-			headers.Add(k, v)
-		}
-	}
-
-	*settings = HTTPClientProxySettings{
-		URL:     url,
-		Disable: tmp.Disable,
-		Headers: headers,
-	}
+	*settings = *s
 	return nil
 }
 
@@ -98,5 +102,5 @@ func (settings *HTTPClientProxySettings) ProxyFunc() func(*http.Request) (*url.U
 		return http.ProxyFromEnvironment
 	}
 
-	return http.ProxyURL(settings.URL)
+	return http.ProxyURL(settings.URL.URI())
 }

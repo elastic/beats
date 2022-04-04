@@ -11,3 +11,6 @@
 {"name": "github.com/munnerz/goautoneg", "licenceType": "BSD-3-Clause"}
 {"name": "github.com/pelletier/go-buffruneio", "licenceType": "MIT"}
 {"name": "github.com/urso/magetools", "licenceType": "Apache-2.0"}
+{"name": "kernel.org/pub/linux/libs/security/libcap/cap", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
+{"name": "kernel.org/pub/linux/libs/security/libcap/psx", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
+{"name": "github.com/awslabs/kinesis-aggregation/go", "licenceType": "Apache-2.0", "url": "https://github.com/awslabs/kinesis-aggregation/blob/master/LICENSE.txt"}

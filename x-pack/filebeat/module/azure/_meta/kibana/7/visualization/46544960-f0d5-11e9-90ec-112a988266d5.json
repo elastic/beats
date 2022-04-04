@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Navigation Alerts [Filebeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "### Azure Monitoring\n\n[Overview](#/dashboard/41e84340-ec20-11e9-90ec-112a988266d5) | [Users](#/dashboard/87095750-f05a-11e9-90ec-112a988266d5) | [**Alerts**](#/dashboard/0f559cc0-f0d5-11e9-90ec-112a988266d5) ",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation Alerts [Filebeat Azure]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "46544960-f0d5-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:01.505Z",
+    "version": "WzQzODAsMV0="
+}

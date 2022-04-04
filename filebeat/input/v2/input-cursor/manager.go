@@ -18,6 +18,7 @@
 package cursor
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"time"
@@ -75,8 +76,10 @@ type Source interface {
 	Name() string
 }
 
-var errNoSourceConfigured = errors.New("no source has been configured")
-var errNoInputRunner = errors.New("no input runner available")
+var (
+	errNoSourceConfigured = errors.New("no source has been configured")
+	errNoInputRunner      = errors.New("no input runner available")
+)
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {
@@ -119,7 +122,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
-	err := group.Go(func(canceler unison.Canceler) error {
+	err := group.Go(func(canceler context.Context) error {
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()

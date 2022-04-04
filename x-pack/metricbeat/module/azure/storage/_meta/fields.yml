@@ -5,3 +5,10 @@
   object_type_mapping_type: "*"
   description: >
     storage account
+- name: storage_account.*.*
+  release: ga
+  type: object
+  object_type: float
+  object_type_mapping_type: "*"
+  description: >
+    storage account

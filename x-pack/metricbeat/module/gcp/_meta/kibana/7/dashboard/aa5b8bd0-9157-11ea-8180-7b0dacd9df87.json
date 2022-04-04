@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "Overview of GCP Load Balancing HTTPS Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "f89112f9-0f3a-4712-a317-23230cd66213",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "f89112f9-0f3a-4712-a317-23230cd66213",
+                "panelRefName": "panel_f89112f9-0f3a-4712-a317-23230cd66213",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8f4baaa9-6f4d-40fa-a77f-9f68f83a379c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 6
+                },
+                "panelIndex": "8f4baaa9-6f4d-40fa-a77f-9f68f83a379c",
+                "panelRefName": "panel_8f4baaa9-6f4d-40fa-a77f-9f68f83a379c",
+                "title": "Backend Request Count",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "10490530-a766-4f87-824a-3fc18bf2e85b",
+                    "w": 24,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "10490530-a766-4f87-824a-3fc18bf2e85b",
+                "panelRefName": "panel_10490530-a766-4f87-824a-3fc18bf2e85b",
+                "title": "Request Count",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "e737b020-eb94-4eb1-b53d-50fa551df648",
+                    "w": 24,
+                    "x": 24,
+                    "y": 21
+                },
+                "panelIndex": "e737b020-eb94-4eb1-b53d-50fa551df648",
+                "panelRefName": "panel_e737b020-eb94-4eb1-b53d-50fa551df648",
+                "title": "Backend Request Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "b90db52e-982e-4360-b5ed-71147ba79246",
+                    "w": 24,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "b90db52e-982e-4360-b5ed-71147ba79246",
+                "panelRefName": "panel_b90db52e-982e-4360-b5ed-71147ba79246",
+                "title": "Request Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a2a5c845-d426-425f-b2e6-e8df6038fd9d",
+                    "w": 24,
+                    "x": 24,
+                    "y": 36
+                },
+                "panelIndex": "a2a5c845-d426-425f-b2e6-e8df6038fd9d",
+                "panelRefName": "panel_a2a5c845-d426-425f-b2e6-e8df6038fd9d",
+                "title": "Backend Response Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2bf5bf09-e743-4c6d-8251-d12c9c70f273",
+                    "w": 24,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "2bf5bf09-e743-4c6d-8251-d12c9c70f273",
+                "panelRefName": "panel_2bf5bf09-e743-4c6d-8251-d12c9c70f273",
+                "title": "Response Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] Load Balancing HTTPS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "aa5b8bd0-9157-11ea-8180-7b0dacd9df87",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "d5418f80-9156-11ea-8180-7b0dacd9df87",
+            "name": "f89112f9-0f3a-4712-a317-23230cd66213:panel_f89112f9-0f3a-4712-a317-23230cd66213",
+            "type": "visualization"
+        },
+        {
+            "id": "dff87070-9155-11ea-8180-7b0dacd9df87",
+            "name": "8f4baaa9-6f4d-40fa-a77f-9f68f83a379c:panel_8f4baaa9-6f4d-40fa-a77f-9f68f83a379c",
+            "type": "visualization"
+        },
+        {
+            "id": "6f933ef0-9155-11ea-8180-7b0dacd9df87",
+            "name": "10490530-a766-4f87-824a-3fc18bf2e85b:panel_10490530-a766-4f87-824a-3fc18bf2e85b",
+            "type": "visualization"
+        },
+        {
+            "id": "eb891a20-9155-11ea-8180-7b0dacd9df87",
+            "name": "e737b020-eb94-4eb1-b53d-50fa551df648:panel_e737b020-eb94-4eb1-b53d-50fa551df648",
+            "type": "visualization"
+        },
+        {
+            "id": "8d4ddf40-9155-11ea-8180-7b0dacd9df87",
+            "name": "b90db52e-982e-4360-b5ed-71147ba79246:panel_b90db52e-982e-4360-b5ed-71147ba79246",
+            "type": "visualization"
+        },
+        {
+            "id": "0bd0a6e0-9156-11ea-8180-7b0dacd9df87",
+            "name": "a2a5c845-d426-425f-b2e6-e8df6038fd9d:panel_a2a5c845-d426-425f-b2e6-e8df6038fd9d",
+            "type": "visualization"
+        },
+        {
+            "id": "d63465e0-9154-11ea-8180-7b0dacd9df87",
+            "name": "2bf5bf09-e743-4c6d-8251-d12c9c70f273:panel_2bf5bf09-e743-4c6d-8251-d12c9c70f273",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:10.632Z",
+    "version": "WzM3ODQsMV0="
+}

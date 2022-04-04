@@ -1,0 +1,125 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Endpoint OS Metrics Overview [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 100": "rgb(0,104,55)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Total Events"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "customLabel": "Devices",
+                        "field": "observer.hostname"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "7",
+                    "params": {
+                        "customLabel": "Event Types",
+                        "field": "cef.extensions.categoryBehavior"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "8",
+                    "params": {
+                        "customLabel": "Event Outcomes",
+                        "field": "cef.extensions.categoryOutcome"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "fontSize": "30",
+                "gauge": {
+                    "autoExtend": false,
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 100
+                        }
+                    ],
+                    "gaugeColorMode": "None",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Metric",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": false,
+                    "scale": {
+                        "color": "#333",
+                        "labels": false,
+                        "show": false,
+                        "width": 2
+                    },
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": "20",
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "type": "simple",
+                    "useRange": false,
+                    "verticalSplit": false
+                },
+                "handleNoResults": true,
+                "type": "gauge"
+            },
+            "title": "Endpoint OS Metrics Overview [Filebeat CEF]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "158d809a-89db-4ffa-88a1-eb5c4bf58d50",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "e6cf2383-71f4-4db1-a791-1a7d4f110194",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:36.211Z",
+    "version": "WzQ2OTksMV0="
+}

@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "ELB Unhealthy Host Count [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(244,78,59,1)",
+                        "color": "rgba(255,255,255,1)",
+                        "id": "7e66beb0-b3c6-11e9-af6e-ef22c5680226",
+                        "operator": "gt",
+                        "value": 0
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
+                    }
+                ],
+                "filter": "",
+                "gauge_color_rules": [
+                    {
+                        "id": "7d0b9b80-b3c6-11e9-af6e-ef22c5680226"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "35d3cbc1-b3c6-11e9-bf3f-29d51aa3d971",
+                        "label": "Unhealthy Host Count",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "aws.elb.metrics.UnHealthyHostCount.max",
+                                "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "aws.dimensions.AvailabilityZone",
+                        "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "ELB Unhealthy Host Count [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6fc1efd0-b3c9-11e9-87a4-078dbbae220d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:29.650Z",
+    "version": "WzMzNTYsMV0="
+}

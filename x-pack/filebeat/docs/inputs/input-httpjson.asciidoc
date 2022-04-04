@@ -31,7 +31,6 @@ Example configurations:
 filebeat.inputs:
 # Fetch your public IP every minute.
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   processors:
@@ -44,7 +43,6 @@ filebeat.inputs:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost:9200/_search?scroll=5m
   request.method: POST
   response.split:
@@ -69,7 +67,6 @@ Example configurations with authentication:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost
   request.transforms:
     - set:
@@ -81,11 +78,23 @@ filebeat.inputs:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   auth.oauth2:
     client.id: 12345678901234567890abcdef
     client.secret: abcdef12345678901234567890
     token_url: http://localhost/oauth2/token
+  request.url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  auth.oauth2:
+    client.id: 12345678901234567890abcdef
+    client.secret: abcdef12345678901234567890
+    token_url: http://localhost/oauth2/token
+    user: user@domain.tld
+    password: P@$$W0₹D
   request.url: http://localhost
 ----
 
@@ -97,16 +106,15 @@ The `httpjson` input keeps a runtime state between requests. This state can be a
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
-- `last_response.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
-- `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
-- `url.value`: The full URL with params and fragments.
-- `url.params`: A map containing the URL params.
-- `header`: A map containing the headers. References request headers when used in <<request-transforms>> or <<request-rate-limit>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
-- `body`: A map containing the body. References request body when used in <<request-transforms>> configuration section, and to the last response body when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `last_event`: A map representing the last event of the current request in the requests chain (result from applying transforms to `last_response.body`).
+- `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
+- `header`: A map containing the headers. References the next request headers when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
+- `body`: A map containing the body. References the next request body when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
 - `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
 All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
@@ -203,6 +211,17 @@ Some built-in helper functions are provided to work with the input state inside 
 - `add`: adds a list of integers and returns their sum.
 - `mul`: multiplies two integers.
 - `div`: does the integer division of two integer values.
+- `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
+- `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
+- `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
+- `base64DecodeNoPad`: Decodes the base64 string without padding. Any binary output will be converted to a UTF8 string.
+- `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
+- `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+- `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
+- `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
+- `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
@@ -210,13 +229,6 @@ In addition to the provided functions, any of the native functions for https://g
 
 The `httpjson` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
-
-[float]
-==== `config_version`
-
-Defines the configuration version. Current supported versions are: `1` and `2`. Default: `1`.
-
-NOTE: This setting defaults to `1` to avoid breaking current configurations. V1 configuration is deprecated and will be unsupported in future releases. Any new configuration should use `config_version: 2`.
 
 [float]
 ==== `interval`
@@ -269,6 +281,22 @@ The client secret used as part of the authentication flow. It is always required
 except if using `google` as provider. Required for providers: `default`, `azure`.
 
 [float]
+==== `auth.oauth2.user`
+
+The user used as part of the authentication flow. It is required for authentication
+ - grant type password. It is only available for provider `default`.
+
+[float]
+==== `auth.oauth2.password`
+
+The password used as part of the authentication flow. It is required for authentication
+ - grant type password. It is only available for provider `default`.
+
+NOTE: user and password are required for grant_type password. If user and
+password is not used then it will automatically use the `token_url` and
+`client credential` method.
+
+[float]
 ==== `auth.oauth2.scopes`
 
 A list of scopes that will be requested during the oauth2 flow.
@@ -290,7 +318,6 @@ Can be set for all providers except `google`.
 ["source","yaml",subs="attributes"]
 ----
 - type: httpjson
-  config_version: 2
   auth.oauth2:
     endpoint_params:
       Param1:
@@ -343,6 +370,7 @@ NOTE: Only one of the credentials settings can be set at once. If none is provid
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
+[[request-parameters]]
 [float]
 ==== `request.url`
 
@@ -368,7 +396,6 @@ Defaults to `null` (no HTTP body).
 ["source","yaml",subs="attributes"]
 ----
 - type: httpjson
-  config_version: 2
   request.method: POST
   request.body:
     query:
@@ -400,7 +427,6 @@ This specifies proxy configuration in the form of `http[s]://<user>:<password>@<
 filebeat.inputs:
 # Fetch your public IP every minute.
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   request.proxy_url: http://proxy.example:8080
@@ -440,19 +466,42 @@ The maximum number of redirects to follow for a request. Default: `10`.
 [float]
 ==== `request.rate_limit.limit`
 
-The value of the response that specifies the total limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+The value of the response that specifies the total limit. It is defined with a Go template value.
+Can read state from: [`.last_response.header`]
 
 [float]
 ==== `request.rate_limit.remaining`
 
-The value of the response that specifies the remaining quota of the rate limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+The value of the response that specifies the remaining quota of the rate limit.
+It is defined with a Go template value. Can read state from: [`.last_response.header`]
+If the `remaining` header is missing from the Response, no rate-limiting will occur.
 
 [float]
 ==== `request.rate_limit.reset`
 
-The value of the response that specifies the epoch time when the rate limit will reset. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+The value of the response that specifies the epoch time when the rate limit will reset.
+It is defined with a Go template value. Can read state from: [`.last_response.header`]
 
 [[request-transforms]]
+[float]
+==== `request.rate_limit.early_limit`
+
+Optionally start rate-limiting prior to the value specified in the Response.
+
+Under the default behavior, Requests will continue while the `remaining` value is non-zero.
+Specifying an `early_limit` will mean that rate-limiting will occur prior to reaching `0`.
+
+* If the value specified for `early_limit` is less than `1`,
+the value is treated as a percentage of the Response provided `limit`.
+e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate-limit --
+for a `limit` value of `120`, the rate-limit starts when the `remaining` reaches `12`.
+If the `limit` header is missing from the Response, default rate-limiting will occur (when `remaining` reaches `0`).
+* If the value specified for `early_limit` is greater than or equal to `1`,
+the value is treated as the target value for `remaining`.
+e.g. instead of rate-limiting when `remaining` hits `0`, rate-limiting will occur when `remaining` hits the value specified.
+
+It is not set by default (by default the rate-limiting as specified in the Response is followed).
+
 [float]
 ==== `request.transforms`
 
@@ -460,15 +509,14 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
-Can write state to: [`header.*`, `url.params.*`, `body.*`].
+Can write state to: [`body.*`, `header.*`, `url.*`].
 
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost:9200/_search?scroll=5m
   request.method: POST
   request.transforms:
@@ -480,7 +528,9 @@ filebeat.inputs:
 [float]
 ==== `response.decode_as`
 
-ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`. It is not set by default.
+ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`. It is not set by default.
+
+NOTE: For `text/csv`, one event for each line will be created, using the header values as the object keys. For this reason is always assumed that a header exists.
 
 [[response-transforms]]
 [float]
@@ -498,7 +548,6 @@ Can write state to: [`body.*`].
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost:9200/_search?scroll=5m
   request.method: POST
   response.transforms:
@@ -563,6 +612,11 @@ Required if using split type of `string`.  This is the sub string used to split 
 Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
 
 [float]
+==== `response.split[].ignore_empty_value`
+
+If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
+
+[float]
 ==== `response.split[].split`
 
 Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.
@@ -580,7 +634,7 @@ List of transforms that will be applied to the response to every new page reques
 
 Available transforms for pagination: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
@@ -628,7 +682,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -724,7 +777,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -799,7 +851,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -851,7 +902,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -882,6 +932,146 @@ This will output:
 ]
 ----
 
+[[chain]]
+[float]
+=== `chain`
+
+A chain is a list of requests to be made after the first one.
+
+[float]
+==== `chain[].step`
+
+Contains basic request and response configuration for chained calls.
+
+[float]
+==== `chain[].step.request`
+
+Please refer <<request-parameters,request parameters>>. Required. 
+
+Example:
+
+First call: https://example.com/services/data/v1.0/
+
+Second call: https://example.com/services/data/v1.0/1/export_ids
+
+Third call: https://example.com/services/data/v1.0/export_ids/file_1/info
+
+[float]
+==== `chain[].step.response.split`
+
+Please refer <<response-split,response split parameter>>.
+
+[float]
+==== `chain[].step.replace`
+
+A [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2[JSONPath]) string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
+
+Example:
+
+- First call: https://example.com/services/data/v1.0/
++
+<<response-json1,response>>
+
+- Second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
++
+<<response-json2,response>>
+
+- Third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+      request.method: GET
+      replace: $.records[:].id
+    # third call
+    - step:
+      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+      request.method: GET
+      replace: $.file_name
+----
+
+Example:
+
+- First call to collect record ids
+
++
+request_url: https://example.com/services/data/v1.0/records
+
++
+response_json:
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "records": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+
+- Second call to collect `file_name` using collected ids from first call.
+
++
+request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
+
++
+response_json using id as '1':
+
++
+[[response-json2]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1"
+}
+----
+
++
+request_url using id as '2': https://example.com/services/data/v1.0/2/export_ids
+
++
+response_json using id as '2':
+
++
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2"
+}
+----
+
+- Third call to collect `files` using collected `file_name` from second call.
+
++
+request_url using file_name as 'file_1': https://example.com/services/data/v1.0/export_ids/file_1/info
+
++
+request_url using file_name as 'file_2': https://example.com/services/data/v1.0/export_ids/file_2/info
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: `request.url`, `request.method`, `request.transforms`, `request.body`, `response.transforms` and `response.split`.
+
 [[cursor]]
 [float]
 ==== `cursor`
@@ -902,7 +1092,6 @@ NOTE: Default templates do not have access to any state, only to functions.
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   response.transforms:
@@ -919,76 +1108,6 @@ filebeat.inputs:
         target: "json"
 ----
 
-[float]
-==== `api_key`
-
-Deprecated, use `request.transforms`.
-
-[float]
-==== `http_client_timeout`
-
-Deprecated, use `request.timeout`.
-
-[float]
-==== `http_headers`
-
-Deprecated, use `request.transforms`.
-
-[float]
-==== `http_method`
-
-Deprecated, use `request.method`.
-
-[float]
-==== `http_request_body`
-
-Deprecated, use `request.body`.
-
-[float]
-==== `json_objects_array`
-
-Deprecated, use `request.split`.
-
-[float]
-==== `split_events_by`
-
-Deprecated, use `request.split`.
-
-[float]
-==== `no_http_body`
-
-Deprecated.
-
-[float]
-==== `pagination.*`
-
-Deprecated, use `response.pagination`.
-
-[float]
-==== `rate_limit.*`
-
-Deprecated, use `request.rate_limit.*`.
-
-[float]
-==== `retry.*`
-
-Deprecated, use `request.retry.*`.
-
-[float]
-==== `ssl`
-
-Deprecated, use `request.ssl`.
-
-[float]
-==== `url`
-
-Deprecated, use `request.url`.
-
-[float]
-==== `oauth2.*`
-
-Deprecated, use `auth.oauth2.*`.
-
 ==== Request life cycle
 
 image:images/input-httpjson-lifecycle.png[Request lifecycle]
@@ -998,8 +1117,17 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 . The resulting transformed request is executed.
 . The server responds (here is where any retry or rate limit policy takes place when configured).
 . The response is transformed using the configured `response.transforms` and `response.split`.
+. If a chain step is configured. Each step will generate new requests based on collected IDs from responses. The requests will be transformed using configured `request.transforms` and the resulting generated transformed requests will be executed. This process will happen for all the steps mentioned in the chain.
 . Each resulting event is published to the output.
 . If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
+
+image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
+
+. Response from regular call will be processed.
+. Extract data from response and generate new requests from responses.
+. Process generated requests and collect responses from server.
+. Go back to step-2 for the next step.
+. Publish collected responses from the last chain step.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

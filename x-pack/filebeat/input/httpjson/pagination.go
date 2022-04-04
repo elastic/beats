@@ -5,121 +5,182 @@
 package httpjson
 
 import (
+	"context"
 	"errors"
-	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
-	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+const paginationNamespace = "pagination"
+
+func registerPaginationTransforms() {
+	registerTransform(paginationNamespace, appendName, newAppendPagination)
+	registerTransform(paginationNamespace, deleteName, newDeletePagination)
+	registerTransform(paginationNamespace, setName, newSetRequestPagination)
+}
+
 type pagination struct {
-	extraBodyContent common.MapStr
-	header           *headerConfig
-	idField          string
-	requestField     string
-	urlField         string
-	url              string
+	log            *logp.Logger
+	httpClient     *httpClient
+	requestFactory *requestFactory
+	decoder        decoderFunc
 }
 
-func newPaginationFromConfig(config config) *pagination {
-	if !config.Pagination.isEnabled() {
-		return nil
-	}
-	return &pagination{
-		extraBodyContent: config.Pagination.ExtraBodyContent.Clone(),
-		header:           config.Pagination.Header,
-		idField:          config.Pagination.IDField,
-		requestField:     config.Pagination.RequestField,
-		urlField:         config.Pagination.URLField,
-		url:              config.Pagination.URL,
-	}
-}
-
-func (p *pagination) nextRequestInfo(ri *requestInfo, response response, lastObj common.MapStr) (*requestInfo, bool, error) {
-	if p == nil {
-		return ri, false, nil
+func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {
+	pagination := &pagination{httpClient: httpClient, log: log}
+	if config.Response == nil {
+		return pagination
 	}
 
-	if p.header == nil {
-		var err error
-		// Pagination control using HTTP Body fields
-		if err = p.setRequestInfoFromBody(response.body, lastObj, ri); err != nil {
-			// if the field is not found, there is no next page
-			if errors.Is(err, common.ErrKeyNotFound) {
-				return ri, false, nil
-			}
-			return ri, false, err
+	pagination.decoder = registeredDecoders[config.Response.DecodeAs]
+
+	if len(config.Response.Pagination) == 0 {
+		return pagination
+	}
+
+	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
+	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
+
+	body := func() *common.MapStr {
+		if config.Response.RequestBodyOnPagination {
+			return config.Request.Body
 		}
+		return &common.MapStr{}
+	}()
 
-		return ri, true, nil
+	requestFactory := newPaginationRequestFactory(
+		config.Request.Method,
+		config.Request.EncodeAs,
+		*config.Request.URL.URL,
+		body,
+		append(rts, pts...),
+		config.Auth,
+		log,
+	)
+	pagination.requestFactory = requestFactory
+	return pagination
+}
+
+func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *common.MapStr, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
+	// config validation already checked for errors here
+	rf := &requestFactory{
+		url:        url,
+		method:     method,
+		body:       body,
+		transforms: ts,
+		log:        log,
+		encoder:    registeredEncoders[encodeAs],
+	}
+	if authConfig != nil && authConfig.Basic.isEnabled() {
+		rf.user = authConfig.Basic.User
+		rf.password = authConfig.Basic.Password
+	}
+	return rf
+}
+
+type pageIterator struct {
+	pagination *pagination
+
+	stdCtx context.Context
+	trCtx  *transformContext
+
+	resp *http.Response
+
+	isFirst bool
+	done    bool
+
+	n int64
+}
+
+func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response) *pageIterator {
+	return &pageIterator{
+		pagination: p,
+		stdCtx:     stdCtx,
+		trCtx:      trCtx,
+		resp:       resp,
+		isFirst:    true,
+	}
+}
+
+func (iter *pageIterator) next() (*response, bool, error) {
+	if iter == nil || iter.resp == nil || iter.done {
+		return nil, false, nil
 	}
 
-	// Pagination control using HTTP Header
-	url, err := getNextLinkFromHeader(response.header, p.header.FieldName, p.header.RegexPattern)
+	if iter.isFirst {
+		iter.isFirst = false
+		tr, err := iter.getPage()
+		if err != nil {
+			return nil, false, err
+		}
+		if iter.pagination.requestFactory == nil {
+			iter.done = true
+		}
+		return tr, true, nil
+	}
+
+	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
+	switch {
+	case err == nil:
+		// OK
+	case errors.Is(err, errNewURLValueNotSet),
+		errors.Is(err, errEmptyTemplateResult),
+		errors.Is(err, errExecutingTemplate):
+		// If this error happens here it means a transform
+		// did not find any new value and we can stop paginating without error.
+		iter.done = true
+		return nil, false, nil
+	default:
+		return nil, false, err
+	}
+
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq) //nolint:bodyclose // Bad linter! The body is closed in the call.
 	if err != nil {
-		return ri, false, fmt.Errorf("failed to retrieve the next URL for pagination: %w", err)
+		return nil, false, err
 	}
-	if ri.url == url || url == "" {
-		return ri, false, nil
-	}
+	iter.resp = resp
 
-	ri.url = url
-
-	return ri, true, nil
-}
-
-// getNextLinkFromHeader retrieves the next URL for pagination from the HTTP Header of the response
-func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Regexp) (string, error) {
-	links, ok := header[http.CanonicalHeaderKey(fieldName)]
-	if !ok {
-		return "", fmt.Errorf("field %s does not exist in the HTTP Header", fieldName)
-	}
-	for _, link := range links {
-		matchArray := re.FindAllStringSubmatch(link, -1)
-		if len(matchArray) == 1 {
-			return matchArray[0][1], nil
-		}
-	}
-	return "", nil
-}
-
-// createRequestInfoFromBody creates a new RequestInfo for a new HTTP request in pagination based on HTTP response body
-func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *requestInfo) error {
-	// we try to get it from last element, if not found, from the original response
-	v, err := last.GetValue(p.idField)
-	if err == common.ErrKeyNotFound {
-		v, err = response.GetValue(p.idField)
-	}
-
+	r, err := iter.getPage()
 	if err != nil {
-		return fmt.Errorf("failed to retrieve id_field for pagination: %w", err)
+		return nil, false, err
 	}
 
-	if p.requestField != "" {
-		_, _ = ri.contentMap.Put(p.requestField, v)
-		if p.url != "" {
-			ri.url = p.url
+	if r.body == nil {
+		iter.pagination.log.Debug("finished pagination because there is no body")
+		iter.done = true
+		return nil, false, nil
+	}
+
+	return r, true, nil
+}
+
+func (iter *pageIterator) getPage() (*response, error) {
+	bodyBytes, err := ioutil.ReadAll(iter.resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	iter.resp.Body.Close()
+	iter.n += 1
+
+	var r response
+	r.header = iter.resp.Header
+	r.url = *iter.resp.Request.URL
+	r.page = iter.n
+
+	if len(bodyBytes) > 0 {
+		if iter.pagination.decoder != nil {
+			err = iter.pagination.decoder(bodyBytes, &r)
+		} else {
+			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r)
 		}
-	} else if p.urlField != "" {
-		url, err := url.Parse(ri.url)
-		if err == nil {
-			q := url.Query()
-			q.Set(p.urlField, fmt.Sprint(v))
-			url.RawQuery = q.Encode()
-			ri.url = url.String()
-		}
-	} else {
-		switch vt := v.(type) {
-		case string:
-			ri.url = vt
-		default:
-			return errors.New("pagination ID is not of string type")
+		if err != nil {
+			return nil, err
 		}
 	}
-	if len(p.extraBodyContent) > 0 {
-		ri.contentMap.Update(common.MapStr(p.extraBodyContent))
-	}
-	return nil
+
+	return &r, nil
 }

@@ -1,0 +1,319 @@
+{
+    "attributes": {
+        "description": "Netflow Top N flows",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "globalState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "input.type",
+                            "negate": false,
+                            "params": {
+                                "query": "netflow"
+                            },
+                            "type": "phrase",
+                            "value": "netflow"
+                        },
+                        "query": {
+                            "match": {
+                                "input.type": {
+                                    "query": "netflow",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 4
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 44
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": 2,
+                                "direction": "desc"
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 64
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "9",
+                    "w": 24,
+                    "x": 24,
+                    "y": 64
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Netflow] Top-N",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "14387a13-53bc-43a4-b9cd-63977aa8d87c",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "15295ea6-ba84-47db-8ced-9312abbf495c",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "5303e99b-389c-47b7-ae7a-945c5a92ba49",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "e9ad835b-b2f2-42d3-a3e7-555a593deacf",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "31b5f6fd-eb9d-4e97-90fd-367062ef217f",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "2b3d4e86-2254-4033-8fe3-ce4753fafd03",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "036aef95-ec90-468d-ad7c-3cc4405e9e81",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "5292a65b-c532-422a-9008-1251a8073a3a",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "cccff92f-cb71-49a9-9caf-84867751d31e",
+            "name": "9:panel_9",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-09-06T11:51:12.575Z",
+    "version": "WzQzOTQsMV0="
+}

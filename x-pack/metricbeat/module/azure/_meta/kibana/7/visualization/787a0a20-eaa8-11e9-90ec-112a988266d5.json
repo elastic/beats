@@ -1,0 +1,92 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "SQL Server Page Reads/Writes [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "azure.resource.type : \"Microsoft.Compute/virtualMachines\" "
+                },
+                "id": "35459a30-eaa8-11e9-a379-c33a712c0373",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,196,0,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "35459a31-eaa8-11e9-a379-c33a712c0373",
+                        "label": "Page Reads/s",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.sqlserver_buffer_manager_page_reads_per_sec.avg",
+                                "id": "35459a32-eaa8-11e9-a379-c33a712c0373",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(176,188,0,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "35459a33-eaa8-11e9-a379-c33a712c0373",
+                        "label": "Page Writes/s",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.sqlserver_buffer_manager_page_writes_per_sec.avg",
+                                "id": "35459a34-eaa8-11e9-a379-c33a712c0373",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "SQL Server Page Reads/Writes [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "787a0a20-eaa8-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:54.175Z",
+    "version": "WzM2MDgsMV0="
+}

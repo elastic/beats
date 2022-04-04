@@ -1,0 +1,139 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Kafka Broker Details [Metricbeat Kafka] ECS",
+        "uiStateJSON": {
+            "table": {
+                "sort": {
+                    "column": "cf09c940-d2ec-11e8-88c8-af5b2a9ee6b2",
+                    "order": "asc"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "7fb31e00-d2ec-11e8-88c8-af5b2a9ee6b2"
+                    }
+                ],
+                "filter": "",
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "pivot_id": "kafka.partition.partition.replica",
+                "pivot_label": "Broker ID",
+                "pivot_rows": "256",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Topics",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kafka.topic.name",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "cardinality"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kafka.broker.id",
+                        "terms_size": "100"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "color_rules": [
+                            {
+                                "id": "7e9ee780-d2ef-11e8-9dd4-c5f03280d7b0"
+                            }
+                        ],
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "kafka.partition.partition.is_leader: true"
+                        },
+                        "formatter": "number",
+                        "id": "b38e91a0-d2ec-11e8-88c8-af5b2a9ee6b2",
+                        "label": "Leader Partitions",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kafka.partition.topic_id",
+                                "id": "b38eb8b0-d2ec-11e8-88c8-af5b2a9ee6b2",
+                                "type": "cardinality"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "color_rules": [
+                            {
+                                "id": "d4d9d2c0-d2ec-11e8-88c8-af5b2a9ee6b2"
+                            }
+                        ],
+                        "fill": 0.5,
+                        "filter": "",
+                        "formatter": "number",
+                        "id": "cf09c940-d2ec-11e8-88c8-af5b2a9ee6b2",
+                        "label": "Replicas",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kafka.partition.topic_broker_id",
+                                "id": "cf09f050-d2ec-11e8-88c8-af5b2a9ee6b2",
+                                "type": "cardinality"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "table",
+                "use_kibana_indexes": false
+            },
+            "title": "Kafka Broker Details [Metricbeat Kafka] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:34.185Z",
+    "version": "WzM5OTYsMV0="
+}

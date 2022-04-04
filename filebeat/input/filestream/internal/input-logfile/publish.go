@@ -50,13 +50,23 @@ type cursorPublisher struct {
 // instances can add update operations to be executed after already pending
 // update operations from older inputs instances that have been shutdown.
 type updateOp struct {
-	store    *store
 	resource *resource
 
 	// state updates to persist
 	timestamp time.Time
-	ttl       time.Duration
 	delta     interface{}
+}
+
+func newUpdateOp(resource *resource, ts time.Time, delta interface{}) *updateOp {
+	return &updateOp{
+		resource:  resource,
+		timestamp: ts,
+		delta:     delta,
+	}
+}
+
+func (op *updateOp) Key() string {
+	return op.resource.key
 }
 
 // Publish publishes an event. Publish returns false if the inputs cancellation context has been marked as done.
@@ -69,7 +79,7 @@ func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate interface{}) er
 		return c.forward(event)
 	}
 
-	op, err := createUpdateOp(c.cursor.store, c.cursor.resource, cursorUpdate)
+	op, err := createUpdateOp(c.cursor.resource, cursorUpdate)
 	if err != nil {
 		return err
 	}
@@ -86,43 +96,27 @@ func (c *cursorPublisher) forward(event beat.Event) error {
 	return c.canceler.Err()
 }
 
-func createUpdateOp(store *store, resource *resource, updates interface{}) (*updateOp, error) {
+func createUpdateOp(resource *resource, updates interface{}) (*updateOp, error) {
 	ts := time.Now()
 
 	resource.stateMutex.Lock()
 	defer resource.stateMutex.Unlock()
 
-	cursor := resource.pendingCursor
-	if resource.activeCursorOperations == 0 {
-		var tmp interface{}
-		typeconv.Convert(&tmp, cursor)
-		resource.pendingCursor = tmp
-		cursor = tmp
-	}
-	if err := typeconv.Convert(&cursor, updates); err != nil {
-		return nil, err
-	}
-	resource.pendingCursor = cursor
+	resource.pendingUpdate = updates
 
 	resource.Retain()
 	resource.activeCursorOperations++
-	return &updateOp{
-		resource:  resource,
-		store:     store,
-		timestamp: ts,
-		delta:     updates,
-	}, nil
+	return newUpdateOp(resource, ts, updates), nil
 }
 
 // done releases resources held by the last N updateOps.
 func (op *updateOp) done(n uint) {
 	op.resource.UpdatesReleaseN(n)
 	op.resource = nil
-	*op = updateOp{}
 }
 
 // Execute updates the persistent store with the scheduled changes and releases the resource.
-func (op *updateOp) Execute(n uint) {
+func (op *updateOp) Execute(store *store, n uint) {
 	resource := op.resource
 
 	resource.stateMutex.Lock()
@@ -135,8 +129,8 @@ func (op *updateOp) Execute(n uint) {
 	defer op.done(n)
 	resource.activeCursorOperations -= n
 	if resource.activeCursorOperations == 0 {
-		resource.cursor = resource.pendingCursor
-		resource.pendingCursor = nil
+		resource.cursor = resource.pendingCursor()
+		resource.pendingCursorValue = nil
 	} else {
 		typeconv.Convert(&resource.cursor, op.delta)
 	}
@@ -145,13 +139,12 @@ func (op *updateOp) Execute(n uint) {
 		resource.internalState.Updated = op.timestamp
 	}
 
-	err := op.store.persistentStore.Set(resource.key, resource.inSyncStateSnapshot())
+	err := store.persistentStore.Set(resource.key, resource.inSyncStateSnapshot())
 	if err != nil {
 		if !statestore.IsClosed(err) {
-			op.store.log.Errorf("Failed to update state in the registry for '%v'", resource.key)
+			store.log.Errorf("Failed to update state in the registry for '%v'", resource.key)
 		}
 	} else {
-		resource.internalInSync = true
 		resource.stored = true
 	}
 }

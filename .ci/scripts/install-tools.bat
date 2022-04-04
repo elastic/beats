@@ -16,21 +16,15 @@ SET PREVIOUS_USERPROFILE=%USERPROFILE%
 SET USERPROFILE=%OLD_USERPROFILE%
 IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.8
-    choco install python -y -r --no-progress --version 3.8.5
-    IF NOT ERRORLEVEL 0 (
-        exit /b 1
-    )
+    choco install python -y -r --no-progress --version 3.8.5 || exit /b 1
 )
 python --version
 where python
 
-where /q gcc
-IF ERRORLEVEL 1 (
+WHERE /q gcc
+IF %ERRORLEVEL% NEQ 0 (
     REM Install mingw 5.3.0
-    choco install mingw -y -r --no-progress --version 5.3.0
-    IF NOT ERRORLEVEL 0 (
-        exit /b 1
-    )
+    choco install mingw -y -r --no-progress --version 5.3.0 || exit /b 1
 )
 gcc --version
 where gcc

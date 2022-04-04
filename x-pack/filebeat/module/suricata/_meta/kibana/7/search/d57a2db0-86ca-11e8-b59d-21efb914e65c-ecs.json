@@ -1,0 +1,106 @@
+{
+    "attributes": {
+        "columns": [
+            "host.name",
+            "suricata.eve.stats.detect.alert",
+            "suricata.eve.stats.app_layer.flow.dns_udp",
+            "suricata.eve.stats.app_layer.flow.tls",
+            "suricata.eve.stats.app_layer.flow.http",
+            "suricata.eve.stats.app_layer.flow.ssh",
+            "suricata.eve.stats.tcp.sessions"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.kind",
+                            "negate": false,
+                            "params": {
+                                "query": "metric"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.kind": "metric"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "suricata"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "suricata",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Host Stats [Filebeat Suricata]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:53.687Z",
+    "version": "WzQ5MjEsMV0="
+}

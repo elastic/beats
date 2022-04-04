@@ -1,0 +1,202 @@
+{
+    "attributes": {
+        "description": "An overview of the transaction log of each database in a MSSQL instance",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "title": "Recovery size of transaction log",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_1",
+                "title": "Transaction log size since last checkpoint",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3",
+                    "w": 18,
+                    "x": 30,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_2",
+                "title": "Percentage of used space of transaction log",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 37
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_3",
+                "title": "Log space size since last backup",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_4",
+                "title": "Active size of transaction log",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_5",
+                "title": "Used space of transaction log",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "7",
+                    "w": 18,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_6",
+                "title": "Total log space usage",
+                "version": "7.0.0-alpha2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "8",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_7",
+                "version": "7.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat MSSQL] Transaction log ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "18d66970-1fb4-11e9-8a4d-eb34d2834f6b-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b-ecs",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "82bf9480-260b-11e9-a46a-471d2a76b305-ecs",
+            "name": "panel_7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:42.500Z",
+    "version": "WzQwNjcsMV0="
+}

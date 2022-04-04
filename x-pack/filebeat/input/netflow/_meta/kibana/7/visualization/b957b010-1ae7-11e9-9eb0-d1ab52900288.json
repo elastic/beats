@@ -1,0 +1,153 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "controlledBy": "1547791659064",
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "network.direction",
+                            "negate": false,
+                            "params": [
+                                "inbound",
+                                "outbound"
+                            ],
+                            "type": "phrases",
+                            "value": "inbound, outbound"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "network.direction": "inbound"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "network.direction": "outbound"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "controlledBy": "1547791714688",
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "flow.locality",
+                            "negate": false,
+                            "params": {
+                                "query": "public",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "public"
+                        },
+                        "query": {
+                            "match": {
+                                "flow.locality": {
+                                    "query": "public",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Flow Selectors [Filebeat Netflow]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "network.direction",
+                        "id": "1547791659064",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Network Direction",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "flow.locality",
+                        "id": "1547791714688",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Locality",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": false,
+                "useTimeFilter": false
+            },
+            "title": "Flow Selectors [Filebeat Netflow]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "b957b010-1ae7-11e9-9eb0-d1ab52900288",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-09-06T13:06:21.081Z",
+    "version": "WzUyNzMsMV0="
+}

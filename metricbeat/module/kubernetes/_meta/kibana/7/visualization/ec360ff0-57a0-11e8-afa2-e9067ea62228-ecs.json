@@ -1,0 +1,116 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "API Server Requests [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(159,5,0,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "lucene",
+                            "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
+                        },
+                        "formatter": "us,ms,2",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Avg response time",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.apiserver.request.latency.sum",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "kubernetes.apiserver.request.count",
+                                "id": "a2185e50-57a0-11e8-af57-a1d645d2b569",
+                                "type": "max"
+                            },
+                            {
+                                "id": "b09133d0-57a0-11e8-af57-a1d645d2b569",
+                                "script": "params.sum / params.count",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "b27c8910-57a0-11e8-af57-a1d645d2b569",
+                                        "name": "sum"
+                                    },
+                                    {
+                                        "field": "a2185e50-57a0-11e8-af57-a1d645d2b569",
+                                        "id": "b5fc8810-57a0-11e8-af57-a1d645d2b569",
+                                        "name": "count"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}} ms"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(22,165,165,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "c0019340-57a1-11e8-a049-ff54cef064a2",
+                        "label": "Requests rate",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.apiserver.request.count",
+                                "id": "c001ba50-57a1-11e8-a049-ff54cef064a2",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c001ba50-57a1-11e8-a049-ff54cef064a2",
+                                "id": "dc83b390-57a1-11e8-a049-ff54cef064a2",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "API Server Requests [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:35.256Z",
+    "version": "WzM5OTksMV0="
+}

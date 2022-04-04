@@ -40,6 +40,10 @@ shared_credential_file: {{ .shared_credential_file }}
 endpoint: {{ .endpoint }}
 {{ end }}
 
+{{ if .default_region }}
+default_region: {{ .default_region }}
+{{ end }}
+
 {{ if .access_key_id }}
 access_key_id: {{ .access_key_id }}
 {{ end }}
@@ -56,8 +60,16 @@ session_token: {{ .session_token }}
 role_arn: {{ .role_arn }}
 {{ end }}
 
+{{ if .proxy_url }}
+proxy_url: {{ .proxy_url }}
+{{ end }}
+
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
 processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.9.0
+        ecs.version: 1.12.0

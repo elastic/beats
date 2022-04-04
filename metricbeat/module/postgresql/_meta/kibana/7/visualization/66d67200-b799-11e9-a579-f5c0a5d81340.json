@@ -1,0 +1,147 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Rows Fetched/Returned [Metricbeat PostgreSQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "bec42b70-b798-11e9-af2f-3be5a91b64a6"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "cc80b5d0-b798-11e9-af2f-3be5a91b64a6"
+                    }
+                ],
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "ada89790-b798-11e9-af2f-3be5a91b64a6"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "a6981ed0-b798-11e9-a598-8baa89257193",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": 0,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "'0.0 a'",
+                        "id": "a6981ed1-b798-11e9-a598-8baa89257193",
+                        "label": "Rows Returned",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.rows.returned",
+                                "id": "a6981ed2-b798-11e9-a598-8baa89257193",
+                                "percentiles": [
+                                    {
+                                        "id": "b507cc90-b798-11e9-af2f-3be5a91b64a6",
+                                        "mode": "line",
+                                        "shade": 0.2,
+                                        "value": 50
+                                    }
+                                ],
+                                "type": "max"
+                            },
+                            {
+                                "field": "a6981ed2-b798-11e9-a598-8baa89257193",
+                                "id": "ed6f33d0-b8ff-11e9-8645-31d6a6d28728",
+                                "type": "derivative",
+                                "unit": "1"
+                            },
+                            {
+                                "field": "ed6f33d0-b8ff-11e9-8645-31d6a6d28728",
+                                "id": "f58b9e50-b8ff-11e9-8645-31d6a6d28728",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "a6981ed3-b798-11e9-a598-8baa89257193",
+                        "label": "Rows Fetched",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.rows.fetched",
+                                "id": "a6981ed4-b798-11e9-a598-8baa89257193",
+                                "type": "max"
+                            },
+                            {
+                                "field": "a6981ed4-b798-11e9-a598-8baa89257193",
+                                "id": "064737e0-b900-11e9-8645-31d6a6d28728",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "064737e0-b900-11e9-8645-31d6a6d28728",
+                                "id": "0fea1b50-b900-11e9-8645-31d6a6d28728",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Rows Fetched/Returned [Metricbeat PostgreSQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "66d67200-b799-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDUsMV0="
+}

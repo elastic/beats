@@ -9,103 +9,89 @@ import (
 	"errors"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestConfigValidationCase1(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":       "GET",
-		"http_request_body": map[string]interface{}{"test": "abc"},
-		"no_http_body":      true,
-		"url":               "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
-	}
+func TestProviderCanonical(t *testing.T) {
+	const (
+		a oAuth2Provider = "gOoGle"
+		b oAuth2Provider = "google"
+	)
+
+	assert.Equal(t, a.canonical(), b.canonical())
 }
 
-func TestConfigValidationCase2(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "GET",
-		"no_http_body": true,
-		"pagination":   map[string]interface{}{"extra_body_content": map[string]interface{}{"test": "abc"}},
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
-	}
+func TestGetProviderIsCanonical(t *testing.T) {
+	const expected oAuth2Provider = "google"
+
+	oauth2 := oAuth2Config{Provider: "GOogle"}
+	assert.Equal(t, expected, oauth2.getProvider())
 }
 
-func TestConfigValidationCase3(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "GET",
-		"no_http_body": true,
-		"pagination":   map[string]interface{}{"req_field": "abc"},
-		"url":          "localhost",
+func TestIsEnabled(t *testing.T) {
+	oauth2 := oAuth2Config{}
+	if !oauth2.isEnabled() {
+		t.Fatal("OAuth2 should be enabled by default")
 	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
-	}
+
+	enabled := false
+	oauth2.Enabled = &enabled
+
+	assert.False(t, oauth2.isEnabled())
+
+	enabled = true
+
+	assert.True(t, oauth2.isEnabled())
 }
 
-func TestConfigValidationCase4(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "req_field": "abc"},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
-	}
+func TestGetTokenURL(t *testing.T) {
+	const expected = "http://localhost"
+	oauth2 := oAuth2Config{TokenURL: "http://localhost"}
+	assert.Equal(t, expected, oauth2.getTokenURL())
 }
 
-func TestConfigValidationCase5(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "id_field": "abc"},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
-	}
+func TestGetTokenURLWithAzure(t *testing.T) {
+	const expectedWithoutTenantID = "http://localhost"
+	oauth2 := oAuth2Config{TokenURL: "http://localhost", Provider: "azure"}
+
+	assert.Equal(t, expectedWithoutTenantID, oauth2.getTokenURL())
+
+	oauth2.TokenURL = ""
+	oauth2.AzureTenantID = "a_tenant_id"
+	const expectedWithTenantID = "https://login.microsoftonline.com/a_tenant_id/oauth2/v2.0/token"
+
+	assert.Equal(t, expectedWithTenantID, oauth2.getTokenURL())
 }
 
-func TestConfigValidationCase6(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "extra_body_content": map[string]interface{}{"test": "abc"}},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
-	}
+func TestGetEndpointParams(t *testing.T) {
+	expected := map[string][]string{"foo": {"bar"}}
+	oauth2 := oAuth2Config{EndpointParams: map[string][]string{"foo": {"bar"}}}
+	assert.Equal(t, expected, oauth2.getEndpointParams())
 }
 
-func TestConfigValidationCase7(t *testing.T) {
+func TestGetEndpointParamsWithAzure(t *testing.T) {
+	expectedWithoutResource := map[string][]string{"foo": {"bar"}}
+	oauth2 := oAuth2Config{Provider: "azure", EndpointParams: map[string][]string{"foo": {"bar"}}}
+
+	assert.Equal(t, expectedWithoutResource, oauth2.getEndpointParams())
+
+	oauth2.AzureResource = "baz"
+	expectedWithResource := map[string][]string{"foo": {"bar"}, "resource": {"baz"}}
+
+	assert.Equal(t, expectedWithResource, oauth2.getEndpointParams())
+}
+
+func TestConfigFailsWithInvalidMethod(t *testing.T) {
 	m := map[string]interface{}{
-		"http_method":  "DELETE",
-		"no_http_body": true,
-		"url":          "localhost",
+		"request.method": "DELETE",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
+	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
 	}
@@ -113,12 +99,12 @@ func TestConfigValidationCase7(t *testing.T) {
 
 func TestConfigMustFailWithInvalidURL(t *testing.T) {
 	m := map[string]interface{}{
-		"url": "::invalid::",
+		"request.url": "::invalid::",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := newDefaultConfig()
+	conf := defaultConfig()
 	err := cfg.Unpack(&conf)
-	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'url'`)
+	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'request.url'`)
 }
 
 func TestConfigOauth2Validation(t *testing.T) {
@@ -130,25 +116,26 @@ func TestConfigOauth2Validation(t *testing.T) {
 		teardown    func()
 	}{
 		{
-			name:        "can't set oauth2 and api_key together",
-			expectedErr: "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config",
+			name:        "can't set oauth2 and basic auth together",
+			expectedErr: "only one kind of auth can be enabled accessing 'auth'",
 			input: map[string]interface{}{
-				"api_key": "an_api_key",
-				"oauth2": map[string]interface{}{
+				"auth.basic.user":     "user",
+				"auth.basic.password": "pass",
+				"auth.oauth2": map[string]interface{}{
 					"token_url": "localhost",
 					"client": map[string]interface{}{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
 				},
-				"url": "localhost",
 			},
 		},
 		{
-			name: "can set oauth2 and api_key together if oauth2 is disabled",
+			name: "can set oauth2 and basic auth together if oauth2 is disabled",
 			input: map[string]interface{}{
-				"api_key": "an_api_key",
-				"oauth2": map[string]interface{}{
+				"auth.basic.user":     "user",
+				"auth.basic.password": "pass",
+				"auth.oauth2": map[string]interface{}{
 					"enabled":   false,
 					"token_url": "localhost",
 					"client": map[string]interface{}{
@@ -156,79 +143,100 @@ func TestConfigOauth2Validation(t *testing.T) {
 						"secret": "a_client_secret",
 					},
 				},
-				"url": "localhost",
 			},
 		},
 		{
-			name:        "can't set oauth2 and authentication_scheme",
-			expectedErr: "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config",
+			name:        "token_url and client credentials must be set",
+			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"authentication_scheme": "a_scheme",
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{},
+			},
+		},
+		{
+			name: "if user and password is set oauth2 must use user-password authentication",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"user":      "a_client_user",
+					"password":  "a_client_password",
 					"token_url": "localhost",
 					"client": map[string]interface{}{
 						"id":     "a_client_id",
 						"secret": "a_client_secret",
 					},
 				},
-				"url": "localhost",
 			},
 		},
 		{
-			name:        "token_url and client credentials must be set",
-			expectedErr: "invalid configuration: both token_url and client credentials must be provided accessing 'oauth2'",
+			name:        "if user is set password credentials must be set for user-password authentication",
+			expectedErr: "both user and password credentials must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{},
-				"url":    "localhost",
+				"auth.oauth2": map[string]interface{}{
+					"user":      "a_client_user",
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+			},
+		},
+		{
+			name:        "if password is set user credentials must be set for user-password authentication",
+			expectedErr: "both user and password credentials must be provided accessing 'auth.oauth2'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"password":  "a_client_password",
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
 			},
 		},
 		{
 			name:        "must fail with an unknown provider",
-			expectedErr: "invalid configuration: unknown provider \"unknown\" accessing 'oauth2'",
+			expectedErr: "unknown provider \"unknown\" accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "unknown",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "azure must have either tenant_id or token_url",
-			expectedErr: "invalid configuration: at least one of token_url or tenant_id must be provided accessing 'oauth2'",
+			expectedErr: "at least one of token_url or tenant_id must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "azure",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "azure must have only one of token_url and tenant_id",
-			expectedErr: "invalid configuration: only one of token_url and tenant_id can be used accessing 'oauth2'",
+			expectedErr: "only one of token_url and tenant_id can be used accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":        "azure",
 					"azure.tenant_id": "a_tenant_id",
 					"token_url":       "localhost",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "azure must have client credentials set",
-			expectedErr: "invalid configuration: client credentials must be provided accessing 'oauth2'",
+			expectedErr: "client credentials must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":        "azure",
 					"azure.tenant_id": "a_tenant_id",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name: "azure config is valid",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "azure",
 					"azure": map[string]interface{}{
 						"tenant_id": "a_tenant_id",
@@ -236,14 +244,13 @@ func TestConfigOauth2Validation(t *testing.T) {
 					"client.id":     "a_client_id",
 					"client.secret": "a_client_secret",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "google can't have token_url or client credentials set",
-			expectedErr: "invalid configuration: none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'oauth2'",
+			expectedErr: "none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "google",
 					"azure": map[string]interface{}{
 						"tenant_id": "a_tenant_id",
@@ -252,17 +259,15 @@ func TestConfigOauth2Validation(t *testing.T) {
 					"client.secret": "a_client_secret",
 					"token_url":     "localhost",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "google must fail if no ADC available",
-			expectedErr: "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'",
+			expectedErr: "no authentication credentials were configured or detected (ADC) accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "google",
 				},
-				"url": "localhost",
 			},
 			setup: func() {
 				// we change the default function to force a failure
@@ -274,60 +279,55 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name:        "google must fail if credentials file not found",
-			expectedErr: "invalid configuration: the file \"./wrong\" cannot be found accessing 'oauth2'",
+			expectedErr: "the file \"./wrong\" cannot be found accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":                "google",
 					"google.credentials_file": "./wrong",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "google must fail if ADC is wrongly set",
-			expectedErr: "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'",
+			expectedErr: "no authentication credentials were configured or detected (ADC) accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "google",
 				},
-				"url": "localhost",
 			},
 			setup: func() { os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./wrong") },
 		},
 		{
 			name: "google must work if ADC is set up",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "google",
 				},
-				"url": "localhost",
 			},
 			setup: func() { os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./testdata/credentials.json") },
 		},
 		{
 			name: "google must work if credentials_file is correct",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":                "google",
 					"google.credentials_file": "./testdata/credentials.json",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name: "google must work if jwt_file is correct",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":        "google",
 					"google.jwt_file": "./testdata/credentials.json",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name: "google must work if credentials_json is correct",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider": "google",
 					"google.credentials_json": `{
 						"type":           "service_account",
@@ -337,67 +337,47 @@ func TestConfigOauth2Validation(t *testing.T) {
 						"client_id":      "0"
 					}`,
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "google must fail if credentials_json is not a valid JSON",
-			expectedErr: "the field can't be converted to valid JSON accessing 'oauth2.google.credentials_json'",
+			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.google.credentials_json'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":                "google",
 					"google.credentials_json": `invalid`,
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name:        "google must fail if the provided credentials file is not a valid JSON",
-			expectedErr: "invalid configuration: the file \"./testdata/invalid_credentials.json\" does not contain valid JSON accessing 'oauth2'",
+			expectedErr: "the file \"./testdata/invalid_credentials.json\" does not contain valid JSON accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":                "google",
 					"google.credentials_file": "./testdata/invalid_credentials.json",
 				},
-				"url": "localhost",
-			},
-		},
-		{
-			name:        "date_cursor.date_format will fail if invalid",
-			expectedErr: "invalid configuration: date_format is not a valid date layout accessing 'date_cursor'",
-			input: map[string]interface{}{
-				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo", "date_format": "1234"},
-				"url":         "localhost",
-			},
-		},
-		{
-			name: "date_cursor must work with a valid date_format",
-			input: map[string]interface{}{
-				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo", "date_format": time.RFC3339},
-				"url":         "localhost",
 			},
 		},
 		{
 			name:        "google must fail if the delegated_account is set without jwt_file",
-			expectedErr: "invalid configuration: google.delegated_account can only be provided with a jwt_file accessing 'oauth2'",
+			expectedErr: "google.delegated_account can only be provided with a jwt_file accessing 'auth.oauth2'",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":                 "google",
 					"google.credentials_file":  "./testdata/credentials.json",
 					"google.delegated_account": "delegated@account.com",
 				},
-				"url": "localhost",
 			},
 		},
 		{
 			name: "google must work with delegated_account and a valid jwt_file",
 			input: map[string]interface{}{
-				"oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
 					"provider":                 "google",
 					"google.jwt_file":          "./testdata/credentials.json",
 					"google.delegated_account": "delegated@account.com",
 				},
-				"url": "localhost",
 			},
 		},
 	}
@@ -413,8 +393,9 @@ func TestConfigOauth2Validation(t *testing.T) {
 				defer c.teardown()
 			}
 
+			c.input["request.url"] = "localhost"
 			cfg := common.MustNewConfigFrom(c.input)
-			conf := newDefaultConfig()
+			conf := defaultConfig()
 			err := cfg.Unpack(&conf)
 
 			switch {
@@ -430,4 +411,26 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCursorEntryConfig(t *testing.T) {
+	in := map[string]interface{}{
+		"entry1": map[string]interface{}{
+			"ignore_empty_value": true,
+		},
+		"entry2": map[string]interface{}{
+			"ignore_empty_value": false,
+		},
+		"entry3": map[string]interface{}{
+			"ignore_empty_value": nil,
+		},
+		"entry4": map[string]interface{}{},
+	}
+	cfg := common.MustNewConfigFrom(in)
+	conf := cursorConfig{}
+	require.NoError(t, cfg.Unpack(&conf))
+	assert.True(t, conf["entry1"].mustIgnoreEmptyValue())
+	assert.False(t, conf["entry2"].mustIgnoreEmptyValue())
+	assert.True(t, conf["entry3"].mustIgnoreEmptyValue())
+	assert.True(t, conf["entry4"].mustIgnoreEmptyValue())
 }

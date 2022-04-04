@@ -80,7 +80,7 @@ metricbeat.modules:
   processes: ['.*']
 
   # Configure the mount point of the host’s filesystem for use in monitoring a host from within a container
-  #system.hostfs: "/hostfs"
+  #hostfs: "/hostfs"
 
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
@@ -182,15 +182,6 @@ metricbeat.modules:
 
   # Password of hosts. Empty by default
   #password: password
-
-#------------------------------ App Search Module ------------------------------
-- module: appsearch
-  metricsets: ["stats"]
-  enabled: true
-  period: 10s
-  hosts: ["http://localhost:3002"]
-  #username: "elastic"
-  #password: "changeme"
 
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
@@ -436,6 +427,20 @@ metricbeat.modules:
   hosts: ["localhost:8500"]
 
 
+#------------------------------ Containerd Module ------------------------------
+- module: containerd
+  metricsets: ["cpu", "memory", "blkio"]
+  period: 10s
+  # containerd metrics endpoint is configured in /etc/containerd/config.toml
+  # Metrics endpoint does not listen by default
+  # https://github.com/containerd/containerd/blob/main/docs/man/containerd-config.toml.5.md
+  hosts: ["localhost:1338"]
+  # if set to true, cpu and memory usage percentages will be calculated. Default is true
+  calcpct.cpu: true
+  calcpct.memory: true
+  #metrics_path: "v1/metrics"
+
+
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   metricsets: ["stats"]
@@ -475,6 +480,12 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Skip metrics for certain device major numbers in docker/diskio. 
+  # Necessary on systems with software RAID, device mappers, 
+  # or other configurations where virtual disks will sum metrics from other disks.
+  # By default, it will skip devices with major numbers 9 or 253.
+  #skip_major: []
+
   # If set to true, collects metrics per core.
   #cpu.cores: true
 
@@ -513,6 +524,15 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
+#-------------------------- Enterprise Search Module --------------------------
+- module: enterprisesearch
+  metricsets: ["health", "stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  #username: "user"
+  #password: "secret"
+
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
@@ -539,6 +559,8 @@ metricbeat.modules:
   metricsets:
     - pubsub
     - loadbalancing
+    - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -568,6 +590,14 @@ metricbeat.modules:
         - "instance/cpu/usage_time"
         - "instance/cpu/utilization"
         - "instance/uptime"
+
+- module: gcp
+  metricsets:
+    - gke
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
 
 - module: gcp
   metricsets:
@@ -682,49 +712,49 @@ metricbeat.modules:
  # application_pool.name: []
 
 #-------------------------------- Istio Module --------------------------------
-# Istio mesh. To collect all Mixer-generated metrics
+# Istio mesh. To collect all Mixer-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["mesh"]
   period: 10s
   # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:42422"]
 
-# Istio mixer. To monitor Mixer itself.
+# Istio mixer. To monitor Mixer itself. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["mixer"]
   period: 10s
   # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio galley. To collect all Galley-generated metrics
+# Istio galley. To collect all Galley-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["galley"]
   period: 10s
   # use istio-galley.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio pilot. To collect all Pilot-generated metrics.
+# Istio pilot. To collect all Pilot-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["pilot"]
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio citadel. To collect all Citadel-generated metrics.
+# Istio citadel. To collect all Citadel-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["citadel"]
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio istiod to monitor the Istio Daemon for versions after 1.5 of Istio.
+# Istio istiod to monitor the Istio Daemon for versions of Istio after 1.5.
 - module: istio
   metricsets: ['istiod']
   period: 10s
   # use istiod.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ['localhost:15014']
 
-# Istio proxy to monitor Envoy sidecars for versions after 1.5 of Istio.
+# Istio proxy to monitor Envoy sidecars for versions of Istio after 1.5.
 - module: istio
   metricsets: ['proxy']
   period: 10s
@@ -854,10 +884,25 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  #   cronjob: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -884,10 +929,49 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Set the namespace to watch for resources
+  #namespace: staging
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  #   cronjob: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
+
+# Kubernetes Events
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - event
+  period: 10s
+  # Skip events older than Metricbeat's statup time is enabled by default.
+  # Setting to false the skip_older setting will stop filtering older events.
+  # This setting is also useful went Event's timestamps are not populated properly.
+  #skip_older: false
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
+  #kube_config: ~/.kube/config
+  # Set the namespace to watch for events
+  #namespace: staging
+  # Set the sync period of the watchers
+  #sync_period: 10m
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # Kubernetes API server
 # (when running metricbeat as a deployment)
@@ -900,8 +984,6 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
-
-
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -952,8 +1034,11 @@ metricbeat.modules:
     # - ksm
     # - conntrack
     # - iostat
+    # - pressure
+    # - rapl
   enabled: true
   #hostfs: /hostfs
+  #rapl.use_msr_safe: false
 
 
 #------------------------------- Logstash Module -------------------------------
@@ -1480,14 +1565,14 @@ metricbeat.modules:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-  
+
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-    
+
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
@@ -1515,66 +1600,6 @@ metricbeat.modules:
     # error. If the queue encounters repeated errors, it will double the
     # length of its retry interval each time, up to this maximum.
     #max_retry_interval: 30s
-
-  # The spool queue will store events in a local spool file, before
-  # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
-  #
-  # The spool file is a circular buffer, which blocks once the file/buffer is full.
-  # Events are put into a write buffer and flushed once the write buffer
-  # is full or the flush_timeout is triggered.
-  # Once ACKed by the output, events are removed immediately from the queue,
-  # making space for new events to be persisted.
-  #spool:
-    # The file namespace configures the file path and the file creation settings.
-    # Once the file exists, the `size`, `page_size` and `prealloc` settings
-    # will have no more effect.
-    #file:
-      # Location of spool file. The default value is ${path.data}/spool.dat.
-      #path: "${path.data}/spool.dat"
-
-      # Configure file permissions if file is created. The default value is 0600.
-      #permissions: 0600
-
-      # File size hint. The spool blocks, once this limit is reached. The default value is 100 MiB.
-      #size: 100MiB
-
-      # The files page size. A file is split into multiple pages of the same size. The default value is 4KiB.
-      #page_size: 4KiB
-
-      # If prealloc is set, the required space for the file is reserved using
-      # truncate. The default value is true.
-      #prealloc: true
-
-    # Spool writer settings
-    # Events are serialized into a write buffer. The write buffer is flushed if:
-    # - The buffer limit has been reached.
-    # - The configured limit of buffered events is reached.
-    # - The flush timeout is triggered.
-    #write:
-      # Sets the write buffer size.
-      #buffer_size: 1MiB
-
-      # Maximum duration after which events are flushed if the write buffer
-      # is not full yet. The default value is 1s.
-      #flush.timeout: 1s
-
-      # Number of maximum buffered events. The write buffer is flushed once the
-      # limit is reached.
-      #flush.events: 16384
-
-      # Configure the on-disk event encoding. The encoding can be changed
-      # between restarts.
-      # Valid encodings are: json, ubjson, and cbor.
-      #codec: cbor
-    #read:
-      # Reader flush timeout, waiting for more events to become available, so
-      # to fill a complete batch as required by the outputs.
-      # If flush_timeout is 0, all available events are forwarded to the
-      # outputs immediately.
-      # The default value is 0s.
-      #flush.timeout: 0s
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
@@ -1647,7 +1672,7 @@ metricbeat.modules:
 #  - add_docker_metadata:
 #      host: "unix:///var/run/docker.sock"
 #      match_fields: ["system.process.cgroup.id"]
-#      match_pids: ["process.pid", "process.ppid"]
+#      match_pids: ["process.pid", "process.parent.pid"]
 #      match_source: true
 #      match_source_index: 4
 #      match_short_id: false
@@ -1793,12 +1818,11 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "metricbeat" plus date
-  # and generates [metricbeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "metricbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[agent.version]}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -1838,6 +1862,10 @@ output.elasticsearch:
 
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
+
+  # metricbeat expects Elasticsearch to be the same version or newer than the Beat.
+  # Lift the version restriction by setting allow_older_versions to true.
+  #allow_older_versions: false
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -1891,6 +1919,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -2023,6 +2058,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2225,6 +2267,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -2389,6 +2438,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
 
 # -------------------------------- File Output ---------------------------------
 #output.file:
@@ -2408,7 +2464,7 @@ output.elasticsearch:
   #path: "/tmp/metricbeat"
 
   # Name of the generated files. The default is `metricbeat` and it generates
-  # files: `metricbeat`, `metricbeat.1`, `metricbeat.2`, etc.
+  # files: `metricbeat-{datetime}.ndjson`, `metricbeat-{datetime}-1.ndjson`, etc.
   #filename: metricbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -2426,6 +2482,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -2524,19 +2581,13 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Select the kind of index template. From Elasticsearch 7.8, it is possible to
-# use component templates. Available options: legacy, component, index.
-# By default metricbeat uses the legacy index templates.
-#setup.template.type: legacy
-
 # Template name. By default the template name is "metricbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "metricbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
-# The first part is the version of the beat and then -* is used to match all daily indices.
+# Template pattern. By default the template pattern is "metricbeat-%{[agent.version]}" to apply to the default index settings.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "metricbeat-%{[agent.version]}-*"
+#setup.template.pattern: "metricbeat-%{[agent.version]}"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -2578,22 +2629,11 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
-# Enable ILM support. Valid values are true, false, and auto. When set to auto
-# (the default), the Beat uses index lifecycle management when it connects to a
-# cluster that supports ILM; otherwise, it creates daily indices.
-#setup.ilm.enabled: auto
-
-# Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'metricbeat-%{[agent.version]}'.
-#setup.ilm.rollover_alias: 'metricbeat'
-
-# Set the rollover index pattern. The default is "%{now/d}-000001".
-#setup.ilm.pattern: "{now/d}-000001"
+# Enable ILM support. Valid values are true, false.
+#setup.ilm.enabled: true
 
 # Set the lifecycle policy name. The default policy name is
 # 'beatname'.
@@ -2691,6 +2731,13 @@ setup.kibana:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
 
 # ================================== Logging ===================================
 
@@ -2724,6 +2771,11 @@ setup.kibana:
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
 
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
+
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
@@ -2756,19 +2808,6 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
-
-  # Rotated files are either suffixed with a number e.g. metricbeat.1 when
-  # renamed during rotation. Or when set to date, the date is added to
-  # the end of the file. On rotation a new file is created, older files are untouched.
-  #suffix: count
-
-# Set to true to log messages in JSON format.
-#logging.json: false
-
-# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
-# information. Recommended to use in combination with `logging.json=true`
-# Defaults to false.
-#logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring
@@ -2897,6 +2936,13 @@ logging.files:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -2953,6 +2999,10 @@ logging.files:
 # Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
 # `http.user`.
 #http.named_pipe.security_descriptor:
+
+# Defines if the HTTP pprof endpoints are enabled.
+# It is recommended that this is only enabled on localhost as these endpoints may leak data.
+#http.pprof.enabled: false
 
 # ============================== Process Security ==============================
 

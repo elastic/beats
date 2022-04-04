@@ -1,0 +1,520 @@
+{
+    "attributes": {
+        "description": "Group management activity.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "22",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "22",
+                "panelRefName": "panel_22",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "29",
+                    "w": 16,
+                    "x": 0,
+                    "y": 68
+                },
+                "panelIndex": "29",
+                "panelRefName": "panel_29",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "30",
+                    "w": 9,
+                    "x": 18,
+                    "y": 48
+                },
+                "panelIndex": "30",
+                "panelRefName": "panel_30",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "31",
+                    "w": 9,
+                    "x": 0,
+                    "y": 48
+                },
+                "panelIndex": "31",
+                "panelRefName": "panel_31",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "32",
+                    "w": 9,
+                    "x": 9,
+                    "y": 48
+                },
+                "panelIndex": "32",
+                "panelRefName": "panel_32",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "33",
+                    "w": 17,
+                    "x": 16,
+                    "y": 68
+                },
+                "panelIndex": "33",
+                "panelRefName": "panel_33",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "34",
+                    "w": 15,
+                    "x": 33,
+                    "y": 68
+                },
+                "panelIndex": "34",
+                "panelRefName": "panel_34",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "36",
+                    "w": 9,
+                    "x": 0,
+                    "y": 55
+                },
+                "panelIndex": "36",
+                "panelRefName": "panel_36",
+                "title": "Group Creation Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "37",
+                    "w": 9,
+                    "x": 9,
+                    "y": 55
+                },
+                "panelIndex": "37",
+                "panelRefName": "panel_37",
+                "title": "Group Changes Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "38",
+                    "w": 9,
+                    "x": 18,
+                    "y": 55
+                },
+                "panelIndex": "38",
+                "panelRefName": "panel_38",
+                "title": "Group Deletion Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "39",
+                    "w": 16,
+                    "x": 0,
+                    "y": 75
+                },
+                "panelIndex": "39",
+                "panelRefName": "panel_39",
+                "title": "Users Added to Group  Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "40",
+                    "w": 17,
+                    "x": 16,
+                    "y": 75
+                },
+                "panelIndex": "40",
+                "panelRefName": "panel_40",
+                "title": "Users Removed From Group Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "42",
+                    "w": 15,
+                    "x": 33,
+                    "y": 75
+                },
+                "panelIndex": "42",
+                "panelRefName": "panel_42",
+                "title": "Group Enumeration - Table [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "43",
+                    "w": 21,
+                    "x": 27,
+                    "y": 48
+                },
+                "panelIndex": "43",
+                "panelRefName": "panel_43",
+                "title": "Logon Details  [Winlogbeat Security]",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 22,
+                    "i": "45",
+                    "w": 48,
+                    "x": 0,
+                    "y": 89
+                },
+                "panelIndex": "45",
+                "panelRefName": "panel_45",
+                "title": "Group Management Operations Details [Winlogbeat Security]",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "added-group-account": "#0A437C",
+                        "added-member-to-group": "#1F78C1",
+                        "deleted-group-account": "#5195CE",
+                        "modified-group-account": "#052B51",
+                        "user-member-enumerated": "#447EBC"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "added-group-account": "#0A437C",
+                            "added-member-to-group": "#1F78C1",
+                            "deleted-group-account": "#82B5D8",
+                            "modified-group-account": "#052B51",
+                            "user-member-enumerated": "#447EBC"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "3f7e277d-09d1-4a79-bc17-bc5da5a7e290",
+                    "w": 20,
+                    "x": 0,
+                    "y": 7
+                },
+                "panelIndex": "3f7e277d-09d1-4a79-bc17-bc5da5a7e290",
+                "panelRefName": "panel_3f7e277d-09d1-4a79-bc17-bc5da5a7e290",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "8cda9d6a-096f-41a5-86e6-09dd1f6b9c98",
+                    "w": 16,
+                    "x": 32,
+                    "y": 7
+                },
+                "panelIndex": "8cda9d6a-096f-41a5-86e6-09dd1f6b9c98",
+                "panelRefName": "panel_8cda9d6a-096f-41a5-86e6-09dd1f6b9c98",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "74edddd5-2dc5-41b8-b4f2-bf9c95218f1b",
+                    "w": 12,
+                    "x": 20,
+                    "y": 7
+                },
+                "panelIndex": "74edddd5-2dc5-41b8-b4f2-bf9c95218f1b",
+                "panelRefName": "panel_74edddd5-2dc5-41b8-b4f2-bf9c95218f1b",
+                "title": "Group Management Events - Event Actions - Table [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "33cef054-615a-49cb-bb2e-eb55fab96ae5",
+                    "w": 27,
+                    "x": 0,
+                    "y": 27
+                },
+                "panelIndex": "33cef054-615a-49cb-bb2e-eb55fab96ae5",
+                "panelRefName": "panel_33cef054-615a-49cb-bb2e-eb55fab96ae5",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "added-group-account": "#1F78C1",
+                        "added-member-to-group": "#0A437C",
+                        "deleted-group-account": "#5195CE",
+                        "modified-group-account": "#0A50A1",
+                        "type-changed-group-account": "#82B5D8",
+                        "user-member-enumerated": "#447EBC"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "added-group-account": "#1F78C1",
+                            "added-member-to-group": "#0A437C",
+                            "deleted-group-account": "#5195CE",
+                            "modified-group-account": "#0A50A1",
+                            "removed-member-from-group": "#BADFF4",
+                            "type-changed-group-account": "#82B5D8",
+                            "user-member-enumerated": "#447EBC"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "e0d495aa-f897-403f-815b-6116fae330b7",
+                    "w": 21,
+                    "x": 27,
+                    "y": 27
+                },
+                "panelIndex": "e0d495aa-f897-403f-815b-6116fae330b7",
+                "panelRefName": "panel_e0d495aa-f897-403f-815b-6116fae330b7",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "663e0493-2070-407b-9d00-079915cce7e7",
+                    "w": 32,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "663e0493-2070-407b-9d00-079915cce7e7",
+                "panelRefName": "panel_663e0493-2070-407b-9d00-079915cce7e7",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Winlogbeat Security] Group Management Events",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "bb858830-f412-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+            "name": "22:panel_22",
+            "type": "visualization"
+        },
+        {
+            "id": "ffebe440-f419-11e9-8405-516218e3d268",
+            "name": "29:panel_29",
+            "type": "visualization"
+        },
+        {
+            "id": "e22c6f40-f498-11e9-8405-516218e3d268",
+            "name": "30:panel_30",
+            "type": "visualization"
+        },
+        {
+            "id": "ee292bc0-f499-11e9-8405-516218e3d268",
+            "name": "31:panel_31",
+            "type": "visualization"
+        },
+        {
+            "id": "400b63e0-f49a-11e9-8405-516218e3d268",
+            "name": "32:panel_32",
+            "type": "visualization"
+        },
+        {
+            "id": "a5f664c0-f49a-11e9-8405-516218e3d268",
+            "name": "33:panel_33",
+            "type": "visualization"
+        },
+        {
+            "id": "546febc0-f49b-11e9-8405-516218e3d268",
+            "name": "34:panel_34",
+            "type": "visualization"
+        },
+        {
+            "id": "98884120-f49d-11e9-8405-516218e3d268",
+            "name": "36:panel_36",
+            "type": "visualization"
+        },
+        {
+            "id": "9e534190-f49d-11e9-8405-516218e3d268",
+            "name": "37:panel_37",
+            "type": "visualization"
+        },
+        {
+            "id": "bb9cf7a0-f49d-11e9-8405-516218e3d268",
+            "name": "38:panel_38",
+            "type": "visualization"
+        },
+        {
+            "id": "ce867840-f49e-11e9-8405-516218e3d268",
+            "name": "39:panel_39",
+            "type": "visualization"
+        },
+        {
+            "id": "fee83900-f49f-11e9-8405-516218e3d268",
+            "name": "40:panel_40",
+            "type": "visualization"
+        },
+        {
+            "id": "bc165210-f4b8-11e9-8405-516218e3d268",
+            "name": "42:panel_42",
+            "type": "visualization"
+        },
+        {
+            "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+            "name": "43:panel_43",
+            "type": "search"
+        },
+        {
+            "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
+            "name": "45:panel_45",
+            "type": "search"
+        },
+        {
+            "id": "b89b0c90-9b41-11ea-87e4-49f31ec44891",
+            "name": "3f7e277d-09d1-4a79-bc17-bc5da5a7e290:panel_3f7e277d-09d1-4a79-bc17-bc5da5a7e290",
+            "type": "visualization"
+        },
+        {
+            "id": "58fb9480-9b46-11ea-87e4-49f31ec44891",
+            "name": "8cda9d6a-096f-41a5-86e6-09dd1f6b9c98:panel_8cda9d6a-096f-41a5-86e6-09dd1f6b9c98",
+            "type": "visualization"
+        },
+        {
+            "id": "33462600-9b47-11ea-87e4-49f31ec44891",
+            "name": "74edddd5-2dc5-41b8-b4f2-bf9c95218f1b:panel_74edddd5-2dc5-41b8-b4f2-bf9c95218f1b",
+            "type": "visualization"
+        },
+        {
+            "id": "e20c02d0-9b48-11ea-87e4-49f31ec44891",
+            "name": "33cef054-615a-49cb-bb2e-eb55fab96ae5:panel_33cef054-615a-49cb-bb2e-eb55fab96ae5",
+            "type": "visualization"
+        },
+        {
+            "id": "7de2e3f0-9b4d-11ea-87e4-49f31ec44891",
+            "name": "e0d495aa-f897-403f-815b-6116fae330b7:panel_e0d495aa-f897-403f-815b-6116fae330b7",
+            "type": "visualization"
+        },
+        {
+            "id": "a3c3f350-9b6d-11ea-87e4-49f31ec44891",
+            "name": "663e0493-2070-407b-9d00-079915cce7e7:panel_663e0493-2070-407b-9d00-079915cce7e7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-11T13:18:56.323Z",
+    "version": "WzIyMjcsMl0="
+}

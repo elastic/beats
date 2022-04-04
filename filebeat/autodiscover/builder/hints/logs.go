@@ -44,6 +44,7 @@ const (
 	excludeLines = "exclude_lines"
 	processors   = "processors"
 	json         = "json"
+	pipeline     = "pipeline"
 )
 
 // validModuleNames to sanitize user input
@@ -121,6 +122,10 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*comm
 			tempCfg.Put(processors, procs)
 		}
 
+		if pip := l.getPipeline(h); len(pip) != 0 {
+			tempCfg.Put(pipeline, pip)
+		}
+
 		if jsonOpts := l.getJSONOptions(h); len(jsonOpts) != 0 {
 			tempCfg.Put(json, jsonOpts)
 		}
@@ -187,6 +192,10 @@ func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
 	return builder.GetProcessors(hints, l.config.Key)
 }
 
+func (l *logHints) getPipeline(hints common.MapStr) string {
+	return builder.GetHintString(hints, l.config.Key, "pipeline")
+}
+
 func (l *logHints) getJSONOptions(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, l.config.Key, json)
 }
@@ -201,7 +210,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 	var configured bool
 	filesets := make(map[string]*filesetConfig)
 
-	moduleFilesets, err := l.registry.ModuleFilesets(module)
+	moduleFilesets, err := l.registry.ModuleAvailableFilesets(module)
 	if err != nil {
 		logp.Err("Error retrieving module filesets: %+v", err)
 		return nil

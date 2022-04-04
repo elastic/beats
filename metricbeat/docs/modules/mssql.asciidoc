@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: mssql
+
 [[metricbeat-module-mssql]]
 [role="xpack"]
 == MSSQL module
@@ -12,6 +14,21 @@ This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft
 === Compatibility
 
 The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-linux/[2017 GA] version under Linux
+
+[float]
+=== Permission/Access required for tables
+
+1.`transaction_log` :
+
+* sys.databases
+* sys.dm_db_log_space_usage
+* sys.dm_db_log_stats(DB_ID)
+
+2.`performance` :
+
+* sys.dm_os_performance_counters
+
+If you browse MSDN for above tables, you will find "Permissions" section which defines the permission needed, e.g https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-log-space-usage-transact-sql?view=sql-server-ver15[Permissions]
 
 [float]
 === Metricsets

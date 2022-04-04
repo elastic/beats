@@ -1,0 +1,144 @@
+{
+    "attributes": {
+        "description": "Overview of Oracle Tablespaces",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 19,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Avg data file size by filename",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Tablespace Total Size",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 19,
+                    "x": 19,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Maximum data file size",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 10,
+                    "x": 38,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Ratio of used space in Tablespaces",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Ratio of used space in data files",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Oracle] Tablespaces",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "862e2c20-9bf0-11e9-a61b-f742ed613c57",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "c92efe60-9bef-11e9-a61b-f742ed613c57",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "05acae50-9bf0-11e9-a61b-f742ed613c57",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "4c051a90-9bf0-11e9-a61b-f742ed613c57",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "981779d0-9bfc-11e9-a61b-f742ed613c57",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "072de430-9bfd-11e9-a61b-f742ed613c57",
+            "name": "5:panel_5",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:20.355Z",
+    "version": "WzMyNzYsMV0="
+}

@@ -18,7 +18,7 @@
       migration: true
     - name: ppid
       type: alias
-      path: process.ppid
+      path: process.parent.pid
       migration: true
     - name: pgid
       type: alias
@@ -148,6 +148,10 @@
             If there isn't a common path used by all cgroups this field will be
             absent.
 
+        - name: cgroups_version
+          type: long
+          description: The version of cgroups reported for the process
+
         - name: cpu
           type: group
           description: >
@@ -157,6 +161,8 @@
             divides the CPU time between cgroups based on weight. RT stands for
             real time scheduler which sets a maximum amount of CPU time that
             processes in the cgroup can consume during a given period.
+            In CPU under cgroups V2, the cgroup is merged with many of the metrics
+            from cpuacct. In addition, per-scheduler metrics are gone in V2.
 
           fields:
             - name: id
@@ -168,6 +174,40 @@
               description: >
                 Path to the cgroup relative to the cgroup subsystem's
                 mountpoint.
+
+            - name: stats
+              type: group
+              description: cgroupv2 stats
+              fields:
+                - name: usage.ns
+                  type: long
+                  description: cgroups v2 usage in nanoseconds
+                - name: usage.pct
+                  type: float
+                  description: cgroups v2 usage
+                - name: usage.norm.pct
+                  type: float
+                  description: cgroups v2 normalized usage
+
+                - name: user.ns
+                  type: long
+                  description: cgroups v2 cpu user time in nanoseconds
+                - name: user.pct
+                  type: float
+                  description: cgroups v2 cpu user time
+                - name: user.norm.pct
+                  type: float
+                  description: cgroups v2 normalized cpu user time
+
+                - name: system.ns
+                  type: long
+                  description: cgroups v2 system time in nanoseconds
+                - name: system.pct
+                  type: float
+                  description: cgroups v2 system time
+                - name: system.norm.pct
+                  type: float
+                  description: cgroups v2 normalized system time
 
             - name: cfs.period.us
               type: long
@@ -214,11 +254,59 @@
                 not allowed to run because they have exhausted all of the
                 available time as specified by their quota).
 
+            - name: stats.throttled.us
+              type: long
+              description: >
+                The total time duration (in microseconds) for which tasks in a
+                cgroup have been throttled, as reported by cgroupsv2
             - name: stats.throttled.ns
               type: long
               description: >
                 The total time duration (in nanoseconds) for which tasks in a
                 cgroup have been throttled.
+            - name: pressure
+              type: group
+              description: Pressure (resource contention) stats.
+              fields:
+                - name: some
+                  type: group
+                  description: Share of time in which at least some tasks are stalled on a given resource
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      format: percent
+                      description: total Some pressure time
+                - name: full
+                  type: group
+                  description: Share of time in which all non-idle tasks are stalled on a given resource simultaneously
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      description: total Full pressure time
 
         - name: cpuacct
           type: group
@@ -319,6 +407,43 @@
                 The number of times that the memory limit (mem.limit.bytes) was
                 reached.
 
+            - name: mem.low.bytes
+              type: long
+              format: bytes
+              description: memory low threshhold
+            - name: mem.high.bytes
+              type: long
+              format: bytes
+              description: memory high threshhold
+            - name: mem.max.bytes
+              type: long
+              format: bytes
+              description: memory max threshhold
+            
+            - name: mem.events
+              type: group
+              description: number of times the controller tripped a given usage level
+              fields:
+                - name: low
+                  type: long
+                  description: low threshold
+                - name: high
+                  type: long
+                  description: high threshold
+                - name: max
+                  type: long
+                  description: max threshold
+                - name: oom
+                  type: long
+                  description: oom threshold
+                - name: oom_kill
+                  type: long
+                  description: oom killer threshold
+                - name: fail
+                  type: long
+                  description: failed threshold
+
+
             - name: memsw.usage.bytes
               type: long
               format: bytes
@@ -340,11 +465,46 @@
                 The maximum amount for the sum of memory and swap usage
                 that tasks in the cgroup are allowed to use.
 
+            - name: memsw.low.bytes
+              type: long
+              format: bytes
+              description: memory low threshhold
+            - name: memsw.high.bytes
+              type: long
+              format: bytes
+              description: memory high threshhold
+            - name: memsw.max.bytes
+              type: long
+              format: bytes
+              description: memory max threshhold
+
             - name: memsw.failures
               type: long
               description: >
                 The number of times that the memory plus swap space limit
                 (memsw.limit.bytes) was reached.
+            - name: memsw.events
+              type: group
+              description: number of times the controller tripped a given usage level
+              fields:
+                - name: low
+                  type: long
+                  description: low threshold
+                - name: high
+                  type: long
+                  description: high threshold
+                - name: max
+                  type: long
+                  description: max threshold
+                - name: oom
+                  type: long
+                  description: oom threshold
+                - name: oom_kill
+                  type: long
+                  description: oom killer threshold
+                - name: fail
+                  type: long
+                  description: failed threshold
 
             - name: kmem.usage.bytes
               type: long
@@ -397,6 +557,13 @@
               description: >
                 The number of times that the memory limit (kmem_tcp.limit.bytes)
                 was reached.
+
+            - name: stats.*
+              type: object
+              description: detailed memory IO stats
+            - name: stats.*.bytes
+              type: object
+              description: detailed memory IO stats
 
             - name: stats.active_anon.bytes
               type: long
@@ -522,3 +689,67 @@
               description: >
                 Total number of I/O operations performed on all devices
                 by processes in the cgroup as seen by the throttling policy.
+        - name: io
+          type: group
+          description: cgroup V2 IO Metrics, replacing blkio.
+          fields:
+            - name: id
+              type: keyword
+              description: ID of the cgroup.
+
+            - name: path
+              type: keyword
+              description: >
+                Path to the cgroup relative to the cgroup subsystems mountpoint.
+            - name: stats.*
+              type: object
+              description: per-device IO usage stats
+            - name: stats.*.*
+              type: object
+            - name: stats.*.*.bytes
+              type: object
+              description: per-device IO usage stats
+            - name: stats.*.*.ios
+              type: object
+              description: per-device IO usage stats
+            - name: pressure
+              type: group
+              description: Pressure (resource contention) stats.
+              fields:
+                - name: full
+                  type: group
+                  description: Share of time in which at least some tasks are stalled on a given resource
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      description: total Some pressure time
+                - name: some
+                  type: group
+                  description: Share of time in which all tasks are stalled on a given resource
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      format: percent
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      description: total Some pressure time

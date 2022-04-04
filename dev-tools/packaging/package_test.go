@@ -23,6 +23,7 @@ package dev_tools
 import (
 	"archive/tar"
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
@@ -48,7 +49,7 @@ const (
 )
 
 var (
-	configFilePattern      = regexp.MustCompile(`.*beat\.yml$|apm-server\.yml|elastic-agent\.yml$`)
+	configFilePattern      = regexp.MustCompile(`/(\w+beat\.yml|apm-server\.yml|elastic-agent\.yml)$`)
 	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
 	modulesDDirPattern     = regexp.MustCompile(`modules.d/$`)
@@ -109,7 +110,7 @@ func TestDocker(t *testing.T) {
 // Sub-tests
 
 func checkRPM(t *testing.T, file string) {
-	p, err := readRPM(file)
+	p, rpmPkg, err := readRPM(file)
 	if err != nil {
 		t.Error(err)
 		return
@@ -127,6 +128,7 @@ func checkRPM(t *testing.T, file string) {
 	checkLicensesPresent(t, "/usr/share", p)
 	checkSystemdUnitPermissions(t, p)
 	ensureNoBuildIDLinks(t, p)
+	checkRPMDigestTypeSHA256(t, rpmPkg)
 }
 
 func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
@@ -168,7 +170,7 @@ func checkTar(t *testing.T, file string) {
 }
 
 func checkZip(t *testing.T, file string) {
-	p, err := readZip(file)
+	p, err := readZip(t, file, checkNpcapNotices)
 	if err != nil {
 		t.Error(err)
 		return
@@ -180,6 +182,49 @@ func checkZip(t *testing.T, file string) {
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
 	checkLicensesPresent(t, "", p)
+}
+
+const (
+	npcapSettings   = "Windows Npcap installation settings"
+	npcapGrant      = `Insecure.Com LLC \(“The Nmap Project”\) has granted Elasticsearch`
+	npcapLicense    = `Dependency : Npcap \(https://nmap.org/npcap/\)`
+	libpcapLicense  = `Dependency : Libpcap \(http://www.tcpdump.org/\)`
+	winpcapLicense  = `Dependency : Winpcap \(https://www.winpcap.org/\)`
+	radiotapLicense = `Dependency : ieee80211_radiotap.h Header File`
+)
+
+// This reflects the order that the licenses and notices appear in the relevant files.
+var npcapLicensePattern = regexp.MustCompile(
+	"(?s)" + npcapLicense +
+		".*" + libpcapLicense +
+		".*" + winpcapLicense +
+		".*" + radiotapLicense,
+)
+
+func checkNpcapNotices(pkg, file string, contents io.Reader) error {
+	if !strings.Contains(pkg, "packetbeat") {
+		return nil
+	}
+
+	wantNotices := strings.Contains(pkg, "windows") && !strings.Contains(pkg, "oss")
+
+	// If the packetbeat README.md is made to be generated
+	// conditionally then it should also be checked here.
+	pkg = filepath.Base(pkg)
+	file, err := filepath.Rel(pkg[:len(pkg)-len(filepath.Ext(pkg))], file)
+	if err != nil {
+		return err
+	}
+	switch file {
+	case "NOTICE.txt":
+		if npcapLicensePattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
+			if wantNotices {
+				return fmt.Errorf("Npcap license section not found in %s file in %s", file, pkg)
+			}
+			return fmt.Errorf("unexpected Npcap license section found in %s file in %s", file, pkg)
+		}
+	}
+	return nil
 }
 
 func checkDocker(t *testing.T, file string) {
@@ -478,6 +523,16 @@ func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
 	})
 }
 
+// checkRPMDigestTypeSHA256 verifies that the RPM contains sha256 digests.
+// https://github.com/elastic/beats/issues/23670
+func checkRPMDigestTypeSHA256(t *testing.T, rpmPkg *rpm.PackageFile) {
+	t.Run("rpm_digest_type_is_sha256", func(t *testing.T) {
+		if rpmPkg.ChecksumType() != "sha256" {
+			t.Errorf("expected SHA256 digest type but got %v", rpmPkg.ChecksumType())
+		}
+	})
+}
+
 // Helpers
 
 type packageFile struct {
@@ -507,10 +562,10 @@ func getFiles(t *testing.T, pattern *regexp.Regexp) []string {
 	return files
 }
 
-func readRPM(rpmFile string) (*packageFile, error) {
+func readRPM(rpmFile string) (*packageFile, *rpm.PackageFile, error) {
 	p, err := rpm.OpenPackageFile(rpmFile)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	contents := p.Files()
@@ -529,7 +584,7 @@ func readRPM(rpmFile string) (*packageFile, error) {
 		pf.Contents[file.Name()] = pe
 	}
 
-	return pf, nil
+	return pf, p, nil
 }
 
 // readDeb reads the data.tar.gz file from the .deb.
@@ -612,7 +667,11 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	return p, nil
 }
 
-func readZip(zipFile string) (*packageFile, error) {
+// inspector is a file contents inspector. It vets the contents of the file
+// within a package for a requirement and returns an error if it is not met.
+type inspector func(pkg, file string, contents io.Reader) error
+
+func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFile, error) {
 	r, err := zip.OpenReader(zipFile)
 	if err != nil {
 		return nil, err
@@ -624,6 +683,18 @@ func readZip(zipFile string) (*packageFile, error) {
 		p.Contents[f.Name] = packageEntry{
 			File: f.Name,
 			Mode: f.Mode(),
+		}
+		for _, inspect := range inspectors {
+			r, err := f.Open()
+			if err != nil {
+				t.Errorf("failed to open %s in %s: %v", f.Name, zipFile, err)
+				break
+			}
+			err = inspect(zipFile, f.Name, r)
+			if err != nil {
+				t.Error(err)
+			}
+			r.Close()
 		}
 	}
 
@@ -729,7 +800,6 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 	err = json.Unmarshal(data, &manifests)
 	if err != nil {
 		return nil, err
-
 	}
 
 	if len(manifests) != 1 {

@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: ibmmq
+
 [[metricbeat-module-ibmmq]]
 [role="xpack"]
 == IBM MQ module

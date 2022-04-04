@@ -26,6 +26,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/sha512"
+	"debug/elf"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -38,6 +39,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -233,6 +235,25 @@ func HaveKubectl() error {
 	return nil
 }
 
+// IsDarwinUniversal indicates whether ot not the darwin/universal should be
+// assembled. If both platforms darwin/adm64 and darwin/arm64 are listed, then
+// IsDarwinUniversal returns true.
+// Note: Platforms might be edited at different moments, therefore it's necessary
+// to perform this check on the fly.
+func IsDarwinUniversal() bool {
+	var darwinAMD64, darwinARM64 bool
+	for _, p := range Platforms {
+		if p.Name == "darwin/arm64" {
+			darwinARM64 = true
+		}
+		if p.Name == "darwin/amd64" {
+			darwinAMD64 = true
+		}
+	}
+
+	return darwinAMD64 && darwinARM64
+}
+
 // FindReplace reads a file, performs a find/replace operation, then writes the
 // output to the same file path.
 func FindReplace(file string, re *regexp.Regexp, repl string) error {
@@ -353,6 +374,73 @@ func unzip(sourceFile, destinationDir string) error {
 	return nil
 }
 
+// Tar compress a directory using tar + gzip algorithms
+func Tar(src string, targetFile string) error {
+	fmt.Printf(">> creating TAR file from directory: %s, target: %s\n", src, targetFile)
+
+	f, err := os.Create(targetFile)
+	if err != nil {
+		return fmt.Errorf("error creating tar file: %w", err)
+	}
+	defer f.Close()
+
+	// tar > gzip > file
+	zr := gzip.NewWriter(f)
+	tw := tar.NewWriter(zr)
+
+	// walk through every file in the folder
+	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+		if errFn != nil {
+			return fmt.Errorf("error traversing the file system: %w", errFn)
+		}
+
+		// if a symlink, skip file
+		if fi.Mode().Type() == os.ModeSymlink {
+			fmt.Printf(">> skipping symlink: %s\n", file)
+			return nil
+		}
+
+		// generate tar header
+		header, err := tar.FileInfoHeader(fi, file)
+		if err != nil {
+			return fmt.Errorf("error getting file info header: %w", err)
+		}
+
+		// must provide real name
+		// (see https://golang.org/src/archive/tar/common.go?#L626)
+		header.Name = filepath.ToSlash(file)
+
+		// write header
+		if err := tw.WriteHeader(header); err != nil {
+			return fmt.Errorf("error writing header: %w", err)
+		}
+
+		// if not a dir, write file content
+		if !fi.IsDir() {
+			data, err := os.Open(file)
+			if err != nil {
+				return fmt.Errorf("error opening file: %w", err)
+			}
+			defer data.Close()
+			if _, err := io.Copy(tw, data); err != nil {
+				return fmt.Errorf("error compressing file: %w", err)
+			}
+		}
+		return nil
+	})
+
+	// produce tar
+	if err := tw.Close(); err != nil {
+		return fmt.Errorf("error closing tar file: %w", err)
+	}
+	// produce gzip
+	if err := zr.Close(); err != nil {
+		return fmt.Errorf("error closing gzip file: %w", err)
+	}
+
+	return nil
+}
+
 func untar(sourceFile, destinationDir string) error {
 	file, err := os.Open(sourceFile)
 	if err != nil {
@@ -459,7 +547,9 @@ func numParallel() int {
 	maxParallel := runtime.NumCPU()
 
 	info, err := GetDockerInfo()
-	if err == nil && info.NCPU < maxParallel {
+	// Check that info.NCPU != 0 since docker info doesn't return with an
+	// error status if communcation with the daemon failed.
+	if err == nil && info.NCPU != 0 && info.NCPU < maxParallel {
 		maxParallel = info.NCPU
 	}
 
@@ -515,7 +605,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 // Parallel runs the given functions in parallel with an upper limit set based
 // on GOMAXPROCS.
 func Parallel(fns ...interface{}) {
-	ParallelCtx(context.Background(), fns...)
+	ParallelCtx(context.TODO(), fns...)
 }
 
 // funcTypeWrap wraps a valid FuncType to FuncContextError
@@ -836,6 +926,7 @@ func IntegrationTestEnvVars() []string {
 	prefixes := []string{
 		"AWS_",
 		"AZURE_",
+		"GCP_",
 
 		// Accepted by terraform, but not by many clients, including Beats
 		"GOOGLE_",
@@ -845,4 +936,49 @@ func IntegrationTestEnvVars() []string {
 		vars = append(vars, ListMatchingEnvVars(prefix)...)
 	}
 	return vars
+}
+
+// ReadGLIBCRequirement returns the required glibc version for a dynamically
+// linked ELF binary. The target machine must have a version equal to or
+// greater than (newer) the returned value.
+func ReadGLIBCRequirement(elfFile string) (*SemanticVersion, error) {
+	e, err := elf.Open(elfFile)
+	if err != nil {
+		return nil, err
+	}
+
+	symbols, err := e.DynamicSymbols()
+	if err != nil {
+		return nil, err
+	}
+
+	versionSet := map[SemanticVersion]struct{}{}
+	for _, sym := range symbols {
+		if strings.HasPrefix(sym.Version, "GLIBC_") {
+			semver, err := NewSemanticVersion(strings.TrimPrefix(sym.Version, "GLIBC_"))
+			if err != nil {
+				continue
+			}
+
+			versionSet[*semver] = struct{}{}
+		}
+	}
+
+	if len(versionSet) == 0 {
+		return nil, errors.New("no GLIBC symbols found in binary (is this a static binary?)")
+	}
+
+	var versions []SemanticVersion
+	for ver := range versionSet {
+		versions = append(versions, ver)
+	}
+
+	sort.Slice(versions, func(i, j int) bool {
+		a := versions[i]
+		b := versions[j]
+		return a.LessThan(&b)
+	})
+
+	max := versions[len(versions)-1]
+	return &max, nil
 }

@@ -20,6 +20,7 @@ var:
 
 ingest_pipeline:
   - ingest/pipeline.yml
+  - ingest/systemhealth.yml
   - ingest/firewall.yml
   - ingest/idp.yml
   - ingest/atp.yml

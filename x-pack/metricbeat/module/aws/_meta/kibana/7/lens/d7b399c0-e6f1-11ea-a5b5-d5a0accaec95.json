@@ -1,0 +1,91 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3": {
+                            "columnOrder": [
+                                "a1f5b3b8-41da-452b-8683-7a9ca6b6267f",
+                                "75188758-7734-4fc3-af1d-297c455715f0"
+                            ],
+                            "columns": {
+                                "75188758-7734-4fc3-af1d-297c455715f0": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Unblended Cost",
+                                    "operationType": "sum",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.billing.UnblendedCost.amount"
+                                },
+                                "a1f5b3b8-41da-452b-8683-7a9ca6b6267f": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top Users",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "75188758-7734-4fc3-af1d-297c455715f0",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.billing.group_by.aws:createdBy"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "75188758-7734-4fc3-af1d-297c455715f0"
+                        ],
+                        "layerId": "cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3",
+                        "seriesType": "bar_horizontal",
+                        "xAccessor": "a1f5b3b8-41da-452b-8683-7a9ca6b6267f"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_horizontal"
+            }
+        },
+        "title": "High Spenders [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d7b399c0-e6f1-11ea-a5b5-d5a0accaec95",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:25.535Z",
+    "version": "WzMzMTksMV0="
+}

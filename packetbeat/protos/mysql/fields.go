@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetMysql returns asset data.
-// This is the base64 encoded gzipped contents of protos/mysql.
+// This is the base64 encoded zlib format compressed contents of protos/mysql.
 func AssetMysql() string {
 	return "eJy8k8GO0zAQhu95il974UL3AXLggnpYaUGC7j1y7XFrEdupZ0yVt0d20tJCCq2Q8CWRx/8/nz0zK3yjsYUf+dA3gDjpqcXTp3Hz5fWpAQyxTm4QF0OLDw0A1NiKB9LOOg36TkFgHfWGnxvMf209ukJQnn7alyXjQC12KeZh3rlUXKqUtaSFTJfikc/Rk0Mfw+5icwH0tF4sZE8TN3T0XgUDx+CsNTHb3L+H7B1PINAxiHKBq+jEcGUYst9SQrQoZOVbjvaKBSxKyFOQ5+a3+7jAlKRz5iHsl8+b9dc3HDKl8V5qZ2aoa2w69uNMQaawL0CG7LupIA9Rbtav649/pywREkisoukdr+yindsBiSSnQOYG4y898V8Ja9X/wFdz3Af3tqdiN03IDKeKuTKwKfpKIUkFVrro35XYIRMvNRilFFOno6F/mJZCVI1QjM7XxHacJuhmXk/MakePZnHBRszaxWw/AgAA//+Mhliv"
 }

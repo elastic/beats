@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "Dashboard for the Filebeat Traefik module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "3",
+                    "w": 16,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "4",
+                    "w": 16,
+                    "x": 16,
+                    "y": 36
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "7",
+                    "w": 16,
+                    "x": 32,
+                    "y": 36
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        50.51342652633956,
+                        -0.17578125
+                    ]
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "8",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Traefik] Access logs ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Filebeat-Traefik-Dashboard-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Traefik-Access-Browsers-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "Traefik-Access-OSes-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "New-Visualization-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "Traefik-Access-Response-codes-by-top-URLs-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "Sent-sizes-ecs",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "Traefik-Access-Map-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:34.139Z",
+    "version": "WzQ2ODcsMV0="
+}

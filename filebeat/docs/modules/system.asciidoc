@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == System module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses logs created by the system logging
 service of common Unix/Linux based distributions.
 

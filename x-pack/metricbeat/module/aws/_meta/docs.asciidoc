@@ -1,5 +1,9 @@
 :libbeat-xpack-dir: ../../../x-pack/libbeat
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This module periodically fetches monitoring metrics from AWS CloudWatch using
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html[GetMetricData API] for AWS services.
 
@@ -28,9 +32,10 @@ AWS regions. If `endpoint` is specified, `regions` becomes a required config par
 * *latency*
 
 Some AWS services send monitoring metrics to CloudWatch with a latency to
-process larger than Metricbeat collection period. This case, please specify a
-`latency` parameter so collection start time and end time will be shifted by the
-given latency amount.
+process larger than Metricbeat collection period. This will cause data points missing
+or none get collected by Metricbeat. In this case, please specify a `latency`
+parameter so collection start time and end time will be shifted by the given
+latency amount.
 
 * *endpoint*
 
@@ -49,6 +54,24 @@ If endpoint is specified, `regions` config becomes required. For example:
   period: 5m
   endpoint: amazonaws.com.cn
   regions: cn-north-1
+  metricsets:
+    - ec2
+----
+
+* *fips_enabled*
+
+Enforces the use of FIPS service endpoints. See <<aws-credentials-config,AWS credentials options>> for more information.
+
+[source,yaml]
+----
+- module: aws
+  period: 5m
+  fips_enabled: true
+  regions:
+    - us-east-1
+    - us-east-2
+    - us-west-1
+    - us-west-2
   metricsets:
     - ec2
 ----
@@ -223,7 +246,7 @@ applications and services.
 
 [float]
 [[aws-api-requests]]
-== AWS API requests count per metricset
+== AWS API requests count
 This session is to document what are the AWS API called made by each metricset
 in `aws` module. This will be useful for users to estimate costs for using `aws`
 module.
@@ -236,7 +259,6 @@ ListMetrics max page size: 500, based on https://docs.aws.amazon.com/AmazonCloud
 GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html[AWS API GetMetricData]
 
 [float]
-=== `cloudwatch`
 |===
 | AWS API Name | AWS API Count | Frequency
 | IAM ListAccountAliases | 1 | Once on startup
@@ -247,51 +269,44 @@ GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonClo
 |===
 `billing`, `ebs`, `elb`, `sns`, `usage` and `lambda` are the same as `cloudwatch` metricset.
 
-[float]
-=== `ec2`
-|===
-| AWS API Name | AWS API Count | Frequency
-| IAM ListAccountAliases | 1 | Once on startup
-| STS GetCallerIdentity | 1 | Once on startup
-| EC2 DescribeRegions| 1 | Once on startup
-| EC2 DescribeInstances | 1 | Per region per collection period
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
-| CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per collection period
-|===
-
-[float]
-=== `rds`
-|===
-| AWS API Name | AWS API Count | Frequency
-| IAM ListAccountAliases | 1 | Once on startup
-| STS GetCallerIdentity | 1 | Once on startup
-| EC2 DescribeRegions| 1 | Once on startup
-| RDS DescribeDBInstances | 1 | Per region per collection period
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
-| CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per collection period
-|===
-
-[float]
-=== `sqs`
-|===
-| AWS API Name | AWS API Count | Frequency
-| IAM ListAccountAliases | 1 | Once on startup
-| STS GetCallerIdentity | 1 | Once on startup
-| EC2 DescribeRegions| 1 | Once on startup
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
-| CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per collection period
-|===
-
-[float]
-=== `s3_daily_storage` and `s3_request`
-|===
-| AWS API Name | AWS API Count | Frequency
-| IAM ListAccountAliases | 1 | Once on startup
-| STS GetCallerIdentity | 1 | Once on startup
-| EC2 DescribeRegions| 1 | Once on startup
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
-| CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per collection period
-|===
-
 [id="aws-credentials-config"]
 include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+
+[float]
+== Running on EKS
+
+* *WebIdentity authentication flow*
+
+See documentation in order to create a IAM Role for Service account:
+https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html
+
+Once you have create the IRSA you can annotate `metricbeat` service account with it
+[source,yaml]
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/<IRSA_ID>
+  name: metricbeat
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+
+In order to enable WebIdentity authentication flow you need to add a trust relationship
+to the IRSA:
+[source,json]
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_PROVIDER_ID>"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.REGION.amazonaws.com/id/<OIDC_PROVIDER_ID>:sub": "system:serviceaccount:kube-system:metricbeat",
+          "oidc.eks.REGION.amazonaws.com/id/<OIDC_PROVIDER_ID>:aud": "sts.amazonaws.com"
+        }
+      }
+    }
+
+In this case there's no need to add `role_arn` to modules config.

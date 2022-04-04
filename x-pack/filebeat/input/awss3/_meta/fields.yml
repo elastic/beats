@@ -5,18 +5,22 @@
   release: ga
   fields:
     - name: bucket.name
+      default_field: true
       type: keyword
       description: >
         Name of the S3 bucket that this log retrieved from.
     - name: bucket.arn
+      default_field: true
       type: keyword
       description: >
         ARN of the S3 bucket that this log retrieved from.
     - name: object.key
+      default_field: true
       type: keyword
       description: >
         Name of the S3 object that this log retrieved from.
     - name: metadata
+      default_field: true
       type: flattened
       description:
         AWS S3 object metadata values.

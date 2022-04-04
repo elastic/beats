@@ -33,7 +33,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -114,15 +114,15 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			}
 
 			if container.StartTime != "" {
-				containerEvent.Put("start_time", container.StartTime)
+				_, _ = containerEvent.Put("start_time", container.StartTime)
 			}
 
 			if nodeCores > 0 {
-				containerEvent.Put("cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores)
+				_, _ = containerEvent.Put("cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores)
 			}
 
 			if nodeMem > 0 {
-				containerEvent.Put("memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem)
+				_, _ = containerEvent.Put("memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem)
 			}
 
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
@@ -130,11 +130,12 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 
 			if coresLimit > 0 {
-				containerEvent.Put("cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit)
+				_, _ = containerEvent.Put("cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit)
 			}
 
 			if memLimit > 0 {
-				containerEvent.Put("memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit)
+				_, _ = containerEvent.Put("memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit)
+				_, _ = containerEvent.Put("memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit)
 			}
 
 			events = append(events, containerEvent)
@@ -143,4 +144,29 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	}
 
 	return events, nil
+}
+
+// ecsfields maps container events fields to container ecs fields
+func ecsfields(containerEvent common.MapStr) common.MapStr {
+	ecsfields := common.MapStr{}
+
+	name, err := containerEvent.GetValue("name")
+	if err == nil {
+		_, _ = ecsfields.Put("name", name)
+
+	}
+
+	cpuUsage, err := containerEvent.GetValue("cpu.usage.node.pct")
+	if err == nil {
+		_, _ = ecsfields.Put("cpu.usage", cpuUsage)
+
+	}
+
+	memUsage, err := containerEvent.GetValue("memory.usage.node.pct")
+	if err == nil {
+		_, _ = ecsfields.Put("memory.usage", memUsage)
+
+	}
+
+	return ecsfields
 }

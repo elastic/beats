@@ -29,9 +29,12 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+var userAgent = useragent.UserAgent("Metricbeat")
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
@@ -87,6 +90,7 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	client, err := config.Transport.Client(
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
 	if err != nil {
 		return nil, err

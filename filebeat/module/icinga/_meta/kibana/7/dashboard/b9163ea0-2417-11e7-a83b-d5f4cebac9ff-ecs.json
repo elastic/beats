@@ -1,0 +1,86 @@
+{
+    "attributes": {
+        "description": "Filebeat Icinga module dashboard for startup errors",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "icinga.startup.facility",
+                        "log.level",
+                        "message"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 52,
+                    "i": "2",
+                    "w": 48,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "search",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Icinga] Startup Errors ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b9163ea0-2417-11e7-a83b-d5f4cebac9ff-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff-ecs",
+            "name": "2:panel_2",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:08.576Z",
+    "version": "WzQ0MjgsMV0="
+}

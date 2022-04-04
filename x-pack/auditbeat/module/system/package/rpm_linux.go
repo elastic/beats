@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux && cgo
 // +build linux,cgo
 
 package pkg
@@ -213,11 +214,11 @@ func (lib *librpm) close() error {
 // version number.  getLibrpmNames looks at the elf header for the rpm
 // binary to determine what version of librpm.so it is linked against.
 func getLibrpmNames() []string {
-	var rpmPaths = []string{
+	rpmPaths := []string{
 		"/usr/bin/rpm",
 		"/bin/rpm",
 	}
-	var libNames = []string{
+	libNames := []string{
 		"librpm.so",
 	}
 	var rpmElf *elf.File
@@ -248,7 +249,6 @@ func getLibrpmNames() []string {
 }
 
 func openLibrpm() (*librpm, error) {
-
 	var librpm librpm
 	var err error
 
@@ -382,7 +382,6 @@ func listRPMPackages() ([]*Package, error) {
 }
 
 func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) {
-
 	header = C.my_headerLink(openedLibrpm.headerLink, header)
 	if header == nil {
 		return nil, fmt.Errorf("Error calling headerLink")

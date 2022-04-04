@@ -8,13 +8,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strconv"
+	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"golang.org/x/sync/semaphore"
+	"gotest.tools/gotestsum/log"
 
-	"github.com/kolide/osquery-go"
+	"github.com/osquery/osquery-go"
+	genosquery "github.com/osquery/osquery-go/gen/osquery"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -102,52 +107,81 @@ func New(socketPath string, opts ...Option) *Client {
 func (c *Client) Connect(ctx context.Context) error {
 	c.mx.Lock()
 	defer c.mx.Unlock()
-	c.log.Debugf("connect client: socket_path: %s, retries: %v", c.socketPath, c.connectRetries)
+	c.log.Debugf("connect osquery client: socket_path: %s, retries: %v", c.socketPath, c.connectRetries)
 	if c.cli != nil {
 		err := ErrAlreadyConnected
 		c.log.Error(err)
 		return err
 	}
 
-	var err error
-
-	for i := 0; i < c.connectRetries; i++ {
-		attempt := i + 1
-		llog := c.log.With("attempt", attempt)
-		llog.Debug("connecting")
-		cli, err := osquery.NewClient(c.socketPath, c.timeout)
-		if err != nil {
-			llog.Errorf("failed to connect: %v", err)
-			if i < c.connectRetries-1 {
-				llog.Infof("wait before next connect attempt: retry_wait: %v", retryWait)
-				if werr := waitWithContext(ctx, retryWait); werr != nil {
-					err = werr
-					break // Context cancelled, exit loop
-				}
-			} else {
-				return err
-			}
-			continue
-		}
-		c.cli = cli
-		break
-	}
+	err := c.reconnect(ctx)
 	if err != nil {
-		c.log.Errorf("failed connect: %v", err)
+		c.log.Errorf("osquery client failed to connect: %v", err)
 		return err
 	}
-	c.log.Info("connected")
+	c.log.Info("osquery client is connected")
 	return err
+}
+
+func (c *Client) reconnect(ctx context.Context) error {
+	c.close()
+
+	r := retry{
+		maxRetry:  c.connectRetries,
+		retryWait: retryWait,
+		log:       c.log.With("context", "osquery client connect"),
+	}
+
+	return r.Run(ctx, func(ctx context.Context) error {
+		cli, err := osquery.NewClient(c.socketPath, c.timeout)
+		if err != nil {
+			log.Errorf("failed to connect: %v", err)
+			return err
+		}
+		c.cli = cli
+		return nil
+	})
 }
 
 func (c *Client) Close() {
 	c.mx.Lock()
 	defer c.mx.Unlock()
+	c.close()
+}
 
+func (c *Client) close() {
 	if c.cli != nil {
 		c.cli.Close()
 		c.cli = nil
 	}
+}
+
+func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
+	err := fn()
+	if err == nil {
+		return nil
+	}
+
+	var netErr *net.OpError
+
+	// The current osquery go library github.com/osquery/osquery-go uses the older version of thrift library that
+	// doesn't not wrap the original error, so we have to use this ugly check for the error message suffix here.
+	// The latest version of thrift library is wrapping the error, so adding this check first here.
+	if (errors.As(err, &netErr) && (netErr.Err == syscall.EPIPE || netErr.Err ==
+		syscall.ECONNRESET)) ||
+		strings.HasSuffix(err.Error(), " broken pipe") {
+
+		c.log.Debugf("osquery error: %v, reconnect", err)
+
+		// reconnect && retry
+		err = c.reconnect(ctx)
+		if err != nil {
+			c.log.Errorf("failed to reconnect: %v", err)
+			return err
+		}
+		return fn()
+	}
+	return nil
 }
 
 // Query executes a given query, resolves the types
@@ -164,7 +198,11 @@ func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{
 	}
 	defer c.cliLimiter.Release(limit)
 
-	res, err := c.cli.Client.Query(ctx, sql)
+	var res *genosquery.ExtensionResponse
+	err = c.withReconnect(ctx, func() error {
+		res, err = c.cli.Client.Query(ctx, sql)
+		return err
+	})
 	if err != nil {
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
@@ -218,7 +256,16 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 	}
 
 	if colTypes == nil {
-		exres, err := c.cli.GetQueryColumns(sql)
+		var (
+			exres *genosquery.ExtensionResponse
+			err   error
+		)
+
+		err = c.withReconnect(ctx, func() error {
+			exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
+			return err
+		})
+
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)
 		}
@@ -232,17 +279,6 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 		c.cache.Add(sql, colTypes)
 	}
 	return colTypes, nil
-}
-
-func waitWithContext(ctx context.Context, to time.Duration) error {
-	t := time.NewTimer(to)
-	defer t.Stop()
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-t.C:
-	}
-	return nil
 }
 
 func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[string]interface{} {

@@ -1,0 +1,128 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset :\"azure.activitylogs\" and azure.activitylogs.event_category : \"Alert\" "
+                }
+            }
+        },
+        "title": "Alerts Count [Filebeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Alerts"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.activitylogs.result_type : \"Activated\""
+                                },
+                                "label": "Activated"
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.activitylogs.result_type : \"Resolved\""
+                                },
+                                "label": "Resolved"
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.activitylogs.result_type : \"Succeeded\""
+                                },
+                                "label": "Succeeded"
+                            }
+                        ]
+                    },
+                    "schema": "group",
+                    "type": "filters"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "bucket": {
+                        "accessor": 0,
+                        "format": {
+                            "id": "string",
+                            "params": {}
+                        },
+                        "type": "vis_dimension"
+                    },
+                    "metrics": [
+                        {
+                            "accessor": 1,
+                            "format": {
+                                "id": "number",
+                                "params": {}
+                            },
+                            "type": "vis_dimension"
+                        }
+                    ]
+                },
+                "metric": {
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 10000,
+                            "type": "range"
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "None",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Alerts Count [Filebeat Azure]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f684a750-ec23-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:02.545Z",
+    "version": "WzQzOTUsMV0="
+}

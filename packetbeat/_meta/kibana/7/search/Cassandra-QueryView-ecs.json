@@ -1,0 +1,48 @@
+{
+    "attributes": {
+        "columns": [
+            "cassandra.request.query",
+            "cassandra.response.result.rows.meta.keyspace",
+            "cassandra.response.result.rows.meta.table",
+            "cassandra.response.result.rows.num_rows"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"cassandra.request.headers.op\",\"negate\":false,\"params\":{\"query\":\"QUERY\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"QUERY\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"cassandra.request.headers.op\":{\"query\":\"QUERY\",\"type\":\"phrase\"}}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"cassandra.response.headers.op\",\"negate\":true,\"params\":{\"query\":\"ERROR\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"ERROR\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index\"},\"query\":{\"match\":{\"cassandra.response.headers.op\":{\"query\":\"ERROR\",\"type\":\"phrase\"}}}}],\"highlight\":{\"fields\":{\"*\":{}},\"fragment_size\":2147483647,\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"],\"require_field_match\":false},\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Cassandra Query Search [Packetbeat] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Cassandra-QueryView-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:28:35.924Z",
+    "version": "WzMxMTcsMV0="
+}

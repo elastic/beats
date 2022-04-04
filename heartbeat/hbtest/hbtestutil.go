@@ -23,11 +23,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/bits"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -81,6 +83,18 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	)
 }
 
+func CustomResponseHandler(body []byte, status int, extraHeaders map[string]string) http.HandlerFunc {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			for key, val := range extraHeaders {
+				w.Header().Add(key, val)
+			}
+			w.WriteHeader(status)
+			w.Write(body)
+		},
+	)
+}
+
 // RedirectHandler redirects the paths at the keys in the redirectingPaths map to the locations in their values.
 // For paths not in the redirectingPaths map it returns a 200 response with the given body.
 func RedirectHandler(redirectingPaths map[string]string, body string) http.HandlerFunc {
@@ -124,6 +138,13 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 	}, time.Duration(1))
 
 	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+
+	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
+	// We don't actually care about the exact cipher matching, since we're not testing the TLS
+	// implementation, we trust go there, just that most of the metadata is present
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		expected.Put("tls.cipher", isdef.IsString)
+	}
 
 	return lookslike.MustCompile(expected)
 }

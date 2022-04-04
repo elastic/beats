@@ -24,8 +24,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
@@ -108,7 +106,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			request := &http.Request{
 				URL: url,
 			}
-			host, port, err := splitHostnamePort(request)
+			host, port, err := splitHostnamePort(request.URL.String())
 
 			if err != nil {
 				if test.expectedError == nil {
@@ -172,13 +170,6 @@ func TestRequestBuildingWithCustomHost(t *testing.T) {
 		assert.Equal(t, "custom-host", request.Host)
 		assert.Equal(t, "custom-host", request.Header.Get("Host"))
 	}
-}
-
-func TestRequestBuildingWithNoUserAgent(t *testing.T) {
-	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
-
-	require.NoError(t, err)
-	assert.Equal(t, useragent.UserAgent("Heartbeat"), request.Header.Get("User-Agent"))
 }
 
 func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {

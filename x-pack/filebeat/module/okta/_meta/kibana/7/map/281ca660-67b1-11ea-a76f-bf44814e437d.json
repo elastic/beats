@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "6908e81b-1695-4445-aee4-8bc8c9f65600",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {},
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "dc52e707-92d7-4de7-becf-a3a8bfaa2c2d",
+                "label": "Okta ",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset : \"okta.system\" "
+                },
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "filterByMapBounds": false,
+                    "geoField": "client.geo.location",
+                    "id": "4b8bd321-4b90-4d97-83e0-2b12bf091f66",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "scalingType": "LIMIT",
+                    "sortField": "",
+                    "sortOrder": "desc",
+                    "tooltipProperties": [],
+                    "topHitsSize": 1,
+                    "type": "ES_SEARCH"
+                },
+                "style": {
+                    "isTimeAware": true,
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "#54B399"
+                            },
+                            "type": "STATIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "marker"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 6
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderColor": {
+                            "options": {
+                                "color": "#FFFFFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderSize": {
+                            "options": {
+                                "size": "SMALL"
+                            }
+                        },
+                        "labelColor": {
+                            "options": {
+                                "color": "#000000"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelSize": {
+                            "options": {
+                                "size": 14
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelText": {
+                            "options": {
+                                "value": ""
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#41937c"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 26.54701,
+                "lon": -44.69098
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "filebeat-*",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "okta.system"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "okta.system"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false
+            },
+            "timeFilters": {
+                "from": "now-15w",
+                "to": "now"
+            },
+            "zoom": 2.75
+        },
+        "title": "Geolocation [Filebeat Okta]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:33:39.099Z",
+    "version": "WzQyMzQsMV0="
+}

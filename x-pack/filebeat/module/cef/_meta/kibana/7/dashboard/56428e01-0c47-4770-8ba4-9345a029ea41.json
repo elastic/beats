@@ -1,0 +1,361 @@
+{
+    "attributes": {
+        "description": "Overview of Microsoft DNS activity.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "lucene",
+                    "query": "*"
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "3",
+                    "w": 40,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 18k": "rgb(247,251,255)",
+                            "108k - 126k": "rgb(74,152,201)",
+                            "126k - 144k": "rgb(46,126,188)",
+                            "144k - 162k": "rgb(23,100,171)",
+                            "162k - 180k": "rgb(8,74,145)",
+                            "18k - 36k": "rgb(227,238,249)",
+                            "36k - 54k": "rgb(208,225,242)",
+                            "54k - 72k": "rgb(182,212,233)",
+                            "72k - 90k": "rgb(148,196,223)",
+                            "90k - 108k": "rgb(107,174,214)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 48
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 32
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "11",
+                    "w": 24,
+                    "x": 24,
+                    "y": 56
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "12",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "13",
+                    "w": 24,
+                    "x": 0,
+                    "y": 56
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "14",
+                    "w": 24,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "15",
+                    "w": 24,
+                    "x": 24,
+                    "y": 20
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        12.211180191503997,
+                        0
+                    ],
+                    "mapZoom": 1
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "16",
+                    "w": 24,
+                    "x": 24,
+                    "y": 72
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        -0.17578097424708533,
+                        0
+                    ],
+                    "mapZoom": 1
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "17",
+                    "w": 24,
+                    "x": 0,
+                    "y": 72
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "refreshInterval": {
+            "display": "Off",
+            "pause": false,
+            "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat CEF] Microsoft DNS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "56428e01-0c47-4770-8ba4-9345a029ea41",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "7e2b0659-0760-4182-8b29-3ee69f26bc6f",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "249e2737-b41f-4115-b303-88bc9d279655",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "566d8b4e-ec5c-4b8b-bd68-3cc9cb236110",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "759e8dc3-0fdb-4cb6-ba47-87a2e2ff8df3",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "fcf798a8-db8f-4492-827b-8fa7581108a9",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "f0e60404-ddf4-4b46-8e45-e28c4fb6d60d",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "1b9cc5b7-7747-49de-96b1-a4bc7f675716",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "677891a1-90c4-4273-b126-f0e54689bd76",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "26a65f68-d7a6-4b47-befc-c5a6819bb91b",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "16aef3e9-e33b-4bab-b32f-d8c5b1263ac0",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "f3c573ad-2c16-4de5-9ec3-0a47141d4fa0",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "1b521f56-8089-433f-88f7-56aba867e07d",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "581a296e-e34a-48f1-93e4-fc4bdadfc68d",
+            "name": "17:panel_17",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3MzAsMV0="
+}

@@ -62,7 +62,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error retrieving usage information")
 	}
-	events := EventsMapping(results)
+	events := EventsMapping(m.client.Config.SubscriptionId, results)
 	for _, event := range events {
 		isOpen := report.Event(event)
 		if !isOpen {

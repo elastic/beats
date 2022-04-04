@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 type kafkaInputConfig struct {
@@ -53,6 +53,7 @@ type kafkaInputConfig struct {
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
+	Parsers                  parser.Config     `config:",inline"`
 }
 
 type kafkaFetch struct {
@@ -165,8 +166,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Fetch.Default = config.Fetch.Default
 	k.Consumer.Fetch.Max = config.Fetch.Max
 
-	k.Consumer.Group.Rebalance.Strategy =
-		config.Rebalance.Strategy.asSaramaStrategy()
+	k.Consumer.Group.Rebalance.Strategy = config.Rebalance.Strategy.asSaramaStrategy()
 	k.Consumer.Group.Rebalance.Timeout = config.Rebalance.Timeout
 	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
 	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries
@@ -215,7 +215,6 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	)
 
 	if err := k.Validate(); err != nil {
-		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, err
 	}
 	return k, nil

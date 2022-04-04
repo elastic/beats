@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package index
@@ -76,7 +77,7 @@ func TestEmpty(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	eventsMapping(reporter, httpClient, info, input)
+	eventsMapping(reporter, httpClient, info, input, true)
 	require.Equal(t, 0, len(reporter.GetEvents()))
 }
 

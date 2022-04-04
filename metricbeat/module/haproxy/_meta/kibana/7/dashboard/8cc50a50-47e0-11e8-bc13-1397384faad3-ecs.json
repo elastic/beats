@@ -1,0 +1,163 @@
+{
+    "attributes": {
+        "description": "HAProxy metrics for HTTP mode",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "7",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "10",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "11",
+                    "w": 24,
+                    "x": 24,
+                    "y": 20
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat HAProxy] HTTP server ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8cc50a50-47e0-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "0751ed00-479c-11e8-bc13-1397384faad3-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "b3463670-47a1-11e8-bc13-1397384faad3-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "fcbdfa60-47bd-11e8-bc13-1397384faad3-ecs",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "981d1040-47be-11e8-bc13-1397384faad3-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "72e84b00-47e1-11e8-bc13-1397384faad3-ecs",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "976b0910-47e4-11e8-bc13-1397384faad3-ecs",
+            "name": "11:panel_11",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:20.914Z",
+    "version": "WzM4MzQsMV0="
+}

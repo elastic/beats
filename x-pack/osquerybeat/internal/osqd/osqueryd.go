@@ -5,14 +5,15 @@
 package osqd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -21,15 +22,16 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 )
 
 const (
-	osqueryDName    = "osqueryd"
-	osqueryAutoload = "osquery.autoload"
+	osqueryDName               = "osqueryd"
+	osqueryDarwinAppBundlePath = "osquery.app/Contents/MacOS"
 )
 
 const (
-	defaultExtensionsTimeout     = 10
 	defaultExitTimeout           = 10 * time.Second
 	defaultDataDir               = "osquery"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
@@ -143,14 +145,14 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 }
 
 // Run executes osqueryd binary as a child process
-func (q *OSQueryD) Run(ctx context.Context) error {
+func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	cleanup, err := q.prepare(ctx)
 	if err != nil {
 		return err
 	}
 	defer cleanup()
 
-	cmd := q.createCommand()
+	cmd := q.createCommand(flags)
 
 	q.log.Debugf("start osqueryd process: args: %v", cmd.Args)
 
@@ -181,6 +183,13 @@ func (q *OSQueryD) Run(ctx context.Context) error {
 		return err
 	}
 
+	// Assign osqueryd process to the JobObject on windows
+	// in order to assure no orphan process is left behind
+	// after osquerybeat process is killed.
+	if err := proc.JobObject.Assign(cmd.Process); err != nil {
+		q.log.Errorf("osqueryd process failed job assign: %v", err)
+	}
+
 	var (
 		errbuf strings.Builder
 	)
@@ -199,9 +208,7 @@ func (q *OSQueryD) Run(ctx context.Context) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		select {
-		case finished <- wait():
-		}
+		finished <- wait()
 	}()
 
 	select {
@@ -259,17 +266,88 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 		if os.IsNotExist(err) {
 			return nil, errors.Wrapf(err, "extension path does not exist: %s", extensionPath)
 		} else {
-			return nil, errors.Wrapf(err, "could not stat extension path")
+			return nil, errors.Wrapf(err, "failed to stat extension path")
 		}
 	}
 
 	// Write the autoload file
-	extensionAutoloadPath := q.osqueryAutoloadPath()
-	if err := ioutil.WriteFile(extensionAutoloadPath, []byte(extensionPath), 0644); err != nil {
-		return nil, errors.Wrap(err, "could not write osquery extension autoload file")
+	extensionAutoloadPath := q.resolveDataPath(osqueryAutoload)
+	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, q.log)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to prepare extensions autoload file")
+	}
+
+	// Write the flagsfile in order to lock down/prevent loading default flags from osquery global locations.
+	// Otherwise the osqueryi and osqueryd will try to load the default flags file,
+	// for example from /var/osquery/osquery.flags.default on Mac, and can potentially mess up configuration of our osquery instance.
+	flagsfilePath := q.resolveDataPath(osqueryFlagfile)
+	exists, err := fileutil.FileExists(flagsfilePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to check flagsfile path")
+	}
+	if !exists {
+		f, err := os.OpenFile(flagsfilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to create flagsfile")
+		}
+		f.Close()
 	}
 
 	return func() {}, nil
+}
+
+func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, log *logp.Logger) error {
+	ok, err := fileutil.FileExists(extensionAutoloadPath)
+	if err != nil {
+		return errors.Wrapf(err, "failed to check osquery.autoload file exists")
+	}
+
+	rewrite := false
+
+	if ok {
+		log.Debugf("Extensions autoload file %s exists, verify the first extension is ours", extensionAutoloadPath)
+		err = verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath)
+		if err != nil {
+			log.Debugf("Extensions autoload file %v verification failed, err: %v, create a new one", extensionAutoloadPath, err)
+			rewrite = true
+		}
+	} else {
+		log.Debugf("Extensions autoload file %s doesn't exists, create a new one", extensionAutoloadPath)
+		rewrite = true
+	}
+
+	if rewrite {
+		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0644); err != nil {
+			return errors.Wrap(err, "failed write osquery extension autoload file")
+		}
+	}
+	return nil
+}
+
+func verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string) error {
+	f, err := os.Open(extensionAutoloadPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for i := 0; scanner.Scan(); i++ {
+		line := scanner.Text()
+		if i == 0 {
+			// Check that the first line is the mandatory extension
+			if line != mandatoryExtensionPath {
+				return errors.New("extentsions autoload file is missing mandatory extension in the first line of the file")
+			}
+		}
+
+		// Check that the line contains the valid path that exists
+		_, err := os.Stat(line)
+		if err != nil {
+			return err
+		}
+	}
+
+	return scanner.Err()
 }
 
 func (q *OSQueryD) prepareBinPath() error {
@@ -284,58 +362,54 @@ func (q *OSQueryD) prepareBinPath() error {
 	return nil
 }
 
-func (q *OSQueryD) createCommand() *exec.Cmd {
+func (q *OSQueryD) args(userFlags Flags) Args {
+	flags := make(Flags, len(userFlags))
 
-	cmd := exec.Command(
-		osquerydPath(q.binPath),
-		"--force=true",
-		"--disable_watchdog",
-		"--utc",
-		// // Enable events collection
-		// "--disable_events=false",
-		// // Begin: enable process events audit
-		// "--disable_audit=false",
-		// "--audit_allow_config=true",
-		// "--audit_persist=true",
-		// "--audit_allow_process_events=true",
-		// // End: enable process events audit
+	// Copy user flags
+	for k, userValue := range userFlags {
+		flags[k] = userValue
+	}
 
-		// // Begin: enable sockets audit
-		// "--audit_allow_sockets=true",
-		// "--audit_allow_unix=true", // Allow domain sockets audit
-		// // End: enable sockets audit
+	// Copy protected flags, protected keys overwrite the user keys
+	for k, v := range protectedFlags {
+		flags[k] = v
+	}
 
-		// // Setting this value to 1 will auto-clear events whenever a SELECT is performed against the table, reducing all impact of the buffer.
-		// "--events_expiry=1",
+	flags["pidfile"] = q.resolveDataPath(flags.GetString("pidfile"))
+	flags["database_path"] = q.resolveDataPath(flags.GetString("database_path"))
+	flags["extensions_autoload"] = q.resolveDataPath(flags.GetString("extensions_autoload"))
+	flags["flagfile"] = q.resolveDataPath(flags.GetString("flagfile"))
 
-		"--pidfile="+path.Join(q.dataPath, "osquery.pid"),
-		"--database_path="+path.Join(q.dataPath, "osquery.db"),
-		"--extensions_socket="+q.socketPath,
-		"--logger_path="+q.dataPath,
-		"--extensions_autoload="+q.osqueryAutoloadPath(),
-		"--extensions_interval=3",
-		fmt.Sprint("--extensions_timeout=", q.extensionsTimeout),
-	)
+	flags["extensions_socket"] = q.socketPath
+
+	if q.extensionsTimeout > 0 {
+		flags["extensions_timeout"] = q.extensionsTimeout
+
+	}
 
 	if q.configPlugin != "" {
-		cmd.Args = append(cmd.Args, "--config_plugin="+q.configPlugin)
+		flags["config_plugin"] = q.configPlugin
 	}
 
 	if q.loggerPlugin != "" {
-		cmd.Args = append(cmd.Args, "--logger_plugin="+q.loggerPlugin)
+		flags["logger_plugin"] = q.loggerPlugin
 	}
 
 	if q.configRefreshInterval > 0 {
-		cmd.Args = append(cmd.Args, fmt.Sprintf("--config_refresh=%d", q.configRefreshInterval))
+		flags["config_refresh"] = q.configRefreshInterval
 	}
-
-	cmd.Args = append(cmd.Args, platformArgs()...)
 
 	if q.isVerbose() {
-		cmd.Args = append(cmd.Args, "--verbose")
-		cmd.Args = append(cmd.Args, "--disable_logging=false")
+		flags["verbose"] = true
+		flags["disable_logging"] = false
 	}
-	return cmd
+
+	return convertToArgs(flags)
+}
+
+func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+	return exec.Command(
+		osquerydPath(q.binPath), q.args(userFlags)...)
 }
 
 func (q *OSQueryD) isVerbose() bool {
@@ -343,15 +417,31 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	return filepath.Join(dir, osquerydFilename())
+	return QsquerydPathForPlatform(runtime.GOOS, dir)
+}
+
+// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func QsquerydPathForPlatform(platform, dir string) string {
+	if platform == "darwin" {
+		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
+
+	}
+	return filepath.Join(dir, osquerydFilename(platform))
+}
+
+func osquerydFilename(platform string) string {
+	if platform == "windows" {
+		return osqueryDName + ".exe"
+	}
+	return osqueryDName
 }
 
 func osqueryExtensionPath(dir string) string {
 	return filepath.Join(dir, extensionName)
 }
 
-func (q *OSQueryD) osqueryAutoloadPath() string {
-	return filepath.Join(q.dataPath, osqueryAutoload)
+func (q *OSQueryD) resolveDataPath(filename string) string {
+	return filepath.Join(q.dataPath, filename)
 }
 
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {

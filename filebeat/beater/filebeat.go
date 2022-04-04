@@ -58,14 +58,12 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
-const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
 	" modules because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
-var (
-	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
-)
+var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
@@ -110,9 +108,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true)
 	if err != nil {
 		return nil, err
-	}
-	if !moduleRegistry.Empty() {
-		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
 	}
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
@@ -174,7 +169,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
 		}
@@ -384,6 +379,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
+	// We start the manager when all the subsystem are initialized and ready to received events.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
@@ -414,6 +414,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 	}
 
+	// Stop the manager and stop the connection to any dependent services.
+	b.Manager.Stop()
+
 	return nil
 }
 
@@ -428,7 +431,7 @@ func (fb *Filebeat) Stop() {
 // Create a new pipeline loader (es client) factory
 func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
 		}

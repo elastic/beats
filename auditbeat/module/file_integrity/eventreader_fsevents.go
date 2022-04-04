@@ -15,18 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin
 // +build darwin
 
 package file_integrity
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/fsnotify/fsevents"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -155,6 +156,17 @@ func (r *fsreader) consumeEvents(done <-chan struct{}) {
 					"event_id", event.ID,
 					"event_flags", flagsToString(event.Flags))
 
+				abs, err := filepath.Abs(event.Path)
+				if err != nil {
+					r.log.Errorw("Failed to obtain absolute path",
+						"file_path", event.Path,
+						"error", err,
+					)
+					event.Path = filepath.Clean(event.Path)
+				} else {
+					event.Path = abs
+				}
+
 				start := time.Now()
 				e := NewEvent(event.Path, flagsToAction(event.Flags), SourceFSNotify,
 					r.config.MaxFileSizeBytes, r.config.HashTypes)
@@ -179,7 +191,7 @@ func flagsToAction(flags fsevents.EventFlags) Action {
 func flagsToString(flags fsevents.EventFlags) string {
 	var list []string
 	for key, name := range flagNames {
-		if 0 != flags&key {
+		if flags&key != 0 {
 			list = append(list, name)
 		}
 	}
@@ -192,7 +204,7 @@ func getFileInfo(path string) (os.FileInfo, error) {
 		path = resolved
 	}
 	info, err := os.Lstat(path)
-	return info, errors.Wrap(err, "failed to stat")
+	return info, fmt.Errorf("failed to stat: %w", err)
 }
 
 func (r *fsreader) isWatched(path string) bool {

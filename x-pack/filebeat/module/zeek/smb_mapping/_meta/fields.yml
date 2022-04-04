@@ -1,6 +1,5 @@
 - name: smb_mapping
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek SMB_Mapping log.
   fields:

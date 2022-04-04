@@ -216,8 +216,8 @@ func (res *MiekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 		failure:     monitoring.NewInt(reg, "failure"),
 		ptrResponse: metrics.NewUniformSample(1028),
 	}
-	adapter.NewGoMetrics(reg, "response", adapter.Accept).
-		Register("ptr", metrics.NewHistogram(stats.ptrResponse))
+	adapter.NewGoMetrics(reg, "response.ptr", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(stats.ptrResponse))
 	res.nsStats[ns] = stats
 
 	return stats

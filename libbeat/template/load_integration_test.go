@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package template
@@ -66,13 +67,13 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		t.Fatal(err)
 	}
 	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
-	client.Request("DELETE", templateLoaderPath[cfg.Type]+cfg.Name, "", nil, nil)
+	client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
 	s.requireTemplateDoesNotExist("")
 	return &s
 }
 
 func (ts *testSetup) mustLoadTemplate(body map[string]interface{}) {
-	err := ts.loader.loadTemplate(ts.config.Name, ts.config.Type, body)
+	err := ts.loader.loadTemplate(ts.config.Name, body)
 	require.NoError(ts.t, err)
 	ts.requireTemplateExists("")
 }
@@ -102,16 +103,21 @@ func (ts *testSetup) requireTemplateExists(name string) {
 	if name == "" {
 		name = ts.config.Name
 	}
-	exists, err := ts.loader.templateExists(name, ts.config.Type)
+	exists, err := ts.loader.checkExistsTemplate(name)
 	require.NoError(ts.t, err, "failed to query template status")
-	require.True(ts.t, exists, "template must exist")
+	require.True(ts.t, exists, "template must exist: %s", name)
+}
+
+func (ts *testSetup) cleanupTemplate(name string) {
+	ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
+	ts.requireTemplateDoesNotExist(name)
 }
 
 func (ts *testSetup) requireTemplateDoesNotExist(name string) {
 	if name == "" {
 		name = ts.config.Name
 	}
-	exists, err := ts.loader.templateExists(name, ts.config.Type)
+	exists, err := ts.loader.checkExistsTemplate(name)
 	require.NoError(ts.t, err, "failed to query template status")
 	require.False(ts.t, exists, "template must not exist")
 }
@@ -145,14 +151,14 @@ func TestESLoader_Load(t *testing.T) {
 
 		t.Run("disabled", func(t *testing.T) {
 			setup.load(nil)
-			tmpl := getTemplate(t, setup.client, setup.config.Name, setup.config.Type)
+			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, true, tmpl.SourceEnabled())
 		})
 
 		t.Run("enabled", func(t *testing.T) {
 			setup.config.Overwrite = true
 			setup.load(nil)
-			tmpl := getTemplate(t, setup.client, setup.config.Name, setup.config.Type)
+			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, false, tmpl.SourceEnabled())
 		})
 	})
@@ -171,6 +177,7 @@ func TestESLoader_Load(t *testing.T) {
 		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON}
 		setup.load(nil)
 		setup.requireTemplateExists(nameJSON)
+		setup.cleanupTemplate(nameJSON)
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
@@ -187,26 +194,17 @@ func TestESLoader_Load(t *testing.T) {
 				fields:     fields,
 				properties: []string{"foo", "bar"},
 			},
-			"default config with fields and component": {
-				cfg:        TemplateConfig{Enabled: true, Type: IndexTemplateComponent},
-				fields:     fields,
-				properties: []string{"foo", "bar"},
-			},
 			"minimal template": {
 				cfg:    TemplateConfig{Enabled: true},
-				fields: nil,
-			},
-			"minimal template component": {
-				cfg:    TemplateConfig{Enabled: true, Type: IndexTemplateComponent},
 				fields: nil,
 			},
 			"fields from file": {
 				cfg:        TemplateConfig{Enabled: true, Fields: path(t, []string{"testdata", "fields.yml"})},
 				fields:     fields,
-				properties: []string{"object", "keyword", "alias", "migration_alias_false", "object_disabled"},
+				properties: []string{"object", "keyword", "alias", "migration_alias_false", "object_disabled", "@timestamp"},
 			},
 			"fields from json": {
-				cfg: TemplateConfig{Enabled: true, Name: "json-template", JSON: struct {
+				cfg: TemplateConfig{Enabled: true, JSON: struct {
 					Enabled bool   `config:"enabled"`
 					Path    string `config:"path"`
 					Name    string `config:"name"`
@@ -216,12 +214,15 @@ func TestESLoader_Load(t *testing.T) {
 			},
 		} {
 			t.Run(run, func(t *testing.T) {
+				if data.cfg.JSON.Enabled {
+					data.cfg.Name = data.cfg.JSON.Name
+				}
 				setup := newTestSetup(t, data.cfg)
 				setup.mustLoad(data.fields)
 
 				// Fetch properties
-				tmpl := getTemplate(t, setup.client, setup.config.Name, setup.config.Type)
-				val, err := tmpl.GetValue("mappings.properties")
+				tmpl := getTemplate(t, setup.client, setup.config.Name)
+				val, err := tmpl.GetValue("template.mappings.properties")
 				if data.properties == nil {
 					assert.Error(t, err)
 				} else {
@@ -234,6 +235,7 @@ func TestESLoader_Load(t *testing.T) {
 					}
 					assert.ElementsMatch(t, properties, data.properties)
 				}
+				setup.cleanupTemplate(setup.config.Name)
 			})
 		}
 	})
@@ -249,7 +251,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 
 	// Try to load invalid template
 	template := map[string]interface{}{"json": "invalid"}
-	err := setup.loader.loadTemplate(setup.config.Name, setup.config.Type, template)
+	err := setup.loader.loadTemplate(setup.config.Name, template)
 	assert.Error(t, err)
 	setup.requireTemplateDoesNotExist("")
 }
@@ -275,7 +277,7 @@ func TestTemplateSettings(t *testing.T) {
 	setup.mustLoadFromFile([]string{"..", "fields.yml"})
 
 	// Check that it contains the mapping
-	templateJSON := getTemplate(t, setup.client, setup.config.Name, setup.config.Type)
+	templateJSON := getTemplate(t, setup.client, setup.config.Name)
 	assert.Equal(t, 1, templateJSON.NumberOfShards())
 	assert.Equal(t, false, templateJSON.SourceEnabled())
 }
@@ -286,8 +288,9 @@ var dataTests = []struct {
 }{
 	{
 		data: common.MapStr{
-			"keyword": "test keyword",
-			"array":   [...]int{1, 2, 3},
+			"@timestamp": time.Now(),
+			"keyword":    "test keyword",
+			"array":      [...]int{1, 2, 3},
 			"object": common.MapStr{
 				"hello": "world",
 			},
@@ -313,6 +316,7 @@ var dataTests = []struct {
 	{
 		// tests enabled: false values
 		data: common.MapStr{
+			"@timestamp":     time.Now(),
 			"array_disabled": [...]int{1, 2, 3},
 			"object_disabled": common.MapStr{
 				"hello": "world",
@@ -339,8 +343,8 @@ func TestTemplateWithData(t *testing.T) {
 	}
 }
 
-func getTemplate(t *testing.T, client ESClient, templateName string, templateType IndexTemplateType) testTemplate {
-	status, body, err := client.Request("GET", templateLoaderPath[templateType]+templateName, "", nil, nil)
+func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {
+	status, body, err := client.Request("GET", "/_index_template/"+templateName, "", nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, status, 200)
 
@@ -349,29 +353,19 @@ func getTemplate(t *testing.T, client ESClient, templateName string, templateTyp
 	require.NoError(t, err)
 	require.NotNil(t, response)
 
-	if templateType == IndexTemplateComponent {
-		var tmpl map[string]interface{}
-		components := response["component_templates"].([]interface{})
-		for _, ct := range components {
-			componentTemplate := ct.(map[string]interface{})["component_template"].(map[string]interface{})
-			tmpl = componentTemplate["template"].(map[string]interface{})
-		}
-		return testTemplate{
-			t:      t,
-			client: client,
-			MapStr: common.MapStr(tmpl),
-		}
-	}
+	templates, _ := response.GetValue("index_templates")
+	templatesList, _ := templates.([]interface{})
+	templateElem := templatesList[0].(map[string]interface{})
 
 	return testTemplate{
 		t:      t,
 		client: client,
-		MapStr: common.MapStr(response[templateName].(map[string]interface{})),
+		MapStr: common.MapStr(templateElem["index_template"].(map[string]interface{})),
 	}
 }
 
 func (tt *testTemplate) SourceEnabled() bool {
-	key := fmt.Sprintf("mappings._source.enabled")
+	key := fmt.Sprintf("template.mappings._source.enabled")
 
 	// _source.enabled is true if it's missing (default)
 	b, _ := tt.HasKey(key)
@@ -389,7 +383,7 @@ func (tt *testTemplate) SourceEnabled() bool {
 }
 
 func (tt *testTemplate) NumberOfShards() int {
-	val, err := tt.GetValue("settings.index.number_of_shards")
+	val, err := tt.GetValue("template.settings.index.number_of_shards")
 	require.NoError(tt.t, err)
 
 	i, err := strconv.Atoi(val.(string))
@@ -407,6 +401,8 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       eslegtest.GetURL(),
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
+		Username:  eslegtest.GetUser(),
+		Password:  eslegtest.GetPass(),
 	})
 	if err != nil {
 		t.Fatal(err)

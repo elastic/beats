@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "Overview of Google Cloud Load Balancing TCP SSL Proxy Metrics\n\n",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "02422b42-6d8c-4924-acc1-0d7f4fb9a1b1",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "02422b42-6d8c-4924-acc1-0d7f4fb9a1b1",
+                "panelRefName": "panel_02422b42-6d8c-4924-acc1-0d7f4fb9a1b1",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "da16e443-8524-47ea-83e1-6a16250ed61c",
+                    "w": 13,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "da16e443-8524-47ea-83e1-6a16250ed61c",
+                "panelRefName": "panel_da16e443-8524-47ea-83e1-6a16250ed61c",
+                "title": "Open Connections",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "305f8fc3-e763-4b2c-8998-9e0e057ce713",
+                    "w": 13,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "305f8fc3-e763-4b2c-8998-9e0e057ce713",
+                "panelRefName": "panel_305f8fc3-e763-4b2c-8998-9e0e057ce713",
+                "title": "Closed Connections",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "e4fe30c7-906a-4878-bec7-7a78a06d98d0",
+                    "w": 12,
+                    "x": 36,
+                    "y": 0
+                },
+                "panelIndex": "e4fe30c7-906a-4878-bec7-7a78a06d98d0",
+                "panelRefName": "panel_e4fe30c7-906a-4878-bec7-7a78a06d98d0",
+                "title": "New Connections",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "c2bec6ee-96e8-440c-bfa4-6e0def7b0095",
+                    "w": 23,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "c2bec6ee-96e8-440c-bfa4-6e0def7b0095",
+                "panelRefName": "panel_c2bec6ee-96e8-440c-bfa4-6e0def7b0095",
+                "title": "Egress Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "fbaeaa8f-262d-41b1-a621-d6dbff52ff59",
+                    "w": 25,
+                    "x": 23,
+                    "y": 16
+                },
+                "panelIndex": "fbaeaa8f-262d-41b1-a621-d6dbff52ff59",
+                "panelRefName": "panel_fbaeaa8f-262d-41b1-a621-d6dbff52ff59",
+                "title": "Ingress Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] Load Balancing TCP SSL Proxy Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6041d970-a6ae-11ea-950e-d57608e3aa51",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "6958ed10-a6ad-11ea-950e-d57608e3aa51",
+            "name": "02422b42-6d8c-4924-acc1-0d7f4fb9a1b1:panel_02422b42-6d8c-4924-acc1-0d7f4fb9a1b1",
+            "type": "visualization"
+        },
+        {
+            "id": "f86c26f0-a6aa-11ea-950e-d57608e3aa51",
+            "name": "da16e443-8524-47ea-83e1-6a16250ed61c:panel_da16e443-8524-47ea-83e1-6a16250ed61c",
+            "type": "visualization"
+        },
+        {
+            "id": "c4e1e090-a6aa-11ea-950e-d57608e3aa51",
+            "name": "305f8fc3-e763-4b2c-8998-9e0e057ce713:panel_305f8fc3-e763-4b2c-8998-9e0e057ce713",
+            "type": "visualization"
+        },
+        {
+            "id": "eed05d80-a6ac-11ea-950e-d57608e3aa51",
+            "name": "e4fe30c7-906a-4878-bec7-7a78a06d98d0:panel_e4fe30c7-906a-4878-bec7-7a78a06d98d0",
+            "type": "visualization"
+        },
+        {
+            "id": "afeb98a0-a6ac-11ea-950e-d57608e3aa51",
+            "name": "c2bec6ee-96e8-440c-bfa4-6e0def7b0095:panel_c2bec6ee-96e8-440c-bfa4-6e0def7b0095",
+            "type": "visualization"
+        },
+        {
+            "id": "be27b340-a6ac-11ea-950e-d57608e3aa51",
+            "name": "fbaeaa8f-262d-41b1-a621-d6dbff52ff59:panel_fbaeaa8f-262d-41b1-a621-d6dbff52ff59",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:12.649Z",
+    "version": "WzM3OTgsMV0="
+}

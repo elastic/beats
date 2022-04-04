@@ -30,12 +30,11 @@ import (
 
 const unlimited = 0
 
-// lineReader reads lines from underlying reader, decoding the input stream
+// LineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type LineReader struct {
 	reader     io.ReadCloser
-	bufferSize int
 	maxBytes   int // max bytes per line limit to avoid OOM with malformatted files
 	nl         []byte
 	decodedNl  []byte
@@ -44,10 +43,11 @@ type LineReader struct {
 	inOffset   int // input buffer read offset
 	byteCount  int // number of bytes decoded from input buffer into output buffer
 	decoder    transform.Transformer
+	tempBuffer []byte
 	logger     *logp.Logger
 }
 
-// New creates a new reader object
+// NewLineReader creates a new reader object
 func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 	encoder := config.Codec.NewEncoder()
 
@@ -64,19 +64,24 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 
 	return &LineReader{
 		reader:     input,
-		bufferSize: config.BufferSize,
 		maxBytes:   config.MaxBytes,
 		decoder:    config.Codec.NewDecoder(),
 		nl:         nl,
 		decodedNl:  terminator,
 		inBuffer:   streambuf.New(nil),
 		outBuffer:  streambuf.New(nil),
+		tempBuffer: make([]byte, config.BufferSize),
 		logger:     logp.NewLogger("reader_line"),
 	}, nil
 }
 
-// Next reads the next line until the new line character
-func (r *LineReader) Next() ([]byte, int, error) {
+// Next reads the next line until the new line character.  The return
+// value b is the byte slice that contains the next line.  The return
+// value n is the number of bytes that were consumed from the
+// underlying reader to read the next line.  If the LineReader is
+// configured with maxBytes n may be larger than the length of b due
+// to skipped lines.
+func (r *LineReader) Next() (b []byte, n int, err error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
@@ -133,18 +138,17 @@ func (r *LineReader) advance() error {
 			r.inOffset = newOffset
 		}
 
-		buf := make([]byte, r.bufferSize)
-
 		// Try to read more bytes into buffer
-		n, err := r.reader.Read(buf)
+		n, err := r.reader.Read(r.tempBuffer)
 
 		if err == io.EOF && n > 0 {
 			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
 			err = nil
 		}
 
-		// Appends buffer also in case of err
-		r.inBuffer.Append(buf[:n])
+		// Write to buffer also in case of err
+		r.inBuffer.Write(r.tempBuffer[:n])
+
 		if err != nil {
 			return err
 		}
@@ -163,6 +167,7 @@ func (r *LineReader) advance() error {
 			for idx != -1 && idx > r.maxBytes {
 				r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, idx)
 				err = r.inBuffer.Advance(idx + len(r.nl))
+				r.byteCount += idx + len(r.nl)
 				r.inBuffer.Reset()
 				r.inOffset = 0
 				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
@@ -170,12 +175,13 @@ func (r *LineReader) advance() error {
 
 			// If newLine is not found and the incoming data buffer exceeded max bytes limit, then skip until the next newLine
 			if idx == -1 && r.inBuffer.Len() > r.maxBytes {
-				skipped, err := r.skipUntilNewLine(buf)
+				skipped, err := r.skipUntilNewLine()
 				if err != nil {
 					r.logger.Error("Error skipping until new line, err:", err)
 					return err
 				}
 				r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, skipped)
+				r.byteCount += skipped
 				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
 			}
 		}
@@ -204,7 +210,7 @@ func (r *LineReader) advance() error {
 	return err
 }
 
-func (r *LineReader) skipUntilNewLine(buf []byte) (int, error) {
+func (r *LineReader) skipUntilNewLine() (int, error) {
 	// The length of the line skipped
 	skipped := r.inBuffer.Len()
 
@@ -221,14 +227,14 @@ func (r *LineReader) skipUntilNewLine(buf []byte) (int, error) {
 
 	// Read until the new line is found
 	for idx := -1; idx == -1; {
-		n, err := r.reader.Read(buf)
+		n, err := r.reader.Read(r.tempBuffer)
 
 		// Check bytes read for newLine
 		if n > 0 {
-			idx = bytes.Index(buf[:n], r.nl)
+			idx = bytes.Index(r.tempBuffer[:n], r.nl)
 
 			if idx != -1 {
-				r.inBuffer.Append(buf[idx+len(r.nl) : n])
+				r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
 				skipped += idx
 			} else {
 				skipped += n
@@ -249,14 +255,13 @@ func (r *LineReader) skipUntilNewLine(buf []byte) (int, error) {
 
 func (r *LineReader) decode(end int) (int, error) {
 	var err error
-	buffer := make([]byte, 1024)
 	inBytes := r.inBuffer.Bytes()
 	start := 0
 
 	for start < end {
 		var nDst, nSrc int
 
-		nDst, nSrc, err = r.decoder.Transform(buffer, inBytes[start:end], false)
+		nDst, nSrc, err = r.decoder.Transform(r.tempBuffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
 			if err != transform.ErrShortDst {
@@ -270,7 +275,7 @@ func (r *LineReader) decode(end int) (int, error) {
 		}
 
 		start += nSrc
-		r.outBuffer.Write(buffer[:nDst])
+		r.outBuffer.Write(r.tempBuffer[:nDst])
 	}
 
 	r.byteCount += start

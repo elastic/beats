@@ -1,0 +1,145 @@
+{
+    "attributes": {
+        "columns": [
+            "event.action",
+            "event.outcome",
+            "source.address",
+            "source.user.name",
+            "destination.address",
+            "destination.user.name",
+            "event.reason"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "cyberarkpas.audit"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "cyberarkpas.audit"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "308",
+                                "319",
+                                "295",
+                                "22",
+                                "38",
+                                "300",
+                                "302"
+                            ],
+                            "type": "phrases",
+                            "value": "308, 319, 295, 22, 38, 300, 302"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "308"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "319"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "295"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "22"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "38"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "300"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "302"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Credential Access logs [Filebeat CyberArk PAS] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:04.520Z",
+    "version": "WzQ0MTEsMV0="
+}

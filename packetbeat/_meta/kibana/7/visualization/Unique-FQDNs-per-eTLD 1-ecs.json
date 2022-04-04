@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Unique FQDNs per eTLD+1 ECS",
+        "uiStateJSON": "{\"vis\": {\"colors\": {\"Count\": \"#1F78C1\", \"Unique count of dns.question.name\": \"#E0752D\"}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Unique Subdomain Count\",\"field\":\"dns.question.name\"},\"schema\":\"metric\",\"type\":\"cardinality\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Domains\",\"field\":\"dns.question.etld_plus_one\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":20},\"schema\":\"segment\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":true,\"legendPosition\":\"right\",\"mode\":\"grouped\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"times\":[],\"yAxis\":{}},\"title\":\"Unique FQDNs per eTLD+1 ECS\",\"type\":\"histogram\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Unique-FQDNs-per-eTLD 1-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:38.960Z",
+    "version": "WzMxMzcsMV0="
+}

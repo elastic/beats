@@ -1,3096 +1,980 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Netflow traffic analysis",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "globalState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "input.type",
-                  "negate": false,
-                  "params": {
-                    "query": "netflow"
-                  },
-                  "type": "phrase",
-                  "value": "netflow"
-                },
-                "query": {
-                  "match": {
-                    "input.type": {
-                      "query": "netflow",
-                      "type": "phrase"
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "globalState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "input.type",
+                            "negate": false,
+                            "params": {
+                                "query": "netflow"
+                            },
+                            "type": "phrase",
+                            "value": "netflow"
+                        },
+                        "query": {
+                            "match": {
+                                "input.type": {
+                                    "query": "netflow",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
                     }
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "version": true
-          }
+                ],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
         },
         "optionsJSON": {
-          "darkTheme": false
+            "darkTheme": false
         },
         "panelsJSON": [
-          {
-            "col": 7,
-            "panelIndex": 1,
-            "panelRefName": "panel_0",
-            "row": 22,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 4,
-            "panelRefName": "panel_1",
-            "row": 1,
-            "size_x": 12,
-            "size_y": 1
-          },
-          {
-            "col": 7,
-            "panelIndex": 5,
-            "panelRefName": "panel_2",
-            "row": 28,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 6,
-            "panelRefName": "panel_3",
-            "row": 28,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 7,
-            "panelRefName": "panel_4",
-            "row": 10,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 9,
-            "panelRefName": "panel_5",
-            "row": 22,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 10,
-            "panelRefName": "panel_6",
-            "row": 16,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 11,
-            "panelRefName": "panel_7",
-            "row": 16,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 12,
-            "panelRefName": "panel_8",
-            "row": 10,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 13,
-            "panelRefName": "panel_9",
-            "row": 4,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 14,
-            "panelRefName": "panel_10",
-            "row": 4,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 15,
-            "panelRefName": "panel_11",
-            "row": 2,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 16,
-            "panelRefName": "panel_12",
-            "row": 8,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 17,
-            "panelRefName": "panel_13",
-            "row": 2,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 18,
-            "panelRefName": "panel_14",
-            "row": 8,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 19,
-            "panelRefName": "panel_15",
-            "row": 14,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 20,
-            "panelRefName": "panel_16",
-            "row": 14,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 21,
-            "panelRefName": "panel_17",
-            "row": 20,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 22,
-            "panelRefName": "panel_18",
-            "row": 20,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 23,
-            "panelRefName": "panel_19",
-            "row": 26,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 24,
-            "panelRefName": "panel_20",
-            "row": 26,
-            "size_x": 4,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 25,
-            "panelRefName": "panel_21",
-            "row": 6,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 11,
-            "panelIndex": 26,
-            "panelRefName": "panel_22",
-            "row": 2,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 5,
-            "panelIndex": 27,
-            "panelRefName": "panel_23",
-            "row": 2,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 28,
-            "panelRefName": "panel_24",
-            "row": 6,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 11,
-            "panelIndex": 29,
-            "panelRefName": "panel_25",
-            "row": 8,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 5,
-            "panelIndex": 30,
-            "panelRefName": "panel_26",
-            "row": 8,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 31,
-            "panelRefName": "panel_27",
-            "row": 24,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 34,
-            "panelRefName": "panel_28",
-            "row": 30,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 35,
-            "panelRefName": "panel_29",
-            "row": 30,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 38,
-            "panelRefName": "panel_30",
-            "row": 12,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 42,
-            "panelRefName": "panel_31",
-            "row": 12,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 44,
-            "panelRefName": "panel_32",
-            "row": 24,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 1,
-            "panelIndex": 45,
-            "panelRefName": "panel_33",
-            "row": 18,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 7,
-            "panelIndex": 47,
-            "panelRefName": "panel_34",
-            "row": 18,
-            "size_x": 6,
-            "size_y": 2
-          },
-          {
-            "col": 5,
-            "panelIndex": 48,
-            "panelRefName": "panel_35",
-            "row": 14,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 11,
-            "panelIndex": 49,
-            "panelRefName": "panel_36",
-            "row": 14,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 11,
-            "panelIndex": 50,
-            "panelRefName": "panel_37",
-            "row": 20,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 11,
-            "panelIndex": 51,
-            "panelRefName": "panel_38",
-            "row": 26,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 5,
-            "panelIndex": 52,
-            "panelRefName": "panel_39",
-            "row": 26,
-            "size_x": 2,
-            "size_y": 2
-          },
-          {
-            "col": 5,
-            "panelIndex": 53,
-            "panelRefName": "panel_40",
-            "row": 20,
-            "size_x": 2,
-            "size_y": 2
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 84
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 108
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 108
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 36
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "9",
+                    "w": 24,
+                    "x": 0,
+                    "y": 84
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "10",
+                    "w": 24,
+                    "x": 24,
+                    "y": 60
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "11",
+                    "w": 24,
+                    "x": 0,
+                    "y": 60
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "12",
+                    "w": 24,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "13",
+                    "w": 24,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "14",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "15",
+                    "w": 16,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "16",
+                    "w": 16,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 16,
+                    "x": 24,
+                    "y": 4
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "18",
+                    "w": 16,
+                    "x": 24,
+                    "y": 28
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "19",
+                    "w": 16,
+                    "x": 0,
+                    "y": 52
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "20",
+                    "w": 16,
+                    "x": 24,
+                    "y": 52
+                },
+                "panelIndex": "20",
+                "panelRefName": "panel_20",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "21",
+                    "w": 16,
+                    "x": 0,
+                    "y": 76
+                },
+                "panelIndex": "21",
+                "panelRefName": "panel_21",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "22",
+                    "w": 16,
+                    "x": 24,
+                    "y": 76
+                },
+                "panelIndex": "22",
+                "panelRefName": "panel_22",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "23",
+                    "w": 16,
+                    "x": 0,
+                    "y": 100
+                },
+                "panelIndex": "23",
+                "panelRefName": "panel_23",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "24",
+                    "w": 16,
+                    "x": 24,
+                    "y": 100
+                },
+                "panelIndex": "24",
+                "panelRefName": "panel_24",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "25",
+                    "w": 24,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "25",
+                "panelRefName": "panel_25",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "26",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "26",
+                "panelRefName": "panel_26",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "27",
+                    "w": 8,
+                    "x": 16,
+                    "y": 4
+                },
+                "panelIndex": "27",
+                "panelRefName": "panel_27",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "28",
+                    "w": 24,
+                    "x": 24,
+                    "y": 20
+                },
+                "panelIndex": "28",
+                "panelRefName": "panel_28",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "29",
+                    "w": 8,
+                    "x": 40,
+                    "y": 28
+                },
+                "panelIndex": "29",
+                "panelRefName": "panel_29",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "30",
+                    "w": 8,
+                    "x": 16,
+                    "y": 28
+                },
+                "panelIndex": "30",
+                "panelRefName": "panel_30",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "31",
+                    "w": 24,
+                    "x": 24,
+                    "y": 92
+                },
+                "panelIndex": "31",
+                "panelRefName": "panel_31",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "34",
+                    "w": 24,
+                    "x": 24,
+                    "y": 116
+                },
+                "panelIndex": "34",
+                "panelRefName": "panel_34",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "35",
+                    "w": 24,
+                    "x": 0,
+                    "y": 116
+                },
+                "panelIndex": "35",
+                "panelRefName": "panel_35",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "38",
+                    "w": 24,
+                    "x": 24,
+                    "y": 44
+                },
+                "panelIndex": "38",
+                "panelRefName": "panel_38",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "42",
+                    "w": 24,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "42",
+                "panelRefName": "panel_42",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "44",
+                    "w": 24,
+                    "x": 0,
+                    "y": 92
+                },
+                "panelIndex": "44",
+                "panelRefName": "panel_44",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "45",
+                    "w": 24,
+                    "x": 0,
+                    "y": 68
+                },
+                "panelIndex": "45",
+                "panelRefName": "panel_45",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "47",
+                    "w": 24,
+                    "x": 24,
+                    "y": 68
+                },
+                "panelIndex": "47",
+                "panelRefName": "panel_47",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "48",
+                    "w": 8,
+                    "x": 16,
+                    "y": 52
+                },
+                "panelIndex": "48",
+                "panelRefName": "panel_48",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "49",
+                    "w": 8,
+                    "x": 40,
+                    "y": 52
+                },
+                "panelIndex": "49",
+                "panelRefName": "panel_49",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "50",
+                    "w": 8,
+                    "x": 40,
+                    "y": 76
+                },
+                "panelIndex": "50",
+                "panelRefName": "panel_50",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "51",
+                    "w": 8,
+                    "x": 40,
+                    "y": 100
+                },
+                "panelIndex": "51",
+                "panelRefName": "panel_51",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "52",
+                    "w": 8,
+                    "x": 16,
+                    "y": 100
+                },
+                "panelIndex": "52",
+                "panelRefName": "panel_52",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "53",
+                    "w": 8,
+                    "x": 16,
+                    "y": 76
+                },
+                "panelIndex": "53",
+                "panelRefName": "panel_53",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat Netflow] Traffic Analysis",
-        "uiStateJSON": {
-          "P-15": {
-            "vis": {
-              "legendOpen": true
-            }
-          },
-          "P-26": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-27": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-29": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-30": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-48": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-49": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-50": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-51": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-52": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          },
-          "P-53": {
-            "vis": {
-              "defaultColors": {
-                "0 - 100": "rgb(0,104,55)"
-              }
-            }
-          }
-        },
         "version": 1
-      },
-      "id": "38012abe-c611-4124-8497-381fcd85acc8",
-      "migrationVersion": {
-        "dashboard": "7.0.0"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "abfa0b19-60cd-4984-9c3d-02ebf0aa1dfb",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "1e74d5cb-556d-42ee-8042-88f6c1af47f0",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "5cfb2c9a-4815-4a25-9d7e-ab0ef55ffe63",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "3e27fb83-b3e3-4c15-b999-ed6da49b7a86",
-          "name": "panel_4",
-          "type": "visualization"
-        },
-        {
-          "id": "5d868836-c7b2-4812-bf47-4838aac281d9",
-          "name": "panel_5",
-          "type": "visualization"
-        },
-        {
-          "id": "a5efa3dd-f53a-4d14-9d3f-ee73345fd93d",
-          "name": "panel_6",
-          "type": "visualization"
-        },
-        {
-          "id": "717cd7c7-bfca-435d-8ee7-38259927aade",
-          "name": "panel_7",
-          "type": "visualization"
-        },
-        {
-          "id": "f668ecdb-eec7-44c6-9060-26aaf9fc8404",
-          "name": "panel_8",
-          "type": "visualization"
-        },
-        {
-          "id": "6bbd6712-494a-4fd9-b3d3-757304681f0f",
-          "name": "panel_9",
-          "type": "visualization"
-        },
-        {
-          "id": "681f0ce4-d828-4a99-b643-0c0715530050",
-          "name": "panel_10",
-          "type": "visualization"
-        },
-        {
-          "id": "fd6c1144-5026-4795-b7af-a9aa3fc28c56",
-          "name": "panel_11",
-          "type": "visualization"
-        },
-        {
-          "id": "0b2818fd-aecc-4bef-b566-9466eb702ae4",
-          "name": "panel_12",
-          "type": "visualization"
-        },
-        {
-          "id": "248e00b4-8fc2-406f-8907-729d5380aaa7",
-          "name": "panel_13",
-          "type": "visualization"
-        },
-        {
-          "id": "cf399a85-e348-4ac1-a399-e8f5a44114c4",
-          "name": "panel_14",
-          "type": "visualization"
-        },
-        {
-          "id": "1cf30eac-aae8-47fa-a156-37f6346d2d5a",
-          "name": "panel_15",
-          "type": "visualization"
-        },
-        {
-          "id": "7fa6cb0a-518d-46e9-a228-15cd4253a957",
-          "name": "panel_16",
-          "type": "visualization"
-        },
-        {
-          "id": "57e13a20-e94f-4465-a942-42148634a1d2",
-          "name": "panel_17",
-          "type": "visualization"
-        },
-        {
-          "id": "f772028b-d5a6-4d55-b441-493871981a60",
-          "name": "panel_18",
-          "type": "visualization"
-        },
-        {
-          "id": "a14c3248-952d-42aa-bd7d-9b39157a776f",
-          "name": "panel_19",
-          "type": "visualization"
-        },
-        {
-          "id": "a685420e-c45f-4b62-932b-5b76ac8b8ca2",
-          "name": "panel_20",
-          "type": "visualization"
-        },
-        {
-          "id": "0528bc66-6981-400a-a02d-c1d221b38890",
-          "name": "panel_21",
-          "type": "visualization"
-        },
-        {
-          "id": "e99dc327-03de-4561-9e0c-f550710125c2",
-          "name": "panel_22",
-          "type": "visualization"
-        },
-        {
-          "id": "32e712ed-fa15-4db7-8575-8476e8d65b03",
-          "name": "panel_23",
-          "type": "visualization"
-        },
-        {
-          "id": "d59a031c-70d6-47d7-966d-7fcb805be9be",
-          "name": "panel_24",
-          "type": "visualization"
-        },
-        {
-          "id": "af707b01-29f1-462b-b279-6d2e803f3645",
-          "name": "panel_25",
-          "type": "visualization"
-        },
-        {
-          "id": "ddd27657-c3c8-4f82-8059-6d7763dd599b",
-          "name": "panel_26",
-          "type": "visualization"
-        },
-        {
-          "id": "30cd1009-2925-4c9b-820d-d689f5d1efda",
-          "name": "panel_27",
-          "type": "visualization"
-        },
-        {
-          "id": "7d447b22-89dc-4f32-b549-4b8620af4d76",
-          "name": "panel_28",
-          "type": "visualization"
-        },
-        {
-          "id": "d41a9663-e5ad-47a7-955e-3803ae4e23c0",
-          "name": "panel_29",
-          "type": "visualization"
-        },
-        {
-          "id": "3a4209e2-281c-467e-b5cb-315bf4a2661f",
-          "name": "panel_30",
-          "type": "visualization"
-        },
-        {
-          "id": "201d7dd1-a880-4a64-b631-db5629340db9",
-          "name": "panel_31",
-          "type": "visualization"
-        },
-        {
-          "id": "8f83cf97-4a48-421f-8db5-690297d1f4fb",
-          "name": "panel_32",
-          "type": "visualization"
-        },
-        {
-          "id": "a1704d46-15fc-41c2-851d-796ceb49877f",
-          "name": "panel_33",
-          "type": "visualization"
-        },
-        {
-          "id": "15e2a267-2495-4df2-a121-abe410d2f18c",
-          "name": "panel_34",
-          "type": "visualization"
-        },
-        {
-          "id": "f27c1479-0625-4cdc-92de-672e47db0f87",
-          "name": "panel_35",
-          "type": "visualization"
-        },
-        {
-          "id": "0177bf1a-cba8-4ba6-a1d7-73caed86ffc2",
-          "name": "panel_36",
-          "type": "visualization"
-        },
-        {
-          "id": "d5568704-e30b-4108-bb49-06a9b8dce6a6",
-          "name": "panel_37",
-          "type": "visualization"
-        },
-        {
-          "id": "16262df9-a979-4136-935e-d883c7d373d7",
-          "name": "panel_38",
-          "type": "visualization"
-        },
-        {
-          "id": "63ef5338-fdf2-488e-b78a-f0e98daccc95",
-          "name": "panel_39",
-          "type": "visualization"
-        },
-        {
-          "id": "2dca3025-692c-4876-8bcc-e0b248dc9819",
-          "name": "panel_40",
-          "type": "visualization"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjIsMV0="
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "abfa0b19-60cd-4984-9c3d-02ebf0aa1dfb",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjMsMV0="
+    "coreMigrationVersion": "8.0.0",
+    "id": "38012abe-c611-4124-8497-381fcd85acc8",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Dashboard Navigation [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
-          },
-          "title": "Dashboard Navigation [Filebeat Netflow]",
-          "type": "markdown"
-        }
-      },
-      "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjQsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Cities (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.geo.city_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.city_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Cities (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "1e74d5cb-556d-42ee-8042-88f6c1af47f0",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjUsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Countries (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.geo.country_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.country_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Countries (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "5cfb2c9a-4815-4a25-9d7e-ab0ef55ffe63",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjYsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Destination Ports (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Destination Ports (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "3e27fb83-b3e3-4c15-b999-ed6da49b7a86",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "TCP Flags (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.tcp_control_bits:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.tcp_control_bits:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "TCP Flags (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "5d868836-c7b2-4812-bf47-4838aac281d9",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjgsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "VLANs (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.vlan_id:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.vlan_id:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "VLANs (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "a5efa3dd-f53a-4d14-9d3f-ee73345fd93d",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NjksMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Types of Service (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.ip_class_of_service:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.ip_class_of_service:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Types of Service (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "717cd7c7-bfca-435d-8ee7-38259927aade",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzAsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Source Ports (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"source.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Source Ports (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "f668ecdb-eec7-44c6-9060-26aaf9fc8404",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzEsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Sources (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"source.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Sources (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "6bbd6712-494a-4fd9-b3d3-757304681f0f",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzIsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Destinations (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Destinations (bytes) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "681f0ce4-d828-4a99-b643-0c0715530050",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzMsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Sources (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Source",
-                "field": "source.ip",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Sources (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "fd6c1144-5026-4795-b7af-a9aa3fc28c56",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
+    "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzQsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
         },
-        "title": "Source Ports (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Source Port",
-                "field": "source.port",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Source Ports (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "0b2818fd-aecc-4bef-b566-9466eb702ae4",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzUsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "abfa0b19-60cd-4984-9c3d-02ebf0aa1dfb",
+            "name": "1:panel_1",
+            "type": "visualization"
         },
-        "title": "Destinations (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Destination",
-                "field": "destination.ip",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Destinations (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "248e00b4-8fc2-406f-8907-729d5380aaa7",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzYsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
+            "name": "4:panel_4",
+            "type": "visualization"
         },
-        "title": "Destination Ports (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Destination Port",
-                "field": "destination.port",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Destination Ports (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "cf399a85-e348-4ac1-a399-e8f5a44114c4",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "1e74d5cb-556d-42ee-8042-88f6c1af47f0",
+            "name": "5:panel_5",
+            "type": "visualization"
         },
-        "title": "Types of Service (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Type of Service",
-                "field": "netflow.ip_class_of_service",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Types of Service (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "1cf30eac-aae8-47fa-a156-37f6346d2d5a",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzgsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "5cfb2c9a-4815-4a25-9d7e-ab0ef55ffe63",
+            "name": "6:panel_6",
+            "type": "visualization"
         },
-        "title": "VLANs (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "VLAN",
-                "field": "netflow.vlan_id",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "VLANs (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "7fa6cb0a-518d-46e9-a228-15cd4253a957",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0NzksMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "3e27fb83-b3e3-4c15-b999-ed6da49b7a86",
+            "name": "7:panel_7",
+            "type": "visualization"
         },
-        "title": "TCP Flags (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "TCP Flags",
-                "field": "netflow.tcp_control_bits",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 255
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "TCP Flags (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "57e13a20-e94f-4465-a942-42148634a1d2",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODAsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "5d868836-c7b2-4812-bf47-4838aac281d9",
+            "name": "9:panel_9",
+            "type": "visualization"
         },
-        "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Autonomous System",
-                "field": "destination.as.organization.name",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "f772028b-d5a6-4d55-b441-493871981a60",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODEsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "a5efa3dd-f53a-4d14-9d3f-ee73345fd93d",
+            "name": "10:panel_10",
+            "type": "visualization"
         },
-        "title": "Countries (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Country",
-                "field": "destination.geo.country_name",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Countries (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "a14c3248-952d-42aa-bd7d-9b39157a776f",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODIsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "717cd7c7-bfca-435d-8ee7-38259927aade",
+            "name": "11:panel_11",
+            "type": "visualization"
         },
-        "title": "Cities (bytes) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "City",
-                "field": "destination.geo.city_name",
-                "order": "desc",
-                "orderBy": "1",
-                "size": 50
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "legendPosition": "right"
-          },
-          "title": "Cities (bytes) [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "a685420e-c45f-4b62-932b-5b76ac8b8ca2",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODMsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
+            "id": "f668ecdb-eec7-44c6-9060-26aaf9fc8404",
+            "name": "12:panel_12",
+            "type": "visualization"
         },
-        "title": "Sources (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"source.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Sources (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "0528bc66-6981-400a-a02d-c1d221b38890",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODQsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Destination Count [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Destinations",
-                "field": "destination.ip"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "fontSize": "32",
-            "handleNoResults": true
-          },
-          "title": "Destination Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "e99dc327-03de-4561-9e0c-f550710125c2",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODUsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "6bbd6712-494a-4fd9-b3d3-757304681f0f",
+            "name": "13:panel_13",
+            "type": "visualization"
         },
-        "title": "Source Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Sources",
-                "field": "source.ip"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "Source Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "32e712ed-fa15-4db7-8575-8476e8d65b03",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODYsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
+            "id": "681f0ce4-d828-4a99-b643-0c0715530050",
+            "name": "14:panel_14",
+            "type": "visualization"
         },
-        "title": "Destinations (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Destinations (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "d59a031c-70d6-47d7-966d-7fcb805be9be",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Destination Port Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Destination Ports",
-                "field": "destination.port"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "Destination Port Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "af707b01-29f1-462b-b279-6d2e803f3645",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODgsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "fd6c1144-5026-4795-b7af-a9aa3fc28c56",
+            "name": "15:panel_15",
+            "type": "visualization"
         },
-        "title": "Source Port Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Source Ports",
-                "field": "source.port"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "Source Port Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "ddd27657-c3c8-4f82-8059-6d7763dd599b",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0ODksMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
+            "id": "0b2818fd-aecc-4bef-b566-9466eb702ae4",
+            "name": "16:panel_16",
+            "type": "visualization"
         },
-        "title": "Autonomous Systems (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Autonomous Systems (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "30cd1009-2925-4c9b-820d-d689f5d1efda",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTAsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Cities (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.geo.city_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.city_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Cities (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "7d447b22-89dc-4f32-b549-4b8620af4d76",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTEsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Countries (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.geo.country_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.country_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Countries (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "d41a9663-e5ad-47a7-955e-3803ae4e23c0",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTIsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Destination Ports (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Destination Ports (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "3a4209e2-281c-467e-b5cb-315bf4a2661f",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTMsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Source Ports (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"source.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Source Ports (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "201d7dd1-a880-4a64-b631-db5629340db9",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTQsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "TCP Flags (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.tcp_control_bits:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.tcp_control_bits:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "TCP Flags (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "8f83cf97-4a48-421f-8db5-690297d1f4fb",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTUsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "Types of Service (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.ip_class_of_service:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.ip_class_of_service:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "Types of Service (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "a1704d46-15fc-41c2-851d-796ceb49877f",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTYsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "query_string": {
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "VLANs (packets) [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "listeners": {},
-          "params": {
-            "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.vlan_id:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.vlan_id:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
-            "interval": "auto"
-          },
-          "title": "VLANs (packets) [Filebeat Netflow]",
-          "type": "timelion"
-        }
-      },
-      "id": "15e2a267-2495-4df2-a121-abe410d2f18c",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
-        },
-        "title": "ToS Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Types of Service",
-                "field": "netflow.ip_class_of_service"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "ToS Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "f27c1479-0625-4cdc-92de-672e47db0f87",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTgsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "248e00b4-8fc2-406f-8907-729d5380aaa7",
+            "name": "17:panel_17",
+            "type": "visualization"
         },
-        "title": "VLAN Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "VLANs",
-                "field": "netflow.vlan_id"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "VLAN Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "0177bf1a-cba8-4ba6-a1d7-73caed86ffc2",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM0OTksMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "cf399a85-e348-4ac1-a399-e8f5a44114c4",
+            "name": "18:panel_18",
+            "type": "visualization"
         },
-        "title": "Autonomous System Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Autonomous Systems",
-                "field": "destination.as.organization.name"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "Autonomous System Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "d5568704-e30b-4108-bb49-06a9b8dce6a6",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM1MDAsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "1cf30eac-aae8-47fa-a156-37f6346d2d5a",
+            "name": "19:panel_19",
+            "type": "visualization"
         },
-        "title": "City Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Cities",
-                "field": "destination.geo.city_name"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "City Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "16262df9-a979-4136-935e-d883c7d373d7",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM1MDEsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "7fa6cb0a-518d-46e9-a228-15cd4253a957",
+            "name": "20:panel_20",
+            "type": "visualization"
         },
-        "title": "Country Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Countries",
-                "field": "destination.geo.country_name"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "Country Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "63ef5338-fdf2-488e-b78a-f0e98daccc95",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM1MDIsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-          }
+            "id": "57e13a20-e94f-4465-a942-42148634a1d2",
+            "name": "21:panel_21",
+            "type": "visualization"
         },
-        "title": "TCP Flags Count [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 100": "rgb(0,104,55)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "TCP Flag States",
-                "field": "netflow.tcp_control_bits"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
-          "listeners": {},
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "fontSize": "32",
-            "gauge": {
-              "autoExtend": false,
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 100
-                }
-              ],
-              "gaugeColorMode": "None",
-              "gaugeStyle": "Full",
-              "gaugeType": "Metric",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": false,
-                "width": 2
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": "36",
-                "labelColor": false,
-                "subText": ""
-              },
-              "type": "simple",
-              "useRange": false,
-              "verticalSplit": false
-            },
-            "handleNoResults": true,
-            "type": "gauge"
-          },
-          "title": "TCP Flags Count [Filebeat Netflow]",
-          "type": "metric"
-        }
-      },
-      "id": "2dca3025-692c-4876-8bcc-e0b248dc9819",
-      "migrationVersion": {
-        "visualization": "7.2.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+            "id": "f772028b-d5a6-4d55-b441-493871981a60",
+            "name": "22:panel_22",
+            "type": "visualization"
+        },
+        {
+            "id": "a14c3248-952d-42aa-bd7d-9b39157a776f",
+            "name": "23:panel_23",
+            "type": "visualization"
+        },
+        {
+            "id": "a685420e-c45f-4b62-932b-5b76ac8b8ca2",
+            "name": "24:panel_24",
+            "type": "visualization"
+        },
+        {
+            "id": "0528bc66-6981-400a-a02d-c1d221b38890",
+            "name": "25:panel_25",
+            "type": "visualization"
+        },
+        {
+            "id": "e99dc327-03de-4561-9e0c-f550710125c2",
+            "name": "26:panel_26",
+            "type": "visualization"
+        },
+        {
+            "id": "32e712ed-fa15-4db7-8575-8476e8d65b03",
+            "name": "27:panel_27",
+            "type": "visualization"
+        },
+        {
+            "id": "d59a031c-70d6-47d7-966d-7fcb805be9be",
+            "name": "28:panel_28",
+            "type": "visualization"
+        },
+        {
+            "id": "af707b01-29f1-462b-b279-6d2e803f3645",
+            "name": "29:panel_29",
+            "type": "visualization"
+        },
+        {
+            "id": "ddd27657-c3c8-4f82-8059-6d7763dd599b",
+            "name": "30:panel_30",
+            "type": "visualization"
+        },
+        {
+            "id": "30cd1009-2925-4c9b-820d-d689f5d1efda",
+            "name": "31:panel_31",
+            "type": "visualization"
+        },
+        {
+            "id": "7d447b22-89dc-4f32-b549-4b8620af4d76",
+            "name": "34:panel_34",
+            "type": "visualization"
+        },
+        {
+            "id": "d41a9663-e5ad-47a7-955e-3803ae4e23c0",
+            "name": "35:panel_35",
+            "type": "visualization"
+        },
+        {
+            "id": "3a4209e2-281c-467e-b5cb-315bf4a2661f",
+            "name": "38:panel_38",
+            "type": "visualization"
+        },
+        {
+            "id": "201d7dd1-a880-4a64-b631-db5629340db9",
+            "name": "42:panel_42",
+            "type": "visualization"
+        },
+        {
+            "id": "8f83cf97-4a48-421f-8db5-690297d1f4fb",
+            "name": "44:panel_44",
+            "type": "visualization"
+        },
+        {
+            "id": "a1704d46-15fc-41c2-851d-796ceb49877f",
+            "name": "45:panel_45",
+            "type": "visualization"
+        },
+        {
+            "id": "15e2a267-2495-4df2-a121-abe410d2f18c",
+            "name": "47:panel_47",
+            "type": "visualization"
+        },
+        {
+            "id": "f27c1479-0625-4cdc-92de-672e47db0f87",
+            "name": "48:panel_48",
+            "type": "visualization"
+        },
+        {
+            "id": "0177bf1a-cba8-4ba6-a1d7-73caed86ffc2",
+            "name": "49:panel_49",
+            "type": "visualization"
+        },
+        {
+            "id": "d5568704-e30b-4108-bb49-06a9b8dce6a6",
+            "name": "50:panel_50",
+            "type": "visualization"
+        },
+        {
+            "id": "16262df9-a979-4136-935e-d883c7d373d7",
+            "name": "51:panel_51",
+            "type": "visualization"
+        },
+        {
+            "id": "63ef5338-fdf2-488e-b78a-f0e98daccc95",
+            "name": "52:panel_52",
+            "type": "visualization"
+        },
+        {
+            "id": "2dca3025-692c-4876-8bcc-e0b248dc9819",
+            "name": "53:panel_53",
+            "type": "visualization"
         }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-07-11T04:44:38.685Z",
-      "version": "WzM1MDMsMV0="
-    }
-  ],
-  "version": "7.2.0"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:49.565Z",
+    "version": "WzQ4NDUsMV0="
 }

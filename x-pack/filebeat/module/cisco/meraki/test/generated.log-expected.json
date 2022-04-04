@@ -1,9 +1,7 @@
 [
     {
         "@timestamp": "2016-01-29T06:09:59.000Z",
-        "destination.ip": [
-            "10.193.124.51"
-        ],
+        "destination.ip": "10.193.124.51",
         "destination.port": 5293,
         "event.action": "deny",
         "event.code": "security_event",
@@ -31,9 +29,7 @@
         "rsa.misc.sensor": "nto_",
         "rsa.time.event_time": "2016-01-29T06:09:59.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.15.44.253"
-        ],
+        "source.ip": "10.15.44.253",
         "source.mac": "01:00:5e:28:ae:7d",
         "source.port": 5078,
         "tags": [
@@ -77,9 +73,7 @@
         "rsa.network.mask": "ameaqu",
         "rsa.time.event_time": "2016-02-12T13:12:33.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.102.218.31"
-        ],
+        "source.ip": "10.102.218.31",
         "source.mac": "01:00:5e:9c:c2:9c",
         "tags": [
             "cisco.meraki",
@@ -118,9 +112,7 @@
     },
     {
         "@timestamp": "2016-03-12T03:17:42.000Z",
-        "destination.ip": [
-            "10.112.46.169"
-        ],
+        "destination.ip": "10.112.46.169",
         "event.action": "radip flows block",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -149,9 +141,7 @@
         "rsa.misc.sensor": "taliquip_",
         "rsa.time.event_time": "2016-03-12T03:17:42.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.155.236.240"
-        ],
+        "source.ip": "10.155.236.240",
         "source.mac": "01:00:5e:7a:74:89",
         "tags": [
             "cisco.meraki",
@@ -181,9 +171,7 @@
         "rsa.network.eth_host": "01:00:5e:a3:d9:ac",
         "rsa.time.event_time": "2016-03-26T10:20:16.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.14.107.140"
-        ],
+        "source.ip": "10.14.107.140",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -191,9 +179,7 @@
     },
     {
         "@timestamp": "2016-04-09T17:22:51.000Z",
-        "destination.ip": [
-            "10.108.180.105"
-        ],
+        "destination.ip": "10.108.180.105",
         "destination.mac": "01:00:5e:40:9b:83",
         "destination.port": 5098,
         "event.code": "events",
@@ -251,9 +237,7 @@
         "rsa.network.eth_host": "01:00:5e:3f:49:e4",
         "rsa.time.event_time": "2016-04-24T00:25:25.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.149.88.198"
-        ],
+        "source.ip": "10.149.88.198",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -307,9 +291,7 @@
         "rsa.network.eth_host": "01:00:5e:9f:b6:a6",
         "rsa.time.event_time": "2016-05-22T14:30:33.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.243.206.225"
-        ],
+        "source.ip": "10.243.206.225",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -339,9 +321,7 @@
         "rsa.misc.sensor": "tatno_ ids-alerts taliqu",
         "rsa.time.event_time": "2016-06-05T21:33:08.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.131.82.116"
-        ],
+        "source.ip": "10.131.82.116",
         "source.port": 7307,
         "tags": [
             "cisco.meraki",
@@ -350,9 +330,7 @@
     },
     {
         "@timestamp": "2016-06-20T04:35:42.000Z",
-        "destination.ip": [
-            "10.134.0.141"
-        ],
+        "destination.ip": "10.134.0.141",
         "destination.port": 2703,
         "event.action": "accept",
         "event.code": "security_event",
@@ -380,9 +358,7 @@
         "rsa.misc.sensor": "ehenderi_",
         "rsa.time.event_time": "2016-06-20T04:35:42.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.210.213.18"
-        ],
+        "source.ip": "10.210.213.18",
         "source.mac": "01:00:5e:aa:42:fa",
         "source.port": 7616,
         "tags": [
@@ -399,9 +375,7 @@
     },
     {
         "@timestamp": "2016-07-04T11:38:16.000Z",
-        "destination.ip": [
-            "10.74.237.180"
-        ],
+        "destination.ip": "10.74.237.180",
         "event.action": "security_event",
         "event.code": "security_event",
         "event.dataset": "cisco.meraki",
@@ -427,9 +401,7 @@
         "rsa.misc.sensor": "oremagna_",
         "rsa.time.event_time": "2016-07-04T11:38:16.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.163.72.17"
-        ],
+        "source.ip": "10.163.72.17",
         "source.mac": "01:00:5e:c8:9c:2f",
         "tags": [
             "cisco.meraki",
@@ -459,9 +431,7 @@
         "rsa.network.eth_host": "01:00:5e:e2:67:d2",
         "rsa.time.event_time": "2016-07-18T18:40:50.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.72.31.26"
-        ],
+        "source.ip": "10.72.31.26",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -491,9 +461,7 @@
         "rsa.misc.sensor": "mqui",
         "rsa.time.event_time": "2016-08-02T01:43:25.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.70.95.74"
-        ],
+        "source.ip": "10.70.95.74",
         "source.port": 4290,
         "tags": [
             "cisco.meraki",
@@ -523,9 +491,7 @@
         "rsa.network.eth_host": "01:00:5e:9c:d2:4a",
         "rsa.time.event_time": "2016-08-16T08:45:59.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.17.21.125"
-        ],
+        "source.ip": "10.17.21.125",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -560,9 +526,7 @@
         "rsa.network.mask": "uiineavo",
         "rsa.time.event_time": "2016-08-30T15:48:33.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.85.10.165"
-        ],
+        "source.ip": "10.85.10.165",
         "source.mac": "01:00:5e:63:93:48",
         "tags": [
             "cisco.meraki",
@@ -571,9 +535,7 @@
     },
     {
         "@timestamp": "2016-09-13T22:51:07.000Z",
-        "destination.ip": [
-            "10.187.77.245"
-        ],
+        "destination.ip": "10.187.77.245",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -597,9 +559,7 @@
         "rsa.misc.sensor": "iscinge",
         "rsa.time.event_time": "2016-09-13T22:51:07.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.88.231.224"
-        ],
+        "source.ip": "10.88.231.224",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -607,9 +567,7 @@
     },
     {
         "@timestamp": "2016-09-28T05:53:42.000Z",
-        "destination.ip": [
-            "10.186.58.115"
-        ],
+        "destination.ip": "10.186.58.115",
         "destination.mac": "01:00:5e:8f:16:6d",
         "destination.port": 7238,
         "event.code": "events",
@@ -673,9 +631,7 @@
         "rsa.network.mask": "uovolup",
         "rsa.time.event_time": "2016-10-12T12:56:16.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.219.84.37"
-        ],
+        "source.ip": "10.219.84.37",
         "source.mac": "01:00:5e:e8:bf:69",
         "tags": [
             "cisco.meraki",
@@ -705,9 +661,7 @@
         "rsa.network.eth_host": "01:00:5e:ec:f8:cc",
         "rsa.time.event_time": "2016-10-26T19:58:50.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.3.134.237"
-        ],
+        "source.ip": "10.3.134.237",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -715,9 +669,7 @@
     },
     {
         "@timestamp": "2016-11-10T03:01:24.000Z",
-        "destination.ip": [
-            "10.63.194.87"
-        ],
+        "destination.ip": "10.63.194.87",
         "destination.mac": "01:00:5e:e3:b1:24",
         "event.action": "texp",
         "event.code": "events",
@@ -747,9 +699,7 @@
         "rsa.time.duration_time": 48.123,
         "rsa.time.event_time": "2016-11-10T03:01:24.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.182.178.217"
-        ],
+        "source.ip": "10.182.178.217",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -764,9 +714,7 @@
     },
     {
         "@timestamp": "2016-11-24T10:03:59.000Z",
-        "destination.ip": [
-            "10.163.154.210"
-        ],
+        "destination.ip": "10.163.154.210",
         "destination.mac": "01:00:5e:9e:7b:a4",
         "event.action": "rau",
         "event.code": "events",
@@ -796,9 +744,7 @@
         "rsa.time.duration_time": 71.798,
         "rsa.time.event_time": "2016-11-24T10:03:59.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.153.0.77"
-        ],
+        "source.ip": "10.153.0.77",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -834,9 +780,7 @@
         "rsa.network.eth_host": "01:00:5e:b9:6b:a8",
         "rsa.time.event_time": "2016-12-08T17:06:33.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.73.69.176"
-        ],
+        "source.ip": "10.73.69.176",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -874,9 +818,7 @@
     },
     {
         "@timestamp": "2017-01-06T07:11:41.000Z",
-        "destination.ip": [
-            "10.12.182.70"
-        ],
+        "destination.ip": "10.12.182.70",
         "event.action": "security_event",
         "event.code": "security_event",
         "event.dataset": "cisco.meraki",
@@ -902,9 +844,7 @@
         "rsa.misc.sensor": "uamest_",
         "rsa.time.event_time": "2017-01-06T07:11:41.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.31.77.157"
-        ],
+        "source.ip": "10.31.77.157",
         "source.mac": "01:00:5e:1c:4c:64",
         "tags": [
             "cisco.meraki",
@@ -943,9 +883,7 @@
     },
     {
         "@timestamp": "2017-02-03T21:16:50.000Z",
-        "destination.ip": [
-            "10.135.217.12"
-        ],
+        "destination.ip": "10.135.217.12",
         "event.action": "cteturad flows deny",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -974,9 +912,7 @@
         "rsa.misc.sensor": "pid_",
         "rsa.time.event_time": "2017-02-03T21:16:50.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.93.68.231"
-        ],
+        "source.ip": "10.93.68.231",
         "source.mac": "01:00:5e:4a:69:5b",
         "tags": [
             "cisco.meraki",
@@ -1010,9 +946,7 @@
     },
     {
         "@timestamp": "2017-03-04T11:21:59.000Z",
-        "destination.ip": [
-            "10.66.89.5"
-        ],
+        "destination.ip": "10.66.89.5",
         "event.action": "iscinge flows",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -1041,9 +975,7 @@
         "rsa.misc.sensor": "ncidi_",
         "rsa.time.event_time": "2017-03-04T11:21:59.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.247.30.212"
-        ],
+        "source.ip": "10.247.30.212",
         "source.mac": "01:00:5e:7f:65:da",
         "tags": [
             "cisco.meraki",
@@ -1076,9 +1008,7 @@
     },
     {
         "@timestamp": "2017-04-02T01:27:07.000Z",
-        "destination.ip": [
-            "10.173.136.186"
-        ],
+        "destination.ip": "10.173.136.186",
         "destination.mac": "01:00:5e:c1:53:b1",
         "event.action": "security_event",
         "event.code": "security_event",
@@ -1105,9 +1035,7 @@
         "rsa.misc.sensor": "iduntu",
         "rsa.time.event_time": "2017-04-02T01:27:07.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.221.102.245"
-        ],
+        "source.ip": "10.221.102.245",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1115,9 +1043,7 @@
     },
     {
         "@timestamp": "2017-04-16T08:29:41.000Z",
-        "destination.ip": [
-            "10.54.37.86"
-        ],
+        "destination.ip": "10.54.37.86",
         "destination.mac": "01:00:5e:1f:c6:29",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -1143,9 +1069,7 @@
         "rsa.misc.sensor": "uscipitl_ ids-alerts ritatise",
         "rsa.time.event_time": "2017-04-16T08:29:41.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.58.64.108"
-        ],
+        "source.ip": "10.58.64.108",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1153,9 +1077,7 @@
     },
     {
         "@timestamp": "2017-04-30T15:32:16.000Z",
-        "destination.ip": [
-            "10.163.93.20"
-        ],
+        "destination.ip": "10.163.93.20",
         "event.action": "veli flows block",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -1184,9 +1106,7 @@
         "rsa.misc.sensor": "uunturm_",
         "rsa.time.event_time": "2017-04-30T15:32:16.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.147.76.202"
-        ],
+        "source.ip": "10.147.76.202",
         "source.mac": "01:00:5e:1d:85:ec",
         "tags": [
             "cisco.meraki",
@@ -1195,9 +1115,7 @@
     },
     {
         "@timestamp": "2017-05-14T22:34:50.000Z",
-        "destination.ip": [
-            "10.183.44.198"
-        ],
+        "destination.ip": "10.183.44.198",
         "destination.mac": "01:00:5e:35:71:1e",
         "destination.port": 1702,
         "event.action": "security_event",
@@ -1225,9 +1143,7 @@
         "rsa.misc.sensor": "uptatema_",
         "rsa.time.event_time": "2017-05-14T22:34:50.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.0.200.27"
-        ],
+        "source.ip": "10.0.200.27",
         "source.port": 5905,
         "tags": [
             "cisco.meraki",
@@ -1263,9 +1179,7 @@
         "rsa.network.mask": "ritin",
         "rsa.time.event_time": "2017-05-29T05:37:24.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.148.124.84"
-        ],
+        "source.ip": "10.148.124.84",
         "source.mac": "01:00:5e:0b:2c:22",
         "tags": [
             "cisco.meraki",
@@ -1274,9 +1188,7 @@
     },
     {
         "@timestamp": "2017-06-12T12:39:58.000Z",
-        "destination.ip": [
-            "10.98.194.212"
-        ],
+        "destination.ip": "10.98.194.212",
         "destination.mac": "01:00:5e:bb:60:a6",
         "event.action": "utaliqu",
         "event.code": "events",
@@ -1306,9 +1218,7 @@
         "rsa.time.duration_time": 165.611,
         "rsa.time.event_time": "2017-06-12T12:39:58.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.204.230.166"
-        ],
+        "source.ip": "10.204.230.166",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1323,9 +1233,7 @@
     },
     {
         "@timestamp": "2017-06-26T19:42:33.000Z",
-        "destination.ip": [
-            "10.197.13.39"
-        ],
+        "destination.ip": "10.197.13.39",
         "destination.port": 5912,
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1386,9 +1294,7 @@
     },
     {
         "@timestamp": "2017-07-25T09:47:41.000Z",
-        "destination.ip": [
-            "10.150.245.88"
-        ],
+        "destination.ip": "10.150.245.88",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -1412,9 +1318,7 @@
         "rsa.misc.sensor": "nimid",
         "rsa.time.event_time": "2017-07-25T09:47:41.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.242.77.170"
-        ],
+        "source.ip": "10.242.77.170",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1422,9 +1326,7 @@
     },
     {
         "@timestamp": "2017-08-08T16:50:15.000Z",
-        "destination.ip": [
-            "10.180.195.43"
-        ],
+        "destination.ip": "10.180.195.43",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -1449,9 +1351,7 @@
         "rsa.misc.sensor": "isc_ ids-alerts volupt",
         "rsa.time.event_time": "2017-08-08T16:50:15.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.247.139.239"
-        ],
+        "source.ip": "10.247.139.239",
         "source.mac": "01:00:5e:9d:eb:fb",
         "tags": [
             "cisco.meraki",
@@ -1485,9 +1385,7 @@
     },
     {
         "@timestamp": "2017-09-06T06:55:24.000Z",
-        "destination.ip": [
-            "10.147.15.213"
-        ],
+        "destination.ip": "10.147.15.213",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -1511,9 +1409,7 @@
         "rsa.misc.sensor": "uov_ ids-alerts isn",
         "rsa.time.event_time": "2017-09-06T06:55:24.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.94.6.140"
-        ],
+        "source.ip": "10.94.6.140",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1521,9 +1417,7 @@
     },
     {
         "@timestamp": "2017-09-20T13:57:58.000Z",
-        "destination.ip": [
-            "10.111.157.56"
-        ],
+        "destination.ip": "10.111.157.56",
         "event.action": "obeata flows block",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -1552,9 +1446,7 @@
         "rsa.misc.sensor": "mve_",
         "rsa.time.event_time": "2017-09-20T13:57:58.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.230.6.127"
-        ],
+        "source.ip": "10.230.6.127",
         "source.mac": "01:00:5e:39:a7:fc",
         "tags": [
             "cisco.meraki",
@@ -1563,9 +1455,7 @@
     },
     {
         "@timestamp": "2017-10-04T21:00:32.000Z",
-        "destination.ip": [
-            "10.193.219.34"
-        ],
+        "destination.ip": "10.193.219.34",
         "destination.mac": "01:00:5e:58:2d:1c",
         "event.action": "inBC",
         "event.code": "events",
@@ -1595,9 +1485,7 @@
         "rsa.time.duration_time": 85.513,
         "rsa.time.event_time": "2017-10-04T21:00:32.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.179.40.170"
-        ],
+        "source.ip": "10.179.40.170",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1633,9 +1521,7 @@
         "rsa.network.eth_host": "01:00:5e:ee:e8:77",
         "rsa.time.event_time": "2017-10-19T04:03:07.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.255.199.16"
-        ],
+        "source.ip": "10.255.199.16",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1664,9 +1550,7 @@
         "rsa.network.eth_host": "01:00:5e:f1:21:bd",
         "rsa.time.event_time": "2017-11-02T11:05:41.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.94.88.5"
-        ],
+        "source.ip": "10.94.88.5",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1722,9 +1606,7 @@
     },
     {
         "@timestamp": "2017-12-15T08:13:24.000Z",
-        "destination.ip": [
-            "10.124.63.4"
-        ],
+        "destination.ip": "10.124.63.4",
         "destination.mac": "01:00:5e:01:60:e0",
         "event.action": "security_event",
         "event.code": "security_event",
@@ -1751,9 +1633,7 @@
         "rsa.misc.sensor": "ser",
         "rsa.time.event_time": "2017-12-15T08:13:24.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.90.99.245"
-        ],
+        "source.ip": "10.90.99.245",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1761,9 +1641,7 @@
     },
     {
         "@timestamp": "2017-12-29T15:15:58.000Z",
-        "destination.ip": [
-            "10.249.7.146"
-        ],
+        "destination.ip": "10.249.7.146",
         "destination.port": 2010,
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1823,9 +1701,7 @@
     },
     {
         "@timestamp": "2018-01-27T05:21:06.000Z",
-        "destination.ip": [
-            "10.81.234.34"
-        ],
+        "destination.ip": "10.81.234.34",
         "destination.mac": "01:00:5e:c9:b7:22",
         "event.action": "security_event",
         "event.code": "security_event",
@@ -1852,9 +1728,7 @@
         "rsa.misc.sensor": "tobeatae_",
         "rsa.time.event_time": "2018-01-27T05:21:06.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.196.96.162"
-        ],
+        "source.ip": "10.196.96.162",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1918,9 +1792,7 @@
         "rsa.network.mask": "ehender",
         "rsa.time.event_time": "2018-02-24T19:26:15.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.40.101.224"
-        ],
+        "source.ip": "10.40.101.224",
         "source.mac": "01:00:5e:0a:df:72",
         "tags": [
             "cisco.meraki",
@@ -1950,9 +1822,7 @@
         "rsa.network.eth_host": "01:00:5e:5f:c1:3e",
         "rsa.time.event_time": "2018-03-11T02:28:49.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.244.29.119"
-        ],
+        "source.ip": "10.244.29.119",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -1960,9 +1830,7 @@
     },
     {
         "@timestamp": "2018-03-25T09:31:24.000Z",
-        "destination.ip": [
-            "10.39.172.93"
-        ],
+        "destination.ip": "10.39.172.93",
         "event.action": "pteurs flows deny",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -1991,9 +1859,7 @@
         "rsa.misc.sensor": "gna_",
         "rsa.time.event_time": "2018-03-25T09:31:24.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.83.131.245"
-        ],
+        "source.ip": "10.83.131.245",
         "source.mac": "01:00:5e:c4:12:c7",
         "tags": [
             "cisco.meraki",
@@ -2029,9 +1895,7 @@
         "rsa.network.mask": "umiure",
         "rsa.time.event_time": "2018-04-08T16:33:58.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.86.188.179"
-        ],
+        "source.ip": "10.86.188.179",
         "source.mac": "01:00:5e:48:4b:78",
         "tags": [
             "cisco.meraki",
@@ -2040,9 +1904,7 @@
     },
     {
         "@timestamp": "2018-04-22T23:36:32.000Z",
-        "destination.ip": [
-            "10.122.204.151"
-        ],
+        "destination.ip": "10.122.204.151",
         "destination.port": 3903,
         "event.action": "deny",
         "event.code": "security_event",
@@ -2070,9 +1932,7 @@
         "rsa.misc.sensor": "acom_",
         "rsa.time.event_time": "2018-04-22T23:36:32.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.148.211.222"
-        ],
+        "source.ip": "10.148.211.222",
         "source.mac": "01:00:5e:c3:a0:dc",
         "source.port": 2053,
         "tags": [
@@ -2119,9 +1979,7 @@
     },
     {
         "@timestamp": "2018-05-21T13:41:41.000Z",
-        "destination.ip": [
-            "10.120.4.9"
-        ],
+        "destination.ip": "10.120.4.9",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -2145,9 +2003,7 @@
         "rsa.misc.sensor": "upt",
         "rsa.time.event_time": "2018-05-21T13:41:41.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.97.46.16"
-        ],
+        "source.ip": "10.97.46.16",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2155,9 +2011,7 @@
     },
     {
         "@timestamp": "2018-06-04T20:44:15.000Z",
-        "destination.ip": [
-            "10.165.173.162"
-        ],
+        "destination.ip": "10.165.173.162",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -2181,9 +2035,7 @@
         "rsa.misc.sensor": "litseddo_ ids-alerts oremqu",
         "rsa.time.event_time": "2018-06-04T20:44:15.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.171.206.139"
-        ],
+        "source.ip": "10.171.206.139",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2223,9 +2075,7 @@
         "rsa.network.mask": "oinBCSed",
         "rsa.time.event_time": "2018-06-19T03:46:49.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.150.163.151"
-        ],
+        "source.ip": "10.150.163.151",
         "source.mac": "01:00:5e:72:b7:79",
         "tags": [
             "cisco.meraki",
@@ -2234,9 +2084,7 @@
     },
     {
         "@timestamp": "2018-07-03T10:49:23.000Z",
-        "destination.ip": [
-            "10.54.44.231"
-        ],
+        "destination.ip": "10.54.44.231",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -2261,9 +2109,7 @@
         "rsa.misc.sensor": "elillum_ ids-alerts tco",
         "rsa.time.event_time": "2018-07-03T10:49:23.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.52.202.158"
-        ],
+        "source.ip": "10.52.202.158",
         "source.mac": "01:00:5e:ac:6d:d3",
         "tags": [
             "cisco.meraki",
@@ -2293,9 +2139,7 @@
         "rsa.network.eth_host": "01:00:5e:f0:a9:cd",
         "rsa.time.event_time": "2018-07-17T17:51:58.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.101.183.86"
-        ],
+        "source.ip": "10.101.183.86",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2354,9 +2198,7 @@
         "rsa.network.eth_host": "01:00:5e:45:aa:51",
         "rsa.time.event_time": "2018-08-15T07:57:06.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.83.130.95"
-        ],
+        "source.ip": "10.83.130.95",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2364,9 +2206,7 @@
     },
     {
         "@timestamp": "2018-08-29T14:59:40.000Z",
-        "destination.ip": [
-            "10.103.49.129"
-        ],
+        "destination.ip": "10.103.49.129",
         "destination.mac": "01:00:5e:59:bf:36",
         "event.action": "olor",
         "event.code": "events",
@@ -2396,9 +2236,7 @@
         "rsa.time.duration_time": 91.439,
         "rsa.time.event_time": "2018-08-29T14:59:40.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.2.110.73"
-        ],
+        "source.ip": "10.2.110.73",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2413,9 +2251,7 @@
     },
     {
         "@timestamp": "2018-09-12T22:02:15.000Z",
-        "destination.ip": [
-            "10.132.176.96"
-        ],
+        "destination.ip": "10.132.176.96",
         "destination.mac": "01:00:5e:e6:a6:a2",
         "event.action": "rvelill",
         "event.code": "events",
@@ -2445,9 +2281,7 @@
         "rsa.time.duration_time": 59.289,
         "rsa.time.event_time": "2018-09-12T22:02:15.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.158.61.228"
-        ],
+        "source.ip": "10.158.61.228",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2494,9 +2328,7 @@
         "rsa.network.mask": "amnihil",
         "rsa.time.event_time": "2018-09-27T05:04:49.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.105.136.146"
-        ],
+        "source.ip": "10.105.136.146",
         "source.mac": "01:00:5e:bb:aa:f6",
         "tags": [
             "cisco.meraki",
@@ -2505,9 +2337,7 @@
     },
     {
         "@timestamp": "2018-10-11T12:07:23.000Z",
-        "destination.ip": [
-            "10.123.62.215"
-        ],
+        "destination.ip": "10.123.62.215",
         "destination.mac": "01:00:5e:1f:7f:1d",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2534,9 +2364,7 @@
         "rsa.misc.sensor": "quiavolu",
         "rsa.time.event_time": "2018-10-11T12:07:23.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.245.199.23"
-        ],
+        "source.ip": "10.245.199.23",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2574,9 +2402,7 @@
     },
     {
         "@timestamp": "2018-11-09T02:12:32.000Z",
-        "destination.ip": [
-            "10.16.230.121"
-        ],
+        "destination.ip": "10.16.230.121",
         "destination.mac": "01:00:5e:99:a6:b4",
         "event.action": "nonpro",
         "event.code": "events",
@@ -2606,9 +2432,7 @@
         "rsa.time.duration_time": 116.294,
         "rsa.time.event_time": "2018-11-09T02:12:32.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.196.176.243"
-        ],
+        "source.ip": "10.196.176.243",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2623,9 +2447,7 @@
     },
     {
         "@timestamp": "2018-11-23T09:15:06.000Z",
-        "destination.ip": [
-            "10.34.62.190"
-        ],
+        "destination.ip": "10.34.62.190",
         "destination.mac": "01:00:5e:6a:c8:f8",
         "destination.port": 1641,
         "event.action": "security_event",
@@ -2653,9 +2475,7 @@
         "rsa.misc.sensor": "gna",
         "rsa.time.event_time": "2018-11-23T09:15:06.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.246.152.72"
-        ],
+        "source.ip": "10.246.152.72",
         "source.port": 4293,
         "tags": [
             "cisco.meraki",
@@ -2739,9 +2559,7 @@
     },
     {
         "@timestamp": "2019-01-19T13:25:23.000Z",
-        "destination.ip": [
-            "10.121.9.5"
-        ],
+        "destination.ip": "10.121.9.5",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -2765,9 +2583,7 @@
         "rsa.misc.sensor": "emUtenim",
         "rsa.time.event_time": "2019-01-19T13:25:23.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.244.32.189"
-        ],
+        "source.ip": "10.244.32.189",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2775,9 +2591,7 @@
     },
     {
         "@timestamp": "2019-02-02T20:27:57.000Z",
-        "destination.ip": [
-            "10.41.124.15"
-        ],
+        "destination.ip": "10.41.124.15",
         "destination.port": 333,
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -2859,9 +2673,7 @@
         "rsa.network.eth_host": "01:00:5e:ed:ed:79",
         "rsa.time.event_time": "2019-03-03T10:33:06.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.43.235.230"
-        ],
+        "source.ip": "10.43.235.230",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -2869,9 +2681,7 @@
     },
     {
         "@timestamp": "2019-03-17T17:35:40.000Z",
-        "destination.ip": [
-            "10.103.91.159"
-        ],
+        "destination.ip": "10.103.91.159",
         "destination.port": 7116,
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -2897,9 +2707,7 @@
         "rsa.misc.sensor": "lorese_ ids-alerts ctobeat",
         "rsa.time.event_time": "2019-03-17T17:35:40.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.199.19.205"
-        ],
+        "source.ip": "10.199.19.205",
         "source.mac": "01:00:5e:a0:b2:c9",
         "source.port": 5823,
         "tags": [
@@ -2909,9 +2717,7 @@
     },
     {
         "@timestamp": "2019-04-01T00:38:14.000Z",
-        "destination.ip": [
-            "10.65.0.157"
-        ],
+        "destination.ip": "10.65.0.157",
         "destination.mac": "01:00:5e:49:c4:17",
         "event.action": "Deny",
         "event.code": "flows",
@@ -2942,9 +2748,7 @@
         "rsa.misc.sensor": "tas",
         "rsa.time.event_time": "2019-04-01T00:38:14.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.17.111.91"
-        ],
+        "source.ip": "10.17.111.91",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3003,9 +2807,7 @@
         "rsa.network.eth_host": "01:00:5e:4d:c0:dd",
         "rsa.time.event_time": "2019-04-29T14:43:23.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.20.130.88"
-        ],
+        "source.ip": "10.20.130.88",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3013,9 +2815,7 @@
     },
     {
         "@timestamp": "2019-05-13T21:45:57.000Z",
-        "destination.ip": [
-            "10.140.242.86"
-        ],
+        "destination.ip": "10.140.242.86",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -3039,9 +2839,7 @@
         "rsa.misc.sensor": "tasnu_ ids-alerts tionev",
         "rsa.time.event_time": "2019-05-13T21:45:57.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.177.64.152"
-        ],
+        "source.ip": "10.177.64.152",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3049,9 +2847,7 @@
     },
     {
         "@timestamp": "2019-05-28T04:48:31.000Z",
-        "destination.ip": [
-            "10.51.121.223"
-        ],
+        "destination.ip": "10.51.121.223",
         "destination.port": 24,
         "event.action": "security_event",
         "event.code": "security_event",
@@ -3078,9 +2874,7 @@
         "rsa.misc.sensor": "ora_",
         "rsa.time.event_time": "2019-05-28T04:48:31.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.199.103.185"
-        ],
+        "source.ip": "10.199.103.185",
         "source.mac": "01:00:5e:b8:73:c8",
         "source.port": 2449,
         "tags": [
@@ -3111,9 +2905,7 @@
         "rsa.network.eth_host": "01:00:5e:21:c2:55",
         "rsa.time.event_time": "2019-06-11T11:51:06.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.126.242.58"
-        ],
+        "source.ip": "10.126.242.58",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3146,9 +2938,7 @@
     },
     {
         "@timestamp": "2019-07-10T01:56:14.000Z",
-        "destination.ip": [
-            "10.113.152.241"
-        ],
+        "destination.ip": "10.113.152.241",
         "event.action": "uira flows deny",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -3177,9 +2967,7 @@
         "rsa.misc.sensor": "aerat_",
         "rsa.time.event_time": "2019-07-10T01:56:14.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.121.37.244"
-        ],
+        "source.ip": "10.121.37.244",
         "source.mac": "01:00:5e:9c:86:62",
         "tags": [
             "cisco.meraki",
@@ -3188,9 +2976,7 @@
     },
     {
         "@timestamp": "2019-07-24T08:58:48.000Z",
-        "destination.ip": [
-            "10.254.96.130"
-        ],
+        "destination.ip": "10.254.96.130",
         "destination.mac": "01:00:5e:10:8b:c3",
         "event.action": "ionu",
         "event.code": "events",
@@ -3220,9 +3006,7 @@
         "rsa.time.duration_time": 39.622,
         "rsa.time.event_time": "2019-07-24T08:58:48.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.247.118.132"
-        ],
+        "source.ip": "10.247.118.132",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3237,9 +3021,7 @@
     },
     {
         "@timestamp": "2019-08-07T16:01:23.000Z",
-        "destination.ip": [
-            "10.200.98.243"
-        ],
+        "destination.ip": "10.200.98.243",
         "destination.mac": "01:00:5e:95:ae:d0",
         "event.action": "ntium",
         "event.code": "events",
@@ -3269,9 +3051,7 @@
         "rsa.time.duration_time": 18.963,
         "rsa.time.event_time": "2019-08-07T16:01:23.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.101.13.122"
-        ],
+        "source.ip": "10.101.13.122",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3286,9 +3066,7 @@
     },
     {
         "@timestamp": "2019-08-21T23:03:57.000Z",
-        "destination.ip": [
-            "10.247.205.185"
-        ],
+        "destination.ip": "10.247.205.185",
         "destination.mac": "01:00:5e:6f:21:c8",
         "destination.port": 7676,
         "event.code": "events",
@@ -3325,9 +3103,7 @@
     },
     {
         "@timestamp": "2019-09-05T06:06:31.000Z",
-        "destination.ip": [
-            "10.147.165.30"
-        ],
+        "destination.ip": "10.147.165.30",
         "destination.mac": "01:00:5e:0a:88:bb",
         "destination.port": 7662,
         "event.action": "ids-alerts",
@@ -3354,9 +3130,7 @@
         "rsa.misc.sensor": "mipsumqu_ ids-alerts ccusa",
         "rsa.time.event_time": "2019-09-05T06:06:31.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.195.90.73"
-        ],
+        "source.ip": "10.195.90.73",
         "source.port": 3914,
         "tags": [
             "cisco.meraki",
@@ -3389,9 +3163,7 @@
     },
     {
         "@timestamp": "2019-10-03T20:11:40.000Z",
-        "destination.ip": [
-            "10.162.202.14"
-        ],
+        "destination.ip": "10.162.202.14",
         "destination.mac": "01:00:5e:dd:cb:5b",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -3417,9 +3189,7 @@
         "rsa.misc.sensor": "iat",
         "rsa.time.event_time": "2019-10-03T20:11:40.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.137.166.97"
-        ],
+        "source.ip": "10.137.166.97",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3427,9 +3197,7 @@
     },
     {
         "@timestamp": "2019-10-18T03:14:14.000Z",
-        "destination.ip": [
-            "10.227.135.142"
-        ],
+        "destination.ip": "10.227.135.142",
         "destination.port": 6598,
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -3486,9 +3254,7 @@
         "rsa.network.eth_host": "01:00:5e:37:9c:af",
         "rsa.time.event_time": "2019-11-01T10:16:48.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.199.29.19"
-        ],
+        "source.ip": "10.199.29.19",
         "tags": [
             "cisco.meraki",
             "forwarded"
@@ -3521,9 +3287,7 @@
     },
     {
         "@timestamp": "2019-11-30T00:21:57.000Z",
-        "destination.ip": [
-            "10.75.122.111"
-        ],
+        "destination.ip": "10.75.122.111",
         "destination.mac": "01:00:5e:92:d8:95",
         "event.action": "modoco",
         "event.code": "events",
@@ -3553,9 +3317,7 @@
         "rsa.time.duration_time": 10.574,
         "rsa.time.event_time": "2019-11-30T00:21:57.000Z",
         "service.type": "cisco",
-        "source.ip": [
-            "10.85.59.172"
-        ],
+        "source.ip": "10.85.59.172",
         "tags": [
             "cisco.meraki",
             "forwarded"

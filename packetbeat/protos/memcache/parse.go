@@ -25,11 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 )
 
-const (
-	codeSpace byte = ' '
-	codeTab        = '\t'
-)
-
 type parserConfig struct {
 	maxValues        int
 	maxBytesPerValue int

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package procs
@@ -41,13 +42,17 @@ type extractor interface {
 	Size() int
 }
 
-type callbackFn func(net.IP, uint16, int)
-type extractorFactory func(fn callbackFn) extractor
+type (
+	callbackFn       func(net.IP, uint16, int)
+	extractorFactory func(fn callbackFn) extractor
+)
 
-type tcpRowOwnerPIDExtractor callbackFn
-type tcp6RowOwnerPIDExtractor callbackFn
-type udpRowOwnerPIDExtractor callbackFn
-type udp6RowOwnerPIDExtractor callbackFn
+type (
+	tcpRowOwnerPIDExtractor  callbackFn
+	tcp6RowOwnerPIDExtractor callbackFn
+	udpRowOwnerPIDExtractor  callbackFn
+	udp6RowOwnerPIDExtractor callbackFn
+)
 
 var tablesByTransport = map[applayer.Transport][]struct {
 	family    uint32

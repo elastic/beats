@@ -45,10 +45,6 @@
       - name: sha1
         type: keyword
 
-      - name: filename
-        type: alias
-        path: file.path
-
       - name: tx_id
         type: long
 
@@ -67,31 +63,11 @@
       - name: md5
         type: keyword
 
-      - name: size
-        type: alias
-        path: file.size
-
     - name: icmp_type
       type: long
 
-    - name: dest_port
-      type: alias
-      path: destination.port
-
-    - name: src_port
-      type: alias
-      path: source.port
-
-    - name: proto
-      type: alias
-      path: network.transport
-
     - name: pcap_cnt
       type: long
-
-    - name: src_ip
-      type: alias
-      path: source.ip
 
     - name: dns
       type: group
@@ -129,49 +105,17 @@
       - name: status
         type: keyword
 
-    - name: dest_ip
-      type: alias
-      path: destination.ip
-
     - name: icmp_code
       type: long
 
     - name: http
       type: group
       fields:
-      - name: status
-        type: alias
-        path: http.response.status_code
-
       - name: redirect
         type: keyword
 
-      - name: http_user_agent
-        type: alias
-        path: user_agent.original
-
       - name: protocol
         type: keyword
-
-      - name: http_refer
-        type: alias
-        path: http.request.referrer
-
-      - name: url
-        type: alias
-        path: url.original
-
-      - name: hostname
-        type: alias
-        path: url.domain
-
-      - name: length
-        type: alias
-        path: http.response.body.bytes
-
-      - name: http_method
-        type: alias
-        path: http.request.method
 
       - name: http_content_type
         type: keyword
@@ -189,10 +133,6 @@
       - name: category
         type: keyword
 
-      - name: severity
-        type: alias
-        path: event.severity
-
       - name: rev
         type: long
 
@@ -201,10 +141,6 @@
 
       - name: signature
         type: keyword
-
-      - name: action
-        type: alias
-        path: event.outcome
 
       - name: signature_id
         type: long
@@ -717,7 +653,6 @@
 
       - name: ja3s
         type: group
-        default_field: false
         fields:
           - name: string
             type: keyword
@@ -726,7 +661,6 @@
 
       - name: ja3
         type: group
-        default_field: false
         fields:
           - name: string
             type: keyword
@@ -739,41 +673,17 @@
     - name: flow
       type: group
       fields:
-      - name: bytes_toclient
-        type: alias
-        path: destination.bytes
-
-      - name: start
-        type: alias
-        path: event.start
-
-      - name: pkts_toclient
-        type: alias
-        path: destination.packets
-
       - name: age
         type: long
 
       - name: state
         type: keyword
 
-      - name: bytes_toserver
-        type: alias
-        path: source.bytes
-
       - name: reason
         type: keyword
 
-      - name: pkts_toserver
-        type: alias
-        path: source.packets
-
       - name: alerted
         type: boolean
-
-    - name: app_proto
-      type: alias
-      path: network.protocol
 
     - name: tx_id
       type: long

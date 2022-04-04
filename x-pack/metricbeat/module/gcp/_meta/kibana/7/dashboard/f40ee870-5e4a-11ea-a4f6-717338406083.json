@@ -1,0 +1,232 @@
+{
+    "attributes": {
+        "description": "Overview of GCP Compute Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "28706ab2-1142-401d-9143-f4176a034c10",
+                    "w": 7,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "28706ab2-1142-401d-9143-f4176a034c10",
+                "panelRefName": "panel_28706ab2-1142-401d-9143-f4176a034c10",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
+                    "w": 10,
+                    "x": 7,
+                    "y": 0
+                },
+                "panelIndex": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
+                "panelRefName": "panel_2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
+                "title": "Instance Uptime",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
+                    "w": 31,
+                    "x": 17,
+                    "y": 0
+                },
+                "panelIndex": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
+                "panelRefName": "panel_5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
+                "title": "CPU Utilization",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
+                    "w": 24,
+                    "x": 0,
+                    "y": 17
+                },
+                "panelIndex": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
+                "panelRefName": "panel_9c6f36f5-c2b2-40f5-8ee3-af6131168842",
+                "title": "Read I/O",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
+                    "w": 24,
+                    "x": 24,
+                    "y": 17
+                },
+                "panelIndex": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
+                "panelRefName": "panel_93906f63-42c9-4f30-9b2c-05041a9e1efe",
+                "title": "Write I/O",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
+                    "w": 24,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
+                "panelRefName": "panel_e1a4e862-dd00-409f-8746-8a8e4bc82807",
+                "title": "Network Sent Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
+                    "w": 24,
+                    "x": 24,
+                    "y": 32
+                },
+                "panelIndex": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
+                "panelRefName": "panel_6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
+                "title": "Network Received Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
+                    "w": 24,
+                    "x": 0,
+                    "y": 47
+                },
+                "panelIndex": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
+                "panelRefName": "panel_00689e12-4cb3-49ad-ac33-dbe4279f446e",
+                "title": "Firewall Dropped Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
+                    "w": 24,
+                    "x": 24,
+                    "y": 47
+                },
+                "panelIndex": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
+                "panelRefName": "panel_901e7bf5-35f5-4c1a-9627-27f6c20d2514",
+                "title": "Firewall Dropped Packets",
+                "type": "visualization",
+                "version": "7.9.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] Compute Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f40ee870-5e4a-11ea-a4f6-717338406083",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "3aa96470-5fc4-11ea-a4f6-717338406083",
+            "name": "28706ab2-1142-401d-9143-f4176a034c10:panel_28706ab2-1142-401d-9143-f4176a034c10",
+            "type": "visualization"
+        },
+        {
+            "id": "da5bc460-63e1-11ea-b0ac-95d4ecb1fecd",
+            "name": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05:panel_2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
+            "type": "visualization"
+        },
+        {
+            "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
+            "name": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f:panel_5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
+            "type": "visualization"
+        },
+        {
+            "id": "89513bc0-5e48-11ea-a4f6-717338406083",
+            "name": "9c6f36f5-c2b2-40f5-8ee3-af6131168842:panel_9c6f36f5-c2b2-40f5-8ee3-af6131168842",
+            "type": "visualization"
+        },
+        {
+            "id": "95e1f050-5e48-11ea-a4f6-717338406083",
+            "name": "93906f63-42c9-4f30-9b2c-05041a9e1efe:panel_93906f63-42c9-4f30-9b2c-05041a9e1efe",
+            "type": "visualization"
+        },
+        {
+            "id": "6f795e70-5e49-11ea-a4f6-717338406083",
+            "name": "e1a4e862-dd00-409f-8746-8a8e4bc82807:panel_e1a4e862-dd00-409f-8746-8a8e4bc82807",
+            "type": "visualization"
+        },
+        {
+            "id": "43f45ba0-5e4a-11ea-a4f6-717338406083",
+            "name": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce:panel_6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
+            "type": "visualization"
+        },
+        {
+            "id": "9d919d00-5e4d-11ea-a4f6-717338406083",
+            "name": "00689e12-4cb3-49ad-ac33-dbe4279f446e:panel_00689e12-4cb3-49ad-ac33-dbe4279f446e",
+            "type": "visualization"
+        },
+        {
+            "id": "ef1508c0-5e4c-11ea-a4f6-717338406083",
+            "name": "901e7bf5-35f5-4c1a-9627-27f6c20d2514:panel_901e7bf5-35f5-4c1a-9627-27f6c20d2514",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:09.611Z",
+    "version": "WzM3NzQsMV0="
+}

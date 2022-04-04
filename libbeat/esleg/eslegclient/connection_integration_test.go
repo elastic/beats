@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package eslegclient
@@ -34,6 +35,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
@@ -116,9 +118,9 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 	s.Transport.Timeout = time.Duration(timeout) * time.Second
 
 	if proxy != "" {
-		p, err := url.Parse(proxy)
+		proxyURI, err := httpcommon.NewProxyURIFromString(proxy)
 		require.NoError(t, err)
-		s.Transport.Proxy.URL = p
+		s.Transport.Proxy.URL = proxyURI
 	}
 
 	return NewConnection(s)

@@ -36,7 +36,6 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
@@ -214,11 +213,14 @@ func NewEvent(
 	hashTypes []HashType,
 ) Event {
 	info, err := os.Lstat(path)
-	if err != nil && os.IsNotExist(err) {
-		// deleted file is signaled by info == nil
-		err = nil
+	if err != nil {
+		if os.IsNotExist(err) {
+			// deleted file is signaled by info == nil
+			err = nil
+		} else {
+			err = fmt.Errorf("failed to lstat: %w", err)
+		}
 	}
-	err = errors.Wrap(err, "failed to lstat")
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
@@ -312,8 +314,6 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			hashes[string(hashType)] = digest
 		}
 		file["hash"] = hashes
-		// Remove this for 8.x
-		out.MetricSetFields.Put("hash", hashes)
 	}
 
 	out.MetricSetFields.Put("event.kind", "event")
@@ -451,13 +451,13 @@ func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map
 		case XXH64:
 			hashes = append(hashes, xxhash.New())
 		default:
-			return nil, 0, errors.Errorf("unknown hash type '%v'", name)
+			return nil, 0, fmt.Errorf("unknown hash type '%v'", name)
 		}
 	}
 
 	f, err := file.ReadOpen(name)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "failed to open file for hashing")
+		return nil, 0, fmt.Errorf("failed to open file for hashing: %w", err)
 	}
 	defer f.Close()
 
@@ -471,7 +471,7 @@ func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map
 	}
 	written, err := io.Copy(hashWriter, r)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "failed to calculate file hashes")
+		return nil, 0, fmt.Errorf("failed to calculate file hashes: %w", err)
 	}
 
 	// The file grew larger than configured limit.

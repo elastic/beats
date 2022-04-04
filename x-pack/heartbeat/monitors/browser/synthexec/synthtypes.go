@@ -146,11 +146,19 @@ func (s *Step) ToMap() common.MapStr {
 }
 
 type Journey struct {
-	Name string `json:"name"`
-	Id   string `json:"id"`
+	Name string   `json:"name"`
+	Id   string   `json:"id"`
+	Tags []string `json:"tags"`
 }
 
 func (j Journey) ToMap() common.MapStr {
+	if len(j.Tags) > 0 {
+		return common.MapStr{
+			"name": j.Name,
+			"id":   j.Id,
+			"tags": j.Tags,
+		}
+	}
 	return common.MapStr{
 		"name": j.Name,
 		"id":   j.Id,

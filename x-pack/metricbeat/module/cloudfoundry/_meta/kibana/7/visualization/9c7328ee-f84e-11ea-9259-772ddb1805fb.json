@@ -1,0 +1,135 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Diego cell fetch state times [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(104,188,0,1)",
+                        "color": null,
+                        "id": "9c7cf130-f84e-11ea-bdee-833d96fe1a00",
+                        "operator": "lt",
+                        "value": 5000000000
+                    },
+                    {
+                        "background_color": "rgba(252,220,0,1)",
+                        "id": "9cb134b8-f84e-11ea-9fd8-cb6a1b33696f",
+                        "operator": "gte",
+                        "value": 5000000000
+                    },
+                    {
+                        "background_color": "rgba(244,78,59,1)",
+                        "id": "9cb588d8-f84e-11ea-af5a-c3012766d944",
+                        "operator": "gt",
+                        "value": 10000000000
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "9cb8a18a-f84e-11ea-bd11-836ecccfc401"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: \"cloudfoundry\" and cloudfoundry.envelope.origin :\"auctioneer\" "
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "9ca68d56-f84e-11ea-a6bb-f3164c0bb859",
+                        "text": null,
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "300000",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "9c8aab7c-f84e-11ea-b4a3-e31a518913fa",
+                "ignore_global_filter": 0,
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name: \"AuctioneerFetchStatesDuration\" "
+                        },
+                        "formatter": "ns,s,",
+                        "hidden": false,
+                        "hide_in_legend": 0,
+                        "id": "9c8c18f4-f84e-11ea-97ff-b32117553dae",
+                        "label": "Max fetch cell state times",
+                        "line_width": "01",
+                        "metrics": [
+                            {
+                                "field": "cloudfoundry.value.value",
+                                "id": "9c8d7514-f84e-11ea-9457-93fdc9395544",
+                                "type": "max"
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "9c753c7e-f84e-11ea-96e9-33ff984da2c7",
+                                "label": ""
+                            }
+                        ],
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "cf.envelope.deployment",
+                        "terms_include": "",
+                        "terms_order_by": "_key",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Diego cell fetch state times [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9c7328ee-f84e-11ea-9259-772ddb1805fb",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:58.327Z",
+    "version": "WzM2NTEsMV0="
+}

@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: apache
+
 [[metricbeat-module-apache]]
 == Apache module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
 HTTPD] servers. The default metricset is `status`.

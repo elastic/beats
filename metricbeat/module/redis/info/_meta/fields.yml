@@ -13,20 +13,10 @@
           type: long
           description: >
             Number of client connections (excluding connections from slaves).
-        - name: longest_output_list
-          type: long
-          deprecated: "6.5.0"
-          description: >
-            Longest output list among current client connections (replaced by max_output_buffer).
         - name: max_output_buffer
           type: long
           description: >
             Longest output list among current client connections.
-        - name: biggest_input_buf
-          type: long
-          deprecated: "6.5.0"
-          description: >
-            Biggest input buffer among current client connections (replaced by max_input_buffer).
         - name: max_input_buffer
           type: long
           description: >
@@ -92,12 +82,12 @@
           type: long
           format: bytes
           description: >
-            Used memory by the Lua engine.        
+            Used memory by the Lua engine.
         - name: used.dataset
           type: long
           format: bytes
           description: >
-            The size in bytes of the dataset 
+            The size in bytes of the dataset
 
         - name: max.value
           type: long
@@ -141,7 +131,7 @@
               type: long
               format: bytes
               description: >
-                Active memeory
+                Active memory
             - name: resident
               type: long
               format: bytes
@@ -209,12 +199,12 @@
               format: duration
               description: >
                 Duration of the on-going RDB save operation if any
-            
+
             - name: copy_on_write.last_size
               type: long
               format: bytes
               description: >
-                The size in bytes of copy-on-write allocations during the last RBD save operation                
+                The size in bytes of copy-on-write allocations during the last RBD save operation
 
         - name: aof
           type: group
@@ -271,12 +261,12 @@
               format: bytes
               description: >
                 Size of the AOF buffer
-            
+
             - name: size.current
               type: long
               format: bytes
               description: >
-                AOF current file size             
+                AOF current file size
             - name: size.base
               type: long
               format: bytes
@@ -307,12 +297,6 @@
           description: >
             Number of connected slaves
 
-        - name: master_offset
-          type: long
-          deprecated: 6.5
-          description: >
-            The server's current replication offset
-        
         - name: backlog.active
           type: long
           description: >
@@ -325,7 +309,7 @@
         - name: backlog.first_byte_offset
           type: long
           description: >
-            The master offset of the replication backlog buffer          
+            The master offset of the replication backlog buffer
         - name: backlog.histlen
           type: long
           description: >
@@ -362,7 +346,7 @@
           format: duration
           description: >
             Number of seconds since last transfer I/O during a SYNC operation
-        
+
         - name: slave.offset
           type: long
           description: >
@@ -513,7 +497,7 @@
           type: long
           description: >
             Number of evicted keys due to maxmemory limit
-        
+
         - name: keyspace.hits
           type: long
           description: >
@@ -568,3 +552,28 @@
       description: >
         Count of slow operations
 
+    - name: commandstats
+      type: group
+      description: >
+        Redis command statistics
+      fields:
+        - name: "*.calls"
+          type: long
+          description: >
+            The number of calls that reached command execution (not rejected).
+        - name: "*.usec"
+          type: long
+          description: >
+            The total CPU time consumed by these commands.
+        - name: "*.usec_per_call"
+          type: float
+          description: >
+            The average CPU consumed per command execution.
+        - name: "*.rejected_calls"
+          type: long
+          description: >
+            The number of rejected calls (on redis 6.2-rc2).
+        - name: "*.failed_calls"
+          type: long
+          description: >
+            The number of failed calls (on redis 6.2-rc2).

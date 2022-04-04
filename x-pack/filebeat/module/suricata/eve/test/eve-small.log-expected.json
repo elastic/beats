@@ -424,14 +424,7 @@
     {
         "@timestamp": "2018-07-05T19:51:50.666Z",
         "destination.address": "17.142.164.13",
-        "destination.as.number": 714,
-        "destination.as.organization.name": "Apple Inc.",
         "destination.domain": "p33-btmmdns.icloud.com",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": "17.142.164.13",
         "destination.port": 443,
         "event.category": [

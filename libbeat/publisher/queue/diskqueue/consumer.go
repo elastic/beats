@@ -20,13 +20,15 @@ package diskqueue
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type diskQueueConsumer struct {
 	queue  *diskQueue
-	closed bool
+	closed atomic.Bool
+	done   chan struct{}
 }
 
 type diskQueueBatch struct {
@@ -39,17 +41,18 @@ type diskQueueBatch struct {
 //
 
 func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
-	if consumer.closed {
+	// We can always eventually read at least one frame unless the queue or the
+	// consumer is closed.
+	var frames []*readFrame
+	select {
+	case frame, ok := <-consumer.queue.readerLoop.output:
+		if !ok {
+			return nil, fmt.Errorf("tried to read from a closed disk queue")
+		}
+		frames = []*readFrame{frame}
+	case <-consumer.done:
 		return nil, fmt.Errorf("tried to read from a closed disk queue consumer")
 	}
-
-	// Read at least one frame. This is guaranteed to eventually
-	// succeed unless the queue is closed.
-	frame, ok := <-consumer.queue.readerLoop.output
-	if !ok {
-		return nil, fmt.Errorf("tried to read from a closed disk queue")
-	}
-	frames := []*readFrame{frame}
 eventLoop:
 	for eventCount <= 0 || len(frames) < eventCount {
 		select {
@@ -85,7 +88,6 @@ eventLoop:
 	// Beats shutdown will always ACK / close its consumers before closing the
 	// queue itself, so we expect this corner case not to arise in practice, but
 	// if it does it is innocuous.
-
 	return &diskQueueBatch{
 		queue:  consumer.queue,
 		frames: frames,
@@ -93,7 +95,10 @@ eventLoop:
 }
 
 func (consumer *diskQueueConsumer) Close() error {
-	consumer.closed = true
+	if consumer.closed.Swap(true) {
+		return fmt.Errorf("already closed")
+	}
+	close(consumer.done)
 	return nil
 }
 

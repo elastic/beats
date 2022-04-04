@@ -2,18 +2,20 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package helper
 
 import (
+	"errors"
+	"fmt"
 	"math/rand"
 	"net"
 	"time"
 	"unsafe"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 )
 
@@ -46,7 +48,7 @@ func NewIPv6Loopback() (lo IPv6Loopback, err error) {
 	lo.fd = -1
 	devs, err := net.Interfaces()
 	if err != nil {
-		return lo, errors.Wrap(err, "cannot list interfaces")
+		return lo, fmt.Errorf("cannot list interfaces: %w", err)
 	}
 	for _, dev := range devs {
 		addrs, err := dev.Addrs()
@@ -59,14 +61,14 @@ func NewIPv6Loopback() (lo IPv6Loopback, err error) {
 				lo.fd, err = unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, unix.IPPROTO_IP)
 				if err != nil {
 					lo.fd = -1
-					return lo, errors.Wrap(err, "ipv6 socket failed")
+					return lo, fmt.Errorf("ipv6 socket failed: %w", err)
 				}
 				copy(lo.ifreq.name[:], dev.Name)
 				lo.ifreq.name[len(dev.Name)] = 0
 				_, _, errno := unix.Syscall(unix.SYS_IOCTL, uintptr(lo.fd), unix.SIOCGIFINDEX, uintptr(unsafe.Pointer(&lo.ifreq)))
 				if errno != 0 {
 					unix.Close(lo.fd)
-					return lo, errors.Wrap(errno, "ioctl(SIOCGIFINDEX) failed")
+					return lo, fmt.Errorf("ioctl(SIOCGIFINDEX) failed: %w", errno)
 				}
 				return lo, nil
 			}
@@ -87,7 +89,7 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 	req.prefix = 128
 	_, _, e := unix.Syscall(unix.SYS_IOCTL, uintptr(lo.fd), unix.SIOCSIFADDR, uintptr(unsafe.Pointer(&req)))
 	if e != 0 {
-		return nil, errors.Wrap(e, "ioctl SIOCSIFADDR failed")
+		return nil, fmt.Errorf("ioctl SIOCSIFADDR failed: %w", e)
 	}
 	lo.addresses = append(lo.addresses, addr)
 
@@ -96,7 +98,7 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 	// available to bind.
 	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, 0)
 	if err != nil {
-		return addr, errors.Wrap(err, "socket ipv6 dgram failed")
+		return addr, fmt.Errorf("socket ipv6 dgram failed: %w", err)
 	}
 	defer unix.Close(fd)
 	var bindAddr unix.SockaddrInet6
@@ -110,7 +112,10 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 		}
 		time.Sleep(time.Millisecond * time.Duration(i))
 	}
-	return addr, errors.Wrap(err, "bind failed")
+	if err != nil {
+		err = fmt.Errorf("bind failed: %w", err)
+	}
+	return addr, err
 }
 
 // Cleanup removes the addresses registered to this loopback.

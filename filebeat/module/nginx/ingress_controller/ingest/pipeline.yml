@@ -125,7 +125,7 @@ processors:
           ctx.nginx.ingress_controller.upstream.response.status_code = last_status_code;
         }
         catch (Exception e) {
-          ctx.nginx.ingress_controller.upstream.response.time = null;
+          ctx.nginx.ingress_controller.upstream.response.status_code = null;
         }
   - script:
       if: ctx.nginx?.ingress_controller?.upstream_address_list != null && ctx.nginx.ingress_controller.upstream_address_list.length > 0
@@ -208,9 +208,9 @@ processors:
       patterns:
         - ^%{IP:source.ip}$
       ignore_failure: true
-  - rename:
-      field: "@timestamp"
-      target_field: event.created
+  - set:
+      copy_from: "@timestamp"
+      field: event.created
   - date:
       field: nginx.ingress_controller.time
       target_field: "@timestamp"

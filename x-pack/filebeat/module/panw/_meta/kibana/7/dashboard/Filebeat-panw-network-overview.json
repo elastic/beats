@@ -1,1107 +1,187 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Palo Alto Networks PAN-OS Networks Overview",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "1",
-              "w": 24,
-              "x": 24,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "panelIndex": "1",
-            "panelRefName": "panel_0",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "2",
-              "w": 24,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "panelIndex": "2",
-            "panelRefName": "panel_1",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "3",
-              "w": 24,
-              "x": 0,
-              "y": 15
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 12,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "panelIndex": "3",
-            "panelRefName": "panel_2",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 12,
+                    "x": 36,
+                    "y": 15
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "4",
-              "w": 12,
-              "x": 24,
-              "y": 15
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "panelIndex": "4",
-            "panelRefName": "panel_3",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "5",
-              "w": 12,
-              "x": 36,
-              "y": 15
-            },
-            "panelIndex": "5",
-            "panelRefName": "panel_4",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "6",
-              "w": 24,
-              "x": 0,
-              "y": 30
-            },
-            "panelIndex": "6",
-            "panelRefName": "panel_5",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "7",
-              "w": 24,
-              "x": 24,
-              "y": 30
-            },
-            "panelIndex": "7",
-            "panelRefName": "panel_6",
-            "version": "7.1.0"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat PANW] Network Flows ECS",
         "version": 1
-      },
-      "id": "e40ba240-7572-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "dashboard": "7.0.0"
-      },
-      "references": [
-        {
-          "id": "091fe860-756a-11e9-976e-65a8f47cc4c1",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "87f30f60-7569-11e9-976e-65a8f47cc4c1",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "78e7e820-756d-11e9-976e-65a8f47cc4c1",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "d9cab170-756f-11e9-976e-65a8f47cc4c1",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "135930b0-7570-11e9-976e-65a8f47cc4c1",
-          "name": "panel_4",
-          "type": "visualization"
-        },
-        {
-          "id": "e46331c0-756a-11e9-976e-65a8f47cc4c1",
-          "name": "panel_5",
-          "type": "visualization"
-        },
-        {
-          "id": "0407a3e0-756f-11e9-976e-65a8f47cc4c1",
-          "name": "panel_6",
-          "type": "visualization"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2019-05-13T11:33:12.420Z",
-      "version": "WzI0NSwxXQ=="
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Destination Flows Map [Filebeat PANW] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "autoPrecision": true,
-                "field": "destination.geo.location",
-                "isFilteredByCollar": true,
-                "mapCenter": [
-                  0,
-                  0
-                ],
-                "mapZoom": 2,
-                "precision": 2,
-                "useGeocentroid": true
-              },
-              "schema": "segment",
-              "type": "geohash_grid"
-            }
-          ],
-          "params": {
-            "addTooltip": true,
-            "colorSchema": "Yellow to Red",
-            "heatClusterSize": 1.5,
-            "isDesaturated": true,
-            "legendPosition": "bottomright",
-            "mapCenter": [
-              0,
-              0
-            ],
-            "mapType": "Scaled Circle Markers",
-            "mapZoom": 2,
-            "wms": {
-              "enabled": false,
-              "options": {
-                "format": "image/png",
-                "transparent": true
-              }
-            }
-          },
-          "title": "Destination Flows Map [Filebeat PANW] ECS",
-          "type": "tile_map"
-        }
-      },
-      "id": "091fe860-756a-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
-        {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T10:29:49.158Z",
-      "version": "WzIzOCwxXQ=="
+    "coreMigrationVersion": "8.0.0",
+    "id": "e40ba240-7572-11e9-976e-65a8f47cc4c1",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Source Flows Map [Filebeat PANW] ECS",
-        "uiStateJSON": {
-          "mapCenter": [
-            -0.17578097424708533,
-            0.17578125
-          ],
-          "mapZoom": 1
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "autoPrecision": true,
-                "field": "source.geo.location",
-                "isFilteredByCollar": true,
-                "mapCenter": [
-                  0,
-                  0
-                ],
-                "mapZoom": 2,
-                "precision": 2,
-                "useGeocentroid": true
-              },
-              "schema": "segment",
-              "type": "geohash_grid"
-            }
-          ],
-          "params": {
-            "addTooltip": true,
-            "colorSchema": "Yellow to Red",
-            "heatClusterSize": 1.5,
-            "isDesaturated": true,
-            "legendPosition": "bottomright",
-            "mapCenter": [
-              0,
-              0
-            ],
-            "mapType": "Scaled Circle Markers",
-            "mapZoom": 2,
-            "wms": {
-              "enabled": false,
-              "options": {
-                "format": "image/png",
-                "transparent": true
-              }
-            }
-          },
-          "title": "Source Flows Map [Filebeat PANW] ECS",
-          "type": "tile_map"
-        }
-      },
-      "id": "87f30f60-7569-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
+    "references": [
         {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T10:26:12.438Z",
-      "version": "WzIzNywxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.action",
-                  "negate": true,
-                  "params": {
-                    "query": "flow_terminated"
-                  },
-                  "type": "phrase",
-                  "value": "flow_terminated"
-                },
-                "query": {
-                  "match": {
-                    "event.action": {
-                      "query": "flow_terminated",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Flow Creation Histogram [Filebeat PANW] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customInterval": "2h",
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "timeRange": {
-                  "from": "2018-04-10T04:36:19.586Z",
-                  "to": "2018-04-10T04:39:56.264Z"
-                },
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": "true",
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Flow Creation Histogram [Filebeat PANW] ECS",
-          "type": "histogram"
-        }
-      },
-      "id": "78e7e820-756d-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
+            "id": "091fe860-756a-11e9-976e-65a8f47cc4c1",
+            "name": "1:panel_1",
+            "type": "visualization"
         },
         {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T10:54:25.186Z",
-      "version": "WzI0MCwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.action",
-                  "negate": true,
-                  "params": {
-                    "query": "flow_started"
-                  },
-                  "type": "phrase",
-                  "value": "flow_started"
-                },
-                "query": {
-                  "match": {
-                    "event.action": {
-                      "query": "flow_started",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Source Zone breakout [Filebeat PANW] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "panw.panos.source.zone",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 200
-                },
-                "position": "left",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": true,
-                  "rotate": 75,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "bottom",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Source Zone breakout [Filebeat PANW] ECS",
-          "type": "horizontal_bar"
-        }
-      },
-      "id": "d9cab170-756f-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
+            "id": "87f30f60-7569-11e9-976e-65a8f47cc4c1",
+            "name": "2:panel_2",
+            "type": "visualization"
         },
         {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T11:12:26.462Z",
-      "version": "WzI0MywxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.action",
-                  "negate": true,
-                  "params": {
-                    "query": "flow_started"
-                  },
-                  "type": "phrase",
-                  "value": "flow_started"
-                },
-                "query": {
-                  "match": {
-                    "event.action": {
-                      "query": "flow_started",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Destination Zone breakout [Filebeat PANW] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "panw.panos.destination.zone",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 200
-                },
-                "position": "left",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": true,
-                  "rotate": 75,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "bottom",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Destination Zone breakout [Filebeat PANW] ECS",
-          "type": "horizontal_bar"
-        }
-      },
-      "id": "135930b0-7570-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
+            "id": "78e7e820-756d-11e9-976e-65a8f47cc4c1",
+            "name": "3:panel_3",
+            "type": "visualization"
         },
         {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T11:13:03.291Z",
-      "version": "WzI0NCwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+            "id": "d9cab170-756f-11e9-976e-65a8f47cc4c1",
+            "name": "4:panel_4",
+            "type": "visualization"
         },
-        "savedSearchRefName": "search_0",
-        "title": "Event Outcome by Transport and Destination Port [Filebeat PANW] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "network.transport",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "field": "destination.port",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Event Outcome by Transport and Destination Port [Filebeat PANW] ECS",
-          "type": "pie"
-        }
-      },
-      "id": "e46331c0-756a-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
         {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T10:35:57.020Z",
-      "version": "WzIzOSwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+            "id": "135930b0-7570-11e9-976e-65a8f47cc4c1",
+            "name": "5:panel_5",
+            "type": "visualization"
         },
-        "savedSearchRefName": "search_0",
-        "title": "Network Application breakout [Filebeat PANW] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "network.application",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Network Application breakout [Filebeat PANW] ECS",
-          "type": "pie"
-        }
-      },
-      "id": "0407a3e0-756f-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      },
-      "references": [
         {
-          "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-05-13T11:05:28.094Z",
-      "version": "WzI0MSwxXQ=="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": "event.dataset: \"panw.panos\" and event.category: \"network_traffic\""
-            },
-            "version": true
-          }
+            "id": "e46331c0-756a-11e9-976e-65a8f47cc4c1",
+            "name": "6:panel_6",
+            "type": "visualization"
         },
-        "sort": [
-          "@timestamp",
-          "desc"
-        ],
-        "title": "PAN-OS Flows [Filebeat PANW] ECS",
-        "version": 1
-      },
-      "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
-      "migrationVersion": {
-        "search": "7.0.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+            "id": "0407a3e0-756f-11e9-976e-65a8f47cc4c1",
+            "name": "7:panel_7",
+            "type": "visualization"
         }
-      ],
-      "type": "search",
-      "updated_at": "2019-05-13T10:23:33.182Z",
-      "version": "WzIzNSwxXQ=="
-    }
-  ],
-  "version": "7.1.0"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:20.886Z",
+    "version": "WzQ1MTQsMV0="
 }

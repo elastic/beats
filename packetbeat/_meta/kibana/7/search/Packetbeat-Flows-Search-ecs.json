@@ -1,0 +1,43 @@
+{
+    "attributes": {
+        "columns": [
+            "type",
+            "event.start",
+            "event.end",
+            "source.ip",
+            "source.port",
+            "destination.ip",
+            "destination.port",
+            "source.bytes",
+            "destination.bytes"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"highlight\":{\"fields\":{\"*\":{}},\"fragment_size\":2147483647,\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"],\"require_field_match\":false},\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"type: flow\"},\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Flows Search [Packetbeat] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Packetbeat-Flows-Search-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:28:39.992Z",
+    "version": "WzMxNDgsMV0="
+}

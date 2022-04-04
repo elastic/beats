@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build gcp
+//go:build integration && gcp
+// +build integration,gcp
 
 package metrics
 

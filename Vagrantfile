@@ -31,306 +31,105 @@
 # Read the branch's Go version from the .go-version file.
 GO_VERSION = File.read(File.join(File.dirname(__FILE__), ".go-version")).strip
 
-# Provisioning for Windows PowerShell
-$winPsProvision = <<SCRIPT
-$gopath_beats = "C:\\Gopath\\src\\github.com\\elastic\\beats"
-if (-Not (Test-Path $gopath_beats)) {
-    echo 'Creating github.com\\elastic in the GOPATH'
-    New-Item -itemtype directory -path "C:\\Gopath\\src\\github.com\\elastic" -force
-    echo "Symlinking C:\\Vagrant to C:\\Gopath\\src\\github.com\\elastic"
-    cmd /c mklink /d $gopath_beats \\\\vboxsvr\\vagrant
-}
+TEST_BOXES = [
+  {:name => "centos6", :box => "bento/centos-6.10", :platform => "centos", :extras => "yum install -y epel-release"},
+  {:name => "centos7", :box => "bento/centos-7", :platform => "centos"},
+  {:name => "centos8", :box => "bento/centos-7", :platform => "centos"},
 
-if (-Not (Get-Command "gvm" -ErrorAction SilentlyContinue)) {
-    echo "Installing gvm to manage go version"
-    [Net.ServicePointManager]::SecurityProtocol = "tls12"
-    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-amd64.exe -Outfile C:\\Windows\\System32\\gvm.exe
-    C:\\Windows\\System32\\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
-    go version
+  {:name => "rhel7", :box => "generic/rhel7", :platform => "redhat" },
+  {:name => "rhel8", :box => "generic/rhel8", :platform => "redhat" },
 
-    echo "Configure Go environment variables"
-    [System.Environment]::SetEnvironmentVariable("GOPATH", "C:\\Gopath", [System.EnvironmentVariableTarget]::Machine)
-    [System.Environment]::SetEnvironmentVariable("GOROOT", "C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64", [System.EnvironmentVariableTarget]::Machine)
-    [System.Environment]::SetEnvironmentVariable("PATH", "%GOROOT%\\bin;$env:PATH;C:\\Gopath\\bin", [System.EnvironmentVariableTarget]::Machine)
-}
+  {:name => "win2012", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box", :platform => "windows"},
+  {:name => "win2016", :box => "StefanScherer/windows_2016", :platform => "windows"},
+  {:name => "win2019", :box => "StefanScherer/windows_2019", :platform => "windows"},
 
-$shell_link = "$Home\\Desktop\\Beats Shell.lnk"
-if (-Not (Test-Path $shell_link)) {
-    echo "Creating Beats Shell desktop shortcut"
-    $WshShell = New-Object -comObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut($shell_link)
-    $Shortcut.TargetPath = "powershell.exe"
-    $Shortcut.Arguments = "-noexit -command '$gopath_beats'"
-    $Shortcut.WorkingDirectory = $gopath_beats
-    $Shortcut.Save()
-}
+  {:name => "ubuntu1404", :box => "ubuntu/trusty64", :platform => "ubuntu"},
+  {:name => "ubuntu1604", :box => "ubuntu/xenial64", :platform => "ubuntu"},
+  {:name => "ubuntu1804", :box => "ubuntu/bionic64", :platform => "ubuntu"},
+  {:name => "ubuntu2004", :box => "ubuntu/focal64", :platform => "ubuntu"},
 
-Try {
-    echo "Disabling automatic updates"
-    $AUSettings = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
-    $AUSettings.NotificationLevel = 1
-    $AUSettings.Save()
-} Catch {
-    echo "Failed to disable automatic updates."
-}
+  {:name => "debian8", :box => "generic/debian8", :platform => "debian"},
+  {:name => "debian9", :box => "debian/stretch64", :platform => "debian"},
+  {:name => "debian10", :box => "debian/buster64", :platform => "debian"},
 
-if (-Not (Get-Command "choco" -ErrorAction SilentlyContinue)) {
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
+  {:name => "amazon1", :box => "mvbcoding/awslinux", :platform => "centos"},
+  {:name => "amazon2", :box => "bento/amazonlinux-2", :platform => "centos"},
 
-choco feature disable -n=showDownloadProgress
+  # Unsupported platforms
+  {:name => "opensuse153", :box => "bento/opensuse-leap-15.3", :platform => "opensuse"},
+  {:name => "sles12", :box => "elastic/sles-12-x86_64", :platform => "sles"},
+  {:name => "solaris", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box", :platform => "unix"},
+  {:name => "freebsd", :box => "bento/freebsd-13", :platform => "freebsd", :extras => "pkg install -y -q bash && chsh -s bash vagrant"},
+  {:name => "openbsd", :box => "generic/openbsd6", :platform => "openbsd", :extras => "sudo pkg_add go"},
+  {:name => "arch", :box => "archlinux/archlinux", :platform => "archlinux", :extras => "pacman -Sy && pacman -S --noconfirm make gcc python python-pip git"},
+]
 
-if (-Not (Get-Command "python" -ErrorAction SilentlyContinue)) {
-    echo "Installing python 3"
-    choco install python -y -r --version 3.8.2
-    refreshenv
-    $env:PATH = "$env:PATH;C:\\Python38;C:\\Python38\\Scripts"
-}
-
-echo "Updating pip"
-python -m pip install --upgrade pip 2>&1 | %{ "$_" }
-
-if (-Not (Get-Command "git" -ErrorAction SilentlyContinue)) {
-    echo "Installing git"
-    choco install git -y -r
-}
-
-if (-Not (Get-Command "gcc" -ErrorAction SilentlyContinue)) {
-    echo "Installing mingw (gcc)"
-    choco install mingw -y -r
-}
-
-echo "Setting PYTHON_ENV in VM to point to C:\\beats-python-env."
-[System.Environment]::SetEnvironmentVariable("PYTHON_ENV", "C:\\beats-python-env", [System.EnvironmentVariableTarget]::Machine)
-SCRIPT
-
-# Provisioning for Unix/Linux
-$unixProvision = <<SCRIPT
-echo 'Creating github.com/elastic in the GOPATH'
-mkdir -p ~/go/src/github.com/elastic
-echo 'Symlinking /vagrant to ~/go/src/github.com/elastic'
-cd ~/go/src/github.com/elastic
-if [ -d "/vagrant" ]  && [ ! -e "beats" ]; then ln -s /vagrant beats; fi
-SCRIPT
-
-$freebsdShellUpdate = <<SCRIPT
-pkg install -y -q bash
-chsh -s bash vagrant
-SCRIPT
-
-
-# Linux GVM
-def gvmProvision(arch="amd64", os="linux")
-  return <<SCRIPT
-mkdir -p ~/bin
-if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-#{os}-#{arch}
-  chmod +x ~/bin/gvm
-  ~/bin/gvm #{GO_VERSION}
-  echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
-  echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
-  echo 'eval "$(gvm #{GO_VERSION})"' >> ~/.bash_profile
-fi
-SCRIPT
-end
-
-# Provision packages for Linux Debian.
-def linuxDebianProvision()
-  return <<SCRIPT
-#!/usr/bin/env bash
-set -eio pipefail
-apt-get update
-apt-get install -y make gcc python3 python3-pip python3-venv git libsystemd-dev
-SCRIPT
-end
 
 Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |vbox|
-    vbox.memory = 4096
-    vbox.cpus = 4
+    vbox.memory = 8192
+    vbox.cpus = 6
   end
 
-  # Windows Server 2012 R2
-  config.vm.define "win2012" do |c|
-    c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box"
-    c.vm.guest = :windows
-
-    # Communicator for windows boxes
-    c.vm.communicator = "winrm"
-
-    # Port forward WinRM and RDP
-    c.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
-    c.vm.network :forwarded_port, guest: 3389, host: 33389, id: "rdp", auto_correct: true
-    c.vm.network :forwarded_port, guest: 5985, host: 55985, id: "winrm", auto_correct: true
-
-    c.vm.provision "shell", inline: $winPsProvision
+  # Docker config. Run with --provision-with docker,shell
+  # For now this script is only going to work on the ubuntu images.
+  # How to run tests from within docker, from within the container:
+  #  docker run -v $(pwd):"/root/go/src/github.com/elastic/beats" -w /root/go/src/github.com/elastic/beats/metricbeat/module/system/process --entrypoint="/usr/local/go/bin/go" -it docker.elastic.co/beats-dev/golang-crossbuild:1.16.6-darwin-debian10 test -v -tags=integrations -run TestFetch
+  config.vm.provision "docker", type: "shell", run: "never" do |s|
+    s.path = "dev-tools/vagrant_scripts/dockerProvision.sh"
   end
 
-  config.vm.define "win2016" do |c|
-    c.vm.box = "StefanScherer/windows_2016"
-    c.vm.provision "shell", inline: $winPsProvision, privileged: false
+  config.vm.provision "kind", type: "shell", run: "never" do |s|
+    s.path = "dev-tools/vagrant_scripts/kindProvision.sh"
   end
 
-  config.vm.define "win2019" do |c|
-    c.vm.box = "StefanScherer/windows_2019"
-    c.vm.provision "shell", inline: $winPsProvision, privileged: false
-  end
 
-  config.vm.define "centos6" do |c|
-    c.vm.box = "bento/centos-6.10"
-    c.vm.network :forwarded_port, guest: 22, host: 2223, id: "ssh", auto_correct: true
+  # Loop to define boxes
+  TEST_BOXES.each_with_index do |node, idx|
+    config.vm.define node[:name] do |nodeconfig|
+      nodeconfig.vm.box = node[:box]
+      nodeconfig.vm.network :forwarded_port, guest: 22, host: 2220 + idx, id: "ssh", auto_correct: true
+      if node.has_key?(:extras)
+        nodeconfig.vm.provision "shell", inline: node[:extras]
+      end
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
-    c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
-  end
+      if node[:platform] != "windows"
+        nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+        nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: node[:platform]
+      end
 
-  config.vm.define "centos7" do |c|
-    c.vm.box = "bento/centos-7"
-    c.vm.network :forwarded_port, guest: 22, host: 2224, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
-  end
+      # for BSDs
+      if node[:platform] == "openbsd" or node[:platform] == "freebsd"
+        nodeconfig.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
+        nodeconfig.vm.provider :virtualbox do |vbox|
+          vbox.check_guest_additions = false
+          vbox.functional_vboxsf = false
+        end
+      end
 
-  config.vm.define "centos8" do |c|
-    c.vm.box = "bento/centos-8"
-    c.vm.network :forwarded_port, guest: 22, host: 2225, id: "ssh", auto_correct: true
+      # Freebsd
+      if node[:platform] == "freebsd"
+        nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 freebsd #{GO_VERSION}", privileged: false
+        nodeconfig.vm.provision "shell", inline: "sudo mount -t linprocfs /dev/null /proc", privileged: false
+      end
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
-  end
+      # gvm install
+      if [:centos, :ubuntu, :debian, :archlinux, :opensuse, :sles, :redhat].include?(node[:platform].to_sym)
+        nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+      end
 
-  config.vm.define "ubuntu1404" do |c|
-    c.vm.box = "ubuntu/trusty64"
-    c.vm.network :forwarded_port, guest: 22, host: 2226, id: "ssh", auto_correct: true
+      if node[:platform] == "windows"
+        nodeconfig.vm.guest = :windows
+        nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/winProvision.ps1", args: "#{GO_VERSION}"
+        # Communicator for windows boxes
+        nodeconfig.vm.communicator = "winrm"
+        # Port forward WinRM and RDP
+        nodeconfig.vm.network :forwarded_port, guest: 3389, host: 33389, id: "rdp", auto_correct: true
+        nodeconfig.vm.network :forwarded_port, guest: 5985, host: 55985, id: "winrm", auto_correct: true
+      end
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python3 python3-pip python3.4-venv git"
-  end
-
-  config.vm.define "ubuntu1604" do |c|
-    c.vm.box = "ubuntu/xenial64"
-    c.vm.network :forwarded_port, guest: 22, host: 2227, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "ubuntu1804" do |c|
-    c.vm.box = "ubuntu/bionic64"
-    c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "ubuntu2004", primary: true  do |c|
-    c.vm.box = "ubuntu/focal64"
-    c.vm.network :forwarded_port, guest: 22, host: 2229, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "debian8" do |c|
-    c.vm.box = "debian/jessie64"
-    c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "debian9" do |c|
-    c.vm.box = "debian/stretch64"
-    c.vm.network :forwarded_port, guest: 22, host: 2232, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "debian10" do |c|
-    c.vm.box = "debian/buster64"
-    c.vm.network :forwarded_port, guest: 22, host: 2233, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
-  end
-
-  config.vm.define "amazon1" do |c|
-    c.vm.box = "mvbcoding/awslinux"
-    c.vm.network :forwarded_port, guest: 22, host: 2234, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
-  end
-
-  config.vm.define "amazon2" do |c|
-    c.vm.box = "bento/amazonlinux-2"
-    c.vm.network :forwarded_port, guest: 22, host: 2235, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
-  end
-
-  # The following boxes are not listed as officially supported by the Elastic support matrix
-  # Solaris 11.2
-  config.vm.define "solaris", autostart: false do |c|
-    c.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box"
-    c.vm.network :forwarded_port, guest: 22, host: 2236, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-  end
-
-  # FreeBSD 13.0
-  config.vm.define "freebsd", autostart: false do |c|
-    c.vm.box = "bento/freebsd-13"
-
-    # Here Be Dragons: don't attempt to try and get nfs working, unless you have a lot of free time.
-    # run `vagrant rsync-auto` to keep the host and guest in sync.
-    c.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
-
-    c.vm.hostname = "beats-tester"
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: $freebsdShellUpdate, privileged: true
-    c.vm.provision "shell", inline: gvmProvision(arch="amd64", os="freebsd"), privileged: false
-    c.vm.provision "shell", inline: "sudo mount -t linprocfs /dev/null /proc", privileged: false
-  end
-
-  # OpenBSD 6.0
-  config.vm.define "openbsd", autostart: false do |c|
-    c.vm.box = "generic/openbsd6"
-    c.vm.network :forwarded_port, guest: 22, host: 2238, id: "ssh", auto_correct: true
-
-    c.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
-    c.vm.provider :virtualbox do |vbox|
-      vbox.check_guest_additions = false
-      vbox.functional_vboxsf = false
     end
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: "sudo pkg_add go", privileged: true
   end
 
-  config.vm.define "archlinux", autostart: false do |c|
-    c.vm.box = "archlinux/archlinux"
-    c.vm.network :forwarded_port, guest: 22, host: 2239, id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python python-pip git"
-  end
 end

@@ -1,0 +1,102 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "450490b7-c7f9-42bf-8e7d-227cbf960e94": {
+                            "columnOrder": [
+                                "b20aebaf-7126-4b1c-acca-79cfa113b44d",
+                                "915eda3d-00ce-40d0-ada8-4eb372202b42"
+                            ],
+                            "columns": {
+                                "915eda3d-00ce-40d0-ada8-4eb372202b42": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Unique count of container.id",
+                                    "operationType": "unique_count",
+                                    "scale": "ratio",
+                                    "sourceField": "container.id"
+                                },
+                                "b20aebaf-7126-4b1c-acca-79cfa113b44d": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "915eda3d-00ce-40d0-ada8-4eb372202b42"
+                        ],
+                        "layerId": "450490b7-c7f9-42bf-8e7d-227cbf960e94",
+                        "position": "top",
+                        "seriesType": "bar_stacked",
+                        "showGridlines": false,
+                        "xAccessor": "b20aebaf-7126-4b1c-acca-79cfa113b44d"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                }
+            }
+        },
+        "title": "Total Number of Containers [Metricbeat AWSFargate]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "86720980-3966-11eb-a417-f961313c14f6",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-450490b7-c7f9-42bf-8e7d-227cbf960e94",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:41.879Z",
+    "version": "WzM0ODEsMV0="
+}

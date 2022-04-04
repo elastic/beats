@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package file
@@ -38,21 +39,24 @@ var cleanupTests = []struct {
 		State{
 			TTL:      0,
 			Finished: true,
-		}, 1, 1, 0,
+		},
+		1, 1, 0,
 	},
 	{
 		"Unfinished but TTL set to 0",
 		State{
 			TTL:      0,
 			Finished: false,
-		}, 1, 0, 1,
+		},
+		1, 0, 1,
 	},
 	{
 		"TTL = -1 means not expiring",
 		State{
 			TTL:      -1,
 			Finished: true,
-		}, 1, 0, 1,
+		},
+		1, 0, 1,
 	},
 	{
 		"Expired and finished",
@@ -60,7 +64,8 @@ var cleanupTests = []struct {
 			TTL:       1 * time.Second,
 			Timestamp: time.Now().Add(-2 * time.Second),
 			Finished:  true,
-		}, 1, 1, 0,
+		},
+		1, 1, 0,
 	},
 	{
 		"Expired but unfinished",
@@ -68,7 +73,8 @@ var cleanupTests = []struct {
 			TTL:       1 * time.Second,
 			Timestamp: time.Now().Add(-2 * time.Second),
 			Finished:  false,
-		}, 1, 0, 1,
+		},
+		1, 0, 1,
 	},
 }
 

@@ -1,0 +1,187 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e350c9e6-e6b7-40f1-83ed-94a38ed9467a": {
+                            "columnOrder": [
+                                "040803fd-23f9-4f4f-95da-e8be99becbc1",
+                                "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                                "b1e08425-6a1e-4db6-bb47-a65167b7e14f",
+                                "09de0d9e-c174-46cf-bdc8-50158475b4a7",
+                                "e0782143-0636-43b4-8fac-b857ea5282b2",
+                                "7626706b-6efa-4fe7-b45c-6e9afa07f982",
+                                "441ceb32-53e7-4408-9638-6dfd38202144"
+                            ],
+                            "columns": {
+                                "040803fd-23f9-4f4f-95da-e8be99becbc1": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Task Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "container.labels.com_amazonaws_ecs_task-definition-family"
+                                },
+                                "09de0d9e-c174-46cf-bdc8-50158475b4a7": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "CPU",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "percent",
+                                            "params": {
+                                                "decimals": 3
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.cpu.total.norm.pct"
+                                },
+                                "441ceb32-53e7-4408-9638-6dfd38202144": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Memory",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "percent",
+                                            "params": {
+                                                "decimals": 3
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.memory.usage.pct"
+                                },
+                                "7626706b-6efa-4fe7-b45c-6e9afa07f982": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Memory Usage",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "bytes",
+                                            "params": {
+                                                "decimals": 2
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.memory.usage.total"
+                                },
+                                "b1e08425-6a1e-4db6-bb47-a65167b7e14f": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "ECS Cluster ARN",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "container.labels.com_amazonaws_ecs_cluster"
+                                },
+                                "e0782143-0636-43b4-8fac-b857ea5282b2": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "DiskIO",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.diskio.total"
+                                },
+                                "eb452b61-bf12-46c0-afae-c0f1c776156c": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Container Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "container.name"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "eb452b61-bf12-46c0-afae-c0f1c776156c"
+                    },
+                    {
+                        "columnId": "040803fd-23f9-4f4f-95da-e8be99becbc1"
+                    },
+                    {
+                        "columnId": "b1e08425-6a1e-4db6-bb47-a65167b7e14f"
+                    },
+                    {
+                        "columnId": "09de0d9e-c174-46cf-bdc8-50158475b4a7"
+                    },
+                    {
+                        "columnId": "e0782143-0636-43b4-8fac-b857ea5282b2"
+                    },
+                    {
+                        "columnId": "7626706b-6efa-4fe7-b45c-6e9afa07f982"
+                    },
+                    {
+                        "columnId": "441ceb32-53e7-4408-9638-6dfd38202144"
+                    }
+                ],
+                "layerId": "e350c9e6-e6b7-40f1-83ed-94a38ed9467a"
+            }
+        },
+        "title": "Container Table [Metricbeat AWSFargate]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8cf592f0-2e8e-11eb-a417-f961313c14f6",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:41.879Z",
+    "version": "WzM0ODAsMV0="
+}

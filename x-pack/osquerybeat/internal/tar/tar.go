@@ -19,6 +19,11 @@ func shouldExtract(name string, files ...string) bool {
 		return true
 	}
 
+	// Clean the file path/name from the tar.gz archive
+	// In the osquery 4.9.0 version the paths started to be prefixed with "./"
+	// which caused the osqueryd binary not found/extracted from the archive.
+	name = filepath.Clean(name)
+
 	for _, f := range files {
 		if strings.HasPrefix(f, name) {
 			return true

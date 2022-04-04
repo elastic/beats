@@ -29,8 +29,6 @@ type icmpConfig struct {
 	TransactionTimeout time.Duration `config:"transaction_timeout"`
 }
 
-var (
-	defaultConfig = icmpConfig{
-		TransactionTimeout: protos.DefaultTransactionExpiration,
-	}
-)
+var defaultConfig = icmpConfig{
+	TransactionTimeout: protos.DefaultTransactionExpiration,
+}

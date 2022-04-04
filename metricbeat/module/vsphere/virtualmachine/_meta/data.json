@@ -10,7 +10,7 @@
         "period": 10000
     },
     "service": {
-        "address": "http://127.0.0.1:37231/sdk",
+        "address": "127.0.0.1:39149",
         "type": "vsphere"
     },
     "vsphere": {
@@ -43,9 +43,6 @@
                 }
             },
             "name": "ha-host_VM0",
-            "network_names": [
-                "VM Network"
-            ],
             "os": "otherGuest"
         }
     }

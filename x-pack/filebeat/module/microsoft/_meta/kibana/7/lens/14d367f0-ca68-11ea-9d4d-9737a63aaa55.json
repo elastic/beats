@@ -1,0 +1,139 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "f93e2634-0dd5-4aec-b6de-45284dd39630": {
+                            "columnOrder": [
+                                "12ecaf1f-b957-4c15-8f43-8f043a7d1d51",
+                                "0f67be87-cc6f-48e7-8afd-d9401037d006"
+                            ],
+                            "columns": {
+                                "0f67be87-cc6f-48e7-8afd-d9401037d006": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Number of techniques",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                },
+                                "12ecaf1f-b957-4c15-8f43-8f043a7d1d51": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Related MITRE attach techniques",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threat.technique.name"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.module",
+                        "negate": false,
+                        "params": {
+                            "query": "microsoft"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.module": "microsoft"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "microsoft.defender_atp"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "microsoft.defender_atp"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "12ecaf1f-b957-4c15-8f43-8f043a7d1d51"
+                        ],
+                        "layerId": "f93e2634-0dd5-4aec-b6de-45284dd39630",
+                        "legendDisplay": "default",
+                        "metric": "0f67be87-cc6f-48e7-8afd-d9401037d006",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                    }
+                ],
+                "shape": "treemap"
+            }
+        },
+        "title": "ATP Techniques [Filebeat Microsoft]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "14d367f0-ca68-11ea-9d4d-9737a63aaa55",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-f93e2634-0dd5-4aec-b6de-45284dd39630",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:12.667Z",
+    "version": "WzQ0NDksMV0="
+}

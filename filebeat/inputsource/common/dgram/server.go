@@ -103,7 +103,7 @@ func (l *Listener) Start() error {
 		return err
 	}
 
-	l.tg.Go(func(ctx unison.Canceler) error {
+	l.tg.Go(func(ctx context.Context) error {
 		connCtx, connCancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx), func() {
 			conn.Close()
 		})

@@ -1,0 +1,216 @@
+{
+    "attributes": {
+        "description": "Overview of the iptables events dashboard.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 37,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 11,
+                    "x": 37,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        47.15984001304432,
+                        -47.02148437500001
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        49.15296965617042,
+                        -27.949218750000004
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 19,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6",
+                    "w": 18,
+                    "x": 19,
+                    "y": 30
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7",
+                    "w": 11,
+                    "x": 37,
+                    "y": 30
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "8",
+                    "w": 48,
+                    "x": 0,
+                    "y": 45
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "search",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Iptables] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ceefb9e0-1f51-11e9-93ed-f7e068f4aebb-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+            "name": "8:panel_8",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:44.176Z",
+    "version": "WzQyODAsMV0="
+}

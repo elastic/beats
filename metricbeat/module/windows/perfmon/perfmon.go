@@ -15,14 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -63,12 +64,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if len(m.reader.query.Counters) == 0 {
 		m.log.Error("no counter paths were found")
 	}
-
 	// refresh performance counter list
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
-	if m.reader.executed {
+	if m.reader.config.RefreshWildcardCounters {
 		err := m.reader.RefreshCounterPaths()
 		if err != nil {
 			return errors.Wrap(err, "failed retrieving counters")

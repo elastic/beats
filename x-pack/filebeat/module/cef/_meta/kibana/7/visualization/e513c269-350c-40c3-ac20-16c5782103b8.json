@@ -1,0 +1,146 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Device Types [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "id": "2fddda5e-d6fc-4581-bbb7-574e1017ae8f"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "23db5bf6-f787-474e-86ab-76362432e984"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "3ed9a6b9-fd2e-4e0d-bd83-7ad467b3c8a4"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "ec53a1d3-213c-4b0f-a074-5005a84cdb83",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": "0",
+                        "filter": "",
+                        "formatter": "number",
+                        "id": "04c44192-1112-4515-a8d9-e9e13215aecf",
+                        "label": "Events",
+                        "line_width": "3",
+                        "metrics": [
+                            {
+                                "id": "c5dbb050-fc10-4a0d-abe0-bc093db6cf0e",
+                                "type": "count"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "c5dbb050-fc10-4a0d-abe0-bc093db6cf0e",
+                                "gamma": 0.3,
+                                "id": "e5a48d9d-7834-4da7-8d78-7d4528136b9b",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "sigma": "",
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": "0",
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(244,78,59,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\""
+                                },
+                                "id": "78bfdf07-ec02-4dd8-8ff4-b7e250c561c2",
+                                "label": "Firewall"
+                            }
+                        ],
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "observer.hostname",
+                        "terms_order_by": null
+                    },
+                    {
+                        "axis_position": "left",
+                        "chart_type": "bar",
+                        "color": "rgba(251,158,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "29d6131a-5143-4a64-b597-9538692f0269",
+                        "label": "Top Device Types by Mvg Averages",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "dc74afdf-64ad-47d6-bbed-114e09d12255",
+                                "type": "count"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "dc74afdf-64ad-47d6-bbed-114e09d12255",
+                                "gamma": 0.3,
+                                "id": "87e21aaa-12eb-4213-bb37-41cb19219240",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "cef.extensions.categoryDeviceType",
+                        "terms_size": "10"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Device Types [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e513c269-350c-40c3-ac20-16c5782103b8",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:39.286Z",
+    "version": "WzQ3NTYsMV0="
+}

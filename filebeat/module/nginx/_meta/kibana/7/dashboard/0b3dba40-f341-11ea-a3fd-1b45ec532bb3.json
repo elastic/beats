@@ -1,0 +1,119 @@
+{
+    "attributes": {
+        "description": "Dashboard for the Filebeat Nginx Ingress Controller",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "36b94fba-26a2-4a63-9260-1e5bdf3a9dd8",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "36b94fba-26a2-4a63-9260-1e5bdf3a9dd8",
+                "panelRefName": "panel_36b94fba-26a2-4a63-9260-1e5bdf3a9dd8",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "a7e7600a-703f-48a0-9a3a-3670294ee98b",
+                    "w": 48,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "a7e7600a-703f-48a0-9a3a-3670294ee98b",
+                "panelRefName": "panel_a7e7600a-703f-48a0-9a3a-3670294ee98b",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1a56c416-e1e4-4e0e-bd2b-ac5e3553d118",
+                    "w": 48,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "1a56c416-e1e4-4e0e-bd2b-ac5e3553d118",
+                "panelRefName": "panel_1a56c416-e1e4-4e0e-bd2b-ac5e3553d118",
+                "type": "search",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 28,
+                    "i": "7e5729fd-aa67-4ee2-aaa3-8a67e529d4b1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "7e5729fd-aa67-4ee2-aaa3-8a67e529d4b1",
+                "panelRefName": "panel_7e5729fd-aa67-4ee2-aaa3-8a67e529d4b1",
+                "type": "search",
+                "version": "7.8.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Nginx] Ingress Controller access and error logs",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0b3dba40-f341-11ea-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "c37e2770-f341-11ea-a3fd-1b45ec532bb3",
+            "name": "36b94fba-26a2-4a63-9260-1e5bdf3a9dd8:panel_36b94fba-26a2-4a63-9260-1e5bdf3a9dd8",
+            "type": "visualization"
+        },
+        {
+            "id": "78738850-f342-11ea-a3fd-1b45ec532bb3",
+            "name": "a7e7600a-703f-48a0-9a3a-3670294ee98b:panel_a7e7600a-703f-48a0-9a3a-3670294ee98b",
+            "type": "visualization"
+        },
+        {
+            "id": "a832bcf0-f342-11ea-a3fd-1b45ec532bb3",
+            "name": "1a56c416-e1e4-4e0e-bd2b-ac5e3553d118:panel_1a56c416-e1e4-4e0e-bd2b-ac5e3553d118",
+            "type": "search"
+        },
+        {
+            "id": "d20d4ea0-f342-11ea-a3fd-1b45ec532bb3",
+            "name": "7e5729fd-aa67-4ee2-aaa3-8a67e529d4b1:panel_7e5729fd-aa67-4ee2-aaa3-8a67e529d4b1",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:16.767Z",
+    "version": "WzQ0ODIsMV0="
+}

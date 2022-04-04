@@ -70,7 +70,6 @@ func (n *namespace) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) c
 	}
 
 	meta := n.resource.GenerateK8s(resource, obj, opts...)
-	// TODO: remove this call when moving to 8.0
 	meta = flattenMetadata(meta)
 
 	// TODO: Add extra fields in here if need be
@@ -114,15 +113,17 @@ func flattenMetadata(in common.MapStr) common.MapStr {
 		}
 	}
 
-	rawLabels, err := in.GetValue("labels")
-	if err != nil {
-		return out
+	populateFromKeys := []string{"labels", "annotations"}
+	for _, key := range populateFromKeys {
+		rawValues, err := in.GetValue(key)
+		if err != nil {
+			continue
+		}
+		values, ok := rawValues.(common.MapStr)
+		if ok {
+			out[resource+"_"+key] = values
+		}
 	}
-	labels, ok := rawLabels.(common.MapStr)
-	if !ok {
-		return out
-	}
-	out[resource+"_labels"] = labels
 
 	return out
 }

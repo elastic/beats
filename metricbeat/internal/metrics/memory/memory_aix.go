@@ -36,7 +36,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 var system struct {
@@ -51,7 +52,7 @@ func init() {
 	system.pagesize = uint64(os.Getpagesize())
 }
 
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 	memData := Memory{}
 	meminfo := C.perfstat_memory_total_t{}
 	_, err := C.perfstat_memory_total(nil, &meminfo, C.sizeof_perfstat_memory_total_t, 1)
@@ -62,14 +63,14 @@ func get(_ string) (Memory, error) {
 	totalMem := uint64(meminfo.real_total) * system.pagesize
 	freeMem := uint64(meminfo.real_free) * system.pagesize
 
-	memData.Total = metrics.OptUintWith(totalMem)
-	memData.Free = metrics.OptUintWith(freeMem)
+	memData.Total = opt.UintWith(totalMem)
+	memData.Free = opt.UintWith(freeMem)
 
 	kern := uint64(meminfo.numperm) * system.pagesize // number of pages in file cache
 
-	memData.Used.Bytes = metrics.OptUintWith(totalMem - freeMem)
-	memData.Actual.Free = metrics.OptUintWith(freeMem + kern)
-	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Used.Bytes.ValueOr(0) - kern)
+	memData.Used.Bytes = opt.UintWith(totalMem - freeMem)
+	memData.Actual.Free = opt.UintWith(freeMem + kern)
+	memData.Actual.Used.Bytes = opt.UintWith(memData.Used.Bytes.ValueOr(0) - kern)
 
 	return memData, nil
 }

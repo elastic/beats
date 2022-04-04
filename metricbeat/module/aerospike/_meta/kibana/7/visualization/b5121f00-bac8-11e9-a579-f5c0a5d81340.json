@@ -1,0 +1,146 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Client Error Rates [Metricbeat Aerospike] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "8674fc30-bac8-11e9-986e-1d8d9532a1f1",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "8674fc31-bac8-11e9-986e-1d8d9532a1f1",
+                        "label": "read",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.read.error",
+                                "id": "8674fc32-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "max"
+                            },
+                            {
+                                "field": "8674fc32-bac8-11e9-986e-1d8d9532a1f1",
+                                "id": "8674fc34-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "8674fc34-bac8-11e9-986e-1d8d9532a1f1",
+                                "id": "8674fc33-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#DB1374",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "86752340-bac8-11e9-986e-1d8d9532a1f1",
+                        "label": "write",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.write.error",
+                                "id": "86752341-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "max"
+                            },
+                            {
+                                "field": "86752341-bac8-11e9-986e-1d8d9532a1f1",
+                                "id": "86752343-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "86752343-bac8-11e9-986e-1d8d9532a1f1",
+                                "id": "86752342-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#00B3A4",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "86752344-bac8-11e9-986e-1d8d9532a1f1",
+                        "label": "delete",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.client.delete.error",
+                                "id": "86752345-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "max"
+                            },
+                            {
+                                "field": "86752345-bac8-11e9-986e-1d8d9532a1f1",
+                                "id": "86752347-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "86752347-bac8-11e9-986e-1d8d9532a1f1",
+                                "id": "86752346-bac8-11e9-986e-1d8d9532a1f1",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Client Error Rates [Metricbeat Aerospike] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b5121f00-bac8-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:23.479Z",
+    "version": "WzMyOTcsMV0="
+}

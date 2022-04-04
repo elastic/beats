@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlight": {
+                    "fields": {
+                        "*": {}
+                    },
+                    "fragment_size": 2147483647,
+                    "post_tags": [
+                        "@/kibana-highlighted-field@"
+                    ],
+                    "pre_tags": [
+                        "@kibana-highlighted-field@"
+                    ],
+                    "require_field_match": false
+                },
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:traefik.access"
+                }
+            }
+        },
+        "title": "Sent Byte Size [Filebeat Traefik] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Data sent",
+                        "field": "http.response.body.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {},
+                    "schema": "radius",
+                    "type": "count"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "defaultYExtents": false,
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "legendPosition": "right",
+                "radiusRatio": "17",
+                "scale": "linear",
+                "setYExtents": false,
+                "shareYAxis": true,
+                "showCircles": true,
+                "smoothLines": true,
+                "times": [],
+                "yAxis": {}
+            },
+            "title": "Sent sizes ECS",
+            "type": "line"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Sent-sizes-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:34.139Z",
+    "version": "WzQ2ODQsMV0="
+}

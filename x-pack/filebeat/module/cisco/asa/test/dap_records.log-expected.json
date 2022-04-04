@@ -14,7 +14,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-734001: DAP: User firsname.lastname@domain.net, Addr 1.2.3.4, Connection AnyConnect: The following DAP records were selected for this connection: dap_1, dap_2",
+        "event.original": "%ASA-6-734001: DAP: User firsname.lastname@domain.net, Addr 81.2.69.143, Connection AnyConnect: The following DAP records were selected for this connection: dap_1, dap_2",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -28,19 +28,19 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "1.2.3.4"
+            "81.2.69.143"
         ],
         "service.type": "cisco",
-        "source.address": "1.2.3.4",
-        "source.geo.city_name": "Moscow",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "RU",
-        "source.geo.country_name": "Russia",
-        "source.geo.location.lat": 55.7527,
-        "source.geo.location.lon": 37.6172,
-        "source.geo.region_iso_code": "RU-MOW",
-        "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "tags": [
             "cisco-asa",
             "forwarded"

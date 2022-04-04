@@ -1,0 +1,108 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Avg Request Duration (cumulative) [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0.1",
+                        "filter": "",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Avg Request Duration (ms)",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "max",
+                                "field": "coredns.stats.dns.request.duration.ns.sum",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "sum"
+                            },
+                            {
+                                "agg_with": "max",
+                                "field": "coredns.stats.dns.request.duration.ns.count",
+                                "id": "f6c82d30-7307-11e9-aba0-4f43d70788c6",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "sum"
+                            },
+                            {
+                                "id": "1d9de350-7308-11e9-aba0-4f43d70788c6",
+                                "script": "params.sum / params.count / 1e6",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "20eee310-7308-11e9-aba0-4f43d70788c6",
+                                        "name": "sum"
+                                    },
+                                    {
+                                        "field": "f6c82d30-7307-11e9-aba0-4f43d70788c6",
+                                        "id": "2e4139f0-7308-11e9-aba0-4f43d70788c6",
+                                        "name": "count"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": ""
+                                },
+                                "id": "505e0670-7309-11e9-aba0-4f43d70788c6",
+                                "label": ""
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "coredns.stats.zone",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "value_template": "{{value}} ms"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Avg Request Duration (cumulative) [Metricbeat CoreDNS] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "57c74300-7308-11e9-b0d0-414c3011ddbb",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:04.459Z",
+    "version": "WzM3MzYsMV0="
+}

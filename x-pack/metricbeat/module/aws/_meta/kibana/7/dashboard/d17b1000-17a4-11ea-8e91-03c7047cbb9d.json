@@ -1,0 +1,305 @@
+{
+    "attributes": {
+        "description": "Overview of AWS SNS Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "aws.sns"
+                            },
+                            "type": "phrase",
+                            "value": "aws.sns"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "aws.sns",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "3b9b0cee-b175-4268-8c5b-4ce869a09caf",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3b9b0cee-b175-4268-8c5b-4ce869a09caf",
+                "panelRefName": "panel_3b9b0cee-b175-4268-8c5b-4ce869a09caf",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5f0d72c5-0f28-449f-9c93-3b4074f068f7",
+                    "w": 39,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "5f0d72c5-0f28-449f-9c93-3b4074f068f7",
+                "panelRefName": "panel_5f0d72c5-0f28-449f-9c93-3b4074f068f7",
+                "title": "SNS Messages and Notifications",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "5a9d5f2f-b075-4892-8188-c6e808a1163d",
+                    "w": 9,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "5a9d5f2f-b075-4892-8188-c6e808a1163d",
+                "panelRefName": "panel_5a9d5f2f-b075-4892-8188-c6e808a1163d",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
+                    "w": 16,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
+                "panelRefName": "panel_c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
+                "title": "SNS Publish Size",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "0684c25d-34e8-425e-9069-dd8364e6325b",
+                    "w": 16,
+                    "x": 16,
+                    "y": 10
+                },
+                "panelIndex": "0684c25d-34e8-425e-9069-dd8364e6325b",
+                "panelRefName": "panel_0684c25d-34e8-425e-9069-dd8364e6325b",
+                "title": "SNS Notifications Filtered Out",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
+                    "w": 16,
+                    "x": 32,
+                    "y": 10
+                },
+                "panelIndex": "72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
+                "panelRefName": "panel_72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
+                "title": "SNS Notifications Filtered Out Invalid Attributes",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
+                "panelRefName": "panel_923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
+                "title": "SNS Notifications Filtered Out No Message Attributes",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "f176153f-4588-42f9-a7bb-3015909d5610",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "f176153f-4588-42f9-a7bb-3015909d5610",
+                "panelRefName": "panel_f176153f-4588-42f9-a7bb-3015909d5610",
+                "title": "SNS Notifications Failed to Redrive to DLQ",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "f3c5915b-6848-4950-afca-53653d13d6af",
+                    "w": 16,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "f3c5915b-6848-4950-afca-53653d13d6af",
+                "panelRefName": "panel_f3c5915b-6848-4950-afca-53653d13d6af",
+                "title": "SNS SMS Success Rate",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3b3cc747-b57c-44e0-a18c-77155072bee4",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "3b3cc747-b57c-44e0-a18c-77155072bee4",
+                "panelRefName": "panel_3b3cc747-b57c-44e0-a18c-77155072bee4",
+                "title": "SNS Notifications Redriven To DLQ",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "ee130150-c1de-465b-8a8e-013f466528bf",
+                    "w": 16,
+                    "x": 16,
+                    "y": 30
+                },
+                "panelIndex": "ee130150-c1de-465b-8a8e-013f466528bf",
+                "panelRefName": "panel_ee130150-c1de-465b-8a8e-013f466528bf",
+                "title": "SNS SMS Month To Date Spent USD",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] SNS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d17b1000-17a4-11ea-8e91-03c7047cbb9d",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "b5308940-7347-11e9-816b-07687310a99a",
+            "name": "3b9b0cee-b175-4268-8c5b-4ce869a09caf:panel_3b9b0cee-b175-4268-8c5b-4ce869a09caf",
+            "type": "visualization"
+        },
+        {
+            "id": "13e624c0-180e-11ea-8e91-03c7047cbb9d",
+            "name": "5f0d72c5-0f28-449f-9c93-3b4074f068f7:panel_5f0d72c5-0f28-449f-9c93-3b4074f068f7",
+            "type": "visualization"
+        },
+        {
+            "id": "59defc90-17a5-11ea-8e91-03c7047cbb9d",
+            "name": "5a9d5f2f-b075-4892-8188-c6e808a1163d:panel_5a9d5f2f-b075-4892-8188-c6e808a1163d",
+            "type": "visualization"
+        },
+        {
+            "id": "6f7f7680-180c-11ea-8e91-03c7047cbb9d",
+            "name": "c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f:panel_c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
+            "type": "visualization"
+        },
+        {
+            "id": "bf81e030-180e-11ea-8e91-03c7047cbb9d",
+            "name": "0684c25d-34e8-425e-9069-dd8364e6325b:panel_0684c25d-34e8-425e-9069-dd8364e6325b",
+            "type": "visualization"
+        },
+        {
+            "id": "d19a71b0-180e-11ea-8e91-03c7047cbb9d",
+            "name": "72e987da-9a49-4dd4-99c4-4acbc49a0e0b:panel_72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
+            "type": "visualization"
+        },
+        {
+            "id": "dffa19e0-180e-11ea-8e91-03c7047cbb9d",
+            "name": "923bd4cd-d8fe-47b5-afcf-577bf2c5987c:panel_923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
+            "type": "visualization"
+        },
+        {
+            "id": "09857a20-180f-11ea-8e91-03c7047cbb9d",
+            "name": "f176153f-4588-42f9-a7bb-3015909d5610:panel_f176153f-4588-42f9-a7bb-3015909d5610",
+            "type": "visualization"
+        },
+        {
+            "id": "abdc7480-180b-11ea-8e91-03c7047cbb9d",
+            "name": "f3c5915b-6848-4950-afca-53653d13d6af:panel_f3c5915b-6848-4950-afca-53653d13d6af",
+            "type": "visualization"
+        },
+        {
+            "id": "fc0869c0-180e-11ea-8e91-03c7047cbb9d",
+            "name": "3b3cc747-b57c-44e0-a18c-77155072bee4:panel_3b3cc747-b57c-44e0-a18c-77155072bee4",
+            "type": "visualization"
+        },
+        {
+            "id": "b7f8bf90-180f-11ea-8e91-03c7047cbb9d",
+            "name": "ee130150-c1de-465b-8a8e-013f466528bf:panel_ee130150-c1de-465b-8a8e-013f466528bf",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:36.824Z",
+    "version": "WzM0MzEsMV0="
+}

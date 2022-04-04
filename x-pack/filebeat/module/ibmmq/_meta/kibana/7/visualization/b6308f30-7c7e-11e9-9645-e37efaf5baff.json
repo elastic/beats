@@ -1,0 +1,159 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "ibmmq"
+                            },
+                            "type": "phrase",
+                            "value": "ibmmq"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "ibmmq",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Top 5 Errors [Filebeat IBM MQ]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Occurences"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "Description",
+                        "field": "message",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "Explanation",
+                        "field": "ibmmq.errorlog.explanation",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "Recommended Action",
+                        "field": "ibmmq.errorlog.action",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Error Codes",
+                        "field": "ibmmq.errorlog.code",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "perPage": 5,
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Top 5 Errors [Filebeat IBM MQ]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b6308f30-7c7e-11e9-9645-e37efaf5baff",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:43.104Z",
+    "version": "WzQyNjUsMV0="
+}

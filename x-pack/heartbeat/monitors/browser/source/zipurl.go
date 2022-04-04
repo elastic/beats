@@ -14,6 +14,9 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ZipURLSource struct {
@@ -23,12 +26,24 @@ type ZipURLSource struct {
 	Password string `config:"password" json:"password"`
 	Retries  int    `config:"retries" default:"3" json:"retries"`
 	BaseSource
-	// Etag from last successful fetch
-	etag            string
 	TargetDirectory string `config:"target_directory" json:"target_directory"`
+
+	// Etag from last successful fetch
+	etag string
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"`
+
+	httpClient *http.Client
 }
 
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
+
+func (z *ZipURLSource) Validate() (err error) {
+	if z.httpClient == nil {
+		z.httpClient, _ = z.Transport.Client()
+	}
+	return err
+}
 
 func (z *ZipURLSource) Fetch() error {
 	changed, err := checkIfChanged(z)
@@ -98,8 +113,10 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 	for _, f := range rdr.File {
 		err = unzipFile(targetDir, folder, f)
 		if err != nil {
-			// TODO: err handlers
-			os.RemoveAll(targetDir)
+			rmErr := os.RemoveAll(targetDir)
+			if rmErr != nil {
+				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, (original unzip error: %s)", rmErr, err)
+			}
 			return err
 		}
 	}
@@ -172,6 +189,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 		if err == nil {
 			resp.Body.Close()
 		}
+		logp.Warn("attempt to download zip at %s failed: %s, will retry in 1s", z.URL, err)
 		time.Sleep(time.Second)
 	}
 	if resp != nil && resp.StatusCode > 300 {
@@ -188,7 +206,7 @@ func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
 	if z.Username != "" && z.Password != "" {
 		req.SetBasicAuth(z.Username, z.Password)
 	}
-	return http.DefaultClient.Do(req)
+	return z.httpClient.Do(req)
 }
 
 func download(z *ZipURLSource, tf *os.File) (etag string, err error) {

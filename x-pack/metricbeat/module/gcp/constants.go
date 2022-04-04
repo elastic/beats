@@ -18,9 +18,12 @@ const (
 const (
 	ServiceCloudFunctions = "cloudfunctions"
 	ServiceCompute        = "compute"
+	ServiceGKE            = "gke"
 	ServiceLoadBalancing  = "loadbalancing"
 	ServicePubsub         = "pubsub"
 	ServiceStorage        = "storage"
+	ServiceFirestore      = "firestore"
+	ServiceDataproc       = "dataproc"
 )
 
 //Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event

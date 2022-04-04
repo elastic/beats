@@ -1,0 +1,106 @@
+{
+    "attributes": {
+        "description": "Total number of XDS requests with an expired nonce.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Pilot XDS expired [Metricbeat Istio]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "7ccbe640-07d8-11eb-985d-2f490d4c2901",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#6092C0",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "7ccbe641-07d8-11eb-985d-2f490d4c2901",
+                        "label": "pilot_xds_expired_nonce",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "prometheus.pilot_xds_expired_nonce.counter",
+                                "id": "7ccbe642-07d8-11eb-985d-2f490d4c2901",
+                                "percentiles": [
+                                    {
+                                        "id": "88c0d000-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "50"
+                                    },
+                                    {
+                                        "id": "95c750d0-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "25"
+                                    },
+                                    {
+                                        "id": "9c5ec900-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "75"
+                                    },
+                                    {
+                                        "id": "9f8e3700-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "95"
+                                    },
+                                    {
+                                        "id": "a3581040-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "99"
+                                    }
+                                ],
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Pilot XDS expired [Metricbeat Istio]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0ed17c80-0883-11eb-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:32.143Z",
+    "version": "WzM5NzUsMV0="
+}

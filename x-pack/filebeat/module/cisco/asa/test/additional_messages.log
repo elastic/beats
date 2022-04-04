@@ -1,38 +1,38 @@
-May  5 17:51:17 dev01: %FTD-6-302013: Built inbound TCP connection 111111111 for net:10.10.10.10/53500 (8.8.8.8/53500) to fw111:192.168.2.2/53500 (8.8.5.4/53500)
-May  5 17:51:17 dev01: %FTD-6-302015: Built inbound UDP connection 111111111 for net:10.10.10.10/53500 (8.8.8.8/53500) to fw111:192.168.2.2/53500 (8.8.5.4/53500)
-May  5 17:51:17 dev01: %FTD-6-302020: Built inbound ICMP connection for faddr 10.10.10.10/0 gaddr 8.8.8.8/0 laddr 192.168.2.2/0 type 3 code 3
+May  5 17:51:17 dev01: %FTD-6-302013: Built inbound TCP connection 111111111 for net:10.10.10.10/53500 (175.16.199.1/53500) to fw111:192.168.2.2/53500 (8.8.5.4/53500)
+May  5 17:51:17 dev01: %FTD-6-302015: Built inbound UDP connection 111111111 for net:10.10.10.10/53500 (175.16.199.1/53500) to fw111:192.168.2.2/53500 (8.8.5.4/53500)
+May  5 17:51:17 dev01: %FTD-6-302020: Built inbound ICMP connection for faddr 10.10.10.10/0 gaddr 175.16.199.1/0 laddr 192.168.2.2/0 type 3 code 3
 May  5 17:51:17 dev01: %FTD-7-609002: Teardown local-host net:192.168.2.2 duration 0:00:00
 May  5 17:51:17 dev01: %FTD-7-609001: Built local-host net:192.168.2.2
-May  5 17:51:17 dev01: %FTD-6-302020: Built inbound ICMP connection for faddr 10.10.10.10/0 gaddr 8.8.8.8/0 laddr 192.168.2.2/0 type 3 code 1
-May  5 17:51:17 dev01: %FTD-6-805001: Offloaded TCP Flow for connection 111111111 from fw111:10.10.10.10/111 (8.8.8.8/111) to fw111:192.168.2.2/111 (8.8.5.4/111)
+May  5 17:51:17 dev01: %FTD-6-302020: Built inbound ICMP connection for faddr 10.10.10.10/0 gaddr 175.16.199.1/0 laddr 192.168.2.2/0 type 3 code 1
+May  5 17:51:17 dev01: %FTD-6-805001: Offloaded TCP Flow for connection 111111111 from fw111:10.10.10.10/111 (175.16.199.1/111) to fw111:192.168.2.2/111 (8.8.5.4/111)
 May  5 17:51:17 dev01: %FTD-6-805002: TCP Flow is no longer offloaded for connection 941243214 from net:10.192.18.4/51261 (10.192.18.4/51261) to fw109:10.192.70.66/443 (10.192.70.66/443)
 May  5 17:51:17 dev01: %FTD-7-710005: UDP request discarded from 192.168.2.2/68 to fw111:10.10.10.10/67
 May  5 17:51:17 dev01: %FTD-6-303002: FTP connection from net:192.168.2.2/63656 to fw111:10.192.18.4/21, user testuser Stored file /export/home/sysm/ftproot/sdsdsds/tmp.log
 May  5 17:51:17 dev01: %FTD-7-710006: VRRP request discarded from 192.168.2.2 to fw111:192.18.4
-May  5 17:51:17 dev01: %FTD-4-313005: No matching connection for ICMP error message: icmp src fw111:10.192.33.100 dst fw111:192.18.4 (type 3, code 3) on fw111 interface. Original IP payload: udp src 192.18.4/53 dst 8.8.8.8/10872.
-May  5 18:16:21 dev01: %ASA-6-302021: Teardown ICMP connection for faddr 192.168.2.2/0 gaddr 8.8.8.8/2 laddr 10.10.10.10/2 type 8 code 0
+May  5 17:51:17 dev01: %FTD-4-313005: No matching connection for ICMP error message: icmp src fw111:10.192.33.100 dst fw111:192.18.4 (type 3, code 3) on fw111 interface. Original IP payload: udp src 192.18.4/53 dst 175.16.199.1/10872.
+May  5 18:16:21 dev01: %ASA-6-302021: Teardown ICMP connection for faddr 192.168.2.2/0 gaddr 175.16.199.1/2 laddr 10.10.10.10/2 type 8 code 0
 May  5 18:22:35 dev01: %ASA-7-609001: Built local-host net:10.10.10.10
 May  5 18:24:31 dev01: %ASA-7-609002: Teardown local-host identity:10.10.10.10 duration 0:00:00
-May  5 18:29:32 dev01: %ASA-6-302020: Built inbound ICMP connection for faddr 10.10.10.10/0 gaddr 8.8.8.8/0 laddr 10.192.46.90/0
-May  5 18:29:32 dev01: %ASA-6-302020: Built outbound ICMP connection for faddr 10.10.10.10/0 gaddr 8.8.8.8/0 laddr 192.168.2.2/0 type 3 code 3
+May  5 18:29:32 dev01: %ASA-6-302020: Built inbound ICMP connection for faddr 10.10.10.10/0 gaddr 175.16.199.1/0 laddr 10.192.46.90/0
+May  5 18:29:32 dev01: %ASA-6-302020: Built outbound ICMP connection for faddr 10.10.10.10/0 gaddr 175.16.199.1/0 laddr 192.168.2.2/0 type 3 code 3
 May  5 18:29:32 dev01: %ASA-6-302014: Teardown TCP connection 2960892904 for out111:10.10.10.10/443 to fw111:192.168.2.2/55225 duration 0:00:00 bytes 0 TCP Reset-I
-May  5 18:29:32 dev01: %ASA-6-302013: Built outbound TCP connection 1588662 for intfacename:192.168.2.2/80 (8.8.8.8/80) to net:10.10.10.10/54839 (8.8.8.8/54839)
-May  5 18:29:32 dev01: %ASA-6-302012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00
+May  5 18:29:32 dev01: %ASA-6-302013: Built outbound TCP connection 1588662 for intfacename:192.168.2.2/80 (175.16.199.1/80) to net:10.10.10.10/54839 (175.16.199.1/54839)
+May  5 18:29:32 dev01: %ASA-6-305012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00
 May  5 18:40:50 dev01: %ASA-4-313004: Denied ICMP type=0, from laddr 10.10.10.10 on interface fw502 to 192.168.2.2: no matching session
 May  5 18:40:50 dev01: %ASA-6-305011: Built dynamic TCP translation from fw111:10.10.10.10/57006 to out111:192.168.2.2/57006
 May  5 18:40:50 dev01: %ASA-2-106001: Inbound TCP connection denied from 192.168.2.2/43803 to 10.10.10.10/14322 flags SYN  on interface out111
 May  5 18:40:50 dev01: %ASA-2-302016: Teardown UDP connection 1671727 for intfacename:10.10.10.10/161 to net:192.186.2.2/53356 duration 0:02:04 bytes 64585
-May  5 18:40:50 dev01: %ASA-2-302015: Built outbound UDP connection 1743372 for intfacename:10.10.10.10/161 (8.8.8.4/161) to net:192.168.2.2/22638 (8.8.8.8/22638)
-May  5 18:40:50 dev01: %ASA-2-302015: Built outbound UDP connection 1743372 for intfacename:10.10.10.10/161 (8.8.8.4/161) to net:192.168.2.2/22638 (8.8.8.8/22638)
+May  5 18:40:50 dev01: %ASA-2-302015: Built outbound UDP connection 1743372 for intfacename:10.10.10.10/161 (8.8.8.4/161) to net:192.168.2.2/22638 (175.16.199.1/22638)
+May  5 18:40:50 dev01: %ASA-2-302015: Built outbound UDP connection 1743372 for intfacename:10.10.10.10/161 (8.8.8.4/161) to net:192.168.2.2/22638 (175.16.199.1/22638)
 May  5 18:40:50 dev01: %ASA-4-106023: Deny tcp src fw111:10.10.10.10/64388 dst out111:192.168.2.2/443 by access-group "out1111_access_out" [0x47e21ef4, 0x47e21ef4]
 May  5 18:40:50 dev01: %ASA-4-106021: Deny TCP reverse path check from 192.168.2.2 to 10.10.10.10 on interface fw111
 May  5 19:02:58 dev01: %ASA-2-106006: Deny inbound UDP from 192.168.2.2/65020 to 10.10.10.10/65020 on interface fw111
 May  5 19:02:58 dev01: %ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/53089 to 10.10.10.10/443 flags FIN PSH ACK  on interface out111
 May  5 19:02:58 dev01: %ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/17127 to 10.10.10.10/443 flags PSH ACK  on interface out111
 May  5 19:02:58 dev01: %ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/24223 to 10.10.10.10/443 flags RST  on interface fw111
-May  5 19:02:58 dev01: %ASA-6-302022: Built director stub TCP connection for fw1111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (8.8.8.8/10051)
-May  5 19:02:58 dev01: %ASA-6-302022: Built forwarder  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (8.8.8.8/10051)
-May  5 19:02:58 dev01: %ASA-6-302022: Built backup  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.1682.2.2/10051 (8.8.8.8/10051)
+May  5 19:02:58 dev01: %ASA-6-302022: Built director stub TCP connection for fw1111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (175.16.199.1/10051)
+May  5 19:02:58 dev01: %ASA-6-302022: Built forwarder  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (175.16.199.1/10051)
+May  5 19:02:58 dev01: %ASA-6-302022: Built backup  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.1682.2.2/10051 (175.16.199.1/10051)
 May  5 19:02:58 dev01: %ASA-6-302023: Teardown stub TCP connection for fw111:10.10.10.10/39210 to net:192.168.2.2/10051 duration 0:00:00 forwarded bytes 0 Cluster flow with CLU closed on owner
 May  5 19:02:58 dev01: %ASA-6-302023: Teardown stub TCP connection for net:10.10.10.10/10051 to unknown:192.168.2.2/39222 duration 0:00:00 forwarded bytes 0 Forwarding or redirect flow removed to create director or backup flow
 May  5 19:03:27 dev01: %ASA-7-111009: User 'aaaa' executed cmd: show access-list fw211111_access_out brief
@@ -40,10 +40,10 @@ May  5 19:02:26 dev01: %ASA-7-111009: User 'aaaa' executed cmd: show access-list
 May  5 19:02:26 dev01: %ASA-6-106100: access-list fw111_out permitted tcp ptaaac/192.168.2.2(62157) -> fw111/10.10.10.10(3452) hit-cnt 1 first hit [0x38ff326b, 0x00000000]
 May  5 19:02:26 dev01: %ASA-6-106100: access-list fw111_out permitted tcp net/192.168.2.2(49033) -> fw111/10.10.10.10(6007) hit-cnt 2 300-second interval [0x38ff326b, 0x00000000]
 May  5 19:02:26 dev01: %ASA-6-302027: Teardown stub ICMP connection for fw1111:10.10.10.10/6426 to net:192.168.2.2/0 duration 1:00:04 forwarded bytes 56 Cluster flow with CLU closed on owner
-May  5 19:02:26 dev01: %ASA-6-302026: Built director stub ICMP connection for fw111:10.10.10.10/32004 (8.8.8.5) to net:192.168.2.2/0 (8.8.8.8)
+May  5 19:02:26 dev01: %ASA-6-302026: Built director stub ICMP connection for fw111:10.10.10.10/32004 (8.8.8.5) to net:192.168.2.2/0 (175.16.199.1)
 May  5 19:02:26 dev01: %ASA-7-710005: UDP request discarded from 10.10.10.10/1985 to net:192.168.2.2/1985
 May  5 19:02:26 dev01: %ASA-6-302025: Teardown stub UDP connection for net:192.168.2.2/123 to unknown:10.10.10.10/123 duration 0:01:00 forwarded bytes 48 Cluster flow with CLU removed from due to idle timeout
-May  5 19:02:26 dev01: %ASA-6-302024: Built backup stub UDP connection for net:192.168.2.2/9051 (8.8.8.5(19051) to fw111:10.10.10.10/123 (8.8.8.8/123)
+May  5 19:02:26 dev01: %ASA-6-302024: Built backup stub UDP connection for net:192.168.2.2/9051 (8.8.8.5(19051) to fw111:10.10.10.10/123 (175.16.199.1/123)
 May  5 19:02:26 dev01: %ASA-3-106014: Deny inbound icmp src fw111:10.10.10.10 dst fw111:10.10.10.10(type 8, code 0)
 May  5 19:02:25 dev01: %ASA-4-733100: [192.168.2.2] drop rate-1 exceeded. Current burst rate is 0 per second, max configured rate is -4; Current average rate is 7 per second, max configured rate is -4; Cumulative total count is 9063
 May  5 19:02:25 dev01: %ASA-3-106010: Deny inbound sctp src fw111:10.10.10.10/5114 dst fw111:10.10.10.10/2
@@ -52,7 +52,7 @@ Apr 27 04:18:49 dev01: %ASA-5-304001: 10.20.30.40 Accessed URL 10.20.30.40:http:
 Apr 27 04:18:49 dev01: %ASA-5-304001: 10.20.30.40 Accessed URL someuser@10.20.30.40:http://10.20.30.40/IOFUHSIU98[0]
 Apr 27 17:54:52 dev01: %ASA-5-304001: 10.20.30.40 Accessed JAVA URL 10.20.30.40:http://10.20.30.40/some/longer/url-asd-er9789870[0]_=23
 Apr 27 04:18:49 dev01: %ASA-5-304001: 10.20.30.40 Accessed JAVA URL someuser@10.20.30.40:http://10.20.30.40/
-Apr 27 04:12:23 dev01: %ASA-6-302304: Teardown TCP state-bypass connection 2751765169 from server.deflan:1.2.3.4/54242 to server.deflan:2.3.4.5/9101 duration 1:00:02 bytes 245 Connection timeout
+Apr 27 04:12:23 dev01: %ASA-6-302304: Teardown TCP state-bypass connection 2751765169 from server.deflan:81.2.69.143/54242 to server.deflan:67.43.156.12/9101 duration 1:00:02 bytes 245 Connection timeout
 Apr 27 02:02:02 dev01: %ASA-4-106023: Deny tcp src outside:10.10.10.2/56444 dst srv:192.168.2.2/51635(testhostname.domain) by access-group "global_access_1"
 Oct 20 2019 15:15:15 dev01: %ASA-5-106100: access-list testrulename denied tcp insideintf/somedomainname.local(27218) -> OUTSIDE/195.122.12.242(53) hit-cnt 1 first hit [0x16847359, 0x00000000]
 Apr 27 02:03:03 dev01: %ASA-5-111004: console end configuration: OK
@@ -62,24 +62,32 @@ Apr 27 02:03:03 dev01: %ASA-6-605004: Login denied from 10.10.1.212/51923 to FCD
 Apr 27 02:03:03 dev01: %ASA-6-611102: User authentication failed: IP address: 10.10.0.87, Uname: admin
 Apr 27 02:03:03 dev01: %ASA-6-605005: Login permitted from 10.10.0.87/6651 to FCD-FS-LAN:10.10.1.254/ssh for user "admin"
 Apr 27 02:03:03 dev01: %ASA-6-611101: User authentication succeeded: IP address: 10.10.0.87, Uname: admin
-Apr 27 02:03:03 dev01: %ASA-5-713049: Group = 91.240.17.178, IP = 91.240.17.178, Security negotiation complete for LAN-to-LAN Group (91.240.17.178) Responder, Inbound SPI = 0x276b1da2, Outbound SPI = 0x0e1a581d
-Apr 27 02:03:03 dev01: %ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested
+Apr 27 02:03:03 dev01: %ASA-5-713049: Group = 81.2.69.143, IP = 81.2.69.143, Security negotiation complete for LAN-to-LAN Group (81.2.69.143) Responder, Inbound SPI = 0x276b1da2, Outbound SPI = 0x0e1a581d
+Apr 27 02:03:03 dev01: %ASA-4-113019: Group = 81.2.69.143, Username = 81.2.69.143, IP = 81.2.69.143, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested
 Apr 27 02:03:03 dev01: %ASA-4-722051: Group <VPN5Policy> User <john> IP <192.168.50.3> IPv4 Address <192.168.50.5> IPv6 address <::> assigned to session
-Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.
+Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User testuser IP 175.16.199.1 WebVPN session terminated: User Requested.
 Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.
-Apr 27 02:03:03 dev01: %ASA-3-710003: TCP access denied by ACL from 104.46.88.19/6370 to outside:195.74.114.34/23
-Apr 27 2020 02:03:03 dev01: %ASA-5-434004: SFR requested ASA to bypass further packet redirection and process TCP flow from sourceInterfaceName:91.240.17.178/8888 to destinationInterfaceName:192.168.2.2/123123 locally
-Apr 27 2020 02:03:03 dev01: %ASA-4-434002: SFR requested to drop TCP packet from sourceInterfaceName:91.240.17.138/8888 to destinationInterfaceName:192.168.2.2/514514
-Apr 27 2020 02:03:03 dev01: %ASA-6-110002: Failed to locate egress interface for TCP from sourceInterfaceName:91.240.17.178/7777 to 192.168.2.2/123412
-Apr 27 2020 02:03:03 dev01: %ASA-4-419002: Duplicate TCP SYN from sourceInterfaceName:91.240.17.178/7777 to destinationInterfaceName:192.168.2.2/514514 with different initial sequence number
-Apr 27 2020 02:03:03 dev01: %ASA-6-602303: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been created.
-Apr 27 2020 02:03:03 dev01: %ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been deleted.
-Apr 27 2020 02:03:03 dev01: %ASA-5-750002: Local:91.240.17.178:7777 Remote:192.168.2.2:7777 Username:admin Received a IKE_INIT_SA request
-Apr 27 2020 02:03:03 dev01: %ASA-4-750003: Local:91.240.17.178:7777 Remote:192.168.2.2:7777 Username:admin Negotiation aborted due to ERROR: Failed to locate an item in the database
-Apr 27 2020 02:03:03 dev01: %ASA-5-713120: Group = 100.60.140.10, IP = 192.128.1.1, PHASE 2 COMPLETED (msgid=bbe383e88)
-Apr 27 2020 02:03:03 dev01: %ASA-5-713202: IP = 192.64.157.61, Duplicate first packet detected. Ignoring packet.
-Apr 27 2020 02:03:03 dev01: %ASA-6-713905: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 02:03:03 dev01: %ASA-3-710003: TCP access denied by ACL from 67.43.156.13/6370 to outside:195.74.114.34/23
+Apr 27 2020 02:03:03 dev01: %ASA-5-434004: SFR requested ASA to bypass further packet redirection and process TCP flow from sourceInterfaceName:81.2.69.143/8888 to destinationInterfaceName:192.168.2.2/123123 locally
+Apr 27 2020 02:03:03 dev01: %ASA-4-434002: SFR requested to drop TCP packet from sourceInterfaceName:67.43.156.15/8888 to destinationInterfaceName:192.168.2.2/514514
+Apr 27 2020 02:03:03 dev01: %ASA-6-110002: Failed to locate egress interface for TCP from sourceInterfaceName:81.2.69.143/7777 to 192.168.2.2/123412
+Apr 27 2020 02:03:03 dev01: %ASA-4-419002: Duplicate TCP SYN from sourceInterfaceName:81.2.69.143/7777 to destinationInterfaceName:192.168.2.2/514514 with different initial sequence number
+Apr 27 2020 02:03:03 dev01: %ASA-6-602303: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 81.2.69.143 and 192.168.2.2 (user= admin) has been created.
+Apr 27 2020 02:03:03 dev01: %ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 81.2.69.143 and 192.168.2.2 (user= admin) has been deleted.
+Apr 27 2020 02:03:03 dev01: %ASA-5-750002: Local:81.2.69.143:7777 Remote:192.168.2.2:7777 Username:admin Received a IKE_INIT_SA request
+Apr 27 2020 02:03:03 dev01: %ASA-4-750003: Local:81.2.69.143:7777 Remote:192.168.2.2:7777 Username:admin Negotiation aborted due to ERROR: Failed to locate an item in the database
+Apr 27 2020 02:03:03 dev01: %ASA-5-713120: Group = 100.60.140.10, IP = 67.43.156.12, PHASE 2 COMPLETED (msgid=bbe383e88)
+Apr 27 2020 02:03:03 dev01: %ASA-5-713202: IP = 1.128.3.4, Duplicate first packet detected. Ignoring packet.
+Apr 27 2020 02:03:03 dev01: %ASA-6-713905: Group = 100.60.140.10, IP = 67.43.156.12, All IPSec SA proposals found unacceptable!
 Apr 27 2020 02:03:03 dev01: %ASA-6-713904: All IPSec SA proposals found unacceptable!
-Apr 27 2020 02:03:03 dev01: %ASA-6-713903: IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-6-713903: IP = 67.43.156.12, All IPSec SA proposals found unacceptable!
 Apr 27 2020 02:03:03 dev01: %ASA-6-713902: Group = 100.60.140.10, All IPSec SA proposals found unacceptable!
-Apr 27 2020 02:03:03 dev01: %ASA-6-713901: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-6-713901: Group = 100.60.140.10, IP = 67.43.156.12, All IPSec SA proposals found unacceptable!
+Apr 27 02:03:03 dev01: %ASA-5-713049: Group = 100.60.140.10, Username = test_user, IP = 81.2.69.143, Security negotiation complete for User (test_user) Responder, Inbound SPI = 0x0000000, Outbound SPI = 0x0000000
+Apr 27 2020 02:03:03 dev01: %ASA-4-106023: Deny protocol 47 src outside:100.66.124.24 dst inside:172.31.98.44 by access-group "inbound"
+Apr 27 2020 02:03:03 dev01: %ASA-4-106023: Deny icmp src OUTSIDE:2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group "OUTSIDE_in"
+Apr 27 2020 02:03:03 dev01: %ASA-4-302016: Teardown UDP connection 123364823 for OUTSIDE:67.43.156.13/500 to identity:1.128.3.4/500 duration 92:24:20 bytes 4671944
+May  5 19:02:25 dev01: %ASA-4-733100: [ Scanning] drop rate-2 exceeded. Current burst rate is 0 per second, max configured rate is 8; Current average rate is 5 per second, max configured rate is 4; Cumulative total count is 19269
+May  5 19:02:25 dev01: %ASA-4-733100: [   192.168.0.1] drop rate-1 exceeded. Current burst rate is 0 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 6018
+May  5 19:02:25 dev01: %ASA-4-733100: [     Port-5432 5432] drop rate-1 exceeded. Current burst rate is 8 per second, max configured rate is 10; Current average rate is 20 per second, max configured rate is 5; Cumulative total count is 12466
+May  5 19:02:25 dev01: %ASA-4-733100: [           RDP 3389] drop rate-1 exceeded. Current burst rate is 63 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 3054

@@ -1,0 +1,63 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "DB Blocks Gets by buffer pool (Top 10) [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "1547f520-ec10-11e9-bea4-bdae5d622976",
+                        "label": "DB Blocks gets",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "oracle.performance.cache.get.db_blocks",
+                                "id": "1547f521-ec10-11e9-bea4-bdae5d622976",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "oracle.performance.buffer_pool"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "DB Blocks Gets by buffer pool (Top 10) [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "68ce1940-ec10-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:19.365Z",
+    "version": "WzMyNzEsMV0="
+}

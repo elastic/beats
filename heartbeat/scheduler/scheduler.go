@@ -27,16 +27,10 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-)
-
-const (
-	statePreRunning int = iota + 1
-	stateRunning
-	stateStopped
 )
 
 var debugf = logp.MakeDebug("scheduler")
@@ -46,21 +40,22 @@ var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
-	limit      int64
-	limitSem   *semaphore.Weighted
-	state      atomic.Int
-	location   *time.Location
-	timerQueue *timerqueue.TimerQueue
-	ctx        context.Context
-	cancelCtx  context.CancelFunc
-	stats      schedulerStats
+	limit       int64
+	limitSem    *semaphore.Weighted
+	location    *time.Location
+	timerQueue  *timerqueue.TimerQueue
+	ctx         context.Context
+	cancelCtx   context.CancelFunc
+	stats       schedulerStats
+	jobLimitSem map[string]*semaphore.Weighted
+	runOnce     bool
+	runOnceWg   *sync.WaitGroup
 }
 
 type schedulerStats struct {
 	activeJobs         *monitoring.Uint // gauge showing number of active jobs
 	activeTasks        *monitoring.Uint // gauge showing number of active tasks
 	waitingTasks       *monitoring.Uint // number of tasks waiting to run, but constrained by scheduler limit
-	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 }
 
@@ -77,13 +72,18 @@ type Schedule interface {
 	RunOnInit() bool
 }
 
-// New creates a new Scheduler
-func New(limit int64, registry *monitoring.Registry) *Scheduler {
-	return NewWithLocation(limit, registry, time.Local)
+func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semaphore.Weighted {
+	jobLimitSem := map[string]*semaphore.Weighted{}
+	for jobType, jobLimit := range jobLimitByType {
+		if jobLimit.Limit > 0 {
+			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
+		}
+	}
+	return jobLimitSem
 }
 
 // NewWithLocation creates a new Scheduler using the given runAt zone.
-func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location) *Scheduler {
+func Create(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]config.JobLimit, runOnce bool) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	if limit < 1 {
@@ -96,14 +96,15 @@ func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.
 	waitingTasksGauge := monitoring.NewUint(registry, "tasks.waiting")
 
 	sched := &Scheduler{
-		limit:     limit,
-		location:  location,
-		state:     atomic.MakeInt(statePreRunning),
-		ctx:       ctx,
-		cancelCtx: cancelCtx,
-		limitSem:  semaphore.NewWeighted(limit),
-
-		timerQueue: timerqueue.NewTimerQueue(ctx),
+		limit:       limit,
+		location:    location,
+		ctx:         ctx,
+		cancelCtx:   cancelCtx,
+		limitSem:    semaphore.NewWeighted(limit),
+		jobLimitSem: getJobLimitSem(jobLimitByType),
+		timerQueue:  timerqueue.NewTimerQueue(ctx),
+		runOnce:     runOnce,
+		runOnceWg:   &sync.WaitGroup{},
 
 		stats: schedulerStats{
 			activeJobs:         activeJobsGauge,
@@ -113,24 +114,10 @@ func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.
 		},
 	}
 
+	sched.timerQueue.Start()
+	go sched.missedDeadlineReporter()
+
 	return sched
-}
-
-// Start the scheduler. Starting a stopped scheduler returns an error.
-func (s *Scheduler) Start() error {
-	if s.state.Load() == stateStopped {
-		return ErrInvalidTransition
-	}
-	if !s.state.CAS(statePreRunning, stateRunning) {
-		return nil // we already running, just exit
-	}
-
-	s.timerQueue.Start()
-
-	// Missed deadline reporter
-	go s.missedDeadlineReporter()
-
-	return nil
 }
 
 func (s *Scheduler) missedDeadlineReporter() {
@@ -149,7 +136,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 			missingNow := s.stats.jobsMissedDeadline.Get()
 			missedDelta := missingNow - missedAtLastCheck
 			if missedDelta > 0 {
-				logp.Warn("%d tasks have missed their schedule deadlines in the last %s.", missedDelta, interval)
+				logp.Warn("%d tasks have missed their schedule deadlines by more than 1 second in the last %s.", missedDelta, interval)
 			}
 			missedAtLastCheck = missingNow
 		}
@@ -157,25 +144,28 @@ func (s *Scheduler) missedDeadlineReporter() {
 }
 
 // Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
-func (s *Scheduler) Stop() error {
-	if s.state.CAS(stateRunning, stateStopped) {
-		s.cancelCtx()
-		return nil
-	} else if s.state.Load() == stateStopped {
-		return nil
-	}
+func (s *Scheduler) Stop() {
+	s.cancelCtx()
+}
 
-	return ErrInvalidTransition
+// Wait until all tasks are done if run in runOnce mode. Will block forever
+// if this scheduler does not have the runOnce option set.
+// Adding new tasks after this method is invoked is not supported.
+func (s *Scheduler) WaitForRunOnce() {
+	s.runOnceWg.Wait()
+	s.Stop()
 }
 
 // ErrAlreadyStopped is returned when an Add operation is attempted after the scheduler
 // has already stopped.
 var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
 
+type AddTask func(sched Schedule, id string, entrypoint TaskFunc, jobType string, waitForPublish func()) (removeFn context.CancelFunc, err error)
+
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn context.CancelFunc, err error) {
-	if s.state.Load() == stateStopped {
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType string, waitForPublish func()) (removeFn context.CancelFunc, err error) {
+	if errors.Is(s.ctx.Err(), context.Canceled) {
 		return nil, ErrAlreadyStopped
 	}
 
@@ -195,20 +185,32 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
+		debugf("Job '%s' started", id)
+		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint)
+
+		lastRanAt := sj.run()
 		s.stats.activeJobs.Dec()
-		s.runOnce(sched.Next(lastRanAt), taskFn)
+
+		if s.runOnce {
+			waitForPublish()
+			s.runOnceWg.Done()
+		} else {
+			// Schedule the next run
+			s.runTaskOnce(sched.Next(lastRanAt), taskFn, true)
+		}
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
 
-	// We skip using the scheduler to execute the initial tasks for jobs that have RunOnInit returning true.
-	// You might think it'd be simpler to just invoke runOnce in either case with 0 as a lastRanAt value,
-	// however, that would caused the missed deadline stats to be incremented. Given that, it's easier
-	// and slightly more efficient to simply run these tasks immediately in a goroutine.
-	if sched.RunOnInit() {
-		go taskFn(time.Now())
+	if s.runOnce {
+		s.runOnceWg.Add(1)
+	}
+
+	// Run non-cron tasks immediately, or run all tasks immediately if we're
+	// in RunOnce mode
+	if s.runOnce || sched.RunOnInit() {
+		s.runTaskOnce(time.Now(), taskFn, false)
 	} else {
-		s.runOnce(sched.Next(lastRanAt), taskFn)
+		s.runTaskOnce(sched.Next(lastRanAt), taskFn, true)
 	}
 
 	return func() {
@@ -217,72 +219,18 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	}, nil
 }
 
-func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
+// runTaskOnce runs the given task exactly once at the given time. Set deadlineCheck
+// to false if this is the first invocation of this, otherwise the deadline checker
+// will complain about a missed task
+func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn, deadlineCheck bool) {
 	now := time.Now().In(s.location)
-	if runAt.Before(now) {
-		// Our last invocation went long!
+	// Check if the task is more than 1 second late
+	if deadlineCheck && runAt.Sub(now) < time.Second {
 		s.stats.jobsMissedDeadline.Inc()
 	}
 
 	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
-	// block the timer thread.
+	// blocks the timer thread.
 	asyncTask := func(now time.Time) { go taskFn(now) }
 	s.timerQueue.Push(runAt, asyncTask)
-}
-
-// runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
-// Subtasks are run in separate goroutines.
-// returns the time execution began on its first task
-func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc) (startedAt time.Time) {
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	startedAt = s.runRecursiveTask(jobCtx, task, wg)
-	wg.Wait()
-	return startedAt
-}
-
-// runRecursiveTask runs an individual task and its continuations until none are left with as much parallelism as possible.
-// Since task funcs can emit continuations recursively we need a function to execute
-// recursively.
-// The wait group passed into this function expects to already have its count incremented by one.
-func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup) (startedAt time.Time) {
-	defer wg.Done()
-
-	// The accounting for waiting/active tasks is done using atomics.
-	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
-	s.stats.waitingTasks.Inc()
-
-	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-	// this should block until resources are available.
-	// In the case where the semaphore has free resources immediately
-	// it will not block and will not check the cancelled status of the
-	// context, which is OK, because we check it later anyway.
-	limitErr := s.limitSem.Acquire(jobCtx, 1)
-	s.stats.waitingTasks.Dec()
-	if limitErr == nil {
-		defer s.limitSem.Release(1)
-	}
-
-	// Record the time this task started now that we have a resource to execute with
-	startedAt = time.Now()
-
-	// Check if the scheduler has been shut down. If so, exit early
-	select {
-	case <-jobCtx.Done():
-		return startedAt
-	default:
-		s.stats.activeTasks.Inc()
-
-		continuations := task(jobCtx)
-		s.stats.activeTasks.Dec()
-
-		wg.Add(len(continuations))
-		for _, cont := range continuations {
-			// Run continuations in parallel, note that these each will acquire their own slots
-			// We can discard the started at times for continuations as those are irrelevant
-			go s.runRecursiveTask(jobCtx, cont, wg)
-		}
-	}
-
-	return startedAt
 }

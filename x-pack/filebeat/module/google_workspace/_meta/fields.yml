@@ -4,7 +4,6 @@
     Google Workspace Module
   fields:
     - name: google_workspace
-      default_field: false
       type: group
       description: >
         Google Workspace specific fields.

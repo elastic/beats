@@ -1,0 +1,131 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e2611df6-ca73-4d53-b0b5-afd8b718c369": {
+                            "columnOrder": [
+                                "53a07fa4-b348-44c7-b644-83f3617e5b5c",
+                                "b9e82720-e098-4dd7-ac5b-f3becccd344a",
+                                "85528f23-48f2-462f-8075-eaddd94b21f2"
+                            ],
+                            "columns": {
+                                "53a07fa4-b348-44c7-b644-83f3617e5b5c": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Read IOPS (Count/Second)",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "85528f23-48f2-462f-8075-eaddd94b21f2",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                },
+                                "85528f23-48f2-462f-8075-eaddd94b21f2": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Average of aws.rds.read.iops",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.read.iops"
+                                },
+                                "b9e82720-e098-4dd7-ac5b-f3becccd344a": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "85528f23-48f2-462f-8075-eaddd94b21f2"
+                        ],
+                        "layerId": "e2611df6-ca73-4d53-b0b5-afd8b718c369",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "53a07fa4-b348-44c7-b644-83f3617e5b5c",
+                        "xAccessor": "b9e82720-e098-4dd7-ac5b-f3becccd344a"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                }
+            }
+        },
+        "title": "RDS Read IOPS [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "f757eba0-f0a0-11eb-b61f-a53cb4913361",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e2611df6-ca73-4d53-b0b5-afd8b718c369",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MjAsMl0="
+}

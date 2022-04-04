@@ -27,12 +27,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/gosigar/sys/windows"
 )
 
 // Get fetches Windows CPU system times
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 	idle, kernel, user, err := windows.GetSystemTimes()
 	if err != nil {
 		return CPUMetrics{}, errors.Wrap(err, "GetSystemTimes failed")
@@ -43,9 +44,9 @@ func Get(_ string) (CPUMetrics, error) {
 	idleMetric := uint64(idle / time.Millisecond)
 	sysMetric := uint64(kernel / time.Millisecond)
 	userMetrics := uint64(user / time.Millisecond)
-	globalMetrics.totals.Idle = metrics.OptUintWith(idleMetric)
-	globalMetrics.totals.Sys = metrics.OptUintWith(sysMetric)
-	globalMetrics.totals.User = metrics.OptUintWith(userMetrics)
+	globalMetrics.totals.Idle = opt.UintWith(idleMetric)
+	globalMetrics.totals.Sys = opt.UintWith(sysMetric)
+	globalMetrics.totals.User = opt.UintWith(userMetrics)
 
 	// get per-cpu data
 	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
@@ -58,9 +59,9 @@ func Get(_ string) (CPUMetrics, error) {
 		sysMetric := uint64(cpu.KernelTime / time.Millisecond)
 		userMetrics := uint64(cpu.UserTime / time.Millisecond)
 		globalMetrics.list = append(globalMetrics.list, CPU{
-			Idle: metrics.OptUintWith(idleMetric),
-			Sys:  metrics.OptUintWith(sysMetric),
-			User: metrics.OptUintWith(userMetrics),
+			Idle: opt.UintWith(idleMetric),
+			Sys:  opt.UintWith(sysMetric),
+			User: opt.UintWith(userMetrics),
 		})
 	}
 

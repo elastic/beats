@@ -49,7 +49,7 @@ func TestData(t *testing.T) {
 	go func() {
 		time.Sleep(100 * time.Millisecond)
 		file := filepath.Join(dir, "file.data")
-		ioutil.WriteFile(file, []byte("hello world"), 0600)
+		ioutil.WriteFile(file, []byte("hello world"), 0o600)
 	}()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
@@ -136,8 +136,8 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
-	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
+	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0o600)
+	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0o600)
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
@@ -201,7 +201,7 @@ func TestExcludedFiles(t *testing.T) {
 	go func() {
 		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
 			file := filepath.Join(dir, f)
-			ioutil.WriteFile(file, []byte("hello world"), 0600)
+			ioutil.WriteFile(file, []byte("hello world"), 0o600)
 		}
 	}()
 
@@ -252,19 +252,19 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0700)
+	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0o700)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	config := getConfig(dir)
-	config["include_files"] = []string{`\.ssh/`}
+	config["include_files"] = []string{`\.ssh`}
 	config["recursive"] = true
 	ms := mbtest.NewPushMetricSetV2(t, config)
 
 	for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
 		file := filepath.Join(dir, f)
-		err := ioutil.WriteFile(file, []byte("hello world"), 0600)
+		err := ioutil.WriteFile(file, []byte("hello world"), 0o600)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -493,7 +493,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
-	ds := datastore.New(store.Name(), 0644)
+	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {
 		t.Fatal(err)
@@ -765,7 +765,7 @@ func TestEventDelete(t *testing.T) {
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
-	ds := datastore.New(store.Name(), 0644)
+	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {
 		t.Fatal(err)
@@ -988,7 +988,7 @@ func getConfig(path ...string) map[string]interface{} {
 }
 
 func skipOnCIForDarwinAMD64(t testing.TB) {
-	if os.Getenv("BUILD_ID") != "" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
+	if os.Getenv("CI") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		t.Skip("Skip test on CI for darwin/amd64")
 	}
 }

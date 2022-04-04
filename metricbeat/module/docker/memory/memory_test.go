@@ -18,7 +18,6 @@
 package memory
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
@@ -65,6 +64,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 				"name": "image",
 			},
 			"runtime": "docker",
+			"memory": common.MapStr{
+				"usage": 0.5,
+			},
 		},
 		"docker": common.MapStr{
 			"container": common.MapStr{
@@ -125,6 +127,34 @@ func TestMemoryServiceBadData(t *testing.T) {
 
 }
 
+func TestMemoryMath(t *testing.T) {
+	memStats := types.StatsJSON{
+		Stats: types.Stats{
+			Read: time.Now(),
+			PreCPUStats: types.CPUStats{
+				CPUUsage: types.CPUUsage{
+					TotalUsage: 200,
+				},
+			},
+			MemoryStats: types.MemoryStats{
+				Limit: 5,
+				Usage: 5000,
+				Stats: map[string]uint64{
+					"total_inactive_file": 1000, // CGV1
+					"inactive_file":       900,
+				},
+			}, //Test for cases where this is empty
+		},
+	}
+
+	memoryService := &MemoryService{}
+	memoryRawStats := []docker.Stat{
+		docker.Stat{Stats: memStats, Container: &types.Container{Names: []string{"test-container"}, Labels: map[string]string{}}},
+	}
+	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
+	assert.Equal(t, float64(800), rawStats[0].UsageP) // 5000-900 /5
+}
+
 func getMemoryStats(read time.Time, number uint64) types.StatsJSON {
 
 	myMemoryStats := types.StatsJSON{
@@ -143,7 +173,4 @@ func getMemoryStats(read time.Time, number uint64) types.StatsJSON {
 	myMemoryStats.MemoryStats.Stats["total_rss"] = number * 5
 
 	return myMemoryStats
-}
-func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
-	return reflect.DeepEqual(expectedEvent, event)
 }

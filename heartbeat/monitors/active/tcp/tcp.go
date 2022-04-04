@@ -68,7 +68,7 @@ func createWithResolver(
 		return plugin.Plugin{}, err
 	}
 
-	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(jc.endpoints)}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(jc.endpoints)}, nil
 }
 
 // jobFactory is where most of the logic here lives. It provides a common context around

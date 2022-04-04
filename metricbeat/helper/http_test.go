@@ -269,6 +269,31 @@ func TestOverUnixSocket(t *testing.T) {
 	}
 }
 
+func TestUserAgentCheck(t *testing.T) {
+	ua := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ua = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	cfg := defaultConfig()
+	hostData := mb.HostData{
+		URI:          ts.URL,
+		SanitizedURI: ts.URL,
+	}
+
+	h, err := NewHTTPFromConfig(cfg, hostData)
+	require.NoError(t, err)
+
+	res, err := h.FetchResponse()
+	require.NoError(t, err)
+	res.Body.Close()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Contains(t, ua, "Metricbeat")
+}
+
 func checkTimeout(t *testing.T, h *HTTP) {
 	t.Helper()
 

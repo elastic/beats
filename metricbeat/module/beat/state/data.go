@@ -20,6 +20,8 @@ package state
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
@@ -65,9 +67,10 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool) error {
 	event := mb.Event{
-		RootFields: common.MapStr{},
+		RootFields:   common.MapStr{},
+		ModuleFields: common.MapStr{},
 	}
 
 	var data map[string]interface{}
@@ -83,6 +86,8 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 		if isOutputES(data) {
 			clusterUUID = getClusterUUID(data)
 			if clusterUUID != "" {
+				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+
 				if event.MetricSetFields != nil {
 					event.MetricSetFields.Put("cluster.uuid", clusterUUID)
 				}
@@ -133,6 +138,13 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 			}
 		}
 		event.MetricSetFields["host"] = hostMap
+	}
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+		event.Index = index
 	}
 
 	r.Event(event)

@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -49,7 +50,8 @@ type MetricSet struct {
 type config struct {
 	Period              time.Duration `config:"period" validate:"required"`
 	ProjectID           string        `config:"project_id" validate:"required"`
-	CredentialsFilePath string        `config:"credentials_file_path" validate:"required"`
+	CredentialsFilePath string        `config:"credentials_file_path"`
+	CredentialsJSON     string        `config:"credentials_json"`
 	DatasetID           string        `config:"dataset_id" validate:"required"`
 	TablePattern        string        `config:"table_pattern"`
 	CostType            string        `config:"cost_type"`
@@ -57,6 +59,10 @@ type config struct {
 
 // Validate checks for deprecated config options
 func (c config) Validate() error {
+	if c.CredentialsFilePath == "" && c.CredentialsJSON == "" {
+		return errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	if c.CostType != "" {
 		// cost_type can only be regular, tax, adjustment, or rounding error
 		costTypes := []string{"regular", "tax", "adjustment", "rounding error"}
@@ -106,7 +112,17 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	// find current month
 	month := getCurrentMonth()
 
-	opt := []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	var opt []option.ClientOption
+	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
+		return errors.New("both credentials_file_path and credentials_json specified, you must use only one of them")
+	} else if m.config.CredentialsFilePath != "" {
+		opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	} else if m.config.CredentialsJSON != "" {
+		opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
+	} else {
+		return errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	client, err := bigquery.NewClient(ctx, m.config.ProjectID, opt...)
 	if err != nil {
 		return fmt.Errorf("gerror creating bigquery client: %w", err)
@@ -205,25 +221,11 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 
 func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, tableMeta tableMeta, month string, costType string) ([]mb.Event, error) {
 	var events []mb.Event
-	query := fmt.Sprintf(`
-			SELECT
-				invoice.month,
-				project.id,
-				project.name,
-				billing_account_id,
-				cost_type,
-			  (SUM(CAST(cost * 1000000 AS int64))
-				+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
-				AS total_exact
-			FROM %s
-			WHERE project.id IS NOT NULL
-			AND invoice.month = '%s'
-			AND cost_type = '%s'
-			GROUP BY 1, 2, 3, 4, 5
-			ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, tableMeta.tableFullID, month, costType)
+
+	query := generateQuery(tableMeta.tableFullID, month, costType)
+	m.logger.Debug("bigquery query = ", query)
 
 	q := client.Query(query)
-	m.logger.Debug("bigquery query = ", query)
 
 	// Location must match that of the dataset(s) referenced in the query.
 	q.Location = tableMeta.location
@@ -300,11 +302,38 @@ func getCurrentDate() string {
 }
 
 func generateEventID(currentDate string, rowItems []bigquery.Value) string {
-	// create eventID using hash of current_date + invoice_month + project_id + cost_type
+	// create eventID using hash of current_date + invoice.month + project.id + project.name
 	// This will prevent more than one billing metric getting collected in the same day.
 	eventID := currentDate + rowItems[0].(string) + rowItems[1].(string) + rowItems[2].(string)
 	h := sha256.New()
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:20]
+}
+
+// generateQuery returns the query to be used by the BigQuery client to retrieve monthly
+// cost types breakdown.
+func generateQuery(tableName, month, costType string) string {
+	// The table name is user provided, so it may contains special characters.
+	// In order to allow any character in the table identifier, use the Quoted identifier format.
+	// See https://github.com/elastic/beats/issues/26855
+	// NOTE: is not possible to escape backtics (`) in a multiline string
+	escapedTableName := fmt.Sprintf("`%s`", tableName)
+	query := fmt.Sprintf(`
+SELECT
+	invoice.month,
+	project.id,
+	project.name,
+	billing_account_id,
+	cost_type,
+	(SUM(CAST(cost * 1000000 AS int64))
+	+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
+	AS total_exact
+FROM %s
+WHERE project.id IS NOT NULL
+AND invoice.month = '%s'
+AND cost_type = '%s'
+GROUP BY 1, 2, 3, 4, 5
+ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, escapedTableName, month, costType)
+	return query
 }

@@ -20,12 +20,13 @@ package memory
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/go-windows"
 )
 
 // get is the windows implementation of get for memory metrics
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 
 	memData := Memory{}
 
@@ -33,19 +34,19 @@ func get(_ string) (Memory, error) {
 	if err != nil {
 		return memData, errors.Wrap(err, "Error fetching global memory status")
 	}
-	memData.Total = metrics.OptUintWith(memoryStatusEx.TotalPhys)
-	memData.Free = metrics.OptUintWith(memoryStatusEx.AvailPhys)
+	memData.Total = opt.UintWith(memoryStatusEx.TotalPhys)
+	memData.Free = opt.UintWith(memoryStatusEx.AvailPhys)
 
-	memData.Used.Bytes = metrics.OptUintWith(memoryStatusEx.TotalPhys - memoryStatusEx.AvailPhys)
+	memData.Used.Bytes = opt.UintWith(memoryStatusEx.TotalPhys - memoryStatusEx.AvailPhys)
 
 	// We shouldn't really be doing this, but we also don't want to make breaking changes right now,
 	// and memory.actual is used by quite a few visualizations
 	memData.Actual.Free = memData.Free
 	memData.Actual.Used.Bytes = memData.Used.Bytes
 
-	memData.Swap.Free = metrics.OptUintWith(memoryStatusEx.AvailPageFile)
-	memData.Swap.Total = metrics.OptUintWith(memoryStatusEx.TotalPageFile)
-	memData.Swap.Used.Bytes = metrics.OptUintWith(memoryStatusEx.TotalPageFile - memoryStatusEx.AvailPageFile)
+	memData.Swap.Free = opt.UintWith(memoryStatusEx.AvailPageFile)
+	memData.Swap.Total = opt.UintWith(memoryStatusEx.TotalPageFile)
+	memData.Swap.Used.Bytes = opt.UintWith(memoryStatusEx.TotalPageFile - memoryStatusEx.AvailPageFile)
 
 	return memData, nil
 }

@@ -73,8 +73,6 @@ GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
-GOLINT=golint
-GOLINT_REPO?=golang.org/x/lint/golint
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
@@ -141,11 +139,9 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
-ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
 	go ${INSTALL_CMD} github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
-endif
 
 .PHONY: check
 check: check-headers mage ## @build Checks project and source code if everything is according to standard
@@ -270,7 +266,7 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
-python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1 
+python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
@@ -367,8 +363,6 @@ endif
 	if [ -d $(PWD)/_meta/kibana ]; then \
 		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
-	@# Convert all dashboards to string
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
 endif
 
 .PHONY: docs

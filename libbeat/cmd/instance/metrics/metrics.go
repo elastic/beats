@@ -15,22 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build (darwin && cgo) || (freebsd && cgo) || linux || windows
 // +build darwin,cgo freebsd,cgo linux windows
 
 package metrics
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
+	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 var (
@@ -116,127 +116,43 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getRSSSize() (uint64, error) {
-	state, err := getBeatProcessState()
+	state, err := beatProcessStats.GetSelf()
 	if err != nil {
 		return 0, err
 	}
 
-	iRss, err := state.GetValue("memory.rss.bytes")
-	if err != nil {
-		return 0, fmt.Errorf("error getting Resident Set Size: %v", err)
-	}
-
-	rss, ok := iRss.(uint64)
-	if !ok {
-		return 0, fmt.Errorf("error converting Resident Set Size to uint64: %v", iRss)
-	}
-	return rss, nil
-}
-
-func getBeatProcessState() (common.MapStr, error) {
-	pid, err := process.GetSelfPid()
-	if err != nil {
-		return nil, fmt.Errorf("error getting PID for self process: %v", err)
-	}
-
-	state, err := beatProcessStats.GetOne(pid)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving process stats: %v", err)
-	}
-
-	return state, nil
+	return state.Memory.Rss.Bytes.ValueOr(0), nil
 }
 
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	totalCPUUsage, cpuTicks, err := getCPUUsage()
+	state, err := beatProcessStats.GetSelf()
 	if err != nil {
 		logp.Err("Error retrieving CPU percentages: %v", err)
 		return
 	}
 
-	userTime, systemTime, err := process.GetOwnResourceUsageTimeInMillis()
-	if err != nil {
-		logp.Err("Error retrieving CPU usage time: %v", err)
-		return
-	}
-
 	monitoring.ReportNamespace(V, "user", func() {
-		monitoring.ReportInt(V, "ticks", int64(cpuTicks.User))
+		monitoring.ReportInt(V, "ticks", int64(state.CPU.User.Ticks.ValueOr(0)))
 		monitoring.ReportNamespace(V, "time", func() {
-			monitoring.ReportInt(V, "ms", userTime)
+			monitoring.ReportInt(V, "ms", int64(state.CPU.User.Ticks.ValueOr(0)))
 		})
 	})
 	monitoring.ReportNamespace(V, "system", func() {
-		monitoring.ReportInt(V, "ticks", int64(cpuTicks.System))
+		monitoring.ReportInt(V, "ticks", int64(state.CPU.System.Ticks.ValueOr(0)))
 		monitoring.ReportNamespace(V, "time", func() {
-			monitoring.ReportInt(V, "ms", systemTime)
+			monitoring.ReportInt(V, "ms", int64(state.CPU.System.Ticks.ValueOr(0)))
 		})
 	})
 	monitoring.ReportNamespace(V, "total", func() {
-		monitoring.ReportFloat(V, "value", totalCPUUsage)
-		monitoring.ReportInt(V, "ticks", int64(cpuTicks.Total))
+		monitoring.ReportFloat(V, "value", state.CPU.Total.Value.ValueOr(0))
+		monitoring.ReportInt(V, "ticks", int64(state.CPU.Total.Ticks.ValueOr(0)))
 		monitoring.ReportNamespace(V, "time", func() {
-			monitoring.ReportInt(V, "ms", userTime+systemTime)
+			monitoring.ReportInt(V, "ms", int64(state.CPU.Total.Ticks.ValueOr(0)))
 		})
 	})
-}
-
-func getCPUUsage() (float64, *process.Ticks, error) {
-	state, err := getBeatProcessState()
-	if err != nil {
-		return 0.0, nil, err
-	}
-
-	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
-	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting total CPU since start: %v", err)
-	}
-
-	totalCPUUsage, ok := iTotalCPUUsage.(float64)
-	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start to float64: %v", iTotalCPUUsage)
-	}
-
-	iTotalCPUUserTicks, err := state.GetValue("cpu.user.ticks")
-	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting number of user CPU ticks since start: %v", err)
-	}
-
-	totalCPUUserTicks, ok := iTotalCPUUserTicks.(uint64)
-	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start to uint64: %v", iTotalCPUUserTicks)
-	}
-
-	iTotalCPUSystemTicks, err := state.GetValue("cpu.system.ticks")
-	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting number of system CPU ticks since start: %v", err)
-	}
-
-	totalCPUSystemTicks, ok := iTotalCPUSystemTicks.(uint64)
-	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start to uint64: %v", iTotalCPUSystemTicks)
-	}
-
-	iTotalCPUTicks, err := state.GetValue("cpu.total.ticks")
-	if err != nil {
-		return 0.0, nil, fmt.Errorf("error getting total number of CPU ticks since start: %v", err)
-	}
-
-	totalCPUTicks, ok := iTotalCPUTicks.(uint64)
-	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start to uint64: %v", iTotalCPUTicks)
-	}
-
-	p := process.Ticks{
-		User:   totalCPUUserTicks,
-		System: totalCPUSystemTicks,
-		Total:  totalCPUTicks,
-	}
-
-	return totalCPUUsage, &p, nil
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
@@ -265,7 +181,7 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	monitoring.ReportInt(V, "cores", int64(runtime.NumCPU()))
+	monitoring.ReportInt(V, "cores", int64(numcpu.NumCPU()))
 }
 
 func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
@@ -279,29 +195,42 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	pid, err := process.GetSelfPid()
-	if err != nil {
-		logp.Err("error getting PID for self process: %v", err)
-		return
-	}
+	// PID shouldn't use hostfs, at least for now.
+	// containerization schemes should provide their own /proc/ that will serve containerized processess
+	pid := os.Getpid()
 
 	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
-		RootfsMountpoint:         paths.Paths.Hostfs,
+		RootfsMountpoint:         resolve.NewTestResolver("/"),
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: os.Getenv(libbeatMonitoringCgroupsHierarchyOverride),
 	})
 	if err != nil {
 		if err == cgroup.ErrCgroupsMissing {
-			logp.Warn("cgroup data collection disabled: %v", err)
+			logp.Warn("cgroup data collection disabled in internal monitoring: %v", err)
 		} else {
-			logp.Err("cgroup data collection disabled: %v", err)
+			logp.Err("cgroup data collection disabled in internal monitoring: %v", err)
 		}
 		return
 	}
-	selfStats, err := cgroups.GetStatsForProcess(pid)
+
+	cgv, err := cgroups.CgroupsVersion(pid)
 	if err != nil {
-		logp.Err("error getting cgroup stats: %v", err)
+		logp.Err("error determining cgroups version for internal monitoring: %v", err)
 		return
+	}
+
+	if cgv == cgroup.CgroupsV1 {
+		reportMetricsCGV1(pid, cgroups, V)
+	} else {
+		reportMetricsCGV2(pid, cgroups, V)
+	}
+
+}
+
+func reportMetricsCGV1(pid int, cgroups *cgroup.Reader, V monitoring.Visitor) {
+	selfStats, err := cgroups.GetV1StatsForProcess(pid)
+	if err != nil {
+		logp.Err("error getting cgroup stats for V1: %v", err)
 	}
 	// GetStatsForProcess returns a nil selfStats and no error when there's no stats
 	if selfStats == nil {
@@ -315,17 +244,17 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 			}
 			monitoring.ReportNamespace(V, "cfs", func() {
 				monitoring.ReportNamespace(V, "period", func() {
-					monitoring.ReportInt(V, "us", int64(cpu.CFS.PeriodMicros))
+					monitoring.ReportInt(V, "us", int64(cpu.CFS.PeriodMicros.Us))
 				})
 				monitoring.ReportNamespace(V, "quota", func() {
-					monitoring.ReportInt(V, "us", int64(cpu.CFS.QuotaMicros))
+					monitoring.ReportInt(V, "us", int64(cpu.CFS.QuotaMicros.Us))
 				})
 			})
 			monitoring.ReportNamespace(V, "stats", func() {
 				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods))
 				monitoring.ReportNamespace(V, "throttled", func() {
-					monitoring.ReportInt(V, "periods", int64(cpu.Stats.ThrottledPeriods))
-					monitoring.ReportInt(V, "ns", int64(cpu.Stats.ThrottledTimeNanos))
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods))
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us))
 				})
 			})
 		})
@@ -337,7 +266,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 				monitoring.ReportString(V, "id", cpuacct.ID)
 			}
 			monitoring.ReportNamespace(V, "total", func() {
-				monitoring.ReportInt(V, "ns", int64(cpuacct.TotalNanos))
+				monitoring.ReportInt(V, "ns", int64(cpuacct.Total.NS))
 			})
 		})
 	}
@@ -349,12 +278,49 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 			}
 			monitoring.ReportNamespace(V, "mem", func() {
 				monitoring.ReportNamespace(V, "limit", func() {
-					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Limit))
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Limit.Bytes))
 				})
 				monitoring.ReportNamespace(V, "usage", func() {
-					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage))
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes))
 				})
 			})
 		})
 	}
+}
+
+func reportMetricsCGV2(pid int, cgroups *cgroup.Reader, V monitoring.Visitor) {
+	selfStats, err := cgroups.GetV2StatsForProcess(pid)
+	if err != nil {
+		logp.Err("error getting cgroup stats for V2: %v", err)
+		return
+	}
+
+	if cpu := selfStats.CPU; cpu != nil {
+		monitoring.ReportNamespace(V, "cpu", func() {
+			if cpu.ID != "" {
+				monitoring.ReportString(V, "id", cpu.ID)
+			}
+			monitoring.ReportNamespace(V, "stats", func() {
+				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods.ValueOr(0)))
+				monitoring.ReportNamespace(V, "throttled", func() {
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods.ValueOr(0)))
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us.ValueOr(0)))
+				})
+			})
+		})
+	}
+
+	if memory := selfStats.Memory; memory != nil {
+		monitoring.ReportNamespace(V, "memory", func() {
+			if memory.ID != "" {
+				monitoring.ReportString(V, "id", memory.ID)
+			}
+			monitoring.ReportNamespace(V, "mem", func() {
+				monitoring.ReportNamespace(V, "usage", func() {
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes))
+				})
+			})
+		})
+	}
+
 }

@@ -8,7 +8,7 @@
 The `rename` processor specifies a list of fields to rename. Under the `fields`
 key, each entry contains a `from: old-key` and a `to: new-key` pair, where:
 
-* `from` is the original field name
+* `from` is the original field name. It's supported to use `@metadata.` prefix for `from` and rename keys in the event metadata instead of event fields.
 * `to` is the target field name
 
 The `rename` processor cannot be used to overwrite fields. To overwrite fields

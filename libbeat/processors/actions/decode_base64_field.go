@@ -20,6 +20,7 @@ package actions
 import (
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -73,10 +74,10 @@ func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
 }
 
 func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
-	var backup common.MapStr
+	var backup *beat.Event
 	// Creates a copy of the event to revert in case of failure
 	if f.config.FailOnError {
-		backup = event.Fields.Clone()
+		backup = event.Clone()
 	}
 
 	err := f.decodeField(event)
@@ -84,7 +85,7 @@ func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %v", err)
 		f.log.Debug(errMsg.Error())
 		if f.config.FailOnError {
-			event.Fields = backup
+			event = backup
 			event.PutValue("error.message", errMsg.Error())
 			return event, err
 		}
@@ -110,7 +111,7 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 		return fmt.Errorf("invalid type for `from`, expecting a string received %T", value)
 	}
 
-	decodedData, err := base64.StdEncoding.DecodeString(base64String)
+	decodedData, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(base64String, "="))
 	if err != nil {
 		return fmt.Errorf("error trying to decode %s: %v", base64String, err)
 	}

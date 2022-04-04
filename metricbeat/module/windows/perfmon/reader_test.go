@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -29,9 +30,8 @@ import (
 
 func TestGetCounter(t *testing.T) {
 	reader := Reader{
-		query:    pdh.Query{},
-		executed: true,
-		log:      nil,
+		query: pdh.Query{},
+		log:   nil,
 		counters: []PerfCounter{
 			{
 				QueryField:   "datagrams_sent_per_sec",
@@ -54,15 +54,6 @@ func TestMapCounters(t *testing.T) {
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		Counters: []Counter{
-			{
-				InstanceLabel:    "physical_disk.name",
-				InstanceName:     "total",
-				MeasurementLabel: "physical_disk.write.time.pct",
-				Query:            `\PhysicalDisk(*)\% Disk Write Time`,
-				Format:           "float",
-			},
-		},
 		Queries: []Query{
 			{
 				Name:      "Process",
@@ -92,17 +83,9 @@ func TestMapCounters(t *testing.T) {
 	}
 	reader := Reader{}
 	reader.mapCounters(config)
-	assert.Equal(t, len(reader.counters), 3)
+	assert.Equal(t, len(reader.counters), 2)
 	for _, readerCounter := range reader.counters {
-		if readerCounter.InstanceField == "physical_disk.name" {
-			assert.Equal(t, readerCounter.InstanceName, "total")
-			assert.Equal(t, readerCounter.ObjectName, "")
-			assert.Equal(t, readerCounter.ObjectField, "")
-			assert.Equal(t, readerCounter.QueryField, "physical_disk.write.time.pct")
-			assert.Equal(t, readerCounter.QueryName, `\PhysicalDisk(*)\% Disk Write Time`)
-			assert.Equal(t, len(readerCounter.ChildQueries), 0)
-			assert.Equal(t, readerCounter.Format, "float")
-		} else if readerCounter.InstanceName == "svchost*" {
+		if readerCounter.InstanceName == "svchost*" {
 			assert.Equal(t, readerCounter.ObjectName, "Process")
 			assert.Equal(t, readerCounter.ObjectField, "object")
 			assert.Equal(t, readerCounter.QueryField, "metrics.%_processor_time")

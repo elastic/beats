@@ -1,6 +1,6 @@
 - module: o365
   audit:
-    enabled: true
+    enabled: false
 
     # Set the application_id (also known as client ID):
     var.application_id: "<MyApplicationID>"

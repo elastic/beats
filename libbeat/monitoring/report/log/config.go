@@ -22,9 +22,13 @@ import (
 )
 
 type config struct {
-	Period time.Duration `config:"period"`
+	Period     time.Duration `config:"period"`
+	Namespaces []string      `config:"namespaces"`
 }
 
-var defaultConfig = config{
-	Period: 30 * time.Second,
+func defaultConfig() config {
+	return config{
+		Period:     30 * time.Second,
+		Namespaces: []string{"stats"},
+	}
 }

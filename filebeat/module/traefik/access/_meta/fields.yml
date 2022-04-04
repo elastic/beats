@@ -60,9 +60,6 @@
     - name: user_agent
       type: group
       fields:
-        - name: device
-          type: alias
-          path: user_agent.device.name
         - name: name
           type: alias
           path: user_agent.name

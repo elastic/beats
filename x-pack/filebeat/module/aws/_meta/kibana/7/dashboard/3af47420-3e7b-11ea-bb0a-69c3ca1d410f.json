@@ -1,0 +1,239 @@
+{
+    "attributes": {
+        "description": "Filebeat AWS ELB Access Log Overview Dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "isLayerTOCOpen": false,
+                    "mapCenter": {
+                        "lat": 51.63808,
+                        "lon": 17.07232,
+                        "zoom": 3.47
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "2c97b32e-5548-429d-9ce0-1bbc3d2398ac",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2c97b32e-5548-429d-9ce0-1bbc3d2398ac",
+                "panelRefName": "panel_2c97b32e-5548-429d-9ce0-1bbc3d2398ac",
+                "title": "ELB Requests Geolocation",
+                "type": "map",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9",
+                "panelRefName": "panel_26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9",
+                "title": "ELB Inbound Traffic",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "48ecb39f-57a5-4805-a8a9-77385a996d75",
+                    "w": 16,
+                    "x": 32,
+                    "y": 14
+                },
+                "panelIndex": "48ecb39f-57a5-4805-a8a9-77385a996d75",
+                "panelRefName": "panel_48ecb39f-57a5-4805-a8a9-77385a996d75",
+                "title": "ELB Top User Agents",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "9812996e-ba10-41bd-b134-c9705a0973b4",
+                    "w": 16,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "9812996e-ba10-41bd-b134-c9705a0973b4",
+                "panelRefName": "panel_9812996e-ba10-41bd-b134-c9705a0973b4",
+                "title": "ELB Total Requests",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "bb25b36e-0787-48fd-aa22-7ba8c08a9c36",
+                    "w": 16,
+                    "x": 16,
+                    "y": 14
+                },
+                "panelIndex": "bb25b36e-0787-48fd-aa22-7ba8c08a9c36",
+                "panelRefName": "panel_bb25b36e-0787-48fd-aa22-7ba8c08a9c36",
+                "title": "ELB Top IP Addresses",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "bf43580d-cc26-415b-ae36-d678a232b544",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "bf43580d-cc26-415b-ae36-d678a232b544",
+                "panelRefName": "panel_bf43580d-cc26-415b-ae36-d678a232b544",
+                "title": "ELB Outbound Traffic",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "466e825b-6ee2-43c3-b221-21abe27612dd",
+                    "w": 16,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "466e825b-6ee2-43c3-b221-21abe27612dd",
+                "panelRefName": "panel_466e825b-6ee2-43c3-b221-21abe27612dd",
+                "title": "ELB HTTP 2xx",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "d42994a6-922c-4f86-bf99-a46f87ff106d",
+                    "w": 16,
+                    "x": 16,
+                    "y": 28
+                },
+                "panelIndex": "d42994a6-922c-4f86-bf99-a46f87ff106d",
+                "panelRefName": "panel_d42994a6-922c-4f86-bf99-a46f87ff106d",
+                "title": "ELB HTTP 4xx",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "f45aaa2c-c244-4d1a-8ad4-4794130b9827",
+                    "w": 16,
+                    "x": 32,
+                    "y": 28
+                },
+                "panelIndex": "f45aaa2c-c244-4d1a-8ad4-4794130b9827",
+                "panelRefName": "panel_f45aaa2c-c244-4d1a-8ad4-4794130b9827",
+                "title": "ELB HTTP 5xx",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat AWS] ELB Access Log Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3af47420-3e7b-11ea-bb0a-69c3ca1d410f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "0edf0640-3e7e-11ea-bb0a-69c3ca1d410f",
+            "name": "2c97b32e-5548-429d-9ce0-1bbc3d2398ac:panel_2c97b32e-5548-429d-9ce0-1bbc3d2398ac",
+            "type": "map"
+        },
+        {
+            "id": "76af8140-3e84-11ea-bb0a-69c3ca1d410f",
+            "name": "26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9:panel_26ebbde3-ee0c-4b4d-8ab9-404cbe5786a9",
+            "type": "visualization"
+        },
+        {
+            "id": "73970bc0-3e86-11ea-bb0a-69c3ca1d410f",
+            "name": "48ecb39f-57a5-4805-a8a9-77385a996d75:panel_48ecb39f-57a5-4805-a8a9-77385a996d75",
+            "type": "visualization"
+        },
+        {
+            "id": "e50c51e0-3e7f-11ea-bb0a-69c3ca1d410f",
+            "name": "9812996e-ba10-41bd-b134-c9705a0973b4:panel_9812996e-ba10-41bd-b134-c9705a0973b4",
+            "type": "visualization"
+        },
+        {
+            "id": "ceb7c030-3e86-11ea-bb0a-69c3ca1d410f",
+            "name": "bb25b36e-0787-48fd-aa22-7ba8c08a9c36:panel_bb25b36e-0787-48fd-aa22-7ba8c08a9c36",
+            "type": "visualization"
+        },
+        {
+            "id": "bd37d720-3e84-11ea-bb0a-69c3ca1d410f",
+            "name": "bf43580d-cc26-415b-ae36-d678a232b544:panel_bf43580d-cc26-415b-ae36-d678a232b544",
+            "type": "visualization"
+        },
+        {
+            "id": "219c1850-3e82-11ea-bb0a-69c3ca1d410f",
+            "name": "466e825b-6ee2-43c3-b221-21abe27612dd:panel_466e825b-6ee2-43c3-b221-21abe27612dd",
+            "type": "visualization"
+        },
+        {
+            "id": "b6a308f0-3e82-11ea-bb0a-69c3ca1d410f",
+            "name": "d42994a6-922c-4f86-bf99-a46f87ff106d:panel_d42994a6-922c-4f86-bf99-a46f87ff106d",
+            "type": "visualization"
+        },
+        {
+            "id": "d8b1e830-3e82-11ea-bb0a-69c3ca1d410f",
+            "name": "f45aaa2c-c244-4d1a-8ad4-4794130b9827:panel_f45aaa2c-c244-4d1a-8ad4-4794130b9827",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:58.419Z",
+    "version": "WzQzNTksMV0="
+}

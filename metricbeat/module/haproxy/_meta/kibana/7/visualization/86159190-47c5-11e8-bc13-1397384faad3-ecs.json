@@ -1,0 +1,96 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Traffic volume [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": "0.5",
+                        "formatter": "bytes",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Incoming",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.in.bytes",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "9814c420-47c4-11e8-994c-81d2daeb7c86",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": "1",
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(25,77,51,1)",
+                        "fill": "0.5",
+                        "formatter": "bytes",
+                        "id": "c89d1520-47c4-11e8-994c-81d2daeb7c86",
+                        "label": "Outgoing",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.out.bytes",
+                                "id": "c89d6340-47c4-11e8-994c-81d2daeb7c86",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "c89d6340-47c4-11e8-994c-81d2daeb7c86",
+                                "id": "c89d6341-47c4-11e8-994c-81d2daeb7c86",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "point_size": "1",
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy traffic volume ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "86159190-47c5-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4NDEsMV0="
+}

@@ -52,7 +52,6 @@
           type: group
           description: >
             Collection of key-value pairs carried in the CEF extension field.
-          default_field: false
           fields:
             - name: agentAddress
               type: ip

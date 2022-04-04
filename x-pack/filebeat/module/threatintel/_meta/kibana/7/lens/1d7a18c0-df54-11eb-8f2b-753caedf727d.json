@@ -1,0 +1,131 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "823b507c-03a2-413b-9fc6-ba86a0160d50": {
+                            "columnOrder": [
+                                "3da14e5a-0f82-42ce-9bca-cc20ec7f3639",
+                                "1266faef-9fa3-4560-9dd0-7116e8b2a6de",
+                                "43cd0668-5ea3-495f-97a5-1d2ddae02ef6"
+                            ],
+                            "columns": {
+                                "1266faef-9fa3-4560-9dd0-7116e8b2a6de": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "3da14e5a-0f82-42ce-9bca-cc20ec7f3639": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Anomali Feed Source",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "43cd0668-5ea3-495f-97a5-1d2ddae02ef6",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 2
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "event.dataset"
+                                },
+                                "43cd0668-5ea3-495f-97a5-1d2ddae02ef6": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:(threatintel.anomalithreatstream or threatintel.anomali)"
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "curveType": "LINEAR",
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "43cd0668-5ea3-495f-97a5-1d2ddae02ef6"
+                        ],
+                        "layerId": "823b507c-03a2-413b-9fc6-ba86a0160d50",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "3da14e5a-0f82-42ce-9bca-cc20ec7f3639",
+                        "xAccessor": "1266faef-9fa3-4560-9dd0-7116e8b2a6de"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide"
+            }
+        },
+        "title": "Anomali Data Source [Filebeat Threat Intel]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "1d7a18c0-df54-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-823b507c-03a2-413b-9fc6-ba86a0160d50",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1ODYsMV0="
+}

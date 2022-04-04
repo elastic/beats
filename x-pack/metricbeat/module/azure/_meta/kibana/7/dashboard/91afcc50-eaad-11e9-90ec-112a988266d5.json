@@ -1,0 +1,232 @@
+{
+    "attributes": {
+        "description": "This dashboard visualized relevant metrics for VMs running on Azure cloud.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
+                "panelRefName": "panel_d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "127eff01-d34c-4bda-8f19-4cf06982989f",
+                    "w": 20,
+                    "x": 6,
+                    "y": 0
+                },
+                "panelIndex": "127eff01-d34c-4bda-8f19-4cf06982989f",
+                "panelRefName": "panel_127eff01-d34c-4bda-8f19-4cf06982989f",
+                "title": "Percentage CPU",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2f85c4f1-a575-49a1-99d3-fbed8a2806ec",
+                    "w": 22,
+                    "x": 26,
+                    "y": 0
+                },
+                "panelIndex": "2f85c4f1-a575-49a1-99d3-fbed8a2806ec",
+                "panelRefName": "panel_2f85c4f1-a575-49a1-99d3-fbed8a2806ec",
+                "title": "Available Memory",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "6cbc30b4-658e-4f7a-a888-221775fd0af3",
+                    "w": 12,
+                    "x": 36,
+                    "y": 12
+                },
+                "panelIndex": "6cbc30b4-658e-4f7a-a888-221775fd0af3",
+                "panelRefName": "panel_6cbc30b4-658e-4f7a-a888-221775fd0af3",
+                "title": "Disk Reads",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
+                    "w": 12,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
+                "panelRefName": "panel_e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
+                "title": "Network In Total",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "64fc0214-97f7-4d52-a9bd-a91449293f1c",
+                    "w": 12,
+                    "x": 12,
+                    "y": 12
+                },
+                "panelIndex": "64fc0214-97f7-4d52-a9bd-a91449293f1c",
+                "panelRefName": "panel_64fc0214-97f7-4d52-a9bd-a91449293f1c",
+                "title": "Network Out Total",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "12c9c185-81ed-4313-b274-b3384de2d396",
+                    "w": 12,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "12c9c185-81ed-4313-b274-b3384de2d396",
+                "panelRefName": "panel_12c9c185-81ed-4313-b274-b3384de2d396",
+                "title": "Disk Writes",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "200ae92b-4184-4aed-9868-6ce5e16e7a8d",
+                    "w": 24,
+                    "x": 0,
+                    "y": 23
+                },
+                "panelIndex": "200ae92b-4184-4aed-9868-6ce5e16e7a8d",
+                "panelRefName": "panel_200ae92b-4184-4aed-9868-6ce5e16e7a8d",
+                "title": "Disk Read Operations/s",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "36c46a84-3e6b-4a7e-9246-357ae9d10d1e",
+                    "w": 24,
+                    "x": 24,
+                    "y": 23
+                },
+                "panelIndex": "36c46a84-3e6b-4a7e-9246-357ae9d10d1e",
+                "panelRefName": "panel_36c46a84-3e6b-4a7e-9246-357ae9d10d1e",
+                "title": "Disk Write Operations/s",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] VM Scale Sets Overview ",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "91afcc50-eaad-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "686bc990-ea92-11e9-90ec-112a988266d5",
+            "name": "d84767cd-3fc9-438c-a969-f15c4d5fc9c5:panel_d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
+            "type": "visualization"
+        },
+        {
+            "id": "33500790-eaaf-11e9-90ec-112a988266d5",
+            "name": "127eff01-d34c-4bda-8f19-4cf06982989f:panel_127eff01-d34c-4bda-8f19-4cf06982989f",
+            "type": "visualization"
+        },
+        {
+            "id": "cecd6680-eb41-11e9-90ec-112a988266d5",
+            "name": "2f85c4f1-a575-49a1-99d3-fbed8a2806ec:panel_2f85c4f1-a575-49a1-99d3-fbed8a2806ec",
+            "type": "visualization"
+        },
+        {
+            "id": "42cc28d0-ea9a-11e9-90ec-112a988266d5",
+            "name": "6cbc30b4-658e-4f7a-a888-221775fd0af3:panel_6cbc30b4-658e-4f7a-a888-221775fd0af3",
+            "type": "visualization"
+        },
+        {
+            "id": "64266ec0-eb42-11e9-90ec-112a988266d5",
+            "name": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b:panel_e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
+            "type": "visualization"
+        },
+        {
+            "id": "b45fd8e0-eb42-11e9-90ec-112a988266d5",
+            "name": "64fc0214-97f7-4d52-a9bd-a91449293f1c:panel_64fc0214-97f7-4d52-a9bd-a91449293f1c",
+            "type": "visualization"
+        },
+        {
+            "id": "0d03a670-eb43-11e9-90ec-112a988266d5",
+            "name": "12c9c185-81ed-4313-b274-b3384de2d396:panel_12c9c185-81ed-4313-b274-b3384de2d396",
+            "type": "visualization"
+        },
+        {
+            "id": "9c1a1910-ea9a-11e9-90ec-112a988266d5",
+            "name": "200ae92b-4184-4aed-9868-6ce5e16e7a8d:panel_200ae92b-4184-4aed-9868-6ce5e16e7a8d",
+            "type": "visualization"
+        },
+        {
+            "id": "cfaedaf0-eb43-11e9-90ec-112a988266d5",
+            "name": "36c46a84-3e6b-4a7e-9246-357ae9d10d1e:panel_36c46a84-3e6b-4a7e-9246-357ae9d10d1e",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:56.299Z",
+    "version": "WzM2MTksMV0="
+}

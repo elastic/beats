@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build aws
+//go:build integration && aws
+// +build integration,aws
 
 package billing
 
@@ -15,7 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"

@@ -3,9 +3,7 @@
         "@timestamp": "2016-01-29T08:09:59.000Z",
         "destination.bytes": 449,
         "destination.geo.country_name": "sequa",
-        "destination.ip": [
-            "10.44.173.44"
-        ],
+        "destination.ip": "10.44.173.44",
         "destination.nat.ip": "10.189.58.145",
         "destination.nat.port": 5273,
         "destination.port": 6125,
@@ -58,9 +56,7 @@
         "service.type": "fortinet",
         "source.bytes": 7880,
         "source.geo.country_name": "dolore",
-        "source.ip": [
-            "10.20.234.169"
-        ],
+        "source.ip": "10.20.234.169",
         "source.port": 1001,
         "tags": [
             "fortinet.fortimanager",
@@ -70,9 +66,7 @@
     {
         "@timestamp": "2016-02-12T03:12:33.000Z",
         "destination.bytes": 3879,
-        "destination.ip": [
-            "10.171.204.166"
-        ],
+        "destination.ip": "10.171.204.166",
         "destination.port": 6668,
         "event.action": "accept",
         "event.code": "atio",
@@ -148,9 +142,7 @@
         "service.type": "fortinet",
         "source.bytes": 6378,
         "source.geo.country_name": "tconsec",
-        "source.ip": [
-            "10.62.4.246"
-        ],
+        "source.ip": "10.62.4.246",
         "source.mac": "01:00:5e:84:66:6c",
         "source.port": 189,
         "tags": [
@@ -173,9 +165,7 @@
         "@timestamp": "2016-02-26T10:15:08.000Z",
         "destination.bytes": 13,
         "destination.geo.country_name": "ima",
-        "destination.ip": [
-            "10.94.103.117"
-        ],
+        "destination.ip": "10.94.103.117",
         "destination.nat.ip": "10.15.159.80",
         "destination.nat.port": 6378,
         "destination.port": 513,
@@ -228,9 +218,7 @@
         "service.type": "fortinet",
         "source.bytes": 6517,
         "source.geo.country_name": "aboris",
-        "source.ip": [
-            "10.200.188.142"
-        ],
+        "source.ip": "10.200.188.142",
         "source.port": 4665,
         "tags": [
             "fortinet.fortimanager",
@@ -241,9 +229,7 @@
         "@timestamp": "2016-03-12T05:17:42.000Z",
         "destination.bytes": 3269,
         "destination.geo.country_name": "amquisno",
-        "destination.ip": [
-            "10.50.112.141"
-        ],
+        "destination.ip": "10.50.112.141",
         "destination.nat.ip": "10.27.88.95",
         "destination.nat.port": 776,
         "destination.port": 7303,
@@ -296,9 +282,7 @@
         "service.type": "fortinet",
         "source.bytes": 1147,
         "source.geo.country_name": "porainc",
-        "source.ip": [
-            "10.131.233.27"
-        ],
+        "source.ip": "10.131.233.27",
         "source.port": 5037,
         "tags": [
             "fortinet.fortimanager",
@@ -308,9 +292,7 @@
     {
         "@timestamp": "2016-03-26T12:20:16.000Z",
         "destination.bytes": 3982,
-        "destination.ip": [
-            "10.157.213.15"
-        ],
+        "destination.ip": "10.157.213.15",
         "destination.port": 3539,
         "event.action": "allow",
         "event.code": "ddoeiu",
@@ -387,9 +369,7 @@
         "service.type": "fortinet",
         "source.bytes": 7651,
         "source.geo.country_name": "loru",
-        "source.ip": [
-            "10.87.212.179"
-        ],
+        "source.ip": "10.87.212.179",
         "source.mac": "01:00:5e:c3:0a:41",
         "source.port": 1758,
         "tags": [
@@ -411,9 +391,7 @@
     {
         "@timestamp": "2016-04-09T07:22:51.000Z",
         "destination.bytes": 927,
-        "destination.ip": [
-            "10.76.73.140"
-        ],
+        "destination.ip": "10.76.73.140",
         "destination.port": 3075,
         "event.action": "accept",
         "event.code": "moenimi",
@@ -489,9 +467,7 @@
         "service.type": "fortinet",
         "source.bytes": 3369,
         "source.geo.country_name": "eataev",
-        "source.ip": [
-            "10.114.150.67"
-        ],
+        "source.ip": "10.114.150.67",
         "source.mac": "01:00:5e:f7:4a:fd",
         "source.port": 1407,
         "tags": [
@@ -513,9 +489,7 @@
     {
         "@timestamp": "2016-04-24T14:25:25.000Z",
         "destination.bytes": 3605,
-        "destination.ip": [
-            "10.95.64.124"
-        ],
+        "destination.ip": "10.95.64.124",
         "destination.port": 7042,
         "event.action": "accept",
         "event.code": "run",
@@ -591,9 +565,7 @@
         "service.type": "fortinet",
         "source.bytes": 6354,
         "source.geo.country_name": "oin",
-        "source.ip": [
-            "10.195.36.51"
-        ],
+        "source.ip": "10.195.36.51",
         "source.mac": "01:00:5e:68:86:a1",
         "source.port": 3905,
         "tags": [
@@ -616,9 +588,7 @@
         "@timestamp": "2016-05-08T09:27:59.000Z",
         "destination.bytes": 3818,
         "destination.geo.country_name": "sectetur",
-        "destination.ip": [
-            "10.186.85.3"
-        ],
+        "destination.ip": "10.186.85.3",
         "destination.nat.ip": "10.114.16.155",
         "destination.nat.port": 1608,
         "destination.port": 5366,
@@ -671,9 +641,7 @@
         "service.type": "fortinet",
         "source.bytes": 5110,
         "source.geo.country_name": "abi",
-        "source.ip": [
-            "10.176.216.90"
-        ],
+        "source.ip": "10.176.216.90",
         "source.port": 2428,
         "tags": [
             "fortinet.fortimanager",
@@ -683,9 +651,7 @@
     {
         "@timestamp": "2016-05-22T04:30:33.000Z",
         "destination.bytes": 3252,
-        "destination.ip": [
-            "10.61.163.4"
-        ],
+        "destination.ip": "10.61.163.4",
         "destination.port": 1232,
         "event.action": "cancel",
         "event.code": "dictasu",
@@ -761,9 +727,7 @@
         "service.type": "fortinet",
         "source.bytes": 3423,
         "source.geo.country_name": "inculpa",
-        "source.ip": [
-            "10.23.62.94"
-        ],
+        "source.ip": "10.23.62.94",
         "source.mac": "01:00:5e:21:f5:0a",
         "source.port": 4368,
         "tags": [
@@ -785,9 +749,7 @@
     {
         "@timestamp": "2016-06-05T11:33:08.000Z",
         "destination.bytes": 5074,
-        "destination.ip": [
-            "10.106.31.86"
-        ],
+        "destination.ip": "10.106.31.86",
         "destination.port": 4198,
         "event.action": "deny",
         "event.code": "tium",
@@ -863,9 +825,7 @@
         "service.type": "fortinet",
         "source.bytes": 1871,
         "source.geo.country_name": "autf",
-        "source.ip": [
-            "10.28.76.42"
-        ],
+        "source.ip": "10.28.76.42",
         "source.mac": "01:00:5e:4a:7f:b8",
         "source.port": 3427,
         "tags": [
@@ -888,9 +848,7 @@
         "@timestamp": "2016-06-20T06:35:42.000Z",
         "destination.bytes": 7130,
         "destination.geo.country_name": "lup",
-        "destination.ip": [
-            "10.106.162.153"
-        ],
+        "destination.ip": "10.106.162.153",
         "destination.nat.ip": "10.58.214.16",
         "destination.nat.port": 508,
         "destination.port": 341,
@@ -943,9 +901,7 @@
         "service.type": "fortinet",
         "source.bytes": 2715,
         "source.geo.country_name": "ine",
-        "source.ip": [
-            "10.238.164.74"
-        ],
+        "source.ip": "10.238.164.74",
         "source.port": 2201,
         "tags": [
             "fortinet.fortimanager",
@@ -956,9 +912,7 @@
         "@timestamp": "2016-07-04T13:38:16.000Z",
         "destination.bytes": 5300,
         "destination.geo.country_name": "eumiu",
-        "destination.ip": [
-            "10.217.150.196"
-        ],
+        "destination.ip": "10.217.150.196",
         "destination.nat.ip": "10.110.31.190",
         "destination.nat.port": 945,
         "destination.port": 4639,
@@ -1011,9 +965,7 @@
         "service.type": "fortinet",
         "source.bytes": 248,
         "source.geo.country_name": "ris",
-        "source.ip": [
-            "10.225.141.20"
-        ],
+        "source.ip": "10.225.141.20",
         "source.port": 2282,
         "tags": [
             "fortinet.fortimanager",
@@ -1023,9 +975,7 @@
     {
         "@timestamp": "2016-07-18T08:40:50.000Z",
         "destination.bytes": 7741,
-        "destination.ip": [
-            "10.69.103.176"
-        ],
+        "destination.ip": "10.69.103.176",
         "destination.port": 1229,
         "event.action": "deny",
         "event.code": "mexe",
@@ -1101,9 +1051,7 @@
         "service.type": "fortinet",
         "source.bytes": 3962,
         "source.geo.country_name": "dutp",
-        "source.ip": [
-            "10.137.56.173"
-        ],
+        "source.ip": "10.137.56.173",
         "source.mac": "01:00:5e:e6:ad:ae",
         "source.port": 3932,
         "tags": [
@@ -1126,9 +1074,7 @@
         "@timestamp": "2016-08-02T03:43:25.000Z",
         "destination.bytes": 7122,
         "destination.geo.country_name": "mvele",
-        "destination.ip": [
-            "10.5.235.217"
-        ],
+        "destination.ip": "10.5.235.217",
         "destination.nat.ip": "10.25.212.118",
         "destination.nat.port": 1190,
         "destination.port": 3689,
@@ -1181,9 +1127,7 @@
         "service.type": "fortinet",
         "source.bytes": 238,
         "source.geo.country_name": "liqua",
-        "source.ip": [
-            "10.30.47.165"
-        ],
+        "source.ip": "10.30.47.165",
         "source.port": 631,
         "tags": [
             "fortinet.fortimanager",
@@ -1193,9 +1137,7 @@
     {
         "@timestamp": "2016-08-16T10:45:59.000Z",
         "destination.bytes": 6247,
-        "destination.ip": [
-            "10.40.152.253"
-        ],
+        "destination.ip": "10.40.152.253",
         "destination.port": 1478,
         "event.action": "deny",
         "event.code": "ipsamvo",
@@ -1271,9 +1213,7 @@
         "service.type": "fortinet",
         "source.bytes": 2826,
         "source.geo.country_name": "quaea",
-        "source.ip": [
-            "10.149.13.76"
-        ],
+        "source.ip": "10.149.13.76",
         "source.mac": "01:00:5e:1d:39:39",
         "source.port": 7809,
         "tags": [
@@ -1296,9 +1236,7 @@
         "@timestamp": "2016-08-30T05:48:33.000Z",
         "destination.bytes": 4844,
         "destination.geo.country_name": "eufugi",
-        "destination.ip": [
-            "10.51.213.42"
-        ],
+        "destination.ip": "10.51.213.42",
         "destination.nat.ip": "10.233.120.207",
         "destination.nat.port": 136,
         "destination.port": 988,
@@ -1351,9 +1289,7 @@
         "service.type": "fortinet",
         "source.bytes": 2859,
         "source.geo.country_name": "inven",
-        "source.ip": [
-            "10.98.194.212"
-        ],
+        "source.ip": "10.98.194.212",
         "source.port": 5469,
         "tags": [
             "fortinet.fortimanager",
@@ -1364,9 +1300,7 @@
         "@timestamp": "2016-09-13T12:51:07.000Z",
         "destination.bytes": 7301,
         "destination.geo.country_name": "tenatuse",
-        "destination.ip": [
-            "10.67.132.242"
-        ],
+        "destination.ip": "10.67.132.242",
         "destination.nat.ip": "10.241.132.176",
         "destination.nat.port": 7224,
         "destination.port": 2340,
@@ -1419,9 +1353,7 @@
         "service.type": "fortinet",
         "source.bytes": 6595,
         "source.geo.country_name": "ptatevel",
-        "source.ip": [
-            "10.245.187.229"
-        ],
+        "source.ip": "10.245.187.229",
         "source.port": 4953,
         "tags": [
             "fortinet.fortimanager",
@@ -1431,9 +1363,7 @@
     {
         "@timestamp": "2016-09-28T07:53:42.000Z",
         "destination.bytes": 1775,
-        "destination.ip": [
-            "10.199.47.220"
-        ],
+        "destination.ip": "10.199.47.220",
         "destination.port": 4084,
         "event.action": "allow",
         "event.code": "urmagn",
@@ -1509,9 +1439,7 @@
         "service.type": "fortinet",
         "source.bytes": 2760,
         "source.geo.country_name": "aUt",
-        "source.ip": [
-            "10.212.214.4"
-        ],
+        "source.ip": "10.212.214.4",
         "source.mac": "01:00:5e:a5:5a:54",
         "source.port": 6040,
         "tags": [
@@ -1533,9 +1461,7 @@
     {
         "@timestamp": "2016-10-12T14:56:16.000Z",
         "destination.bytes": 4059,
-        "destination.ip": [
-            "10.234.165.130"
-        ],
+        "destination.ip": "10.234.165.130",
         "destination.port": 7079,
         "event.action": "deny",
         "event.code": "henderit",
@@ -1611,9 +1537,7 @@
         "service.type": "fortinet",
         "source.bytes": 6153,
         "source.geo.country_name": "uta",
-        "source.ip": [
-            "10.46.56.204"
-        ],
+        "source.ip": "10.46.56.204",
         "source.mac": "01:00:5e:bf:07:ee",
         "source.port": 2463,
         "tags": [
@@ -1635,9 +1559,7 @@
     {
         "@timestamp": "2016-10-26T09:58:50.000Z",
         "destination.bytes": 4527,
-        "destination.ip": [
-            "10.95.117.134"
-        ],
+        "destination.ip": "10.95.117.134",
         "destination.port": 1723,
         "event.action": "block",
         "event.code": "rsi",
@@ -1713,9 +1635,7 @@
         "service.type": "fortinet",
         "source.bytes": 4010,
         "source.geo.country_name": "undeomni",
-        "source.ip": [
-            "10.128.46.70"
-        ],
+        "source.ip": "10.128.46.70",
         "source.mac": "01:00:5e:26:56:73",
         "source.port": 5269,
         "tags": [
@@ -1737,9 +1657,7 @@
     {
         "@timestamp": "2016-11-10T05:01:24.000Z",
         "destination.bytes": 1506,
-        "destination.ip": [
-            "10.253.228.140"
-        ],
+        "destination.ip": "10.253.228.140",
         "destination.port": 6748,
         "event.action": "cancel",
         "event.code": "admi",
@@ -1815,9 +1733,7 @@
         "service.type": "fortinet",
         "source.bytes": 7685,
         "source.geo.country_name": "tatev",
-        "source.ip": [
-            "10.208.21.135"
-        ],
+        "source.ip": "10.208.21.135",
         "source.mac": "01:00:5e:98:79:a3",
         "source.port": 2721,
         "tags": [
@@ -1839,9 +1755,7 @@
     {
         "@timestamp": "2016-11-24T12:03:59.000Z",
         "destination.bytes": 4009,
-        "destination.ip": [
-            "10.3.23.172"
-        ],
+        "destination.ip": "10.3.23.172",
         "destination.port": 7332,
         "event.action": "cancel",
         "event.code": "illoi",
@@ -1917,9 +1831,7 @@
         "service.type": "fortinet",
         "source.bytes": 3984,
         "source.geo.country_name": "sBonorum",
-        "source.ip": [
-            "10.243.226.122"
-        ],
+        "source.ip": "10.243.226.122",
         "source.mac": "01:00:5e:92:c2:23",
         "source.port": 3512,
         "tags": [
@@ -1941,9 +1853,7 @@
     {
         "@timestamp": "2016-12-08T07:06:33.000Z",
         "destination.bytes": 1651,
-        "destination.ip": [
-            "10.106.85.174"
-        ],
+        "destination.ip": "10.106.85.174",
         "destination.port": 307,
         "event.action": "cancel",
         "event.code": "odoco",
@@ -2019,9 +1929,7 @@
         "service.type": "fortinet",
         "source.bytes": 617,
         "source.geo.country_name": "iquaUt",
-        "source.ip": [
-            "10.94.242.80"
-        ],
+        "source.ip": "10.94.242.80",
         "source.mac": "01:00:5e:99:7b:4a",
         "source.port": 2724,
         "tags": [
@@ -2044,9 +1952,7 @@
         "@timestamp": "2016-12-23T14:09:07.000Z",
         "destination.bytes": 5749,
         "destination.geo.country_name": "usm",
-        "destination.ip": [
-            "10.247.53.179"
-        ],
+        "destination.ip": "10.247.53.179",
         "destination.nat.ip": "10.168.20.20",
         "destination.nat.port": 68,
         "destination.port": 6493,
@@ -2100,9 +2006,7 @@
         "service.type": "fortinet",
         "source.bytes": 7188,
         "source.geo.country_name": "Nemoenim",
-        "source.ip": [
-            "10.117.63.181"
-        ],
+        "source.ip": "10.117.63.181",
         "source.port": 5299,
         "tags": [
             "fortinet.fortimanager",
@@ -2112,9 +2016,7 @@
     {
         "@timestamp": "2017-01-06T09:11:41.000Z",
         "destination.bytes": 405,
-        "destination.ip": [
-            "10.53.168.187"
-        ],
+        "destination.ip": "10.53.168.187",
         "destination.port": 73,
         "event.action": "block",
         "event.code": "rsin",
@@ -2191,9 +2093,7 @@
         "service.type": "fortinet",
         "source.bytes": 4211,
         "source.geo.country_name": "uat",
-        "source.ip": [
-            "10.141.156.217"
-        ],
+        "source.ip": "10.141.156.217",
         "source.mac": "01:00:5e:c0:47:f3",
         "source.port": 2700,
         "tags": [
@@ -2215,9 +2115,7 @@
     {
         "@timestamp": "2017-01-20T04:14:16.000Z",
         "destination.bytes": 837,
-        "destination.ip": [
-            "10.189.82.19"
-        ],
+        "destination.ip": "10.189.82.19",
         "destination.port": 4267,
         "event.action": "accept",
         "event.code": "vel",
@@ -2294,9 +2192,7 @@
         "service.type": "fortinet",
         "source.bytes": 6327,
         "source.geo.country_name": "colabori",
-        "source.ip": [
-            "10.44.198.184"
-        ],
+        "source.ip": "10.44.198.184",
         "source.mac": "01:00:5e:dd:dc:44",
         "source.port": 5695,
         "tags": [
@@ -2318,9 +2214,7 @@
     {
         "@timestamp": "2017-02-03T11:16:50.000Z",
         "destination.bytes": 3097,
-        "destination.ip": [
-            "10.181.183.104"
-        ],
+        "destination.ip": "10.181.183.104",
         "destination.port": 5554,
         "event.action": "cancel",
         "event.code": "roinBCSe",
@@ -2396,9 +2290,7 @@
         "service.type": "fortinet",
         "source.bytes": 5453,
         "source.geo.country_name": "idatat",
-        "source.ip": [
-            "10.151.170.207"
-        ],
+        "source.ip": "10.151.170.207",
         "source.mac": "01:00:5e:58:7e:f5",
         "source.port": 1400,
         "tags": [
@@ -2420,9 +2312,7 @@
     {
         "@timestamp": "2017-02-18T06:19:24.000Z",
         "destination.bytes": 6209,
-        "destination.ip": [
-            "10.130.240.11"
-        ],
+        "destination.ip": "10.130.240.11",
         "destination.port": 6515,
         "event.action": "deny",
         "event.code": "consequa",
@@ -2498,9 +2388,7 @@
         "service.type": "fortinet",
         "source.bytes": 3376,
         "source.geo.country_name": "lloinve",
-        "source.ip": [
-            "10.70.7.23"
-        ],
+        "source.ip": "10.70.7.23",
         "source.mac": "01:00:5e:4a:1d:f8",
         "source.port": 2758,
         "tags": [
@@ -2523,9 +2411,7 @@
         "@timestamp": "2017-03-04T13:21:59.000Z",
         "destination.bytes": 6509,
         "destination.geo.country_name": "uian",
-        "destination.ip": [
-            "10.111.182.212"
-        ],
+        "destination.ip": "10.111.182.212",
         "destination.nat.ip": "10.17.209.252",
         "destination.nat.port": 2119,
         "destination.port": 4493,
@@ -2578,9 +2464,7 @@
         "service.type": "fortinet",
         "source.bytes": 313,
         "source.geo.country_name": "olore",
-        "source.ip": [
-            "10.37.161.101"
-        ],
+        "source.ip": "10.37.161.101",
         "source.port": 1552,
         "tags": [
             "fortinet.fortimanager",
@@ -2591,9 +2475,7 @@
         "@timestamp": "2017-03-18T08:24:33.000Z",
         "destination.bytes": 1936,
         "destination.geo.country_name": "nonpro",
-        "destination.ip": [
-            "10.170.196.181"
-        ],
+        "destination.ip": "10.170.196.181",
         "destination.nat.ip": "10.153.166.133",
         "destination.nat.port": 4638,
         "destination.port": 6994,
@@ -2646,9 +2528,7 @@
         "service.type": "fortinet",
         "source.bytes": 6610,
         "source.geo.country_name": "velites",
-        "source.ip": [
-            "10.158.175.98"
-        ],
+        "source.ip": "10.158.175.98",
         "source.port": 1491,
         "tags": [
             "fortinet.fortimanager",
@@ -2658,9 +2538,7 @@
     {
         "@timestamp": "2017-04-02T03:27:07.000Z",
         "destination.bytes": 5360,
-        "destination.ip": [
-            "10.48.25.200"
-        ],
+        "destination.ip": "10.48.25.200",
         "destination.port": 5179,
         "event.action": "accept",
         "event.code": "uredol",
@@ -2736,9 +2614,7 @@
         "service.type": "fortinet",
         "source.bytes": 3942,
         "source.geo.country_name": "ciad",
-        "source.ip": [
-            "10.63.171.91"
-        ],
+        "source.ip": "10.63.171.91",
         "source.mac": "01:00:5e:b0:3e:44",
         "source.port": 4396,
         "tags": [
@@ -2761,9 +2637,7 @@
         "@timestamp": "2017-04-16T10:29:41.000Z",
         "destination.bytes": 7791,
         "destination.geo.country_name": "ddoe",
-        "destination.ip": [
-            "10.77.105.81"
-        ],
+        "destination.ip": "10.77.105.81",
         "destination.nat.ip": "10.38.168.190",
         "destination.nat.port": 7260,
         "destination.port": 4455,
@@ -2816,9 +2690,7 @@
         "service.type": "fortinet",
         "source.bytes": 368,
         "source.geo.country_name": "ores",
-        "source.ip": [
-            "10.174.17.46"
-        ],
+        "source.ip": "10.174.17.46",
         "source.port": 2743,
         "tags": [
             "fortinet.fortimanager",
@@ -2829,9 +2701,7 @@
         "@timestamp": "2017-04-30T05:32:16.000Z",
         "destination.bytes": 7663,
         "destination.geo.country_name": "boriosa",
-        "destination.ip": [
-            "10.225.37.73"
-        ],
+        "destination.ip": "10.225.37.73",
         "destination.nat.ip": "10.166.142.198",
         "destination.nat.port": 4151,
         "destination.port": 5630,
@@ -2884,9 +2754,7 @@
         "service.type": "fortinet",
         "source.bytes": 465,
         "source.geo.country_name": "Malor",
-        "source.ip": [
-            "10.36.99.207"
-        ],
+        "source.ip": "10.36.99.207",
         "source.port": 4829,
         "tags": [
             "fortinet.fortimanager",
@@ -2897,9 +2765,7 @@
         "@timestamp": "2017-05-14T12:34:50.000Z",
         "destination.bytes": 6820,
         "destination.geo.country_name": "lill",
-        "destination.ip": [
-            "10.214.156.161"
-        ],
+        "destination.ip": "10.214.156.161",
         "destination.nat.ip": "10.145.194.12",
         "destination.nat.port": 1001,
         "destination.port": 3854,
@@ -2952,9 +2818,7 @@
         "service.type": "fortinet",
         "source.bytes": 6452,
         "source.geo.country_name": "uis",
-        "source.ip": [
-            "10.66.90.225"
-        ],
+        "source.ip": "10.66.90.225",
         "source.port": 4846,
         "tags": [
             "fortinet.fortimanager",
@@ -2965,9 +2829,7 @@
         "@timestamp": "2017-05-29T07:37:24.000Z",
         "destination.bytes": 4638,
         "destination.geo.country_name": "cidu",
-        "destination.ip": [
-            "10.156.208.5"
-        ],
+        "destination.ip": "10.156.208.5",
         "destination.nat.ip": "10.163.36.101",
         "destination.nat.port": 253,
         "destination.port": 7612,
@@ -3020,9 +2882,7 @@
         "service.type": "fortinet",
         "source.bytes": 1880,
         "source.geo.country_name": "snulap",
-        "source.ip": [
-            "10.6.242.108"
-        ],
+        "source.ip": "10.6.242.108",
         "source.port": 3373,
         "tags": [
             "fortinet.fortimanager",
@@ -3032,9 +2892,7 @@
     {
         "@timestamp": "2017-06-12T14:39:58.000Z",
         "destination.bytes": 1048,
-        "destination.ip": [
-            "10.68.233.163"
-        ],
+        "destination.ip": "10.68.233.163",
         "destination.port": 3126,
         "event.action": "allow",
         "event.code": "emve",
@@ -3110,9 +2968,7 @@
         "service.type": "fortinet",
         "source.bytes": 5763,
         "source.geo.country_name": "quis",
-        "source.ip": [
-            "10.220.148.127"
-        ],
+        "source.ip": "10.220.148.127",
         "source.mac": "01:00:5e:ed:6b:57",
         "source.port": 6681,
         "tags": [
@@ -3134,9 +2990,7 @@
     {
         "@timestamp": "2017-06-26T09:42:33.000Z",
         "destination.bytes": 6196,
-        "destination.ip": [
-            "10.94.177.125"
-        ],
+        "destination.ip": "10.94.177.125",
         "destination.port": 6683,
         "event.action": "allow",
         "event.code": "mquido",
@@ -3212,9 +3066,7 @@
         "service.type": "fortinet",
         "source.bytes": 1078,
         "source.geo.country_name": "snula",
-        "source.ip": [
-            "10.116.82.108"
-        ],
+        "source.ip": "10.116.82.108",
         "source.mac": "01:00:5e:00:fd:79",
         "source.port": 7276,
         "tags": [
@@ -3236,9 +3088,7 @@
     {
         "@timestamp": "2017-07-11T04:45:07.000Z",
         "destination.bytes": 7131,
-        "destination.ip": [
-            "10.113.152.241"
-        ],
+        "destination.ip": "10.113.152.241",
         "destination.port": 2330,
         "event.action": "cancel",
         "event.code": "uptat",
@@ -3315,9 +3165,7 @@
         "service.type": "fortinet",
         "source.bytes": 3313,
         "source.geo.country_name": "setquas",
-        "source.ip": [
-            "10.115.121.243"
-        ],
+        "source.ip": "10.115.121.243",
         "source.mac": "01:00:5e:0c:fb:2b",
         "source.port": 550,
         "tags": [
@@ -3339,9 +3187,7 @@
     {
         "@timestamp": "2017-07-25T11:47:41.000Z",
         "destination.bytes": 6863,
-        "destination.ip": [
-            "10.179.153.97"
-        ],
+        "destination.ip": "10.179.153.97",
         "destination.port": 1908,
         "event.action": "accept",
         "event.code": "taliqu",
@@ -3417,9 +3263,7 @@
         "service.type": "fortinet",
         "source.bytes": 3045,
         "source.geo.country_name": "saquaeab",
-        "source.ip": [
-            "10.49.82.45"
-        ],
+        "source.ip": "10.49.82.45",
         "source.mac": "01:00:5e:09:79:f2",
         "source.port": 435,
         "tags": [
@@ -3442,9 +3286,7 @@
         "@timestamp": "2017-08-08T06:50:15.000Z",
         "destination.bytes": 722,
         "destination.geo.country_name": "rumex",
-        "destination.ip": [
-            "10.99.55.115"
-        ],
+        "destination.ip": "10.99.55.115",
         "destination.nat.ip": "10.205.83.138",
         "destination.nat.port": 6239,
         "destination.port": 1537,
@@ -3497,9 +3339,7 @@
         "service.type": "fortinet",
         "source.bytes": 3290,
         "source.geo.country_name": "uir",
-        "source.ip": [
-            "10.98.52.184"
-        ],
+        "source.ip": "10.98.52.184",
         "source.port": 7402,
         "tags": [
             "fortinet.fortimanager",
@@ -3510,9 +3350,7 @@
         "@timestamp": "2017-08-22T13:52:50.000Z",
         "destination.bytes": 422,
         "destination.geo.country_name": "did",
-        "destination.ip": [
-            "10.90.189.248"
-        ],
+        "destination.ip": "10.90.189.248",
         "destination.nat.ip": "10.228.11.50",
         "destination.nat.port": 984,
         "destination.port": 1293,
@@ -3565,9 +3403,7 @@
         "service.type": "fortinet",
         "source.bytes": 6907,
         "source.geo.country_name": "inBC",
-        "source.ip": [
-            "10.197.128.162"
-        ],
+        "source.ip": "10.197.128.162",
         "source.port": 2052,
         "tags": [
             "fortinet.fortimanager",
@@ -3625,9 +3461,7 @@
     {
         "@timestamp": "2017-09-20T03:57:58.000Z",
         "destination.bytes": 6283,
-        "destination.ip": [
-            "10.22.248.52"
-        ],
+        "destination.ip": "10.22.248.52",
         "destination.port": 6566,
         "event.action": "cancel",
         "event.code": "oreve",
@@ -3703,9 +3537,7 @@
         "service.type": "fortinet",
         "source.bytes": 1737,
         "source.geo.country_name": "scipi",
-        "source.ip": [
-            "10.124.71.88"
-        ],
+        "source.ip": "10.124.71.88",
         "source.mac": "01:00:5e:5b:68:89",
         "source.port": 7540,
         "tags": [
@@ -3727,9 +3559,7 @@
     {
         "@timestamp": "2017-10-04T11:00:32.000Z",
         "destination.bytes": 6230,
-        "destination.ip": [
-            "10.26.58.20"
-        ],
+        "destination.ip": "10.26.58.20",
         "destination.port": 2809,
         "event.action": "block",
         "event.code": "rchitect",
@@ -3805,9 +3635,7 @@
         "service.type": "fortinet",
         "source.bytes": 7229,
         "source.geo.country_name": "elitsedq",
-        "source.ip": [
-            "10.185.37.176"
-        ],
+        "source.ip": "10.185.37.176",
         "source.mac": "01:00:5e:cd:f6:0e",
         "source.port": 1859,
         "tags": [
@@ -3830,9 +3658,7 @@
         "@timestamp": "2017-10-19T06:03:07.000Z",
         "destination.bytes": 5047,
         "destination.geo.country_name": "nven",
-        "destination.ip": [
-            "10.14.145.107"
-        ],
+        "destination.ip": "10.14.145.107",
         "destination.nat.ip": "10.250.231.196",
         "destination.nat.port": 5863,
         "destination.port": 4362,
@@ -3885,9 +3711,7 @@
         "service.type": "fortinet",
         "source.bytes": 2763,
         "source.geo.country_name": "loremi",
-        "source.ip": [
-            "10.200.12.126"
-        ],
+        "source.ip": "10.200.12.126",
         "source.port": 2347,
         "tags": [
             "fortinet.fortimanager",
@@ -3898,9 +3722,7 @@
         "@timestamp": "2017-11-02T13:05:41.000Z",
         "destination.bytes": 2565,
         "destination.geo.country_name": "fugia",
-        "destination.ip": [
-            "10.21.203.112"
-        ],
+        "destination.ip": "10.21.203.112",
         "destination.nat.ip": "10.103.36.192",
         "destination.nat.port": 1974,
         "destination.port": 5930,
@@ -3953,9 +3775,7 @@
         "service.type": "fortinet",
         "source.bytes": 2801,
         "source.geo.country_name": "equamni",
-        "source.ip": [
-            "10.225.34.176"
-        ],
+        "source.ip": "10.225.34.176",
         "source.port": 5569,
         "tags": [
             "fortinet.fortimanager",
@@ -3966,9 +3786,7 @@
         "@timestamp": "2017-11-16T08:08:15.000Z",
         "destination.bytes": 6222,
         "destination.geo.country_name": "roid",
-        "destination.ip": [
-            "10.5.67.140"
-        ],
+        "destination.ip": "10.5.67.140",
         "destination.nat.ip": "10.118.111.183",
         "destination.nat.port": 5410,
         "destination.port": 5687,
@@ -4021,9 +3839,7 @@
         "service.type": "fortinet",
         "source.bytes": 6821,
         "source.geo.country_name": "olors",
-        "source.ip": [
-            "10.140.59.161"
-        ],
+        "source.ip": "10.140.59.161",
         "source.port": 3599,
         "tags": [
             "fortinet.fortimanager",
@@ -4033,9 +3849,7 @@
     {
         "@timestamp": "2017-12-01T03:10:49.000Z",
         "destination.bytes": 5351,
-        "destination.ip": [
-            "10.28.212.191"
-        ],
+        "destination.ip": "10.28.212.191",
         "destination.port": 1997,
         "event.action": "accept",
         "event.code": "abillo",
@@ -4111,9 +3925,7 @@
         "service.type": "fortinet",
         "source.bytes": 6659,
         "source.geo.country_name": "ollita",
-        "source.ip": [
-            "10.7.70.169"
-        ],
+        "source.ip": "10.7.70.169",
         "source.mac": "01:00:5e:e9:ec:d5",
         "source.port": 2514,
         "tags": [
@@ -4135,9 +3947,7 @@
     {
         "@timestamp": "2017-12-15T10:13:24.000Z",
         "destination.bytes": 7417,
-        "destination.ip": [
-            "10.143.144.52"
-        ],
+        "destination.ip": "10.143.144.52",
         "destination.port": 974,
         "event.action": "block",
         "event.code": "iqu",
@@ -4213,9 +4023,7 @@
         "service.type": "fortinet",
         "source.bytes": 2372,
         "source.geo.country_name": "uepor",
-        "source.ip": [
-            "10.148.197.60"
-        ],
+        "source.ip": "10.148.197.60",
         "source.mac": "01:00:5e:28:0c:11",
         "source.port": 5711,
         "tags": [
@@ -4238,9 +4046,7 @@
         "@timestamp": "2017-12-29T05:15:58.000Z",
         "destination.bytes": 7299,
         "destination.geo.country_name": "ciad",
-        "destination.ip": [
-            "10.22.149.132"
-        ],
+        "destination.ip": "10.22.149.132",
         "destination.nat.ip": "10.251.183.113",
         "destination.nat.port": 2604,
         "destination.port": 7725,
@@ -4293,9 +4099,7 @@
         "service.type": "fortinet",
         "source.bytes": 5697,
         "source.geo.country_name": "quaturve",
-        "source.ip": [
-            "10.217.145.137"
-        ],
+        "source.ip": "10.217.145.137",
         "source.port": 5242,
         "tags": [
             "fortinet.fortimanager",
@@ -4306,9 +4110,7 @@
         "@timestamp": "2018-01-12T12:18:32.000Z",
         "destination.bytes": 1519,
         "destination.geo.country_name": "iarchit",
-        "destination.ip": [
-            "10.203.66.175"
-        ],
+        "destination.ip": "10.203.66.175",
         "destination.nat.ip": "10.51.60.203",
         "destination.nat.port": 5315,
         "destination.port": 3904,
@@ -4361,9 +4163,7 @@
         "service.type": "fortinet",
         "source.bytes": 7551,
         "source.geo.country_name": "oid",
-        "source.ip": [
-            "10.183.16.252"
-        ],
+        "source.ip": "10.183.16.252",
         "source.port": 3150,
         "tags": [
             "fortinet.fortimanager",
@@ -4373,9 +4173,7 @@
     {
         "@timestamp": "2018-01-27T07:21:06.000Z",
         "destination.bytes": 6650,
-        "destination.ip": [
-            "10.61.200.105"
-        ],
+        "destination.ip": "10.61.200.105",
         "destination.port": 2813,
         "event.action": "accept",
         "event.code": "orinc",
@@ -4451,9 +4249,7 @@
         "service.type": "fortinet",
         "source.bytes": 5413,
         "source.geo.country_name": "itatise",
-        "source.ip": [
-            "10.157.14.165"
-        ],
+        "source.ip": "10.157.14.165",
         "source.mac": "01:00:5e:5c:c2:50",
         "source.port": 7170,
         "tags": [
@@ -4475,9 +4271,7 @@
     {
         "@timestamp": "2018-02-10T14:23:41.000Z",
         "destination.bytes": 5375,
-        "destination.ip": [
-            "10.217.111.77"
-        ],
+        "destination.ip": "10.217.111.77",
         "destination.port": 7309,
         "event.action": "allow",
         "event.code": "entoreve",
@@ -4553,9 +4347,7 @@
         "service.type": "fortinet",
         "source.bytes": 7328,
         "source.geo.country_name": "agnamali",
-        "source.ip": [
-            "10.242.178.15"
-        ],
+        "source.ip": "10.242.178.15",
         "source.mac": "01:00:5e:e9:5f:84",
         "source.port": 3948,
         "tags": [
@@ -4577,9 +4369,7 @@
     {
         "@timestamp": "2018-02-24T09:26:15.000Z",
         "destination.bytes": 6059,
-        "destination.ip": [
-            "10.86.152.227"
-        ],
+        "destination.ip": "10.86.152.227",
         "destination.port": 850,
         "event.action": "cancel",
         "event.code": "onsec",
@@ -4655,9 +4445,7 @@
         "service.type": "fortinet",
         "source.bytes": 289,
         "source.geo.country_name": "eaqueip",
-        "source.ip": [
-            "10.199.119.251"
-        ],
+        "source.ip": "10.199.119.251",
         "source.mac": "01:00:5e:06:53:8a",
         "source.port": 7286,
         "tags": [
@@ -4679,9 +4467,7 @@
     {
         "@timestamp": "2018-03-11T04:28:49.000Z",
         "destination.bytes": 3374,
-        "destination.ip": [
-            "10.234.171.117"
-        ],
+        "destination.ip": "10.234.171.117",
         "destination.port": 4488,
         "event.action": "deny",
         "event.code": "quian",
@@ -4757,9 +4543,7 @@
         "service.type": "fortinet",
         "source.bytes": 5988,
         "source.geo.country_name": "dex",
-        "source.ip": [
-            "10.239.194.105"
-        ],
+        "source.ip": "10.239.194.105",
         "source.mac": "01:00:5e:b5:9a:3e",
         "source.port": 3629,
         "tags": [
@@ -4782,9 +4566,7 @@
         "@timestamp": "2018-03-25T11:31:24.000Z",
         "destination.bytes": 2855,
         "destination.geo.country_name": "rinc",
-        "destination.ip": [
-            "10.249.16.201"
-        ],
+        "destination.ip": "10.249.16.201",
         "destination.nat.ip": "10.107.168.208",
         "destination.nat.port": 1864,
         "destination.port": 4293,
@@ -4838,9 +4620,7 @@
         "service.type": "fortinet",
         "source.bytes": 1067,
         "source.geo.country_name": "itanimi",
-        "source.ip": [
-            "10.34.41.75"
-        ],
+        "source.ip": "10.34.41.75",
         "source.port": 4436,
         "tags": [
             "fortinet.fortimanager",
@@ -4850,9 +4630,7 @@
     {
         "@timestamp": "2018-04-08T06:33:58.000Z",
         "destination.bytes": 7292,
-        "destination.ip": [
-            "10.109.106.194"
-        ],
+        "destination.ip": "10.109.106.194",
         "destination.port": 5356,
         "event.action": "allow",
         "event.code": "vol",
@@ -4928,9 +4706,7 @@
         "service.type": "fortinet",
         "source.bytes": 3719,
         "source.geo.country_name": "rorsitv",
-        "source.ip": [
-            "10.96.168.24"
-        ],
+        "source.ip": "10.96.168.24",
         "source.mac": "01:00:5e:c1:b8:93",
         "source.port": 6206,
         "tags": [
@@ -4952,9 +4728,7 @@
     {
         "@timestamp": "2018-04-22T13:36:32.000Z",
         "destination.bytes": 6693,
-        "destination.ip": [
-            "10.47.191.95"
-        ],
+        "destination.ip": "10.47.191.95",
         "destination.port": 6242,
         "event.action": "deny",
         "event.code": "remagnam",
@@ -5030,9 +4804,7 @@
         "service.type": "fortinet",
         "source.bytes": 4249,
         "source.geo.country_name": "itvolupt",
-        "source.ip": [
-            "10.112.155.228"
-        ],
+        "source.ip": "10.112.155.228",
         "source.mac": "01:00:5e:63:85:d2",
         "source.port": 5011,
         "tags": [
@@ -5055,9 +4827,7 @@
         "@timestamp": "2018-05-07T08:39:06.000Z",
         "destination.bytes": 6033,
         "destination.geo.country_name": "amrema",
-        "destination.ip": [
-            "10.140.137.17"
-        ],
+        "destination.ip": "10.140.137.17",
         "destination.nat.ip": "10.62.241.218",
         "destination.nat.port": 7444,
         "destination.port": 446,
@@ -5110,9 +4880,7 @@
         "service.type": "fortinet",
         "source.bytes": 4832,
         "source.geo.country_name": "riatur",
-        "source.ip": [
-            "10.103.169.94"
-        ],
+        "source.ip": "10.103.169.94",
         "source.port": 2174,
         "tags": [
             "fortinet.fortimanager",
@@ -5123,9 +4891,7 @@
         "@timestamp": "2018-05-21T03:41:41.000Z",
         "destination.bytes": 2687,
         "destination.geo.country_name": "umetMalo",
-        "destination.ip": [
-            "10.251.212.166"
-        ],
+        "destination.ip": "10.251.212.166",
         "destination.nat.ip": "10.77.105.160",
         "destination.nat.port": 5541,
         "destination.port": 3925,
@@ -5178,9 +4944,7 @@
         "service.type": "fortinet",
         "source.bytes": 5294,
         "source.geo.country_name": "siutal",
-        "source.ip": [
-            "10.90.229.92"
-        ],
+        "source.ip": "10.90.229.92",
         "source.port": 6796,
         "tags": [
             "fortinet.fortimanager",
@@ -5190,9 +4954,7 @@
     {
         "@timestamp": "2018-06-04T10:44:15.000Z",
         "destination.bytes": 205,
-        "destination.ip": [
-            "10.112.242.68"
-        ],
+        "destination.ip": "10.112.242.68",
         "destination.port": 3105,
         "event.action": "cancel",
         "event.code": "atisund",
@@ -5268,9 +5030,7 @@
         "service.type": "fortinet",
         "source.bytes": 3508,
         "source.geo.country_name": "nimadmi",
-        "source.ip": [
-            "10.216.49.112"
-        ],
+        "source.ip": "10.216.49.112",
         "source.mac": "01:00:5e:8a:c1:2a",
         "source.port": 4521,
         "tags": [
@@ -5292,9 +5052,7 @@
     {
         "@timestamp": "2018-06-19T05:46:49.000Z",
         "destination.bytes": 1768,
-        "destination.ip": [
-            "10.96.100.84"
-        ],
+        "destination.ip": "10.96.100.84",
         "destination.port": 2253,
         "event.action": "accept",
         "event.code": "etco",
@@ -5370,9 +5128,7 @@
         "service.type": "fortinet",
         "source.bytes": 2397,
         "source.geo.country_name": "emUten",
-        "source.ip": [
-            "10.182.58.108"
-        ],
+        "source.ip": "10.182.58.108",
         "source.mac": "01:00:5e:7e:ea:3f",
         "source.port": 4811,
         "tags": [
@@ -5395,9 +5151,7 @@
         "@timestamp": "2018-07-03T12:49:23.000Z",
         "destination.bytes": 2952,
         "destination.geo.country_name": "tatem",
-        "destination.ip": [
-            "10.246.41.77"
-        ],
+        "destination.ip": "10.246.41.77",
         "destination.nat.ip": "10.157.22.21",
         "destination.nat.port": 5252,
         "destination.port": 1217,
@@ -5450,9 +5204,7 @@
         "service.type": "fortinet",
         "source.bytes": 2167,
         "source.geo.country_name": "sse",
-        "source.ip": [
-            "10.228.61.5"
-        ],
+        "source.ip": "10.228.61.5",
         "source.port": 1179,
         "tags": [
             "fortinet.fortimanager",
@@ -5463,9 +5215,7 @@
         "@timestamp": "2018-07-17T07:51:58.000Z",
         "destination.bytes": 4226,
         "destination.geo.country_name": "nonpro",
-        "destination.ip": [
-            "10.239.231.168"
-        ],
+        "destination.ip": "10.239.231.168",
         "destination.nat.ip": "10.188.131.18",
         "destination.nat.port": 981,
         "destination.port": 88,
@@ -5518,9 +5268,7 @@
         "service.type": "fortinet",
         "source.bytes": 2770,
         "source.geo.country_name": "giatq",
-        "source.ip": [
-            "10.242.119.111"
-        ],
+        "source.ip": "10.242.119.111",
         "source.port": 645,
         "tags": [
             "fortinet.fortimanager",
@@ -5530,9 +5278,7 @@
     {
         "@timestamp": "2018-08-01T14:54:32.000Z",
         "destination.bytes": 306,
-        "destination.ip": [
-            "10.247.124.74"
-        ],
+        "destination.ip": "10.247.124.74",
         "destination.port": 2491,
         "event.action": "accept",
         "event.code": "nderitin",
@@ -5608,9 +5354,7 @@
         "service.type": "fortinet",
         "source.bytes": 2068,
         "source.geo.country_name": "lites",
-        "source.ip": [
-            "10.106.101.87"
-        ],
+        "source.ip": "10.106.101.87",
         "source.mac": "01:00:5e:6a:a6:c9",
         "source.port": 7569,
         "tags": [
@@ -5680,9 +5424,7 @@
     {
         "@timestamp": "2018-08-29T04:59:40.000Z",
         "destination.bytes": 806,
-        "destination.ip": [
-            "10.162.114.52"
-        ],
+        "destination.ip": "10.162.114.52",
         "destination.port": 2925,
         "event.action": "allow",
         "event.code": "san",
@@ -5758,9 +5500,7 @@
         "service.type": "fortinet",
         "source.bytes": 75,
         "source.geo.country_name": "ihilmol",
-        "source.ip": [
-            "10.215.144.167"
-        ],
+        "source.ip": "10.215.144.167",
         "source.mac": "01:00:5e:11:d6:5d",
         "source.port": 6675,
         "tags": [
@@ -5782,9 +5522,7 @@
     {
         "@timestamp": "2018-09-12T12:02:15.000Z",
         "destination.bytes": 7641,
-        "destination.ip": [
-            "10.78.75.82"
-        ],
+        "destination.ip": "10.78.75.82",
         "destination.port": 7799,
         "event.action": "accept",
         "event.code": "fugi",
@@ -5860,9 +5598,7 @@
         "service.type": "fortinet",
         "source.bytes": 5013,
         "source.geo.country_name": "rroquis",
-        "source.ip": [
-            "10.162.128.87"
-        ],
+        "source.ip": "10.162.128.87",
         "source.mac": "01:00:5e:41:90:bf",
         "source.port": 6214,
         "tags": [
@@ -5885,9 +5621,7 @@
         "@timestamp": "2018-09-27T07:04:49.000Z",
         "destination.bytes": 5464,
         "destination.geo.country_name": "mdolorem",
-        "destination.ip": [
-            "10.137.36.151"
-        ],
+        "destination.ip": "10.137.36.151",
         "destination.nat.ip": "10.51.106.43",
         "destination.nat.port": 6486,
         "destination.port": 196,
@@ -5940,9 +5674,7 @@
         "service.type": "fortinet",
         "source.bytes": 3531,
         "source.geo.country_name": "ciatisun",
-        "source.ip": [
-            "10.75.198.93"
-        ],
+        "source.ip": "10.75.198.93",
         "source.port": 1982,
         "tags": [
             "fortinet.fortimanager",
@@ -5953,9 +5685,7 @@
         "@timestamp": "2018-10-11T14:07:23.000Z",
         "destination.bytes": 5744,
         "destination.geo.country_name": "tlab",
-        "destination.ip": [
-            "10.7.230.206"
-        ],
+        "destination.ip": "10.7.230.206",
         "destination.nat.ip": "10.249.93.150",
         "destination.nat.port": 799,
         "destination.port": 5757,
@@ -6008,9 +5738,7 @@
         "service.type": "fortinet",
         "source.bytes": 2808,
         "source.geo.country_name": "perspi",
-        "source.ip": [
-            "10.154.151.111"
-        ],
+        "source.ip": "10.154.151.111",
         "source.port": 5860,
         "tags": [
             "fortinet.fortimanager",
@@ -6020,9 +5748,7 @@
     {
         "@timestamp": "2018-10-25T09:09:57.000Z",
         "destination.bytes": 6280,
-        "destination.ip": [
-            "10.26.4.3"
-        ],
+        "destination.ip": "10.26.4.3",
         "destination.port": 5291,
         "event.action": "deny",
         "event.code": "iameaq",
@@ -6098,9 +5824,7 @@
         "service.type": "fortinet",
         "source.bytes": 622,
         "source.geo.country_name": "setquas",
-        "source.ip": [
-            "10.217.209.221"
-        ],
+        "source.ip": "10.217.209.221",
         "source.mac": "01:00:5e:19:ce:4b",
         "source.port": 3639,
         "tags": [
@@ -6122,9 +5846,7 @@
     {
         "@timestamp": "2018-11-09T04:12:32.000Z",
         "destination.bytes": 6960,
-        "destination.ip": [
-            "10.180.162.174"
-        ],
+        "destination.ip": "10.180.162.174",
         "destination.port": 7186,
         "event.action": "accept",
         "event.code": "taedic",
@@ -6200,9 +5922,7 @@
         "service.type": "fortinet",
         "source.bytes": 5817,
         "source.geo.country_name": "lors",
-        "source.ip": [
-            "10.241.140.241"
-        ],
+        "source.ip": "10.241.140.241",
         "source.mac": "01:00:5e:fe:be:28",
         "source.port": 1813,
         "tags": [
@@ -6224,9 +5944,7 @@
     {
         "@timestamp": "2018-11-23T11:15:06.000Z",
         "destination.bytes": 5783,
-        "destination.ip": [
-            "10.62.140.108"
-        ],
+        "destination.ip": "10.62.140.108",
         "destination.port": 1225,
         "event.action": "deny",
         "event.code": "enimip",
@@ -6302,9 +6020,7 @@
         "service.type": "fortinet",
         "source.bytes": 1800,
         "source.geo.country_name": "seruntm",
-        "source.ip": [
-            "10.110.99.222"
-        ],
+        "source.ip": "10.110.99.222",
         "source.mac": "01:00:5e:21:d3:0a",
         "source.port": 5685,
         "tags": [
@@ -6326,9 +6042,7 @@
     {
         "@timestamp": "2018-12-07T06:17:40.000Z",
         "destination.bytes": 7612,
-        "destination.ip": [
-            "10.53.50.77"
-        ],
+        "destination.ip": "10.53.50.77",
         "destination.port": 5330,
         "event.action": "accept",
         "event.code": "etdo",
@@ -6404,9 +6118,7 @@
         "service.type": "fortinet",
         "source.bytes": 2685,
         "source.geo.country_name": "emoe",
-        "source.ip": [
-            "10.4.244.115"
-        ],
+        "source.ip": "10.4.244.115",
         "source.mac": "01:00:5e:f5:2a:24",
         "source.port": 4588,
         "tags": [
@@ -6429,9 +6141,7 @@
         "@timestamp": "2018-12-21T13:20:14.000Z",
         "destination.bytes": 3484,
         "destination.geo.country_name": "litess",
-        "destination.ip": [
-            "10.236.211.111"
-        ],
+        "destination.ip": "10.236.211.111",
         "destination.nat.ip": "10.120.212.78",
         "destination.nat.port": 119,
         "destination.port": 1801,
@@ -6484,9 +6194,7 @@
         "service.type": "fortinet",
         "source.bytes": 4752,
         "source.geo.country_name": "taspe",
-        "source.ip": [
-            "10.221.100.157"
-        ],
+        "source.ip": "10.221.100.157",
         "source.port": 865,
         "tags": [
             "fortinet.fortimanager",
@@ -6496,9 +6204,7 @@
     {
         "@timestamp": "2019-01-05T08:22:49.000Z",
         "destination.bytes": 5326,
-        "destination.ip": [
-            "10.208.231.15"
-        ],
+        "destination.ip": "10.208.231.15",
         "destination.port": 412,
         "event.action": "accept",
         "event.code": "redol",
@@ -6574,9 +6280,7 @@
         "service.type": "fortinet",
         "source.bytes": 2336,
         "source.geo.country_name": "mfugiatq",
-        "source.ip": [
-            "10.210.82.202"
-        ],
+        "source.ip": "10.210.82.202",
         "source.mac": "01:00:5e:4a:5d:af",
         "source.port": 2749,
         "tags": [
@@ -6599,9 +6303,7 @@
         "@timestamp": "2019-01-19T03:25:23.000Z",
         "destination.bytes": 220,
         "destination.geo.country_name": "aqueipsa",
-        "destination.ip": [
-            "10.123.59.69"
-        ],
+        "destination.ip": "10.123.59.69",
         "destination.nat.ip": "10.53.251.202",
         "destination.nat.port": 7501,
         "destination.port": 5399,
@@ -6654,9 +6356,7 @@
         "service.type": "fortinet",
         "source.bytes": 6876,
         "source.geo.country_name": "ipexe",
-        "source.ip": [
-            "10.226.255.3"
-        ],
+        "source.ip": "10.226.255.3",
         "source.port": 5449,
         "tags": [
             "fortinet.fortimanager",
@@ -6667,9 +6367,7 @@
         "@timestamp": "2019-02-02T10:27:57.000Z",
         "destination.bytes": 7868,
         "destination.geo.country_name": "persp",
-        "destination.ip": [
-            "10.212.56.26"
-        ],
+        "destination.ip": "10.212.56.26",
         "destination.nat.ip": "10.29.141.252",
         "destination.nat.port": 2077,
         "destination.port": 3032,
@@ -6722,9 +6420,7 @@
         "service.type": "fortinet",
         "source.bytes": 3472,
         "source.geo.country_name": "lumdolor",
-        "source.ip": [
-            "10.3.85.176"
-        ],
+        "source.ip": "10.3.85.176",
         "source.port": 318,
         "tags": [
             "fortinet.fortimanager",
@@ -6734,9 +6430,7 @@
     {
         "@timestamp": "2019-02-17T05:30:32.000Z",
         "destination.bytes": 4658,
-        "destination.ip": [
-            "10.236.175.163"
-        ],
+        "destination.ip": "10.236.175.163",
         "destination.port": 6562,
         "event.action": "cancel",
         "event.code": "oeni",
@@ -6812,9 +6506,7 @@
         "service.type": "fortinet",
         "source.bytes": 3449,
         "source.geo.country_name": "temU",
-        "source.ip": [
-            "10.126.11.186"
-        ],
+        "source.ip": "10.126.11.186",
         "source.mac": "01:00:5e:82:ca:1b",
         "source.port": 589,
         "tags": [
@@ -6837,9 +6529,7 @@
         "@timestamp": "2019-03-03T12:33:06.000Z",
         "destination.bytes": 3339,
         "destination.geo.country_name": "paq",
-        "destination.ip": [
-            "10.11.150.136"
-        ],
+        "destination.ip": "10.11.150.136",
         "destination.nat.ip": "10.83.98.220",
         "destination.nat.port": 1300,
         "destination.port": 3615,
@@ -6892,9 +6582,7 @@
         "service.type": "fortinet",
         "source.bytes": 5812,
         "source.geo.country_name": "llumquid",
-        "source.ip": [
-            "10.171.60.173"
-        ],
+        "source.ip": "10.171.60.173",
         "source.port": 209,
         "tags": [
             "fortinet.fortimanager",
@@ -6905,9 +6593,7 @@
         "@timestamp": "2019-03-17T07:35:40.000Z",
         "destination.bytes": 3946,
         "destination.geo.country_name": "ipisc",
-        "destination.ip": [
-            "10.74.88.209"
-        ],
+        "destination.ip": "10.74.88.209",
         "destination.nat.ip": "10.92.3.166",
         "destination.nat.port": 5777,
         "destination.port": 740,
@@ -6960,9 +6646,7 @@
         "service.type": "fortinet",
         "source.bytes": 715,
         "source.geo.country_name": "sit",
-        "source.ip": [
-            "10.238.49.73"
-        ],
+        "source.ip": "10.238.49.73",
         "source.port": 1554,
         "tags": [
             "fortinet.fortimanager",
@@ -6973,9 +6657,7 @@
         "@timestamp": "2019-04-01T14:38:14.000Z",
         "destination.bytes": 4329,
         "destination.geo.country_name": "quelaud",
-        "destination.ip": [
-            "10.187.107.47"
-        ],
+        "destination.ip": "10.187.107.47",
         "destination.nat.ip": "10.84.200.121",
         "destination.nat.port": 3226,
         "destination.port": 288,
@@ -7028,9 +6710,7 @@
         "service.type": "fortinet",
         "source.bytes": 2150,
         "source.geo.country_name": "labor",
-        "source.ip": [
-            "10.119.248.36"
-        ],
+        "source.ip": "10.119.248.36",
         "source.port": 2450,
         "tags": [
             "fortinet.fortimanager",
@@ -7041,9 +6721,7 @@
         "@timestamp": "2019-04-15T09:40:49.000Z",
         "destination.bytes": 1057,
         "destination.geo.country_name": "nvolupt",
-        "destination.ip": [
-            "10.135.213.17"
-        ],
+        "destination.ip": "10.135.213.17",
         "destination.nat.ip": "10.30.239.222",
         "destination.nat.port": 1546,
         "destination.port": 6427,
@@ -7096,9 +6774,7 @@
         "service.type": "fortinet",
         "source.bytes": 6561,
         "source.geo.country_name": "odtem",
-        "source.ip": [
-            "10.167.128.229"
-        ],
+        "source.ip": "10.167.128.229",
         "source.port": 4052,
         "tags": [
             "fortinet.fortimanager",
@@ -7108,9 +6784,7 @@
     {
         "@timestamp": "2019-04-29T04:43:23.000Z",
         "destination.bytes": 1150,
-        "destination.ip": [
-            "10.115.166.48"
-        ],
+        "destination.ip": "10.115.166.48",
         "destination.port": 7491,
         "event.action": "block",
         "event.code": "tiumt",
@@ -7186,9 +6860,7 @@
         "service.type": "fortinet",
         "source.bytes": 2527,
         "source.geo.country_name": "etM",
-        "source.ip": [
-            "10.169.133.219"
-        ],
+        "source.ip": "10.169.133.219",
         "source.mac": "01:00:5e:cd:6c:ed",
         "source.port": 92,
         "tags": [
@@ -7210,9 +6882,7 @@
     {
         "@timestamp": "2019-05-13T11:45:57.000Z",
         "destination.bytes": 4374,
-        "destination.ip": [
-            "10.226.39.82"
-        ],
+        "destination.ip": "10.226.39.82",
         "destination.port": 3950,
         "event.action": "block",
         "event.code": "isetqu",
@@ -7288,9 +6958,7 @@
         "service.type": "fortinet",
         "source.bytes": 4247,
         "source.geo.country_name": "amqu",
-        "source.ip": [
-            "10.146.255.40"
-        ],
+        "source.ip": "10.146.255.40",
         "source.mac": "01:00:5e:1a:9c:4f",
         "source.port": 3003,
         "tags": [
@@ -7313,9 +6981,7 @@
         "@timestamp": "2019-05-28T06:48:31.000Z",
         "destination.bytes": 2380,
         "destination.geo.country_name": "tani",
-        "destination.ip": [
-            "10.224.212.88"
-        ],
+        "destination.ip": "10.224.212.88",
         "destination.nat.ip": "10.35.240.70",
         "destination.nat.port": 2587,
         "destination.port": 5404,
@@ -7368,9 +7034,7 @@
         "service.type": "fortinet",
         "source.bytes": 7102,
         "source.geo.country_name": "apa",
-        "source.ip": [
-            "10.53.82.96"
-        ],
+        "source.ip": "10.53.82.96",
         "source.port": 7088,
         "tags": [
             "fortinet.fortimanager",
@@ -7381,9 +7045,7 @@
         "@timestamp": "2019-06-11T13:51:06.000Z",
         "destination.bytes": 475,
         "destination.geo.country_name": "aevitae",
-        "destination.ip": [
-            "10.233.128.7"
-        ],
+        "destination.ip": "10.233.128.7",
         "destination.nat.ip": "10.66.149.234",
         "destination.nat.port": 6236,
         "destination.port": 2455,
@@ -7436,9 +7098,7 @@
         "service.type": "fortinet",
         "source.bytes": 6344,
         "source.geo.country_name": "tnulap",
-        "source.ip": [
-            "10.186.253.240"
-        ],
+        "source.ip": "10.186.253.240",
         "source.port": 6982,
         "tags": [
             "fortinet.fortimanager",
@@ -7449,9 +7109,7 @@
         "@timestamp": "2019-06-25T08:53:40.000Z",
         "destination.bytes": 1387,
         "destination.geo.country_name": "avolupt",
-        "destination.ip": [
-            "10.46.11.114"
-        ],
+        "destination.ip": "10.46.11.114",
         "destination.nat.ip": "10.173.140.201",
         "destination.nat.port": 6422,
         "destination.port": 4009,
@@ -7504,9 +7162,7 @@
         "service.type": "fortinet",
         "source.bytes": 7249,
         "source.geo.country_name": "mwritt",
-        "source.ip": [
-            "10.227.133.134"
-        ],
+        "source.ip": "10.227.133.134",
         "source.port": 3351,
         "tags": [
             "fortinet.fortimanager",
@@ -7517,9 +7173,7 @@
         "@timestamp": "2019-07-10T03:56:14.000Z",
         "destination.bytes": 1751,
         "destination.geo.country_name": "ari",
-        "destination.ip": [
-            "10.69.130.207"
-        ],
+        "destination.ip": "10.69.130.207",
         "destination.nat.ip": "10.170.236.123",
         "destination.nat.port": 4346,
         "destination.port": 1191,
@@ -7572,9 +7226,7 @@
         "service.type": "fortinet",
         "source.bytes": 6877,
         "source.geo.country_name": "nimvenia",
-        "source.ip": [
-            "10.205.18.11"
-        ],
+        "source.ip": "10.205.18.11",
         "source.port": 6737,
         "tags": [
             "fortinet.fortimanager",
@@ -7584,9 +7236,7 @@
     {
         "@timestamp": "2019-07-24T10:58:48.000Z",
         "destination.bytes": 1742,
-        "destination.ip": [
-            "10.124.34.251"
-        ],
+        "destination.ip": "10.124.34.251",
         "destination.port": 3899,
         "event.action": "deny",
         "event.code": "mrem",
@@ -7662,9 +7312,7 @@
         "service.type": "fortinet",
         "source.bytes": 6361,
         "source.geo.country_name": "reetd",
-        "source.ip": [
-            "10.97.254.192"
-        ],
+        "source.ip": "10.97.254.192",
         "source.mac": "01:00:5e:99:e3:a5",
         "source.port": 302,
         "tags": [
@@ -7687,9 +7335,7 @@
         "@timestamp": "2019-08-07T06:01:23.000Z",
         "destination.bytes": 3936,
         "destination.geo.country_name": "tio",
-        "destination.ip": [
-            "10.81.58.91"
-        ],
+        "destination.ip": "10.81.58.91",
         "destination.nat.ip": "10.204.98.238",
         "destination.nat.port": 3885,
         "destination.port": 2247,
@@ -7742,9 +7388,7 @@
         "service.type": "fortinet",
         "source.bytes": 2498,
         "source.geo.country_name": "roide",
-        "source.ip": [
-            "10.9.41.221"
-        ],
+        "source.ip": "10.9.41.221",
         "source.port": 4010,
         "tags": [
             "fortinet.fortimanager",
@@ -7803,9 +7447,7 @@
         "@timestamp": "2019-09-05T08:06:31.000Z",
         "destination.bytes": 11,
         "destination.geo.country_name": "mollita",
-        "destination.ip": [
-            "10.37.120.29"
-        ],
+        "destination.ip": "10.37.120.29",
         "destination.nat.ip": "10.212.208.70",
         "destination.nat.port": 3237,
         "destination.port": 4170,
@@ -7858,9 +7500,7 @@
         "service.type": "fortinet",
         "source.bytes": 5330,
         "source.geo.country_name": "nos",
-        "source.ip": [
-            "10.35.84.125"
-        ],
+        "source.ip": "10.35.84.125",
         "source.port": 341,
         "tags": [
             "fortinet.fortimanager",
@@ -7871,9 +7511,7 @@
         "@timestamp": "2019-09-19T03:09:05.000Z",
         "destination.bytes": 7419,
         "destination.geo.country_name": "ullamcor",
-        "destination.ip": [
-            "10.199.201.26"
-        ],
+        "destination.ip": "10.199.201.26",
         "destination.nat.ip": "10.207.207.106",
         "destination.nat.port": 2048,
         "destination.port": 3770,
@@ -7926,9 +7564,7 @@
         "service.type": "fortinet",
         "source.bytes": 6896,
         "source.geo.country_name": "oquisqu",
-        "source.ip": [
-            "10.143.65.84"
-        ],
+        "source.ip": "10.143.65.84",
         "source.port": 2670,
         "tags": [
             "fortinet.fortimanager",
@@ -7939,9 +7575,7 @@
         "@timestamp": "2019-10-03T10:11:40.000Z",
         "destination.bytes": 3702,
         "destination.geo.country_name": "rrorsi",
-        "destination.ip": [
-            "10.163.236.253"
-        ],
+        "destination.ip": "10.163.236.253",
         "destination.nat.ip": "10.41.61.88",
         "destination.nat.port": 426,
         "destination.port": 7768,
@@ -7994,9 +7628,7 @@
         "service.type": "fortinet",
         "source.bytes": 525,
         "source.geo.country_name": "sunt",
-        "source.ip": [
-            "10.204.27.48"
-        ],
+        "source.ip": "10.204.27.48",
         "source.port": 5998,
         "tags": [
             "fortinet.fortimanager",
@@ -8007,9 +7639,7 @@
         "@timestamp": "2019-10-18T05:14:14.000Z",
         "destination.bytes": 5239,
         "destination.geo.country_name": "ation",
-        "destination.ip": [
-            "10.185.44.26"
-        ],
+        "destination.ip": "10.185.44.26",
         "destination.nat.ip": "10.53.110.111",
         "destination.nat.port": 2549,
         "destination.port": 3193,
@@ -8062,9 +7692,7 @@
         "service.type": "fortinet",
         "source.bytes": 5569,
         "source.geo.country_name": "aquei",
-        "source.ip": [
-            "10.246.81.164"
-        ],
+        "source.ip": "10.246.81.164",
         "source.port": 3453,
         "tags": [
             "fortinet.fortimanager",
@@ -8074,9 +7702,7 @@
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
         "destination.bytes": 4334,
-        "destination.ip": [
-            "10.146.77.206"
-        ],
+        "destination.ip": "10.146.77.206",
         "destination.port": 1554,
         "event.action": "allow",
         "event.code": "veli",
@@ -8153,9 +7779,7 @@
         "service.type": "fortinet",
         "source.bytes": 4763,
         "source.geo.country_name": "iaecon",
-        "source.ip": [
-            "10.109.172.90"
-        ],
+        "source.ip": "10.109.172.90",
         "source.mac": "01:00:5e:7b:68:0e",
         "source.port": 2785,
         "tags": [
@@ -8177,9 +7801,7 @@
     {
         "@timestamp": "2019-11-15T07:19:22.000Z",
         "destination.bytes": 6464,
-        "destination.ip": [
-            "10.202.250.141"
-        ],
+        "destination.ip": "10.202.250.141",
         "destination.port": 1824,
         "event.action": "allow",
         "event.code": "ern",
@@ -8255,9 +7877,7 @@
         "service.type": "fortinet",
         "source.bytes": 1061,
         "source.geo.country_name": "ameaque",
-        "source.ip": [
-            "10.38.18.72"
-        ],
+        "source.ip": "10.38.18.72",
         "source.mac": "01:00:5e:09:8f:0e",
         "source.port": 3177,
         "tags": [
@@ -8279,9 +7899,7 @@
     {
         "@timestamp": "2019-11-30T14:21:57.000Z",
         "destination.bytes": 4714,
-        "destination.ip": [
-            "10.139.144.75"
-        ],
+        "destination.ip": "10.139.144.75",
         "destination.port": 5037,
         "event.action": "block",
         "event.code": "rchitec",
@@ -8357,9 +7975,7 @@
         "service.type": "fortinet",
         "source.bytes": 7043,
         "source.geo.country_name": "turQuisa",
-        "source.ip": [
-            "10.182.124.88"
-        ],
+        "source.ip": "10.182.124.88",
         "source.mac": "01:00:5e:73:ca:c1",
         "source.port": 116,
         "tags": [
@@ -8381,9 +7997,7 @@
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
         "destination.bytes": 568,
-        "destination.ip": [
-            "10.188.124.185"
-        ],
+        "destination.ip": "10.188.124.185",
         "destination.port": 5837,
         "event.action": "block",
         "event.code": "tate",
@@ -8459,9 +8073,7 @@
         "service.type": "fortinet",
         "source.bytes": 2693,
         "source.geo.country_name": "emaccus",
-        "source.ip": [
-            "10.35.10.19"
-        ],
+        "source.ip": "10.35.10.19",
         "source.mac": "01:00:5e:df:96:27",
         "source.port": 3941,
         "tags": [

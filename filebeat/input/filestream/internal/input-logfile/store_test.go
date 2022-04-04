@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint: errcheck // Some errors are not checked on tests/helper functions
 package input_logfile
 
 import (
@@ -30,11 +31,26 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/go-concert/unison"
 )
 
 type testStateStore struct {
 	Store    *statestore.Store
 	GCPeriod time.Duration
+}
+
+func TestResource_CopyInto(t *testing.T) {
+	src := resource{lock: unison.MakeMutex()}
+	dst := resource{lock: unison.MakeMutex()}
+	src.lock.Lock()
+	dst.lock.Lock()
+
+	src.copyInto(&dst)
+
+	require.NotPanics(t, func() {
+		src.lock.Unlock()
+		dst.lock.Unlock()
+	}, "perhaps `lock` field was replaced during the copy")
 }
 
 func TestStore_OpenClose(t *testing.T) {
@@ -202,7 +218,7 @@ func TestStore_UpdateTTL(t *testing.T) {
 
 		// create pending update operation
 		res := store.Get("test::key")
-		op, err := createUpdateOp(store, res, "test-state-update")
+		op, err := createUpdateOp(res, "test-state-update")
 		require.NoError(t, err)
 		defer op.done(1)
 
@@ -244,7 +260,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, nil, res.cursor)
-		require.Equal(t, nil, res.pendingCursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 10})
 
@@ -272,7 +289,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
@@ -296,18 +314,19 @@ func TestStore_ResetCursor(t *testing.T) {
 		}))
 		defer store.Release()
 
+		//nolint // Tests won't be refactored on this commit
 		res := store.Get("test::key")
 
 		// lock before creating a new update operation
 		res, err := lock(input.Context{}, store, "test::key")
 		require.NoError(t, err)
-		op, err := createUpdateOp(store, res, cur{Offset: 42})
+		op, err := createUpdateOp(res, cur{Offset: 42})
 		require.NoError(t, err)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
 		// try to update cursor after it has been reset
-		op.Execute(1)
+		op.Execute(store, 1)
 		releaseResource(res)
 
 		res = store.Get("test::key")
@@ -315,8 +334,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, uint(0), res.activeCursorOperations)
 		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursor)
-
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
 	})
 }
 
@@ -327,18 +346,18 @@ type testMeta struct {
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				TTL:  60 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
-			"test::key2": state{
+			"test::key2": {
 				TTL:  0 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
 			var m testMeta
@@ -348,27 +367,25 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			}
 			if m.IdentifierName == "method" {
 				return "test::key1::updated", testMeta{IdentifierName: "something"}
-
 			}
 			return "", nil
-
 		})
 
 		var newState state
 		s.persistentStore.Get("test::key1::updated", &newState)
 
 		want := map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				Updated: s.Get("test::key1").internalState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key2": state{
+			"test::key2": {
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key1::updated": state{
+			"test::key1::updated": {
 				Updated: newState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "something"},
@@ -379,30 +396,31 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	})
 }
 
+//nolint: dupl // Test code won't be refactored on this commit
 func TestSourceStore_CleanIf(t *testing.T) {
-	t.Run("entries are cleaned when funtion returns true", func(t *testing.T) {
+	t.Run("entries are cleaned when function returns true", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				TTL: 60 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				TTL: 0 * time.Second,
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.CleanIf(func(_ Value) bool {
 			return true
 		})
 
 		want := map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				Updated: s.Get("test::key1").internalState.Updated,
 				TTL:     0 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 			},
@@ -412,29 +430,29 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
 	})
 
-	t.Run("entries are left alone when funtion returns false", func(t *testing.T) {
+	t.Run("entries are left alone when function returns false", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				TTL: 60 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				TTL: 0 * time.Second,
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.CleanIf(func(v Value) bool {
 			return false
 		})
 
 		want := map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				Updated: s.Get("test::key1").internalState.Updated,
 				TTL:     60 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 			},
@@ -453,6 +471,7 @@ func closeStoreWith(fn func(s *store)) func() {
 	}
 }
 
+//nolint: unparam // It's a test helper
 func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
@@ -503,7 +522,6 @@ func (ts testStateStore) snapshot() map[string]state {
 		states[key] = st
 		return true, nil
 	})
-
 	if err != nil {
 		panic("unexpected decode error from persistent test store")
 	}
@@ -548,21 +566,11 @@ func storeInSyncSnapshot(store *store) map[string]state {
 // fails with Errorf if the state differ.
 //
 // Note: testify is too strict when comparing timestamp, better use checkEqualStoreState.
+//nolint: unparam // It's a test helper
 func checkEqualStoreState(t *testing.T, want, got map[string]state) bool {
+	t.Helper()
 	if d := cmp.Diff(want, got); d != "" {
 		t.Errorf("store state mismatch (-want +got):\n%s", d)
-		return false
-	}
-	return true
-}
-
-// requireEqualStoreState compares 2 store snapshot tables for equality. The test
-// fails with Fatalf if the state differ.
-//
-// Note: testify is too strict when comparing timestamp, better use checkEqualStoreState.
-func requireEqualStoreState(t *testing.T, want, got map[string]state) bool {
-	if d := cmp.Diff(want, got); d != "" {
-		t.Fatalf("store state mismatch (-want +got):\n%s", d)
 		return false
 	}
 	return true

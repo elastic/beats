@@ -1,0 +1,224 @@
+{
+    "attributes": {
+        "description": "System Processes",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "1",
+                    "w": 11,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "2",
+                    "w": 11,
+                    "x": 11,
+                    "y": 4
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3",
+                    "w": 11,
+                    "x": 22,
+                    "y": 4
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 38
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "search",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5",
+                    "w": 15,
+                    "x": 33,
+                    "y": 4
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7",
+                    "w": 24,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8",
+                    "w": 24,
+                    "x": 24,
+                    "y": 14
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Auditbeat System] Process Dashboard ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4c68f110-2863-11e9-97cb-474beda9f119-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "0db90830-27fd-11e9-89af-fd12d59dac90-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "b885dae0-27fd-11e9-89af-fd12d59dac90-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "0f9611b0-2862-11e9-97cb-474beda9f119-ecs",
+            "name": "4:panel_4",
+            "type": "search"
+        },
+        {
+            "id": "91708fd0-2862-11e9-97cb-474beda9f119-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "b1e2af00-2862-11e9-97cb-474beda9f119-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "f1d365a0-2862-11e9-97cb-474beda9f119-ecs",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "30936470-2863-11e9-97cb-474beda9f119-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
+            "name": "9:panel_9",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:36:04.954Z",
+    "version": "WzUwMzgsMV0="
+}

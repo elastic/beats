@@ -46,7 +46,6 @@
 
   - name: mapped_source_host
     type: keyword
-    default_field: false
     description: >
       The translated source host.
 
@@ -62,7 +61,6 @@
 
   - name: mapped_destination_host
     type: keyword
-    default_field: false
     description: >
       The translated destination host.
 
@@ -100,90 +98,90 @@
 
   - name: connection_type
     type: keyword
-    default_field: false
     description: >
       The VPN connection type
 
   - name: dap_records
-    default_field: false
     type: keyword
     description: >
       The assigned DAP records
 
   - name: command_line_arguments
-    default_field: false
     type: keyword
     description: >
       The command line arguments logged by the local audit log
 
   - name: assigned_ip
-    default_field: false
     type: ip
     description: >
       The IP address assigned to a VPN client successfully connecting
 
   - name: privilege.old
-    default_field: false
     type: keyword
     description: >
       When a users privilege is changed this is the old value
 
   - name: privilege.new
-    default_field: false
     type: keyword
     description: >
       When a users privilege is changed this is the new value
 
   - name: burst.object
-    default_field: false
     type: keyword
     description: >
       The related object for burst warnings
 
   - name: burst.id
-    default_field: false
     type: keyword
     description: >
       The related rate ID for burst warnings
 
   - name: burst.current_rate
-    default_field: false
     type: keyword
     description: >
       The current burst rate seen
 
   - name: burst.configured_rate
-    default_field: false
     type: keyword
     description: >
       The current configured burst rate
 
   - name: burst.avg_rate
-    default_field: false
     type: keyword
     description: >
       The current average burst rate seen
 
   - name: burst.configured_avg_rate
-    default_field: false
     type: keyword
     description: >
       The current configured average burst rate allowed
 
   - name: burst.cumulative_count
-    default_field: false
     type: keyword
     description: >
       The total count of burst rate hits since the object was created or cleared
 
   - name: termination_user
-    default_field: false
     type: keyword
     description: >
       AAA name of user requesting termination
 
   - name: webvpn.group_name
     type: keyword
-    default_field: false
     description: >
       The WebVPN group name the user belongs to
+
+  - name: termination_initiator
+    type: keyword
+    description: >
+      Interface name of the side that initiated the teardown
+
+  - name: tunnel_type
+    type: keyword
+    description: >
+      SA type (remote access or L2L)
+
+  - name: session_type
+    type: keyword
+    description: >
+      Session type (for example, IPsec or UDP)

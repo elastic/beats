@@ -1,0 +1,101 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": "Flow Records [Filebeat Netflow]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 100": "rgb(0,104,55)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Flow Records"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "fontSize": "32",
+                "gauge": {
+                    "autoExtend": false,
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 100
+                        }
+                    ],
+                    "gaugeColorMode": "None",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Metric",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": false,
+                    "scale": {
+                        "color": "#333",
+                        "labels": false,
+                        "show": false,
+                        "width": 2
+                    },
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": "36",
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "type": "simple",
+                    "useRange": false,
+                    "verticalSplit": false
+                },
+                "handleNoResults": true,
+                "type": "gauge"
+            },
+            "title": "Flow Records [Filebeat Netflow]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c27c6a3b-93ee-44d5-8d0c-9b097e575f52",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:45.451Z",
+    "version": "WzQ4MTIsMV0="
+}

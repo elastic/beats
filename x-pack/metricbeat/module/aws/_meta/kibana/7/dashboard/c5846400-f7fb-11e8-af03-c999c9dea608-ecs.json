@@ -1,0 +1,211 @@
+{
+    "attributes": {
+        "description": "Overview of AWS EC2 Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 16
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "DiskIO Write Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "5",
+                    "w": 18,
+                    "x": 6,
+                    "y": 11
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Status Check",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "11",
+                    "w": 24,
+                    "x": 0,
+                    "y": 31
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "title": "Network In Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "12",
+                    "w": 24,
+                    "x": 24,
+                    "y": 31
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "title": "Network Out Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "15",
+                    "w": 24,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "title": "DiskIO Read Bytes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "17",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "title": "CPU Utilization",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "18",
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "19",
+                    "w": 18,
+                    "x": 6,
+                    "y": 0
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "title": "Instance State",
+                "type": "visualization",
+                "version": "7.9.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] EC2 Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c5846400-f7fb-11e8-af03-c999c9dea608-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "fed59380-f7f8-11e8-af03-c999c9dea608-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "15818fd0-f7f9-11e8-af03-c999c9dea608-ecs",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "233b3400-f7f9-11e8-af03-c999c9dea608-ecs",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608-ecs",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "be8828d0-f7f6-11e8-af03-c999c9dea608-ecs",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "09db13f0-2bdd-11e9-9fe1-cde861544141",
+            "name": "19:panel_19",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:28.616Z",
+    "version": "WzMzNDQsMV0="
+}

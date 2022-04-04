@@ -1,0 +1,114 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Available pods [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "508ffb30-30d5-11e7-8df8-6d3604a72912"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "674d83b0-30d5-11e7-8df8-6d3604a72912"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:kubernetes AND metricset.name:state_deployment"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "50f9b980-30d5-11e7-8df8-6d3604a72912"
+                    }
+                ],
+                "gauge_inner_width": "10",
+                "gauge_max": "5",
+                "gauge_style": "half",
+                "gauge_width": "10",
+                "hide_last_value_indicator": true,
+                "id": "2fe9d3b0-30d5-11e7-8df8-6d3604a72912",
+                "index_pattern": "metricbeat-*",
+                "interval": "2m",
+                "isModelInvalid": false,
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "",
+                        "id": "2fe9d3b1-30d5-11e7-8df8-6d3604a72912",
+                        "label": "Available Pods",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "kubernetes.deployment.replicas.available",
+                                "id": "54cf79a0-30d5-11e7-8df8-6d3604a72912",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "top_hit"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "ca293350-a6b2-11ec-806f-0d8163a9ab5c",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "series_interval": "10s",
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": [
+                            "kubernetes.deployment.name",
+                            "kubernetes.namespace"
+                        ],
+                        "terms_size": "10000",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "last_value",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Available pods [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3-ecs",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-03-24T09:58:56.469Z",
+    "version": "Wzc3OTAsM10="
+}

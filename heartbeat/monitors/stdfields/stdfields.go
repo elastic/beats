@@ -18,16 +18,12 @@
 package stdfields
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
-
-// ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
-var ErrPluginDisabled = errors.New("monitor not loaded, plugin is disabled")
 
 type ServiceFields struct {
 	Name string `config:"name"`
@@ -49,7 +45,7 @@ func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 	mpi := StdMonitorFields{Enabled: true}
 
 	if err := config.Unpack(&mpi); err != nil {
-		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
+		return mpi, fmt.Errorf("error unpacking monitor plugin config: %w", err)
 	}
 
 	// Use `service_name` if `service.name` is unspecified
@@ -58,10 +54,6 @@ func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 		if mpi.Service.Name == "" {
 			mpi.Service.Name = mpi.LegacyServiceName
 		}
-	}
-
-	if !mpi.Enabled {
-		return mpi, ErrPluginDisabled
 	}
 
 	return mpi, nil

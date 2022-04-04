@@ -1,114 +1,129 @@
+---
 description: Pipeline for parsing Abuse.ch URL Threat Intel
 processors:
+  ####################
+  # Event ECS fields #
+  ####################
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - set:
+      field: event.kind
+      value: enrichment
+  - set:
+      field: event.category
+      value: threat
+  - set:
+      field: event.type
+      value: indicator
 
-####################
-# Event ECS fields #
-####################
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- set:
-    field: event.kind
-    value: enrichment
-- set:
-    field: event.category
-    value: threat
-- set:
-    field: event.type
-    value: indicator
+  ######################
+  # General ECS fields #
+  ######################
+  - rename:
+      field: message
+      target_field: event.original
+      ignore_missing: true
+  - json:
+      field: event.original
+      target_field: abusech.url
+  - fingerprint:
+      fields:
+        - abusech.url.id
+      target_field: "_id"
 
-######################
-# General ECS fields #
-######################
-- rename:
-    field: json
-    target_field: threatintel.abuseurl
-    ignore_missing: true
+  #####################
+  # Threat ECS Fields #
+  #####################
+  - set:
+      field: threat.feed.name
+      value: "[Filebeat] AbuseCH URL"
+  - set:
+      field: threat.feed.dashboard_id
+      value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
+  - set:
+      field: threat.indicator.type
+      value: url
+  - date:
+      field: abusech.url.date_added
+      target_field: threat.indicator.first_seen
+      formats:
+        - "yyyy-MM-dd HH:mm:ss z"
+        - "yyyy-MM-dd HH:mm:ss Z"
+      if: "ctx.abusech?.url?.date_added != null"
+  - uri_parts:
+      field: abusech.url.url
+      target_field: threat.indicator.url
+      keep_original: true
+      remove_if_successful: true
+  - set:
+      field: threat.indicator.url.full
+      value: "{{{threat.indicator.url.original}}}"
+      ignore_empty_value: true
+  - rename:
+      field: abusech.url.urlhaus_reference
+      target_field: threat.indicator.reference
+      ignore_missing: true
 
-#####################
-# Threat ECS Fields #
-#####################
-- set:
-    field: threatintel.indicator.type
-    value: url
-- date:
-    field: threatintel.abuseurl.date_added
-    target_field: threatintel.indicator.first_seen
-    formats:
-      - "yyyy-MM-dd HH:mm:ss z"
-      - "yyyy-MM-dd HH:mm:ss Z"
-    if: "ctx?.threatintel?.abuseurl?.date_added != null"
-- uri_parts:
-    field: threatintel.abuseurl.url
-    target_field: threatintel.indicator.url
-    keep_original: true
-    remove_if_successful: true
-- set:
-    field: threatintel.indicator.url.full
-    value: '{{{threatintel.indicator.url.original}}}'
-    ignore_empty_value: true
-- rename:
-    field: threatintel.abuseurl.host
-    target_field: threatintel.indicator.domain
-    ignore_missing: true
-- rename:
-    field: threatintel.abuseurl.urlhaus_reference
-    target_field: event.reference
-    ignore_missing: true
+  # Host can be both IP addresses and domain names
+  - grok:
+      field: abusech.url.host
+      patterns:
+        - "(?:%{IP:threat.indicator.ip}|%{GREEDYDATA:threat.indicator.url.domain})"
+      ignore_failure: true
+  - rename:
+      field: abusech.url.reporter
+      target_field: threat.indicator.provider
+      ignore_missing: true
 
-# Host can be both IP addresses and domain names
-- grok:
-    field: threatintel.abuseurl.host
-    patterns:
-      - "(?:%{IP:threatintel.indicator.ip}|%{GREEDYDATA:threatintel.indicator.domain})"
-    ignore_failure: true
-- rename:
-    field: threatintel.abuseurl.reporter
-    target_field: threatintel.indicator.provider
-    ignore_missing: true
-
-######################
-# Cleanup processors #
-######################
-- set:
-    field: threatintel.indicator.type
-    value: unknown
-    if: ctx?.threatintel?.indicator?.type == null
-- convert:
-    field: threatintel.abuseurl.larted
-    type: boolean
-    ignore_missing: true
-- script:
-    lang: painless
-    if: ctx?.threatintel != null
-    source: |
-      void handleMap(Map map) {
-        for (def x : map.values()) {
-          if (x instanceof Map) {
-              handleMap(x);
-          } else if (x instanceof List) {
-              handleList(x);
-          }
-        }
-      map.values().removeIf(v -> v == null);
-      }
-      void handleList(List list) {
-        for (def x : list) {
+  ######################
+  # Cleanup processors #
+  ######################
+  - set:
+      field: threat.indicator.type
+      value: unknown
+      if: ctx?.threat?.indicator?.type == null
+  - convert:
+      field: abusech.url.larted
+      type: boolean
+      ignore_missing: true
+  - script:
+      lang: painless
+      if: ctx?.abusech != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
             if (x instanceof Map) {
                 handleMap(x);
             } else if (x instanceof List) {
                 handleList(x);
             }
+          }
+        map.values().removeIf(v -> v == null);
         }
-      }
-      handleMap(ctx);
-- remove:
-    field:
-    - threatintel.abuseurl.date_added
-    - threatintel.abuseurl.url
-    - message
-    ignore_missing: true
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
+  - remove:
+      field: event.original
+      if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      ignore_failure: true
+      ignore_missing: true
+  - remove:
+      field:
+        - abusech.url.date_added
+        - abusech.url.url
+        - abusech.url.host
+        - message
+      ignore_missing: true
 on_failure:
-- set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

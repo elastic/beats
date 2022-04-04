@@ -267,7 +267,7 @@ func TestNormalizeValue(t *testing.T) {
 	}
 
 	checkDelta := func(t *testing.T, a, b interface{}) {
-		assert.InDelta(t, a, float64(b.(Float)), 0.000001)
+		assert.InDelta(t, a, b, 0.000001)
 	}
 
 	var nilStringPtr *string
@@ -394,22 +394,6 @@ func TestMarshalUnmarshalArray(t *testing.T) {
 
 		assert.Equal(t, test.out, out, "Test case %v", i)
 	}
-}
-
-func TestMarshalFloatValues(t *testing.T) {
-	assert := assert.New(t)
-
-	var f float64
-
-	f = 5
-
-	a := MapStr{
-		"f": Float(f),
-	}
-
-	b, err := json.Marshal(a)
-	assert.Nil(err)
-	assert.Equal(string(b), "{\"f\":5.000000}")
 }
 
 func TestNormalizeTime(t *testing.T) {

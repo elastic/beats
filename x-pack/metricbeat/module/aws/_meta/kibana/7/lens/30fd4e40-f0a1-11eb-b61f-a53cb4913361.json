@@ -1,0 +1,147 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "94e6f698-4af3-4acd-a018-867330b4e0de": {
+                            "columnOrder": [
+                                "ba1bdf55-b2f8-4bb4-b78c-caab170367e0",
+                                "98b1c682-acf5-4331-8129-62177616a221",
+                                "c7534b00-fa2b-4633-84da-83d71de297f8",
+                                "c7534b00-fa2b-4633-84da-83d71de297f8X0"
+                            ],
+                            "columns": {
+                                "98b1c682-acf5-4331-8129-62177616a221": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                },
+                                "ba1bdf55-b2f8-4bb4-b78c-caab170367e0": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "c7534b00-fa2b-4633-84da-83d71de297f8": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Write IOPS (Count/Second)",
+                                    "operationType": "formula",
+                                    "params": {
+                                        "formula": "average(aws.rds.write.iops)",
+                                        "isFormulaBroken": false
+                                    },
+                                    "references": [
+                                        "c7534b00-fa2b-4633-84da-83d71de297f8X0"
+                                    ],
+                                    "scale": "ratio"
+                                },
+                                "c7534b00-fa2b-4633-84da-83d71de297f8X0": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Part of Write IOPS (Count/Second)",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.write.iops"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "c7534b00-fa2b-4633-84da-83d71de297f8"
+                        ],
+                        "layerId": "94e6f698-4af3-4acd-a018-867330b4e0de",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "98b1c682-acf5-4331-8129-62177616a221",
+                        "xAccessor": "ba1bdf55-b2f8-4bb4-b78c-caab170367e0"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                }
+            }
+        },
+        "title": "RDS Write IOPS [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "30fd4e40-f0a1-11eb-b61f-a53cb4913361",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-94e6f698-4af3-4acd-a018-867330b4e0de",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MTksMl0="
+}

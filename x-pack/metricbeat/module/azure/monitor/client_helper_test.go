@@ -10,19 +10,19 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
-func MockResource() resources.GenericResource {
+func MockResourceExpanded() resources.GenericResourceExpanded {
 	id := "123"
 	name := "resourceName"
 	location := "resourceLocation"
 	rType := "resourceType"
-	return resources.GenericResource{
+	return resources.GenericResourceExpanded{
 		ID:       &id,
 		Name:     &name,
 		Location: &location,
@@ -55,7 +55,7 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 }
 
 func TestMapMetric(t *testing.T) {
-	resource := MockResource()
+	resource := MockResourceExpanded()
 	metricDefinitions := insights.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
 	}
@@ -66,7 +66,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
-		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
+		metric, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.Error(t, err)
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
@@ -77,7 +77,7 @@ func TestMapMetric(t *testing.T) {
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"*"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
-		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
+		metrics, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
@@ -93,7 +93,7 @@ func TestMapMetric(t *testing.T) {
 		metricConfig.Name = []string{"TotalRequests", "Capacity"}
 		metricConfig.Aggregations = []string{"Average"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
-		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
+		metrics, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.NoError(t, err)
 
 		assert.True(t, len(metrics) > 0)

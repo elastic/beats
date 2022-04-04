@@ -23,11 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 func TestMonitorSample(t *testing.T) {
-	cpu := &Monitor{lastSample: CPUMetrics{}}
+	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: resolve.NewTestResolver("")}
 	s, err := cpu.Fetch()
 	if err != nil {
 		t.Fatal(err)
@@ -40,10 +41,10 @@ func TestMonitorSample(t *testing.T) {
 
 func TestCoresMonitorSample(t *testing.T) {
 
-	cpuMetrics, err := Get("")
+	cpuMetrics, err := Get(resolve.NewTestResolver(""))
 	assert.NoError(t, err, "error in Get()")
 
-	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}}
+	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: resolve.NewTestResolver("")}
 	sample, err := cores.FetchCores()
 	if err != nil {
 		t.Fatal(err)
@@ -94,14 +95,14 @@ func TestMetricsRounding(t *testing.T) {
 
 	sample := Metrics{
 		previousSample: CPU{
-			User: metrics.OptUintWith(10855311),
-			Sys:  metrics.OptUintWith(2021040),
-			Idle: metrics.OptUintWith(17657874),
+			User: opt.UintWith(10855311),
+			Sys:  opt.UintWith(2021040),
+			Idle: opt.UintWith(17657874),
 		},
 		currentSample: CPU{
-			User: metrics.OptUintWith(10855693),
-			Sys:  metrics.OptUintWith(2021058),
-			Idle: metrics.OptUintWith(17657876),
+			User: opt.UintWith(10855693),
+			Sys:  opt.UintWith(2021058),
+			Idle: opt.UintWith(17657876),
 		},
 	}
 
@@ -124,16 +125,16 @@ func TestMetricsPercentages(t *testing.T) {
 	const userTest, systemTest = 30., 70.
 
 	s0 := CPU{
-		User: metrics.OptUintWith(10000000),
-		Sys:  metrics.OptUintWith(10000000),
-		Idle: metrics.OptUintWith(20000000),
-		Nice: metrics.OptUintWith(0),
+		User: opt.UintWith(10000000),
+		Sys:  opt.UintWith(10000000),
+		Idle: opt.UintWith(20000000),
+		Nice: opt.UintWith(0),
 	}
 	s1 := CPU{
-		User: metrics.OptUintWith(s0.User.ValueOr(0) + uint64(userTest)),
-		Sys:  metrics.OptUintWith(s0.Sys.ValueOr(0) + uint64(systemTest)),
+		User: opt.UintWith(s0.User.ValueOr(0) + uint64(userTest)),
+		Sys:  opt.UintWith(s0.Sys.ValueOr(0) + uint64(systemTest)),
 		Idle: s0.Idle,
-		Nice: metrics.OptUintWith(0),
+		Nice: opt.UintWith(0),
 	}
 	sample := Metrics{
 		count:          numCores,

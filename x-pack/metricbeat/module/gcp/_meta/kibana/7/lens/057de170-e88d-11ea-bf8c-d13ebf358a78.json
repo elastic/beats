@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "4ca843af-63d7-46b9-a719-51a81eebf1f7": {
+                            "columnOrder": [
+                                "2477291e-9021-4eb2-9fce-8da1ee792c49",
+                                "10b91492-efef-490d-bc7a-c2074b2eae84"
+                            ],
+                            "columns": {
+                                "10b91492-efef-490d-bc7a-c2074b2eae84": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Maximum of gcp.billing.total",
+                                    "operationType": "max",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.billing.total"
+                                },
+                                "2477291e-9021-4eb2-9fce-8da1ee792c49": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Cost Per Project ID",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "10b91492-efef-490d-bc7a-c2074b2eae84",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.billing.project_id"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "2477291e-9021-4eb2-9fce-8da1ee792c49"
+                        ],
+                        "layerId": "4ca843af-63d7-46b9-a719-51a81eebf1f7",
+                        "legendDisplay": "default",
+                        "metric": "10b91492-efef-490d-bc7a-c2074b2eae84",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                    }
+                ],
+                "shape": "pie"
+            }
+        },
+        "title": "Cost Per Project ID [Metricbeat GCP]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "057de170-e88d-11ea-bf8c-d13ebf358a78",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-4ca843af-63d7-46b9-a719-51a81eebf1f7",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NzAsMV0="
+}

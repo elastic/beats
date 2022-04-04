@@ -1,6 +1,5 @@
 - name: mysql
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek MySQL log.
   fields:

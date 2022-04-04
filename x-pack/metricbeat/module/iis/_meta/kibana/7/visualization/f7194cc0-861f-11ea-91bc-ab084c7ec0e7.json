@@ -1,0 +1,71 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Application Pool Private Bytes [Metricbeat IIS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "c9fd65d0-32e8-11ea-84f4-e9593f8ba8f6",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": "0",
+                        "formatter": "bytes",
+                        "id": "c9fd8ce0-32e8-11ea-84f4-e9593f8ba8f6",
+                        "label": "Private Bytes",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "iis.application_pool.process.private_bytes",
+                                "id": "c9fd8ce1-32e8-11ea-84f4-e9593f8ba8f6",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "iis.application_pool.name",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Application Pool Private Bytes [Metricbeat IIS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f7194cc0-861f-11ea-91bc-ab084c7ec0e7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:28.083Z",
+    "version": "WzM5MTYsMV0="
+}

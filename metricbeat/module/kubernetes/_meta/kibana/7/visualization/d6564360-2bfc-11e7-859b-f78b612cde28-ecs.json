@@ -1,0 +1,134 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Memory usage by node  [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "12c1f2f0-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "0d5c6b10-2bf2-11e7-859b-f78b612cde28",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "0d5c9220-2bf2-11e7-859b-f78b612cde28",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.container.memory.usage.bytes",
+                                "id": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                                "id": "9f0cf900-1ffb-11e8-81f2-43be86397500",
+                                "type": "cumulative_sum"
+                            },
+                            {
+                                "field": "9f0cf900-1ffb-11e8-81f2-43be86397500",
+                                "id": "a926e130-1ffb-11e8-81f2-43be86397500",
+                                "type": "derivative",
+                                "unit": "10s"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.node.name",
+                        "terms_order_by": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
+                        "terms_size": "10000"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": "0",
+                        "formatter": "bytes",
+                        "hide_in_legend": 1,
+                        "id": "8ba3b270-31a7-11e7-84cc-096d2b38e6e5",
+                        "label": "Node capacity",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.node.memory.capacity.bytes",
+                                "id": "8ba3b271-31a7-11e7-84cc-096d2b38e6e5",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "8ba3b271-31a7-11e7-84cc-096d2b38e6e5",
+                                "id": "d1fb2670-1ffb-11e8-81f2-43be86397500",
+                                "type": "cumulative_sum"
+                            },
+                            {
+                                "field": "d1fb2670-1ffb-11e8-81f2-43be86397500",
+                                "id": "dc8b01f0-1ffb-11e8-81f2-43be86397500",
+                                "type": "derivative",
+                                "unit": "10s"
+                            }
+                        ],
+                        "point_size": "0",
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.node.name",
+                        "terms_order_by": "8ba3b271-31a7-11e7-84cc-096d2b38e6e5",
+                        "terms_size": "10000"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Memory usage by node  [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "d6564360-2bfc-11e7-859b-f78b612cde28-ecs",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-03-24T09:43:55.002Z",
+    "version": "WzYzNDIsM10="
+}

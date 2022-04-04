@@ -1,0 +1,132 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": {
+                                "query": "4799"
+                            },
+                            "type": "phrase",
+                            "value": "4799"
+                        },
+                        "query": {
+                            "match": {
+                                "event.code": {
+                                    "query": "4799",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Group Membership Enumeration  - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Group Membership Enumerated"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "metrics": [
+                        {
+                            "accessor": 0,
+                            "format": {
+                                "id": "number",
+                                "params": {}
+                            },
+                            "type": "vis_dimension"
+                        }
+                    ]
+                },
+                "metric": {
+                    "colorSchema": "Blues",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 500,
+                            "type": "range"
+                        },
+                        {
+                            "from": 500,
+                            "to": 20000
+                        },
+                        {
+                            "from": 20000,
+                            "to": 30000
+                        },
+                        {
+                            "from": 30000,
+                            "to": 40000
+                        }
+                    ],
+                    "invertColors": true,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "Labels",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": true,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Group Membership Enumeration  - Simple Metric [Winlogbeat Security]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "0f2f5280-feeb-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:55.318Z",
+    "version": "WzIyMTksMl0="
+}

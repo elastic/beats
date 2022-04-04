@@ -15,3 +15,5 @@ dashboards:
     file: Filebeat-threatintel-overview.json
   - id: 894dd3e0-df57-11eb-8f2b-753caedf727d
     file: Filebeat-threatintel-recordedfuture.json
+  - id: 3b605720-ff78-11eb-acb2-2960a7069ed1
+    file: Filebeat-threatintel-threatq.json

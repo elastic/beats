@@ -1,0 +1,74 @@
+{
+    "attributes": {
+        "description": "Total number of Anomali indicators ingested by the threat intel Filebeat module.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "41f41086-8875-4d18-8844-b51b9c9cb8bc": {
+                            "columnOrder": [
+                                "15a91057-d730-461d-8510-633a1205b462"
+                            ],
+                            "columns": {
+                                "15a91057-d730-461d-8510-633a1205b462": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Anomali Indicators",
+                                    "operationType": "count",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:(threatintel.anomalithreatstream or threatintel.anomali)"
+            },
+            "visualization": {
+                "accessor": "15a91057-d730-461d-8510-633a1205b462",
+                "layerId": "41f41086-8875-4d18-8844-b51b9c9cb8bc"
+            }
+        },
+        "title": "Anomali Indicators [Filebeat Threat Intel]",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9a61edc0-de93-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-41f41086-8875-4d18-8844-b51b9c9cb8bc",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1NzksMV0="
+}

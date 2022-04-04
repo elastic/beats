@@ -26,11 +26,10 @@ import (
 type stdSupport struct {
 	log *logp.Logger
 
-	mode        Mode
+	enabled     bool
 	overwrite   bool
 	checkExists bool
 
-	alias  Alias
 	policy Policy
 }
 
@@ -52,23 +51,20 @@ var defaultCacheDuration = 5 * time.Minute
 // NewStdSupport creates an instance of default ILM support implementation.
 func NewStdSupport(
 	log *logp.Logger,
-	mode Mode,
-	alias Alias,
+	enabled bool,
 	policy Policy,
 	overwrite, checkExists bool,
 ) Supporter {
 	return &stdSupport{
 		log:         log,
-		mode:        mode,
+		enabled:     enabled,
 		overwrite:   overwrite,
 		checkExists: checkExists,
-		alias:       alias,
 		policy:      policy,
 	}
 }
 
-func (s *stdSupport) Mode() Mode      { return s.mode }
-func (s *stdSupport) Alias() Alias    { return s.alias }
+func (s *stdSupport) Enabled() bool   { return s.enabled }
 func (s *stdSupport) Policy() Policy  { return s.policy }
 func (s *stdSupport) Overwrite() bool { return s.overwrite }
 
@@ -80,7 +76,7 @@ func (s *stdSupport) Manager(h ClientHandler) Manager {
 }
 
 func (m *stdManager) CheckEnabled() (bool, error) {
-	if m.mode == ModeDisabled {
+	if !m.enabled {
 		return false, nil
 	}
 
@@ -88,66 +84,28 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 		return m.cache.Enabled, nil
 	}
 
-	enabled, err := m.client.CheckILMEnabled(m.mode)
+	ilmEnabled, err := m.client.CheckILMEnabled(m.enabled)
 	if err != nil {
-		return enabled, err
+		return ilmEnabled, err
 	}
 
-	if !enabled && m.mode == ModeEnabled {
-		return false, errOf(ErrESILMDisabled)
-	}
-
-	m.cache.Enabled = enabled
+	m.cache.Enabled = ilmEnabled
 	m.cache.LastUpdate = time.Now()
-	return enabled, nil
-}
-
-func (m *stdManager) EnsureAlias() error {
-	log := m.log
-	overwrite := m.Overwrite()
-	name := m.alias.Name
-
-	var exists bool
-	if m.checkExists && !overwrite {
-		var err error
-		exists, err = m.client.HasAlias(name)
-		if err != nil {
-			return err
-		}
-	}
-
-	switch {
-	case exists && !overwrite:
-		log.Infof("Index Alias %v exists already.", name)
-		return nil
-
-	case !exists || overwrite:
-		err := m.client.CreateAlias(m.alias)
-		if err != nil {
-			if ErrReason(err) != ErrAliasAlreadyExists {
-				log.Errorf("Index Alias %v setup failed: %v.", name, err)
-				return err
-			}
-			log.Infof("Index Alias %v exists already.", name)
-			return nil
-		}
-
-		log.Infof("Index Alias %v successfully created.", name)
-		return nil
-
-	default:
-		m.log.Infof("ILM index alias not created: exists=%v, overwrite=%v", exists, overwrite)
-		return nil
-	}
+	return ilmEnabled, nil
 }
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
+	if !m.checkExists {
+		log.Infof("ILM policy is not checked as setup.ilm.check_exists is disabled")
+		return false, nil
+	}
+
 	overwrite = overwrite || m.Overwrite()
 	name := m.policy.Name
 
 	var exists bool
-	if m.checkExists && !overwrite {
+	if !overwrite {
 		var err error
 		exists, err = m.client.HasILMPolicy(name)
 		if err != nil {

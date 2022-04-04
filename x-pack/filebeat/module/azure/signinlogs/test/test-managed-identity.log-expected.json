@@ -1,0 +1,58 @@
+[
+    {
+        "@timestamp": "2021-01-23T20:44:29.768Z",
+        "azure.correlation_id": "22222222-92d0-4887-9ead-46258539a699",
+        "azure.resource.id": "/tenants/tenantId/providers/Microsoft.aadiam",
+        "azure.resource.provider": "Microsoft.aadiam",
+        "azure.signinlogs.category": "ManagedIdentitySignInLogs",
+        "azure.signinlogs.operation_name": "Sign-in activity",
+        "azure.signinlogs.operation_version": "1.0",
+        "azure.signinlogs.properties.app_id": "22222222-b540-4792-a2a2-81818990a95b",
+        "azure.signinlogs.properties.correlation_id": "22222222-92d0-4887-9ead-46258539a699",
+        "azure.signinlogs.properties.created_at": "2021-01-23T20:44:29.7688982+00:00",
+        "azure.signinlogs.properties.flagged_for_review": false,
+        "azure.signinlogs.properties.id": "22222222-0b57-4b77-bf1a-317a88591a00",
+        "azure.signinlogs.properties.is_interactive": false,
+        "azure.signinlogs.properties.processing_time_ms": 0,
+        "azure.signinlogs.properties.resource_display_name": "Windows Azure Service Management API",
+        "azure.signinlogs.properties.resource_id": "22222222-ba00-4fd7-ba43-dac1f8f63013",
+        "azure.signinlogs.properties.risk_detail": "none",
+        "azure.signinlogs.properties.risk_level_aggregated": "low",
+        "azure.signinlogs.properties.risk_level_during_signin": "low",
+        "azure.signinlogs.properties.risk_state": "none",
+        "azure.signinlogs.properties.service_principal_id": "22222222-864d-4e00-9882-ff649530f186",
+        "azure.signinlogs.properties.service_principal_name": "ASC provisioning Dependency agent for Linux",
+        "azure.signinlogs.properties.status.error_code": 0,
+        "azure.signinlogs.properties.token_issuer_type": "AzureAD",
+        "azure.signinlogs.result_signature": "None",
+        "azure.signinlogs.result_type": "0",
+        "azure.tenant_id": "tenantId",
+        "cloud.provider": "azure",
+        "event.action": "Sign-in activity",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "azure.signinlogs",
+        "event.duration": 0,
+        "event.id": "22222222-0b57-4b77-bf1a-317a88591a00",
+        "event.kind": "event",
+        "event.module": "azure",
+        "event.original": "{\"Level\":4,\"category\":\"ManagedIdentitySignInLogs\",\"correlationId\":\"22222222-92d0-4887-9ead-46258539a699\",\"durationMs\":0,\"operationName\":\"Sign-in activity\",\"operationVersion\":\"1.0\",\"properties\":{\"appId\":\"22222222-b540-4792-a2a2-81818990a95b\",\"correlationId\":\"22222222-92d0-4887-9ead-46258539a699\",\"createdDateTime\":\"2021-01-23T20:44:29.7688982+00:00\",\"flaggedForReview\":false,\"id\":\"22222222-0b57-4b77-bf1a-317a88591a00\",\"ipAddress\":\"\",\"isInteractive\":false,\"location\":{\"city\":\"\",\"countryOrRegion\":\"\",\"geoCoordinates\":{\"latitude\":0,\"longitude\":0},\"state\":\"\"},\"processingTimeInMilliseconds\":0,\"resourceDisplayName\":\"Windows Azure Service Management API\",\"resourceId\":\"22222222-ba00-4fd7-ba43-dac1f8f63013\",\"riskDetail\":\"none\",\"riskLevelAggregated\":\"low\",\"riskLevelDuringSignIn\":\"low\",\"riskState\":\"none\",\"servicePrincipalId\":\"22222222-864d-4e00-9882-ff649530f186\",\"servicePrincipalName\":\"ASC provisioning Dependency agent for Linux\",\"status\":{\"errorCode\":0},\"tokenIssuerType\":\"AzureAD\",\"userId\":null},\"resourceId\":\"/tenants/tenantId/providers/Microsoft.aadiam\",\"resultSignature\":\"None\",\"resultType\":\"0\",\"tenantId\":\"tenantId\",\"time\":\"2021-01-23T20:44:29.7688982Z\"}",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "signinlogs",
+        "geo.city_name": "",
+        "geo.country_name": "",
+        "geo.location.lat": 0,
+        "geo.location.lon": 0,
+        "input.type": "log",
+        "log.level": "4",
+        "log.offset": 0,
+        "service.type": "azure",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]

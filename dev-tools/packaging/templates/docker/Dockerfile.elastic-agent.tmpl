@@ -17,30 +17,73 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
     rm {{ $beatBinary }} && \
     ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
     chmod 0755 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
-{{- if .linux_capabilities }}
-    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
-{{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
+{{- end }}
+{{- if contains .image_name "-cloud" }}
+    mkdir -p /opt/filebeat /opt/metricbeat && \
+    tar xf {{ $beatHome }}/data/elastic-agent-*/downloads/metricbeat-*.tar.gz -C /opt/metricbeat --strip-components=1 && \
+    tar xf {{ $beatHome }}/data/elastic-agent-*/downloads/filebeat-*.tar.gz -C /opt/filebeat --strip-components=1 && \
 {{- end }}
     true
 
 FROM {{ .from }}
 
+ENV BEAT_SETUID_AS={{ .user }}
+
 {{- if contains .from "ubi-minimal" }}
-RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils jq &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
+RUN for iter in {1..10}; do microdnf update -y && microdnf install -y findutils shadow-utils && microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 {{- else }}
-# Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
-RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
-    for iter in {1..10}; do \
-        yum update -y $YUM_FLAGS && \
-        yum install -y epel-release &&  \
-        yum update -y $YUM_FLAGS && \
-        yum install -y jq && \
-        yum clean all && \
-        exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \
+
+RUN for iter in {1..10}; do \
+        apt-get update -y && \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
+        apt-get clean all && \
+        exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \
     (exit $exit_code)
+{{- end }}
+
+{{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal"))) }}
+RUN apt-get update -y && \
+    for iter in {1..10}; do \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
+        libglib2.0-0\
+        libnss3\
+        libnspr4\
+        libatk1.0-0\
+        libatk-bridge2.0-0\
+        libcups2\
+        libdrm2\
+        libdbus-1-3\
+        libxcb1\
+        libxkbcommon0\
+        libx11-6\
+        libxcomposite1\
+        libxdamage1\
+        libxext6\
+        libxfixes3\
+        libxrandr2\
+        libgbm1\
+        libpango-1.0-0\
+        libcairo2\
+        libasound2\
+        libatspi2.0-0\
+        libxshmfence1 \
+        fonts-noto-core\
+        fonts-noto-cjk &&\
+        apt-get clean all && \
+        exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
+ENV NODE_PATH={{ $beatHome }}/.node
+RUN echo \
+    $NODE_PATH \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/.synthetics \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
 {{- end }}
 
 LABEL \
@@ -109,11 +152,65 @@ RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
-{{- if ne .user "root" }}
+{{- if contains .image_name "-cloud" }}
+COPY --from=home /opt /opt
+{{- end }}
+
+{{- if .linux_capabilities }}
+# Since the beat is stored at the other end of a symlink we must follow the symlink first
+# For security reasons setcap does not support symlinks. This is smart in the general case
+# but in our specific case since we're building a trusted image from trusted binaries this is
+# fine. Thus, we use readlink to follow the link and setcap on the actual binary
+RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
+{{- end }}
+
+{{- if eq .user "root" }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+{{- end }}
+{{- else }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
+{{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
+RUN chown {{ .user }} $NODE_PATH
+{{- end }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+RUN chown {{ .user }} /app
+{{- end }}
 {{- end }}
 USER {{ .user }}
+
+{{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
+# Setup synthetics env vars
+ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV SUITES_DIR={{ $beatHome }}/suites
+ENV NODE_VERSION=14.17.5
+ENV PATH="$NODE_PATH/node/bin:$PATH"
+# Install the latest version of @elastic/synthetics forcefully ignoring the previously
+# cached node_modules, heartbeat then calls the global executable to run test suites
+# Setup node
+RUN cd {{$beatHome}}/.node \
+  && NODE_DOWNLOAD_URL="" \
+  && case "$(arch)" in \
+       x86_64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
+           ;; \
+       aarch64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
+           ;; \
+       *) \
+           echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+           ;; \
+     esac \
+  && mkdir -p node \
+  && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
+  && chmod ug+rwX -R $NODE_PATH \
+  && npm i -g -f @elastic/synthetics && chmod ug+rwX -R $NODE_PATH
+{{- end }}
+
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
@@ -125,4 +222,14 @@ EXPOSE {{ $port }}
 ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 
 WORKDIR {{ $beatHome }}
+
+{{- if contains .image_name "-cloud" }}
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["/app/apm.sh"]
+# Generate a stub command that will be overwritten at runtime
+RUN echo -e '#!/bin/sh\nexec /usr/local/bin/docker-entrypoint' > /app/apm.sh && \
+    chmod 0555 /app/apm.sh
+{{- else }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
+{{- end }}
+

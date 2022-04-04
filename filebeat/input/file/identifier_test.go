@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !windows
 // +build !windows
 
 package file
@@ -39,11 +40,11 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states poiting to the same file": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
@@ -52,11 +53,11 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 2, Device: 1},
 				},
@@ -83,11 +84,11 @@ func TestPathIdentifier(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states poiting to the same file": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
@@ -96,11 +97,11 @@ func TestPathIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 2, Device: 1},
 				},
@@ -126,11 +127,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states poiting to the same file i.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
@@ -139,11 +140,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 		},
 		"two states poiting to the same file ii.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 2},
 				},
@@ -152,11 +153,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files i.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 2, Device: 1},
 				},
@@ -165,11 +166,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files ii.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 2, Device: 3},
 				},

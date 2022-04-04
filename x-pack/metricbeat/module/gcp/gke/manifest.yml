@@ -1,0 +1,49 @@
+default: true
+input:
+  module: gcp
+  metricset: metrics
+  defaults:
+    metrics:
+    - service: gke
+      service_metric_prefix: kubernetes.io/
+      metric_types:
+      - "container/cpu/core_usage_time"
+      - "container/cpu/limit_cores"
+      - "container/cpu/limit_utilization"
+      - "container/cpu/request_cores"
+      - "container/cpu/request_utilization"
+      - "container/ephemeral_storage/limit_bytes"
+      - "container/ephemeral_storage/request_bytes"
+      - "container/ephemeral_storage/used_bytes"
+      - "container/memory/limit_bytes"
+      - "container/memory/limit_utilization"
+      - "container/memory/page_fault_count"
+      - "container/memory/request_bytes"
+      - "container/memory/request_utilization"
+      - "container/memory/used_bytes"
+      - "container/restart_count"
+      - "container/uptime"
+      - "node/cpu/allocatable_cores"
+      - "node/cpu/allocatable_utilization"
+      - "node/cpu/core_usage_time"
+      - "node/cpu/total_cores"
+      - "node/ephemeral_storage/allocatable_bytes"
+      - "node/ephemeral_storage/inodes_free"
+      - "node/ephemeral_storage/inodes_total"
+      - "node/ephemeral_storage/total_bytes"
+      - "node/ephemeral_storage/used_bytes"
+      - "node/memory/allocatable_bytes"
+      - "node/memory/allocatable_utilization"
+      - "node/memory/total_bytes"
+      - "node/memory/used_bytes"
+      - "node/network/received_bytes_count"
+      - "node/network/sent_bytes_count"
+      - "node/pid_limit"
+      - "node/pid_used"
+      - "node_daemon/cpu/core_usage_time"
+      - "node_daemon/memory/used_bytes"
+      - "pod/network/received_bytes_count"
+      - "pod/network/sent_bytes_count"
+      - "pod/volume/total_bytes"
+      - "pod/volume/used_bytes"
+      - "pod/volume/utilization"

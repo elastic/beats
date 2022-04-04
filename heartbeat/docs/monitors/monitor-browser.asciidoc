@@ -4,9 +4,14 @@
 TIP: Want to get started with synthetic monitoring?
 See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 
-The options described here configure {beatname_uc} to run the synthetic
+beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test suites via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>.
+
+Browser based monitors can only be run in our {beatname_uc} docker image,
+or via the `elastic-agent-complete` docker image.
+For more information, see {observability-guide}/synthetics-quickstart.html[Synthetic monitoring using Docker].
+
 Example configuration:
 
 [source,yaml]
@@ -65,6 +70,7 @@ Under `zip_url`, specify these options:
 located in the repository.
 *`username`*:: The username for authenticating with the zip endpoint. This setting is optional.
 *`password`*:: The password for authenticating with the zip endpoint. This setting is optional.
+*`ssl`*:: SSL options applied to downloading the zip, not the browser. See <<configuration-ssl>> for more details.
 
 If `username` and `password` are provided, they will be sent as HTTP Basic Authentication
 headers to the remote zip endpoint.
@@ -83,8 +89,10 @@ Example configuration:
       folder: "examples/todos"
       username: ""
       password: ""
+      # ssl options apply to downloading the zip, not the browser
+      #ssl:
+      #  certificate_authorities: ['/etc/ca.crt']
 -------------------------------------------------------------------------------
-
 
 [float]
 [[monitor-source-local]]
@@ -106,17 +114,28 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 [float]
-[[monitor-browser-sandbox]]
-==== `sandbox`
+[[monitor-browser-params]]
+==== `params`
 
-Set this option to `true` to enable the normally disabled chromium sandbox. Defaults to false.
+Set this option to add user defined parameters for your scripts. This value takes
+arbitrary YAML that is then converted to JSON which is then passed into synthetics
+via the `--params` option. See {observability-guide}/synthetics-params-secrets.html[Working with Params]
+for more information.
 
-[float]
-[[monitor-browser-synthetics-args]]
-==== `synthetics_args`
+Example:
 
-Extra arguments to pass to the synthetics agent package. Takes a list of
-strings.
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  source: # Omitted in this example for brevity
+  params:
+    root_url: http://example.net
+    my_custom_object:
+      a_key: ["a value"]
+-------------------------------------------------------------------------------
 
 [float]
 [[monitor-browser-screenshots]]
@@ -145,3 +164,79 @@ Example configuration:
       path: "/path/to/synthetics/journeys"
 -------------------------------------------------------------------------------
 
+[float]
+[[monitor-browser-ignore-https-errors]]
+==== `ignore_https_errors`
+
+Set this option to `true` to disable TLS/SSL validation in the synthetics browser. This is useful for testing
+sites that use self-signed certs. This option can also be used to test certs from non-standard CAs,
+though you will no longer get errors if there is anything wrong with the certificate.
+
+
+[float]
+[[monitor-browser-sandbox]]
+==== `sandbox`
+
+Set this option to `true` to enable the normally disabled chromium sandbox.
+Defaults to false.
+
+[float]
+[[monitor-browser-throttling]]
+==== `throttling`
+
+Set this option to control the network throttling. By default, all journeys are
+run with 5Mbps download, 3Mbps upload and 20ms latency which emulates a standard
+Cable connection.
+
+Users can control the throttling parameters, Below is an example of emulating a
+3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  schedule: '@every 1m'
+  throttling: "1.6d/0.75u/150l"
+-------------------------------------------------------------------------------
+
+Network throttling can be completely disabled by passing `false`
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  schedule: '@every 1m'
+  throttling: false
+-------------------------------------------------------------------------------
+
+
+[float]
+[[monitor-browser-filter-journeys]]
+==== `filter_journeys`
+
+Set this option to filter journeys based on journey tags and names.
+
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  filter_journeys:
+    tags: ["browse", "checkout"]
+    match: "login*"
+  source:
+    local:
+      path: "/path/to/synthetics/journeys"
+-------------------------------------------------------------------------------
+
+*`tags`*:: run only journeys with the given tag(s), or globs
+*`match`*:: run only journeys with a name or tags that matches the configured glob
+
+[float]
+[[monitor-browser-synthetics-args]]
+==== `synthetics_args`
+
+Extra arguments to pass to the synthetics agent package. Takes a list of
+strings.

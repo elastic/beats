@@ -1,0 +1,130 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e6ccc957-e33e-4fb3-956e-746522e233ef": {
+                            "columnOrder": [
+                                "4d571997-8dea-491a-b508-6317613db7ac",
+                                "5f3cdc7f-367e-4214-9d88-ee5a27f4d4e4",
+                                "a5d75ee3-a37b-4f64-ab88-701d651a1b24"
+                            ],
+                            "columns": {
+                                "4d571997-8dea-491a-b508-6317613db7ac": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "a5d75ee3-a37b-4f64-ab88-701d651a1b24",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                },
+                                "5f3cdc7f-367e-4214-9d88-ee5a27f4d4e4": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "a5d75ee3-a37b-4f64-ab88-701d651a1b24": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Average of aws.rds.database_connections",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.database_connections"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "a5d75ee3-a37b-4f64-ab88-701d651a1b24"
+                        ],
+                        "layerId": "e6ccc957-e33e-4fb3-956e-746522e233ef",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "4d571997-8dea-491a-b508-6317613db7ac",
+                        "xAccessor": "5f3cdc7f-367e-4214-9d88-ee5a27f4d4e4"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                }
+            }
+        },
+        "title": "RDS Database Connections [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "be8d8d30-09ae-11ec-8d29-f3a1bb757c14",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e6ccc957-e33e-4fb3-956e-746522e233ef",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-30T16:30:52.205Z",
+    "version": "WzEyMTIyLDJd"
+}

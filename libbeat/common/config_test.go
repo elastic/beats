@@ -78,6 +78,28 @@ func TestConfigPrintDebug(t *testing.T) {
 `,
 		},
 		{
+			"config selector redacts authorization headers",
+			"config",
+			map[string]interface{}{
+				"config": map[string]interface{}{
+					"headers": map[string]interface{}{
+						"Authorization": "secret1",
+						"authorization": "secret2",
+					},
+				},
+			},
+			`test:
+{
+  "config": {
+    "headers": {
+      "Authorization": "xxxxx",
+      "authorization": "xxxxx"
+    }
+  }
+}
+`,
+		},
+		{
 			"config-with-passwords does not redact",
 			"config-with-passwords",
 			map[string]interface{}{

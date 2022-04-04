@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -28,6 +29,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
+
+	"math/rand"
+
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -44,10 +49,10 @@ const (
 // Reader will contain the config options
 type Reader struct {
 	query    pdh.Query    // PDH Query
-	executed bool         // Indicates if the query has been executed.
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
 	counters []PerfCounter
+	event    windows.Handle
 }
 
 type PerfCounter struct {
@@ -67,13 +72,18 @@ func NewReader(config Config) (*Reader, error) {
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
+	event, err := windows.CreateEvent(nil, 0, 0, nil)
+	if err != nil {
+		return nil, err
+	}
 	r := &Reader{
 		query:  query,
 		log:    logp.NewLogger("perfmon"),
 		config: config,
+		event:  event,
 	}
 	r.mapCounters(config)
-	_, err := r.getCounterPaths()
+	_, err = r.getCounterPaths()
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +118,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	}
 
 	// Get the values.
-	values, err := re.query.GetFormattedCounterValues()
+	values, err := re.getValues()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
@@ -120,12 +130,46 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	} else {
 		events = re.groupToEvents(values)
 	}
-	re.executed = true
 	return events, nil
+}
+
+func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
+	var val map[string][]pdh.CounterValue
+	var sec uint32 = 1
+	err := re.query.CollectDataEx(sec, re.event)
+	if err != nil {
+		return nil, err
+	}
+	waitFor, err := windows.WaitForSingleObject(re.event, windows.INFINITE)
+	if err != nil {
+		return nil, err
+	}
+	switch waitFor {
+	case windows.WAIT_OBJECT_0:
+		val, err = re.query.GetFormattedCounterValues()
+		if err != nil {
+			return nil, err
+		}
+	case windows.WAIT_FAILED:
+		return nil, errors.New("WaitForSingleObject has failed")
+	default:
+		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
+	}
+	return val, err
+}
+
+func randSeq(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
+	defer windows.CloseHandle(re.event)
 	return re.query.Close()
 }
 
@@ -175,18 +219,6 @@ func (re *Reader) getCounter(query string) (bool, PerfCounter) {
 
 func (re *Reader) mapCounters(config Config) {
 	re.counters = []PerfCounter{}
-	if len(config.Counters) > 0 {
-		for _, counter := range config.Counters {
-			re.counters = append(re.counters, PerfCounter{
-				InstanceField: counter.InstanceLabel,
-				InstanceName:  counter.InstanceName,
-				QueryField:    counter.MeasurementLabel,
-				QueryName:     counter.Query,
-				Format:        counter.Format,
-				ChildQueries:  nil,
-			})
-		}
-	}
 	if len(config.Queries) > 0 {
 		for _, query := range config.Queries {
 			for _, counter := range query.Counters {

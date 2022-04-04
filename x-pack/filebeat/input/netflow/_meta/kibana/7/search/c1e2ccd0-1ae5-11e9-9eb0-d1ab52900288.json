@@ -1,0 +1,80 @@
+{
+    "attributes": {
+        "columns": [
+            "source.ip",
+            "destination.ip",
+            "network.direction",
+            "network.transport",
+            "network.bytes"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.action",
+                            "negate": false,
+                            "params": {
+                                "query": "netflow_flow",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "netflow_flow"
+                        },
+                        "query": {
+                            "match": {
+                                "event.action": {
+                                    "query": "netflow_flow",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Network Flow Search [Filebeat]",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-09-06T13:06:21.081Z",
+    "version": "WzUyNzEsMV0="
+}

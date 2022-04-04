@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "columns": [
+            "log.level",
+            "logstash.slowlog.plugin_type",
+            "logstash.slowlog.plugin_name",
+            "logstash.slowlog.message",
+            "logstash.slowlog.plugin_params",
+            "logstash.slowlog.execution_time_ns"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "logstash",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "logstash"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "logstash",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "fileset.name",
+                            "negate": false,
+                            "params": {
+                                "query": "slowlog",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "slowlog"
+                        },
+                        "query": {
+                            "match": {
+                                "fileset.name": {
+                                    "query": "slowlog",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "log.level",
+                "asc"
+            ]
+        ],
+        "title": "Slow logs [Filebeat Logstash] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "742e45d0-cbdd-11e7-9852-73e0a9df1bb6-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:11.672Z",
+    "version": "WzQ0NDAsMV0="
+}

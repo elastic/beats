@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/osquerybeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -8,9 +8,9 @@ PYTHON_EXE?=python3
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 VENV_PARAMS?=
 FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
-GOLINT=golint
-GOLINT_REPO=golang.org/x/lint/golint
 XPACK_SUFFIX=x-pack/
+
+BEAT_VERSION=$(shell grep defaultBeatVersion libbeat/version/version.go | cut -d'=' -f2 | tr -d '" ')
 
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
@@ -102,6 +102,16 @@ check:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
+## check : Run some checks similar to what the default check validation runs in the CI.
+.PHONY: check-default
+check-default:
+	@$(MAKE) check-python
+	@echo "The update goal is skipped to speed up the checks in the CI on a PR basis."
+	@$(MAKE) notice
+	@$(MAKE) check-headers
+	@$(MAKE) check-go
+	@$(MAKE) check-no-changes
+
 ## ccheck-go : Check there is no changes in Go modules.
 .PHONY: check-go
 check-go:
@@ -118,8 +128,9 @@ check-no-changes:
 ## check-python : Python Linting.
 .PHONY: check-python
 check-python: python-env
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	@. $(PYTHON_ENV)/bin/activate; \
+	$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false); \
+	$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 
 ## check-headers : Check the license headers.
 .PHONY: check-headers
@@ -173,10 +184,11 @@ notice:
 ## python-env : Sets up the virtual python environment.
 .PHONY: python-env
 python-env:
-	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4
+	@test -f $(PYTHON_ENV)/bin/activate || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
+	@. $(PYTHON_ENV)/bin/activate; \
+	${PYTHON_EXE} -m pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4; \
+	find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
-	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
 ## test-apm : Tests if apm works with the current code
 .PHONY: test-apm
@@ -186,7 +198,7 @@ test-apm:
 ## get-version : Get the libbeat version
 .PHONY: get-version
 get-version:
-	@mage dumpVariables | grep 'beat_version' | cut -d"=" -f 2 | tr -d " "
+	@echo $(BEAT_VERSION)
 
 ### Packaging targets ####
 
@@ -218,3 +230,8 @@ release-manager-release:
 .PHONY: beats-dashboards
 beats-dashboards: mage update
 	@mage packageBeatDashboards
+
+## build/distributions/dependencies.csv : Generates the dependencies file
+build/distributions/dependencies.csv: $(PYTHON)
+	@mkdir -p build/distributions
+	$(PYTHON) dev-tools/dependencies-report --csv $@

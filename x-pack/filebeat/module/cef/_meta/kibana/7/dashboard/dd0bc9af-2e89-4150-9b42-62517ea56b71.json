@@ -1,0 +1,467 @@
+{
+    "attributes": {
+        "description": "Network data overview.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "lucene",
+                    "query": "*"
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 48,
+                    "x": 0,
+                    "y": 68
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 60
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "7",
+                    "w": 40,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "/Attempt": "#0A50A1",
+                            "/Failure": "#BF1B00",
+                            "/Success": "#629E51"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "9",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "/Attempt": "#0A50A1",
+                            "/Failure": "#BF1B00",
+                            "/Success": "#629E51"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "11",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "13",
+                    "w": 32,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0% - 17%": "rgb(255,255,204)",
+                            "17% - 34%": "rgb(255,230,146)",
+                            "34% - 50%": "rgb(254,191,90)",
+                            "50% - 67%": "rgb(253,141,60)",
+                            "67% - 84%": "rgb(244,61,37)",
+                            "84% - 100%": "rgb(202,8,35)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "15",
+                    "w": 16,
+                    "x": 32,
+                    "y": 32
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "Anti-Virus": "#EF843C",
+                            "Content Security": "#7EB26D",
+                            "Firewall": "#E24D42",
+                            "Integrated Security": "#962D82",
+                            "Network-based IDS/IPS": "#1F78C1",
+                            "Operating System": "#1F78C1",
+                            "VPN": "#EAB839"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "16",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 48,
+                    "x": 0,
+                    "y": 52
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "18",
+                    "w": 24,
+                    "x": 0,
+                    "y": 76
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "19",
+                    "w": 24,
+                    "x": 24,
+                    "y": 76
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "20",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "20",
+                "panelRefName": "panel_20",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "21",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "21",
+                "panelRefName": "panel_21",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        -0.3515602939922709,
+                        0
+                    ],
+                    "mapZoom": 1
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "24",
+                    "w": 24,
+                    "x": 0,
+                    "y": 92
+                },
+                "panelIndex": "24",
+                "panelRefName": "panel_24",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        -0.3515602939922709,
+                        0
+                    ],
+                    "mapZoom": 1
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "25",
+                    "w": 24,
+                    "x": 24,
+                    "y": 92
+                },
+                "panelIndex": "25",
+                "panelRefName": "panel_25",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "refreshInterval": {
+            "display": "Off",
+            "pause": false,
+            "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat CEF] Network Overview Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dd0bc9af-2e89-4150-9b42-62517ea56b71",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f5258de9-71f7-410f-b713-201007f77470",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "0abfc226-535b-45a2-b534-e9bc87e5584f",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "a97e3628-022b-46cf-8f29-a73cf9bb4e26",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "499f50ba-2f84-4f7c-9021-73a4efc47921",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "d061c7a9-7f92-4bf4-b35c-499b9f4b987a",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "b1002b5c-08fc-4bbe-b9a0-6243a8637e60",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "df056709-2deb-4363-ae7a-b0148ea456c6",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "e89a64e8-928c-41fc-8745-3c8157b21cdb",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "a729c249-8d34-4eb1-bbb0-5d25cf224114",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "3c19f138-2ab3-4ecb-bb1b-86fb90158042",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "e513c269-350c-40c3-ac20-16c5782103b8",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "8f6075c5-f525-4173-92a4-3a56e96e362d",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "013ff153-7b80-490b-8fec-6e56cba785ed",
+            "name": "19:panel_19",
+            "type": "visualization"
+        },
+        {
+            "id": "33747d52-ec4c-4d91-86d8-fbdf9b9c82db",
+            "name": "20:panel_20",
+            "type": "visualization"
+        },
+        {
+            "id": "c394e650-b16c-407c-b305-bd409d69d433",
+            "name": "21:panel_21",
+            "type": "visualization"
+        },
+        {
+            "id": "8b31af8b-522e-41fe-b9d6-9a3451b54108",
+            "name": "24:panel_24",
+            "type": "visualization"
+        },
+        {
+            "id": "4fccee0c-7193-4aa8-919f-0b0b0a16d013",
+            "name": "25:panel_25",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:39.286Z",
+    "version": "WzQ3NDUsMV0="
+}

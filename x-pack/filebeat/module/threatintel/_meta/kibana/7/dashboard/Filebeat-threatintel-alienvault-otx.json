@@ -1,1877 +1,289 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "AlienVault OTX indicators ingested by the threat intel Filebeat module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "7847e7a5-06a5-43e7-bd6b-ccae637739e5",
+                    "w": 17,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "7847e7a5-06a5-43e7-bd6b-ccae637739e5",
+                "panelRefName": "panel_0",
+                "version": "7.11.1"
             },
-            "gridData": {
-              "h": 18,
-              "i": "7847e7a5-06a5-43e7-bd6b-ccae637739e5",
-              "w": 17,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "dc17e932-e983-4deb-95dc-07d571bf9e28",
+                    "w": 7,
+                    "x": 17,
+                    "y": 0
+                },
+                "panelIndex": "dc17e932-e983-4deb-95dc-07d571bf9e28",
+                "panelRefName": "panel_1",
+                "version": "7.11.1"
             },
-            "panelIndex": "7847e7a5-06a5-43e7-bd6b-ccae637739e5",
-            "panelRefName": "panel_0",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "6d448f2b-f2b7-4e18-a9ef-77c06ab755ac",
+                    "w": 15,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "6d448f2b-f2b7-4e18-a9ef-77c06ab755ac",
+                "panelRefName": "panel_2",
+                "version": "7.11.1"
             },
-            "gridData": {
-              "h": 18,
-              "i": "dc17e932-e983-4deb-95dc-07d571bf9e28",
-              "w": 7,
-              "x": 17,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "a946ed22-37d4-4c8d-8250-fc00f2ad646b",
+                    "w": 9,
+                    "x": 39,
+                    "y": 0
+                },
+                "panelIndex": "a946ed22-37d4-4c8d-8250-fc00f2ad646b",
+                "panelRefName": "panel_3",
+                "version": "7.11.1"
             },
-            "panelIndex": "dc17e932-e983-4deb-95dc-07d571bf9e28",
-            "panelRefName": "panel_1",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "6d448f2b-f2b7-4e18-a9ef-77c06ab755ac",
-              "w": 15,
-              "x": 24,
-              "y": 0
-            },
-            "panelIndex": "6d448f2b-f2b7-4e18-a9ef-77c06ab755ac",
-            "panelRefName": "panel_2",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "a946ed22-37d4-4c8d-8250-fc00f2ad646b",
-              "w": 9,
-              "x": 39,
-              "y": 0
-            },
-            "panelIndex": "a946ed22-37d4-4c8d-8250-fc00f2ad646b",
-            "panelRefName": "panel_3",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 286
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 286
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "e4c2fa0c-b238-4502-82b8-b61847d19b18",
+                    "w": 9,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "e4c2fa0c-b238-4502-82b8-b61847d19b18",
+                "panelRefName": "panel_4",
+                "version": "7.11.1"
             },
-            "gridData": {
-              "h": 18,
-              "i": "e4c2fa0c-b238-4502-82b8-b61847d19b18",
-              "w": 9,
-              "x": 0,
-              "y": 18
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "ed1ab436-d7cc-4545-bbc6-a3aa4d45108b",
+                    "w": 17,
+                    "x": 9,
+                    "y": 18
+                },
+                "panelIndex": "ed1ab436-d7cc-4545-bbc6-a3aa4d45108b",
+                "panelRefName": "panel_5",
+                "version": "7.11.1"
             },
-            "panelIndex": "e4c2fa0c-b238-4502-82b8-b61847d19b18",
-            "panelRefName": "panel_4",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "ac6508e3-214a-4af9-8621-f9bd9cd9fe36",
+                    "w": 10,
+                    "x": 26,
+                    "y": 18
+                },
+                "panelIndex": "ac6508e3-214a-4af9-8621-f9bd9cd9fe36",
+                "panelRefName": "panel_6",
+                "version": "7.11.1"
             },
-            "gridData": {
-              "h": 18,
-              "i": "ed1ab436-d7cc-4545-bbc6-a3aa4d45108b",
-              "w": 17,
-              "x": 9,
-              "y": 18
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "d5dbe626-716b-4dc2-9018-21050ee860ad",
+                    "w": 12,
+                    "x": 36,
+                    "y": 18
+                },
+                "panelIndex": "d5dbe626-716b-4dc2-9018-21050ee860ad",
+                "panelRefName": "panel_7",
+                "version": "7.11.1"
             },
-            "panelIndex": "ed1ab436-d7cc-4545-bbc6-a3aa4d45108b",
-            "panelRefName": "panel_5",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "fb89a073-18ce-41a0-87ec-a66bb35216e5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "fb89a073-18ce-41a0-87ec-a66bb35216e5",
+                "panelRefName": "panel_8",
+                "version": "7.11.1"
             },
-            "gridData": {
-              "h": 18,
-              "i": "ac6508e3-214a-4af9-8621-f9bd9cd9fe36",
-              "w": 10,
-              "x": 26,
-              "y": 18
-            },
-            "panelIndex": "ac6508e3-214a-4af9-8621-f9bd9cd9fe36",
-            "panelRefName": "panel_6",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "d5dbe626-716b-4dc2-9018-21050ee860ad",
-              "w": 12,
-              "x": 36,
-              "y": 18
-            },
-            "panelIndex": "d5dbe626-716b-4dc2-9018-21050ee860ad",
-            "panelRefName": "panel_7",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "fb89a073-18ce-41a0-87ec-a66bb35216e5",
-              "w": 24,
-              "x": 0,
-              "y": 36
-            },
-            "panelIndex": "fb89a073-18ce-41a0-87ec-a66bb35216e5",
-            "panelRefName": "panel_8",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 303
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 303
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "a2a17e0d-2de0-45cc-8440-d00a7044aaab",
+                    "w": 9,
+                    "x": 24,
+                    "y": 36
+                },
+                "panelIndex": "a2a17e0d-2de0-45cc-8440-d00a7044aaab",
+                "panelRefName": "panel_9",
+                "version": "7.11.1"
             },
-            "gridData": {
-              "h": 18,
-              "i": "a2a17e0d-2de0-45cc-8440-d00a7044aaab",
-              "w": 9,
-              "x": 24,
-              "y": 36
-            },
-            "panelIndex": "a2a17e0d-2de0-45cc-8440-d00a7044aaab",
-            "panelRefName": "panel_9",
-            "version": "7.11.1"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 598
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 598
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
-            },
-            "gridData": {
-              "h": 18,
-              "i": "291a8404-8e31-45f4-9117-4ea5bf996e78",
-              "w": 15,
-              "x": 33,
-              "y": 36
-            },
-            "panelIndex": "291a8404-8e31-45f4-9117-4ea5bf996e78",
-            "panelRefName": "panel_10",
-            "version": "7.11.1"
-          }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "291a8404-8e31-45f4-9117-4ea5bf996e78",
+                    "w": 15,
+                    "x": 33,
+                    "y": 36
+                },
+                "panelIndex": "291a8404-8e31-45f4-9117-4ea5bf996e78",
+                "panelRefName": "panel_10",
+                "version": "7.11.1"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat Threat Intel] AlienVault OTX",
         "version": 1
-      },
-      "id": "53e4e630-76cf-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "dashboard": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "95f384b0-76d8-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "b5bd3a70-76ce-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "f33125b0-76d8-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "302cd5b0-76cd-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "49f0c060-76cd-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_4",
-          "type": "visualization"
-        },
-        {
-          "id": "346136f0-76d5-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_5",
-          "type": "visualization"
-        },
-        {
-          "id": "9109e490-76cd-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_6",
-          "type": "visualization"
-        },
-        {
-          "id": "6077fd00-76d5-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_7",
-          "type": "visualization"
-        },
-        {
-          "id": "4e5d25c0-76ce-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_8",
-          "type": "visualization"
-        },
-        {
-          "id": "0ccdda50-76ce-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_9",
-          "type": "visualization"
-        },
-        {
-          "id": "01c261b0-7aa9-11eb-ac13-d5ca87cb8fa2",
-          "name": "panel_10",
-          "type": "visualization"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODcsMl0="
     },
-    {
-      "attributes": {
-        "description": "AlienVault OTX URL scheme ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlientVault OTX URL Scheme [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "http": "#65C5DB",
-              "https": "#F9934E"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "",
-                "field": "threatintel.indicator.url.scheme",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 200
-                },
-                "position": "left",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": true
-            },
-            "labels": {
-              "show": true
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": true,
-                  "rotate": 75,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "bottom",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "AlientVault OTX URL Scheme [Filebeat Threat Intel]",
-          "type": "horizontal_bar"
-        }
-      },
-      "id": "95f384b0-76d8-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzYsMl0="
+    "coreMigrationVersion": "8.0.0",
+    "id": "53e4e630-76cf-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "Total number of AlienVault OTX indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+    "references": [
+        {
+            "id": "95f384b0-76d8-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_0",
+            "type": "visualization"
         },
-        "savedSearchRefName": "search_0",
-        "title": "AlienVault OTX Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "AlienVault OTX Indicators"
-              },
-              "schema": "metric",
-              "type": "count"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "AlienVault OTX Indicators [Filebeat Threat Intel]",
-          "type": "metric"
+        {
+            "id": "b5bd3a70-76ce-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "f33125b0-76d8-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "302cd5b0-76cd-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "49f0c060-76cd-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "346136f0-76d5-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "9109e490-76cd-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "6077fd00-76d5-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "4e5d25c0-76ce-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "0ccdda50-76ce-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "01c261b0-7aa9-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
         }
-      },
-      "id": "b5bd3a70-76ce-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzcsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX indicator types ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.type"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.type",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlientVault OTX Indicator Types [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "threatintel.indicator.type",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "AlientVault OTX Indicator Types [Filebeat Threat Intel]",
-          "type": "pie"
-        }
-      },
-      "id": "f33125b0-76d8-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzgsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX IP indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.ip"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.ip",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlientVault OTX IP Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX IP Indicator",
-                "field": "threatintel.indicator.ip",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlientVault OTX IP Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "302cd5b0-76cd-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzksMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX domain indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.domain"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.domain",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlientVault OTX Domain Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX IP Indicator",
-                "field": "threatintel.indicator.domain",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlientVault OTX Domain Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "49f0c060-76cd-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODAsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX URL indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.original"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.original",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlienVault OTX URL Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX URL Indicator",
-                "field": "threatintel.indicator.url.original",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlienVault OTX URL Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "346136f0-76d5-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODEsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX URL domain indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.domain"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.domain",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlienVault OTX URL Domain Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX URL Domain Indicator",
-                "field": "threatintel.indicator.url.domain",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlienVault OTX URL Domain Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "9109e490-76cd-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODIsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX URI indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.path"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.path",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlienVault OTX URI Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX URI Indicator",
-                "field": "threatintel.indicator.url.path",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlienVault OTX URI Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "6077fd00-76d5-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODMsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX SHA256 hash indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.file.hash.sha256"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.file.hash.sha256",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlientVault OTX SHA256 Hash Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX SHA256 Hash Indicator",
-                "field": "threatintel.indicator.file.hash.sha256",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlientVault OTX SHA256 Hash Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "4e5d25c0-76ce-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODQsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX MD5 hash indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.file.hash.md5"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.file.hash.md5",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlientVault OTX MD5 Hash Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX MD5 Hash Indicator",
-                "field": "threatintel.indicator.file.hash.md5",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlientVault OTX MD5 Hash Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "0ccdda50-76ce-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODUsMl0="
-    },
-    {
-      "attributes": {
-        "description": "AlienVault OTX indicator title ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.otx"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.otx"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.otx.title"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.otx.title",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "AlienVault OTX Indicator Title [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "AlienVault OTX Indicator Title",
-                "field": "threatintel.otx.title",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "AlienVault OTX Indicator Title [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "01c261b0-7aa9-11eb-ac13-d5ca87cb8fa2",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyODYsMl0="
-    },
-    {
-      "attributes": {
-        "color": "#a548ae",
-        "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
-        "name": "threat intel"
-      },
-      "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-      "namespaces": [
-        "default"
-      ],
-      "references": [],
-      "type": "tag",
-      "updated_at": "2021-03-10T19:01:18.125Z",
-      "version": "WzIyMTcsMl0="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.module",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.module": "threatintel"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "event.category",
-                  "negate": false,
-                  "params": {
-                    "query": "threat"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.category": "threat"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                  "key": "event.kind",
-                  "negate": false,
-                  "params": {
-                    "query": "enrichment"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.kind": "enrichment"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
-                  "key": "event.type",
-                  "negate": false,
-                  "params": {
-                    "query": "indicator"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.type": "indicator"
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [],
-        "title": "All Logs [Filebeat Threat Intel] ECS",
-        "version": 1
-      },
-      "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "search": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMTksMl0="
-    }
-  ],
-  "version": "7.11.1"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:27.014Z",
+    "version": "WzQ1NjMsMV0="
 }

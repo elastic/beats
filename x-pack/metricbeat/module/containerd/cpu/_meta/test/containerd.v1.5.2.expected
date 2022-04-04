@@ -1,0 +1,401 @@
+[
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"7": {
+						"ns": 97134782770
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"4": {
+						"ns": 105731762224
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"9": {
+						"ns": 102272190459
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"8": {
+						"ns": 104266711568
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"10": {
+						"ns": 106709905770
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"5": {
+						"ns": 98155683224
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"2": {
+						"ns": 105305653633
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"3": {
+						"ns": 101195506344
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"0": {
+						"ns": 99137817570
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"1": {
+						"ns": 116475261138
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"6": {
+						"ns": 95075348914
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"11": {
+						"ns": 104878380370
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"cpu": {
+					"usage": 0
+				},
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"kernel": {
+					"ns": 532180000000,
+					"pct": 0
+				},
+				"total": {
+					"ns": 1236339003984,
+					"pct": 0
+				},
+				"user": {
+					"ns": 525470000000,
+					"pct": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

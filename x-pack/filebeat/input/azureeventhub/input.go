@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !aix
+// +build !aix
+
 package azureeventhub
 
 import (
@@ -41,7 +44,6 @@ type azureInput struct {
 	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
-	ackChannel   chan int
 }
 
 const (

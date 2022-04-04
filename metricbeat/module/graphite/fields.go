@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetGraphite returns asset data.
-// This is the base64 encoded gzipped contents of module/graphite.
+// This is the base64 encoded zlib format compressed contents of module/graphite.
 func AssetGraphite() string {
 	return "eJx8j80OwiAcw+88RbP7XoCDN+PJhyBSJxkbBJi6tzf7zJjTHvunv5YSNXuJKij/MIkCSCZZShSX2SoEoBlvwfhkXCtxEgDWBK5Od3YIBlqqSIlKCeBuaHWU49sSrWqYtQxKvR9N1/nZOejJSVtaZHgyrPYR7ydz0hch/8Ki/YDtCL5V4y2z27KkZv9yQe9uf/YMOk/AqVR8AgAA///94G6N"
 }

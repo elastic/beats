@@ -1,0 +1,105 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "c6ed7acb-d119-41cc-99ce-cca114d1f1cb": {
+                            "columnOrder": [
+                                "1bfe525f-e68d-4504-86bc-e80fb154192c",
+                                "08fe8b96-3fe0-410f-8ee3-3ca1379bea49",
+                                "08fe8b96-3fe0-410f-8ee3-3ca1379bea49X0"
+                            ],
+                            "columns": {
+                                "08fe8b96-3fe0-410f-8ee3-3ca1379bea49": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Free Storage Bytes",
+                                    "operationType": "formula",
+                                    "params": {
+                                        "formula": "average(aws.rds.free_storage.bytes)",
+                                        "isFormulaBroken": false
+                                    },
+                                    "references": [
+                                        "08fe8b96-3fe0-410f-8ee3-3ca1379bea49X0"
+                                    ],
+                                    "scale": "ratio"
+                                },
+                                "08fe8b96-3fe0-410f-8ee3-3ca1379bea49X0": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Part of average(aws.rds.free_storage.bytes)",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.free_storage.bytes"
+                                },
+                                "1bfe525f-e68d-4504-86bc-e80fb154192c": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "08fe8b96-3fe0-410f-8ee3-3ca1379bea49",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "1bfe525f-e68d-4504-86bc-e80fb154192c",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "c6ed7acb-d119-41cc-99ce-cca114d1f1cb"
+            }
+        },
+        "title": "RDS Free Storage Bytes [Metricbeat AWS]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "68f36fb0-f0a0-11eb-b61f-a53cb4913361",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-c6ed7acb-d119-41cc-99ce-cca114d1f1cb",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MTIsMl0="
+}

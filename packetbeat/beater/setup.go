@@ -60,7 +60,7 @@ func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg conf
 		},
 	}
 	if cfg.Flows.Index != "" {
-		clientConfig.Processing.Meta = common.MapStr{"index": cfg.Flows.Index}
+		clientConfig.Processing.Meta = common.MapStr{"raw_index": cfg.Flows.Index}
 	}
 
 	client, err := pipeline.ConnectWith(clientConfig)

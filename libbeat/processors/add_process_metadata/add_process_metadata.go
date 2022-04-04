@@ -29,15 +29,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 const (
-	processorName      = "add_process_metadata"
-	cacheExpiration    = time.Second * 30
-	containerIDMapping = "container.id"
+	processorName       = "add_process_metadata"
+	cacheExpiration     = time.Second * 30
+	cacheCapacity       = 32 << 10 // maximum number of process cache entries.
+	cacheEvictionEffort = 10       // number of entries to sample for expiry eviction.
+	containerIDMapping  = "container.id"
 )
 
 var (
@@ -48,7 +51,7 @@ var (
 	// ErrNoProcess is returned when metadata for a process can't be collected.
 	ErrNoProcess = errors.New("process not found")
 
-	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
+	procCache = newProcessCache(cacheExpiration, cacheCapacity, cacheEvictionEffort, gosysinfoProvider{})
 
 	processCgroupPaths = cgroup.ProcessCgroupPaths
 
@@ -65,11 +68,11 @@ type addProcessMetadata struct {
 }
 
 type processMetadata struct {
-	name, title, exe string
-	args             []string
-	env              map[string]string
-	startTime        time.Time
-	pid, ppid        int
+	name, title, exe, username, userid string
+	args                               []string
+	env                                map[string]string
+	startTime                          time.Time
+	pid, ppid                          int
 	//
 	fields common.MapStr
 }
@@ -111,14 +114,11 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	}
 
 	mappings, err := config.getMappings()
-
 	if err != nil {
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
 	}
 
-	var p addProcessMetadata
-
-	p = addProcessMetadata{
+	p := addProcessMetadata{
 		config:   config,
 		provider: provider,
 		log:      log,
@@ -134,11 +134,10 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
+			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
 		} else {
-			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
+			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
 		}
-
 	}
 
 	if withCache {
@@ -158,10 +157,10 @@ func containsValue(m common.MapStr, v string) bool {
 	return false
 }
 
-// Run enriches the given event with the host meta data
+// Run enriches the given event with the host meta data.
 func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	for _, pidField := range p.config.MatchPIDs {
-		result, err := p.enrich(event.Fields, pidField)
+		result, err := p.enrich(event, pidField)
 		if err != nil {
 			switch err {
 			case common.ErrKeyNotFound:
@@ -173,7 +172,7 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 			}
 		}
 		if result != nil {
-			event.Fields = result
+			event = result
 		}
 		return event, nil
 	}
@@ -208,7 +207,7 @@ func pidToInt(value interface{}) (pid int, err error) {
 	return pid, nil
 }
 
-func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (result common.MapStr, err error) {
+func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result *beat.Event, err error) {
 	pidIf, err := event.GetValue(pidField)
 	if err != nil {
 		return nil, err
@@ -252,7 +251,7 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 			return nil, errors.New("source is not a string")
 		}
 		if !p.config.OverwriteKeys {
-			if found, _ := result.HasKey(dest); found {
+			if _, err := result.GetValue(dest); err == nil {
 				return nil, errors.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
 			}
 		}
@@ -263,7 +262,7 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 			continue
 		}
 
-		if _, err = result.Put(dest, value); err != nil {
+		if _, err = result.PutValue(dest, value); err != nil {
 			return nil, err
 		}
 	}
@@ -301,16 +300,30 @@ func (p *addProcessMetadata) String() string {
 }
 
 func (p *processMetadata) toMap() common.MapStr {
-	return common.MapStr{
-		"process": common.MapStr{
-			"name":       p.name,
-			"title":      p.title,
-			"executable": p.exe,
-			"args":       p.args,
-			"env":        p.env,
-			"pid":        p.pid,
-			"ppid":       p.ppid,
-			"start_time": p.startTime,
+	process := common.MapStr{
+		"name":       p.name,
+		"title":      p.title,
+		"executable": p.exe,
+		"args":       p.args,
+		"env":        p.env,
+		"pid":        p.pid,
+		"parent": common.MapStr{
+			"pid": p.ppid,
 		},
+		"start_time": p.startTime,
+	}
+	if p.username != "" || p.userid != "" {
+		user := common.MapStr{}
+		if p.username != "" {
+			user["name"] = p.username
+		}
+		if p.userid != "" {
+			user["id"] = p.userid
+		}
+		process["owner"] = user
+	}
+
+	return common.MapStr{
+		"process": process,
 	}
 }

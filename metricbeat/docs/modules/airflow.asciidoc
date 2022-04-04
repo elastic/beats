@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: airflow
+
 [[metricbeat-module-airflow]]
 [role="xpack"]
 == Airflow module

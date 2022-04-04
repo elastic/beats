@@ -88,6 +88,40 @@ func TestDecodeBase64Run(t *testing.T) {
 			error: false,
 		},
 		{
+			description: "simple field padded base64 decode from and to equals",
+			config: base64Config{
+				Field: fromTo{
+					From: "field1", To: "field1",
+				},
+				IgnoreMissing: false,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "Y29ycmVjdCBwYWRkZWQgZGF0YQ==",
+			},
+			Output: common.MapStr{
+				"field1": "correct padded data",
+			},
+			error: false,
+		},
+		{
+			description: "simple field unpadded base64 decode from and to equals",
+			config: base64Config{
+				Field: fromTo{
+					From: "field1", To: "field1",
+				},
+				IgnoreMissing: false,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "dW5wYWRkZWQgZGF0YQ",
+			},
+			Output: common.MapStr{
+				"field1": "unpadded data",
+			},
+			error: false,
+		},
+		{
 			description: "simple field bad data - fail on error",
 			config: base64Config{
 				Field: fromTo{
@@ -187,4 +221,37 @@ func TestDecodeBase64Run(t *testing.T) {
 			assert.Equal(t, test.Output, newEvent.Fields)
 		})
 	}
+
+	t.Run("supports a metadata field", func(t *testing.T) {
+		config := base64Config{
+			Field: fromTo{
+				From: "field1",
+				To:   "@metadata.field",
+			},
+		}
+
+		event := &beat.Event{
+			Meta: common.MapStr{},
+			Fields: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+			},
+		}
+
+		f := &decodeBase64Field{
+			log:    logp.NewLogger(processorName),
+			config: config,
+		}
+
+		expectedFields := common.MapStr{
+			"field1": "Y29ycmVjdCBkYXRh",
+		}
+		expectedMeta := common.MapStr{
+			"field": "correct data",
+		}
+
+		newEvent, err := f.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedFields, newEvent.Fields)
+		assert.Equal(t, expectedMeta, newEvent.Meta)
+	})
 }

@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Osquery module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and decodes the result logs written by
 https://osquery.readthedocs.io/en/latest/introduction/using-osqueryd/[osqueryd]
 in the JSON format. To set up osqueryd follow the osquery installation

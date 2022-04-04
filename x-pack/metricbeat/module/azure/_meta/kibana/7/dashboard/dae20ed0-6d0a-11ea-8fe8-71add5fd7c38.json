@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "This dashboard shows metrics for the container service in Azure.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "32b4e6e2-bf3f-4c4a-8fdb-925f21f9d22b",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "32b4e6e2-bf3f-4c4a-8fdb-925f21f9d22b",
+                "panelRefName": "panel_32b4e6e2-bf3f-4c4a-8fdb-925f21f9d22b",
+                "title": "",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "c35d3d89-2f34-43a0-b346-85ba0e7c9e89",
+                    "w": 18,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "c35d3d89-2f34-43a0-b346-85ba0e7c9e89",
+                "panelRefName": "panel_c35d3d89-2f34-43a0-b346-85ba0e7c9e89",
+                "title": "Container Service Kube Node Status Allocatable Memory",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "e1952edf-ed31-49ee-8db1-24370998ab89",
+                    "w": 21,
+                    "x": 27,
+                    "y": 0
+                },
+                "panelIndex": "e1952edf-ed31-49ee-8db1-24370998ab89",
+                "panelRefName": "panel_e1952edf-ed31-49ee-8db1-24370998ab89",
+                "title": "Container Service Kube Node Status Allocatable CPU Cores",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "ec183a66-545b-4a67-bfb4-568def660612",
+                    "w": 9,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "ec183a66-545b-4a67-bfb4-568def660612",
+                "panelRefName": "panel_ec183a66-545b-4a67-bfb4-568def660612",
+                "title": "Container Filters",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ada37452-619f-470a-b9cd-bafa20e7d7b1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 17
+                },
+                "panelIndex": "ada37452-619f-470a-b9cd-bafa20e7d7b1",
+                "panelRefName": "panel_ada37452-619f-470a-b9cd-bafa20e7d7b1",
+                "title": "Container Service Kube Pod Status Phase",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c8d3ed1a-6e72-4115-9a69-db1919a36fc4",
+                    "w": 24,
+                    "x": 24,
+                    "y": 17
+                },
+                "panelIndex": "c8d3ed1a-6e72-4115-9a69-db1919a36fc4",
+                "panelRefName": "panel_c8d3ed1a-6e72-4115-9a69-db1919a36fc4",
+                "title": "Container Service Kube Pod Status Ready",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "707fb714-99af-4484-a56e-bfecdf592c58",
+                    "w": 48,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "707fb714-99af-4484-a56e-bfecdf592c58",
+                "panelRefName": "panel_707fb714-99af-4484-a56e-bfecdf592c58",
+                "title": "Container Service Kube Node Status Condition",
+                "type": "visualization",
+                "version": "7.6.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] Container Service Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dae20ed0-6d0a-11ea-8fe8-71add5fd7c38",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "3630b9a0-6d22-11ea-8fe8-71add5fd7c38",
+            "name": "32b4e6e2-bf3f-4c4a-8fdb-925f21f9d22b:panel_32b4e6e2-bf3f-4c4a-8fdb-925f21f9d22b",
+            "type": "visualization"
+        },
+        {
+            "id": "eda368d0-6d1d-11ea-8fe8-71add5fd7c38",
+            "name": "c35d3d89-2f34-43a0-b346-85ba0e7c9e89:panel_c35d3d89-2f34-43a0-b346-85ba0e7c9e89",
+            "type": "visualization"
+        },
+        {
+            "id": "6e2d9930-6d1e-11ea-8fe8-71add5fd7c38",
+            "name": "e1952edf-ed31-49ee-8db1-24370998ab89:panel_e1952edf-ed31-49ee-8db1-24370998ab89",
+            "type": "visualization"
+        },
+        {
+            "id": "0fa31060-6aae-11ea-af5c-73e8f396b3e9",
+            "name": "ec183a66-545b-4a67-bfb4-568def660612:panel_ec183a66-545b-4a67-bfb4-568def660612",
+            "type": "visualization"
+        },
+        {
+            "id": "bda7b580-6d1f-11ea-8fe8-71add5fd7c38",
+            "name": "ada37452-619f-470a-b9cd-bafa20e7d7b1:panel_ada37452-619f-470a-b9cd-bafa20e7d7b1",
+            "type": "visualization"
+        },
+        {
+            "id": "c19586f0-6d1e-11ea-8fe8-71add5fd7c38",
+            "name": "c8d3ed1a-6e72-4115-9a69-db1919a36fc4:panel_c8d3ed1a-6e72-4115-9a69-db1919a36fc4",
+            "type": "visualization"
+        },
+        {
+            "id": "e79211c0-6d37-11ea-8fe8-71add5fd7c38",
+            "name": "707fb714-99af-4484-a56e-bfecdf592c58:panel_707fb714-99af-4484-a56e-bfecdf592c58",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:48.023Z",
+    "version": "WzM1MzIsMV0="
+}

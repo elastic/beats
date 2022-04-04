@@ -1,0 +1,52 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.extensions.categoryDeviceGroup",
+            "cef.extensions.categoryTechnique",
+            "cef.extensions.categoryOutcome",
+            "cef.extensions.categorySignificance",
+            "cef.extensions.categoryObject",
+            "cef.extensions.categoryBehavior",
+            "cef.extensions.categoryDeviceType"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Endpoint Event Explorer [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5cede2d3-20fe-4140-add4-4c4f841b71a2",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:37.252Z",
+    "version": "WzQ3MjMsMV0="
+}

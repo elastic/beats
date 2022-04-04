@@ -1,0 +1,83 @@
+{
+    "attributes": {
+        "description": "Overview of Kubernetes API Server",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "API Server Top clients by number of requests [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "61a13010-5794-11e8-8bd0-2180975e72dd"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": 0.5,
+                        "filter": "",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Top clients by number of requests (5m)",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.apiserver.request.count",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "0e6ff4a0-5792-11e8-8bd0-2180975e72dd",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "id": "9e4b8030-5792-11e8-8bd0-2180975e72dd"
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "stacked",
+                        "terms_field": "kubernetes.apiserver.request.client",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "terms_size": "10"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "API Server Top clients by number of requests [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:35.256Z",
+    "version": "WzM5OTgsMV0="
+}

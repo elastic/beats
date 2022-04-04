@@ -1,0 +1,76 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Cloudwatch Lambda Throttles Top5 [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "cbb498f0-734c-11e9-a683-47ca322fa6f9"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "94f2ce40-734c-11e9-a683-47ca322fa6f9"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Lambda Throttles",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.lambda.metrics.Throttles",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "aws.dimensions.FunctionName",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "terms_size": "5"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "AWS Cloudwatch Lambda Throttles Top5",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "398d12d0-7352-11e9-816b-07687310a99a",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:33.734Z",
+    "version": "WzM0MDcsMV0="
+}

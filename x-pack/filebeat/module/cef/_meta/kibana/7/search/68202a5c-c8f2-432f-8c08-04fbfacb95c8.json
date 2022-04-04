@@ -1,0 +1,87 @@
+{
+    "attributes": {
+        "columns": [
+            "priority",
+            "message",
+            "source.ip",
+            "source.port",
+            "destination.ip",
+            "destination.port",
+            "network.application",
+            "message",
+            "cef.extensions.categoryBehavior",
+            "cef.extensions.categoryOutcome",
+            "deviceAddress",
+            "cef.device.product",
+            "cef.device.vendor",
+            "cef.extensions.categoryDeviceGroup",
+            "cef.extensions.categoryDeviceType"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "query",
+                            "negate": false,
+                            "type": "custom",
+                            "value": "{\"terms\":{\"cef.extensions.categoryDeviceGroup\":[\"/VPN\",\"/IDS/Network\",\"/Firewall\"]}}"
+                        },
+                        "query": {
+                            "terms": {
+                                "cef.extensions.categoryDeviceGroup": [
+                                    "/VPN",
+                                    "/IDS/Network",
+                                    "/Firewall"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Network Events [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:40.331Z",
+    "version": "WzQ3NzcsMV0="
+}

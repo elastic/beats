@@ -1,0 +1,125 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "envoyproxy.log"
+                            },
+                            "type": "phrase",
+                            "value": "envoyproxy.log"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "envoyproxy.log",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Top HTTP Response Codes [Filebeat Envoyproxy]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "http.response.status_code",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "bucket": {
+                    "accessor": 0,
+                    "aggType": "terms",
+                    "format": {
+                        "id": "terms",
+                        "params": {
+                            "id": "number",
+                            "missingBucketLabel": "Missing",
+                            "otherBucketLabel": "Other"
+                        }
+                    },
+                    "params": {}
+                },
+                "maxFontSize": 72,
+                "metric": {
+                    "accessor": 1,
+                    "aggType": "count",
+                    "format": {
+                        "id": "number"
+                    },
+                    "params": {}
+                },
+                "minFontSize": 18,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "linear",
+                "showLabel": false
+            },
+            "title": "Top HTTP Response Codes [Filebeat Envoyproxy]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "36f872a0-5c03-11e9-85b4-19d0072eb4f2",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:42.085Z",
+    "version": "WzQyNTcsMV0="
+}

@@ -1,0 +1,154 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "325e60ce-0fbd-42b0-82f6-b10df31fef6c": {
+                            "columnOrder": [
+                                "faaaaf23-f362-4a00-be9e-8a155208a39e",
+                                "c4bc659c-3e7c-41f2-bc38-32d9edee95e8",
+                                "3041fc1b-ceb8-4188-b55d-d354819f267e"
+                            ],
+                            "columns": {
+                                "3041fc1b-ceb8-4188-b55d-d354819f267e": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Billing",
+                                    "operationType": "max",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.billing.total"
+                                },
+                                "c4bc659c-3e7c-41f2-bc38-32d9edee95e8": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "1d"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "faaaaf23-f362-4a00-be9e-8a155208a39e": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Project ID",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "3041fc1b-ceb8-4188-b55d-d354819f267e",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.billing.project_id"
+                                }
+                            }
+                        },
+                        "4ca843af-63d7-46b9-a719-51a81eebf1f7": {
+                            "columnOrder": [
+                                "1164563d-d2b3-4067-bc7b-d694179182ed",
+                                "10b91492-efef-490d-bc7a-c2074b2eae84"
+                            ],
+                            "columns": {
+                                "10b91492-efef-490d-bc7a-c2074b2eae84": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Billing Cost",
+                                    "operationType": "sum",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.billing.total"
+                                },
+                                "1164563d-d2b3-4067-bc7b-d694179182ed": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "1d"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "e25f49de-f161-4be8-a8fc-519188a7776c": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Cost",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "10b91492-efef-490d-bc7a-c2074b2eae84",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 15
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.billing.project_id"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "3041fc1b-ceb8-4188-b55d-d354819f267e"
+                        ],
+                        "layerId": "325e60ce-0fbd-42b0-82f6-b10df31fef6c",
+                        "seriesType": "bar_stacked",
+                        "splitAccessor": "faaaaf23-f362-4a00-be9e-8a155208a39e",
+                        "xAccessor": "c4bc659c-3e7c-41f2-bc38-32d9edee95e8"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked"
+            }
+        },
+        "title": "Total Cost Bar Chart [Metricbeat GCP]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "73346db0-e88d-11ea-bf8c-d13ebf358a78",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-325e60ce-0fbd-42b0-82f6-b10df31fef6c",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-4ca843af-63d7-46b9-a719-51a81eebf1f7",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NzMsMV0="
+}

@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.rapl",
+        "duration": 115000,
+        "module": "linux"
+    },
+    "linux": {
+        "rapl": {
+            "core": 0,
+            "dram": {
+                "joules": 38106.59,
+                "watts": 5.912
+            },
+            "package": {
+                "joules": 25764.9984,
+                "watts": 11.5784
+            },
+            "pp0": {
+                "joules": 27353.5644,
+                "watts": 2.7159
+            }
+        }
+    },
+    "metricset": {
+        "name": "rapl",
+        "period": 10000
+    },
+    "service": {
+        "type": "linux"
+    }
+}

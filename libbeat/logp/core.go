@@ -67,7 +67,7 @@ func Configure(cfg Config) error {
 	return ConfigureWithOutputs(cfg)
 }
 
-// XXX: ConfigureWithOutputs is used by elastic-agent only (See file: x-pack/elastic-agent/pkg/core/logger/logger.go).
+// ConfigureWithOutputs XXX: is used by elastic-agent only (See file: x-pack/elastic-agent/pkg/core/logger/logger.go).
 // The agent requires that the output specified in the config object is configured and merged with the
 // logging outputs given.
 func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
@@ -196,10 +196,9 @@ func makeOptions(cfg Config) []zap.Option {
 	if cfg.development {
 		options = append(options, zap.Development())
 	}
-	if cfg.ECSEnabled {
+	if cfg.Beat != "" {
 		fields := []zap.Field{
 			zap.String("service.name", cfg.Beat),
-			zap.String("event.dataset", cfg.LogFilename()),
 		}
 		options = append(options, zap.Fields(fields...))
 	}
@@ -242,7 +241,6 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.Interval(cfg.Files.Interval),
 		file.RotateOnStartup(cfg.Files.RotateOnStartup),
 		file.RedirectStderr(cfg.Files.RedirectStderr),
-		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create file rotator")
@@ -255,10 +253,7 @@ func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapco
 	return wrappedCore(cfg, zapcore.NewCore(enc, ws, enab))
 }
 func wrappedCore(cfg Config, core zapcore.Core) zapcore.Core {
-	if cfg.ECSEnabled {
-		return ecszap.WrapCore(core)
-	}
-	return core
+	return ecszap.WrapCore(core)
 }
 
 func globalLogger() *zap.Logger {

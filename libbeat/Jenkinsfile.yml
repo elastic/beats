@@ -12,14 +12,14 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
+    checks:
         make: |
           make -C libbeat check;
           make -C libbeat update;
           make -C x-pack/libbeat check;
           make -C x-pack/libbeat update;
           make check-no-changes;
-        stage: lint
+        stage: checks
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -31,8 +31,15 @@ stages:
                 - "arm"
             parameters:
                 - "armTest"
-    build:
-        mage: "mage build test"
+        stage: extended
+    unitTest:
+        mage: "mage build unitTest"
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
+        stage: mandatory
+    pythonIntegTest:
+        mage: "mage pythonIntegTest"
         stage: mandatory
     crosscompile:
         make: "make -C libbeat crosscompile"

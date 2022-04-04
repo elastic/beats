@@ -1,0 +1,101 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Broker Consumers/Producers [Metricbeat ActiveMQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "annotations": [],
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "60dba290-0b99-11ea-8e0f-4970006b3ce7"
+                    }
+                ],
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Consumers",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "activemq.broker.consumers.count",
+                                "id": "50a86850-0b98-11ea-8e0f-4970006b3ce7",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "activemq.broker.name",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(65,157,247,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "9a1e6840-0b98-11ea-8e0f-4970006b3ce7",
+                        "label": "Producers",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "activemq.broker.producers.count",
+                                "id": "9a1e6841-0b98-11ea-8e0f-4970006b3ce7",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "activemq.broker.name",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Broker Consumers/Producers [Metricbeat ActiveMQ]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ce456e60-0b99-11ea-81bb-cf244189d349",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:54.803Z",
+    "version": "WzQxODAsMV0="
+}

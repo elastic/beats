@@ -18,21 +18,14 @@
 package memory
 
 import (
-	"bufio"
-	"bytes"
-	"io"
-	"io/ioutil"
-	"path/filepath"
-	"strconv"
-	"strings"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // get is the linux implementation for fetching Memory data
-func get(rootfs string) (Memory, error) {
+func get(rootfs resolve.Resolver) (Memory, error) {
 	table, err := ParseMeminfo(rootfs)
 	if err != nil {
 		return Memory{}, errors.Wrap(err, "error fetching meminfo")
@@ -41,14 +34,15 @@ func get(rootfs string) (Memory, error) {
 	memData := Memory{}
 
 	var free, cached uint64
+	var ok bool
 	if total, ok := table["MemTotal"]; ok {
-		memData.Total = metrics.OptUintWith(total)
+		memData.Total = opt.UintWith(total)
 	}
-	if free, ok := table["MemFree"]; ok {
-		memData.Free = metrics.OptUintWith(free)
+	if free, ok = table["MemFree"]; ok {
+		memData.Free = opt.UintWith(free)
 	}
-	if cached, ok := table["Cached"]; ok {
-		memData.Cached = metrics.OptUintWith(cached)
+	if cached, ok = table["Cached"]; ok {
+		memData.Cached = opt.UintWith(cached)
 	}
 
 	// overlook parsing issues here
@@ -58,7 +52,7 @@ func get(rootfs string) (Memory, error) {
 
 	if memAvail, ok := table["MemAvailable"]; ok {
 		// MemAvailable is in /proc/meminfo (kernel 3.14+)
-		memData.Actual.Free = metrics.OptUintWith(memAvail)
+		memData.Actual.Free = opt.UintWith(memAvail)
 	} else {
 		// in the future we may want to find another way to do this.
 		// "MemAvailable" and other more derivied metrics
@@ -69,75 +63,26 @@ func get(rootfs string) (Memory, error) {
 		// The use of `cached` here is particularly concerning,
 		// as under certain intense DB server workloads, the cached memory can be quite large
 		// and give the impression that we've passed memory usage watermark
-		memData.Actual.Free = metrics.OptUintWith(free + buffers + cached)
+		memData.Actual.Free = opt.UintWith(free + buffers + cached)
 	}
 
-	memData.Used.Bytes = metrics.OptUintWith(memData.Total.ValueOr(0) - memData.Free.ValueOr(0))
-	memData.Actual.Used.Bytes = metrics.OptUintWith(memData.Total.ValueOr(0) - memData.Actual.Free.ValueOr(0))
+	memData.Used.Bytes = opt.UintWith(memData.Total.ValueOr(0) - memData.Free.ValueOr(0))
+	memData.Actual.Used.Bytes = opt.UintWith(memData.Total.ValueOr(0) - memData.Actual.Free.ValueOr(0))
 
 	// Populate swap data
 	swapTotal, okST := table["SwapTotal"]
 	if okST {
-		memData.Swap.Total = metrics.OptUintWith(swapTotal)
+		memData.Swap.Total = opt.UintWith(swapTotal)
 	}
 	swapFree, okSF := table["SwapFree"]
 	if okSF {
-		memData.Swap.Free = metrics.OptUintWith(swapFree)
+		memData.Swap.Free = opt.UintWith(swapFree)
 	}
 
 	if okSF && okST {
-		memData.Swap.Used.Bytes = metrics.OptUintWith(swapTotal - swapFree)
+		memData.Swap.Used.Bytes = opt.UintWith(swapTotal - swapFree)
 	}
 
 	return memData, nil
 
-}
-
-// ParseMeminfo parses the contents of /proc/meminfo into a hashmap
-func ParseMeminfo(rootfs string) (map[string]uint64, error) {
-	table := map[string]uint64{}
-
-	meminfoPath := filepath.Join(rootfs, "/proc/meminfo")
-	err := readFile(meminfoPath, func(line string) bool {
-		fields := strings.Split(line, ":")
-
-		if len(fields) != 2 {
-			return true // skip on errors
-		}
-
-		valueUnit := strings.Fields(fields[1])
-		value, err := strconv.ParseUint(valueUnit[0], 10, 64)
-		if err != nil {
-			return true // skip on errors
-		}
-
-		if len(valueUnit) > 1 && valueUnit[1] == "kB" {
-			value *= 1024
-		}
-		table[fields[0]] = value
-
-		return true
-	})
-	return table, err
-}
-
-func readFile(file string, handler func(string) bool) error {
-	contents, err := ioutil.ReadFile(file)
-	if err != nil {
-		return errors.Wrapf(err, "error reading file %s", file)
-	}
-
-	reader := bufio.NewReader(bytes.NewBuffer(contents))
-
-	for {
-		line, _, err := reader.ReadLine()
-		if err == io.EOF {
-			break
-		}
-		if !handler(string(line)) {
-			break
-		}
-	}
-
-	return nil
 }

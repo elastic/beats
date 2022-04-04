@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// Test metadata updates don't replace existing pod metrics
-func TestAnnotatorDeepUpdate(t *testing.T) {
+// Test Annotator is skipped if kubernetes metadata already exist
+func TestAnnotatorSkipped(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
@@ -53,8 +53,7 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 			"kubernetes": common.MapStr{
 				"pod": common.MapStr{
 					"labels": common.MapStr{
-						"dont":     "replace",
-						"original": "fields",
+						"added": "should not",
 					},
 				},
 			},
@@ -84,10 +83,6 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 				"metrics": common.MapStr{
 					"a": 1,
 					"b": 2,
-				},
-				"labels": common.MapStr{
-					"dont":     "replace",
-					"original": "fields",
 				},
 			},
 		},

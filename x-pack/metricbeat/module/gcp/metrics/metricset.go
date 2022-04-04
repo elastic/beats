@@ -7,6 +7,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
@@ -51,9 +52,45 @@ type MetricSet struct {
 
 //metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
-	ServiceName string   `config:"service"  validate:"required"`
-	MetricTypes []string `config:"metric_types" validate:"required"`
-	Aligner     string   `config:"aligner"`
+	ServiceName string `config:"service"  validate:"required"`
+	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
+	// Stackdriver requires metrics to be prefixed with a common prefix.
+	// This prefix changes based on the services the metrics belongs to.
+	ServiceMetricPrefix string   `config:"service_metric_prefix"`
+	MetricTypes         []string `config:"metric_types" validate:"required"`
+	Aligner             string   `config:"aligner"`
+}
+
+// prefix returns the service metric prefix, falling back to the Google Cloud
+// monitoring service prefix when not specified.
+// The prefix is normalized to always end with '/'.
+func (mc metricsConfig) prefix() string {
+	prefix := mc.ServiceMetricPrefix
+
+	// NOTE: fallback to Google Cloud prefix for backward compatibility
+	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
+	// List: https://cloud.google.com/monitoring/api/metrics_gcp
+	if prefix == "" {
+		prefix = mc.ServiceName + ".googleapis.com/"
+	}
+
+	// Final slash is part of prefix. Creating a prefix with final slash
+	// normalize the prefix for other use cases
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
+	}
+
+	return prefix
+}
+
+// AddPrefixTo adds the required service metric prefix to the given metric
+func (mc metricsConfig) AddPrefixTo(metric string) string {
+	return mc.prefix() + metric
+}
+
+// RemovePrefixFrom removes service metric prefix from the given metric
+func (mc metricsConfig) RemovePrefixFrom(metric string) string {
+	return strings.TrimPrefix(metric, mc.prefix())
 }
 
 type metricMeta struct {
@@ -67,6 +104,7 @@ type config struct {
 	ProjectID           string `config:"project_id" validate:"required"`
 	ExcludeLabels       bool   `config:"exclude_labels"`
 	CredentialsFilePath string `config:"credentials_file_path"`
+	CredentialsJSON     string `config:"credentials_json"`
 
 	opt    []option.ClientOption
 	period *duration.Duration
@@ -92,7 +130,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.MetricsConfig = metricsConfigs.Metrics
-	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+
+	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
+		return m, errors.New("both credentials_file_path and credentials_json specified, you must use only one of them")
+	} else if m.config.CredentialsFilePath != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	} else if m.config.CredentialsJSON != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
+	} else {
+		return m, errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
@@ -128,14 +176,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
 	for _, sdc := range m.MetricsConfig {
 		m.Logger().Debugf("metrics config: %v", sdc)
-		responses, err := m.requester.Metrics(ctx, sdc, m.metricsMeta)
+		// m.metricsMeta contains all metrics to be collected, not just the one in the current MetricsConfig.
+		// this loop filters the metrics in metricsMeta so requester.Metrics can collect only the appropriate
+		// ones.
+		// See https://github.com/elastic/beats/pull/29514
+		metricsToCollect := map[string]metricMeta{}
+		for _, v := range sdc.MetricTypes {
+			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
+		}
+		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
 			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 			m.Logger().Error(err)
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc.ServiceName)
+		events, err := m.eventMapping(ctx, responses, sdc)
 		if err != nil {
 			err = errors.Wrap(err, "eventMapping failed")
 			m.Logger().Error(err)
@@ -150,14 +206,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, serviceName string) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger())
+func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	e := newIncomingFieldExtractor(m.Logger(), sdc)
 
 	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, serviceName); err != nil {
+		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
 	}
@@ -182,7 +238,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
 		}
 
-		if serviceName == "compute" {
+		if sdc.ServiceName == "compute" {
 			event.RootFields = addHostFields(groupedEvents)
 		} else {
 			event.RootFields = groupedEvents[0].ECS
@@ -228,7 +284,8 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
+			id := sdc.AddPrefixTo(mt)
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, id)
 			it := client.ListMetricDescriptors(ctx, req)
 
 			for {
@@ -246,6 +303,14 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 				if err == iterator.Done {
 					break
 				}
+
+			}
+
+			// NOTE: if a metric is not added to the metricsWithMeta map is not collected subsequently.
+			// Such a case is an error, as the configuration is explicitly requesting a metric that the beat
+			// is not able to collect, so we provide a logging statement for this behaviour.
+			if _, ok := metricsWithMeta[id]; !ok {
+				m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
 			}
 		}
 	}

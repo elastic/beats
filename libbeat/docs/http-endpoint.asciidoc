@@ -32,6 +32,7 @@ It is recommended to use only localhost. Default is `localhost`
 current user.
 `http.named_pipe.security_descriptor`:: (Optional) Windows Security descriptor string defined in the SDDL format. Default to
 read and write permission for the current user.
+`http.pprof.enabled`:: (Optional) Enable the `/debug/pprof/` endpoints when serving HTTP. It is recommended that this is only enabled on localhost as these endpoints may leak data. Default is `false`.
 
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
@@ -56,7 +57,7 @@ curl -XGET 'localhost:5066/?pretty'
 ["source","js",subs="attributes"]
 ----
 {
-  "beat": "metricbeat",
+  "beat": "{beatname_lc}",
   "hostname": "example.lan",
   "name": "example.lan",
   "uuid": "34f6c6e1-45a8-4b12-9125-11b3e6e89866",

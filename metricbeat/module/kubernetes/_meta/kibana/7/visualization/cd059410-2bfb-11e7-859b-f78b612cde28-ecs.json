@@ -1,0 +1,86 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Deployments [Metricbeat Kubernetes] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "67ee7da0-30e0-11e7-8df8-6d3604a72912"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "68cdba10-30e0-11e7-8df8-6d3604a72912"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:kubernetes AND metricset.name:state_deployment"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "69765620-30e0-11e7-8df8-6d3604a72912"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "4c4690b0-30e0-11e7-8df8-6d3604a72912",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "4c4690b1-30e0-11e7-8df8-6d3604a72912",
+                        "label": "Deployments",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.deployment.name",
+                                "id": "4c4690b2-30e0-11e7-8df8-6d3604a72912",
+                                "type": "cardinality"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.deployment.name"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Deployments [Metricbeat Kubernetes] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "cd059410-2bfb-11e7-859b-f78b612cde28-ecs",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-03-24T09:43:55.002Z",
+    "version": "WzYzNDAsM10="
+}

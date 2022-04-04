@@ -3,7 +3,7 @@
 
 - module: gcp
   vpcflow:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -31,7 +31,7 @@
     #var.internal_networks: [ "private" ]
 
   firewall:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -58,7 +58,7 @@
     #var.internal_networks: [ "private" ]
 
   audit:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id

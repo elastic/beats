@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: prometheus
+
 [[metricbeat-module-prometheus]]
 == Prometheus module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 [[prometheus-module]]
 This module periodically scrapes metrics from

@@ -1,0 +1,106 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"name": "kube-state-metrics",
+			"paused": false,
+			"replicas": {
+				"available": 1,
+				"desired": 1,
+				"unavailable": 0,
+				"updated": 1
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.deployment",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "local-path-storage"
+		},
+		"MetricSetFields": {
+			"name": "local-path-provisioner",
+			"paused": false,
+			"replicas": {
+				"available": 1,
+				"desired": 1,
+				"unavailable": 0,
+				"updated": 1
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.deployment",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"name": "hello-python",
+			"paused": false,
+			"replicas": {
+				"available": 1,
+				"desired": 1,
+				"unavailable": 0,
+				"updated": 1
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.deployment",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"name": "coredns",
+			"paused": false,
+			"replicas": {
+				"available": 2,
+				"desired": 2,
+				"unavailable": 0,
+				"updated": 2
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.deployment",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

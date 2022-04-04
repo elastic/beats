@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+        },
+        "savedSearchRefName": "search_0",
+        "title": "TLS Session Resume [Packetbeat] ECS",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"exclude\":\"\",\"field\":\"tls.detailed.resumption_method\",\"json\":\"{\\n\\\"missing\\\": \\\"none\\\"\\n}\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":5},\"schema\":\"segment\",\"type\":\"terms\"}],\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"labels\":{\"last_level\":true,\"show\":false,\"truncate\":100,\"values\":true},\"legendPosition\":\"right\",\"type\":\"pie\",\"palette\":{\"type\":\"palette\",\"name\":\"kibana_palette\"},\"distinctColors\":true},\"title\":\"TLS Session Resume [Packetbeat] ECS\",\"type\":\"pie\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2c467370-d392-11e7-8fa0-232aa9259081-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:48.230Z",
+    "version": "WzMyMzksMV0="
+}

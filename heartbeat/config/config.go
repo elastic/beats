@@ -27,12 +27,17 @@ import (
 
 // Config defines the structure of heartbeat.yml.
 type Config struct {
-	// Modules is a list of module specific configuration data.
+	RunOnce         bool                 `config:"run_once"`
 	Monitors        []*common.Config     `config:"monitors"`
 	ConfigMonitors  *common.Config       `config:"config.monitors"`
 	Scheduler       Scheduler            `config:"scheduler"`
 	Autodiscover    *autodiscover.Config `config:"autodiscover"`
 	SyntheticSuites []*common.Config     `config:"synthetic_suites"`
+	Jobs            map[string]JobLimit  `config:"jobs"`
+}
+
+type JobLimit struct {
+	Limit int64 `config:"limit" validate:"min=0"`
 }
 
 // Scheduler defines the syntax of a heartbeat.yml scheduler block.

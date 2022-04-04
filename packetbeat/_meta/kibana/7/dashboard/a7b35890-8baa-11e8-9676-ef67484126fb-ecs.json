@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "description": "DHCPv4 Overview",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\": false, \"hidePanelTitles\": false, \"useMargins\": true}",
+        "panelsJSON": "[{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"h\":9,\"i\":\"1\",\"w\":48,\"x\":0,\"y\":7},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"h\":7,\"i\":\"2\",\"w\":8,\"x\":0,\"y\":0},\"panelIndex\":\"2\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"h\":7,\"i\":\"3\",\"w\":11,\"x\":37,\"y\":0},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.3.0\",\"type\":\"search\",\"gridData\":{\"h\":14,\"i\":\"5\",\"w\":48,\"x\":0,\"y\":16},\"panelIndex\":\"5\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_5\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"h\":7,\"i\":\"6\",\"w\":8,\"x\":8,\"y\":0},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_6\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"h\":7,\"i\":\"7\",\"w\":8,\"x\":16,\"y\":0},\"panelIndex\":\"7\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_7\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"h\":7,\"i\":\"8\",\"w\":13,\"x\":24,\"y\":0},\"panelIndex\":\"8\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_8\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] DHCPv4 ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a7b35890-8baa-11e8-9676-ef67484126fb-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "8460fcd0-8baa-11e8-9676-ef67484126fb-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "4ad9db20-8bab-11e8-9676-ef67484126fb-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "418dfbe0-8bac-11e8-9676-ef67484126fb-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+            "name": "5:panel_5",
+            "type": "search"
+        },
+        {
+            "id": "d0120dc0-8bac-11e8-9676-ef67484126fb-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "11d33ea0-8bad-11e8-9676-ef67484126fb-ecs",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:28:36.983Z",
+    "version": "WzMxMjcsMV0="
+}

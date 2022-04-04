@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -37,6 +38,8 @@ func init() {
 }
 
 var debugf = logp.MakeDebug("http")
+
+var userAgent = useragent.UserAgent("Heartbeat")
 
 // Create makes a new HTTP monitor
 func create(
@@ -118,7 +121,7 @@ func create(
 		js[i] = wrappers.WithURLField(u, job)
 	}
 
-	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(config.Hosts)}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts)}, nil
 }
 
 func newRoundTripper(config *Config) (http.RoundTripper, error) {
@@ -128,5 +131,6 @@ func newRoundTripper(config *Config) (http.RoundTripper, error) {
 		httpcommon.WithKeepaliveSettings{
 			Disable: true,
 		},
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
 }

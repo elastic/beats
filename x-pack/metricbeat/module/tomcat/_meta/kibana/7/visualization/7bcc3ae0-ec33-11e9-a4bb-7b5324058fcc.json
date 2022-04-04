@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Bytes sent/received [Metricbeat Tomcat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Received",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.requests.bytes.sent",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "a0d8b6a0-ee8c-11e9-a452-e36b1c5ca82b",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "a0d8b6a0-ee8c-11e9-a452-e36b1c5ca82b",
+                                "id": "e3099fa0-ee94-11e9-a452-e36b1c5ca82b",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "5310fbe0-ec33-11e9-a38d-abb22848ef7c",
+                        "label": "Sent",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.requests.bytes.received",
+                                "id": "5310fbe1-ec33-11e9-a38d-abb22848ef7c",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "5310fbe1-ec33-11e9-a38d-abb22848ef7c",
+                                "id": "bbfe0610-ee8c-11e9-a452-e36b1c5ca82b",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "bbfe0610-ee8c-11e9-a452-e36b1c5ca82b",
+                                "id": "e6da0890-ee94-11e9-a452-e36b1c5ca82b",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Bytes sent/received [Metricbeat Tomcat]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "7bcc3ae0-ec33-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:22.513Z",
+    "version": "WzMyOTEsMV0="
+}
