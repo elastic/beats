@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// TODO: Support other architectures (e.g. arm)
 //go:build linux
 // +build linux
 
