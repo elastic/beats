@@ -1,23 +1,5 @@
 projects:
-    - "auditbeat"
-    - "deploy/kubernetes"
-    - "filebeat"
-    - "heartbeat"
-    - "libbeat"
-    - "metricbeat"
-    - "packetbeat"
-    - "winlogbeat"
     - "x-pack/auditbeat"
-    - "x-pack/dockerlogbeat"
-    - "x-pack/filebeat"
-    - "x-pack/functionbeat"
-    - "x-pack/heartbeat"
-    - "x-pack/libbeat"
-    - "x-pack/metricbeat"
-    - "x-pack/osquerybeat"
-    - "x-pack/packetbeat"
-    - "x-pack/winlogbeat"
-    - "dev-tools"
 
 ## Changeset macros that are defined here and used in each specific 2.0 pipeline.
 changeset:
