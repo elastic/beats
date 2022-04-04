@@ -85,8 +85,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer bt.cancel()
 
-	bt.log.Warn("Functionbeat is going to be removed in 8.1")
-
 	outputName := b.Config.Output.Name()
 	if !isOutputSupported(outputName) {
 		return fmt.Errorf("unsupported output type: %s; supported ones: %+v", outputName, supportedOutputs)
