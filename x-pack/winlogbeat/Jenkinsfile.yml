@@ -11,7 +11,7 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-winlogbeat"
     tags: true                 ## for all the tags
-platform: "windows-2019"       ## default label for all the stages
+platform: "windows-2022"       ## default label for all the stages
 stages:
     lint:
         make: |
@@ -26,19 +26,12 @@ stages:
     build:
         mage: "mage build unitTest"
         withModule: true
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
         stage: mandatory
-    windows-2022:
-      mage: "mage build unitTest"
-      platforms: ## override default labels in this specific stage.
-        - "windows-2022"
-      stage: mandatory
     windows-2019:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2022"
-        stage: mandatory
+            - "windows-2019"
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
