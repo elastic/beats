@@ -160,7 +160,7 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 			},
 		}
 
-		objType = "service"
+		objType = "serviceAccount"
 	case *CronJob:
 		cronjob := client.BatchV1().CronJobs(opts.Namespace)
 		listwatch = &cache.ListWatch{
