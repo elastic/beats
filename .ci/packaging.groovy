@@ -129,6 +129,7 @@ pipeline {
                            file: "${BASE_DIR}/${env.DRA_OUTPUT}",
                            subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
                            body: 'Contact the Release Platform team [#platform-release]')
+<<<<<<< HEAD
             }
           }
         }
@@ -143,6 +144,22 @@ pipeline {
               not { branch 'main' }
             }
           }
+=======
+            }
+          }
+        }
+        stage('DRA Staging') {
+          options { skipDefaultCheckout() }
+          when {
+            allOf {
+              // The Unified Release process keeps moving branches as soon as a new
+              // minor version is created, therefore old release branches won't be able
+              // to use the release manager as their definition is removed.
+              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              not { branch 'main' }
+            }
+          }
+>>>>>>> 2fdefcfbc7 (DRA: support for staging (#31092))
           steps {
             runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
           }
@@ -400,7 +417,10 @@ def release(type){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+<<<<<<< HEAD
         sh(label: "mage ironbank ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage ironbank')
+=======
+>>>>>>> 2fdefcfbc7 (DRA: support for staging (#31092))
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
