@@ -184,7 +184,7 @@ func (l *ESLoader) putDataStream(name string) error {
 	path := "/_data_stream/" + name
 	_, body, err := l.client.Request("PUT", path, "", nil, nil)
 	if err != nil {
-		return fmt.Errorf("couldn't put data stream: %w. Response body: %s", err, body)
+		return fmt.Errorf("could not put data stream: %w. Response body: %s", err, body)
 	}
 	return nil
 }

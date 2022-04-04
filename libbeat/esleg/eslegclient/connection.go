@@ -242,6 +242,9 @@ func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
 func (conn *Connection) Connect() error {
+	if conn.log == nil {
+		conn.log = logp.NewLogger("esclientleg")
+	}
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
