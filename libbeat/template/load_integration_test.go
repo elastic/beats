@@ -62,16 +62,19 @@ type testSetup struct {
 }
 
 func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
-	t.Helper()
+	if cfg.Name == "" {
+		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
+	}
 	client := getTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	s := newTestSetupWithESClient(t, client, cfg)
-	s.cleanupDataStream(cfg.Name)
+	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
+	client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
+	s.requireDataStreamDoesNotExist("")
 	client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
 	s.requireTemplateDoesNotExist("")
-	return s
+	return &s
 }
 
 func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig) *testSetup {
