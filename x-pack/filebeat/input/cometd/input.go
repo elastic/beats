@@ -62,13 +62,13 @@ func (in *cometdInput) run() error {
 			// Convert json.RawMessage response to []byte
 			msg, err := e.Data.Payload.MarshalJSON()
 			if err != nil {
-				return fmt.Errorf("JSON error: %v", err)
+				return fmt.Errorf("JSON error: %w", err)
 			}
 
 			// Extract event IDs from json.RawMessage
 			err = json.Unmarshal(e.Data.Payload, &event)
 			if err != nil {
-				return fmt.Errorf("error while parsing JSON: %v", err)
+				return fmt.Errorf("error while parsing JSON: %w", err)
 			}
 			if ok := in.outlet.OnEvent(makeEvent(event.EventId, string(msg))); !ok {
 				in.log.Debug("OnEvent returned false. Stopping input worker.")

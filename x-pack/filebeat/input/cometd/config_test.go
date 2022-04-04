@@ -10,6 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	demoClientID     = "DEMOCLIENTID"
+	demoClientSecret = "DEMOCLIENTSECRET"
+	salesforceUser   = "salesforce_user"
+	password         = "P@$$w0₹D"
+	tokenURL         = "https://login.salesforce.com/services/oauth2/token"
+)
+
 // Validate that it finds the application default credentials and does
 // not trigger a config validation error because credentials were not
 // set in the config.
@@ -26,40 +34,40 @@ func TestConfigValidateFailure(t *testing.T) {
 
 func TestConfigAuthValidate(t *testing.T) {
 	var o oAuth2Config
-	o.ClientID = "DEMOCLIENTID"
-	o.ClientSecret = "DEMOCLIENTSECRET"
-	o.User = "salesforce_user"
-	o.Password = "P@$$w0₹D"
-	o.TokenURL = "https://login.salesforce.com/services/oauth2/token"
+	o.ClientID = demoClientID
+	o.ClientSecret = demoClientSecret
+	o.User = salesforceUser
+	o.Password = password
+	o.TokenURL = tokenURL
 
 	assert.NoError(t, o.Validate())
 }
 
 func TestConfigAuthValidateFailure_MissingTokenURL(t *testing.T) {
 	var o oAuth2Config
-	o.ClientID = "DEMOCLIENTID"
-	o.ClientSecret = "DEMOCLIENTSECRET"
-	o.User = "salesforce_user"
-	o.Password = "P@$$w0₹D"
+	o.ClientID = demoClientID
+	o.ClientSecret = demoClientSecret
+	o.User = salesforceUser
+	o.Password = password
 
 	assert.Error(t, o.Validate())
 }
 
 func TestConfigAuthValidateFailure_MissingClientCredentials(t *testing.T) {
 	var o oAuth2Config
-	o.ClientSecret = "DEMOCLIENTSECRET"
-	o.User = "salesforce_user"
-	o.Password = "P@$$w0₹D"
-	o.TokenURL = "https://login.salesforce.com/services/oauth2/token"
+	o.ClientSecret = demoClientSecret
+	o.User = salesforceUser
+	o.Password = password
+	o.TokenURL = tokenURL
 
 	assert.Error(t, o.Validate())
 }
 
 func TestConfigAuthValidateFailure_MissingUsernamePassword(t *testing.T) {
 	var o oAuth2Config
-	o.ClientID = "DEMOCLIENTID"
-	o.ClientSecret = "DEMOCLIENTSECRET"
-	o.TokenURL = "https://login.salesforce.com/services/oauth2/token"
+	o.ClientID = demoClientID
+	o.ClientSecret = demoClientSecret
+	o.TokenURL = tokenURL
 
 	assert.Error(t, o.Validate())
 }
