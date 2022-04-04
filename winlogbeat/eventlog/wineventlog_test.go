@@ -31,7 +31,6 @@ import (
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -183,26 +182,12 @@ func testWindowsEventLog(t *testing.T, api string) {
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000)+1, []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
+		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
 		return openLog(t, api, nil, config)
 	}
-
-	t.Run("has_message", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
-		defer log.Close()
-
-		for i := 0; i < 10; i++ {
-			records, err := log.Read()
-			require.NotEmpty(t, records)
-			require.NoError(t, err)
-
-			r := records[0]
-			require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
-		}
-	})
 
 	// Test reading from an event log using a custom XML query.
 	t.Run("custom_xml_query", func(t *testing.T) {
@@ -317,18 +302,16 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	}
 
 	if existed {
-		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "") //nolint:errcheck // This is just a resource release.
+		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
 	}
 
 	log, err = eventlog.Open(source)
-	//nolint:errcheck // This is just a resource release.
 	if err != nil {
 		eventlog.RemoveSource(name, source)
 		eventlog.RemoveProvider(name)
 		t.Fatal(err)
 	}
 
-	//nolint:errcheck // This is just a resource release.
 	tearDown = func() {
 		log.Close()
 		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
@@ -355,7 +338,7 @@ func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, m
 
 // setLogSize set the maximum number of bytes that an event log can hold.
 func setLogSize(t testing.TB, provider string, sizeBytes int) {
-	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput() //nolint:gosec // No possibility of command injection.
+	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput()
 	if err != nil {
 		t.Fatal("Failed to set log size", err, string(output))
 	}

@@ -30,6 +30,7 @@ import (
 	"unsafe"
 
 	"github.com/cespare/xxhash/v2"
+	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
@@ -40,10 +41,10 @@ import (
 
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
-	// Mutex to guard the metadataCache. The other members are immutable.
-	mutex sync.RWMutex
 	// Cache of publisher metadata. Maps publisher names to stored metadata.
 	metadataCache map[string]*PublisherMetadataStore
+	// Mutex to guard the metadataCache. The other members are immutable.
+	mutex sync.RWMutex
 
 	session       EvtHandle // Session handle if working with remote log.
 	systemContext EvtHandle // Render context for system values.
@@ -55,12 +56,12 @@ type Renderer struct {
 func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 	systemContext, err := _EvtCreateRenderContext(0, 0, EvtRenderContextSystem)
 	if err != nil {
-		return nil, fmt.Errorf("failed in EvtCreateRenderContext for system context: %w", err)
+		return nil, errors.Wrap(err, "failed in EvtCreateRenderContext for system context")
 	}
 
 	userContext, err := _EvtCreateRenderContext(0, 0, EvtRenderContextUser)
 	if err != nil {
-		return nil, fmt.Errorf("failed in EvtCreateRenderContext for user context: %w", err)
+		return nil, errors.Wrap(err, "failed in EvtCreateRenderContext for user context")
 	}
 
 	return &Renderer{
@@ -91,7 +92,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	event := &winevent.Event{}
 
 	if err := r.renderSystem(handle, event); err != nil {
-		return nil, fmt.Errorf("failed to render system properties: %w", err)
+		return nil, errors.Wrap(err, "failed to render system properties")
 	}
 
 	// From this point on it will return both the event and any errors. It's
@@ -109,7 +110,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 
 	eventData, fingerprint, err := r.renderUser(handle, event)
 	if err != nil {
-		errs = append(errs, fmt.Errorf("failed to render event data: %w", err))
+		errs = append(errs, errors.Wrap(err, "failed to render event data"))
 	}
 
 	// Load cached event metadata or try to bootstrap it from the event's XML.
@@ -119,7 +120,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	r.addEventData(eventMeta, eventData, event)
 
 	if event.Message, err = r.formatMessage(md, eventMeta, handle, eventData, uint16(event.EventIdentifier.ID)); err != nil {
-		errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
+		errs = append(errs, errors.Wrap(err, "failed to get the event message string"))
 	}
 
 	if len(errs) > 0 {
@@ -157,8 +158,8 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*PublisherMetadataSto
 			// Return an empty store on error (can happen in cases where the
 			// log was forwarded and the provider doesn't exist on collector).
 			md = NewEmptyPublisherMetadataStore(publisher, r.log)
-			err = fmt.Errorf("failed to load publisher metadata for %v "+
-				"(returning an empty metadata store): %w", publisher, err)
+			err = errors.Wrapf(err, "failed to load publisher metadata for %v "+
+				"(returning an empty metadata store)", publisher)
 		}
 		r.metadataCache[publisher] = md
 	} else {
@@ -172,11 +173,11 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*PublisherMetadataSto
 func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 	bb, propertyCount, err := r.render(r.systemContext, handle)
 	if err != nil {
-		return fmt.Errorf("failed to get system values: %w", err)
+		return errors.Wrap(err, "failed to get system values")
 	}
 	defer bb.Free()
 
-	for i := 0; i < propertyCount; i++ {
+	for i := 0; i < int(propertyCount); i++ {
 		property := EvtSystemPropertyID(i)
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
@@ -186,7 +187,6 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 			continue
 		}
 
-		//nolint:errcheck // Bad linter!
 		switch property {
 		case EvtSystemProviderName:
 			event.Provider.Name = data.(string)
@@ -201,10 +201,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 		case EvtSystemTask:
 			event.TaskRaw = data.(uint16)
 		case EvtSystemOpcode:
-			if event.OpcodeRaw == nil {
-				event.OpcodeRaw = new(uint8)
-			}
-			*event.OpcodeRaw = data.(uint8)
+			event.OpcodeRaw = data.(uint8)
 		case EvtSystemKeywords:
 			event.KeywordsRaw = winevent.HexInt64(data.(hexInt64))
 		case EvtSystemTimeCreated:
@@ -243,7 +240,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
-		return nil, 0, fmt.Errorf("failed to get user values: %w", err)
+		return nil, 0, errors.Wrap(err, "failed to get user values")
 	}
 	defer bb.Free()
 
@@ -263,7 +260,7 @@ func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values [
 	for i := 0; i < propertyCount; i++ {
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
-		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type)) //nolint:errcheck // Hash writes never fail.
+		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type))
 
 		values[i], err = evtVar.Data(bb.Bytes())
 		if err != nil {
@@ -286,8 +283,8 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 	var bufferUsed, propertyCount uint32
 
 	err := _EvtRender(context, eventHandle, EvtRenderEventValues, 0, nil, &bufferUsed, &propertyCount)
-	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return nil, 0, fmt.Errorf("failed in EvtRender: %w", err)
+	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER {
+		return nil, 0, errors.Wrap(err, "failed in EvtRender")
 	}
 
 	if propertyCount == 0 {
@@ -300,7 +297,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 	err = _EvtRender(context, eventHandle, EvtRenderEventValues, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed, &propertyCount)
 	if err != nil {
 		bb.Free()
-		return nil, 0, fmt.Errorf("failed in EvtRender: %w", err)
+		return nil, 0, errors.Wrap(err, "failed in EvtRender")
 	}
 
 	return bb, int(propertyCount), nil
@@ -387,7 +384,7 @@ func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values 
 	defer bb.Free()
 
 	if err := msgTmpl.Execute(bb, values); err != nil {
-		return "", fmt.Errorf("failed to execute template with data=%#v template=%v: %w", values, msgTmpl.Root.String(), err)
+		return "", errors.Wrapf(err, "failed to execute template with data=%#v template=%v", values, msgTmpl.Root.String())
 	}
 
 	return string(bb.Bytes()), nil

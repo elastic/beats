@@ -28,9 +28,10 @@ import (
 	"sort"
 	"syscall"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
@@ -73,7 +74,7 @@ func Channels() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer _EvtClose(handle) //nolint:errcheck // This is just a resource release.
+	defer _EvtClose(handle)
 
 	var channels []string
 	cpBuffer := make([]uint16, 512)
@@ -82,7 +83,7 @@ loop:
 		var used uint32
 		err := _EvtNextChannelPath(handle, uint32(len(cpBuffer)), &cpBuffer[0], &used)
 		if err != nil {
-			errno, ok := err.(syscall.Errno) //nolint:errorlint // This is an errno or nil.
+			errno, ok := err.(syscall.Errno)
 			if ok {
 				switch errno {
 				case ERROR_INSUFFICIENT_BUFFER:
@@ -202,7 +203,7 @@ func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 		// Munge ERROR_INVALID_OPERATION to ERROR_NO_MORE_ITEMS when no handles
 		// were read. This happens you call the method and there are no events
 		// to read (i.e. polling).
-		if err == ERROR_INVALID_OPERATION && numRead == 0 { //nolint:errorlint // This is an errno or nil.
+		if err == ERROR_INVALID_OPERATION && numRead == 0 {
 			return nil, ERROR_NO_MORE_ITEMS
 		}
 		return nil, err
@@ -240,11 +241,12 @@ func RenderEvent(
 	// Only a single string is returned when rendering XML.
 	err = FormatEventString(EvtFormatMessageXml,
 		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
+
 	// Recover by rendering the XML without the RenderingInfo (message string).
 	if err != nil {
 		// Do not try to recover from InsufficientBufferErrors because these
 		// can be retried with a larger buffer.
-		if errors.Is(err, sys.InsufficientBufferError{}) {
+		if _, ok := err.(sys.InsufficientBufferError); ok {
 			return err
 		}
 
@@ -252,26 +254,6 @@ func RenderEvent(
 	}
 
 	return err
-}
-
-// Message reads the event data associated with the EvtHandle and renders
-// and returns the message only.
-func Message(h EvtHandle, buf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
-	providerName, err := evtRenderProviderName(buf, h)
-	if err != nil {
-		return "", err
-	}
-
-	var pub EvtHandle
-	if pubHandleProvider != nil {
-		messageFiles := pubHandleProvider(providerName)
-		if messageFiles.Err == nil {
-			// There is only ever a single handle when using the Windows Event
-			// Log API.
-			pub = EvtHandle(messageFiles.Handles[0].Handle)
-		}
-	}
-	return getMessageStringFromHandle(&PublisherMetadata{Handle: pub}, h, nil)
 }
 
 // RenderEventXML renders the event as XML. If the event is already rendered, as
@@ -333,7 +315,7 @@ func CreateBookmarkFromXML(bookmarkXML string) (EvtHandle, error) {
 // CreateRenderContext creates a render context. Close must be called on
 // returned EvtHandle when finished with the handle.
 func CreateRenderContext(valuePaths []string, flag EvtRenderContextFlag) (EvtHandle, error) {
-	paths := make([]uintptr, 0, len(valuePaths))
+	var paths []uintptr
 	for _, path := range valuePaths {
 		utf16, err := syscall.UTF16FromString(path)
 		if err != nil {
@@ -402,12 +384,11 @@ func FormatEventString(
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
 	if ph == 0 {
-		var err error
-		ph, err = OpenPublisherMetadata(0, publisher, lang)
+		ph, err := OpenPublisherMetadata(0, publisher, lang)
 		if err != nil {
 			return err
 		}
-		defer _EvtClose(ph) //nolint:errcheck // This is just a resource release.
+		defer _EvtClose(ph)
 	}
 
 	// Create a buffer if one was not provided.
@@ -415,7 +396,7 @@ func FormatEventString(
 	if buffer == nil {
 		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 			0, nil, &bufferUsed)
-		if err != nil && err != ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
+		if err != nil && err != ERROR_INSUFFICIENT_BUFFER {
 			return err
 		}
 
@@ -427,8 +408,8 @@ func FormatEventString(
 	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
 	bufferUsed *= 2
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
 	if err != nil {
 		return err
@@ -445,7 +426,7 @@ func Publishers() ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtOpenPublisherEnum: %w", err)
 	}
-	defer Close(publisherEnumerator) //nolint:errcheck // This is just a resource release.
+	defer Close(publisherEnumerator)
 
 	var (
 		publishers []string
@@ -456,7 +437,7 @@ func Publishers() ([]string, error) {
 loop:
 	for {
 		if err = _EvtNextPublisherId(publisherEnumerator, uint32(len(buffer)), &buffer[0], &bufferUsed); err != nil {
-			switch err { //nolint:errorlint // This is an errno or nil.
+			switch err {
 			case ERROR_NO_MORE_ITEMS:
 				break loop
 			case ERROR_INSUFFICIENT_BUFFER:
@@ -485,7 +466,7 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	var err error
 	switch runtime.GOARCH {
 	default:
-		return 0, fmt.Errorf("unhandled architecture: %s", runtime.GOARCH)
+		return 0, fmt.Errorf("Unhandled architecture: %s", runtime.GOARCH)
 	case "amd64":
 		err = binary.Read(reader, binary.LittleEndian, &dataPtr)
 		if err != nil {
@@ -508,8 +489,8 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	offset := dataPtr - bufferPtr
 
 	if offset > uint64(len(buffer)) {
-		return 0, fmt.Errorf("invalid pointer %x: cannot dereference an "+
-			"address outside of the buffer [%x:%x]", dataPtr, bufferPtr,
+		return 0, fmt.Errorf("Invalid pointer %x. Cannot dereference an "+
+			"address outside of the buffer [%x:%x].", dataPtr, bufferPtr,
 			bufferPtr+uint64(len(buffer)))
 	}
 
@@ -522,7 +503,7 @@ func readString(buffer []byte, reader io.Reader) (string, error) {
 	offset, err := offset(buffer, reader)
 	if err != nil {
 		// Ignore NULL values.
-		if err == ErrorEvtVarTypeNull { //nolint:errorlint // This is never wrapped.
+		if err == ErrorEvtVarTypeNull {
 			return "", nil
 		}
 		return "", err
@@ -536,11 +517,11 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 	var bufferUsed, propertyCount uint32
 	err := _EvtRender(providerNameContext, eventHandle, EvtRenderEventValues,
 		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return "", sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
 	if err != nil {
-		return "", fmt.Errorf("evtRenderProviderName: %w", err)
+		return "", fmt.Errorf("evtRenderProviderName %v", err)
 	}
 
 	reader := bytes.NewReader(renderBuf)
@@ -551,15 +532,14 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 	var bufferUsed, propertyCount uint32
 	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
 		&renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
 	if err != nil {
 		return err
 	}
 
 	if int(bufferUsed) > len(renderBuf) {
-		//nolint:stylecheck // These are proper nouns.
 		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
 			"to the buffer, but the buffer can only hold %d bytes",
 			bufferUsed, len(renderBuf))
