@@ -114,7 +114,7 @@ pipeline {
           when {
             allOf {
               expression { return env.IS_BRANCH_AVAILABLE == "true" }
-              not { branch '7.17 '}
+              not { branch '7.17' }
             }
           }
           environment {
