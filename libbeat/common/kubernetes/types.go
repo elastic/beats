@@ -76,6 +76,9 @@ type StatefulSet = appsv1.StatefulSet
 // Service data
 type Service = v1.Service
 
+// ServiceAccount data
+type ServiceAccount = v1.ServiceAccount
+
 // Job data
 type Job = batchv1.Job
 
