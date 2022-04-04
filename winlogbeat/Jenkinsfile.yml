@@ -13,14 +13,14 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
+    checks:
         make: |
           make -C winlogbeat check;
           make -C winlogbeat update;
           make -C x-pack/winlogbeat check;
           make -C x-pack/winlogbeat update;
           make check-no-changes;
-        stage: lint
+        stage: checks
     crosscompile:
         make: "make -C winlogbeat crosscompile"
         stage: mandatory

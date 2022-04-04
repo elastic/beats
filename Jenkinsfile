@@ -79,21 +79,21 @@ pipeline {
         }
       }
     }
-    stage('Lint'){
+    stage('Checks'){
       options { skipDefaultCheckout() }
       environment {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: "Lint") {
-          stageStatusCache(id: 'Lint'){
-            withBeatsEnv(archive: false, id: "lint") {
+        withGithubNotify(context: "Checks") {
+          stageStatusCache(id: 'Checks'){
+            withBeatsEnv(archive: false, id: "checks") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'true') {
                 cmd(label: "make check", script: "make check")
               }
               whenTrue(env.ONLY_DOCS == 'false') {
-                runLinting()
+                runChecks()
               }
             }
           }
@@ -209,11 +209,11 @@ VERSION=${env.VERSION}-SNAPSHOT""")
   }
 }
 
-def runLinting() {
+def runChecks() {
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
-    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'lint').each { k,v ->
+    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'checks').each { k,v ->
       mapParallelTasks["${k}"] = v
     }
   }
@@ -1056,9 +1056,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
       //   2) All the remaining stages will retry the command within the same worker/workspace if any failure
       //
-      // NOTE: stage: lint uses target function while cloud and k8sTest use a different function
+      // NOTE: stage: checks uses target function while cloud and k8sTest use a different function
       //
-      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('lint') ||
+      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('checks') ||
                          args?.content?.containsKey('packaging-arm') ||
                          args?.content?.containsKey('packaging-linux')) ? false : true
       if(args?.content?.containsKey('make')) {
