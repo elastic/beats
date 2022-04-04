@@ -7,17 +7,24 @@ package http_endpoint
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
 
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
+)
+
+const headerContentEncoding = "Content-Encoding"
+
+var (
+	errBodyEmpty       = errors.New("body cannot be empty")
+	errUnsupportedType = errors.New("only JSON objects are accepted")
 )
 
 type httpHandler struct {
@@ -31,67 +38,64 @@ type httpHandler struct {
 	preserveOriginalEvent bool
 }
 
-var (
-	errBodyEmpty       = errors.New("body cannot be empty")
-	errUnsupportedType = errors.New("only JSON objects are accepted")
-)
-
 // Triggers if middleware validation returns successful
 func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
-	var headers map[string]interface{}
-	objs, _, status, err := httpReadJSON(r.Body)
+	body, status, err := getBodyReader(r)
 	if err != nil {
-		sendErrorResponse(w, status, err)
+		sendAPIErrorResponse(w, r, h.log, status, err)
 		return
 	}
+	defer body.Close()
+
+	objs, _, status, err := httpReadJSON(body)
+	if err != nil {
+		sendAPIErrorResponse(w, r, h.log, status, err)
+		return
+	}
+
+	var headers map[string]interface{}
 	if len(h.includeHeaders) > 0 {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
+
 	for _, obj := range objs {
-		h.publishEvent(obj, headers)
+		if err = h.publishEvent(obj, headers); err != nil {
+			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			return
+		}
 	}
+
 	h.sendResponse(w, h.responseCode, h.responseBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
-	io.WriteString(w, message)
+	if _, err := io.WriteString(w, message); err != nil {
+		h.log.Debugw("Failed writing response to client.", "error", err)
+	}
 }
 
-func (h *httpHandler) publishEvent(obj common.MapStr, headers common.MapStr) {
+func (h *httpHandler) publishEvent(obj, headers common.MapStr) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
-			h.messageField: obj,
-		},
+		Fields:    common.MapStr{},
 	}
 	if h.preserveOriginalEvent {
-		event.PutValue("event.original", obj.String())
+		event.Fields["event"] = common.MapStr{
+			"original": obj.String(),
+		}
 	}
 	if len(headers) > 0 {
-		event.PutValue("headers", headers)
+		event.Fields["headers"] = headers
+	}
+
+	if _, err := event.PutValue(h.messageField, obj); err != nil {
+		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
 	}
 
 	h.publisher.Publish(event)
-}
-
-func withValidator(v validator, handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if status, err := v.ValidateHeader(r); status != 0 && err != nil {
-			sendErrorResponse(w, status, err)
-		} else {
-			handler(w, r)
-		}
-	}
-}
-
-func sendErrorResponse(w http.ResponseWriter, status int, err error) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
-	e := json.NewEncoder(w)
-	e.SetEscapeHTML(false)
-	e.Encode(common.MapStr{"message": err.Error()})
+	return nil
 }
 
 func httpReadJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, status int, err error) {
@@ -110,15 +114,15 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 	for decoder.More() {
 		var raw json.RawMessage
 		if err := decoder.Decode(&raw); err != nil {
-			if err == io.EOF {
+			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
-			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", decoder.InputOffset())
+			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 
 		var obj interface{}
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
-			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", decoder.InputOffset())
+			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 		switch v := obj.(type) {
 		case map[string]interface{}:
@@ -127,7 +131,7 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 		case []interface{}:
 			nobjs, nrawMessages, err := decodeJSONArray(bytes.NewReader(raw))
 			if err != nil {
-				return nil, nil, errors.Wrapf(err, "recursive error %d", decoder.InputOffset())
+				return nil, nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
 			}
 			objs = append(objs, nobjs...)
 			rawMessages = append(rawMessages, nrawMessages...)
@@ -144,22 +148,28 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, err error) {
 	dec := newJSONDecoder(raw)
 	token, err := dec.Token()
-	if token != json.Delim('[') || err != nil {
-		return nil, nil, errors.Wrapf(err, "malformed JSON array, not starting with delimiter [ at position: %d", dec.InputOffset())
+	if err != nil {
+		if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
+			return nil, nil, nil
+		}
+		return nil, nil, fmt.Errorf("failed reading JSON array: %w", err)
+	}
+	if token != json.Delim('[') {
+		return nil, nil, fmt.Errorf("malformed JSON array, not starting with delimiter [ at position: %d", dec.InputOffset())
 	}
 
 	for dec.More() {
 		var raw json.RawMessage
 		if err := dec.Decode(&raw); err != nil {
-			if err == io.EOF {
+			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
-			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", dec.InputOffset())
+			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
 		var obj interface{}
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
-			return nil, nil, errors.Wrapf(err, "malformed JSON object at stream position %d", dec.InputOffset())
+			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
 		m, ok := obj.(map[string]interface{})
@@ -168,15 +178,14 @@ func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []jso
 			objs = append(objs, m)
 		}
 	}
-	return
+	return objs, rawMessages, nil
 }
 
 func getIncludedHeaders(r *http.Request, headerConf []string) (includedHeaders common.MapStr) {
 	includedHeaders = common.MapStr{}
 	for _, header := range headerConf {
-		h, found := r.Header[header]
-		if found {
-			includedHeaders.Put(header, h)
+		if value, found := r.Header[header]; found {
+			includedHeaders[common.DeDot(header)] = value
 		}
 	}
 	return includedHeaders
@@ -186,4 +195,21 @@ func newJSONDecoder(r io.Reader) *json.Decoder {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 	return dec
+}
+
+// getBodyReader returns a reader that decodes the specified Content-Encoding.
+func getBodyReader(r *http.Request) (body io.ReadCloser, status int, err error) {
+	switch enc := r.Header.Get(headerContentEncoding); enc {
+	case "gzip", "x-gzip":
+		gzipReader, err := newPooledGzipReader(r.Body)
+		if err != nil {
+			return nil, http.StatusInternalServerError, fmt.Errorf("failed to create gzip reader: %w", err)
+		}
+		return gzipReader, 0, nil
+	case "":
+		// No encoding.
+		return r.Body, 0, nil
+	default:
+		return nil, http.StatusUnsupportedMediaType, fmt.Errorf("unsupported Content-Encoding type %q", enc)
+	}
 }
