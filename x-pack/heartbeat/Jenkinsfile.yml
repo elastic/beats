@@ -13,14 +13,14 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
+    checks:
         make: |
           make -C x-pack/heartbeat check;
           make -C x-pack/heartbeat update;
           make -C heartbeat check;
           make -C heartbeat update;
           make check-no-changes;
-        stage: lint
+        stage: checks
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
