@@ -43,6 +43,7 @@ func TestErrorJson(t *testing.T) {
 }
 
 func assertConnection(t *testing.T, URL string, expectedStatusCode int) {
+	t.Helper()
 	conn := Connection{
 		URL:  URL,
 		HTTP: http.DefaultClient,
