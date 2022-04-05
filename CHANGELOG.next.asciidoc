@@ -52,13 +52,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
 - Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
   inputs will fix the problem without generating any data duplication{issue}30061[30061]
-- Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
-
-*Filebeat*
-
-- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
-- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
-- Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
 - Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
 
 *Heartbeat*
