@@ -3294,6 +3294,26 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.device_detail.is_compliant`*::
++
+--
+If the device is compliant
+
+
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.device_detail.is_managed`*::
++
+--
+If the device is managed
+
+
+type: boolean
+
+--
+
 *`azure.signinlogs.properties.applied_conditional_access_policies`*::
 +
 --
@@ -3324,6 +3344,35 @@ type: flattened
 
 --
 
+*`azure.signinlogs.properties.authentication_protocol`*::
++
+--
+Authentication protocol type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.incoming_token_type`*::
++
+--
+Incoming token type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.unique_token_identifier`*::
++
+--
+Unique token identifier for the request.
+
+type: keyword
+
+--
+
 *`azure.signinlogs.properties.authentication_requirement`*::
 +
 --
@@ -3340,7 +3389,7 @@ type: keyword
 Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
 
 
-type: keyword
+type: flattened
 
 --
 
@@ -20639,6 +20688,40 @@ type: keyword
 --
 In case of phishing event, the domain, which the attacker was impersonating.
 
+
+type: keyword
+
+--
+
+*`checkpoint.comment`*::
++
+--
+type: keyword
+
+--
+
+*`checkpoint.conn_direction`*::
++
+--
+Connection direction
+
+type: keyword
+
+--
+
+*`checkpoint.db_ver`*::
++
+--
+Database version
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Status of database update
 
 type: keyword
 
