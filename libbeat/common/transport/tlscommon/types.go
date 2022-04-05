@@ -75,6 +75,8 @@ var tlsCipherSuitesInverse = make(map[CipherSuite]string, len(tlsCipherSuites))
 var tlsRenegotiationSupportTypesInverse = make(map[TlsRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
 var tlsVerificationModesInverse = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
 
+const unknownString = "unknown"
+
 // Init creates a inverse representation of the values mapping.
 func init() {
 	for cipherName, i := range tlsCipherSuites {
@@ -142,7 +144,7 @@ func (m TLSVerificationMode) String() string {
 	if s, ok := tlsVerificationModesInverse[m]; ok {
 		return s
 	}
-	return "unknown"
+	return unknownString
 }
 
 // MarshalText marshal the verification mode into a human readable value.
@@ -200,7 +202,7 @@ func (cs CipherSuite) String() string {
 	if s, found := tlsCipherSuitesInverse[cs]; found {
 		return s
 	}
-	return "unknown"
+	return unknownString
 }
 
 type tlsCurveType tls.CurveID
