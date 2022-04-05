@@ -14,7 +14,7 @@ const (
 	demoClientID     = "DEMOCLIENTID"
 	demoClientSecret = "DEMOCLIENTSECRET"
 	salesforceUser   = "salesforce_user"
-	password         = "P@$$w0₹D"
+	pwd              = "P@$$w0₹D"
 	tokenURL         = "https://login.salesforce.com/services/oauth2/token"
 )
 
@@ -37,7 +37,7 @@ func TestConfigAuthValidate(t *testing.T) {
 	o.ClientID = demoClientID
 	o.ClientSecret = demoClientSecret
 	o.User = salesforceUser
-	o.Password = password
+	o.Password = pwd
 	o.TokenURL = tokenURL
 
 	assert.NoError(t, o.Validate())
@@ -48,7 +48,7 @@ func TestConfigAuthValidateFailure_MissingTokenURL(t *testing.T) {
 	o.ClientID = demoClientID
 	o.ClientSecret = demoClientSecret
 	o.User = salesforceUser
-	o.Password = password
+	o.Password = pwd
 
 	assert.Error(t, o.Validate())
 }
@@ -57,7 +57,7 @@ func TestConfigAuthValidateFailure_MissingClientCredentials(t *testing.T) {
 	var o oAuth2Config
 	o.ClientSecret = demoClientSecret
 	o.User = salesforceUser
-	o.Password = password
+	o.Password = pwd
 	o.TokenURL = tokenURL
 
 	assert.Error(t, o.Validate())

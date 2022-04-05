@@ -12,8 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -83,7 +81,7 @@ func (in *cometdInput) run() error {
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 }
 
