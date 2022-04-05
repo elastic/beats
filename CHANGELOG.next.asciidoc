@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
 - threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 - Add pipeline in FB's supported hints. {pull}30212[30212]
+- Support SASL/SCRAM authentication in the Kafka input. {pull}31167[31167]
 
 *Auditbeat*
 
