@@ -84,6 +84,9 @@ pipeline {
       environment {
         GOFLAGS = '-mod=readonly'
       }
+      when {
+        expression { return false }
+      }
       steps {
         withGithubNotify(context: "Checks") {
           stageStatusCache(id: 'Checks'){
