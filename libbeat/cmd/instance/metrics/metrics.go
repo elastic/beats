@@ -280,11 +280,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	pid, err := process.GetSelfPid()
-	if err != nil {
-		logp.Err("error getting PID for self process: %v", err)
-		return
-	}
+	pid := os.Getpid()
 
 	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
 		IgnoreRootCgroups:        true,
@@ -301,7 +297,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 
 	cgv, err := cgroups.CgroupsVersion(pid)
 	if err != nil {
-		logp.Err("error determining cgroups version: %v", err)
+		logp.L().Debugf("error determining cgroups version: %v", err)
 		return
 	}
 

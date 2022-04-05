@@ -74,7 +74,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: heartbeat
-        image: docker.elastic.co/beats/heartbeat:7.17.1
+        image: docker.elastic.co/beats/heartbeat:7.17.2
         args: [
           "-c", "/etc/heartbeat.yml",
           "-e",

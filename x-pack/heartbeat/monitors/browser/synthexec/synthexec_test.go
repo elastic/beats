@@ -141,8 +141,8 @@ Loop:
 		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
 	})
 	t.Run("should have one event per line in sampleinput", func(t *testing.T) {
-		// 27 lines are in sample.ndjson + 2 from stderr + 1 from stdout
-		expected := 27 + 2 + 1
+		// 27 lines are in sample.ndjson + 2 from stderr + 1 from stdout + 1 from the command exit
+		expected := 28 + 2 + 1
 		require.Len(t, synthEvents, expected)
 	})
 
@@ -150,6 +150,7 @@ Loop:
 		"journey/start",
 		"step/end",
 		"journey/end",
+		"cmd/status",
 	}
 	for _, typ := range expectedEventTypes {
 		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {

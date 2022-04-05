@@ -23,9 +23,11 @@ pipeline {
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
+    SLACK_CHANNEL = '#beats'
+    NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    timeout(time: 4, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -40,7 +42,8 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu-18 && immutable' }
+      options { skipDefaultCheckout() }
+      agent { label 'ubuntu-20 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -56,6 +59,9 @@ pipeline {
             return ret
           }
         }
+      }
+      environment {
+        HOME = "${env.WORKSPACE}"
       }
       stages {
         stage('Checkout') {
@@ -82,11 +88,10 @@ pipeline {
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
             // Stash without any build/dependencies context to support different architectures.
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-            withMageEnv(){
-              dir("${BASE_DIR}"){
-                setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-              }
+            dir("${BASE_DIR}"){
+              setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
+            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
           }
         }
         stage('Build Packages'){
@@ -99,6 +104,48 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             runE2ETests()
+          }
+        }
+        stage('DRA') {
+          options { skipDefaultCheckout() }
+          // The Unified Release process keeps moving branches as soon as a new
+          // minor version is created, therefore old release branches won't be able
+          // to use the release manager as their definition is removed.
+          when {
+            allOf {
+              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              not { branch '7.17' }
+            }
+          }
+          environment {
+            // It uses the folder structure done in uploadPackagesToGoogleBucket
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+            DRA_OUTPUT = 'release-manager.out'
+          }
+          steps {
+            dir("${BASE_DIR}") {
+              // TODO: as long as googleStorageDownload does not support recursive copy with **/*
+              dir("build/distributions") {
+                gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+              }
+              sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
+              sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
+              dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+              releaseManager(project: 'beats',
+                             version: env.BEAT_VERSION,
+                             type: 'snapshot',
+                             artifactsFolder: 'build/distributions',
+                             outputFile: env.DRA_OUTPUT)
+            }
+          }
+          post {
+            failure {
+              notifyStatus(analyse: true,
+                           file: "${BASE_DIR}/${env.DRA_OUTPUT}",
+                           subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
+                           body: 'Contact the Release Platform team [#platform-release]')
+            }
           }
         }
       }
@@ -158,6 +205,18 @@ def generateSteps() {
       parallelTasks["arm-${beat}"] =  generateArmStep(beat)
     }
   }
+
+  // enable beats-dashboards within the existing worker
+  parallelTasks["beats-dashboards"] = {
+    withGithubNotify(context: "beats-dashboards") {
+      withEnv(["HOME=${env.WORKSPACE}"]) {
+        withBeatsEnv() {
+          sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+          sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+        }
+      }
+    }
+  }
   parallel(parallelTasks)
 }
 
@@ -179,7 +238,7 @@ def generateArmStep(beat) {
 
 def generateLinuxStep(beat) {
   return {
-    withNode(labels: 'ubuntu-18.04 && immutable') {
+    withNode(labels: 'ubuntu-20.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
@@ -288,12 +347,13 @@ def release(){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
           repo: env.REPO,
           bucket: env.JOB_GCS_BUCKET,
-          folder: getBeatsName(env.BEATS_FOLDER),
-          pattern: "build/distributions/**/*"
+          folder: folder,
+          pattern: "build/distributions/*"
         )
       }
     }
@@ -316,12 +376,14 @@ def runE2ETests(){
         suites += "${suite},"
       };
     }
-
+    echo 'runE2E will run now in a sync mode to validate packages can be published.'
     runE2E(runTestsSuites: suites,
            beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
            gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
            gitHubCheckRepo: env.REPO,
-           gitHubCheckSha1: env.GIT_BASE_COMMIT)
+           gitHubCheckSha1: env.GIT_BASE_COMMIT,
+           propagate: true,
+           wait: true)
   }
 }
 
@@ -348,4 +410,19 @@ def withBeatsEnv(Closure body) {
       }
     }
   }
+}
+
+def notifyStatus(def args = [:]) {
+  def releaseManagerFile = args.get('file', '')
+  def analyse = args.get('analyse', false)
+  def subject = args.get('subject', '')
+  def body = args.get('body', '')
+  releaseManagerNotification(file: releaseManagerFile,
+                             analyse: analyse,
+                             slackChannel: "${env.SLACK_CHANNEL}",
+                             slackColor: 'danger',
+                             slackCredentialsId: 'jenkins-slack-integration-token',
+                             to: "${env.NOTIFY_TO}",
+                             subject: subject,
+                             body: "Build: (<${env.RUN_DISPLAY_URL}|here>).\n ${body}")
 }

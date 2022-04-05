@@ -3,7 +3,7 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.17.2-81597e21-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.17.3-206df1ed-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
@@ -17,7 +17,7 @@ services:
     - "indices.id_field_data.enabled=true"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash-oss:7.17.2-81597e21-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash-oss:7.17.3-206df1ed-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -27,7 +27,7 @@ services:
     - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.17.2-81597e21-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana-oss:7.17.3-206df1ed-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
