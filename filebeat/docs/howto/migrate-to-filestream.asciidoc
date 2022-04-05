@@ -8,8 +8,8 @@ improvements over the old input, such as configurable order for parsers and more
 While we do not plan to remove the `log` input from Filebeat, we are not fixing
 new issues or adding any enhancements to the input. Our focus is on `filestream`.
 
-In this guide, we are leading you through the migration of an existing log input configuration.
-Let's say you are collecting the list of files above with the following three log inputs:
+In this guide, you learn how to migrate an existing `log` input configuration.
+The following example shows three `log` inputs:
 
 [source,yaml]
 ----
