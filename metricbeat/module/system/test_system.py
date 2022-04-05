@@ -78,7 +78,7 @@ SYSTEM_FILESYSTEM = {
                                     "used.pct"]
 }
 SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] + \
-    ["files", "free_files"]
+    ["files", "free_files", "options"]
 
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
