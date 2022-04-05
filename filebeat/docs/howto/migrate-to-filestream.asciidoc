@@ -89,11 +89,11 @@ registry of Filebeat. You have to exclude the files the log input has processed
 or is processing. If you do not exclude those files, you will end up with
 duplicate events in the output.
 
-Given the file list above with their ingestion progress, you
-should run log input and filestream input simultaneously until everything
-collected by the log input has made it to the output.
-Once the files collected by the log input are shipped, you can delete log
-inputs and the exlude_files settings from filestream input.
+Given the file list and ingestion progress shown earlier, 
+you should run the `log` and `filestream` inputs simultaneously until everything
+collected by the `log` input has made it to the output.
+After the files collected by the `log` input are shipped, you can delete the `log`
+inputs and the `exlude_files` settings from `filestream` input.
 
 [source,yaml]
 ----
