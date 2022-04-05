@@ -1,0 +1,60 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package cometd
+
+import (
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+)
+
+type mockedConnector struct {
+	connectWithError error
+	outlet           channel.Outleter
+}
+
+var _ channel.Connector = new(mockedConnector)
+
+func (m *mockedConnector) Connect(c *common.Config) (channel.Outleter, error) {
+	return m.ConnectWith(c, beat.ClientConfig{})
+}
+
+func (m *mockedConnector) ConnectWith(*common.Config, beat.ClientConfig) (channel.Outleter, error) {
+	if m.connectWithError != nil {
+		return nil, m.connectWithError
+	}
+	return m.outlet, nil
+}
+
+type mockedOutleter struct {
+	onEventHandler func(event beat.Event) bool
+}
+
+var _ channel.Outleter = new(mockedOutleter)
+
+func (m mockedOutleter) Close() error {
+	panic("implement me")
+}
+
+func (m mockedOutleter) Done() <-chan struct{} {
+	panic("implement me")
+}
+
+func (m mockedOutleter) OnEvent(event beat.Event) bool {
+	return m.onEventHandler(event)
+}
