@@ -121,6 +121,8 @@ The RFC 5424 format accepts the following forms of timestamps:
 
 Formats with an asterisk (*) are a non-standard allowance.
 
+ifndef::serverless[]
+
 [float]
 ==== Metrics
 
@@ -152,3 +154,5 @@ For example, here are metrics from a processor with a *tag* of `log-input` and a
 `missing`:: Measures the number of occurrences where an event was missing the required input field.
 
 `success`:: Measures the number of successfully parsed syslog messages.
+
+endif::[]
