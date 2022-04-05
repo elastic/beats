@@ -992,6 +992,7 @@ filebeat.inputs:
   # default to `required` otherwise it will be set to `none`.
   #ssl.client_authentication: "required"
 
+
 #------------------------------ Kafka input --------------------------------
 # Accept events from topics in a Kafka cluster.
 #- type: kafka
