@@ -24,16 +24,18 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool) {
-	for _, container := range containersList {
-		eventMapping(r, &container, dedot)
+func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool, logger *logp.Logger) {
+	for i := range containersList {
+		eventMapping(r, &containersList[i], dedot, logger)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
+func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool, logger *logp.Logger) {
 	event := common.MapStr{
 		"container": common.MapStr{
 			"id": cont.ID,
@@ -60,7 +62,7 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
 	labels := docker.DeDotLabels(cont.Labels, dedot)
 
 	if len(labels) > 0 {
-		event.Put("docker.container.labels", labels)
+		util.ShouldPut(event, "docker.container.labels", labels, logger)
 	}
 
 	r.Event(mb.Event{

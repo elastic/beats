@@ -73,6 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
@@ -94,7 +95,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	events, err := eventMapping(body, util.PerfMetrics, m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -111,7 +112,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 
 		// Enrich event with container ECS fields
-		containerEcsFields := ecsfields(event)
+		containerEcsFields := ecsfields(event, m.Logger())
 		if len(containerEcsFields) != 0 {
 			if e.RootFields != nil {
 				e.RootFields.DeepUpdate(common.MapStr{

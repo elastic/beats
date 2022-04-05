@@ -28,12 +28,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
 func TestEventMapping(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.container")
+
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
@@ -45,7 +48,7 @@ func TestEventMapping(t *testing.T) {
 	cache.NodeMemAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 146227200)
 	cache.ContainerMemLimit.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), 14622720)
 
-	events, err := eventMapping(body, cache)
+	events, err := eventMapping(body, cache, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -87,7 +90,7 @@ func TestEventMapping(t *testing.T) {
 		testValue(t, events[0], k, v)
 	}
 
-	containerEcsFields := ecsfields(events[0])
+	containerEcsFields := ecsfields(events[0], logger)
 	testEcs := map[string]interface{}{
 		"cpu.usage":    0.005631997,
 		"memory.usage": 0.01,

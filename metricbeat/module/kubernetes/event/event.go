@@ -24,7 +24,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 // init registers the MetricSet with the central registry.
@@ -60,12 +62,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the kubernetes event configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the kubernetes event configuration: %w", err)
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
-		return nil, fmt.Errorf("fail to get kubernetes client: %s", err.Error())
+		return nil, fmt.Errorf("fail to get kubernetes client: %w", err)
 	}
 
 	watchOptions := kubernetes.WatchOptions{
@@ -75,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	watcher, err := kubernetes.NewNamedWatcher("event", client, &kubernetes.Event{}, watchOptions, nil)
 	if err != nil {
-		return nil, fmt.Errorf("fail to init kubernetes watcher: %s", err.Error())
+		return nil, fmt.Errorf("fail to init kubernetes watcher: %w", err)
 	}
 
 	dedotConfig := dedotConfig{
@@ -93,21 +95,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
-func (m *MetricSet) Run(reporter mb.PushReporter) {
+func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig))
+			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+			reporter.Event(mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil))
 		},
 		UpdateFunc: func(obj interface{}) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig))
+			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+			reporter.Event(mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil))
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
 	}
 	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
-			eve := obj.(*kubernetes.Event)
+			eve, ok := obj.(*kubernetes.Event)
+			if !ok {
+				m.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			// if fields are null they are decoded to `0001-01-01 00:00:00 +0000 UTC`
 			// so we need to check if they are valid first
 			lastTimestampValid := !kubernetes.Time(&eve.LastTimestamp).IsZero()
@@ -125,13 +132,15 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 		Handler: handler,
 	})
 	// start event watcher
-	m.watcher.Start()
+	err := m.watcher.Start()
+	if err != nil {
+		m.Logger().Debugf("Unable to start watcher: %w", err)
+	}
 	<-reporter.Done()
 	m.watcher.Stop()
-	return
 }
 
-func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) common.MapStr {
+func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
 			"created": kubernetes.Time(&eve.ObjectMeta.CreationTimestamp).UTC(),
@@ -149,9 +158,13 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 		for k, v := range eve.ObjectMeta.Labels {
 			if dedotConfig.LabelsDedot {
 				label := common.DeDot(k)
-				labels.Put(label, v)
+				util.ShouldPut(labels, label, v, logger)
+
 			} else {
-				safemapstr.Put(labels, k, v)
+				err := safemapstr.Put(labels, k, v)
+				if err != nil {
+					logger.Debugf("Failed to put field '%s' with value '%s': %s", k, v, err)
+				}
 			}
 		}
 
@@ -163,9 +176,12 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 		for k, v := range eve.ObjectMeta.Annotations {
 			if dedotConfig.AnnotationsDedot {
 				annotation := common.DeDot(k)
-				annotations.Put(annotation, v)
+				util.ShouldPut(annotations, annotation, v, logger)
 			} else {
-				safemapstr.Put(annotations, k, v)
+				err := safemapstr.Put(annotations, k, v)
+				if err != nil {
+					logger.Debugf("Failed to put field '%s' with value '%s': %s", k, v, err)
+				}
 			}
 		}
 

@@ -22,14 +22,16 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte) (common.MapStr, error) {
+func eventMapping(content []byte, logger *logp.Logger) (common.MapStr, error) {
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -106,7 +108,7 @@ func eventMapping(content []byte) (common.MapStr, error) {
 	}
 
 	if node.StartTime != "" {
-		nodeEvent.Put("start_time", node.StartTime)
+		util.ShouldPut(nodeEvent, "start_time", node.StartTime, logger)
 	}
 
 	return nodeEvent, nil
