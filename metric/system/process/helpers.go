@@ -32,11 +32,11 @@ func unixTimeMsToTime(unixTimeMs uint64) string {
 	return typeconv.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
 }
 
-func stripNullByte(buf []byte) string { // nolint: deadcode,unused // it is used in platform specific code
+func stripNullByte(buf []byte) string { //nolint: deadcode,unused // it is used in platform specific code
 	return string(buf[0 : len(buf)-1])
 }
 
-func stripNullByteRaw(buf []byte) []byte { // nolint: deadcode,unused // it is used in platform specific code
+func stripNullByteRaw(buf []byte) []byte { //nolint: deadcode,unused // it is used in platform specific code
 	return buf[0 : len(buf)-1]
 }
 

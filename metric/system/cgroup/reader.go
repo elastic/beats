@@ -68,7 +68,7 @@ const (
 	memoryStat  = "memory"
 )
 
-// nolint: deadcode,structcheck,unused // needed by other platforms
+//nolint: deadcode,structcheck,unused // needed by other platforms
 type mount struct {
 	subsystem  string // Subsystem name (e.g. cpuacct).
 	mountpoint string // Mountpoint of the subsystem (e.g. /cgroup/cpuacct).
@@ -187,7 +187,7 @@ func (r *Reader) GetStatsForPid(pid int) (CGStats, error) {
 }
 
 // GetV1StatsForProcess returns cgroup metrics and limits associated with a process.
-func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) { // nolint: dupl // return value is different
+func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) { //nolint: dupl // return value is different
 	// Read /proc/[pid]/cgroup to get the paths to the cgroup metrics.
 	paths, err := r.ProcessCgroupPaths(pid)
 	if err != nil {
@@ -211,7 +211,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) { // nolint: du
 }
 
 // GetV2StatsForProcess returns cgroup metrics and limits associated with a process.
-func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) { // nolint: dupl // return value is different
+func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) { //nolint: dupl // return value is different
 	// Read /proc/[pid]/cgroup to get the paths to the cgroup metrics.
 	paths, err := r.ProcessCgroupPaths(pid)
 	if err != nil {

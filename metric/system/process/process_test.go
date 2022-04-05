@@ -87,19 +87,19 @@ func TestGetProcess(t *testing.T) {
 	assert.NotEqual(t, "unknown", process.State)
 
 	// Memory Checks
-	assert.True(t, (process.Memory.Size.ValueOr(0) >= 0))      // nolint: staticcheck // it's not pointless in this case?
-	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) >= 0)) // nolint: staticcheck // it's not pointless in this case?
-	assert.True(t, (process.Memory.Share.ValueOr(0) >= 0))     // nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.Memory.Size.ValueOr(0) >= 0))      //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) >= 0)) //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.Memory.Share.ValueOr(0) >= 0))     //nolint: staticcheck // it's not pointless in this case?
 
 	// CPU Checks
 	assert.True(t, (process.CPU.Total.Value.ValueOr(0) >= 0))
-	assert.True(t, (process.CPU.User.Ticks.ValueOr(0) >= 0))   // nolint: staticcheck // it's not pointless in this case?
-	assert.True(t, (process.CPU.System.Ticks.ValueOr(0) >= 0)) // nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.CPU.User.Ticks.ValueOr(0) >= 0))   //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.CPU.System.Ticks.ValueOr(0) >= 0)) //nolint: staticcheck // it's not pointless in this case?
 
 	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
 	switch runtime.GOOS {
-	case "darwin", "linux", "freebsd":
+	case "darwin", "linux", "freebsd": //nolint: goconst // it is just a test file
 		assert.True(t, len(process.Env) > 0, "empty environment")
 	}
 

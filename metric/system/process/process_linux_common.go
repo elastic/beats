@@ -112,7 +112,7 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 
 	if state.Env == nil {
 		// env vars
-		state.Env, err = getEnvData(hostfs, pid, filter)
+		state.Env, _ = getEnvData(hostfs, pid, filter)
 	}
 
 	state.Exe, state.Cwd, err = getProcStringData(hostfs, pid)
@@ -193,7 +193,7 @@ func getProcStringData(hostfs resolve.Resolver, pid int) (string, string, error)
 		return "", "", fmt.Errorf("error fetching cwd for pid %d: %w", pid, err)
 	}
 
-	return string(exe), string(cwd), nil
+	return exe, cwd, nil
 }
 
 func dirIsPid(name string) bool {
@@ -210,7 +210,7 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 	}
 	uidValues, ok := status["Uid"]
 	if !ok {
-		return "", fmt.Errorf("Uid not found in proc status: %w", err)
+		return "", fmt.Errorf("field Uid not found in proc status: %w", err)
 	}
 	uidStrings := strings.Fields(uidValues)
 	var userFinal string
@@ -274,7 +274,7 @@ func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 	}
 	state.Rss.Bytes = opt.UintWith(rss << 12)
 
-	share, err := strconv.ParseUint(fields[2], 10, 64)
+	share, _ := strconv.ParseUint(fields[2], 10, 64)
 	state.Share = opt.UintWith(share << 12)
 
 	return state, nil

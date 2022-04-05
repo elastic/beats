@@ -58,7 +58,7 @@ func extractTestData(path string) error {
 		}
 		defer rc.Close()
 
-		path := filepath.Join(dest, f.Name) // nolint: gosec // test with controlled input
+		path := filepath.Join(dest, f.Name) //nolint: gosec // test with controlled input
 		if found, err := exists(path); err != nil || found {
 			return err
 		}
@@ -72,7 +72,7 @@ func extractTestData(path string) error {
 			}
 			defer destFile.Close()
 
-			_, err = io.Copy(destFile, rc) // nolint: gosec // test with controlled input
+			_, err = io.Copy(destFile, rc) //nolint: gosec // test with controlled input
 			if err != nil {
 				return err
 			}

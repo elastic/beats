@@ -165,7 +165,7 @@ func (procStats *Stats) Init() error {
 	for _, pattern := range procStats.Procs {
 		reg, err := match.Compile(pattern)
 		if err != nil {
-			return fmt.Errorf("Failed to compile regexp [%s]: %w", pattern, err)
+			return fmt.Errorf("failed to compile regexp [%s]: %w", pattern, err)
 		}
 		procStats.procRegexps = append(procStats.procRegexps, reg)
 	}
@@ -228,12 +228,13 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	rootEvents := []mapstr.M{}
 
 	for _, process := range plist {
+		process := process
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
 		//Create the root event
 		root := process.FormatForRoot()
 		rootMap := mapstr.M{}
-		err := typeconv.Convert(&rootMap, root)
+		_ = typeconv.Convert(&rootMap, root)
 
 		proc, err := procStats.getProcessEvent(&process)
 		if err != nil {

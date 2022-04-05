@@ -87,12 +87,12 @@ func (stat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 	normalizedUser := userPct / float64(cpuCount)
 	normalizedSystem := systemPct / float64(cpuCount)
 
-	stat.CPUAccounting.Total.Pct = opt.FloatWith(metric.Round(pctgc))
-	stat.CPUAccounting.Total.Norm.Pct = opt.FloatWith(metric.Round(normalizedPctgc))
-	stat.CPUAccounting.Stats.User.Pct = opt.FloatWith(metric.Round(userPctgc))
-	stat.CPUAccounting.Stats.User.Norm.Pct = opt.FloatWith(metric.Round(normalizedUsergc))
-	stat.CPUAccounting.Stats.System.Pct = opt.FloatWith(metric.Round(systemPctgc))
-	stat.CPUAccounting.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystemgc))
+	stat.CPUAccounting.Total.Pct = opt.FloatWith(metric.Round(pct))
+	stat.CPUAccounting.Total.Norm.Pct = opt.FloatWith(metric.Round(normalizedPct))
+	stat.CPUAccounting.Stats.User.Pct = opt.FloatWith(metric.Round(userPct))
+	stat.CPUAccounting.Stats.User.Norm.Pct = opt.FloatWith(metric.Round(normalizedUser))
+	stat.CPUAccounting.Stats.System.Pct = opt.FloatWith(metric.Round(systemPct))
+	stat.CPUAccounting.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystem))
 }
 
 //Format converts the stats object to a MapStr that can be sent to Report()
@@ -113,7 +113,7 @@ func (stat StatsV2) CGVersion() CgroupsVersion {
 
 // FillPercentages uses a previous CGStats object to fill out the percentage values
 // in the cgroup metrics. The `prev` object must be from the same process.
-// curTime and Prev time should be time.Time objects that corrispond to the "scrape time" of when the metrics were gathered.
+// curTime and Prev time should be time.Time objects that correspond to the "scrape time" of when the metrics were gathered.
 func (stat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) {
 	if prev != nil && prev.CGVersion() != CgroupsV2 {
 		return
@@ -142,10 +142,10 @@ func (stat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 	normalizedUser := userPct / float64(cpuCount)
 	normalizedSystem := systemPct / float64(cpuCount)
 
-	stat.CPU.Stats.Usage.Pct = opt.FloatWith(metric.Round(pctgc))
-	stat.CPU.Stats.Usage.Norm.Pct = opt.FloatWith(metric.Round(normalizedPctgc))
-	stat.CPU.Stats.User.Pct = opt.FloatWith(metric.Round(userPctgc))
-	stat.CPU.Stats.User.Norm.Pct = opt.FloatWith(metric.Round(normalizedUsergc))
-	stat.CPU.Stats.System.Pct = opt.FloatWith(metric.Round(systemPctgc))
-	stat.CPU.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystemgc))
+	stat.CPU.Stats.Usage.Pct = opt.FloatWith(metric.Round(pct))
+	stat.CPU.Stats.Usage.Norm.Pct = opt.FloatWith(metric.Round(normalizedPct))
+	stat.CPU.Stats.User.Pct = opt.FloatWith(metric.Round(userPct))
+	stat.CPU.Stats.User.Norm.Pct = opt.FloatWith(metric.Round(normalizedUser))
+	stat.CPU.Stats.System.Pct = opt.FloatWith(metric.Round(systemPct))
+	stat.CPU.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystem))
 }
