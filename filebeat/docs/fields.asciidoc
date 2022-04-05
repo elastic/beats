@@ -153191,21 +153191,6 @@ Threat intelligence Filebeat Module.
 
 
 
-
-*`threat.feed.name`*::
-+
---
-type: keyword
-
---
-
-*`threat.feed.dashboard_id`*::
-+
---
-type: keyword
-
---
-
 [float]
 === abusech.malware
 
