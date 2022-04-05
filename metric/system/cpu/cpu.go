@@ -21,6 +21,7 @@
 package cpu
 
 import (
+	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 	sigar "github.com/elastic/gosigar"
 )

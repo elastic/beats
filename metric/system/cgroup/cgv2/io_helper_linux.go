@@ -45,13 +45,13 @@ func fetchDeviceName(major uint64, minor uint64) (bool, string, error) {
 		}
 		fInfo, dirErr := d.Info()
 		if dirErr != nil {
-			return nil // nolint: nilerr // errors are hidden on purpose
+			return nil //nolint: nilerr // errors are hidden on purpose
 		}
 		infoT, ok := fInfo.Sys().(*syscall.Stat_t)
 		if !ok {
 			return nil
 		}
-		devID = uint64(infoT.Rdev)
+		devID = infoT.Rdev
 
 		// do some bitmapping to extract the major and minor device values
 		// The odd duplicated logic here is to deal with 32 and 64 bit values.

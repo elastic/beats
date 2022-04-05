@@ -157,7 +157,7 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 	if err != nil {
 		return fmt.Errorf("error reading blkio.throttle.read_bps_device: %w", err)
 	}
-	if values != nil {
+	if len(values) != 0 {
 		for _, bv := range values {
 			getDevice(bv.DeviceID).ReadLimitBPS = bv.Value
 		}

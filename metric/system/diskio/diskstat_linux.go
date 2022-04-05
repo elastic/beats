@@ -21,9 +21,9 @@
 package diskio
 
 import (
+	"errors"
 	"math"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 
 	"github.com/elastic/elastic-agent-system-metrics/metric"
@@ -91,7 +91,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	// calculate the delta ms between the CloseSampling and OpenSampling
 	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(numcpu.NumCPU()) / float64(GetCLKTCK())
 	if deltams <= 0 {
-		return IOMetric{}, errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
+		return IOMetric{}, errors.New("the delta cpu time between close sampling and open sampling is less or equal to 0")
 	}
 
 	rdIOs := counter.ReadCount - last.ReadCount

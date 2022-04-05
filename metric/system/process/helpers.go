@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
@@ -47,7 +48,7 @@ func GetProcMemPercentage(proc ProcState, totalPhyMem uint64) opt.Float {
 
 	perc := (float64(proc.Memory.Rss.Bytes.ValueOr(0)) / float64(totalPhyMem))
 
-	return opt.FloatWith(metric.Round(perc, 4))
+	return opt.FloatWith(metric.Round(perc))
 }
 
 // isProcessInSlice looks up proc in the processes slice and returns if
