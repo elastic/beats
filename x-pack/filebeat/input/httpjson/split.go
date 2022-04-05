@@ -19,6 +19,7 @@ var (
 	errExpectedSplitArr    = errors.New("split was expecting field to be an array")
 	errExpectedSplitObj    = errors.New("split was expecting field to be an object")
 	errExpectedSplitString = errors.New("split was expecting field to be a string")
+	errUnknownSplitType    = errors.New("unknown split type")
 )
 
 // split is a split processor chain element. Split processing is executed
@@ -102,7 +103,7 @@ func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMs
 // split recursively executes the split processor chain.
 func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.targetInfo.Name)
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != common.ErrKeyNotFound { //nolint:errorlint // common.ErrKeyNotFound is never wrapped by GetValue.
 		return err
 	}
 
@@ -203,7 +204,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		return nil
 	}
 
-	return errors.New("unknown split type")
+	return errUnknownSplitType
 }
 
 // sendMessage sends an array or map split result value, v, on ch after performing

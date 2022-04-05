@@ -22,18 +22,19 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
+func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *logp.Logger) ([]common.MapStr, error) {
 	events := []common.MapStr{}
 	var summary kubernetes.Summary
 
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -114,15 +115,15 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			}
 
 			if container.StartTime != "" {
-				containerEvent.Put("start_time", container.StartTime)
+				util.ShouldPut(containerEvent, "start_time", container.StartTime, logger)
 			}
 
 			if nodeCores > 0 {
-				containerEvent.Put("cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores)
+				util.ShouldPut(containerEvent, "cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores, logger)
 			}
 
 			if nodeMem > 0 {
-				containerEvent.Put("memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem)
+				util.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
@@ -130,12 +131,12 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 
 			if coresLimit > 0 {
-				containerEvent.Put("cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit)
+				util.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit, logger)
 			}
 
 			if memLimit > 0 {
-				containerEvent.Put("memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit)
-				containerEvent.Put("memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit)
+				util.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit, logger)
+				util.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit, logger)
 			}
 
 			events = append(events, containerEvent)
@@ -144,4 +145,26 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	}
 
 	return events, nil
+}
+
+// ecsfields maps container events fields to container ecs fields
+func ecsfields(containerEvent common.MapStr, logger *logp.Logger) common.MapStr {
+	ecsfields := common.MapStr{}
+
+	name, err := containerEvent.GetValue("name")
+	if err == nil {
+		util.ShouldPut(ecsfields, "name", name, logger)
+	}
+
+	cpuUsage, err := containerEvent.GetValue("cpu.usage.node.pct")
+	if err == nil {
+		util.ShouldPut(ecsfields, "cpu.usage", cpuUsage, logger)
+	}
+
+	memUsage, err := containerEvent.GetValue("memory.usage.node.pct")
+	if err == nil {
+		util.ShouldPut(ecsfields, "memory.usage", memUsage, logger)
+	}
+
+	return ecsfields
 }
