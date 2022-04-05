@@ -160,6 +160,20 @@ Kafka rebalance settings:
 *`retry_backoff`*:: How long to wait after an unsuccessful rebalance attempt.
 Defaults to 2s.
 
+===== `sasl.mechanism`
+
+The SASL mechanism to use when connecting to Kafka. It can be one of:
+
+* `PLAIN` for SASL/PLAIN.
+* `SCRAM-SHA-256` for SCRAM-SHA-256.
+* `SCRAM-SHA-512` for SCRAM-SHA-512.
+
+If `sasl.mechanism` is not set, `PLAIN` is used if `username` and `password`
+are provided. Otherwise, SASL authentication is disabled.
+
+To use `GSSAPI` mechanism to authenticate with Kerberos, you must leave this
+field empty, and use the <<kerberos-option-kafka>> options.
+
 ===== `kerberos`
 
 beta[]
