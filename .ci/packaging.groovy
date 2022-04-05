@@ -42,6 +42,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
+      options { skipDefaultCheckout() }
       agent { label 'ubuntu-20 && immutable' }
       when {
         beforeAgent true
@@ -106,15 +107,20 @@ pipeline {
           }
         }
         stage('DRA') {
+          options { skipDefaultCheckout() }
           // The Unified Release process keeps moving branches as soon as a new
           // minor version is created, therefore old release branches won't be able
           // to use the release manager as their definition is removed.
           when {
-            expression { return env.IS_BRANCH_AVAILABLE == "true" }
+            allOf {
+              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              not { branch '7.17' }
+            }
           }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
             BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+            DRA_OUTPUT = 'release-manager.out'
           }
           steps {
             dir("${BASE_DIR}") {
@@ -124,17 +130,21 @@ pipeline {
                 sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
+              sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
-              script {
-                getVaultSecret.readSecretWrapper {
-                  sh(label: 'release-manager.sh', script: '.ci/scripts/release-manager.sh')
-                }
-              }
+              releaseManager(project: 'beats',
+                             version: env.BEAT_VERSION,
+                             type: 'snapshot',
+                             artifactsFolder: 'build/distributions',
+                             outputFile: env.DRA_OUTPUT)
             }
           }
           post {
             failure {
-              notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${env.BRANCH_NAME}] DRA failed", body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
+              notifyStatus(analyse: true,
+                           file: "${BASE_DIR}/${env.DRA_OUTPUT}",
+                           subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
+                           body: 'Contact the Release Platform team [#platform-release]')
             }
           }
         }
@@ -403,10 +413,16 @@ def withBeatsEnv(Closure body) {
 }
 
 def notifyStatus(def args = [:]) {
-  releaseNotification(slackChannel: "${env.SLACK_CHANNEL}",
-                      slackColor: args.slackStatus,
-                      slackCredentialsId: 'jenkins-slack-integration-token',
-                      to: "${env.NOTIFY_TO}",
-                      subject: args.subject,
-                      body: args.body)
+  def releaseManagerFile = args.get('file', '')
+  def analyse = args.get('analyse', false)
+  def subject = args.get('subject', '')
+  def body = args.get('body', '')
+  releaseManagerNotification(file: releaseManagerFile,
+                             analyse: analyse,
+                             slackChannel: "${env.SLACK_CHANNEL}",
+                             slackColor: 'danger',
+                             slackCredentialsId: 'jenkins-slack-integration-token',
+                             to: "${env.NOTIFY_TO}",
+                             subject: subject,
+                             body: "Build: (<${env.RUN_DISPLAY_URL}|here>).\n ${body}")
 }
