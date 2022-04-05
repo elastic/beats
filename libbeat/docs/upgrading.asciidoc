@@ -37,6 +37,9 @@ We recommend that you fully upgrade {es} and {kib} to version 8.0
 before upgrading {beats}. The {beats} version must be lower than or equal to the
 {es} version. {beats} cannot send data to older versions of {es}.
 
+Users of the Uptime app should make sure to add `synthetics-*` to their "Index Pattern"
+in the Uptime Kibana app's settings page.
+
 If you're on {beats} 7.0 through 7.16, upgrade the {stack} and {beats} to
 version 7.17 *before* proceeding with the 8.0 upgrade.
 
