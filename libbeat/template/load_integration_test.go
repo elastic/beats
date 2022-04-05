@@ -150,6 +150,39 @@ func (ts *testSetup) requireDataStreamDoesNotExist(name string) {
 	require.False(ts.t, exists, "data stream must not exist")
 }
 
+func (ts *testSetup) sendTestEvent() {
+	evt := map[string]interface{}{
+		"@timestamp": "2099-11-15T13:12:00",
+		"message":    "my super important message",
+	}
+	c, _, err := ts.client.Request(http.MethodPut, "/"+ts.config.Name+"/_create/1", "", nil, evt)
+	require.NoError(ts.t, err)
+	require.Equal(ts.t, c, http.StatusCreated, "document must be created with id 1")
+
+	// refresh index so the event becomes available immediately
+	_, _, err = ts.client.Request(http.MethodPost, "/"+ts.config.Name+"/_refresh", "", nil, nil)
+	require.NoError(ts.t, err)
+}
+
+// requireTestEventPresent validates that the event is available
+// returns the backing index of the event
+func (ts *testSetup) requireTestEventPresent() string {
+	c, b, err := ts.client.Request("GET", "/"+ts.config.Name+"/_search", "", nil, nil)
+	require.NoError(ts.t, err)
+	require.Equal(ts.t, http.StatusOK, c)
+
+	var resp eslegclient.SearchResults
+	err = json.Unmarshal(b, &resp)
+	require.Equal(ts.t, 1, resp.Hits.Total.Value, "the test event must be returned")
+
+	idx := struct {
+		Index string `json:"_index"`
+	}{Index: ""}
+	err = json.Unmarshal(resp.Hits.Hits[0], &idx)
+	require.NoError(ts.t, err, "backing index name must be parsed")
+	return idx.Index
+}
+
 func TestESLoader_Load(t *testing.T) {
 	t.Run("failure", func(t *testing.T) {
 		t.Run("loading disabled", func(t *testing.T) {
@@ -237,6 +270,25 @@ func TestESLoader_Load(t *testing.T) {
 			setup.load(nil)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, false, tmpl.SourceEnabled())
+		})
+
+		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
+			fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+			require.NoError(t, err)
+			setup := newTestSetup(t, TemplateConfig{Enabled: true, Overwrite: true})
+			setup.mustLoad(fields)
+
+			exists, err := setup.loader.checkExistsDatastream(setup.config.Name)
+			require.True(t, exists, "data stream must exits")
+
+			// send test event before reloading the template
+			setup.sendTestEvent()
+			backingIdx := setup.requireTestEventPresent()
+
+			setup.mustLoad(fields)
+
+			newBackingIdx := setup.requireTestEventPresent()
+			require.Equal(setup.t, backingIdx, newBackingIdx, "the event must be present in the same backing index")
 		})
 	})
 
