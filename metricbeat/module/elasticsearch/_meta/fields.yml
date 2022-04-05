@@ -614,8 +614,6 @@
                 - name: rejected
                   path: elasticsearch.node.stats.thread_pool.write.rejected.count
                   type: alias    
-        
-        
     - name: indices_stats
       type: group
       fields:

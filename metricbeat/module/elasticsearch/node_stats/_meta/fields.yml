@@ -339,7 +339,6 @@
               type: long
             - name: rejected.count
               type: long
-<<<<<<< HEAD
     - name: indexing_pressure
       type: group
       fields:
@@ -388,5 +387,3 @@
             - name: limit_in_bytes
               type: long
               format: bytes
-=======
->>>>>>> 912f8040e58e3e9a8b9f03e5c40e8e0871feb645
