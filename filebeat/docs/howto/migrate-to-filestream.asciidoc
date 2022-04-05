@@ -140,7 +140,7 @@ filebeat.inputs:
 ----
 
 
-=== 3. Use new option names
+=== Step 3: Use new option names
 
 Several options are renamed in `filestream`. You can find a table with all of the
 changed configuration names at the end of this guide.
