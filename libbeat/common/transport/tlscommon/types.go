@@ -174,17 +174,7 @@ func (m *TLSVerificationMode) Unpack(in interface{}) error {
 	return nil
 }
 
-func (m *tlsClientAuth) Unpack(in interface{}) error {
-	if in == nil {
-		*m = tlsClientAuthRequired
-		return nil
-	}
-
-	s, ok := in.(string)
-	if !ok {
-		return fmt.Errorf("client authentication must be an identifier")
-	}
-
+func (m *tlsClientAuth) Unpack(s string) error {
 	mode, found := tlsClientAuthTypes[s]
 	if !found {
 		return fmt.Errorf("unknown client authentication mode'%v'", s)
