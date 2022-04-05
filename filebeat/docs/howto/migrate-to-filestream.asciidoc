@@ -1,9 +1,9 @@
 [[migrate-to-filestream]]
 == Migrate log input configurations to filestream
 
-Filestream input is generally available since 7.14. So it is high time you
-migrate your existing log input configurations.  It comes with many
-improvements over the old input like configurable order for parsers and more.
+The `filestream` input has been generally available since 7.14. So it is high time you
+migrate your existing `log` input configurations.  The `filestream` input comes with many
+improvements over the old input, such as configurable order for parsers and more.
 
 While we do not plan to remove the log input from Filebeat, we are not fixing
 new issues or adding any enhancements to the input. Our focus is on filestream.
