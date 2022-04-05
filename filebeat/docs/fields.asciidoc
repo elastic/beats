@@ -20693,6 +20693,40 @@ type: keyword
 
 --
 
+*`checkpoint.comment`*::
++
+--
+type: keyword
+
+--
+
+*`checkpoint.conn_direction`*::
++
+--
+Connection direction
+
+type: keyword
+
+--
+
+*`checkpoint.db_ver`*::
++
+--
+Database version
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Status of database update
+
+type: keyword
+
+--
+
 [[exported-fields-cisco]]
 == Cisco fields
 
