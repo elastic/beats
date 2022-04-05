@@ -4,11 +4,3 @@
   description: >
     Threat intelligence Filebeat Module.
   fields:
-    - name: ""
-      type: group
-      fields:
-        - name: threat.feed.name
-          type: keyword
-
-        - name: threat.feed.dashboard_id
-          type: keyword
