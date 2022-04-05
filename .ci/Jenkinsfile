@@ -1,0 +1,68 @@
+#!/usr/bin/env groovy
+
+@Library('apm@current') _
+
+pipeline {
+  agent { label 'ubuntu-20.04 && immutable' }
+  environment {
+    REPO = "elastic-agent-system-metrics"
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    JOB_GIT_CREDENTIALS = "f6c7695a-671e-4f4f-a331-acdce44ff9ba"
+    PIPELINE_LOG_LEVEL = 'INFO'
+  }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    timestamps()
+    ansiColor('xterm')
+    disableResume()
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
+    quietPeriod(10)
+  }
+  triggers {
+    issueCommentTrigger("${obltGitHubComments()}")
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
+        deleteDir()
+        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+      }
+    }
+    stage('Lint'){
+      steps {
+        withGithubNotify(context: "Lint") {
+          dir("${BASE_DIR}"){
+            echo 'command for linting'
+          }
+        }
+      }
+    }
+    stage('Build'){
+      steps {
+        withGithubNotify(context: "Build") {
+          dir("${BASE_DIR}"){
+            echo 'command for building'
+          }
+        }
+      }
+    }
+    stage('Test'){
+      steps {
+        withGithubNotify(context: "Test") {
+          dir("${BASE_DIR}"){
+            echo 'command for testing'
+          }
+        }
+      }
+    }
+  }
+  post {
+    cleanup {
+      notifyBuildResult(prComment: true)
+    }
+  }
+}
