@@ -312,3 +312,46 @@ endif::win_only[]
 PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_index_template/{beatname_lc}-{version}
 ----
 endif::win_os[]
+
+Once you have loaded the index template, load the data stream as well. If you
+do not load it, you have to give the publisher user `manage` permission on
+{beatname_lc}-{version} index.
+
+ifdef::deb_os,rpm_os[]
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+curl -XPUT http://localhost:9200/_data_stream/{beatname_lc}-{version}
+----
+endif::deb_os,rpm_os[]
+
+ifdef::mac_os[]
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+curl -XPUT http://localhost:9200/_data_stream/{beatname_lc}-{version}
+----
+endif::mac_os[]
+
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+curl -XPUT http://localhost:9200/_data_stream/{beatname_lc}-{version}
+----
+endif::linux_os[]
+
+ifdef::win_os[]
+ifndef::win_only[]
+*win:*
+endif::win_only[]
+
+["source","sh",subs="attributes"]
+----
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/{beatname_lc}-{version}
+----
+endif::win_os[]
+

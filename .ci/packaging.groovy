@@ -21,10 +21,10 @@ pipeline {
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
-    SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
     SLACK_CHANNEL = '#beats'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
+    DRA_OUTPUT = 'release-manager.out'
   }
   options {
     timeout(time: 4, unit: 'HOURS')
@@ -42,6 +42,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
+      options { skipDefaultCheckout() }
       agent { label 'ubuntu-20 && immutable' }
       when {
         beforeAgent true
@@ -105,36 +106,46 @@ pipeline {
             runE2ETests()
           }
         }
-        stage('DRA') {
+        stage('DRA Snapshot') {
+          options { skipDefaultCheckout() }
           // The Unified Release process keeps moving branches as soon as a new
           // minor version is created, therefore old release branches won't be able
           // to use the release manager as their definition is removed.
           when {
             expression { return env.IS_BRANCH_AVAILABLE == "true" }
           }
-          environment {
-            // It uses the folder structure done in uploadPackagesToGoogleBucket
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
-          }
           steps {
-            dir("${BASE_DIR}") {
-              // TODO: as long as googleStorageDownload does not support recursive copy with **/*
-              dir("build/distributions") {
-                gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
-              }
-              sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
-              dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
-              script {
-                getVaultSecret.readSecretWrapper {
-                  sh(label: 'release-manager.sh', script: '.ci/scripts/release-manager.sh')
-                }
-              }
-            }
+            runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
           }
           post {
             failure {
-              notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${env.BRANCH_NAME}] DRA failed", body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
+              notifyStatus(analyse: true,
+                           file: "${BASE_DIR}/${env.DRA_OUTPUT}",
+                           subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
+                           body: 'Contact the Release Platform team [#platform-release]')
+            }
+          }
+        }
+        stage('DRA Staging') {
+          options { skipDefaultCheckout() }
+          when {
+            allOf {
+              // The Unified Release process keeps moving branches as soon as a new
+              // minor version is created, therefore old release branches won't be able
+              // to use the release manager as their definition is removed.
+              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              not { branch 'main' }
+            }
+          }
+          steps {
+            runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
+          }
+          post {
+            failure {
+              notifyStatus(analyse: true,
+                           file: "${BASE_DIR}/${env.DRA_OUTPUT}",
+                           subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
+                           body: 'Contact the Release Platform team [#platform-release]')
             }
           }
         }
@@ -151,6 +162,36 @@ pipeline {
         }
       }
     }
+  }
+}
+
+def getBucketUri(type) {
+  // It uses the folder structure done in uploadPackagesToGoogleBucket
+  // commit for the normal workflow, snapshots (aka SNAPSHOT=true)
+  // staging for the staging workflow, SNAPSHOT=false
+  def folder = type.equals('staging') ? 'staging' : 'commits'
+  return "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${folder}/${env.GIT_BASE_COMMIT}"
+}
+
+def runReleaseManager(def args = [:]) {
+  def type = args.get('type', 'snapshot')
+  def bucketUri = getBucketUri(type)
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  dir("${BASE_DIR}") {
+    unstash "dependencies-${type}"
+    // TODO: as long as googleStorageDownload does not support recursive copy with **/*
+    dir("build/distributions") {
+      gsutil(command: "-m -q cp -r ${bucketUri} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+      sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+    }
+    sh(label: "prepare-release-manager-artifacts ${type}", script: ".ci/scripts/prepare-release-manager.sh ${type}")
+    dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+    releaseManager(project: 'beats',
+                   version: env.BEAT_VERSION,
+                   type: type,
+                   artifactsFolder: 'build/distributions',
+                   outputFile: args.outputFile)
   }
 }
 
@@ -198,9 +239,13 @@ def generateSteps() {
   parallelTasks["beats-dashboards"] = {
     withGithubNotify(context: "beats-dashboards") {
       withEnv(["HOME=${env.WORKSPACE}"]) {
-        withBeatsEnv() {
-          sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
-          sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+        ['snapshot', 'staging'].each { type ->
+          deleteDir()
+          withBeatsEnv(type) {
+            sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+            sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+            stash(includes: 'build/distributions/**', name: "dependencies-${type}", useDefaultExcludes: false)
+          }
         }
       }
     }
@@ -214,10 +259,15 @@ def generateArmStep(beat) {
       withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
-          release()
+          release('snapshot')
           dir("${BASE_DIR}"){
             pushCIDockerImages(arch: 'arm64')
           }
+        }
+        // Staging is only needed from branches (main or release branches)
+        if (isBranch()) {
+          deleteDir()
+          release('staging')
         }
       }
     }
@@ -230,12 +280,27 @@ def generateLinuxStep(beat) {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
-          release()
+          release('snapshot')
           dir("${BASE_DIR}"){
             pushCIDockerImages(arch: 'amd64')
           }
         }
         prepareE2ETestForPackage("${beat}")
+
+        // Staging is only needed from branches (main or release branches)
+        if (isBranch()) {
+          // As long as we reuse the same worker to package more than
+          // once, the workspace gets corrupted with some permissions
+          // therefore let's reset the workspace to a new location
+          // in order to reuse the worker and successfully run the package
+          def work = "workspace/${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}-staging"
+          ws(work) {
+            withEnv(["HOME=${env.WORKSPACE}"]) {
+              deleteDir()
+              release('staging')
+            }
+          }
+        }
       }
     }
   }
@@ -259,9 +324,8 @@ def linuxPlatforms() {
             //'linux/s390x',
             'windows/amd64',
             'windows/386',
-            'darwin/amd64'
-            // TODO(AndersonQ): comment in after the tests pass
-            // 'darwin/arm64'
+            'darwin/amd64',
+            'darwin/arm64'
           ].join(' ')
 }
 
@@ -322,14 +386,14 @@ def prepareE2ETestForPackage(String beat){
   }
 }
 
-def release(){
-  withBeatsEnv(){
+def release(type){
+  withBeatsEnv(type){
     withEnv([
       "DEV=true"
     ]) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
-        sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
@@ -338,6 +402,18 @@ def release(){
           folder: folder,
           pattern: "build/distributions/*"
         )
+        if (type.equals('staging')) {
+          dir("build/distributions") {
+            def bucketUri = getBucketUri(type)
+            log(level: 'INFO', text: "${env.BEATS_FOLDER} for ${type} requires to upload the artifacts to ${bucketUri}.")
+            googleStorageUploadExt(bucket: "${bucketUri}/${folder}",
+                                   credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                                   pattern: "*",
+                                   sharedPublicly: true)
+          }
+        } else {
+          log(level: 'INFO', text: "${env.BEATS_FOLDER} for ${type} does not require to upload the staging artifacts.")
+        }
       }
     }
   }
@@ -351,23 +427,21 @@ def runE2ETests(){
 
   def suites = '' // empty value represents all suites in the E2E tests
 
-  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    def suitesSet = e2eTestSuites.toSet()
+  def suitesSet = e2eTestSuites.toSet()
 
-    if (!suitesSet.contains('ALL')) {
-      suitesSet.each { suite ->
-        suites += "${suite},"
-      };
-    }
-    echo 'runE2E will run now in a sync mode to validate packages can be published.'
-    runE2E(runTestsSuites: suites,
-           beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-           gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
-           gitHubCheckRepo: env.REPO,
-           gitHubCheckSha1: env.GIT_BASE_COMMIT,
-           propagate: true,
-           wait: true)
+  if (!suitesSet.contains('ALL')) {
+    suitesSet.each { suite ->
+      suites += "${suite},"
+    };
   }
+  echo 'runE2E will run now in a sync mode to validate packages can be published.'
+  runE2E(runTestsSuites: suites,
+         beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+         gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+         gitHubCheckRepo: env.REPO,
+         gitHubCheckSha1: env.GIT_BASE_COMMIT,
+         propagate: true,
+         wait: true)
 }
 
 /**
@@ -382,12 +456,14 @@ def getBeatsName(baseDir) {
   return baseDir.replace('x-pack/', '')
 }
 
-def withBeatsEnv(Closure body) {
+def withBeatsEnv(type, Closure body) {
+  def envVars = [ "PYTHON_ENV=${WORKSPACE}/python-env" ]
+  if (type.equals('snapshot')) {
+    envVars << "SNAPSHOT=true"
+  }
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   withMageEnv(){
-    withEnv([
-      "PYTHON_ENV=${WORKSPACE}/python-env"
-    ]) {
+    withEnv(envVars) {
       dir("${env.BASE_DIR}"){
         body()
       }
@@ -396,10 +472,16 @@ def withBeatsEnv(Closure body) {
 }
 
 def notifyStatus(def args = [:]) {
-  releaseNotification(slackChannel: "${env.SLACK_CHANNEL}",
-                      slackColor: args.slackStatus,
-                      slackCredentialsId: 'jenkins-slack-integration-token',
-                      to: "${env.NOTIFY_TO}",
-                      subject: args.subject,
-                      body: args.body)
+  def releaseManagerFile = args.get('file', '')
+  def analyse = args.get('analyse', false)
+  def subject = args.get('subject', '')
+  def body = args.get('body', '')
+  releaseManagerNotification(file: releaseManagerFile,
+                             analyse: analyse,
+                             slackChannel: "${env.SLACK_CHANNEL}",
+                             slackColor: 'danger',
+                             slackCredentialsId: 'jenkins-slack-integration-token',
+                             to: "${env.NOTIFY_TO}",
+                             subject: subject,
+                             body: "Build: (<${env.RUN_DISPLAY_URL}|here>).\n ${body}")
 }
