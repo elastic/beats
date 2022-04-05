@@ -44,7 +44,6 @@ Microsoft Azure Event Hubs that have Kafka compatibility enabled:
 
 ----
 
-
 For more details on the mapping between Kafka and Event Hubs configuration
 parameters, see the
 link:https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-for-kafka-ecosystem-overview[Azure documentation].
@@ -160,7 +159,6 @@ Kafka rebalance settings:
 
 *`retry_backoff`*:: How long to wait after an unsuccessful rebalance attempt.
 Defaults to 2s.
-
 
 ===== `sasl.mechanism`
 
