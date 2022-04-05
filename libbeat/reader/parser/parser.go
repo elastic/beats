@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 )
 
 var (
@@ -112,6 +113,13 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 				}
 				suffix = config.Stream.String()
 			}
+		case "syslog":
+			config := syslog.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing syslog parser config: %w", err)
+			}
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
@@ -157,6 +165,14 @@ func (c *Config) Create(in reader.Reader) Parser {
 				return p
 			}
 			p = readjson.NewContainerParser(p, &config)
+		case "syslog":
+			config := syslog.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return p
+			}
+			p = syslog.NewParser(p, &config)
 		default:
 			return p
 		}

@@ -24,11 +24,11 @@ func statelessConfigure(cfg *common.Config) (stateless.Input, error) {
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
-	return newStatelessInput(conf)
+	return newStatelessInput(conf), nil
 }
 
-func newStatelessInput(config config) (*statelessInput, error) {
-	return &statelessInput{config: config}, nil
+func newStatelessInput(config config) *statelessInput {
+	return &statelessInput{config: config}
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
