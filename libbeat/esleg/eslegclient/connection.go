@@ -365,7 +365,7 @@ func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body) // nolint:noctx // keep legacy behaviour
+	req, err := http.NewRequest(method, url, body) //nolint:noctx // keep legacy behaviour
 	if err != nil {
 		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err
@@ -405,7 +405,7 @@ func (conn *Connection) getVersion() error {
 func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
 	status, body, err := conn.Request("PUT", path, "", nil, json)
 	if err != nil {
-		return body, fmt.Errorf("couldn't load json. Error: %s", err)
+		return body, fmt.Errorf("couldn't load json. Error: %w", err)
 	}
 	if status > 300 {
 		return body, fmt.Errorf("couldn't load json. Status: %v", status)
