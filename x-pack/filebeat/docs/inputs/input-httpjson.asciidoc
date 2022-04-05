@@ -222,7 +222,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
 - `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
 - `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
-- `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`
+- `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
