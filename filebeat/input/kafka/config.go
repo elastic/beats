@@ -153,7 +153,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 
 	version, ok := config.Version.Get()
 	if !ok {
-		return nil, fmt.Errorf("Unknown/unsupported kafka version: %v", config.Version)
+		return nil, fmt.Errorf("unknown/unsupported kafka version: %v", config.Version)
 	}
 	k.Version = version
 
