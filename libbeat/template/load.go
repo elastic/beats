@@ -132,7 +132,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 
 	// If a data stream already exists, we do not attempt to delete or overwrite
-	// it becaues it would delete all backing indices, and the user would lose all
+	// it because it would delete all backing indices, and the user would lose all
 	// their documents.
 	dataStreamExist, err := l.checkExistsDatastream(templateName)
 	if err != nil {
