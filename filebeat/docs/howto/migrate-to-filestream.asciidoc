@@ -146,9 +146,9 @@ Several options are renamed in `filestream`. You can find a table with all of th
 changed configuration names at the end of this guide.
 
 The most significant change you have to know about is in parsers. The configuration of
-multiline, json and other parsers has changed. Now the ordering is
-configurable, so filestream expects a list of parsers. Furthermore, the json
-parser was renamed to ndjson.
+`multiline`, `json`, and other parsers has changed. Now the ordering is
+configurable, so `filestream` expects a list of parsers. Furthermore, the `json`
+parser was renamed to `ndjson`.
 
 The example configuration we presented has to be adjusted as well:
 
