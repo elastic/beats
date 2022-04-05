@@ -142,7 +142,7 @@ filebeat.inputs:
 
 === 3. Use new option names
 
-Several options are renamed in filestream. You can find a table with all of the
+Several options are renamed in `filestream`. You can find a table with all of the
 changed configuration names at the end of this guide.
 
 The most significant change you have to know about is in parsers. The configuration of
