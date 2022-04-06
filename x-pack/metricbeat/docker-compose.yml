@@ -24,19 +24,11 @@ services:
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.1.1}-1
-    build:
-      context: ../../metricbeat/module/kibana/_meta
-      args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-8.1.1}
-=======
     image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.1.2}-1
     build:
       context: ../../metricbeat/module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-8.1.2}
->>>>>>> f5d2a2ff65 ([Release] Update test environment to 8.3.0 (#31059))
     depends_on:
       - elasticsearch
     ports:
