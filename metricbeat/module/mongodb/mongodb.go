@@ -18,15 +18,15 @@
 package mongodb
 
 import (
+	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
-	mgo "gopkg.in/mgo.v2"
 )
 
 func init() {
@@ -41,7 +41,8 @@ func init() {
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
-		Hosts []string `config:"hosts"    validate:"nonzero,required"`
+		Hosts    []string `config:"hosts"    validate:"nonzero,required"`
+		Database string   `config:"database"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
 		return nil, err
@@ -74,10 +75,12 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 
 	parse.SetURLUser(u, c.Username, c.Password)
 
+	clientOptions := options.Client().ApplyURI(u.String())
+
 	// https://docs.mongodb.com/manual/reference/connection-string/
-	_, err = mgo.ParseURL(u.String())
+	_, err = url.Parse(clientOptions.GetURI())
 	if err != nil {
-		return mb.HostData{}, err
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
 	}
 
 	return parse.NewHostDataFromURL(u), nil
@@ -85,22 +88,10 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 
 // NewDirectSession estbalishes direct connections with a list of hosts. It uses the supplied
 // dialInfo parameter as a template for establishing more direct connections
-func NewDirectSession(dialInfo *mgo.DialInfo) (*mgo.Session, error) {
-	// make a copy
-	nodeDialInfo := *dialInfo
-	nodeDialInfo.Direct = true
-	nodeDialInfo.FailFast = true
+func NewDirectSession(uri string) (*mongo.Client, error) {
+	clientOptions := options.Client().ApplyURI(uri)
+	isDirectConnection := true
+	clientOptions.Direct = &isDirectConnection
 
-	logp.Debug("mongodb", "Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
-
-	session, err := mgo.DialWithInfo(&nodeDialInfo)
-	if err != nil {
-		logp.Err("Error establishing direct connection to mongo node at %v. Error output: %s", nodeDialInfo.Addrs, err.Error())
-		return nil, err
-	}
-
-	// Relax consistency mode so reading from a secondary is allowed
-	session.SetMode(mgo.Monotonic, true)
-
-	return session, nil
+	return mongo.Connect(context.TODO(), clientOptions)
 }

@@ -18,11 +18,13 @@
 package collstats
 
 import (
-	"github.com/pkg/errors"
-
+	"context"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
+	"strings"
 )
 
 func init() {
@@ -55,18 +57,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+
 	// instantiate direct connections to each of the configured Mongo hosts
-	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
+	client, err := mongodb.NewDirectSession(m.FullyQualifiedName())
 	if err != nil {
 		return errors.Wrap(err, "error creating new Session")
 	}
-	defer mongoSession.Close()
+	defer client.Disconnect(context.TODO())
 
 	result := common.MapStr{}
 
-	err = mongoSession.Run("top", &result)
+	dbs, err := client.ListDatabaseNames(context.TODO(), bson.D{})
 	if err != nil {
-		return errors.Wrap(err, "Error retrieving collection totals from Mongo instance")
+		return errors.Wrap(err, "could not get a list of databases")
+	}
+	dbName := ""
+	for _, db := range dbs {
+		isFound := strings.Contains(db, m.FullyQualifiedName())
+		if isFound {
+			dbName = db
+			break
+		}
+	}
+	if dbName == ""{
+		return errors.New("database specified not found")
+	}
+
+	db := client.Database(dbName)
+	res := db.RunCommand(context.TODO(), "top")
+	if err = res.Decode(&result) ; err != nil {
+		return errors.Wrap(err, "could not decode mongo response")
 	}
 
 	if _, ok := result["totals"]; !ok {
