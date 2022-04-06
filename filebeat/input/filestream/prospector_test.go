@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint: errcheck // It's a test file
 package filestream
 
 import (
@@ -85,7 +86,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
 			}
-			p.Init(testStore)
+			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
 		})
@@ -151,7 +152,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				identifier:  mustPathIdentifier(false),
 				filewatcher: &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
 			}
-			p.Init(testStore)
+			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
 
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
@@ -451,7 +452,7 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 	return evt
 }
 
-func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
+func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
 func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return m.filesOnDisk }
 
@@ -473,7 +474,7 @@ func (mu *mockMetadataUpdater) has(id string) bool {
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
-	v, ok := mu.table[s.Name()]
+	_, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id")
 	}
@@ -532,6 +533,9 @@ func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (
 		}
 	}
 }
+
+// FixUpIdentifiers does nothing
+func (c *mockProspectorCleaner) FixUpIdentifiers(func(loginp.Value) (string, interface{})) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier

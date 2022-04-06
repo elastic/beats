@@ -18,11 +18,11 @@
 package kubernetes
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -97,7 +97,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
-			return nil, errors.Wrap(err, "error generating cache hash for kubeStateMetricsCache")
+			return nil, fmt.Errorf("error generating cache hash for kubeStateMetricsCache: %w", err)
 		}
 		m := module{
 			BaseModule:            base,

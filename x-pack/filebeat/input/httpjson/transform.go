@@ -12,8 +12,6 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -198,11 +196,10 @@ func (e maybeMsg) Error() string { return e.err.Error() }
 
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
 func newTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
-	var trans transforms
-
+	var trans transforms //nolint:prealloc // Bad linter!
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
-			return nil, errors.Errorf(
+			return nil, fmt.Errorf(
 				"each transform must have exactly one action, but found %d actions",
 				len(tfConfig.GetFields()),
 			)
@@ -216,7 +213,7 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 
 		constructor, found := registeredTransforms.get(namespace, actionName)
 		if !found {
-			return nil, errors.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms.String())
+			return nil, fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms.String())
 		}
 
 		cfg.PrintDebugf("Configure transform '%v' with:", actionName)
@@ -237,7 +234,7 @@ func newBasicTransformsFromConfig(config transformsConfig, namespace string, log
 		return nil, err
 	}
 
-	var rts []basicTransform
+	var rts []basicTransform //nolint:prealloc // Bad linter!
 	for _, t := range ts {
 		rt, ok := t.(basicTransform)
 		if !ok {
