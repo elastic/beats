@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Improve the error message when the registry file content is invalid. {pull}30543[30543]
 - Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
+- Add parent process ID to new process creation events. {issue}29237[29237] {pull}31102[31102]
 
 
 *Elastic Log Driver*

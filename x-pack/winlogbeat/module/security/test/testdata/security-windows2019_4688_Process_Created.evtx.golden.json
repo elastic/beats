@@ -32,7 +32,8 @@
       "name": "wevtutil.exe",
       "parent": {
         "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "name": "powershell.exe"
+        "name": "powershell.exe",
+        "pid": 4652
       },
       "pid": 4556
     },
