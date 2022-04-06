@@ -5,6 +5,11 @@
 package aws
 
 import (
+<<<<<<< HEAD
+=======
+	"crypto/tls"
+	"fmt"
+>>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	"net/http"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -12,7 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/aws/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
@@ -35,6 +39,23 @@ type ConfigAWS struct {
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
+<<<<<<< HEAD
+=======
+	if AWSConfig.Region == "" {
+		if config.DefaultRegion != "" {
+			AWSConfig.Region = config.DefaultRegion
+		} else {
+			AWSConfig.Region = "us-east-1"
+		}
+	}
+
+	// Assume IAM role if iam_role config parameter is given
+	if config.RoleArn != "" {
+		AWSConfig = switchToAssumeRoleProvider(config, AWSConfig)
+	}
+
+	var proxy func(*http.Request) (*url.URL, error)
+>>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	if config.ProxyUrl != "" {
 		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
 		if err != nil {
@@ -66,7 +87,6 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 }
 
 func getAccessKeys(config ConfigAWS) awssdk.Config {
-	logger := logp.NewLogger("getAccessKeys")
 	awsConfig := defaults.Config()
 	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     config.AccessKeyID,
@@ -81,6 +101,7 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		Value: awsCredentials,
 	}
 
+<<<<<<< HEAD
 	// Set default region if empty to make initial aws api call
 	if awsConfig.Region == "" {
 		awsConfig.Region = "us-east-1"
@@ -92,6 +113,8 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		return getRoleArn(config, awsConfig)
 	}
 
+=======
+>>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	return awsConfig
 }
 
@@ -116,6 +139,7 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
+<<<<<<< HEAD
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
@@ -128,13 +152,19 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	if config.RoleArn != "" {
 		logger.Debug("Using role arn and shared credential profile for AWS credential")
 		return getRoleArn(config, awsConfig), nil
+=======
+		return awsConfig, fmt.Errorf("external.LoadDefaultAWSConfig failed with shared credential profile given: %w", err)
+>>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	}
 
 	logger.Debug("Using shared credential profile for AWS credential")
 	return awsConfig, nil
 }
 
-func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+// switchToAssumeRoleProvider switches the credentials provider in the awsConfig to the `AssumeRoleProvider`.
+func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+	logger := logp.NewLogger("switchToAssumeRoleProvider")
+	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.New(awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
 	awsConfig.Credentials = stsCredProvider
