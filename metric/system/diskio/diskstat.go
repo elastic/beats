@@ -50,6 +50,6 @@ type IOMetric struct {
 // IOStat carries disk statistics for all devices
 type IOStat struct {
 	lastDiskIOCounters map[string]disk.IOCountersStat
-	lastCPU            sigar.Cpu
-	curCPU             sigar.Cpu
+	lastCPU            sigar.Cpu //nolint: nolintlint,structcheck,unused // not used on windows
+	curCPU             sigar.Cpu //nolint: nolintlint,structcheck,unused // not used on windows
 }
