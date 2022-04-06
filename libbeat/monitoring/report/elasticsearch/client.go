@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"time"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 
 	"github.com/pkg/errors"
 
