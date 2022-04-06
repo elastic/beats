@@ -86,30 +86,4 @@ type Log struct {
 	// severity. This number is therefore expected to contain a value between 0
 	// and 191.
 	SyslogPriority int64 `ecs:"syslog.priority"`
-
-	// The device or application that originated the Syslog message, if available.
-	SyslogAppname string `ecs:"syslog.appname"`
-
-	// The hostname, FQDN, or IP of the machine that originally sent the
-	// Syslog message. This is sourced from the hostname field of the syslog header.
-	// Depending on the environment, this value may be different from the host that
-	// handled the event, especially if the host handling the events is acting as
-	// a collector.
-	SyslogHostname string `ecs:"syslog.hostname"`
-
-	// An identifier for the type of Syslog message, if available. Only
-	// applicable for RFC 5424 messages.
-	SyslogMsgid string `ecs:"syslog.msgid"`
-
-	// The process name or ID that originated the Syslog message, if available.
-	SyslogProcid string `ecs:"syslog.procid"`
-
-	// Structured data expressed in RFC 5424 messages, if available. These
-	// are key-value pairs formed from the structured data portion of the syslog
-	// message, as defined in RFC 5424 Section 6.3.
-	SyslogStructuredData map[string]interface{} `ecs:"syslog.syslog.structured_data"`
-
-	// The version of the Syslog protocol specification. Only applicable
-	// for RFC 5424 messages.
-	SyslogVersion string `ecs:"syslog.version"`
 }

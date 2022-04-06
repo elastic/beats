@@ -35,15 +35,9 @@ type Hash struct {
 	// SHA256 hash.
 	Sha256 string `ecs:"sha256"`
 
-	// SHA384 hash.
-	Sha384 string `ecs:"sha384"`
-
 	// SHA512 hash.
 	Sha512 string `ecs:"sha512"`
 
 	// SSDEEP hash.
 	Ssdeep string `ecs:"ssdeep"`
-
-	// TLSH hash.
-	Tlsh string `ecs:"tlsh"`
 }
