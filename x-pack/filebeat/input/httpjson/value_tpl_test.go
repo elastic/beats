@@ -460,6 +460,28 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: version.GetDefaultVersion(),
 		},
+		{
+			name:          "func urlEncode blank",
+			value:         `[[urlEncode ""]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
+			name:        "func urlEncode URL Safe",
+			value:       `[[urlEncode "asdf"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "asdf",
+		},
+		{
+			name:        "func urlEncode URL Safe",
+			value:       `[[urlEncode "2022-02-17T04:37:10.406+0000"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2022-02-17T04%3A37%3A10.406%2B0000",
+		},
 	}
 
 	for _, tc := range cases {
