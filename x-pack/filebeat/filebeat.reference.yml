@@ -4440,6 +4440,9 @@ output.elasticsearch:
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
 
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
+
 # Overwrite existing template
 # Do not enable this option for more than one instance of filebeat as it might
 # overload your Elasticsearch with too many update requests.
