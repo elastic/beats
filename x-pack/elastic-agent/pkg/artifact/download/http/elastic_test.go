@@ -18,6 +18,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -122,14 +124,8 @@ func TestVerify(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			isOk, err := testVerifier.Verify(beatSpec, version, false)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if !isOk {
-				t.Fatal("verify failed")
-			}
+			err = testVerifier.Verify(beatSpec, version)
+			require.NoError(t, err)
 
 			os.Remove(artifact)
 			os.Remove(artifact + ".sha512")

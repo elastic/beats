@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"go.elastic.co/apm/apmtest"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -63,7 +65,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, apmtest.DiscardTracer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,8 +150,8 @@ var _ download.Downloader = &DummyDownloader{}
 
 type DummyVerifier struct{}
 
-func (*DummyVerifier) Verify(_ program.Spec, _ string, _ bool) (bool, error) {
-	return true, nil
+func (*DummyVerifier) Verify(_ program.Spec, _ string) error {
+	return nil
 }
 
 var _ download.Verifier = &DummyVerifier{}

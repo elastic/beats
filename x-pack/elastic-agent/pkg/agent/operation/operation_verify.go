@@ -66,16 +66,9 @@ func (o *operationVerify) Run(_ context.Context, application Application) (err e
 		}
 	}()
 
-	isVerified, err := o.verifier.Verify(o.program.Spec(), o.program.Version(), true)
-	if err != nil {
+	if err := o.verifier.Verify(o.program.Spec(), o.program.Version()); err != nil {
 		return errors.New(err,
 			fmt.Sprintf("operation '%s' failed to verify %s.%s", o.Name(), o.program.BinaryName(), o.program.Version()),
-			errors.TypeSecurity)
-	}
-
-	if !isVerified {
-		return errors.New(err,
-			fmt.Sprintf("operation '%s' marked '%s.%s' corrupted", o.Name(), o.program.BinaryName(), o.program.Version()),
 			errors.TypeSecurity)
 	}
 

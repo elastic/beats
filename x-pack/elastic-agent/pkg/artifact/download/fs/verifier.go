@@ -5,39 +5,32 @@
 package fs
 
 import (
-	"bufio"
-	"bytes"
-	"crypto/sha512"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-
-	"golang.org/x/crypto/openpgp"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 
 const (
-	ascSuffix    = ".asc"
-	sha512Length = 128
+	ascSuffix = ".asc"
 )
 
-// Verifier verifies a downloaded package by comparing with public ASC
-// file from elastic.co website.
+// Verifier verifies an artifact's GPG signature as read from the filesystem.
+// The signature is validated against Elastic's public GPG key that is
+// embedded into Elastic Agent.
 type Verifier struct {
 	config        *artifact.Config
 	pgpBytes      []byte
 	allowEmptyPgp bool
 }
 
-// NewVerifier create a verifier checking downloaded package on preconfigured
-// location agains a key stored on elastic.co website.
+// NewVerifier creates a verifier checking downloaded package on preconfigured
+// location against a key stored on elastic.co website.
 func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Verifier, error) {
 	if len(pgp) == 0 && !allowEmptyPgp {
 		return nil, errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
@@ -53,106 +46,50 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 }
 
 // Verify checks downloaded package on preconfigured
-// location agains a key stored on elastic.co website.
-func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool) (isMatch bool, err error) {
+// location against a key stored on elastic.co website.
+func (v *Verifier) Verify(spec program.Spec, version string) error {
 	filename, err := artifact.GetArtifactName(spec, version, v.config.OS(), v.config.Arch())
 	if err != nil {
-		return false, errors.New(err, "retrieving package name")
+		return errors.New(err, "retrieving package name")
 	}
 
 	fullPath := filepath.Join(v.config.TargetDirectory, filename)
-	defer func() {
-		if removeOnFailure && (!isMatch || err != nil) {
-			// remove bits so they can be redownloaded
+
+	if err = download.VerifySHA512Hash(fullPath); err != nil {
+		var checksumMismatchErr *download.ChecksumMismatchError
+		if errors.As(err, &checksumMismatchErr) {
 			os.Remove(fullPath)
 			os.Remove(fullPath + ".sha512")
+		}
+		return err
+	}
+
+	if err = v.verifyAsc(fullPath); err != nil {
+		var invalidSignatureErr *download.InvalidSignatureError
+		if errors.As(err, &invalidSignatureErr) {
 			os.Remove(fullPath + ".asc")
 		}
-	}()
-
-	if isMatch, err := v.verifyHash(filename, fullPath); !isMatch || err != nil {
-		return isMatch, err
+		return err
 	}
 
-	return v.verifyAsc(filename, fullPath)
+	return nil
 }
 
-func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
-	hashFilePath := fullPath + ".sha512"
-	hashFileHandler, err := os.Open(hashFilePath)
-	if err != nil {
-		return false, err
-	}
-	defer hashFileHandler.Close()
-
-	// get hash
-	// content of a file is in following format
-	// hash  filename
-	var expectedHash string
-	scanner := bufio.NewScanner(hashFileHandler)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if !strings.HasSuffix(line, filename) {
-			continue
-		}
-
-		if len(line) > sha512Length {
-			expectedHash = strings.TrimSpace(line[:sha512Length])
-		}
-	}
-
-	if expectedHash == "" {
-		return false, fmt.Errorf("hash for '%s' not found in '%s'", filename, hashFilePath)
-	}
-
-	// compute file hash
-	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
-	if err != nil {
-		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
-	}
-	defer fileReader.Close()
-
-	hash := sha512.New()
-	if _, err := io.Copy(hash, fileReader); err != nil {
-		return false, err
-	}
-	computedHash := fmt.Sprintf("%x", hash.Sum(nil))
-
-	return expectedHash == computedHash, nil
-}
-
-func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
+func (v *Verifier) verifyAsc(fullPath string) error {
 	if len(v.pgpBytes) == 0 {
 		// no pgp available skip verification process
-		return true, nil
+		return nil
 	}
 
 	ascBytes, err := v.getPublicAsc(fullPath)
 	if err != nil && v.allowEmptyPgp {
 		// asc not available but we allow empty for dev use-case
-		return true, nil
+		return nil
 	} else if err != nil {
-		return false, err
+		return err
 	}
 
-	pubkeyReader := bytes.NewReader(v.pgpBytes)
-	ascReader := bytes.NewReader(ascBytes)
-	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
-	if err != nil {
-		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
-	}
-	defer fileReader.Close()
-
-	keyring, err := openpgp.ReadArmoredKeyRing(pubkeyReader)
-	if err != nil {
-		return false, errors.New(err, "read armored key ring", errors.TypeSecurity)
-	}
-	_, err = openpgp.CheckArmoredDetachedSignature(keyring, fileReader, ascReader)
-	if err != nil {
-		return false, errors.New(err, "check detached signature", errors.TypeSecurity)
-	}
-
-	return true, nil
+	return download.VerifyGPGSignature(fullPath, ascBytes, v.pgpBytes)
 }
 
 func (v *Verifier) getPublicAsc(fullPath string) ([]byte, error) {
