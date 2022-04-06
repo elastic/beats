@@ -4,6 +4,9 @@
   description: >
     Fields for Azure activity logs.
   fields:
+    - name: identity_name
+      type: keyword
+      description: identity name
     - name: identity
       type: group
       description: >
@@ -82,6 +85,18 @@
                   type: keyword
                   description: >
                     Principal type
+    - name: tenant_id
+      type: keyword
+      description: >
+        Tenant ID
+    - name: level
+      type: keyword
+      description: >
+        Level
+    - name: operation_version
+      type: keyword
+      description: >
+        Operation version
     - name: operation_name
       type: keyword
       description: >
