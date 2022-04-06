@@ -413,7 +413,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # running tests in parallel
             pass
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond", err_msg=""):
+    def wait_until(self, cond, max_timeout=20, poll_interval=0.1, name="cond", err_msg=""):
         """
         TODO: this can probably be a "wait_until_output_count", among other things, since that could actually use `self`, and this can become an internal function
         Waits until the cond function returns true,
