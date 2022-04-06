@@ -66,6 +66,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Heartbeat now successfully runs synthetic monitors on ARM processors. {pull}31114[31114]
+
 *Metricbeat*
 
 - Enhance metricbeat on openshift documentation {pull}30054[30054]
