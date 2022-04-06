@@ -151,6 +151,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Improve httpjson documentation for split processor. {pull}33473[33473]
 - Added separation of transform context object inside httpjson. Introduced new clause `.parent_last_response.*` {pull}33499[33499]
 - Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
+- Add Common Expression Language input. {pull}31233[31233]
 
 *Auditbeat*
 
