@@ -13,7 +13,15 @@
 # ============================== Filebeat inputs ===============================
 
 filebeat.inputs:
-
+- type: cometd
+  enabled: true
+  channel_name: /event/LoginEventStream
+  auth.oauth2:
+    client.id: 3MVG9pRzvMkjMb6m1I.fz3f7zBuH4xdKCJcM9B5XLgxXh2AFTmQmr8JMn1v9_AoKIW7gwf2FIGqRwKZVEMR_C
+    client.secret: E9FE118633BC7C55D0AD395204F19C1D4529D09CB7231754AD2F2CA668400619
+    token_url: https://login.salesforce.com/services/oauth2/token
+    user: kush.rana@elastic.co
+    password: Crest@123
 # Each - is an input. Most options can be set at the input level, so
 # you can use different inputs for various configurations.
 # Below are the input specific configurations.
@@ -130,11 +138,12 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-
+output.console:
+  pretty: true
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
+# output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  # hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -163,9 +172,9 @@ output.elasticsearch:
 processors:
   - add_host_metadata:
       when.not.contains.tags: forwarded
-  - add_cloud_metadata: ~
-  - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
+  # - add_cloud_metadata: ~
+  # - add_docker_metadata: ~
+  # - add_kubernetes_metadata: ~
 
 # ================================== Logging ===================================
 

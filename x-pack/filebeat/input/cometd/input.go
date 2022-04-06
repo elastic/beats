@@ -139,8 +139,8 @@ func NewInput(
 
 // Stop stops the input and waits for it to fully stop.
 func (in *cometdInput) Stop() {
-	close(in.out)
 	in.workerCancel()
+	close(in.out)
 	in.workerWg.Wait()
 }
 
