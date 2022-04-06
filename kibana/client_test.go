@@ -49,6 +49,7 @@ func TestErrorJson(t *testing.T) {
 }
 
 func assertConnection(t *testing.T, URL string, expectedStatusCode int) {
+	t.Helper()
 	conn := Connection{
 		URL:  URL,
 		HTTP: http.DefaultClient,
@@ -56,7 +57,6 @@ func assertConnection(t *testing.T, URL string, expectedStatusCode int) {
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
 	assert.Equal(t, expectedStatusCode, code)
 	assert.Error(t, err)
-
 }
 
 func TestErrorBadJson(t *testing.T) {
@@ -116,25 +116,32 @@ func TestServiceToken(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestNewKibanaClient(t *testing.T) {
+func TestNewKibanaClientWithSpace(t *testing.T) {
+	var (
+		testSpace      = "test-space"
+		spaceURLPrefix = "/s/" + testSpace
+	)
+
 	var requests []*http.Request
 	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests = append(requests, r)
-		if r.URL.Path == statusAPI {
+		if r.URL.Path == spaceURLPrefix+statusAPI {
 			_, _ = w.Write([]byte(`{"version":{"number":"1.2.3-beta","build_snapshot":true}}`))
 		}
 	}))
 	defer kibanaTS.Close()
 
+	// Configure an arbitrary test space to ensure the space URL prefix is added.
 	client, err := NewKibanaClient(config.MustNewConfigFrom(fmt.Sprintf(`
 protocol: http
 host: %s
+space.id: %s
 headers:
   key: value
   content-type: text/plain
   accept: text/plain
   kbn-xsrf: 0
-`, kibanaTS.Listener.Addr().String())), binaryName, v, commit, buildTime)
+`, kibanaTS.Listener.Addr().String(), testSpace)), binaryName, v, commit, buildTime)
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
@@ -143,14 +150,14 @@ headers:
 
 	// NewKibanaClient issues a request to /api/status to fetch the version.
 	require.Len(t, requests, 2)
-	assert.Equal(t, statusAPI, requests[0].URL.Path)
+	assert.Equal(t, spaceURLPrefix+statusAPI, requests[0].URL.Path)
 	assert.Equal(t, []string{"value"}, requests[0].Header.Values("key"))
 	assert.Equal(t, "1.2.3-beta-SNAPSHOT", client.Version.String())
 
 	// Headers specified in cient.Request are added to those defined in config.
 	//
 	// Content-Type, Accept, and kbn-xsrf cannot be overridden.
-	assert.Equal(t, "/foo", requests[1].URL.Path)
+	assert.Equal(t, spaceURLPrefix+"/foo", requests[1].URL.Path)
 	assert.Equal(t, []string{"value", "another_value"}, requests[1].Header.Values("key"))
 	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Content-Type"))
 	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Accept"))
@@ -168,6 +175,7 @@ func TestNewKibanaClientWithMultipartData(t *testing.T) {
 	}))
 	defer kibanaTS.Close()
 
+	// Don't configure a space to ensure the space URL prefix is not added.
 	client, err := NewKibanaClient(config.MustNewConfigFrom(fmt.Sprintf(`
 protocol: http
 host: %s
