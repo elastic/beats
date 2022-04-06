@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"sync"
 	"time"
 
@@ -29,6 +28,7 @@ const (
 // Run starts the input worker then returns. Only the first invocation
 // will ever start the worker.
 func (in *cometdInput) Run() {
+	var err error
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go func() {
@@ -37,7 +37,11 @@ func (in *cometdInput) Run() {
 			defer in.workerWg.Done()
 			defer in.workerCancel()
 			in.b = bay.Bayeux{}
-			in.creds = bay.GetSalesforceCredentials()
+			in.creds, err = bay.GetSalesforceCredentials(in.authParams)
+			if err != nil {
+				in.log.Error("not able to get access token", err)
+				return
+			}
 			if err := in.run(); err != nil {
 				in.log.Error(err)
 				return
@@ -47,7 +51,7 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
-	in.out = in.b.Channel(in.out, "-1", in.creds, in.config.ChannelName)
+	in.out = in.b.Channel(in.out, "-1", *in.creds, in.config.ChannelName)
 
 	var event Event
 	for e := range in.out {
@@ -98,11 +102,12 @@ func NewInput(
 		return nil, err
 	}
 
-	os.Setenv("SALESFORCE_CONSUMER_KEY", conf.Auth.OAuth2.ClientID)
-	os.Setenv("SALESFORCE_CONSUMER_SECRET", conf.Auth.OAuth2.ClientSecret)
-	os.Setenv("SALESFORCE_USER", conf.Auth.OAuth2.User)
-	os.Setenv("SALESFORCE_PASSWORD", conf.Auth.OAuth2.Password)
-	os.Setenv("SALESFORCE_TOKEN_URL", conf.Auth.OAuth2.TokenURL)
+	var authParams bay.AuthenticationParameters
+	authParams.ClientID = conf.Auth.OAuth2.ClientID
+	authParams.ClientSecret = conf.Auth.OAuth2.ClientSecret
+	authParams.Username = conf.Auth.OAuth2.User
+	authParams.Password = conf.Auth.OAuth2.Password
+	authParams.TokenURL = conf.Auth.OAuth2.TokenURL
 
 	logger := logp.NewLogger("cometd").With(
 		"pubsub_channel", conf.ChannelName)
@@ -123,6 +128,7 @@ func NewInput(
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 		ackedCount:   atomic.NewUint32(0),
+		authParams:   authParams,
 	}
 
 	// Creating a new channel for cometd input
@@ -164,7 +170,8 @@ type cometdInput struct {
 	ackedCount *atomic.Uint32 // Total number of successfully ACKed messages.
 	out        chan bay.TriggerEvent
 	b          bay.Bayeux
-	creds      bay.Credentials
+	creds      *bay.Credentials
+	authParams bay.AuthenticationParameters
 }
 
 type Event struct {

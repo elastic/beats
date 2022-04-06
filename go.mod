@@ -189,6 +189,7 @@ require (
 )
 
 require (
+	github.com/elastic/bayeux v1.0.3
 	github.com/elastic/elastic-agent-libs v0.1.1
 	github.com/shirou/gopsutil/v3 v3.21.12
 )
@@ -220,7 +221,6 @@ require (
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/elastic/bayeux v1.0.2 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
