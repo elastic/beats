@@ -101,7 +101,7 @@ func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
-	case r.Method != "POST":
+	case r.Method != http.MethodPost:
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
@@ -114,7 +114,7 @@ func oauth2ClientIdHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
-	case r.Method != "POST":
+	case r.Method != http.MethodPost:
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
@@ -126,7 +126,7 @@ func oauth2SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
-	case r.Method != "POST":
+	case r.Method != http.MethodPost:
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
@@ -138,7 +138,7 @@ func oauth2EventHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
-	case r.Method != "POST":
+	case r.Method != http.MethodPost:
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
@@ -152,13 +152,13 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	body, _ := ioutil.ReadAll(r.Body)
-	if r.URL.Path == "/cometd/38.0" && string(body) == `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}` {
+	if string(body) == `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}` {
 		oauth2ClientIdHandler(w, r)
 		return
-	} else if r.URL.Path == "/cometd/38.0" && string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "94b112sp7ph1c9s41mycpzik4rkj3"} ` {
+	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "94b112sp7ph1c9s41mycpzik4rkj3"} ` {
 		oauth2EventHandler(w, r)
 		return
-	} else if r.URL.Path == "/cometd/38.0" && string(body) == `{
+	} else if string(body) == `{
 								"channel": "/meta/subscribe",
 								"subscription": "first-channel",
 								"clientId": "94b112sp7ph1c9s41mycpzik4rkj3",

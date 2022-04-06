@@ -81,10 +81,6 @@ func TestInput(t *testing.T) {
 
 	// Setup the input
 	input, err := NewInput(config, connector, inputContext)
-	if err != nil {
-		fmt.Println("error: ", err)
-	}
-
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -102,7 +98,6 @@ func TestInput(t *testing.T) {
 	for _, event := range []beat.Event{<-eventsCh} {
 		require.NoError(t, err)
 		message, err := event.GetValue("message")
-		fmt.Println(message)
 		require.NoError(t, err)
 		require.Equal(t, string(msg.Data.Payload), message)
 	}
