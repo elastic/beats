@@ -57,10 +57,11 @@ function dockerPullImages() {
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
   golang:${GO_VERSION}
+  docker.elastic.co/infra/release-manager:latest
   "
   for image in ${DOCKER_IMAGES}
   do
-    (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image. Continuing."
+    (retry 2 docker pull "${image}") || echo "Error pulling ${image} Docker image. Continuing."
   done
 }
 
@@ -74,10 +75,11 @@ if [ -x "$(command -v docker)" ]; then
 
   ## GitHub api returns up to 100 entries.
   ## Probably we need a different approach to search the latest minor.
-  latestMinor=$(curl -s https://api.github.com/repos/elastic/beats/branches\?per_page=100 | jq -r '.[].name' | grep "^7." | tail -1)
+  latest7Minor=$(curl -s https://api.github.com/repos/elastic/beats/branches\?per_page=100 | jq -r '.[].name' | grep "^7." | tail -1)
+  latest8Minor=$(curl -s https://api.github.com/repos/elastic/beats/branches\?per_page=100 | jq -r '.[].name' | grep "^8." | tail -1)
 
-  for branch in master 7.x $latestMinor ; do
-    if [ "$branch" != "master" ] ; then
+  for branch in main $latest7Minor $latest8Minor; do
+    if [ "$branch" != "main" ] ; then
       echo "Checkout the branch $branch"
       git checkout "$branch"
     fi

@@ -20,6 +20,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
@@ -101,17 +102,6 @@ func extractFromMSI() error {
 		return err
 	}
 
-	// Install msitools
-	err := execCommand("apt", "update")
-	if err != nil {
-		return err
-	}
-
-	err = execCommand("apt", "install", "-y", "msitools")
-	if err != nil {
-		return err
-	}
-
 	osArchs := osquerybeat.OSArchs(devtools.Platforms)
 
 	for _, osarch := range osArchs {
@@ -161,18 +151,12 @@ func GolangCrossBuild() error {
 	// Currently we can't reproduce this is issue, but here we can eliminate the need for calling msiexec
 	// if extract the osqueryd.exe binary during the build.
 	//
-	// The builder docker images are Debian so we need to install msitools for
-	// linux in order to extract the osqueryd.exe from MSI during build process.	// Install MSI tools in order to extract file from MSI
-	// Ideally we would want these to be a part of the build docker image,
-	// but doing this here for now due to limited time before 7.16.2
-	//
 	// The cross build is currently called for two binaries osquerybeat and osqquery-extension
-	// Only install msitools and extract osqueryd.exe during osquerybeat build on windows
+	// Only extract osqueryd.exe during osquerybeat build on windows
 	args := devtools.DefaultGolangCrossBuildArgs()
 
-	// Install msitools only
 	if !strings.HasPrefix(args.Name, "osquery-extension-") {
-		// Install msitools in the container and extract osqueryd.exe from MSI
+		// Extract osqueryd.exe from MSI
 		if err := extractFromMSI(); err != nil {
 			return err
 		}
@@ -204,6 +188,13 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.

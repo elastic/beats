@@ -33,7 +33,6 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/time/rate"
@@ -143,7 +142,7 @@ func (c *Config) Validate() error {
 
 	for _, ht := range c.HashTypes {
 		if !ht.IsValid() {
-			errs = append(errs, errors.Errorf("invalid hash_types value '%v'", ht))
+			errs = append(errs, fmt.Errorf("invalid hash_types value '%v'", ht))
 		}
 	}
 
@@ -151,14 +150,14 @@ func (c *Config) Validate() error {
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "invalid max_file_size value"))
+		errs = append(errs, fmt.Errorf("invalid max_file_size value: %w", err))
 	} else if c.MaxFileSizeBytes <= 0 {
-		errs = append(errs, errors.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
+		errs = append(errs, fmt.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
 	}
 
 	c.ScanRateBytesPerSec, err = humanize.ParseBytes(c.ScanRatePerSec)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
+		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 
 	return errs.Err()
@@ -189,14 +188,14 @@ func NewFileHasher(c Config, done <-chan struct{}) (*FileHasher, error) {
 func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to stat file %v", path)
+		return nil, fmt.Errorf("failed to stat file %v: %w", path, err)
 	}
 
 	// Throttle reading and hashing rate.
 	if len(hasher.config.HashTypes) > 0 {
 		err = hasher.throttle(info.Size())
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to hash file %v", path)
+			return nil, fmt.Errorf("failed to hash file %v: %w", path, err)
 		}
 	}
 
@@ -204,7 +203,7 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 	for _, hashType := range hasher.config.HashTypes {
 		h, valid := validHashes[hashType]
 		if !valid {
-			return nil, errors.Errorf("unknown hash type '%v'", hashType)
+			return nil, fmt.Errorf("unknown hash type '%v'", hashType)
 		}
 
 		hashes = append(hashes, h())
@@ -213,13 +212,13 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 	if len(hashes) > 0 {
 		f, err := file.ReadOpen(path)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to open file for hashing")
+			return nil, fmt.Errorf("failed to open file for hashing: %w", err)
 		}
 		defer f.Close()
 
 		hashWriter := multiWriter(hashes)
 		if _, err := io.Copy(hashWriter, f); err != nil {
-			return nil, errors.Wrap(err, "failed to calculate file hashes")
+			return nil, fmt.Errorf("failed to calculate file hashes: %w", err)
 		}
 
 		nameToHash := make(map[HashType]Digest, len(hashes))

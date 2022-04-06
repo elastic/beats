@@ -88,13 +88,23 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	// TODO: same happens with CronJob vs Job. The hierarcy there is CronJob->Job->Pod
 	if p.addResourceMetadata.Deployment {
 		rsName, _ := out.GetValue("replicaset.name")
 		if rsName, ok := rsName.(string); ok {
 			dep := p.getRSDeployment(rsName, po.GetNamespace())
 			if dep != "" {
 				out.Put("deployment.name", dep)
+			}
+		}
+	}
+
+	// check if Pod is handled by a Job which is controlled by a CronJob
+	if p.addResourceMetadata.CronJob {
+		jobName, _ := out.GetValue("job.name")
+		if jobName, ok := jobName.(string); ok {
+			dep := p.getCronjobOfJob(jobName, po.GetNamespace())
+			if dep != "" {
+				out.Put("cronjob.name", dep)
 			}
 		}
 	}
@@ -156,6 +166,27 @@ func (p *pod) getRSDeployment(rsName string, ns string) string {
 		if ref.Controller != nil && *ref.Controller {
 			switch ref.Kind {
 			case "Deployment":
+				return ref.Name
+			}
+		}
+	}
+	return ""
+}
+
+// getCronjobOfJob return the name of the Cronjob object that
+// owns the Job with the given name under the given Namespace
+func (p *pod) getCronjobOfJob(jobName string, ns string) string {
+	if p.client == nil {
+		return ""
+	}
+	cronjob, err := p.client.BatchV1().Jobs(ns).Get(context.TODO(), jobName, metav1.GetOptions{})
+	if err != nil {
+		return ""
+	}
+	for _, ref := range cronjob.GetOwnerReferences() {
+		if ref.Controller != nil && *ref.Controller {
+			switch ref.Kind {
+			case "CronJob":
 				return ref.Name
 			}
 		}

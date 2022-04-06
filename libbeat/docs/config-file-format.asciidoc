@@ -3,6 +3,7 @@
 
 Beats config files are based on http://www.yaml.org[YAML], a file format that is
 easier to read and write than other common data formats like XML or JSON.
+Config files must be encoded in UTF-8.
 
 In beats all YAML files start with a dictionary, an unordered collection of
 name/value pairs. In addition to dictionaries, YAML also supports lists, numbers,

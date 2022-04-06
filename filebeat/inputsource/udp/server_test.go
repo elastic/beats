@@ -28,9 +28,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 )
 
-const maxMessageSize = 20
-const maxSocketSize = 0
-const timeout = time.Second * 15
+const (
+	maxMessageSize = 20
+	maxSocketSize  = 0
+	timeout        = time.Second * 15
+)
 
 type info struct {
 	message []byte

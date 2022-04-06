@@ -155,7 +155,7 @@ roleRef:
 === Compatibility
 
 The Kubernetes module is tested with the following versions of Kubernetes:
-1.18.x, 1.19.x, 1.20.x, 1.21.x, 1.22.x, 1.23.x
+1.21.x, 1.22.x, 1.23.x
 
 [float]
 === Dashboard
@@ -166,12 +166,23 @@ If you are using HA for those components, be aware that when gathering data from
 
 Dashboards for `controllermanager` `scheduler` and `proxy` are not compatible with kibana versions below `7.2.0`
 
-Cluster selector in `cluster overview` dashboard helps in distinguishing and filtering metrics collected from multiple clusters. If you want to focus on a subset of the Kubernetes clusters for monitoring a specific scenario, this cluster selector could be a handy tool. Note that this selector gets populated from the `orchestrator.cluster.name` field that may not always be available. This field gets its value from sources like `kube_config`, `kubeadm-config` configMap, and Google Cloud's meta API for GKE. If the sources mentioned above don't provide this value, metricbeat will not report it. However, you can always use https://www.elastic.co/guide/en/beats/metricbeat/current/defining-processors.html[processors] to set this field and utilize it in the `cluster overview` dashboard.
+Cluster selector in `cluster overview` dashboard helps in distinguishing and filtering metrics collected from multiple clusters. If you want to focus on a subset of the Kubernetes clusters for monitoring a specific scenario, this cluster selector could be a handy tool. Note that this selector gets populated from the `orchestrator.cluster.name` field that may not always be available. This field gets its value from sources like `kube_config`, `kubeadm-config` configMap, and Google Cloud's meta API for GKE. If the sources mentioned above don't provide this value, metricbeat will not report it. However, you can always use https://www.elastic.co/guide/en/beats/filebeat/current/add-fields.html[add_fields processor] to set `orchestrator.cluster.name` fields and utilize it in the `cluster overview` dashboard:
+[source,yaml]
+----
+processors:
+  - add_fields:
+      target: orchestrator.cluster
+      fields:
+        name: clusterName
+        url: clusterURL
+----
 
 Kubernetes cluster overview example:
 
 image::./images/metricbeat-kubernetes-clusteroverview.png[]
 
+If you are setting collection period to a value bigger than `2m` you will need to increase
+the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 
@@ -218,7 +229,7 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
@@ -232,6 +243,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -262,10 +274,12 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Set the namespace to watch for resources
+  #namespace: staging
   # To configure additionally node and namespace metadata, added to pod, service and container resource types,
   # `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
@@ -276,6 +290,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5

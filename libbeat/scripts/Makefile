@@ -78,8 +78,6 @@ GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
-GOLINT=golint
-GOLINT_REPO?=golang.org/x/lint/golint
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
@@ -273,7 +271,7 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
-python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1 
+python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \

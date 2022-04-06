@@ -9,18 +9,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
 func TestS3Poller(t *testing.T) {
@@ -135,7 +132,7 @@ func TestS3Poller(t *testing.T) {
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
 		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
-		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
+		assert.Equal(t, numberOfWorkers, receiver.workerSem.Available())
 	})
 
 	t.Run("retry after Poll error", func(t *testing.T) {
@@ -265,6 +262,6 @@ func TestS3Poller(t *testing.T) {
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
 		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
-		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
+		assert.Equal(t, numberOfWorkers, receiver.workerSem.Available())
 	})
 }

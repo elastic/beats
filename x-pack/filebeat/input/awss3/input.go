@@ -111,7 +111,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   inputContext.Cancelation,
-		ACKHandler: newEventACKHandler(),
+		ACKHandler: awscommon.NewEventACKHandler(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
@@ -293,7 +293,7 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		return "aws"
 	}
 	// List of popular S3 SaaS providers
-	var providers = map[string]string{
+	providers := map[string]string{
 		"amazonaws.com":          "aws",
 		"c2s.sgov.gov":           "aws",
 		"c2s.ic.gov":             "aws",

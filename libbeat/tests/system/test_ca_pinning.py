@@ -33,11 +33,11 @@ class TestCAPinning(BaseTest):
 
         self.render_config_template(
             elasticsearch={
-                "hosts": self.get_elasticsearch_url_ssl(),
-                "username": "admin",
-                "password": "changeme",
-                "ssl.certificate_authorities": [ca],
-                "ssl.ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
+                "host": self.get_elasticsearch_url_ssl(),
+                "user": "admin",
+                "pass": "testing",
+                "ssl_certificate_authorities": [ca],
+                "ssl_ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
             },
         )
 
@@ -65,11 +65,11 @@ class TestCAPinning(BaseTest):
 
         self.render_config_template(
             elasticsearch={
-                "hosts": self.get_elasticsearch_url_ssl(),
-                "username": "admin",
-                "password": "changeme",
-                "ssl.certificate_authorities": [ca],
-                "ssl.ca_sha256": "not-good-sha",
+                "host": self.get_elasticsearch_url_ssl(),
+                "user": "beats",
+                "pass": "testing",
+                "ssl_certificate_authorities": [ca],
+                "ssl_ca_sha256": "not-good-sha",
             },
         )
 

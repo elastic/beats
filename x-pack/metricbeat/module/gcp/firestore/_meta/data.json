@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-apm"
+        },
+        "provider": "gcp"
+    },
+    "event": {
+        "dataset": "gcp.firestore",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "labels": {
+            "metrics": {
+                "storage_class": "MULTI_REGIONAL"
+            },
+            "resource": {
+                "bucket_name": "artifacts.elastic-apm.appspot.com",
+                "location": "us"
+            }
+        },
+        "firestore": {
+            "document": {
+                "delete_count": {
+                    "value": 15
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "firestore",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

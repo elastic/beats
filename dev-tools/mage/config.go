@@ -149,6 +149,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	params := map[string]interface{}{
 		"GOOS":                           EnvOr("DEV_OS", "linux"),
 		"GOARCH":                         EnvOr("DEV_ARCH", "amd64"),
+		"BeatLicense":                    BeatLicense,
 		"Reference":                      false,
 		"Docker":                         false,
 		"ExcludeConsole":                 false,

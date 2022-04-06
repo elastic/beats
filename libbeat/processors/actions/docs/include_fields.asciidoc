@@ -7,7 +7,7 @@
 
 The `include_fields` processor specifies which fields to export if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
-specified fields are always exported. The `@timestamp` and `type` fields are
+specified fields are always exported. The `@timestamp`, `@metadata` and `type` fields are
 always exported, even if they are not defined in the `include_fields` list.
 
 [source,yaml]

@@ -60,7 +60,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	memory := common.MapStr{}
 	err = typeconv.Convert(&memory, &eventRaw)
-
+	if err != nil {
+		return err
+	}
 	r.Event(mb.Event{
 		MetricSetFields: memory,
 	})

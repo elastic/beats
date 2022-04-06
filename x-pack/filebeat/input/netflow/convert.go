@@ -23,21 +23,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
 
-var (
-	// RFC 1918
-	privateIPv4 = []net.IPNet{
-		{IP: net.IPv4(10, 0, 0, 0), Mask: net.IPv4Mask(255, 0, 0, 0)},
-		{IP: net.IPv4(172, 16, 0, 0), Mask: net.IPv4Mask(255, 240, 0, 0)},
-		{IP: net.IPv4(192, 168, 0, 0), Mask: net.IPv4Mask(255, 255, 0, 0)},
-	}
-
-	// RFC 4193
-	privateIPv6 = net.IPNet{
-		IP:   net.IP{0xfd, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		Mask: net.IPMask{0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	}
-)
-
 func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
 	switch flow.Type {
 	case record.Flow:

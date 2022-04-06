@@ -275,6 +275,8 @@ metricbeat.modules:
   metricsets:
     - pubsub
     - loadbalancing
+    - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -307,17 +309,11 @@ metricbeat.modules:
 
 - module: gcp
   metricsets:
-    - metrics
+    - gke
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  metrics:
-    - aligner: ALIGN_NONE
-      service: gke
-      service_metric_prefix: kubernetes.io/
-      metric_types:
-        - "container/cpu/core_usage_time"
 
 - module: gcp
   metricsets:
@@ -339,6 +335,10 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-gcp-compute,compute>>
 
+* <<metricbeat-metricset-gcp-dataproc,dataproc>>
+
+* <<metricbeat-metricset-gcp-firestore,firestore>>
+
 * <<metricbeat-metricset-gcp-gke,gke>>
 
 * <<metricbeat-metricset-gcp-loadbalancing,loadbalancing>>
@@ -352,6 +352,10 @@ The following metricsets are available:
 include::gcp/billing.asciidoc[]
 
 include::gcp/compute.asciidoc[]
+
+include::gcp/dataproc.asciidoc[]
+
+include::gcp/firestore.asciidoc[]
 
 include::gcp/gke.asciidoc[]
 

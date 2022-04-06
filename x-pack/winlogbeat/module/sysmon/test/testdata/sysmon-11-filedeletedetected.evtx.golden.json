@@ -1,0 +1,146 @@
+[
+  {
+    "@timestamp": "2022-01-24T05:12:34.328Z",
+    "event": {
+      "category": [
+        "file"
+      ],
+      "code": "26",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "deletion"
+      ]
+    },
+    "file": {
+      "directory": "C:\\Windows\\ServiceState\\EventLog\\Data",
+      "extension": "dat",
+      "name": "lastalive1.dat",
+      "path": "C:\\Windows\\ServiceState\\EventLog\\Data\\lastalive1.dat"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{63a74932-a2b4-61ee-1b00-000000000700}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "hash": {
+        "sha256": "a94808e7c66973b122f66ec6611019c745a9602f8e944f53635cab58aef35a79"
+      },
+      "name": "svchost.exe",
+      "pid": 1264
+    },
+    "related": {
+      "hash": "a94808e7c66973b122f66ec6611019c745a9602f8e944f53635cab58aef35a79",
+      "user": "LOCAL SERVICE"
+    },
+    "rule": {
+      "name": "-"
+    },
+    "sysmon": {
+      "file": {
+        "is_executable": false
+      }
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "LOCAL SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_id": "26",
+      "process": {
+        "pid": 2764,
+        "thread": {
+          "id": 3792
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 456,
+      "user": {
+        "identifier": "S-1-5-18"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2022-01-24T05:12:51.031Z",
+    "event": {
+      "category": [
+        "file"
+      ],
+      "code": "26",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "deletion"
+      ]
+    },
+    "file": {
+      "directory": "C:\\ProgramData\\Microsoft\\Windows\\DeviceMetadataCache",
+      "extension": "000",
+      "name": "OLDCACHE.000",
+      "path": "C:\\ProgramData\\Microsoft\\Windows\\DeviceMetadataCache\\OLDCACHE.000"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{63a74932-3523-61ee-af00-000000000700}",
+      "executable": "C:\\Windows\\system32\\svchost.exe",
+      "hash": {
+        "sha256": "d78fbf654d84ddf2cb4fe221f7d8b61e0decdee48a4687915e6e4a2296e2418b"
+      },
+      "name": "svchost.exe",
+      "pid": 1364
+    },
+    "related": {
+      "hash": "d78fbf654d84ddf2cb4fe221f7d8b61e0decdee48a4687915e6e4a2296e2418b",
+      "user": "SYSTEM"
+    },
+    "rule": {
+      "name": "-"
+    },
+    "sysmon": {
+      "file": {
+        "is_executable": false
+      }
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_id": "26",
+      "process": {
+        "pid": 2764,
+        "thread": {
+          "id": 3792
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 457,
+      "user": {
+        "identifier": "S-1-5-18"
+      },
+      "version": 5
+    }
+  }
+]

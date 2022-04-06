@@ -51,12 +51,13 @@ type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 
-	Host       string        `config:"host"`
+	Node       string        `config:"node"`
 	SyncPeriod time.Duration `config:"sync_period"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	Namespace           string                              `config:"namespace"`
 }
 
 type enricher struct {
@@ -197,7 +198,10 @@ func NewContainerMetadataEnricher(
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			meta := metaGen.Generate(pod)
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
@@ -228,8 +232,9 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						meta.Put("container.id", s.ContainerID[split+3:])
-						meta.Put("container.runtime", s.ContainerID[:split])
+						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+
+						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
@@ -238,7 +243,10 @@ func NewContainerMetadataEnricher(
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
@@ -262,6 +270,7 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 
 	options := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
+		Namespace:   config.Namespace,
 	}
 
 	log := logp.NewLogger(selector)
@@ -269,7 +278,7 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 	// Watch objects in the node only
 	if nodeScope {
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Host,
+			ConfigHost:  config.Node,
 			Client:      client,
 			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
@@ -281,7 +290,7 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 		}
 	}
 
-	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
+	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Node)
 
 	watcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher", client, resource, options, nil)
 	if err != nil {
@@ -447,7 +456,11 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			ecsMeta.Delete("kubernetes")
+			err = ecsMeta.Delete("kubernetes")
+			if err != nil {
+				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+			}
+
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
@@ -494,4 +507,18 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 		}
 	}
 	return e, err
+}
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }
