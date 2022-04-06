@@ -12,7 +12,8 @@ jobs:
         include:
           - GOOS: windows
           - GOOS: linux
-          - GOOS: darwin
+          # issue: https://github.com/elastic/elastic-agent-system-metrics/issues/4
+          # - GOOS: darwin
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -35,7 +36,6 @@ jobs:
       - name: golangci-lint
         env:
           GOOS: ${{ matrix.GOOS }}
-          CGO_ENABLED: '1'
         uses: golangci/golangci-lint-action@v2
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
