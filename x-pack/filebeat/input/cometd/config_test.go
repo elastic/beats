@@ -14,8 +14,8 @@ const (
 	demoClientID     = "DEMOCLIENTID"
 	demoClientSecret = "DEMOCLIENTSECRET"
 	salesforceUser   = "salesforce_user"
-	pwd              = "P@$$w0₹D"
-	tokenURL         = "https://login.salesforce.com/services/oauth2/token"
+	pwd              = "P@$$w0₹D"                                           //nolint:gosec // Bad linter! The pwd is used as testing purpose.
+	tokenURL         = "https://login.salesforce.com/services/oauth2/token" //nolint:gosec // Bad linter! The tokenURL is used as testing purpose.
 )
 
 // Validate that it finds the application default credentials and does

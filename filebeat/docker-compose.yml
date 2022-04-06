@@ -35,7 +35,6 @@ services:
       kibana:        { condition: service_healthy }
       mosquitto:     { condition: service_healthy }
       redis:         { condition: service_healthy }
-      cometd:        { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -79,10 +78,6 @@ services:
       - ${ES_BEATS}/testing/environments/docker/cometd/files/:/files:ro
     environment:
       PORT: "8080"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -X POST http://127.0.0.1:8080/token"]
-      retries: 300
-      interval: 1s
     command:
       - http-server
       - --addr=:8080

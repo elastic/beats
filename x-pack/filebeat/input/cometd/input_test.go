@@ -11,13 +11,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	bay "github.com/elastic/bayeux"
 	finput "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+)
+
+const (
+	channelName = "first-channel"
 )
 
 var (
@@ -26,12 +31,12 @@ var (
 
 func TestNewInputDone(t *testing.T) {
 	config := common.MapStr{
-		"channel_name":              "cometd-channel",
+		"channel_name":              channelName,
 		"auth.oauth2.client.id":     "DEMOCLIENTID",
 		"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
 		"auth.oauth2.user":          "salesforce_user",
-		"auth.oauth2.password":      "P@$$w0₹D",
-		"auth.oauth2.token_url":     "https://login.salesforce.com/services/oauth2/token",
+		"auth.oauth2.password":      "pwd",
+		"auth.oauth2.token_url":     "https://example.com/token",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
@@ -68,10 +73,10 @@ func TestNewInput_Run(t *testing.T) {
 	var msg bay.TriggerEvent
 	msg.Data.Event.ReplayID = 1234
 	msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	msg.Channel = "first-channel"
+	msg.Channel = channelName
 
 	config := map[string]interface{}{
-		"channel_name":              "first-channel",
+		"channel_name":              channelName,
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
