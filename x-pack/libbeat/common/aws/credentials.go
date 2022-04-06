@@ -5,11 +5,7 @@
 package aws
 
 import (
-<<<<<<< HEAD
-=======
-	"crypto/tls"
 	"fmt"
->>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	"net/http"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -39,14 +35,10 @@ type ConfigAWS struct {
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
-<<<<<<< HEAD
-=======
+
+	// Set default region if empty to make initial aws api call
 	if AWSConfig.Region == "" {
-		if config.DefaultRegion != "" {
-			AWSConfig.Region = config.DefaultRegion
-		} else {
-			AWSConfig.Region = "us-east-1"
-		}
+		AWSConfig.Region = "us-east-1"
 	}
 
 	// Assume IAM role if iam_role config parameter is given
@@ -54,8 +46,6 @@ func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 		AWSConfig = switchToAssumeRoleProvider(config, AWSConfig)
 	}
 
-	var proxy func(*http.Request) (*url.URL, error)
->>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	if config.ProxyUrl != "" {
 		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
 		if err != nil {
@@ -101,20 +91,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		Value: awsCredentials,
 	}
 
-<<<<<<< HEAD
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
-	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role arn and access keys for AWS credential")
-		return getRoleArn(config, awsConfig)
-	}
-
-=======
->>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	return awsConfig
 }
 
@@ -139,22 +115,7 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
-<<<<<<< HEAD
-		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
-	}
-
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
-	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role arn and shared credential profile for AWS credential")
-		return getRoleArn(config, awsConfig), nil
-=======
 		return awsConfig, fmt.Errorf("external.LoadDefaultAWSConfig failed with shared credential profile given: %w", err)
->>>>>>> cb5a95180f ([libbeat][aws] Fix AWS config initialization issue when using a role (#31014))
 	}
 
 	logger.Debug("Using shared credential profile for AWS credential")
