@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || linux || openbsd || windows || (freebsd && cgo)
 // +build darwin linux openbsd windows freebsd,cgo
 
 package uptime
@@ -25,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestData(t *testing.T) {

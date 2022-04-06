@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package mntr
@@ -45,8 +46,8 @@ func TestFetch(t *testing.T) {
 	e, _ := events[0].BeatEvent("zookeeper", "mntr").Fields.GetValue("zookeeper.mntr")
 	event := e.(common.MapStr)
 	// Check values
-	avgLatency := event["latency"].(common.MapStr)["avg"].(int64)
-	maxLatency := event["latency"].(common.MapStr)["max"].(int64)
+	avgLatency := event["latency"].(common.MapStr)["avg"].(float64)
+	maxLatency := event["latency"].(common.MapStr)["max"].(float64)
 	numAliveConnections := event["num_alive_connections"].(int64)
 
 	assert.True(t, avgLatency >= 0)

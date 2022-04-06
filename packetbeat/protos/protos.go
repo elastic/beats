@@ -79,7 +79,6 @@ type Protocols interface {
 	BpfFilter(withVlans bool, withICMP bool) string
 	GetTCP(proto Protocol) TCPPlugin
 	GetUDP(proto Protocol) UDPPlugin
-
 	GetAllTCP() map[Protocol]TCPPlugin
 	GetAllUDP() map[Protocol]UDPPlugin
 

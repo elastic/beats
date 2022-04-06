@@ -17,7 +17,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -189,12 +188,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
 	ms := &MetricSet{
@@ -207,7 +206,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Load state (lastHost) from disk
 	err = ms.restoreStateFromDisk()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore state from disk")
+		return nil, fmt.Errorf("failed to restore state from disk: %w", err)
 	}
 
 	return ms, nil
@@ -319,7 +318,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 func getHost() (*Host, error) {
 	sysinfoHost, err := sysinfo.Host()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load host information")
+		return nil, fmt.Errorf("failed to load host information: %w", err)
 	}
 
 	ips, macs, err := getNetInfo()
@@ -432,12 +431,12 @@ func (ms *MetricSet) saveStateToDisk() error {
 	if ms.lastHost != nil {
 		err := encoder.Encode(*ms.lastHost)
 		if err != nil {
-			return errors.Wrap(err, "error encoding host information")
+			return fmt.Errorf("error encoding host information: %w", err)
 		}
 
 		err = ms.bucket.Store(bucketKeyLastHost, buf.Bytes())
 		if err != nil {
-			return errors.Wrap(err, "error writing host information to disk")
+			return fmt.Errorf("error writing host information to disk: %w", err)
 		}
 
 		ms.log.Debug("Wrote host information to disk.")
@@ -464,7 +463,7 @@ func (ms *MetricSet) restoreStateFromDisk() error {
 		if err == nil {
 			ms.lastHost = &lastHost
 		} else if err != io.EOF {
-			return errors.Wrap(err, "error decoding host information")
+			return fmt.Errorf("error decoding host information: %w", err)
 		}
 	}
 

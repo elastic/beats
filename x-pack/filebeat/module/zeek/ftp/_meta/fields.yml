@@ -1,6 +1,5 @@
 - name: ftp
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek FTP log
   fields:

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package wineventlog
@@ -40,7 +41,7 @@ import (
 )
 
 func TestRenderer(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:errcheck // Bad linter! Never returns a non-nil error when called without options.
 
 	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
 		log := openLog(t, sysmon9File)
@@ -85,7 +86,8 @@ func TestRenderer(t *testing.T) {
 
 		assert.Equal(t, e.Keywords, []string{"Audit Success"})
 
-		assert.EqualValues(t, 0, e.OpcodeRaw)
+		assert.NotNil(t, 0, e.OpcodeRaw)
+		assert.EqualValues(t, 0, *e.OpcodeRaw)
 		assert.Equal(t, "Info", e.Opcode)
 
 		assert.EqualValues(t, 0, e.LevelRaw)
@@ -130,7 +132,7 @@ func TestRenderer(t *testing.T) {
 
 		assert.Equal(t, e.Keywords, []string{"Classic"})
 
-		assert.EqualValues(t, 0, e.OpcodeRaw)
+		assert.EqualValues(t, (*uint8)(nil), e.OpcodeRaw)
 		assert.Equal(t, "", e.Opcode)
 
 		assert.EqualValues(t, 4, e.LevelRaw)
@@ -196,7 +198,7 @@ func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMiss
 
 // setLogSize set the maximum number of bytes that an event log can hold.
 func setLogSize(t testing.TB, provider string, sizeBytes int) {
-	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput()
+	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput() //nolint:gosec // No possibility of command injection.
 	if err != nil {
 		t.Fatal("failed to set log size", err, string(output))
 	}

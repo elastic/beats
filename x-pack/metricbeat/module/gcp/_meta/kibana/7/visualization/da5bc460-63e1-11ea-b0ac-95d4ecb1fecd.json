@@ -60,9 +60,9 @@
                         "metrics": [
                             {
                                 "denominator": "60",
-                                "field": "gcp.compute.instance.uptime.value",
+                                "field": "gcp.compute.instance.uptime.sec",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                                "numerator": "gcp.compute.instance.uptime.value",
+                                "numerator": "gcp.compute.instance.uptime.sec",
                                 "type": "avg",
                                 "values": [
                                     "60"

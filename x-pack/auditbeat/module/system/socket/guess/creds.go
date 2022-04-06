@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package guess
@@ -56,9 +57,7 @@ func init() {
 	}
 }
 
-type guessStructCreds struct {
-	ctx Context
-}
+type guessStructCreds struct{}
 
 // Name of this guess.
 func (g *guessStructCreds) Name() string {
@@ -99,7 +98,7 @@ func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessStructCreds) Prepare(ctx Context) error {
+func (g *guessStructCreds) Prepare(Context) error {
 	return nil
 }
 

@@ -2,15 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package guess
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
@@ -97,7 +97,7 @@ func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (resul
 		result, err = guessOnce(guesser, installer, ctx)
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s failed", guesser.Name())
+		return nil, fmt.Errorf("%s failed: %w", guesser.Name(), err)
 	}
 	return result, nil
 }
@@ -131,7 +131,7 @@ func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx
 
 func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
 	if err := guesser.Prepare(ctx); err != nil {
-		return nil, errors.Wrap(err, "prepare failed")
+		return nil, fmt.Errorf("prepare failed: %w", err)
 	}
 	defer func() {
 		if err := guesser.Terminate(); err != nil {
@@ -140,7 +140,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	}()
 	probes, err := guesser.Probes()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed generating probes")
+		return nil, fmt.Errorf("failed generating probes: %w", err)
 	}
 
 	decoders := make([]tracing.Decoder, 0, len(probes))
@@ -149,7 +149,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	for _, pdesc := range probes {
 		format, decoder, err := installer.Install(pdesc)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to add kprobe '%s'", pdesc.Probe.String())
+			return nil, fmt.Errorf("failed to add kprobe '%s': %w", pdesc.Probe.String(), err)
 		}
 		formats = append(formats, format)
 		decoders = append(decoders, decoder)
@@ -176,18 +176,18 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		tracing.WithTID(thread.TID),
 		tracing.WithPollTimeout(time.Millisecond*10))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create perfchannel")
+		return nil, fmt.Errorf("failed to create perfchannel: %w", err)
 	}
 	defer perfchan.Close()
 
 	for i := range probes {
 		if err := perfchan.MonitorProbe(formats[i], decoders[i]); err != nil {
-			return nil, errors.Wrap(err, "failed to monitor probe")
+			return nil, fmt.Errorf("failed to monitor probe: %w", err)
 		}
 	}
 
 	if err := perfchan.Run(); err != nil {
-		return nil, errors.Wrap(err, "failed to run perf channel")
+		return nil, fmt.Errorf("failed to run perf channel: %w", err)
 	}
 
 	timer := time.NewTimer(ctx.Timeout)
@@ -210,7 +210,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	select {
 	case r := <-thread.C():
 		if r.Err != nil {
-			return nil, errors.Wrap(r.Err, "trigger execution failed")
+			return nil, fmt.Errorf("trigger execution failed: %w", r.Err)
 		}
 	case <-timer.C:
 		return nil, errors.New("timeout while waiting for trigger to complete")
@@ -232,11 +232,11 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 
 		case err := <-perfchan.ErrC():
 			if err != nil {
-				return nil, errors.Wrap(err, "error received from perf channel")
+				return nil, fmt.Errorf("error received from perf channel: %w", err)
 			}
 
 		case <-perfchan.LostC():
-			return nil, errors.Wrap(err, "event loss in perf channel")
+			return nil, errors.New("event loss in perf channel")
 		}
 	}
 }
@@ -264,7 +264,7 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 			if cond, isCond := guesser.(ConditionalGuesser); isCond {
 				mustRun, err := cond.Condition(ctx)
 				if err != nil {
-					return errors.Wrapf(err, "condition failed for %s", cond.Name())
+					return fmt.Errorf("condition failed for %s: %w", cond.Name(), err)
 				}
 				if !mustRun {
 					ctx.Log.Debugf("Guess %s skipped.", cond.Name())

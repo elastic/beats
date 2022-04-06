@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !linux
 // +build !linux
 
 package sniffer
@@ -23,16 +24,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
-type afpacketHandle struct {
-}
+type afpacketHandle struct{}
 
 func newAfpacketHandle(device string, snaplen int, blockSize int, numBlocks int,
-	timeout time.Duration, enableAutoPromiscMode bool) (*afpacketHandle, error) {
-
+	timeout time.Duration, enableAutoPromiscMode bool) (*afpacketHandle, error,
+) {
 	return nil, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
 }
 
@@ -49,4 +49,10 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 }
 
 func (h *afpacketHandle) Close() {
+}
+
+// isAfpacketErrTimeout returns whether the error is afpacket.ErrTimeout, always false on
+// non-linux systems.
+func isAfpacketErrTimeout(error) bool {
+	return false
 }

@@ -1,4 +1,4 @@
-- name: abuseurl
+- name: abusech.url
   type: group
   description: >
     Fields for AbuseCH Malware Threat Intel

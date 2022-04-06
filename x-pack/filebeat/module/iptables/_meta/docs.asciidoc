@@ -5,6 +5,8 @@
 
 == Iptables module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for iptables and ip6tables logs. It parses logs received
 over the network via syslog or from a file. Also, it understands the prefix added
 by some Ubiquiti firewalls, which includes the rule set name, rule number and
@@ -15,8 +17,8 @@ When you run the module, it performs a few tasks under the hood:
 * Sets the default input to `syslog` and binds to `localhost` port `9001`
   (but don’t worry, you can override the defaults).
 
-* Uses ingest node to parse and process the log lines, shaping the data into
-  a structure suitable for visualizing in Kibana.
+* Uses an ingest pipeline to parse and process the log lines, shaping the data
+  into a structure suitable for visualizing in Kibana.
 
 * Deploys dashboards for visualizing the log data.
 

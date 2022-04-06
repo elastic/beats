@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package elasticsearch
@@ -42,6 +43,103 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
+
+type testIndexSelector struct{}
+
+func (testIndexSelector) Select(event *beat.Event) (string, error) {
+	return "test", nil
+}
+
+type batchMock struct {
+	// we embed the interface so we are able to implement the interface partially,
+	// only functions needed for tests are implemented
+	// if you use a function that is not implemented in the mock it will panic
+	publisher.Batch
+	events      []publisher.Event
+	ack         bool
+	drop        bool
+	retryEvents []publisher.Event
+}
+
+func (bm batchMock) Events() []publisher.Event {
+	return bm.events
+}
+func (bm *batchMock) ACK() {
+	bm.ack = true
+}
+func (bm *batchMock) Drop() {
+	bm.drop = true
+}
+func (bm *batchMock) RetryEvents(events []publisher.Event) {
+	bm.retryEvents = events
+}
+
+func TestPublishStatusCode(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
+	events := []publisher.Event{event}
+
+	t.Run("returns pre-defined error and drops batch when 413", func(t *testing.T) {
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusRequestEntityTooLarge)
+			w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
+		}))
+		defer esMock.Close()
+
+		client, err := NewClient(
+			ClientSettings{
+				ConnectionSettings: eslegclient.ConnectionSettings{
+					URL: esMock.URL,
+				},
+				Index: testIndexSelector{},
+			},
+			nil,
+		)
+		assert.NoError(t, err)
+
+		event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
+		events := []publisher.Event{event}
+		batch := &batchMock{
+			events: events,
+		}
+
+		err = client.Publish(ctx, batch)
+
+		assert.Error(t, err)
+		assert.Equal(t, errPayloadTooLarge, err, "should be a pre-defined error")
+		assert.True(t, batch.drop, "should must be dropped")
+	})
+
+	t.Run("retries the batch if bad HTTP status", func(t *testing.T) {
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+		}))
+		defer esMock.Close()
+
+		client, err := NewClient(
+			ClientSettings{
+				ConnectionSettings: eslegclient.ConnectionSettings{
+					URL: esMock.URL,
+				},
+				Index: testIndexSelector{},
+			},
+			nil,
+		)
+		assert.NoError(t, err)
+
+		batch := &batchMock{
+			events: events,
+		}
+
+		err = client.Publish(ctx, batch)
+
+		assert.Error(t, err)
+		assert.False(t, batch.ack, "should not be acknowledged")
+		assert.Len(t, batch.retryEvents, len(events), "all events should be in retry")
+	})
+}
 
 func TestCollectPublishFailsNone(t *testing.T) {
 	client, err := NewClient(

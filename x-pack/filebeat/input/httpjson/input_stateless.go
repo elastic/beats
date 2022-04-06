@@ -20,7 +20,7 @@ func (statelessInput) Name() string {
 }
 
 func statelessConfigure(cfg *common.Config) (stateless.Input, error) {
-	conf := newDefaultConfig()
+	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func newStatelessInput(config config) *statelessInput {
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
-	return test(in.config.URL.URL)
+	return test(in.config.Request.URL.URL)
 }
 
 type statelessPublisher struct {

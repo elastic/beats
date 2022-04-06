@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: docker
+
 [[metricbeat-module-docker]]
 == Docker module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
 
@@ -51,6 +57,12 @@ metricbeat.modules:
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+
+  # Skip metrics for certain device major numbers in docker/diskio. 
+  # Necessary on systems with software RAID, device mappers, 
+  # or other configurations where virtual disks will sum metrics from other disks.
+  # By default, it will skip devices with major numbers 9 or 253.
+  #skip_major: []
 
   # If set to true, collects metrics per core.
   #cpu.cores: true

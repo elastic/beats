@@ -258,12 +258,6 @@ This monitor examines match successfully only when 'foo' or 'Foo' in body AND no
   name: Demo Service
   schedule: '@every 5s'
   urls: ["http://localhost:8080/demo/add"]
-  check.request:
-    method: POST
-    headers:
-      'Content-Type': 'application/x-www-form-urlencoded'
-    # urlencode the body:
-    body: "name=first&email=someemail%40someemailprovider.com"
   check.response:
     status: [200, 201]
     body:
@@ -275,11 +269,32 @@ This monitor examines match successfully only when 'foo' or 'Foo' in body AND no
         - Bar
 -------------------------------------------------------------------------------
 
-*`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON. Body sizes
+*`json`*:: A list of expressions or <<conditions,condition>> statements (now deprecated) executed against the body when parsed as JSON. Body sizes
 must be less than or equal to 100 MiB.
 
-The following configuration shows how to check the response when the body
-contains JSON:
+The following configuration shows how to check the response using https://github.com/PaesslerAG/gval/blob/master/README.md[gval] expressions when the body contains JSON:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  id: demo-service
+  name: Demo Service
+  schedule: '@every 5s'
+  hosts: ["https://localhost:9200/_/nodes/stats"]
+  username: elastic
+  password: changeme
+  check.response:
+    status: [200]
+    json:
+      - description: check status
+        expression: 'foo.bar == "myValue"'
+-------------------------------------------------------------------------------
+
+Expressions can be much more complex than simple equality. They can also use https://goessner.net/articles/JsonPath/[jsonpath] syntax. Note that strings must be double quoted with `"` rather than single quoted with `'` in the `gval` variant of jsonpath. Please note that jsonpath sub-expressions must start with `$.`, for instance `'$.nodes[?(@.name=="myname")] != []'` will check that the `nodes` map has at least one value with the name 'myname'.
+
+When working with responses that are returned in the form of a JSON array at the root rather than an object jsonpath can be used as well. As an example `$.[0].foo == "bar"` tests that the first item in the response has an attribute `foo` that has the value "bar".
+
+JSON bodies can also be checked via the now deprecated `condition` option, which is not as powerful as `expression`. The following configuration shows how to check the response using a `condition` statement when the body contains JSON:
 
 [source,yaml]
 -------------------------------------------------------------------------------

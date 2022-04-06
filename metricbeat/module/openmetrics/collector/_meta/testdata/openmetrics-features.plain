@@ -1,0 +1,23 @@
+# HELP my_counter_last_increment_timestamp_milliseconds When my_counter was last incremented
+# TYPE my_counter_last_increment_timestamp_milliseconds gauge
+# UNIT my_counter_last_increment_timestamp_milliseconds milliseconds
+my_counter_last_increment_timestamp_milliseconds 123
+# TYPE disk_errors counter
+# HELP disk_errors Count total disk errors
+disk_errors_total{type="netapp"} 17.0 1520879607.789
+# TYPE app info
+app_info{name="open metrics collector",version="6.3.9"} 1
+# TYPE collector info
+collector_info{name="metrics collector",version="8.2.7"} 1 1622329674
+# TYPE enable_category stateset
+enable_category{category="shoes"} 0
+enable_category{category="shirts"} 1
+enable_category{category="shades"} 0
+# TYPE connection_errors unknown
+connection_errors 42
+# TYPE cnt_rulefires_deployment counter
+cnt_rulefires_deployment_total 66666.0 # {trace_id="KOO5S4vxi0o"} 0.67
+# TYPE process_cpu_seconds counter
+# UNIT process_cpu_seconds seconds
+# HELP process_cpu_seconds Total user and system CPU time spent in seconds. Exemplar with timestamp and labels.
+process_cpu_seconds_total{entity="controller",build="8.2.7"} 11111 1622301927 # {trace_id="0d482-ac43e-d9320-debfe"} 17.0 1622302012

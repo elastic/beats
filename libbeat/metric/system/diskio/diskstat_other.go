@@ -15,13 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build (darwin && cgo) || freebsd
 // +build darwin,cgo freebsd
 
 package diskio
 
 import (
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 // NewDiskIOStat :init DiskIOStat object.

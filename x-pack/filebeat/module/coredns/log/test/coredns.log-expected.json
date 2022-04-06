@@ -1,18 +1,7 @@
 [
     {
         "@timestamp": "2019-03-06T08:55:28.903Z",
-        "coredns.dnssec_ok": false,
-        "coredns.id": "21583",
-        "coredns.query.class": "IN",
-        "coredns.query.name": "httpbin.org.cluster.local.",
         "coredns.query.size": 43,
-        "coredns.query.type": "A",
-        "coredns.response.code": "NXDOMAIN",
-        "coredns.response.flags": [
-            "QR",
-            "RA",
-            "RD"
-        ],
         "coredns.response.size": 136,
         "dns.header_flags": [
             "QR",
@@ -55,18 +44,7 @@
     },
     {
         "@timestamp": "2019-03-18T22:13:36.289-07:00",
-        "coredns.dnssec_ok": false,
-        "coredns.id": "14639",
-        "coredns.query.class": "IN",
-        "coredns.query.name": "www.yahoo.com.",
         "coredns.query.size": 42,
-        "coredns.query.type": "A",
-        "coredns.response.code": "NOERROR",
-        "coredns.response.flags": [
-            "QR",
-            "RA",
-            "RD"
-        ],
         "coredns.response.size": 188,
         "dns.header_flags": [
             "QR",

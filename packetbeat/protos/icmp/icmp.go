@@ -21,17 +21,17 @@ import (
 	"net"
 	"time"
 
+	"github.com/google/gopacket/layers"
+
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/ecs/code/go/ecs"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-
-	"github.com/tsg/gopacket/layers"
 )
 
 type icmpPlugin struct {
@@ -102,7 +102,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, watcher procs.ProcessesWat
 	}
 	logp.Debug("icmp", "Local IP addresses: %s", icmp.localIps)
 
-	var removalListener = func(k common.Key, v common.Value) {
+	removalListener := func(k common.Key, v common.Value) {
 		icmp.expireTransaction(k.(hashableIcmpTuple), v.(*icmpTransaction))
 	}
 
@@ -145,7 +145,7 @@ func (icmp *icmpPlugin) ProcessICMPv4(
 		ts:     pkt.Ts,
 		Type:   typ,
 		code:   code,
-		length: len(icmp4.BaseLayer.Payload),
+		length: len(icmp4.Payload),
 	}
 
 	if isRequest(tuple, msg) {
@@ -180,7 +180,7 @@ func (icmp *icmpPlugin) ProcessICMPv6(
 		ts:     pkt.Ts,
 		Type:   typ,
 		code:   code,
-		length: len(icmp6.BaseLayer.Payload),
+		length: len(icmp6.Payload),
 	}
 
 	if isRequest(tuple, msg) {
@@ -255,14 +255,6 @@ func (icmp *icmpPlugin) isLocalIP(ip net.IP) bool {
 	}
 
 	return false
-}
-
-func (icmp *icmpPlugin) getTransaction(k hashableIcmpTuple) *icmpTransaction {
-	v := icmp.transactions.Get(k)
-	if v != nil {
-		return v.(*icmpTransaction)
-	}
-	return nil
 }
 
 func (icmp *icmpPlugin) deleteTransaction(k hashableIcmpTuple) *icmpTransaction {

@@ -3,6 +3,8 @@
 
 == Traefik module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module parses access logs created by
 https://traefik.io/[Træfik].
 

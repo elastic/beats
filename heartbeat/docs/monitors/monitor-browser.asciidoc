@@ -4,9 +4,14 @@
 TIP: Want to get started with synthetic monitoring?
 See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 
-The options described here configure {beatname_uc} to run the synthetic
+beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test suites via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>.
+
+Browser based monitors can only be run in our {beatname_uc} docker image,
+or via the `elastic-agent-complete` docker image.
+For more information, see {observability-guide}/synthetics-quickstart.html[Synthetic monitoring using Docker].
+
 Example configuration:
 
 [source,yaml]
@@ -160,11 +165,11 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 [float]
-[[monitor-browser-ignore-https-errors]]]]
+[[monitor-browser-ignore-https-errors]]
 ==== `ignore_https_errors`
 
 Set this option to `true` to disable TLS/SSL validation in the synthetics browser. This is useful for testing
-sites that use self-signed certs. This option can also be used to test certs from non-standard CAs, 
+sites that use self-signed certs. This option can also be used to test certs from non-standard CAs,
 though you will no longer get errors if there is anything wrong with the certificate.
 
 
@@ -174,6 +179,34 @@ though you will no longer get errors if there is anything wrong with the certifi
 
 Set this option to `true` to enable the normally disabled chromium sandbox.
 Defaults to false.
+
+[float]
+[[monitor-browser-throttling]]
+==== `throttling`
+
+Set this option to control the network throttling. By default, all journeys are
+run with 5Mbps download, 3Mbps upload and 20ms latency which emulates a standard
+Cable connection.
+
+Users can control the throttling parameters, Below is an example of emulating a
+3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  schedule: '@every 1m'
+  throttling: "1.6d/0.75u/150l"
+-------------------------------------------------------------------------------
+
+Network throttling can be completely disabled by passing `false`
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  schedule: '@every 1m'
+  throttling: false
+-------------------------------------------------------------------------------
+
 
 [float]
 [[monitor-browser-filter-journeys]]

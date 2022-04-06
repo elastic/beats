@@ -17,12 +17,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list AL-DMZ-LB-IN denied tcp LB-DMZ/WHAT-IS-THIS-A-HOSTNAME-192.0.2.244(27218) -> OUTSIDE/203.0.113.42(53) hit-cnt 1 first hit [0x16847359, 0x00000000]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -77,6 +77,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 201,
+        "network.community_id": "1:tTzSWYTCd+HV5W2Q/cSW6AszABM=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.hostname": "localhost",
@@ -127,14 +128,15 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 360,
+        "network.community_id": "1:d9RGgqBro5rzu16MqJQFehDRaKY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "wan",

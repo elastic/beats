@@ -5,6 +5,8 @@
 
 == Google Workspace module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for ingesting data from the different Google Workspace audit reports APIs.
 
 include::../include/gs-link.asciidoc[]
@@ -30,9 +32,9 @@ It is compatible with a subset of applications under the https://developers.goog
 
 In order for Filebeat to ingest data from the Google Reports API you must:
 
-- Have an *administrator account*.
+- Have an *administrator account*, as described https://developers.google.com/admin-sdk/reports/v1/guides/prerequisites[here].
 - https://support.google.com/workspacemigrate/answer/9222993?hl=en[Set up a ServiceAccount] using the administrator account.
-- https://support.google.com/workspacemigrate/answer/9222865?hl=en[Set up access to the Admin SDK API] for the ServiceAccount.
+- https://developers.google.com/admin-sdk/reports/v1/guides/authorizing[Set up access to the Admin SDK API] for the ServiceAccount.
 - https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Enable Domain-Wide Delegation] for your ServiceAccount.
 
 This module will make use of the following *oauth2 scope*:

@@ -37,7 +37,7 @@
                         "fill": "0",
                         "filter": {
                             "language": "kuery",
-                            "query": "gcp.storage.storage.total_bytes.value : * "
+                            "query": "gcp.storage.storage.total.bytes : * "
                         },
                         "formatter": "bytes",
                         "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -45,7 +45,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "gcp.storage.storage.total_bytes.value",
+                                "field": "gcp.storage.storage.total.bytes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }

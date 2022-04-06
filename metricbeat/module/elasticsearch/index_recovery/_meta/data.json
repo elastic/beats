@@ -2,11 +2,11 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "elasticsearch": {
         "cluster": {
-            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster"
         },
         "index": {
-            "name": ".kibana-event-log-8.0.0-000001",
+            "name": "users",
             "recovery": {
                 "id": 0,
                 "index": {
@@ -22,19 +22,20 @@
                         "total_in_bytes": 0
                     }
                 },
+                "name": "users",
                 "primary": true,
                 "source": {},
                 "stage": "DONE",
                 "start_time": {
-                    "ms": 1605819056123
+                    "ms": 1635956540240
                 },
                 "stop_time": {
-                    "ms": 1605819058696
+                    "ms": 1635956540265
                 },
                 "target": {
                     "host": "127.0.0.1",
-                    "id": "Fkj12lAFQOex0DwK0HMwHw",
-                    "name": "082618b4bb36",
+                    "id": "f5i3v9hMT_q__q6B9WOo5A",
+                    "name": "27fb1c2fd783",
                     "transport_address": "127.0.0.1:9300"
                 },
                 "translog": {
@@ -56,7 +57,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:43035",
+        "address": "172.19.0.2:9200",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

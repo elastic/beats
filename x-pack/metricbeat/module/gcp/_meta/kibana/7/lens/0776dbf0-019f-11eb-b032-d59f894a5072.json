@@ -26,7 +26,7 @@
                                         }
                                     },
                                     "scale": "ratio",
-                                    "sourceField": "gcp.pubsub.snapshot.backlog_bytes.value"
+                                    "sourceField": "gcp.pubsub.snapshot.backlog.bytes"
                                 },
                                 "6be62612-437b-448d-9631-c6cc0938225d": {
                                     "dataType": "date",

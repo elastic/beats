@@ -2358,7 +2358,7 @@ alias to: error.message
 [float]
 === geoip
 
-The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or Ingest Node.
+The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or an Elasticsearch geoip ingest processor.
 
 
 
@@ -2876,7 +2876,7 @@ For log events the message field contains the log message, optimized for viewing
 For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event.
 If multiple messages exist, they can be combined into one message.
 
-type: text
+type: match_only_text
 
 example: Hello World
 
@@ -3003,7 +3003,7 @@ example: Google LLC
 *`as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -3050,7 +3050,7 @@ example: Google LLC
 *`client.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -3070,9 +3070,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -3335,7 +3338,7 @@ example: Albert Einstein
 *`client.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -3384,6 +3387,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`client.user.name`*::
@@ -3393,14 +3398,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`client.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -3487,6 +3492,130 @@ example: t2.medium
 
 --
 
+*`cloud.origin.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.origin.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.origin.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.origin.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.origin.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.origin.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.origin.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.origin.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.origin.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.origin.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.origin.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 *`cloud.project.id`*::
 +
 --
@@ -3545,11 +3674,147 @@ example: lambda
 
 --
 
+*`cloud.target.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.target.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.target.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.target.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.target.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.target.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.target.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.target.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.target.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.target.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.target.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 [float]
 === code_signature
 
 These fields contain information about binary code signatures.
 
+
+*`code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
 
 *`code_signature.exists`*::
 +
@@ -3609,6 +3874,17 @@ example: EQHXZ8M8AV
 
 --
 
+*`code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
+
+--
+
 *`code_signature.trusted`*::
 +
 --
@@ -3636,9 +3912,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -3676,12 +3978,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 
@@ -3788,7 +4117,7 @@ example: Google LLC
 *`destination.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -3808,9 +4137,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -4073,7 +4405,7 @@ example: Albert Einstein
 *`destination.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -4122,6 +4454,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`destination.user.name`*::
@@ -4131,14 +4465,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`destination.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -4163,6 +4497,18 @@ Many operating systems refer to "shared code libraries" with different names, bu
 * Shared Object (`.so`) commonly used on Unix-like operating systems
 * Dynamic library (`.dylib`) commonly used on macOS
 
+
+*`dll.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
 
 *`dll.code_signature.exists`*::
 +
@@ -4219,6 +4565,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -4945,7 +5302,7 @@ type: keyword
 --
 Error message.
 
-type: text
+type: match_only_text
 
 --
 
@@ -4954,16 +5311,14 @@ type: text
 --
 The stack trace of this error in plain text.
 
-type: keyword
-
-Field is not indexed.
+type: wildcard
 
 --
 
 *`error.stack_trace.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -5302,6 +5657,69 @@ example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
 --
 
 [float]
+=== faas
+
+The user fields describe information about the function as a service that is relevant to the event.
+
+
+*`faas.coldstart`*::
++
+--
+Boolean value indicating a cold start of a function.
+
+type: boolean
+
+--
+
+*`faas.execution`*::
++
+--
+The execution ID of the current function execution.
+
+type: keyword
+
+example: af9d5aa4-a685-4c5f-a22b-444f80b3cc28
+
+--
+
+*`faas.trigger`*::
++
+--
+Details about the function trigger.
+
+type: nested
+
+--
+
+*`faas.trigger.request_id`*::
++
+--
+The ID of the trigger request , message, event, etc.
+
+type: keyword
+
+example: 123456789
+
+--
+
+*`faas.trigger.type`*::
++
+--
+The trigger for the function execution.
+Expected values are:
+  * http
+  * pubsub
+  * datasource
+  * timer
+  * other
+
+type: keyword
+
+example: http
+
+--
+
+[float]
 === file
 
 A file is defined as a set of information that has been created on, or has existed on a filesystem.
@@ -5327,6 +5745,18 @@ Attributes names will vary by platform. Here's a non-exhaustive list of values t
 type: keyword
 
 example: ["readonly", "system"]
+
+--
+
+*`file.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
 
 --
 
@@ -5385,6 +5815,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`file.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -5759,6 +6200,19 @@ example: png
 
 --
 
+*`file.fork_name`*::
++
+--
+A fork is additional data associated with a filesystem object.
+On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: `C:\path\to\filename.extension:some_fork_name`, and `some_fork_name` is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+
+type: keyword
+
+example: Zone.Identifer
+
+--
+
 *`file.gid`*::
 +
 --
@@ -5902,7 +6356,7 @@ example: /home/alice/example.png
 *`file.path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -6008,7 +6462,7 @@ type: keyword
 *`file.target_path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -6812,7 +7266,7 @@ example: Mac OS Mojave
 *`host.os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -6841,7 +7295,7 @@ example: Mac OS X
 *`host.os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -6901,119 +7355,6 @@ example: 1325
 
 --
 
-*`host.user.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.email`*::
-+
---
-User email address.
-
-type: keyword
-
---
-
-*`host.user.full_name`*::
-+
---
-User's full name, if available.
-
-type: keyword
-
-example: Albert Einstein
-
---
-
-*`host.user.full_name.text`*::
-+
---
-type: text
-
---
-
-*`host.user.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`host.user.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`host.user.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`host.user.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`host.user.name`*::
-+
---
-Short name or login of the user.
-
-type: keyword
-
-example: albert
-
---
-
-*`host.user.name.text`*::
-+
---
-type: text
-
---
-
-*`host.user.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 [float]
 === http
 
@@ -7038,7 +7379,7 @@ format: bytes
 --
 The full HTTP request body.
 
-type: keyword
+type: wildcard
 
 example: Hello world
 
@@ -7047,7 +7388,7 @@ example: Hello world
 *`http.request.body.content.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -7080,13 +7421,11 @@ example: 123e4567-e89b-12d3-a456-426614174000
 +
 --
 HTTP request method.
-Prior to ECS 1.6.0 the following guidance was provided:
-"The field value must be normalized to lowercase for querying."
-As of ECS 1.6.0, the guidance is deprecated because the original case of the method may be useful in anomaly detection.  Original case will be mandated in ECS 2.0.0
+The value should retain its casing from the original event. For example, `GET`, `get`, and `GeT` are all considered valid values for this field.
 
 type: keyword
 
-example: GET, POST, PUT, PoST
+example: POST
 
 --
 
@@ -7131,7 +7470,7 @@ format: bytes
 --
 The full HTTP response body.
 
-type: keyword
+type: wildcard
 
 example: Hello world
 
@@ -7140,7 +7479,7 @@ example: Hello world
 *`http.response.body.content.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -7281,7 +7620,7 @@ example: org.elasticsearch.bootstrap.Bootstrap
 --
 The line number of the file containing the source code which originated the log event.
 
-type: integer
+type: long
 
 example: 42
 
@@ -7307,22 +7646,6 @@ The name of the function or method which originated the log event.
 type: keyword
 
 example: init
-
---
-
-*`log.original`*::
-+
---
-Deprecated for removal in next major version release. This field is superseded by  `event.original`.
-This is the original log message and contains the full log message before splitting it up in multiple parts.
-In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
-This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
-
-type: keyword
-
-example: Sep 19 08:26:10 localhost My log
-
-Field is not indexed.
 
 --
 
@@ -7408,8 +7731,9 @@ The network.* fields should be populated with details about the network activity
 *`network.application`*::
 +
 --
-A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+When a specific application or service is identified from network connection details (source/dest IPs, ports, certificates, or wire format), this field captures the application's or service's name.
+For example, the original event identifies the network connection being from a specific web service in a `https` network connection, like `facebook` or `twitter`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -7545,8 +7869,8 @@ example: 24
 *`network.protocol`*::
 +
 --
-L7 Network protocol name. ex. http, lumberjack, transport protocol.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+In the OSI Model this would be the Application Layer protocol. For example, `http`, `dns`, or `ssh`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -7558,7 +7882,7 @@ example: http
 +
 --
 Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -7570,7 +7894,7 @@ example: tcp
 +
 --
 In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -7949,7 +8273,7 @@ example: Mac OS Mojave
 *`observer.os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -7978,7 +8302,7 @@ example: Mac OS X
 *`observer.os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -8196,7 +8520,7 @@ type: keyword
 *`organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -8231,7 +8555,7 @@ example: Mac OS Mojave
 *`os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -8260,7 +8584,7 @@ example: Mac OS X
 *`os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -8566,6 +8890,18 @@ example: 4
 
 --
 
+*`process.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
+
 *`process.code_signature.exists`*::
 +
 --
@@ -8624,6 +8960,17 @@ example: EQHXZ8M8AV
 
 --
 
+*`process.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
+
+--
+
 *`process.code_signature.trusted`*::
 +
 --
@@ -8654,7 +9001,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: keyword
+type: wildcard
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -8663,7 +9010,7 @@ example: /usr/bin/ssh -l user 10.0.0.16
 *`process.command_line.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -8948,6 +9295,17 @@ type: keyword
 
 --
 
+*`process.end`*::
++
+--
+The time the process ended.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
 *`process.entity_id`*::
 +
 --
@@ -8975,7 +9333,7 @@ example: /usr/bin/ssh
 *`process.executable.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9051,7 +9409,7 @@ example: ssh
 *`process.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9076,6 +9434,18 @@ This field can be useful for querying or performing bucket analysis on how many 
 type: long
 
 example: 4
+
+--
+
+*`process.parent.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
 
 --
 
@@ -9137,6 +9507,17 @@ example: EQHXZ8M8AV
 
 --
 
+*`process.parent.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
+
+--
+
 *`process.parent.code_signature.trusted`*::
 +
 --
@@ -9167,7 +9548,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: keyword
+type: wildcard
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -9176,7 +9557,7 @@ example: /usr/bin/ssh -l user 10.0.0.16
 *`process.parent.command_line.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9461,6 +9842,17 @@ type: keyword
 
 --
 
+*`process.parent.end`*::
++
+--
+The time the process ended.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
 *`process.parent.entity_id`*::
 +
 --
@@ -9488,7 +9880,7 @@ example: /usr/bin/ssh
 *`process.parent.executable.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9564,7 +9956,7 @@ example: ssh
 *`process.parent.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9670,19 +10062,6 @@ format: string
 
 --
 
-*`process.parent.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
-
-format: string
-
---
-
 *`process.parent.start`*::
 +
 --
@@ -9731,7 +10110,7 @@ type: keyword
 *`process.parent.title.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9760,7 +10139,7 @@ example: /home/alice
 *`process.parent.working_directory.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9866,19 +10245,6 @@ format: string
 
 --
 
-*`process.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
-
-format: string
-
---
-
 *`process.start`*::
 +
 --
@@ -9927,7 +10293,7 @@ type: keyword
 *`process.title.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9956,7 +10322,7 @@ example: /home/alice
 *`process.working_directory.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -9984,7 +10350,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: keyword
+type: wildcard
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -10250,7 +10616,7 @@ example: Google LLC
 *`server.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -10270,9 +10636,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -10535,7 +10904,7 @@ example: Albert Einstein
 *`server.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -10584,6 +10953,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`server.user.name`*::
@@ -10593,14 +10964,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`server.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -10621,6 +10992,30 @@ example: ["kibana_admin", "reporting_user"]
 The service fields describe the service for or from which the data was collected.
 These fields help you find and correlate logs for a specific service and version.
 
+
+*`service.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
 
 *`service.ephemeral_id`*::
 +
@@ -10673,12 +11068,230 @@ example: instance-0000000016
 
 --
 
+*`service.origin.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.origin.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.origin.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.origin.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.origin.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.origin.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.origin.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.origin.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.origin.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
+
+--
+
 *`service.state`*::
 +
 --
 Current state of the service.
 
 type: keyword
+
+--
+
+*`service.target.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.target.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.target.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.target.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.target.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.target.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.target.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.target.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.target.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
 
 --
 
@@ -10749,7 +11362,7 @@ example: Google LLC
 *`source.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -10769,9 +11382,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -11034,7 +11650,7 @@ example: Albert Einstein
 *`source.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -11083,6 +11699,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`source.user.name`*::
@@ -11092,14 +11710,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`source.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -11118,7 +11736,7 @@ example: ["kibana_admin", "reporting_user"]
 === threat
 
 Fields to classify events and alerts according to a threat taxonomy such as the MITRE ATT&CK® framework.
-These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
+These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* fields are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
 *`threat.enrichments`*::
@@ -11164,23 +11782,24 @@ example: Google LLC
 *`threat.enrichments.indicator.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
 *`threat.enrichments.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -11225,6 +11844,18 @@ Attributes names will vary by platform. Here's a non-exhaustive list of values t
 type: keyword
 
 example: ["readonly", "system"]
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
 
 --
 
@@ -11283,6 +11914,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -11657,6 +12299,19 @@ example: png
 
 --
 
+*`threat.enrichments.indicator.file.fork_name`*::
++
+--
+A fork is additional data associated with a filesystem object.
+On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: `C:\path\to\filename.extension:some_fork_name`, and `some_fork_name` is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+
+type: keyword
+
+example: Zone.Identifer
+
+--
+
 *`threat.enrichments.indicator.file.gid`*::
 +
 --
@@ -11676,6 +12331,51 @@ Primary group name of the file.
 type: keyword
 
 example: alice
+
+--
+
+*`threat.enrichments.indicator.file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
 
 --
 
@@ -11755,7 +12455,85 @@ example: /home/alice/example.png
 *`threat.enrichments.indicator.file.path.text`*::
 +
 --
-type: text
+type: match_only_text
+
+--
+
+*`threat.enrichments.indicator.file.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`threat.enrichments.indicator.file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.enrichments.indicator.file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`threat.enrichments.indicator.file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`threat.enrichments.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`threat.enrichments.indicator.file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`threat.enrichments.indicator.file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -11783,7 +12561,7 @@ type: keyword
 *`threat.enrichments.indicator.file.target_path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -11806,6 +12584,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.enrichments.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.enrichments.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.enrichments.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -11944,51 +12986,6 @@ example: America/Argentina/Buenos_Aires
 
 --
 
-*`threat.enrichments.indicator.hash.md5`*::
-+
---
-MD5 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.sha1`*::
-+
---
-SHA1 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.sha256`*::
-+
---
-SHA256 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.sha512`*::
-+
---
-SHA512 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.ssdeep`*::
-+
---
-SSDEEP hash.
-
-type: keyword
-
---
-
 *`threat.enrichments.indicator.ip`*::
 +
 --
@@ -12034,84 +13031,6 @@ The date and time when intelligence source last modified information for this in
 type: date
 
 example: 2020-11-05T17:25:47.000Z
-
---
-
-*`threat.enrichments.indicator.pe.architecture`*::
-+
---
-CPU architecture target for the file.
-
-type: keyword
-
-example: x64
-
---
-
-*`threat.enrichments.indicator.pe.company`*::
-+
---
-Internal company name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft Corporation
-
---
-
-*`threat.enrichments.indicator.pe.description`*::
-+
---
-Internal description of the file, provided at compile-time.
-
-type: keyword
-
-example: Paint
-
---
-
-*`threat.enrichments.indicator.pe.file_version`*::
-+
---
-Internal version of the file, provided at compile-time.
-
-type: keyword
-
-example: 6.3.9600.17415
-
---
-
-*`threat.enrichments.indicator.pe.imphash`*::
-+
---
-A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
-Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
-
-type: keyword
-
-example: 0c6803c4e922103c4dca5963aad36ddf
-
---
-
-*`threat.enrichments.indicator.pe.original_file_name`*::
-+
---
-Internal name of the file, provided at compile-time.
-
-type: keyword
-
-example: MSPAINT.EXE
-
---
-
-*`threat.enrichments.indicator.pe.product`*::
-+
---
-Internal product name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft® Windows® Operating System
 
 --
 
@@ -12166,7 +13085,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: keyword
+type: wildcard
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -12319,7 +13238,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -12328,7 +13247,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 *`threat.enrichments.indicator.url.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -12339,7 +13258,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -12348,7 +13267,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elas
 *`threat.enrichments.indicator.url.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -12366,7 +13285,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: keyword
+type: wildcard
 
 --
 
@@ -12784,7 +13703,8 @@ example: MITRE ATT&CK
 *`threat.group.alias`*::
 +
 --
-The alias(es) of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group alias(es).
+The alias(es) of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group alias(es).
 
 type: keyword
 
@@ -12795,7 +13715,8 @@ example: [ "Magecart Group 6" ]
 *`threat.group.id`*::
 +
 --
-The id of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group id.
+The id of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group id.
 
 type: keyword
 
@@ -12806,7 +13727,8 @@ example: G0037
 *`threat.group.name`*::
 +
 --
-The name of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group name.
+The name of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group name.
 
 type: keyword
 
@@ -12817,7 +13739,8 @@ example: FIN6
 *`threat.group.reference`*::
 +
 --
-The reference URL of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group reference URL.
+The reference URL of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group reference URL.
 
 type: keyword
 
@@ -12850,24 +13773,24 @@ example: Google LLC
 *`threat.indicator.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
 *`threat.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales.
-Recommended values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -12912,6 +13835,18 @@ Attributes names will vary by platform. Here's a non-exhaustive list of values t
 type: keyword
 
 example: ["readonly", "system"]
+
+--
+
+*`threat.indicator.file.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
 
 --
 
@@ -12970,6 +13905,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`threat.indicator.file.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -13344,6 +14290,19 @@ example: png
 
 --
 
+*`threat.indicator.file.fork_name`*::
++
+--
+A fork is additional data associated with a filesystem object.
+On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: `C:\path\to\filename.extension:some_fork_name`, and `some_fork_name` is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+
+type: keyword
+
+example: Zone.Identifer
+
+--
+
 *`threat.indicator.file.gid`*::
 +
 --
@@ -13363,6 +14322,51 @@ Primary group name of the file.
 type: keyword
 
 example: alice
+
+--
+
+*`threat.indicator.file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
 
 --
 
@@ -13442,7 +14446,85 @@ example: /home/alice/example.png
 *`threat.indicator.file.path.text`*::
 +
 --
-type: text
+type: match_only_text
+
+--
+
+*`threat.indicator.file.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`threat.indicator.file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.indicator.file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`threat.indicator.file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`threat.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`threat.indicator.file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`threat.indicator.file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -13470,7 +14552,7 @@ type: keyword
 *`threat.indicator.file.target_path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -13493,6 +14575,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -13631,51 +14977,6 @@ example: America/Argentina/Buenos_Aires
 
 --
 
-*`threat.indicator.hash.md5`*::
-+
---
-MD5 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.sha1`*::
-+
---
-SHA1 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.sha256`*::
-+
---
-SHA256 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.sha512`*::
-+
---
-SHA512 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.ssdeep`*::
-+
---
-SSDEEP hash.
-
-type: keyword
-
---
-
 *`threat.indicator.ip`*::
 +
 --
@@ -13722,84 +15023,6 @@ The date and time when intelligence source last modified information for this in
 type: date
 
 example: 2020-11-05T17:25:47.000Z
-
---
-
-*`threat.indicator.pe.architecture`*::
-+
---
-CPU architecture target for the file.
-
-type: keyword
-
-example: x64
-
---
-
-*`threat.indicator.pe.company`*::
-+
---
-Internal company name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft Corporation
-
---
-
-*`threat.indicator.pe.description`*::
-+
---
-Internal description of the file, provided at compile-time.
-
-type: keyword
-
-example: Paint
-
---
-
-*`threat.indicator.pe.file_version`*::
-+
---
-Internal version of the file, provided at compile-time.
-
-type: keyword
-
-example: 6.3.9600.17415
-
---
-
-*`threat.indicator.pe.imphash`*::
-+
---
-A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
-Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
-
-type: keyword
-
-example: 0c6803c4e922103c4dca5963aad36ddf
-
---
-
-*`threat.indicator.pe.original_file_name`*::
-+
---
-Internal name of the file, provided at compile-time.
-
-type: keyword
-
-example: MSPAINT.EXE
-
---
-
-*`threat.indicator.pe.product`*::
-+
---
-Internal product name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft® Windows® Operating System
 
 --
 
@@ -13854,7 +15077,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: keyword
+type: wildcard
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -14008,7 +15231,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -14017,7 +15240,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 *`threat.indicator.url.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -14028,7 +15251,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -14037,7 +15260,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elas
 *`threat.indicator.url.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -14055,7 +15278,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: keyword
+type: wildcard
 
 --
 
@@ -14404,10 +15627,23 @@ example: 3
 
 --
 
+*`threat.software.alias`*::
++
+--
+The alias(es) of the software for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® associated software description.
+
+type: keyword
+
+example: [ "X-Agent" ]
+
+--
+
 *`threat.software.id`*::
 +
 --
-The id of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software id.
+The id of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
+While not required, you can use a MITRE ATT&CK® software id.
 
 type: keyword
 
@@ -14418,7 +15654,8 @@ example: S0552
 *`threat.software.name`*::
 +
 --
-The name of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software name.
+The name of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
+While not required, you can use a MITRE ATT&CK® software name.
 
 type: keyword
 
@@ -14429,7 +15666,7 @@ example: AdFind
 *`threat.software.platforms`*::
 +
 --
-The platforms of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software platforms.
+The platforms of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
 Recommended Values:
   * AWS
   * Azure
@@ -14442,6 +15679,8 @@ Recommended Values:
   * SaaS
   * Windows
 
+While not required, you can use a MITRE ATT&CK® software platforms.
+
 type: keyword
 
 example: [ "Windows" ]
@@ -14451,7 +15690,8 @@ example: [ "Windows" ]
 *`threat.software.reference`*::
 +
 --
-The reference URL of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software reference URL.
+The reference URL of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
+While not required, you can use a MITRE ATT&CK® software reference URL.
 
 type: keyword
 
@@ -14462,10 +15702,12 @@ example: https://attack.mitre.org/software/S0552/
 *`threat.software.type`*::
 +
 --
-The type of software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software type.
+The type of software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
 Recommended values
   * Malware
   * Tool
+
+ While not required, you can use a MITRE ATT&CK® software type.
 
 type: keyword
 
@@ -14531,7 +15773,7 @@ example: Command and Scripting Interpreter
 *`threat.technique.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -14571,7 +15813,7 @@ example: PowerShell
 *`threat.technique.subtechnique.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15519,7 +16761,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -15528,7 +16770,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 *`url.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15539,7 +16781,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -15548,7 +16790,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elas
 *`url.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15566,7 +16808,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: keyword
+type: wildcard
 
 --
 
@@ -15691,7 +16933,7 @@ example: Albert Einstein
 *`user.changes.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15740,6 +16982,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.changes.name`*::
@@ -15749,14 +16993,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.changes.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15814,7 +17058,7 @@ example: Albert Einstein
 *`user.effective.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15863,6 +17107,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.effective.name`*::
@@ -15872,14 +17118,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.effective.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15917,7 +17163,7 @@ example: Albert Einstein
 *`user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -15966,6 +17212,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.name`*::
@@ -15975,14 +17223,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -16030,7 +17278,7 @@ example: Albert Einstein
 *`user.target.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -16079,6 +17327,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.target.name`*::
@@ -16088,14 +17338,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.target.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -16153,7 +17403,7 @@ example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.
 *`user_agent.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -16182,7 +17432,7 @@ example: Mac OS Mojave
 *`user_agent.os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -16211,7 +17461,7 @@ example: Mac OS X
 *`user_agent.os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -16335,7 +17585,7 @@ example: In macOS before 2.12.6, there is a vulnerability in the RPC...
 *`vulnerability.description.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -17134,18 +18384,6 @@ Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
-
---
-
-*`kubernetes.container.image`*::
-+
---
-Kubernetes container image
-
-
-type: alias
-
-alias to: container.image.name
 
 --
 

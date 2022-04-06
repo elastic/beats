@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package kafka
@@ -44,8 +45,9 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
+	kafkaDefaultHost     = "kafka"
+	kafkaDefaultPort     = "9092"
+	kafkaDefaultSASLPort = "9093"
 )
 
 type eventInfo struct {
@@ -182,6 +184,60 @@ func TestKafkaPublish(t *testing.T) {
 				"type": "log",
 			}),
 		},
+		{
+			"publish single event to test topic",
+			map[string]interface{}{},
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
+		{
+			// Initially I tried rerunning all tests over SASL/SCRAM, but
+			// that added a full 30sec to the test. Instead most tests run
+			// in plaintext, and individual tests can switch to SCRAM
+			// by inserting the config in this example:
+			"publish single event to test topic over SASL/SCRAM",
+			map[string]interface{}{
+				"hosts":          []string{getTestSASLKafkaHost()},
+				"protocol":       "https",
+				"sasl.mechanism": "SCRAM-SHA-512",
+				"ssl.certificate_authorities": []string{
+					"../../../testing/environments/docker/kafka/certs/ca-cert",
+				},
+				"username": "beats",
+				"password": "KafkaTest",
+			},
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
+		{
+			"publish message with kafka headers to test topic",
+			map[string]interface{}{
+				"headers": []map[string]string{
+					{
+						"key":   "app",
+						"value": "test-app",
+					},
+					{
+						"key":   "app",
+						"value": "test-app2",
+					},
+					{
+						"key":   "host",
+						"value": "test-host",
+					},
+				},
+			},
+			testTopic,
+			randMulti(5, 100, common.MapStr{
+				"host": "test-host",
+			}),
+		},
 	}
 
 	defaultConfig := map[string]interface{}{
@@ -244,8 +300,23 @@ func TestKafkaPublish(t *testing.T) {
 				validate = makeValidateFmtStr(fmt.(string))
 			}
 
+			cfgHeaders, headersSet := test.config["headers"]
+
 			seenMsgs := map[string]struct{}{}
 			for _, s := range stored {
+				if headersSet {
+					expectedHeaders, ok := cfgHeaders.([]map[string]string)
+					assert.True(t, ok)
+					assert.Len(t, s.Headers, len(expectedHeaders))
+					for i, h := range s.Headers {
+						expectedHeader := expectedHeaders[i]
+						key := string(h.Key)
+						value := string(h.Value)
+						assert.Equal(t, expectedHeader["key"], key)
+						assert.Equal(t, expectedHeader["value"], value)
+					}
+				}
+
 				msg := validate(t, s.Value, expected)
 				seenMsgs[msg] = struct{}{}
 			}
@@ -318,6 +389,13 @@ func getTestKafkaHost() string {
 	return fmt.Sprintf("%v:%v",
 		getenv("KAFKA_HOST", kafkaDefaultHost),
 		getenv("KAFKA_PORT", kafkaDefaultPort),
+	)
+}
+
+func getTestSASLKafkaHost() string {
+	return fmt.Sprintf("%v:%v",
+		getenv("KAFKA_HOST", kafkaDefaultHost),
+		getenv("KAFKA_SASL_PORT", kafkaDefaultSASLPort),
 	)
 }
 

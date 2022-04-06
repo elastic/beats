@@ -10,20 +10,20 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuring-ingest-node]]
-== Parse data by using ingest node
+== Parse data using an ingest pipeline
 
-When you use Elasticsearch for output, you can configure {beatname_uc} to use
-{ref}/ingest.html[ingest node] to pre-process documents before the actual
-indexing takes place in Elasticsearch.
+When you use {es} for output, you can configure {beatname_uc} to use
+an {ref}/ingest.html[ingest pipeline] to pre-process documents before the actual
+indexing takes place in {es}.
 ifndef::no-output-logstash[]
-Ingest node is a convenient processing option when you want to do some extra
-processing on your data, but you do not require the full power of Logstash.
+An ingest pipeline is a convenient processing option when you want to do some
+extra processing on your data, but you do not require the full power of {ls}.
 endif::[]
-For example, you can create an ingest node pipeline
-in Elasticsearch that consists of one processor that removes a field in a
+For example, you can create an ingest pipeline
+in {es} that consists of one processor that removes a field in a
 document followed by another processor that renames a field.
 
-After defining the pipeline in Elasticsearch, you simply configure {beatname_uc}
+After defining the pipeline in {es}, you simply configure {beatname_uc}
 to use the pipeline. To configure {beatname_uc}, you specify the pipeline ID in
 the `parameters` option under `elasticsearch` in the +{beatname_lc}.yml+ file:
 
@@ -51,7 +51,7 @@ named `pipeline.json`:
 }
 ------------------------------------------------------------------------------
 
-To add the pipeline in Elasticsearch, you would run:
+To add the pipeline in {es}, you would run:
 
 [source,shell]
 ------------------------------------------------------------------------------
@@ -70,4 +70,4 @@ output.elasticsearch:
 When you run {beatname_uc}, the value of `agent.name` is converted to lowercase before indexing.
 
 For more information about defining a pre-processing pipeline, see the
-{ref}/ingest.html[Ingest Node] documentation.
+{ref}/ingest.html[ingest pipeline] documentation.

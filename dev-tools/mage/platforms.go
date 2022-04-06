@@ -27,6 +27,7 @@ import (
 // BuildPlatforms is a list of GOOS/GOARCH pairs supported by Go.
 // The list originated from 'go tool dist list -json'.
 var BuildPlatforms = BuildPlatformList{
+	{"aix/ppc64", CGOSupported},
 	{"android/386", CGOSupported},
 	{"android/amd64", CGOSupported},
 	{"android/arm", CGOSupported},
@@ -34,7 +35,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"darwin/386", CGOSupported | CrossBuildSupported},
 	{"darwin/amd64", CGOSupported | CrossBuildSupported | Default},
 	{"darwin/arm", CGOSupported},
-	{"darwin/arm64", CGOSupported},
+	{"darwin/arm64", CGOSupported | CrossBuildSupported | Default},
 	{"dragonfly/amd64", CGOSupported},
 	{"freebsd/386", CGOSupported},
 	{"freebsd/amd64", CGOSupported},
@@ -256,7 +257,6 @@ func (list BuildPlatformList) Remove(name string) BuildPlatformList {
 // Select returns a new list containing the platforms that match name.
 func (list BuildPlatformList) Select(name string) BuildPlatformList {
 	attrs := BuildPlatform{Name: name}.Attributes()
-
 	if attrs.Arch == "" {
 		// Filter by GOOS only.
 		return list.filter(func(bp BuildPlatform) bool {
@@ -326,13 +326,13 @@ func newPlatformExpression(expr string) (*platformExpression, error) {
 
 // NewPlatformList returns a new BuildPlatformList based on given expression.
 //
-// By default the initial set include only the platforms designated as defaults.
+// By default, the initial set include only the platforms designated as defaults.
 // To add additional platforms to list use an addition term that is designated
 // with a plug sign (e.g. "+netbsd" or "+linux/armv7"). Or you may use "+all"
 // to change the initial set to include all possible platforms then filter
 // from there (e.g. "+all linux windows").
 //
-// The expression can consists of selections (e.g. "linux") and/or
+// The expression can consist of selections (e.g. "linux") and/or
 // removals (e.g."!windows"). Each term can be valid GOOS or a valid GOOS/Arch
 // pair.
 //
@@ -353,8 +353,11 @@ func NewPlatformList(expr string) BuildPlatformList {
 
 	var out BuildPlatformList
 	if len(pe.Add) == 0 || (len(pe.Select) == 0 && len(pe.Remove) == 0) {
-		// Bootstrap list with default platforms when the expression is
+		// Bootstrap list with platforms when the expression is
 		// exclusively adds OR exclusively selects and removes.
+		out = BuildPlatforms
+	}
+	if len(pe.Remove) > 0 || len(pe.Add) > 0 {
 		out = BuildPlatforms.Defaults()
 	}
 
@@ -375,7 +378,6 @@ func NewPlatformList(expr string) BuildPlatformList {
 		}
 		out = selected
 	}
-
 	for _, name := range pe.Remove {
 		if name == "defaults" {
 			for _, defaultBP := range all.Defaults() {

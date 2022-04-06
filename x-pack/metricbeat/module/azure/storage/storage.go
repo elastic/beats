@@ -24,6 +24,7 @@ var (
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
 	mb.Registry.MustAddMetricSet("azure", "storage", New)
+	mb.Registry.MustAddMetricSet("azure", "storage_account", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement

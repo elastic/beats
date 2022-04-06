@@ -18,12 +18,12 @@
 package file_integrity
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"time"
 
 	flatbuffers "github.com/google/flatbuffers/go"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/schema"
 )
@@ -31,7 +31,7 @@ import (
 // Requires the Google flatbuffer compiler.
 //go:generate flatc --go schema.fbs
 
-var actionMap = map[Action]byte{
+var actionMap = map[Action]schema.Action{
 	AttributesModified: schema.ActionAttributesModified,
 	Created:            schema.ActionCreated,
 	Deleted:            schema.ActionDeleted,
@@ -113,7 +113,7 @@ func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType]Digest) flatbuffers
 		case SHA512_256:
 			schema.HashAddSha512256(b, offset)
 		case XXH64:
-			schema.HashAddXx64(b, offset)
+			schema.HashAddXxh64(b, offset)
 		}
 	}
 	return schema.HashEnd(b)
@@ -189,9 +189,9 @@ func fbWriteEvent(b *flatbuffers.Builder, e *Event) flatbuffers.UOffsetT {
 		schema.EventAddTargetPath(b, targetPathOffset)
 	}
 
-	var action byte
+	var action schema.Action
 	for k, v := range actionMap {
-		if 0 != e.Action&k {
+		if e.Action&k != 0 {
 			action |= v
 		}
 	}
@@ -227,7 +227,7 @@ func fbDecodeEvent(path string, buf []byte) *Event {
 
 	action := e.Action()
 	for k, v := range actionMap {
-		if 0 != action&v {
+		if action&v != 0 {
 			rtn.Action |= k
 		}
 	}
@@ -329,10 +329,10 @@ func fbDecodeHash(e *schema.Event) map[HashType]Digest {
 			length = hash.Sha512256Length()
 			producer = hash.Sha512256
 		case XXH64:
-			length = hash.Xx64Length()
-			producer = hash.Xx64
+			length = hash.Xxh64Length()
+			producer = hash.Xxh64
 		default:
-			panic(errors.Errorf("unhandled hash type: %v", hashType))
+			panic(fmt.Errorf("unhandled hash type: %v", hashType))
 		}
 
 		if length > 0 {

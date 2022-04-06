@@ -31,12 +31,11 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "{{.BeatIndexPrefix}}" plus date
-  # and generates [{{.BeatIndexPrefix}}-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "{{.BeatIndexPrefix}}-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "{{.BeatIndexPrefix}}-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "{{.BeatIndexPrefix}}-%{[agent.version]}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -76,6 +75,10 @@ output.elasticsearch:
 
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
+
+  # {{.BeatName}} expects Elasticsearch to be the same version or newer than the Beat.
+  # Lift the version restriction by setting allow_older_versions to true.
+  #allow_older_versions: false
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.

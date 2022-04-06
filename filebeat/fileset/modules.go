@@ -37,8 +37,13 @@ import (
 const logName = "modules"
 
 type ModuleRegistry struct {
-	registry map[string]map[string]*Fileset // module -> fileset -> Fileset
+	registry []Module // []Module -> []Fileset
 	log      *logp.Logger
+}
+
+type Module struct {
+	filesets []Fileset
+	config   ModuleConfig
 }
 
 // newModuleRegistry reads and loads the configured module into the registry.
@@ -48,54 +53,33 @@ func newModuleRegistry(modulesPath string,
 	beatInfo beat.Info,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
-		registry: map[string]map[string]*Fileset{},
+		registry: []Module{},
 		log:      logp.NewLogger(logName),
 	}
-
 	for _, mcfg := range moduleConfigs {
-		if mcfg.Enabled != nil && !(*mcfg.Enabled) {
+		if mcfg.Module == "" || (mcfg.Enabled != nil && !(*mcfg.Enabled)) {
 			continue
 		}
-
 		// Look for moved modules
-		if module, moved := getCurrentModuleName(modulesPath, mcfg.Module); moved {
-			reg.log.Warnf("Configuration uses the old name %q for module %q, please update your configuration.", mcfg.Module, module)
-			mcfg.Module = module
+		if moduleName, moved := getCurrentModuleName(modulesPath, mcfg.Module); moved {
+			reg.log.Warnf("Configuration uses the old name %q for module %q, please update your configuration.", mcfg.Module, moduleName)
+			mcfg.Module = moduleName
 		}
-
-		reg.registry[mcfg.Module] = map[string]*Fileset{}
 		moduleFilesets, err := getModuleFilesets(modulesPath, mcfg.Module)
 		if err != nil {
 			return nil, fmt.Errorf("error getting filesets for module %s: %v", mcfg.Module, err)
 		}
-
-		for _, filesetName := range moduleFilesets {
-			fcfg, exists := mcfg.Filesets[filesetName]
-			if !exists {
-				fcfg = &FilesetConfig{}
-			}
+		module := Module{
+			config:   *mcfg,
+			filesets: []Fileset{},
+		}
+		for filesetName, fcfg := range mcfg.Filesets {
 
 			fcfg, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
 			if err != nil {
 				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
 
-			if fcfg.Enabled != nil && !(*fcfg.Enabled) {
-				continue
-			}
-
-			fileset, err := New(modulesPath, filesetName, mcfg, fcfg)
-			if err != nil {
-				return nil, err
-			}
-			if err = fileset.Read(beatInfo); err != nil {
-				return nil, fmt.Errorf("error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
-			}
-			reg.registry[mcfg.Module][filesetName] = fileset
-		}
-
-		// check that no extra filesets are configured
-		for filesetName, fcfg := range mcfg.Filesets {
 			if fcfg.Enabled != nil && !(*fcfg.Enabled) {
 				continue
 			}
@@ -108,9 +92,26 @@ func newModuleRegistry(modulesPath string,
 			if !found {
 				return nil, fmt.Errorf("fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
 			}
+
+			fileset, err := New(modulesPath, filesetName, mcfg.Module, fcfg)
+			if err != nil {
+				return nil, err
+			}
+			if err = fileset.Read(beatInfo); err != nil {
+				return nil, fmt.Errorf("error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
+			}
+			module.filesets = append(module.filesets, *fileset)
 		}
+		reg.registry = append(reg.registry, module)
 	}
 
+	reg.log.Infof("Enabled modules/filesets: %s", reg.InfoString())
+	for _, mod := range reg.registry {
+		filesets := reg.ModuleConfiguredFilesets(mod)
+		if len(filesets) == 0 {
+			return nil, errors.Errorf("module %s is configured but has no enabled filesets", mod.config.Module)
+		}
+	}
 	return &reg, nil
 }
 
@@ -152,7 +153,28 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init 
 		return nil, err
 	}
 
+	enableFilesetsFromOverrides(mcfgs, modulesOverrides)
 	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo)
+}
+
+// enableFilesetsFromOverrides enables in mcfgs the filesets mentioned in overrides,
+// so that the overridden configuration can be applied.
+func enableFilesetsFromOverrides(mcfgs []*ModuleConfig, overrides *ModuleOverrides) {
+	if overrides == nil {
+		return
+	}
+	for _, mcfg := range mcfgs {
+		if modOvr, ok := (*overrides)[mcfg.Module]; ok {
+			for fset := range modOvr {
+				if _, ok = mcfg.Filesets[fset]; !ok {
+					if mcfg.Filesets == nil {
+						mcfg.Filesets = make(map[string]*FilesetConfig)
+					}
+					mcfg.Filesets[fset] = &FilesetConfig{}
+				}
+			}
+		}
+	}
 }
 
 func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
@@ -171,10 +193,17 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 	}
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
-	for name, filesetConfig := range dict {
+
+	// This calls cfg.GetFields() instead of iterating over `dict` keys
+	// because cfg.Unpack above doesn't return keys that map to a nil value,
+	// but GetFields() returns all keys. We need to observe filesets that
+	// don't contain any configuration (all default values).
+	for _, name := range cfg.GetFields() {
 		if name == "module" || name == "enabled" || name == "path" {
 			continue
 		}
+
+		filesetConfig, _ := dict[name] // Nil config if name is not present.
 
 		tmpCfg, err := common.NewConfigFrom(filesetConfig)
 		if err != nil {
@@ -232,8 +261,8 @@ func getModuleFilesets(modulePath, module string) ([]string, error) {
 
 func applyOverrides(fcfg *FilesetConfig,
 	module, fileset string,
-	overrides *ModuleOverrides) (*FilesetConfig, error) {
-
+	overrides *ModuleOverrides) (*FilesetConfig, error,
+) {
 	if overrides == nil {
 		return fcfg, nil
 	}
@@ -291,12 +320,11 @@ func appendWithoutDuplicates(moduleConfigs []*ModuleConfig, modules []string) ([
 
 func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 	var result []*common.Config
-	for module, filesets := range reg.registry {
-		for name, fileset := range filesets {
+	for _, module := range reg.registry {
+		for _, fileset := range module.filesets {
 			fcfg, err := fileset.getInputConfig()
 			if err != nil {
-				return result, fmt.Errorf("error getting config for fileset %s/%s: %v",
-					module, name, err)
+				return result, fmt.Errorf("error getting config for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 			}
 			result = append(result, fcfg)
 		}
@@ -308,18 +336,18 @@ func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 // be shown to the user
 func (reg *ModuleRegistry) InfoString() string {
 	var result string
-	for module, filesets := range reg.registry {
-		var filesetNames string
-		for name := range filesets {
+	for _, module := range reg.registry {
+		for _, fileset := range module.filesets {
+			var filesetNames string
 			if filesetNames != "" {
 				filesetNames += ", "
 			}
-			filesetNames += name
+			filesetNames += fileset.name
+			if result != "" {
+				result += ", "
+			}
+			result += fmt.Sprintf("%s (%s)", module.config.Module, filesetNames)
 		}
-		if result != "" {
-			result += ", "
-		}
-		result += fmt.Sprintf("%s (%s)", module, filesetNames)
 	}
 	return result
 }
@@ -385,8 +413,8 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 
 func (reg *ModuleRegistry) Empty() bool {
 	count := 0
-	for _, filesets := range reg.registry {
-		count += len(filesets)
+	for _, module := range reg.registry {
+		count += len(module.filesets)
 	}
 	return count == 0
 }
@@ -394,15 +422,24 @@ func (reg *ModuleRegistry) Empty() bool {
 // ModuleNames returns the names of modules in the ModuleRegistry.
 func (reg *ModuleRegistry) ModuleNames() []string {
 	var modules []string
-	for m := range reg.registry {
-		modules = append(modules, m)
+	for _, m := range reg.registry {
+		modules = append(modules, m.config.Module)
 	}
 	return modules
 }
 
-// ModuleFilesets return the list of available filesets for the given module
+// ModuleAvailableFilesets return the list of available filesets for the given module
 // it returns an empty list if the module doesn't exist
-func (reg *ModuleRegistry) ModuleFilesets(module string) ([]string, error) {
+func (reg *ModuleRegistry) ModuleAvailableFilesets(module string) ([]string, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 	return getModuleFilesets(modulesPath, module)
+}
+
+// ModuleConfiguredFilesets return the list of configured filesets for the given module
+// it returns an empty list if the module doesn't exist
+func (reg *ModuleRegistry) ModuleConfiguredFilesets(module Module) (list []string) {
+	for _, fileset := range module.filesets {
+		list = append(list, fileset.name)
+	}
+	return list
 }

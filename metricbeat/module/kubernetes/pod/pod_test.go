@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package pod
@@ -27,12 +28,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
 func TestEventMapping(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.pod")
+
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
@@ -44,7 +48,7 @@ func TestEventMapping(t *testing.T) {
 	cache.NodeMemAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 146227200)
 	cache.ContainerMemLimit.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), 14622720)
 
-	events, err := eventMapping(body, cache)
+	events, err := eventMapping(body, cache, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -63,9 +67,10 @@ func TestEventMapping(t *testing.T) {
 		"cpu.usage.node.pct":  0.005631997,
 		"cpu.usage.limit.pct": 0.005631997,
 
-		"memory.usage.bytes":     1462272,
-		"memory.usage.node.pct":  0.01,
-		"memory.usage.limit.pct": 0.1,
+		"memory.usage.bytes":           1462272,
+		"memory.usage.node.pct":        0.01,
+		"memory.usage.limit.pct":       0.1,
+		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
 	for k, v := range testCases {

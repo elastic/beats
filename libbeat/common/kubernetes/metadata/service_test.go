@@ -279,7 +279,9 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 					Labels: map[string]string{
 						"nskey": "nsvalue",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"ns.annotation": "value",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Namespace",
@@ -295,19 +297,13 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 					"labels": common.MapStr{
 						"foo": "bar",
 					},
-					// Use this for 8.0
-					/*
-						"namespace": common.MapStr{
-							"name": "default",
-							"uid":  uid,
-							"labels": common.MapStr{
-								"nskey": "nsvalue",
-							},
-					},*/
 					"namespace":     "default",
 					"namespace_uid": uid,
 					"namespace_labels": common.MapStr{
 						"nskey": "nsvalue",
+					},
+					"namespace_annotations": common.MapStr{
+						"ns_annotation": "value",
 					},
 				},
 			},
@@ -315,15 +311,17 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		nsConfig, _ := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"ns.annotation"},
+		})
 		services := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		services.Add(test.input)
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.namespace)
-		nsMeta := NewNamespaceMetadataGenerator(cfg, namespaces, client)
+		nsMeta := NewNamespaceMetadataGenerator(nsConfig, namespaces, client)
 
-		metagen := NewServiceMetadataGenerator(cfg, services, nsMeta, client)
+		metagen := NewServiceMetadataGenerator(nsConfig, services, nsMeta, client)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})

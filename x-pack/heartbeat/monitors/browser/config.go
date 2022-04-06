@@ -29,6 +29,7 @@ type Config struct {
 	// Id is optional for lightweight checks but required for browsers
 	Id                string                        `config:"id"`
 	Sandbox           bool                          `config:"sandbox"`
+	Throttling        interface{}                   `config:"throttling"`
 	Screenshots       string                        `config:"screenshots"`
 	SyntheticsArgs    []string                      `config:"synthetics_args"`
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`

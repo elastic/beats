@@ -23,6 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -78,7 +79,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	Scope Scope
+	Scope        Scope
+	XPackEnabled bool
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -89,10 +91,14 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		return nil, err
 	}
 
+	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
 	config := struct {
-		Scope Scope `config:"scope"`
+		Scope        Scope `config:"scope"`
+		XPackEnabled bool  `config:"xpack.enabled"`
 	}{
-		Scope: ScopeNode,
+		Scope:        ScopeNode,
+		XPackEnabled: false,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -103,6 +109,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		servicePath,
 		http,
 		config.Scope,
+		config.XPackEnabled,
 	}
 
 	ms.SetServiceURI(servicePath)

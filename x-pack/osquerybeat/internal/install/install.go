@@ -23,7 +23,7 @@ import (
 )
 
 func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) error {
-	dstfp := filepath.Join(dstDir, distro.OsquerydFilename())
+	dstfp := filepath.Join(dstDir, distro.OsquerydDarwinApp())
 
 	dir, err := installFromCommon(ctx, srcPkg, dstDir, dstfp, force, "pkgutil", "--expand-full", srcPkg)
 	// Remove the directory that was created could have been created by pkgutil
@@ -35,7 +35,7 @@ func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) erro
 	}
 
 	// Copy over the osqueryd from under Payload into the dstDir directory
-	return devtools.Copy(path.Join(dir, "Payload", distro.OsquerydDistroPath()), dstfp)
+	return devtools.Copy(filepath.Join(dir, "Payload", distro.OsquerydDarwinDistroPath()), filepath.Join(dstDir, distro.OsquerydDarwinApp()))
 }
 
 func InstallFromMSI(ctx context.Context, srcMSI, dstDir string, force bool) error {
@@ -52,7 +52,7 @@ func InstallFromMSI(ctx context.Context, srcMSI, dstDir string, force bool) erro
 		return err
 	}
 
-	// Copy over the osqueryd from under osquery/osqueryd into the dstDir directory
+	// Copy over the or osquery.app osqueryd from under osquery/osqueryd into the dstDir directory
 	return devtools.Copy(path.Join(dir, "osquery", distro.OsquerydPath("osqueryd")), dstfp)
 }
 

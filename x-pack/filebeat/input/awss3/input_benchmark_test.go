@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
@@ -29,10 +28,13 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
-const totalListingObjects = 10000
+const (
+	cloudtrailTestFile  = "testdata/aws-cloudtrail.json.gz"
+	totalListingObjects = 10000
+)
 
 type constantSQS struct {
 	msgs []sqs.Message
@@ -134,7 +136,7 @@ func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetO
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
-func (c constantS3) ListObjectsPaginator(bucket string) s3Pager {
+func (c constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	return c.pagerConstant
 }
 
@@ -166,13 +168,13 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		conf := makeBenchmarkConfig(t)
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, time.Minute, 5, s3EventHandlerFactory)
+		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, s3EventHandlerFactory)
 		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
 
 		go func() {
 			for event := range client.Channel {
 				// Fake the ACK handling that's not implemented in pubtest.
-				event.Private.(*eventACKTracker).ACK()
+				event.Private.(*awscommon.EventACKTracker).ACK()
 			}
 		}()
 
@@ -259,7 +261,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		s3API := newConstantS3(t)
 		s3API.pagerConstant = newS3PagerConstant()
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
 		defer close(client.Channel)
@@ -277,7 +279,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		}
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", "region", numberOfWorkers, time.Second)
+		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", "key-", "region", "provider", numberOfWorkers, time.Second)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
@@ -316,7 +318,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		b.ReportMetric(float64(metrics.s3ObjectsAckedTotal.Get()), "objects_acked")
 		b.ReportMetric(float64(metrics.s3ObjectsAckedTotal.Get())/elapsed.Seconds(), "objects_acked_per_sec")
-
 	})
 }
 

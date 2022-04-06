@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package guess
@@ -9,11 +10,11 @@ package guess
 import (
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"math/rand"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -134,7 +135,7 @@ func (g *guessSkBuffLen) Extract(ev interface{}) (common.MapStr, bool) {
 		uIntSize          = 4
 		n                 = skbuffDumpSize / uIntSize
 		maxOverhead       = 128
-		minHeadersSize    = 0 //20 /* min IP*/ + 20 /* min TCP */
+		minHeadersSize    = 0 // 20 /* min IP*/ + 20 /* min TCP */
 		ipHeaderSizeChunk = 4
 	)
 	target := uint32(g.written)
@@ -280,14 +281,14 @@ func (g *guessSkBuffProto) Prepare(ctx Context) (err error) {
 	g.ctx = ctx
 	g.hasIPv6, err = isIPv6Enabled(ctx.Vars)
 	if err != nil {
-		return errors.Wrap(err, "unable to determine if IPv6 is enabled")
+		return fmt.Errorf("unable to determine if IPv6 is enabled: %w", err)
 	}
 	g.doIPv6 = g.hasIPv6 && !g.doIPv6
 	g.msg = make([]byte, 0x123)
 	if g.doIPv6 {
 		g.loopback, err = helper.NewIPv6Loopback()
 		if err != nil {
-			return errors.Wrap(err, "detect IPv6 loopback failed")
+			return fmt.Errorf("detect IPv6 loopback failed: %w", err)
 		}
 		defer func() {
 			if err != nil {
@@ -296,20 +297,20 @@ func (g *guessSkBuffProto) Prepare(ctx Context) (err error) {
 		}()
 		clientIP, err := g.loopback.AddRandomAddress()
 		if err != nil {
-			return errors.Wrap(err, "failed adding first device address")
+			return fmt.Errorf("failed adding first device address: %w", err)
 		}
 		serverIP, err := g.loopback.AddRandomAddress()
 		if err != nil {
-			return errors.Wrap(err, "failed adding second device address")
+			return fmt.Errorf("failed adding second device address: %w", err)
 		}
 		copy(g.clientAddr.Addr[:], clientIP)
 		copy(g.serverAddr.Addr[:], serverIP)
 
 		if g.client, g.clientAddr, err = createSocket6WithProto(unix.SOCK_DGRAM, g.clientAddr); err != nil {
-			return errors.Wrap(err, "error creating server")
+			return fmt.Errorf("error creating server: %w", err)
 		}
 		if g.server, g.serverAddr, err = createSocket6WithProto(unix.SOCK_DGRAM, g.serverAddr); err != nil {
-			return errors.Wrap(err, "error creating client")
+			return fmt.Errorf("error creating client: %w", err)
 		}
 	} else {
 		g.cs.SetupUDP()
@@ -333,17 +334,17 @@ func (g *guessSkBuffProto) Terminate() (err error) {
 func (g *guessSkBuffProto) Trigger() error {
 	if g.doIPv6 {
 		if err := unix.Sendto(g.client, g.msg, 0, &g.serverAddr); err != nil {
-			return errors.Wrap(err, "failed to send ipv4")
+			return fmt.Errorf("failed to send ipv4: %w", err)
 		}
 		if _, _, err := unix.Recvfrom(g.server, g.msg, 0); err != nil {
-			return errors.Wrap(err, "failed to receive ipv4")
+			return fmt.Errorf("failed to receive ipv4: %w", err)
 		}
 	} else {
 		if err := unix.Sendto(g.cs.client, g.msg, 0, &g.cs.srvAddr); err != nil {
-			return errors.Wrap(err, "failed to send ipv4")
+			return fmt.Errorf("failed to send ipv4: %w", err)
 		}
 		if _, _, err := unix.Recvfrom(g.cs.server, g.msg, 0); err != nil {
-			return errors.Wrap(err, "failed to receive ipv4")
+			return fmt.Errorf("failed to receive ipv4: %w", err)
 		}
 	}
 	return nil
@@ -590,10 +591,10 @@ func (g *guessSkBuffDataPtr) Terminate() error {
 // Trigger causes a packet to be received at server socket.
 func (g *guessSkBuffDataPtr) Trigger() error {
 	if err := unix.Sendto(g.cs.client, g.payload, 0, &g.cs.srvAddr); err != nil {
-		return errors.Wrap(err, "failed to send ipv4")
+		return fmt.Errorf("failed to send ipv4: %w", err)
 	}
 	if _, _, err := unix.Recvfrom(g.cs.server, g.payload, 0); err != nil {
-		return errors.Wrap(err, "failed to receive ipv4")
+		return fmt.Errorf("failed to receive ipv4: %w", err)
 	}
 	return nil
 }

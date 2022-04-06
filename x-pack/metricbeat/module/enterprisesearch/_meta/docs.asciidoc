@@ -1,0 +1,20 @@
+This module periodically fetches metrics and health information from Elastic Enterprise Search instances using HTTP APIs.
+
+[float]
+=== Compatibility
+The module has been tested with Enterprise Search versions 7.16.0 and higher. Versions below 7.16.0 are not expected to work due to a number of API-level incompatibilities.
+
+[float]
+=== Usage
+The Enterprise Search module requires a set of credentials (a username and a password) for an Elasticserch user for a user that has a `monitor` https://www.elastic.co/guide/en/elasticsearch/reference/current/security-privileges.html#privileges-list-cluster[cluster privilege].
+
+[float]
+=== Usage for {stack} Monitoring
+
+The Enterprise Search module can be used to collect metrics shown in our {stack-monitor-app}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` in configuration.
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].

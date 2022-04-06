@@ -38,9 +38,7 @@
     },
     {
         "destination.bytes": 3676,
-        "destination.ip": [
-            "10.212.11.114"
-        ],
+        "destination.ip": "10.212.11.114",
         "destination.port": 3716,
         "event.action": "deny",
         "event.code": "NGIPS_events",
@@ -84,9 +82,7 @@
         "rule.name": "iatisu",
         "service.type": "snort",
         "source.bytes": 4512,
-        "source.ip": [
-            "10.38.77.13"
-        ],
+        "source.ip": "10.38.77.13",
         "source.port": 3971,
         "tags": [
             "forwarded",
@@ -189,9 +185,7 @@
     },
     {
         "destination.bytes": 3365,
-        "destination.ip": [
-            "10.24.67.250"
-        ],
+        "destination.ip": "10.24.67.250",
         "destination.port": 2026,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -235,9 +229,7 @@
         "rule.name": "doloremi",
         "service.type": "snort",
         "source.bytes": 651,
-        "source.ip": [
-            "10.182.199.231"
-        ],
+        "source.ip": "10.182.199.231",
         "source.port": 4478,
         "tags": [
             "forwarded",
@@ -313,9 +305,7 @@
     },
     {
         "destination.geo.country_name": "eeufugia",
-        "destination.ip": [
-            "10.157.18.252"
-        ],
+        "destination.ip": "10.157.18.252",
         "destination.port": 5300,
         "event.code": "5979",
         "event.dataset": "snort.log",
@@ -357,9 +347,7 @@
         "rsa.time.event_time_str": "May 22 14:30:33 2016 UTC",
         "rsa.time.month": "May",
         "service.type": "snort",
-        "source.ip": [
-            "10.110.31.190"
-        ],
+        "source.ip": "10.110.31.190",
         "tags": [
             "forwarded",
             "snort.log"
@@ -808,9 +796,7 @@
         "user.name": "smodtem"
     },
     {
-        "destination.ip": [
-            "10.9.200.197"
-        ],
+        "destination.ip": "10.9.200.197",
         "event.code": "27813",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -851,9 +837,7 @@
         "rsa.time.month": "Dec",
         "service.type": "snort",
         "source.geo.country_name": "tur",
-        "source.ip": [
-            "10.182.213.195"
-        ],
+        "source.ip": "10.182.213.195",
         "source.port": 7119,
         "tags": [
             "forwarded",
@@ -862,9 +846,7 @@
     },
     {
         "destination.bytes": 3813,
-        "destination.ip": [
-            "10.111.33.70"
-        ],
+        "destination.ip": "10.111.33.70",
         "destination.port": 3758,
         "event.action": "allow",
         "event.code": "NGIPS_events",
@@ -908,9 +890,7 @@
         "rule.name": "eriam",
         "service.type": "snort",
         "source.bytes": 3465,
-        "source.ip": [
-            "10.210.180.142"
-        ],
+        "source.ip": "10.210.180.142",
         "source.port": 3015,
         "tags": [
             "forwarded",
@@ -948,9 +928,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.222.183.123"
-        ],
+        "destination.ip": "10.222.183.123",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -979,18 +957,14 @@
         "rsa.time.day": "20",
         "rsa.time.month": "Jan",
         "service.type": "snort",
-        "source.ip": [
-            "10.165.33.19"
-        ],
+        "source.ip": "10.165.33.19",
         "tags": [
             "forwarded",
             "snort.log"
         ]
     },
     {
-        "destination.ip": [
-            "10.238.223.171"
-        ],
+        "destination.ip": "10.238.223.171",
         "event.code": "16539",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -1030,9 +1004,7 @@
         "rsa.time.event_time_str": "Feb 3 21:16:50 2017 UTC",
         "rsa.time.month": "Feb",
         "service.type": "snort",
-        "source.ip": [
-            "10.52.190.18"
-        ],
+        "source.ip": "10.52.190.18",
         "source.port": 4411,
         "tags": [
             "forwarded",
@@ -1040,9 +1012,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.160.178.109"
-        ],
+        "destination.ip": "10.160.178.109",
         "destination.port": 1934,
         "event.code": "26992",
         "event.dataset": "snort.log",
@@ -1084,9 +1054,7 @@
         "rsa.time.event_time_str": "Feb 18 04:19:24 2017 UTC",
         "rsa.time.month": "Feb",
         "service.type": "snort",
-        "source.ip": [
-            "10.68.233.163"
-        ],
+        "source.ip": "10.68.233.163",
         "tags": [
             "forwarded",
             "snort.log"
@@ -1192,9 +1160,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.213.100.153"
-        ],
+        "destination.ip": "10.213.100.153",
         "event.code": "11634",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -1235,9 +1201,7 @@
         "rsa.time.event_time_str": "Apr 16 08:29:41 2017 UTC",
         "rsa.time.month": "Apr",
         "service.type": "snort",
-        "source.ip": [
-            "10.116.175.84"
-        ],
+        "source.ip": "10.116.175.84",
         "tags": [
             "forwarded",
             "snort.log"
@@ -1476,9 +1440,7 @@
     },
     {
         "destination.bytes": 4902,
-        "destination.ip": [
-            "10.251.159.118"
-        ],
+        "destination.ip": "10.251.159.118",
         "destination.port": 2795,
         "event.action": "cancel",
         "event.code": "NGIPS_events",
@@ -1522,9 +1484,7 @@
         "rule.name": "emagnam",
         "service.type": "snort",
         "source.bytes": 1580,
-        "source.ip": [
-            "10.240.144.78"
-        ],
+        "source.ip": "10.240.144.78",
         "source.port": 2998,
         "tags": [
             "forwarded",
@@ -1623,9 +1583,7 @@
     },
     {
         "destination.bytes": 5413,
-        "destination.ip": [
-            "10.201.132.114"
-        ],
+        "destination.ip": "10.201.132.114",
         "destination.port": 639,
         "event.action": "cancel",
         "event.code": "NGIPS_events",
@@ -1669,9 +1627,7 @@
         "rule.name": "temse",
         "service.type": "snort",
         "source.bytes": 470,
-        "source.ip": [
-            "10.140.209.249"
-        ],
+        "source.ip": "10.140.209.249",
         "source.port": 1801,
         "tags": [
             "forwarded",
@@ -1713,9 +1669,7 @@
     },
     {
         "destination.geo.country_name": "ariatu",
-        "destination.ip": [
-            "10.36.122.169"
-        ],
+        "destination.ip": "10.36.122.169",
         "destination.port": 6751,
         "event.code": "13228",
         "event.dataset": "snort.log",
@@ -1756,9 +1710,7 @@
         "rsa.time.event_time_str": "Nov 2 11:05:41 2017 UTC",
         "rsa.time.month": "Nov",
         "service.type": "snort",
-        "source.ip": [
-            "10.198.44.231"
-        ],
+        "source.ip": "10.198.44.231",
         "tags": [
             "forwarded",
             "snort.log"
@@ -1766,9 +1718,7 @@
     },
     {
         "destination.bytes": 6430,
-        "destination.ip": [
-            "10.144.162.122"
-        ],
+        "destination.ip": "10.144.162.122",
         "destination.port": 2080,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -1812,9 +1762,7 @@
         "rule.name": "ffici",
         "service.type": "snort",
         "source.bytes": 3273,
-        "source.ip": [
-            "10.77.86.215"
-        ],
+        "source.ip": "10.77.86.215",
         "source.port": 5913,
         "tags": [
             "forwarded",
@@ -2096,9 +2044,7 @@
     },
     {
         "destination.geo.country_name": "icons",
-        "destination.ip": [
-            "10.60.137.215"
-        ],
+        "destination.ip": "10.60.137.215",
         "destination.port": 3266,
         "event.code": "5155",
         "event.dataset": "snort.log",
@@ -2139,9 +2085,7 @@
         "rsa.time.event_time_str": "Mar 25 09:31:24 2018 UTC",
         "rsa.time.month": "Mar",
         "service.type": "snort",
-        "source.ip": [
-            "10.28.105.106"
-        ],
+        "source.ip": "10.28.105.106",
         "tags": [
             "forwarded",
             "snort.log"
@@ -2211,9 +2155,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.49.190.163"
-        ],
+        "destination.ip": "10.49.190.163",
         "destination.nat.ip": "10.20.167.114",
         "destination.nat.port": 6975,
         "destination.port": 4220,
@@ -2251,9 +2193,7 @@
         "rsa.time.day": "7",
         "rsa.time.month": "May",
         "service.type": "snort",
-        "source.ip": [
-            "10.166.40.137"
-        ],
+        "source.ip": "10.166.40.137",
         "source.nat.ip": "10.65.144.119",
         "source.nat.port": 6233,
         "source.port": 5279,
@@ -2263,9 +2203,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.162.128.87"
-        ],
+        "destination.ip": "10.162.128.87",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2294,18 +2232,14 @@
         "rsa.time.day": "21",
         "rsa.time.month": "May",
         "service.type": "snort",
-        "source.ip": [
-            "10.104.78.147"
-        ],
+        "source.ip": "10.104.78.147",
         "tags": [
             "forwarded",
             "snort.log"
         ]
     },
     {
-        "destination.ip": [
-            "10.82.180.46"
-        ],
+        "destination.ip": "10.82.180.46",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2334,9 +2268,7 @@
         "rsa.time.day": "4",
         "rsa.time.month": "Jun",
         "service.type": "snort",
-        "source.ip": [
-            "10.237.43.87"
-        ],
+        "source.ip": "10.237.43.87",
         "tags": [
             "forwarded",
             "snort.log"
@@ -2344,9 +2276,7 @@
     },
     {
         "destination.geo.country_name": "quovol",
-        "destination.ip": [
-            "10.180.28.156"
-        ],
+        "destination.ip": "10.180.28.156",
         "destination.port": 4665,
         "event.code": "5315",
         "event.dataset": "snort.log",
@@ -2389,9 +2319,7 @@
         "rsa.time.month": "Jun",
         "service.type": "snort",
         "source.geo.country_name": "eos",
-        "source.ip": [
-            "10.234.234.205"
-        ],
+        "source.ip": "10.234.234.205",
         "source.port": 5714,
         "tags": [
             "forwarded",
@@ -2430,9 +2358,7 @@
     },
     {
         "destination.bytes": 4280,
-        "destination.ip": [
-            "10.166.10.187"
-        ],
+        "destination.ip": "10.166.10.187",
         "destination.port": 793,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -2476,9 +2402,7 @@
         "rule.name": "iconseq",
         "service.type": "snort",
         "source.bytes": 1259,
-        "source.ip": [
-            "10.40.250.209"
-        ],
+        "source.ip": "10.40.250.209",
         "source.port": 3941,
         "tags": [
             "forwarded",
@@ -2519,9 +2443,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.78.180.219"
-        ],
+        "destination.ip": "10.78.180.219",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2550,9 +2472,7 @@
         "rsa.time.day": "15",
         "rsa.time.month": "Aug",
         "service.type": "snort",
-        "source.ip": [
-            "10.198.202.72"
-        ],
+        "source.ip": "10.198.202.72",
         "tags": [
             "forwarded",
             "snort.log"
@@ -2560,9 +2480,7 @@
     },
     {
         "destination.geo.country_name": "maccusan",
-        "destination.ip": [
-            "10.232.67.182"
-        ],
+        "destination.ip": "10.232.67.182",
         "destination.port": 2086,
         "event.code": "26152",
         "event.dataset": "snort.log",
@@ -2606,18 +2524,14 @@
         "rsa.time.event_time_str": "Aug 29 14:59:40 2018 UTC",
         "rsa.time.month": "Aug",
         "service.type": "snort",
-        "source.ip": [
-            "10.147.155.100"
-        ],
+        "source.ip": "10.147.155.100",
         "tags": [
             "forwarded",
             "snort.log"
         ]
     },
     {
-        "destination.ip": [
-            "10.95.152.78"
-        ],
+        "destination.ip": "10.95.152.78",
         "destination.port": 1267,
         "event.code": "9193",
         "event.dataset": "snort.log",
@@ -2659,9 +2573,7 @@
         "rsa.time.event_time_str": "Sep 12 22:02:15 2018 UTC",
         "rsa.time.month": "Sep",
         "service.type": "snort",
-        "source.ip": [
-            "10.4.147.70"
-        ],
+        "source.ip": "10.4.147.70",
         "source.port": 3210,
         "tags": [
             "forwarded",
@@ -2772,9 +2684,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.216.14.36"
-        ],
+        "destination.ip": "10.216.14.36",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2803,18 +2713,14 @@
         "rsa.time.day": "9",
         "rsa.time.month": "Nov",
         "service.type": "snort",
-        "source.ip": [
-            "10.224.250.83"
-        ],
+        "source.ip": "10.224.250.83",
         "tags": [
             "forwarded",
             "snort.log"
         ]
     },
     {
-        "destination.ip": [
-            "10.231.10.63"
-        ],
+        "destination.ip": "10.231.10.63",
         "event.code": "10329",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -2856,9 +2762,7 @@
         "rsa.time.month": "Nov",
         "service.type": "snort",
         "source.geo.country_name": "ipi",
-        "source.ip": [
-            "10.38.22.60"
-        ],
+        "source.ip": "10.38.22.60",
         "source.port": 653,
         "tags": [
             "forwarded",
@@ -2867,9 +2771,7 @@
     },
     {
         "destination.bytes": 560,
-        "destination.ip": [
-            "10.29.231.11"
-        ],
+        "destination.ip": "10.29.231.11",
         "destination.port": 2231,
         "event.action": "cancel",
         "event.code": "NGIPS_events",
@@ -2913,9 +2815,7 @@
         "rule.name": "tlab",
         "service.type": "snort",
         "source.bytes": 42,
-        "source.ip": [
-            "10.46.57.181"
-        ],
+        "source.ip": "10.46.57.181",
         "source.port": 3760,
         "tags": [
             "forwarded",
@@ -3024,9 +2924,7 @@
     },
     {
         "destination.bytes": 1881,
-        "destination.ip": [
-            "10.135.250.25"
-        ],
+        "destination.ip": "10.135.250.25",
         "destination.port": 1306,
         "event.action": "block",
         "event.code": "NGIPS_events",
@@ -3070,9 +2968,7 @@
         "rule.name": "Secti",
         "service.type": "snort",
         "source.bytes": 4673,
-        "source.ip": [
-            "10.107.144.80"
-        ],
+        "source.ip": "10.107.144.80",
         "source.port": 703,
         "tags": [
             "forwarded",
@@ -3144,9 +3040,7 @@
         "user.name": "iscing"
     },
     {
-        "destination.ip": [
-            "10.5.88.183"
-        ],
+        "destination.ip": "10.5.88.183",
         "destination.port": 7518,
         "event.code": "FTD_events",
         "event.dataset": "snort.log",
@@ -3178,9 +3072,7 @@
         "rsa.time.day": "17",
         "rsa.time.month": "Mar",
         "service.type": "snort",
-        "source.ip": [
-            "10.198.207.31"
-        ],
+        "source.ip": "10.198.207.31",
         "source.port": 579,
         "tags": [
             "forwarded",
@@ -3396,9 +3288,7 @@
     },
     {
         "destination.bytes": 4560,
-        "destination.ip": [
-            "10.186.68.87"
-        ],
+        "destination.ip": "10.186.68.87",
         "destination.port": 2129,
         "event.action": "allow",
         "event.code": "NGIPS_events",
@@ -3442,9 +3332,7 @@
         "rule.name": "itsed",
         "service.type": "snort",
         "source.bytes": 2005,
-        "source.ip": [
-            "10.154.87.98"
-        ],
+        "source.ip": "10.154.87.98",
         "source.port": 2632,
         "tags": [
             "forwarded",
@@ -3453,9 +3341,7 @@
     },
     {
         "destination.bytes": 584,
-        "destination.ip": [
-            "10.67.211.63"
-        ],
+        "destination.ip": "10.67.211.63",
         "destination.port": 7478,
         "event.action": "allow",
         "event.code": "NGIPS_events",
@@ -3499,9 +3385,7 @@
         "rule.name": "dantiu",
         "service.type": "snort",
         "source.bytes": 4338,
-        "source.ip": [
-            "10.35.59.140"
-        ],
+        "source.ip": "10.35.59.140",
         "source.port": 1832,
         "tags": [
             "forwarded",
@@ -3640,9 +3524,7 @@
         "user.name": "uptate"
     },
     {
-        "destination.ip": [
-            "10.179.27.185"
-        ],
+        "destination.ip": "10.179.27.185",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -3671,9 +3553,7 @@
         "rsa.time.day": "19",
         "rsa.time.month": "Sep",
         "service.type": "snort",
-        "source.ip": [
-            "10.14.46.141"
-        ],
+        "source.ip": "10.14.46.141",
         "tags": [
             "forwarded",
             "snort.log"
@@ -3818,9 +3698,7 @@
         "user.name": "ctobea"
     },
     {
-        "destination.ip": [
-            "10.118.103.185"
-        ],
+        "destination.ip": "10.118.103.185",
         "destination.nat.ip": "10.240.77.10",
         "destination.nat.port": 2226,
         "destination.port": 1333,
@@ -3858,9 +3736,7 @@
         "rsa.time.day": "30",
         "rsa.time.month": "Nov",
         "service.type": "snort",
-        "source.ip": [
-            "10.125.130.61"
-        ],
+        "source.ip": "10.125.130.61",
         "source.nat.ip": "10.32.195.34",
         "source.nat.port": 135,
         "source.port": 6154,
@@ -3870,9 +3746,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.111.130.177"
-        ],
+        "destination.ip": "10.111.130.177",
         "event.code": "MALWARE",
         "event.dataset": "snort.log",
         "event.module": "snort",
@@ -3901,9 +3775,7 @@
         "rsa.time.day": "14",
         "rsa.time.month": "Dec",
         "service.type": "snort",
-        "source.ip": [
-            "10.188.88.133"
-        ],
+        "source.ip": "10.188.88.133",
         "tags": [
             "forwarded",
             "snort.log"

@@ -72,7 +72,7 @@ class Test(BaseTest):
 
         entry_list = []
 
-        with open(self.working_dir + "/output/filebeat") as f:
+        with open(self.working_dir + "/output/filebeat-" + self.today + ".ndjson") as f:
             for line in f:
                 content = json.loads(line)
                 v = int(content["message"])

@@ -6,7 +6,7 @@ package httpjson
 
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -21,37 +21,36 @@ type source struct {
 }
 
 func (src source) Name() string {
-	return src.config.URL.String()
+	return src.config.Request.URL.String()
 }
 
-func cursorConfigure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
-	conf := newDefaultConfig()
+func cursorConfigure(cfg *common.Config) ([]inputcursor.Source, inputcursor.Input, error) {
+	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err
 	}
-
 	sources, inp := newCursorInput(conf)
 	return sources, inp, nil
 }
 
-func newCursorInput(config config) ([]cursor.Source, cursor.Input) {
+func newCursorInput(config config) ([]inputcursor.Source, inputcursor.Input) {
 	// we only allow one url per config, if we wanted to allow more than one
 	// each source should hold only one url
-	return []cursor.Source{&source{config: config}}, &cursorInput{}
+	return []inputcursor.Source{&source{config: config}}, &cursorInput{}
 }
 
-func (in *cursorInput) Test(src cursor.Source, _ v2.TestContext) error {
-	return test((src.(*source)).config.URL.URL)
+func (in *cursorInput) Test(src inputcursor.Source, _ v2.TestContext) error {
+	return test((src.(*source)).config.Request.URL.URL)
 }
 
 // Run starts the input and blocks until it ends the execution.
 // It will return on context cancellation, any other error will be retried.
 func (in *cursorInput) Run(
 	ctx v2.Context,
-	src cursor.Source,
-	cursor cursor.Cursor,
-	publisher cursor.Publisher,
+	src inputcursor.Source,
+	cursor inputcursor.Cursor,
+	publisher inputcursor.Publisher,
 ) error {
-	s := src.(*source)
+	s := src.(*source) //nolint:errcheck // Bad linter! A panic is a check.
 	return run(ctx, s.config, publisher, &cursor)
 }

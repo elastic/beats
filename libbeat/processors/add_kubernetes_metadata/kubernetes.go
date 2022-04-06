@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package add_kubernetes_metadata
@@ -125,12 +126,12 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
 	}
 
-	//Load and append default indexer configs
+	// Load and append default indexer configs
 	if config.DefaultIndexers.Enabled {
 		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
 	}
 
-	//Load and append default matcher configs
+	// Load and append default matcher configs
 	if config.DefaultMatchers.Enabled {
 		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
 	}
@@ -140,7 +141,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
 	k.initOnce.Do(func() {
-		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
 				k.log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
@@ -165,21 +166,23 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		k.matchers = matchers
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Host,
+			ConfigHost:  config.Node,
 			Client:      client,
 			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
 		}
-		config.Host, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
-		if err != nil {
-			k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
-			return
+		if config.Scope == "node" {
+			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
+			if err != nil {
+				k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
+				return
+			}
+			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
 		}
-		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
-		watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+		watcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        config.Host,
+			Node:        config.Node,
 			Namespace:   config.Namespace,
 		}, nil)
 		if err != nil {
@@ -188,22 +191,18 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		}
 
 		metaConf := config.AddResourceMetadata
-		if metaConf == nil {
-			metaConf = metadata.GetDefaultResourceMetadataConfig()
-		}
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        config.Host,
+			Node:        config.Node,
+			Namespace:   config.Namespace,
 		}
-		if config.Namespace != "" {
-			options.Namespace = config.Namespace
-		}
-		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+
+		nodeWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, options, nil)
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 		}
-		namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		namespaceWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 		}, nil)
 		if err != nil {
@@ -255,6 +254,9 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 	})
 }
 
+// Run runs the processor that adds a field `kubernetes` to the event fields that
+// contains a map with various Kubernetes metadata.
+// This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if !k.kubernetesAvailable {
 		return event, nil

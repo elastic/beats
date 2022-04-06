@@ -1,7 +1,9 @@
 :modulename: haproxy
 :has-dashboards: true
 
-== haproxy module
+== HAproxy module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 The +{modulename}+ module collects and parses logs from a (`haproxy`) process.
 

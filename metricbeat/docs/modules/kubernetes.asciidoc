@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: kubernetes
+
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 As one of the main pieces provided for Kubernetes monitoring, this module is capable of fetching metrics from several components:
 
@@ -149,7 +155,7 @@ roleRef:
 === Compatibility
 
 The Kubernetes module is tested with the following versions of Kubernetes:
-1.14.x, 1.17.x, 1.18.x, 1.19.x, 1.20.x, 1.21.x
+1.21.x, 1.22.x, 1.23.x
 
 [float]
 === Dashboard
@@ -160,12 +166,23 @@ If you are using HA for those components, be aware that when gathering data from
 
 Dashboards for `controllermanager` `scheduler` and `proxy` are not compatible with kibana versions below `7.2.0`
 
-Cluster selector in `cluster overview` dashboard helps in distinguishing and filtering metrics collected from multiple clusters. If you want to focus on a subset of the Kubernetes clusters for monitoring a specific scenario, this cluster selector could be a handy tool. Note that this selector gets populated from the `orchestrator.cluster.name` field that may not always be available. This field gets its value from sources like `kube_config`, `kubeadm-config` configMap, and Google Cloud's meta API for GKE. If the sources mentioned above don't provide this value, metricbeat will not report it. However, you can always use https://www.elastic.co/guide/en/beats/metricbeat/current/defining-processors.html[processors] to set this field and utilize it in the `cluster overview` dashboard.
+Cluster selector in `cluster overview` dashboard helps in distinguishing and filtering metrics collected from multiple clusters. If you want to focus on a subset of the Kubernetes clusters for monitoring a specific scenario, this cluster selector could be a handy tool. Note that this selector gets populated from the `orchestrator.cluster.name` field that may not always be available. This field gets its value from sources like `kube_config`, `kubeadm-config` configMap, and Google Cloud's meta API for GKE. If the sources mentioned above don't provide this value, metricbeat will not report it. However, you can always use https://www.elastic.co/guide/en/beats/filebeat/current/add-fields.html[add_fields processor] to set `orchestrator.cluster.name` fields and utilize it in the `cluster overview` dashboard:
+[source,yaml]
+----
+processors:
+  - add_fields:
+      target: orchestrator.cluster
+      fields:
+        name: clusterName
+        url: clusterURL
+----
 
 Kubernetes cluster overview example:
 
 image::./images/metricbeat-kubernetes-clusteroverview.png[]
 
+If you are setting collection period to a value bigger than `2m` you will need to increase
+the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 
@@ -212,10 +229,25 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  #   cronjob: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -242,10 +274,49 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Set the namespace to watch for resources
+  #namespace: staging
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  #   cronjob: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
+
+# Kubernetes Events
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - event
+  period: 10s
+  # Skip events older than Metricbeat's statup time is enabled by default.
+  # Setting to false the skip_older setting will stop filtering older events.
+  # This setting is also useful went Event's timestamps are not populated properly.
+  #skip_older: false
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
+  #kube_config: ~/.kube/config
+  # Set the namespace to watch for events
+  #namespace: staging
+  # Set the sync period of the watchers
+  #sync_period: 10m
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # Kubernetes API server
 # (when running metricbeat as a deployment)
@@ -258,8 +329,6 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
-
-
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)

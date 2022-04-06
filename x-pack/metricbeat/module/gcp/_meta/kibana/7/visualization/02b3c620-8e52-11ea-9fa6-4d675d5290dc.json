@@ -39,7 +39,7 @@
                         "fill": "0",
                         "filter": {
                             "language": "kuery",
-                            "query": "gcp.storage.storage.object_count.value : * "
+                            "query": "gcp.storage.storage.object.count : * "
                         },
                         "formatter": "number",
                         "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -47,7 +47,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "gcp.storage.storage.object_count.value",
+                                "field": "gcp.storage.storage.object.count",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }

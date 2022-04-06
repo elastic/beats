@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build cloudfoundry
+//go:build integration && cloudfoundry && !aix
+// +build integration,cloudfoundry,!aix
 
 package cloudfoundry
 

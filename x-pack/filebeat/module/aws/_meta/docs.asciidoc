@@ -7,6 +7,8 @@
 
 == AWS module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for aws logs. It uses filebeat s3 input to get log files from
 AWS S3 buckets with SQS notification or directly polling list of S3 objects in an S3 bucket.
 The use of SQS notification is preferred: polling list of S3 objects is expensive
@@ -43,6 +45,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -53,6 +56,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -60,6 +64,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -70,6 +75,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -77,6 +83,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -87,6 +94,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -94,6 +102,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -104,6 +113,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -111,6 +121,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -121,6 +132,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -128,6 +140,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -138,6 +151,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 ----
@@ -153,7 +167,10 @@ Default to be 300 seconds.
 
 *`var.api_timeout`*::
 
-Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
+call will be interrupted. The default AWS API timeout is `120s`.
+
+The API timeout must be longer than the `sqs.wait_time` value.
 
 *`var.bucket_arn`*::
 
@@ -168,9 +185,17 @@ Use to vertically scale the input.
 
 Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
 
+*`var.bucket_list_prefix`*::
+
+Prefix to apply for the list request to the S3 bucket. Default empty.
+
 *`var.endpoint`*::
 
 Custom endpoint used to access AWS APIs.
+
+*`var.default_region`*::
+
+Default region to query if no other region is set.
 
 *`var.shared_credential_file`*::
 

@@ -6,10 +6,10 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"k8s.io/apimachinery/pkg/util/json"
 )
 
 type reloader struct {

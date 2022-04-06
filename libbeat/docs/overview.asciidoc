@@ -8,10 +8,9 @@ for capturing:
 
 [horizontal]
 Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat]
-Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat]
+Log files and journals:: https://www.elastic.co/products/beats/filebeat[Filebeat]
 Cloud data:: https://www.elastic.co/products/beats/functionbeat[Functionbeat]
 Availability:: https://www.elastic.co/products/beats/heartbeat[Heartbeat]
-Systemd journals:: https://www.elastic.co/downloads/beats/journalbeat[Journalbeat]
 Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat]
 Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat]
 Windows event logs:: https://www.elastic.co/products/beats/winlogbeat[Winlogbeat]

@@ -20,6 +20,7 @@ package winevent
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -80,25 +81,12 @@ func AddPairs(m common.MapStr, key string, pairs []KeyValue) common.MapStr {
 
 // isZero return true if the given value is the zero value for its type.
 func isZero(i interface{}) bool {
-	if i == nil {
+	switch i := i.(type) {
+	case nil:
 		return true
+	case time.Time:
+		return false
+	default:
+		return reflect.ValueOf(i).IsZero()
 	}
-
-	v := reflect.ValueOf(i)
-	switch v.Kind() {
-	case reflect.Array, reflect.String:
-		return v.Len() == 0
-	case reflect.Bool:
-		return !v.Bool()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return v.Int() == 0
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return v.Uint() == 0
-	case reflect.Float32, reflect.Float64:
-		return v.Float() == 0
-	case reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
-		return v.IsNil()
-	}
-
-	return false
 }

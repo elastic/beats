@@ -29,7 +29,7 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD-SHELL", "curl -u myelastic:changeme -f http://localhost:9200/_cat/health?h=status | grep -q green"]
+      test: ["CMD-SHELL", "curl -u kibana_system_user:testing -f http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 1200
       interval: 5s
       start_period: 60s
@@ -50,8 +50,8 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
     healthcheck:
-      test: ["CMD-SHELL", "curl -u myelastic:changeme -f http://localhost:5601/api/status | grep -q 'Looking good'"]
+      test: ["CMD-SHELL", "curl -s -u kibana_system_user:testing -f http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 1200
       interval: 5s
       start_period: 60s
-    command: /usr/local/bin/kibana-docker --xpack.security.enabled=true --elasticsearch.username=myelastic --elasticsearch.password=changeme
+    command: /usr/local/bin/kibana-docker

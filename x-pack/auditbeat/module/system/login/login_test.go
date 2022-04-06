@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package login
@@ -96,7 +97,7 @@ func TestWtmp(t *testing.T) {
 		"Timestamp is not equal: %+v", events[0].Timestamp)
 
 	// Append logout event to wtmp file and check that it's read
-	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0644)
+	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		t.Fatalf("error opening %v: %v", wtmpFilepath, err)
 	}
@@ -263,7 +264,6 @@ func checkFieldValue(t *testing.T, mapstr common.MapStr, fieldName string, field
 		default:
 			assert.Equal(t, fieldValue, v)
 		}
-
 	}
 }
 

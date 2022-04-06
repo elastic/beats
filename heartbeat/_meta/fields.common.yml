@@ -92,6 +92,13 @@
           type: integer
           description: >
             The number of endpoints that failed
+- key: service
+  title: "APM Service"
+  description:
+  fields:
+    - name: name
+      type: keyword
+      description: APM service name this monitor is linked to
 
 - key: resolve
   title: "Host lookup"
@@ -154,6 +161,9 @@
           fields:
             - name: name
               type: text
+              multi_fields:
+                - name: keyword
+                  type: keyword
             - name: index
               type: integer
             - name: status
@@ -201,69 +211,76 @@
                 - name: hash
                   type: keyword
                   description: Hash that uniquely identifies this image by content. Corresponds to block document id.
-        - name: browser
+
+- key: browser
+  title: "Synthetics browser metrics"
+  description:
+  fields:
+    - name: browser
+      type: group
+      description: Browser metrics and traces
+      fields:
+        - name: experience
           type: group
+          description: >
+            Absolute values of all user experience metrics in the browser
+            relative to the navigation start event in microseconds
           fields:
-            - name: experience
+            - name: fcp
               type: group
-              description: >
-                Absolute values of all user experience metrics in the browser
-                relative to the navigation start event in microseconds
+              description: duration of First contentful paint metric
               fields:
-                - name: fcp
-                  type: group
-                  description: duration of First contentful paint metric
-                  fields:
-                    - name: us
-                      type: integer
-                - name: lcp
-                  type: group
-                  description: duration of Largest contentful paint metric
-                  fields:
-                    - name: us
-                      type: integer
-                - name: dcl
-                  type: group
-                  description: duration of Document content loaded end event
-                  fields:
-                    - name: us
-                      type: integer
-                - name: load
-                  type: group
-                  description: duration of Load end event
-                  fields:
-                    - name: duration
-                      type: integer
-                - name: cls
+                - name: us
                   type: integer
-                  description: culumative layout shift score across all frames
-            - name: relative_trace
+            - name: lcp
               type: group
-              description: >
-                trace event with timing information that are realtive to
-                journey timings in microseconds
+              description: duration of Largest contentful paint metric
               fields:
-                - name: name
-                  type: keyword
-                  description: name of the trace event
-                - name: type
-                  type: text
-                  description: could be one of mark or measure event types
-                - name: start
-                  type: group
-                  description: monotonically increasing trace start time in microseconds
-                  fields:
-                    - name: us
-                      type: long
+                - name: us
+                  type: integer
+            - name: dcl
+              type: group
+              description: duration of Document content loaded end event
+              fields:
+                - name: us
+                  type: integer
+            - name: load
+              type: group
+              description: duration of Load end event
+              fields:
                 - name: duration
-                  type: group
-                  description: duration of the trace event in microseconds.
-                  fields:
-                    - name: us
-                      type: integer
-                - name: score
                   type: integer
-                  description: weighted score of the layout shift event
+            - name: cls
+              type: integer
+              description: culumative layout shift score across all frames
+
+        - name: relative_trace
+          type: group
+          description: >
+            trace event with timing information that are realtive to
+            journey timings in microseconds
+          fields:
+            - name: name
+              type: keyword
+              description: name of the trace event
+            - name: type
+              type: text
+              description: could be one of mark or measure event types
+            - name: start
+              type: group
+              description: monotonically increasing trace start time in microseconds
+              fields:
+                - name: us
+                  type: long
+            - name: duration
+              type: group
+              description: duration of the trace event in microseconds.
+              fields:
+                - name: us
+                  type: integer
+            - name: score
+              type: integer
+              description: weighted score of the layout shift event
 
 - key: http
   title: "HTTP monitor"
@@ -475,7 +492,6 @@
               ignore_above: 1024
               description: Version of x509 format.
               example: 3
-              default_field: false
 
 - key: icmp
   title: "ICMP"

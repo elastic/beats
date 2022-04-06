@@ -486,11 +486,11 @@ class Test(BaseTest):
 
         # Output file was rotated
         self.wait_until(
-            lambda: self.output_has(lines=1, output_file="output/filebeat.1"),
+            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + ".ndjson"),
             max_timeout=10)
 
         self.wait_until(
-            lambda: self.output_has(lines=1),
+            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -505,7 +505,7 @@ class Test(BaseTest):
         # should never have been detected
         assert len(data) == 1
 
-        output = self.read_output()
+        output = self.read_output(output_file="output/filebeat-" + self.today + "-1.ndjson")
 
         # Check that output file has the same number of lines as the log file
         assert len(output) == 1
@@ -592,15 +592,15 @@ class Test(BaseTest):
         with open(testfile_path, 'w') as testfile:
             testfile.write("entry3\n")
 
-        filebeat = self.start_beat(output="filebeat2.log")
+        filebeat = self.start_beat()
 
         # Output file was rotated
         self.wait_until(
-            lambda: self.output_has(lines=2, output_file="output/filebeat.1"),
+            lambda: self.output_has(lines=2),
             max_timeout=10)
 
         self.wait_until(
-            lambda: self.output_has(lines=1),
+            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -951,8 +951,8 @@ class Test(BaseTest):
             clean_inactive="3s",
         )
 
-        filebeat = self.start_beat(output="filebeat2.log")
-        logs = self.log_access("filebeat2.log")
+        filebeat = self.start_beat()
+        logs = self.log_access()
 
         # Write additional file
         for name in restart_files:
@@ -1346,20 +1346,14 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            type='docker',
+            type='container',
             input_raw='''
-  containers:
-    path: {path}
-    stream: stdout
-    ids:
-      - container_id
-- type: docker
-  containers:
-    path: {path}
-    stream: stderr
-    ids:
-      - container_id
-            '''.format(path=os.path.abspath(self.working_dir) + "/log/")
+  paths: {path}
+  stream: stdout
+- type: container
+  paths: {path}
+  stream: stderr
+'''.format(path=os.path.abspath(self.working_dir) + "/log/*/*.log")
         )
         os.mkdir(self.working_dir + "/log/")
         os.mkdir(self.working_dir + "/log/container_id")

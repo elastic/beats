@@ -89,12 +89,10 @@
             "container": {
                 "cpu": {
                     "limit": {
-                        "cores": 0.2,
-                        "nanocores": 200000000
+                        "cores": 0.2
                     },
                     "request": {
-                        "cores": 0.1,
-                        "nanocores": 100000000
+                        "cores": 0.1
                     }
                 },
                 "memory": {
@@ -138,12 +136,10 @@
             "container": {
                 "cpu": {
                     "limit": {
-                        "cores": 0.2,
-                        "nanocores": 200000000
+                        "cores": 0.2
                     },
                     "request": {
-                        "cores": 0.1,
-                        "nanocores": 100000000
+                        "cores": 0.1
                     }
                 },
                 "id": "docker://973cbe45982c5126a5caf8c58d964c0ab1d5bb2c165ccc59715fcc1ebd58ab3d",
@@ -196,8 +192,7 @@
             "container": {
                 "cpu": {
                     "request": {
-                        "cores": 0.2,
-                        "nanocores": 200000000
+                        "cores": 0.2
                     }
                 },
                 "id": "docker://e2ee1c2c7b8d4e5fd8c834b83cba8377d6b0e39da18157688ccc1a06b7c53117",
@@ -247,8 +242,7 @@
             "container": {
                 "cpu": {
                     "request": {
-                        "cores": 0.1,
-                        "nanocores": 100000000
+                        "cores": 0.1
                     }
                 },
                 "id": "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62",
@@ -301,8 +295,7 @@
             "container": {
                 "cpu": {
                     "request": {
-                        "cores": 0.1,
-                        "nanocores": 100000000
+                        "cores": 0.1
                     }
                 },
                 "id": "docker://4fa227874ee68536bf902394fb662f07b99099798ca9cd5c1506b79075acc065",
@@ -352,8 +345,7 @@
             "container": {
                 "cpu": {
                     "request": {
-                        "cores": 0.2,
-                        "nanocores": 200000000
+                        "cores": 0.2
                     }
                 },
                 "id": "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
@@ -406,8 +398,7 @@
             "container": {
                 "cpu": {
                     "request": {
-                        "cores": 0.005,
-                        "nanocores": 5000000
+                        "cores": 0.005
                     }
                 },
                 "id": "docker://91fdd43f6b1b4c3dd133cfca53e0b1210bc557c2ae56006026b5ccdb5f52826f",
@@ -457,8 +448,7 @@
             "container": {
                 "cpu": {
                     "request": {
-                        "cores": 0.01,
-                        "nanocores": 10000000
+                        "cores": 0.01
                     }
                 },
                 "id": "docker://52fa55e051dc5b68e44c027588685b7edd85aaa03b07f7216d399249ff4fc821",

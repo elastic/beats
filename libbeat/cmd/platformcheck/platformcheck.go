@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || windows
 // +build linux windows
 
 package platformcheck
@@ -24,7 +25,7 @@ import (
 	"math/bits"
 	"strings"
 
-	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 func CheckNativePlatformCompat() error {

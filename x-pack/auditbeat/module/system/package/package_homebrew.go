@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !windows
 // +build !windows
 
 package pkg
@@ -9,12 +10,11 @@ package pkg
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // InstallReceiptSource represents the "source" object in Homebrew's INSTALL_RECEIPT.json.
@@ -41,7 +41,7 @@ func listBrewPackages() ([]*Package, error) {
 		pkgPath := path.Join(homebrewCellarPath, packageDir.Name())
 		versions, err := ioutil.ReadDir(pkgPath)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error reading directory: %s", pkgPath)
+			return nil, fmt.Errorf("error reading directory: %s: %w", pkgPath, err)
 		}
 
 		for _, version := range versions {
@@ -60,12 +60,12 @@ func listBrewPackages() ([]*Package, error) {
 			installReceiptPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, "INSTALL_RECEIPT.json")
 			contents, err := ioutil.ReadFile(installReceiptPath)
 			if err != nil {
-				pkg.error = errors.Wrapf(err, "error reading %v", installReceiptPath)
+				pkg.error = fmt.Errorf("error reading %v: %w", installReceiptPath, err)
 			} else {
 				var installReceipt InstallReceipt
 				err = json.Unmarshal(contents, &installReceipt)
 				if err != nil {
-					pkg.error = errors.Wrapf(err, "error unmarshalling JSON in %v", installReceiptPath)
+					pkg.error = fmt.Errorf("error unmarshalling JSON in %v: %w", installReceiptPath, err)
 				} else {
 					formulaPath = installReceipt.Source.Path
 				}
@@ -78,7 +78,7 @@ func listBrewPackages() ([]*Package, error) {
 
 			file, err := os.Open(formulaPath)
 			if err != nil {
-				pkg.error = errors.Wrapf(err, "error reading %v", formulaPath)
+				pkg.error = fmt.Errorf("error reading %v: %w", formulaPath, err)
 			} else {
 				defer file.Close()
 
@@ -97,7 +97,7 @@ func listBrewPackages() ([]*Package, error) {
 					}
 				}
 				if err = scanner.Err(); err != nil {
-					pkg.error = errors.Wrapf(err, "error parsing %v", formulaPath)
+					pkg.error = fmt.Errorf("error parsing %v: %w", formulaPath, err)
 				}
 			}
 

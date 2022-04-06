@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !windows
 // +build !windows
 
 package filestream
@@ -111,7 +112,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 			}
 			files := fs.GetFiles()
 			paths := make([]string, 0)
-			for p, _ := range files {
+			for p := range files {
 				paths = append(paths, p)
 			}
 			assert.ElementsMatch(t, test.expectedFiles, paths)

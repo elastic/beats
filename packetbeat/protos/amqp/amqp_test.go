@@ -96,7 +96,7 @@ func TestAmqp_FrameSize(t *testing.T) {
 
 	_, amqp := amqpModForTests()
 
-	//incomplete frame
+	// incomplete frame
 	data, err := hex.DecodeString("0100000000000c000a001fffff000200")
 	assert.NoError(t, err)
 
@@ -118,7 +118,7 @@ func TestAmqp_PartialFrameSize(t *testing.T) {
 
 	_, amqp := amqpModForTests()
 
-	//incomplete frame
+	// incomplete frame
 	data, err := hex.DecodeString("414d515000060606010000000000")
 	assert.NoError(t, err)
 
@@ -275,7 +275,7 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 	assert.Equal(t, false, m.fields["no-wait"])
 }
 
-//this method is exclusive to RabbitMQ
+// this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeBind(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -308,7 +308,7 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 	}
 }
 
-//this method is exclusive to RabbitMQ
+// this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -365,13 +365,13 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
-	//method frame
+	// method frame
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	//header frame
+	// header frame
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data3}
-	//body frame
+	// body frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
@@ -414,13 +414,13 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
-	//method frame
+	// method frame
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
-	//header frame
+	// header frame
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data3}
-	//body frame
+	// body frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
@@ -467,7 +467,7 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 	assert.Equal(t, "el mensaje", m.fields["message-id"])
 	assert.Equal(t, "love message", m.fields["type"])
 	assert.Equal(t, "text/plain", m.fields["content-type"])
-	//assert.Equal(t, "September 15 15:31:44 2015", m.Fields["timestamp"])
+	// assert.Equal(t, "September 15 15:31:44 2015", m.Fields["timestamp"])
 	priority, ok := m.fields["priority"].(uint8)
 	if !ok {
 		t.Errorf("Field should be present")
@@ -576,7 +576,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
-	//method frame
+	// method frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
@@ -668,8 +668,8 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
 
-	//method frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	// method frame
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
 
@@ -699,7 +699,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
 
-	//method frame
+	// method frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans = expectTransaction(t, results)
@@ -728,7 +728,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	amqp.parseHeaders = false
 	amqp.parseArguments = false
 
-	//parse args
+	// parse args
 	data, err := hex.DecodeString("0100010000004d0032000a00000a5465737448656164" +
 		"6572180000003704626f6f6c74010362697462050568656c6c6f530000001f4869206461" +
 		"726c696e6720c3aac3aac3aac3aac3aac3aac3aae697a5e69cacce")
@@ -736,7 +736,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
 	assert.Equal(t, "queue.declare", trans["method"])
@@ -753,7 +753,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 		t.Errorf("Arguments field should not be present")
 	}
 
-	//parse headers
+	// parse headers
 	data, err = hex.DecodeString("01000100000013003c00280000000a546573744865616" +
 		"4657200ce02000100000026003c0000000000000000001a98800a746578742f706c61696" +
 		"e02060a656c206d656e73616a65ce0300010000001a54657374206865616465722066696" +
@@ -808,7 +808,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	assert.Equal(t, common.MapStr{"requeue": true}, trans["amqp"])
 }
 
-//this is a specific rabbitMQ method
+// this is a specific rabbitMQ method
 func TestAmqp_BasicNack(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -887,7 +887,7 @@ func TestAmqp_GetTable(t *testing.T) {
 	assert.Equal(t, true, m.fields["no-wait"])
 	assert.Equal(t, true, m.fields["auto-delete"])
 	assert.Equal(t, false, m.fields["exclusive"])
-	//assert.Equal(t, "September 15 11:25:29 2015", args["timestamp"])
+	// assert.Equal(t, "September 15 11:25:29 2015", args["timestamp"])
 	assert.Equal(t, "TestHeader", m.request)
 }
 
@@ -948,7 +948,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 
 	_, amqp := amqpModForTests()
 
-	//byte array, rabbitMQ specific field
+	// byte array, rabbitMQ specific field
 	data, err := hex.DecodeString("010001000000260028000a0000057465737431057" +
 		"46f706963020000000f05617272617978000000040a007dd2ce")
 	assert.NoError(t, err)
@@ -1025,7 +1025,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 
 	_, amqp := amqpModForTests()
 
-	//declared table size too big
+	// declared table size too big
 	data, err := hex.DecodeString("010001000000890032000a00000a54657374486561646" +
 		"57218000000da0974696d657374616d70540000000055f7e409036269746205076465636" +
 		"96d616c440500ec49050568656c6c6f530000001f4869206461726c696e6720c3aac3aac" +
@@ -1048,7 +1048,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 	}
 	assert.Equal(t, []string{"Failed to parse additional arguments"}, m.notes)
 
-	//table size ok, but total non-sense inside
+	// table size ok, but total non-sense inside
 	data, err = hex.DecodeString("010001000000890032000a00000a54657374486561646" +
 		"57218000000730974696d657374616d7054004400005521e409036269743705076400036" +
 		"96d616c447600ec49180568036c6c0b536400001f480a2064076e6c696e0520c3aac3aac" +

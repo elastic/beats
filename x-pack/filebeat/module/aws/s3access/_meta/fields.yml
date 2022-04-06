@@ -1,7 +1,6 @@
 - name: s3access
   type: group
   release: ga
-  default_field: false
   description: >
     Fields for AWS S3 server access logs.
   fields:

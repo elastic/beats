@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build aws
+//go:build integration && aws
+// +build integration,aws
 
 package ec2
 
@@ -18,7 +18,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/24201")
 	config := mtest.GetConfigForTest(t, "ec2", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)

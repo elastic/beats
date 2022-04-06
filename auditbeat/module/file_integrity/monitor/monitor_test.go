@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package monitor
@@ -58,7 +59,7 @@ func TestNonRecursive(t *testing.T) {
 	testDirOps(t, dir, watcher)
 
 	subdir := filepath.Join(dir, "subdir")
-	os.Mkdir(subdir, 0750)
+	os.Mkdir(subdir, 0o750)
 
 	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)
@@ -67,7 +68,7 @@ func TestNonRecursive(t *testing.T) {
 
 	// subdirs are not watched
 	subfile := filepath.Join(subdir, "file.dat")
-	assertNoError(t, ioutil.WriteFile(subfile, []byte("foo"), 0640))
+	assertNoError(t, ioutil.WriteFile(subfile, []byte("foo"), 0o640))
 
 	_, err = readTimeout(t, watcher)
 	assert.Error(t, err)
@@ -106,7 +107,7 @@ func TestRecursive(t *testing.T) {
 	testDirOps(t, dir, watcher)
 
 	subdir := filepath.Join(dir, "subdir")
-	os.Mkdir(subdir, 0750)
+	os.Mkdir(subdir, 0o750)
 
 	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)
@@ -160,7 +161,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 	// Create a file in the other dir
 
 	file := filepath.Join(linkedDir, "not.seen")
-	assertNoError(t, ioutil.WriteFile(file, []byte("hello"), 0640))
+	assertNoError(t, ioutil.WriteFile(file, []byte("hello"), 0o640))
 
 	// No event is received
 	ev, err := readTimeout(t, watcher)
@@ -202,8 +203,8 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	for _, name := range []string{"a", "b", "c"} {
 		path := filepath.Join(outDir, name)
-		assertNoError(t, os.Mkdir(path, 0755))
-		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0644))
+		assertNoError(t, os.Mkdir(path, 0o755))
+		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0o644))
 	}
 
 	// Make a subdir not accessible
@@ -298,8 +299,8 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 
 	for _, name := range []string{"a", "b", "c"} {
 		path := filepath.Join(outDir, name)
-		assertNoError(t, os.Mkdir(path, 0755))
-		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0644))
+		assertNoError(t, os.Mkdir(path, 0o755))
+		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0o644))
 	}
 
 	// excludes file/dir named "b"
@@ -370,7 +371,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	fpath2 := filepath.Join(dir, "file2.txt")
 
 	// Create
-	assertNoError(t, ioutil.WriteFile(fpath, []byte("hello"), 0640))
+	assertNoError(t, ioutil.WriteFile(fpath, []byte("hello"), 0o640))
 
 	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)
@@ -381,7 +382,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	// Repeat the write if no event is received. Under macOS often
 	// the write fails to generate a write event for non-recursive watcher
 	for i := 0; i < 3; i++ {
-		f, err := os.OpenFile(fpath, os.O_RDWR|os.O_APPEND, 0640)
+		f, err := os.OpenFile(fpath, os.O_RDWR|os.O_APPEND, 0o640)
 		assertNoError(t, err)
 		f.WriteString(" world\n")
 		f.Sync()

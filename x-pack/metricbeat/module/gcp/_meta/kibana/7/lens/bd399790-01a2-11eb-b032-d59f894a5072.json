@@ -18,7 +18,7 @@
                                     "label": "Topic Send Request Count",
                                     "operationType": "average",
                                     "scale": "ratio",
-                                    "sourceField": "gcp.pubsub.topic.send_request_count.value"
+                                    "sourceField": "gcp.pubsub.topic.send_request.count"
                                 },
                                 "4f8dae5f-b49c-4a10-8f94-a29039f93919": {
                                     "dataType": "string",

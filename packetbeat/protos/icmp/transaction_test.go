@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package icmp
@@ -22,7 +23,7 @@ package icmp
 import (
 	"testing"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 
 	"github.com/stretchr/testify/assert"
 )

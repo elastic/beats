@@ -7,7 +7,7 @@
 
 Libbeat uses the Elastic APM Go Agent to instrument its publishing pipeline.
 Currently, only the Elasticsearch output is instrumented.
-To gain insight into the performance of {beatname_uc}, you can enable this instrumentation and send trace data to APM Server.
+To gain insight into the performance of {beatname_uc}, you can enable this instrumentation and send trace data to the APM Integration.
 
 Example configuration with instrumentation enabled:
 
@@ -41,19 +41,19 @@ Environments can be filtered in the {kibana-ref}/xpack-apm.html[APM app].
 [float]
 ==== `hosts`
 
-The {apm-server-ref-v}/getting-started-apm-server.html[APM Server] hosts to report instrumentation data to.
+The APM integration {apm-guide-ref}/input-apm.html[host] to report instrumentation data to.
 Defaults to `http://localhost:8200`.
 
 [float]
 ==== `api_key`
 
-{apm-server-ref-v}/api-key.html[API key] used to secure communication with the APM Server(s).
+The {apm-guide-ref}/input-apm.html[API Key] used to secure communication with the APM Integration.
 If `api_key` is set then `secret_token` will be ignored.
 
 [float]
 ==== `secret_token`
 
-{apm-server-ref-v}/secret-token.html[Secret token] used to secure communication with the APM Server(s).
+The {apm-guide-ref}/input-apm.html[Secret token] used to secure communication with the APM Integration.
 
 [float]
 ==== `profiling.cpu.enabled`

@@ -2,11 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -21,13 +23,11 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
@@ -117,7 +117,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 		Tags:       []string{rootImageName},
 		Dockerfile: dockerfile,
 	}
-	//build, wait for output
+	// build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
 	if err != nil {
 		return errors.Wrap(err, "error building final container image")
@@ -167,7 +167,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// create the container that will become our rootfs
-		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, "")
+		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, nil, "")
 		if err != nil {
 			return errors.Wrap(err, "error creating container")
 		}
@@ -200,7 +200,7 @@ func BuildContainer(ctx context.Context) error {
 			return errors.Wrap(err, "error writing exported container")
 		}
 
-		//misc prepare operations
+		// misc prepare operations
 
 		err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
 		if err != nil {
@@ -239,7 +239,7 @@ func Uninstall(ctx context.Context) error {
 		return errors.Wrap(err, "error creating docker client")
 	}
 
-	//check to see if we have a plugin we need to remove
+	// check to see if we have a plugin we need to remove
 	plugins, err := cli.PluginList(ctx, filters.Args{})
 	if err != nil {
 		return errors.Wrap(err, "error getting list of plugins")
@@ -285,11 +285,7 @@ func Install(ctx context.Context) error {
 		return errors.Wrap(err, "error creating docker client")
 	}
 
-	archiveOpts := &archive.TarOptions{
-		Compression:  archive.Uncompressed,
-		IncludeFiles: []string{"rootfs", "config.json"},
-	}
-	archive, err := archive.TarWithOptions(buildDir, archiveOpts)
+	archive, err := tar(buildDir, "rootfs", "config.json")
 	if err != nil {
 		return errors.Wrap(err, "error creating archive of work dir")
 	}
@@ -305,6 +301,18 @@ func Install(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func tar(dir string, files ...string) (io.Reader, error) {
+	var archive bytes.Buffer
+	var stdErr bytes.Buffer
+	args := append([]string{"-C", dir, "-cf", "-"}, files...)
+	_, err := sh.Exec(nil, &archive, &stdErr, "tar", args...)
+	if err != nil {
+		return nil, errors.Wrap(err, stdErr.String())
+	}
+
+	return &archive, nil
 }
 
 // Export exports a "ready" root filesystem and config.json into a tarball
@@ -335,6 +343,7 @@ func Export() error {
 		if err != nil {
 			return errors.Wrap(err, "error creating release tarball")
 		}
+		return errors.Wrap(devtools.CreateSHA512File(outpath), "failed to create .sha512 file")
 	}
 
 	return nil
@@ -350,7 +359,7 @@ func Build() {
 	mg.SerialDeps(CrossBuild, BuildContainer)
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild build the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	buildArgs := devtools.DefaultBuildArgs()

@@ -5,8 +5,10 @@
 package aws
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/url"
+	"strings"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
@@ -15,33 +17,60 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
+// These services follow the standard <service name>-fips.<region>.amazonaws.com format.
+var OptionalGovCloudFIPS = map[string]bool{
+	"s3": true,
+}
+
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID          string   `config:"access_key_id"`
-	SecretAccessKey      string   `config:"secret_access_key"`
-	SessionToken         string   `config:"session_token"`
-	ProfileName          string   `config:"credential_profile_name"`
-	SharedCredentialFile string   `config:"shared_credential_file"`
-	Endpoint             string   `config:"endpoint"`
-	RoleArn              string   `config:"role_arn"`
-	AWSPartition         string   `config:"aws_partition"` // Deprecated.
-	ProxyUrl             *url.URL `config:"proxy_url"`
+	AccessKeyID          string            `config:"access_key_id"`
+	SecretAccessKey      string            `config:"secret_access_key"`
+	SessionToken         string            `config:"session_token"`
+	ProfileName          string            `config:"credential_profile_name"`
+	SharedCredentialFile string            `config:"shared_credential_file"`
+	Endpoint             string            `config:"endpoint"`
+	RoleArn              string            `config:"role_arn"`
+	ProxyUrl             string            `config:"proxy_url"`
+	FIPSEnabled          bool              `config:"fips_enabled"`
+	TLS                  *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
+	DefaultRegion        string            `config:"default_region"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
-	if config.ProxyUrl != nil {
-		httpClient := &http.Client{
-			Transport: &http.Transport{
-				Proxy: http.ProxyURL(config.ProxyUrl),
-			},
+	if AWSConfig.Region == "" {
+		if config.DefaultRegion != "" {
+			AWSConfig.Region = config.DefaultRegion
+		} else {
+			AWSConfig.Region = "us-east-1"
 		}
-		AWSConfig.HTTPClient = httpClient
+	}
+	var proxy func(*http.Request) (*url.URL, error)
+	if config.ProxyUrl != "" {
+		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
+		if err != nil {
+			return AWSConfig, err
+		}
+		proxy = http.ProxyURL(proxyUrl.URI())
+	}
+	var tlsConfig *tls.Config
+	if config.TLS != nil {
+		TLSConfig, _ := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig = TLSConfig.ToConfig()
+	}
+	AWSConfig.HTTPClient = &http.Client{
+		Transport: &http.Transport{
+			Proxy:           proxy,
+			TLSClientConfig: tlsConfig,
+		},
 	}
 	return AWSConfig, nil
 }
@@ -74,11 +103,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 
 	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
 		Value: awsCredentials,
-	}
-
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
 	}
 
 	// Assume IAM role if iam_role config parameter is given
@@ -114,11 +138,6 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
-	}
-
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
 		logger.Debug("Using role arn and shared credential profile for AWS credential")
@@ -139,20 +158,30 @@ func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
 // service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
+	var eurl string
 	if endpoint != "" {
-		if regionName == "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		parsedEndpoint, _ := url.Parse(endpoint)
+		if parsedEndpoint.Scheme != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(endpoint)
 		} else {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			if regionName == "" {
+				eurl = "https://" + serviceName + "." + endpoint
+			} else {
+				eurl = "https://" + serviceName + "." + regionName + "." + endpoint
+			}
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(eurl)
 		}
 	}
 	return awsConfig
 }
 
-// Validate checks for deprecated config option
-func (c ConfigAWS) Validate() error {
-	if c.AWSPartition != "" {
-		cfgwarn.Deprecate("8.0.0", "aws_partition is deprecated. Please use endpoint instead.")
+//Create AWS service name based on Region and FIPS
+func CreateServiceName(serviceName string, fipsEnabled bool, region string) string {
+	if fipsEnabled {
+		_, found := OptionalGovCloudFIPS[serviceName]
+		if !strings.HasPrefix(region, "us-gov-") || found {
+			return serviceName + "-fips"
+		}
 	}
-	return nil
+	return serviceName
 }

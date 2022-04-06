@@ -7,6 +7,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:09.99 Server      Microsoft SQL Server 2017 (RTM-CU13) (KB4466404) - 14.0.3048.4 (X64)\n\tNov 30 2018 12:57:58\n\tCopyright (C) 2017 Microsoft Corporation\n\tDeveloper Edition (64-bit) on Linux (Ubuntu 16.04.5 LTS)",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -17,7 +18,6 @@
             "multiline"
         ],
         "log.offset": 0,
-        "log.original": "2019-05-03 09:01:09.99 Server      Microsoft SQL Server 2017 (RTM-CU13) (KB4466404) - 14.0.3048.4 (X64)\n\tNov 30 2018 12:57:58\n\tCopyright (C) 2017 Microsoft Corporation\n\tDeveloper Edition (64-bit) on Linux (Ubuntu 16.04.5 LTS)",
         "message": "Microsoft SQL Server 2017 (RTM-CU13) (KB4466404) - 14.0.3048.4 (X64)",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -30,6 +30,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:09.99 Server      UTC adjustment: 0:00",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -37,7 +38,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 226,
-        "log.original": "2019-05-03 09:01:09.99 Server      UTC adjustment: 0:00",
         "message": "UTC adjustment: 0:00",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -50,6 +50,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:09.99 Server      (c) Microsoft Corporation.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -57,7 +58,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 282,
-        "log.original": "2019-05-03 09:01:09.99 Server      (c) Microsoft Corporation.",
         "message": "(c) Microsoft Corporation.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -70,6 +70,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:09.99 Server      All rights reserved.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -77,7 +78,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 344,
-        "log.original": "2019-05-03 09:01:09.99 Server      All rights reserved.",
         "message": "All rights reserved.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -90,6 +90,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      Server process ID is 4124.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -97,7 +98,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 400,
-        "log.original": "2019-05-03 09:01:10.00 Server      Server process ID is 4124.",
         "message": "Server process ID is 4124.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -110,6 +110,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      Logging SQL Server messages in file '/var/opt/mssql/log/errorlog'.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -117,7 +118,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 462,
-        "log.original": "2019-05-03 09:01:10.00 Server      Logging SQL Server messages in file '/var/opt/mssql/log/errorlog'.",
         "message": "Logging SQL Server messages in file '/var/opt/mssql/log/errorlog'.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -130,6 +130,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      Registry startup parameters:\n\t -d /var/opt/mssql/data/master.mdf\n\t -l /var/opt/mssql/data/mastlog.ldf\n\t -e /var/opt/mssql/log/errorlog",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -140,7 +141,6 @@
             "multiline"
         ],
         "log.offset": 564,
-        "log.original": "2019-05-03 09:01:10.00 Server      Registry startup parameters:\n\t -d /var/opt/mssql/data/master.mdf\n\t -l /var/opt/mssql/data/mastlog.ldf\n\t -e /var/opt/mssql/log/errorlog",
         "message": "Registry startup parameters:",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -153,6 +153,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      SQL Server detected 1 sockets with 6 cores per socket and 12 logical processors per socket, 12 total logical processors; using 12 logical processors based on SQL Server licensing. This is an informational message; no user action is required.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -160,7 +161,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 734,
-        "log.original": "2019-05-03 09:01:10.00 Server      SQL Server detected 1 sockets with 6 cores per socket and 12 logical processors per socket, 12 total logical processors; using 12 logical processors based on SQL Server licensing. This is an informational message; no user action is required.",
         "message": "SQL Server detected 1 sockets with 6 cores per socket and 12 logical processors per socket, 12 total logical processors; using 12 logical processors based on SQL Server licensing. This is an informational message; no user action is required.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -173,6 +173,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      SQL Server is starting at normal priority base (=7). This is an informational message only. No user action is required.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -180,7 +181,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1011,
-        "log.original": "2019-05-03 09:01:10.00 Server      SQL Server is starting at normal priority base (=7). This is an informational message only. No user action is required.",
         "message": "SQL Server is starting at normal priority base (=7). This is an informational message only. No user action is required.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -193,6 +193,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      Detected 25445 MB of RAM. This is an informational message; no user action is required.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -200,7 +201,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1166,
-        "log.original": "2019-05-03 09:01:10.00 Server      Detected 25445 MB of RAM. This is an informational message; no user action is required.",
         "message": "Detected 25445 MB of RAM. This is an informational message; no user action is required.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -213,6 +213,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.00 Server      Using conventional memory in the memory manager.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -220,7 +221,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1289,
-        "log.original": "2019-05-03 09:01:10.00 Server      Using conventional memory in the memory manager.",
         "message": "Using conventional memory in the memory manager.",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -233,6 +233,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.01 Server      Large Page Allocated: 32MB",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -240,7 +241,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1373,
-        "log.original": "2019-05-03 09:01:10.01 Server      Large Page Allocated: 32MB",
         "message": "Large Page Allocated: 32MB",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -253,6 +253,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:10.20 Server      Buffer pool extension is already disabled. No action is n",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -260,7 +261,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1435,
-        "log.original": "2019-05-03 09:01:10.20 Server      Buffer pool extension is already disabled. No action is n",
         "message": "Buffer pool extension is already disabled. No action is n",
         "mssql.log.origin": "Server",
         "service.type": "mssql"
@@ -273,6 +273,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:11.93 spid22s     Service Broker manager has started.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -280,7 +281,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1528,
-        "log.original": "2019-05-03 09:01:11.93 spid22s     Service Broker manager has started.",
         "message": "Service Broker manager has started.",
         "mssql.log.origin": "spid22s",
         "service.type": "mssql"
@@ -293,6 +293,7 @@
         "event.dataset": "mssql.log",
         "event.kind": "event",
         "event.module": "mssql",
+        "event.original": "2019-05-03 09:01:12.03 spid6s      Recovery is complete. This is an informational message only. No user action is required.",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -300,7 +301,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1599,
-        "log.original": "2019-05-03 09:01:12.03 spid6s      Recovery is complete. This is an informational message only. No user action is required.",
         "message": "Recovery is complete. This is an informational message only. No user action is required.",
         "mssql.log.origin": "spid6s",
         "service.type": "mssql"

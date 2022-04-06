@@ -6,6 +6,7 @@
   release: experimental
   fields:
     - name: aws.elb
+      default_field: true
       type: group
       description: >
           Represents an AWS ELB Listener, e.g. a port on an ELB.

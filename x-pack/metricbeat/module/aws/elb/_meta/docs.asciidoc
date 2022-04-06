@@ -32,7 +32,6 @@ image::./images/metricbeat-aws-elb-overview.png[]
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   # This module uses the aws cloudwatch metricset, all
   # the options for this metricset are also available here.
 ----

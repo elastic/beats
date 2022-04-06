@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -24,15 +24,19 @@ type config struct {
 	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
 	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
 	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	FIPSEnabled         bool                 `config:"fips_enabled"`
+	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
 	BucketARN           string               `config:"bucket_arn"`
+	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix    string               `config:"bucket_list_prefix"`
 	NumberOfWorkers     int                  `config:"number_of_workers"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	PathStyle           bool                 `config:"path_style"`
+	ProviderOverride    string               `config:"provider"`
 }
 
 func defaultConfig() config {
@@ -40,31 +44,36 @@ func defaultConfig() config {
 		APITimeout:          120 * time.Second,
 		VisibilityTimeout:   300 * time.Second,
 		BucketListInterval:  120 * time.Second,
+		BucketListPrefix:    "",
 		SQSWaitTime:         20 * time.Second,
 		SQSMaxReceiveCount:  5,
-		FIPSEnabled:         false,
 		MaxNumberOfMessages: 5,
+		PathStyle:           false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
 }
 
 func (c *config) Validate() error {
-	if c.QueueURL == "" && c.BucketARN == "" {
-		logp.NewLogger(inputName).Warnf("neither queue_url nor bucket_arn were provided, input %s will stop", inputName)
-		return nil
+	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.NonAWSBucketName != ""}
+	enabled := []bool{}
+	for i := range configs {
+		if configs[i] {
+			enabled = append(enabled, configs[i])
+		}
+	}
+	if len(enabled) == 0 {
+		return errors.New("neither queue_url, bucket_arn nor non_aws_bucket_name were provided")
+	} else if len(enabled) > 1 {
+		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
 	}
 
-	if c.QueueURL != "" && c.BucketARN != "" {
-		return fmt.Errorf("queue_url <%v> and bucket_arn <%v> "+
-			"cannot be set at the same time", c.QueueURL, c.BucketARN)
-	}
-
-	if c.BucketARN != "" && c.BucketListInterval <= 0 {
+	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
 		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
 	}
 
-	if c.BucketARN != "" && c.NumberOfWorkers <= 0 {
+	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
 	}
 
@@ -86,6 +95,16 @@ func (c *config) Validate() error {
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
 		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
 			c.APITimeout, c.SQSWaitTime)
+	}
+
+	if c.AWSConfig.FIPSEnabled && c.NonAWSBucketName != "" {
+		return errors.New("fips_enabled cannot be used with a non-AWS S3 bucket.")
+	}
+	if c.PathStyle && c.NonAWSBucketName == "" {
+		return errors.New("path_style can only be used when polling non-AWS S3 services")
+	}
+	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
+		return errors.New("provider can only be overriden when polling non-AWS S3 services")
 	}
 
 	return nil
@@ -126,6 +145,36 @@ func (rc *readerConfig) Validate() error {
 	_, found := encoding.FindEncoding(rc.Encoding)
 	if !found {
 		return fmt.Errorf("encoding type <%v> not found", rc.Encoding)
+	}
+
+	return nil
+}
+
+type scriptConfig struct {
+	Source            string                 `config:"source"`                               // Inline script to execute.
+	File              string                 `config:"file"`                                 // Source file.
+	Files             []string               `config:"files"`                                // Multiple source files.
+	Params            map[string]interface{} `config:"params"`                               // Parameters to pass to script.
+	Timeout           time.Duration          `config:"timeout" validate:"min=0"`             // Execution timeout.
+	MaxCachedSessions int                    `config:"max_cached_sessions" validate:"min=0"` // Max. number of cached VM sessions.
+}
+
+// Validate returns an error if one (and only one) option is not set.
+func (c scriptConfig) Validate() error {
+	numConfigured := 0
+	for _, set := range []bool{c.Source != "", c.File != "", len(c.Files) > 0} {
+		if set {
+			numConfigured++
+		}
+	}
+
+	switch {
+	case numConfigured == 0:
+		return errors.New("javascript must be defined via 'file', " +
+			"'files', or inline as 'source'")
+	case numConfigured > 1:
+		return errors.New("javascript can be defined in only one of " +
+			"'file', 'files', or inline as 'source'")
 	}
 
 	return nil

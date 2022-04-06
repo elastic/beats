@@ -1,19 +1,16 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "redis.info",
         "duration": 115000,
         "module": "redis"
     },
     "metricset": {
-        "name": "info"
+        "name": "info",
+        "period": 10000
     },
     "os": {
-        "full": "Linux 4.9.125-linuxkit x86_64"
+        "full": "Linux 5.10.47-linuxkit x86_64"
     },
     "process": {
         "pid": 1
@@ -21,22 +18,32 @@
     "redis": {
         "info": {
             "clients": {
-                "biggest_input_buf": 0,
                 "blocked": 0,
-                "connected": 5,
-                "longest_output_list": 0,
+                "connected": 2,
                 "max_input_buffer": 0,
                 "max_output_buffer": 0
             },
             "cluster": {
                 "enabled": false
             },
+            "commandstats": {
+                "info": {
+                    "calls": 3,
+                    "usec": 241,
+                    "usec_per_call": 80.33
+                },
+                "slowlog": {
+                    "calls": 3,
+                    "usec": 22,
+                    "usec_per_call": 7.33
+                }
+            },
             "cpu": {
                 "used": {
-                    "sys": 1.66,
+                    "sys": 0.85,
                     "sys_children": 0,
-                    "user": 0.39,
-                    "user_children": 0.01
+                    "user": 0.14,
+                    "user_children": 0
                 }
             },
             "memory": {
@@ -47,7 +54,7 @@
                     "rss": {}
                 },
                 "fragmentation": {
-                    "ratio": 2.71
+                    "ratio": 2.74
                 },
                 "max": {
                     "policy": "noeviction",
@@ -55,9 +62,9 @@
                 },
                 "used": {
                     "lua": 37888,
-                    "peak": 945016,
-                    "rss": 2453504,
-                    "value": 904992
+                    "peak": 843312,
+                    "rss": 2310144,
+                    "value": 843312
                 }
             },
             "persistence": {
@@ -99,8 +106,8 @@
                     },
                     "copy_on_write": {},
                     "last_save": {
-                        "changes_since": 35,
-                        "time": 1548663522
+                        "changes_since": 0,
+                        "time": 1642155583
                     }
                 }
             },
@@ -116,7 +123,6 @@
                     "offset": 0,
                     "sync": {}
                 },
-                "master_offset": 0,
                 "role": "master",
                 "slave": {}
             },
@@ -128,44 +134,44 @@
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 5159690,
+                "lru_clock": 14765805,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "run_id": "0f681cb959aa47413ec40ff383715c923f9cbefd",
+                "run_id": "567ea825bae461f81d687f671c6cfaef5c1e45c7",
                 "tcp_port": 6379,
-                "uptime": 707
+                "uptime": 174
             },
             "slowlog": {
                 "count": 0
             },
             "stats": {
                 "active_defrag": {},
-                "commands_processed": 265,
+                "commands_processed": 6,
                 "connections": {
-                    "received": 848,
+                    "received": 164,
                     "rejected": 0
                 },
                 "instantaneous": {
-                    "input_kbps": 0.18,
-                    "ops_per_sec": 6,
-                    "output_kbps": 1.39
+                    "input_kbps": 0,
+                    "ops_per_sec": 0,
+                    "output_kbps": 0
                 },
                 "keys": {
                     "evicted": 0,
                     "expired": 0
                 },
                 "keyspace": {
-                    "hits": 15,
+                    "hits": 0,
                     "misses": 0
                 },
                 "latest_fork_usec": 0,
                 "migrate_cached_sockets": 0,
                 "net": {
                     "input": {
-                        "bytes": 7300
+                        "bytes": 170
                     },
                     "output": {
-                        "bytes": 219632
+                        "bytes": 6593
                     }
                 },
                 "pubsub": {
@@ -183,7 +189,7 @@
         }
     },
     "service": {
-        "address": "127.0.0.1:6379",
+        "address": "localhost:63118",
         "type": "redis",
         "version": "3.2.12"
     }

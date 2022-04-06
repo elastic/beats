@@ -177,6 +177,41 @@ func TestDecodeXML(t *testing.T) {
 			},
 		},
 		{
+			description: "Decoding with an array and mixed-case keys",
+			config: decodeXMLConfig{
+				Field:   "message",
+				ToLower: true,
+			},
+			Input: common.MapStr{
+				"message": `<AuditBase>
+				  <ContextComponents>
+					<Component>
+					  <RelyingParty>N/A</RelyingParty>
+					</Component>
+					<Component>
+					  <PrimaryAuth>N/A</PrimaryAuth>
+					</Component>
+				  </ContextComponents>
+				</AuditBase>`,
+			},
+			Output: common.MapStr{
+				"message": common.MapStr{
+					"auditbase": map[string]interface{}{
+						"contextcomponents": map[string]interface{}{
+							"component": []interface{}{
+								map[string]interface{}{
+									"relyingparty": "N/A",
+								},
+								map[string]interface{}{
+									"primaryauth": "N/A",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "Decoding with multiple xml objects",
 			config: decodeXMLConfig{
 				Field: "message",
@@ -367,6 +402,54 @@ func TestDecodeXML(t *testing.T) {
 			assert.Equal(t, test.Output, newEvent.Fields)
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		t.Parallel()
+		target := "@metadata.xml"
+		config := decodeXMLConfig{
+			Field:  "@metadata.message",
+			Target: &target,
+		}
+
+		f, err := newDecodeXML(config)
+		require.NoError(t, err)
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"message": `<catalog>
+					<book seq="1">
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+					</book>
+				</catalog>`,
+			},
+		}
+		expMeta := common.MapStr{
+			"xml": common.MapStr{
+				"catalog": map[string]interface{}{
+					"book": map[string]interface{}{
+						"author": "William H. Gaddis",
+						"review": "One of the great seminal American novels of the 20th century.",
+						"seq":    "1",
+						"title":  "The Recognitions",
+					},
+				},
+			},
+			"message": `<catalog>
+					<book seq="1">
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+					</book>
+				</catalog>`,
+		}
+
+		newEvent, err := f.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
 }
 
 func BenchmarkProcessor_Run(b *testing.B) {

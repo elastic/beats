@@ -117,12 +117,64 @@ func TestLogsPathMatcher_InvalidSource4(t *testing.T) {
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
 
+func TestLogsPathMatcher_InvalidVarLogPodSource(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/invalid/dir/namespace_pod-name_%s/container/0.log", puid)
+	expectedResult := ""
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210912"
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log.20220221-210912"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	expectedResult := puid
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_InvalidVarLogPodSource2(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210526.gz", puid)
+	expectedResult := ""
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_InvalidVarLogPodIDFormat(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/log/pods/%s/container/0.log", puid)
+	expectedResult := ""
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_ValidVarLogPod(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log"
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	expectedResult := puid
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
 func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult string) {
 	executeTestWithResourceType(t, cfgLogsPath, "", source, expectedResult)
 }
 
 func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult string) {
-	var testConfig = common.NewConfig()
+	testConfig := common.NewConfig()
 	if cfgLogsPath != "" {
 		testConfig.SetString("logs_path", -1, cfgLogsPath)
 	}

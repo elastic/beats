@@ -29,7 +29,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 var (
@@ -120,12 +120,8 @@ func parseMountinfoLine(line string) (mountinfo, error) {
 
 // SupportedSubsystems returns the subsystems that are supported by the
 // kernel. The returned map contains a entry for each subsystem.
-func SupportedSubsystems(rootfsMountpoint string) (map[string]struct{}, error) {
-	if rootfsMountpoint == "" {
-		rootfsMountpoint = "/"
-	}
-
-	cgroups, err := os.Open(filepath.Join(rootfsMountpoint, "proc", "cgroups"))
+func SupportedSubsystems(rootfs resolve.Resolver) (map[string]struct{}, error) {
+	cgroups, err := os.Open(rootfs.ResolveHostFS("/proc/cgroups"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, ErrCgroupsMissing
@@ -172,12 +168,9 @@ func SupportedSubsystems(rootfsMountpoint string) (map[string]struct{}, error) {
 // SubsystemMountpoints returns the mountpoints for each of the given subsystems.
 // The returned map contains the subsystem name as a key and the value is the
 // mountpoint.
-func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{}) (Mountpoints, error) {
-	if rootfsMountpoint == "" {
-		rootfsMountpoint = "/"
-	}
+func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{}) (Mountpoints, error) {
 
-	mountinfo, err := os.Open(filepath.Join(rootfsMountpoint, "proc", "self", "mountinfo"))
+	mountinfo, err := os.Open(rootfs.ResolveHostFS("/proc/self/mountinfo"))
 	if err != nil {
 		return Mountpoints{}, err
 	}
@@ -200,7 +193,8 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 			return Mountpoints{}, err
 		}
 
-		if !strings.HasPrefix(mount.mountpoint, rootfsMountpoint) {
+		// if the mountpoint from the subsystem has a different root than ours, it probably belongs to something else.
+		if !strings.HasPrefix(mount.mountpoint, rootfs.ResolveHostFS("")) {
 			continue
 		}
 
@@ -238,7 +232,8 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 // ProcessCgroupPaths returns the cgroups to which a process belongs and the
 // pathname of the cgroup relative to the mountpoint of the subsystem.
 func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
-	cgroup, err := os.Open(filepath.Join(r.rootfsMountpoint, "proc", strconv.Itoa(pid), "cgroup"))
+	cgroupPath := filepath.Join("proc", strconv.Itoa(pid), "cgroup")
+	cgroup, err := os.Open(r.rootfsMountpoint.ResolveHostFS(cgroupPath))
 	if err != nil {
 		return PathList{}, err //return a blank error so other events can use any file not found errors
 	}
@@ -272,15 +267,14 @@ func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 			// For this very annoying edge case, revert to the hostfs flag
 			// If it's not set, warn the user that they've hit this.
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
-			// Depending on the test environment, Hostfs can either be blank, or `/`
-			if r.cgroupMountpoints.V2Loc == "" && len(paths.Paths.Hostfs) <= 1 {
+			if r.cgroupMountpoints.V2Loc == "" && !r.rootfsMountpoint.IsSet() {
 				logp.L().Debugf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
 This may be because metricbeat is running inside a container on a hybrid system.
 To monitor cgroups V2 processess in this way, mount the unified (V2) hierarchy inside
-the container as /sys/fs/cgroup/unified and start metricbeat with --system.hostfs.`, pid, line)
+the container as /sys/fs/cgroup/unified and start the system module with the hostfs setting.`, pid, line)
 				continue
-			} else if r.cgroupMountpoints.V2Loc == "" && len(paths.Paths.Hostfs) > 1 {
-				controllerPath = filepath.Join(paths.Paths.Hostfs, "/sys/fs/cgroup/unified", path)
+			} else if r.cgroupMountpoints.V2Loc == "" && r.rootfsMountpoint.IsSet() {
+				controllerPath = r.rootfsMountpoint.ResolveHostFS(filepath.Join("/sys/fs/cgroup/unified", path))
 			}
 
 			cgpaths, err := ioutil.ReadDir(controllerPath)

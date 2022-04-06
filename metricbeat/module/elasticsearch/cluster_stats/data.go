@@ -212,7 +212,7 @@ func getClusterMetadataSettings(httpClient *helper.HTTP) (common.MapStr, error) 
 	return clusterSettings, nil
 }
 
-func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -303,22 +303,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	metricSetFields, _ := schema.Apply(data)
 
 	metricSetFields.Put("stack", stackData)
-	metricSetFields.Put("license", struct {
-		Status       string `json:"status"`
-		Type         string `json:"type"`
-		ExpiryDateMs int    `json:"expiry_date_in_millis"`
-	}{
-		Status:       license.Status,
-		Type:         license.Type,
-		ExpiryDateMs: license.ExpiryDateInMillis,
-	})
-
-	if license.ExpiryDateInMillis != 0 {
-		// We don't want to record a 0 expiry date as this means the license has expired
-		// in the Stack Monitoring UI
-		metricSetFields.Put("expiry_date_in_millis", license.ExpiryDateInMillis)
-	}
-
+	metricSetFields.Put("license", l)
 	metricSetFields.Put("state", clusterStateReduced)
 
 	if err = elasticsearch.PassThruField("version", clusterState, event.ModuleFields); err != nil {
@@ -326,6 +311,13 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	}
 
 	event.MetricSetFields = metricSetFields
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+	}
 
 	r.Event(event)
 

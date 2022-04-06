@@ -1,7 +1,6 @@
 - name: cloudtrail
   type: group
   release: ga
-  default_field: false
   description: >
     Fields for AWS CloudTrail logs.
   fields:
@@ -93,7 +92,6 @@
       multi_fields:
         - name: text
           type: text
-          default_field: false
     - name: response_elements
       type: keyword
       description: >-
@@ -102,7 +100,6 @@
       multi_fields:
         - name: text
           type: text
-          default_field: false
     - name: additional_eventdata
       type: keyword
       description: >-
@@ -111,7 +108,6 @@
       multi_fields:
         - name: text
           type: text
-          default_field: false
     - name: request_id
       type: keyword
       description: >-
@@ -164,7 +160,6 @@
       multi_fields:
         - name: text
           type: text
-          default_field: false
     - name: shared_event_id
       type: keyword
       description: >-

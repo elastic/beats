@@ -130,7 +130,13 @@ func (w *watcher) sync() error {
 	w.logger.Debugf("Found %d allocations", len(allocations))
 	for _, alloc := range allocations {
 		// the allocation has not changed since last seen, ignore
-		if w.waitIndex > alloc.AllocModifyIndex {
+		if w.waitIndex > alloc.ModifyIndex {
+			w.logger.Debugf(
+				"Skip allocation.id=%s ClientStatus=%s because w.waitIndex=%v > alloc.ModifyIndex=%v",
+				alloc.ID,
+				alloc.ClientStatus,
+				fmt.Sprint(w.waitIndex),
+				fmt.Sprint(alloc.ModifyIndex))
 			continue
 		}
 
@@ -156,7 +162,7 @@ func (w *watcher) sync() error {
 		case AllocClientStatusRunning:
 			// Handle in-place allocation updates (like adding tags to a service definition) that
 			// don't trigger a new allocation
-			updated := (w.waitIndex != 0) && (alloc.CreateIndex < w.waitIndex) && (alloc.AllocModifyIndex >= w.waitIndex)
+			updated := (w.waitIndex != 0) && (alloc.CreateIndex < w.waitIndex) && (alloc.ModifyIndex >= w.waitIndex)
 
 			w.logger.Debugf("allocation.id=%s waitIndex=%v CreateIndex=%v ModifyIndex=%v AllocModifyIndex=%v updated=%v",
 				alloc.ID, w.waitIndex, alloc.CreateIndex, alloc.ModifyIndex,

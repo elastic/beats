@@ -19,6 +19,7 @@
 
 :apikey-command-short-desc: Manage API Keys for communication between APM agents and server.
 
+ifndef::export_pipeline[]
 ifndef::serverless[]
 ifndef::no_dashboards[]
 :export-command-short-desc: Exports the configuration, index template, ILM policy, or a dashboard to stdout
@@ -32,6 +33,11 @@ endif::serverless[]
 ifdef::serverless[]
 :export-command-short-desc: Exports the configuration, index template, or {cloudformation-ref} template to stdout
 endif::serverless[]
+endif::export_pipeline[]
+
+ifdef::export_pipeline[]
+:export-command-short-desc: Exports the configuration, index template, pipeline, or ILM policy to stdout
+endif::export_pipeline[]
 
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
@@ -262,6 +268,7 @@ endif::[]
 [[export-command]]
 ==== `export` command
 
+ifndef::export_pipeline[]
 ifndef::serverless[]
 ifndef::no_dashboards[]
 {export-command-short-desc}. You can use this
@@ -281,6 +288,14 @@ ifdef::serverless[]
 command to quickly view your configuration, see the contents of the index
 template and the ILM policy, or export an CloudFormation template.
 endif::serverless[]
+endif::export_pipeline[]
+
+ifdef::export_pipeline[]
+{export-command-short-desc}. You can use this
+command to quickly view your configuration, see the contents of the index
+template and the ILM policy, export a dashboard from {kib}, or export ingest
+pipelines.
+endif::export_pipeline[]
 
 *SYNOPSIS*
 
@@ -336,13 +351,39 @@ ifdef::serverless[]
 Exports an {cloudformation-ref} template to stdout.
 endif::serverless[]
 
+ifdef::export_pipeline[]
+[[pipeline-subcommand]]
+*`pipeline`*::
+
+Exports the ingest piplines.  You must specify the `--es.version` to
+specify which version of {es} the pipelines should be compatible with.
+You can optionally specify `--dir` to control where the pipelines are
+written.
+
+endif::export_pipeline[]
+
 *FLAGS*
 
+ifdef::export_pipeline[]
 *`--es.version VERSION`*::
+
 When used with <<template-subcommand,`template`>>, exports an index
-template that is compatible with the specified version.
-When used with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy
-if the specified ES version is enabled for ILM.
+template that is compatible with the specified version.  When used
+with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy if
+the specified ES version is enabled for ILM.  When used with
+<<pipeline-subcommand, `pipeline`>>, exports versions of the pipeline
+that is compatible with the specified version.
+endif::export_pipeline[]
+
+ifndef::export_pipeline[]
+*`--es.version VERSION`*::
+
+When used with <<template-subcommand,`template`>>, exports an index
+template that is compatible with the specified version.  When used
+with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy if
+the specified ES version is enabled for ILM.
+endif::export_pipeline[]
+
 
 *`-h, --help`*::
 Shows help for the `export` command.
@@ -353,8 +394,9 @@ the index template. If this flag is not specified, the default base name is
 +{beatname_lc}+.
 
 *`--dir DIRNAME`*::
-Define a directory to which the template and ILM policy should be exported to
-as files instead of printing them to `stdout`.
+
+Define a directory to which the template, pipelines, and ILM policy
+should be exported to as files instead of printing them to `stdout`.
 
 ifndef::no_dashboards[]
 *`--id DASHBOARD_ID`*::
@@ -706,7 +748,8 @@ endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::
 
-Specifies the mount point of the host's filesystem for use in monitoring a host.
+Specifies the mount point of the host's filesystem for use in monitoring a host. 
+This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 
 ifeval::["{beatname_lc}"=="packetbeat"]
@@ -801,16 +844,6 @@ ifdef::apm-server[]
 *`--pipelines`*::
 Registers the <<configuring-ingest-node,pipeline>> definitions set in `ingest/pipeline/definition.json`.
 endif::apm-server[]
-
-*`--template`*::
-deprecated:[7.2]
-Sets up the index template only.
-It is recommended to use `--index-management` instead.
-
-*`--ilm-policy`*::
-deprecated:[7.2]
-Sets up the index lifecycle management policy.
-It is recommended to use `--index-management` instead.
 
 {global-flags}
 

@@ -1,172 +1,172 @@
-description: Pipeline for parsing checkpoint firewall logs
+description: Pipeline for parsing Oracle Audit logs
 processors:
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- set:
-    field: event.action
-    value: database_audit
-- set:
-    field: event.kind
-    value: event
-- set:
-    field: event.category
-    value: database
-- set:
-    field: event.type
-    value: access
-- set:
-    field: event.outcome
-    value: success
-- grok:
-    field: message
-    patterns:
-    - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH : '%{GREEDYDATA:LENGTH}'\\\n(?m)%{GREEDYDATA:audit}"
-- kv:
-    field: audit
-    field_split: "\\\n(?=[a-zA-Z])"
-    value_split: ":\\S\\d+\\S(?= ')"
-    trim_value: " '"
-    trim_key: " "
-    prefix: oracle.database_audit.
-- grok:
-    field: log.file.path
-    patterns:
-    - "%{BASE10NUM:process.pid}\\_%{BASE10NUM}\\.aud(\\.log)?$"
-# All field names are uppercase by default, converts them to lowercase
-- script:
-    source: "ctx.oracle.database_audit = ctx.oracle.database_audit.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), Map.Entry::getValue));"
-    lang: painless
-# Replace all field names that has spaces in them with _
-- script:
-    lang: painless
-    source: "ctx.oracle.database_audit = ctx?.oracle?.database_audit.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().replace(' ', '_'), e -> e.getValue()));"
-- gsub:
-    field: "oracle.database_audit.action"
-    pattern: "\\n"
-    replacement: ""
-- gsub:
-    field: "oracle.database_audit.action"
-    pattern: "\\s{2,}"
-    replacement: " "
-- trim:
-    field: "oracle.database_audit.action_number"
-    ignore_missing: true
-# Removes all null values from ctx.*
-- script:
-    lang: painless
-    if: ctx?.oracle?.database_audit != null
-    source: |
-      void handleMap(Map map) {
-        for (def x : map.values()) {
-          if (x instanceof Map) {
-              handleMap(x);
-          } else if (x instanceof List) {
-              handleList(x);
-          }
-        }
-        map.values().removeIf(v -> v instanceof String && v.isEmpty() == true);
-      }
-      void handleList(List list) {
-        for (def x : list) {
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - set:
+      field: event.action
+      value: database_audit
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      field: event.category
+      value: database
+  - set:
+      field: event.type
+      value: access
+  - set:
+      field: event.outcome
+      value: success
+  - grok:
+      field: message
+      patterns:
+        - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH : '%{GREEDYDATA:LENGTH}'\\\n(?m)%{GREEDYDATA:audit}"
+  - kv:
+      field: audit
+      field_split: "\\\n(?=[a-zA-Z])"
+      value_split: ":\\S\\d+\\S(?= ')"
+      trim_value: " '"
+      trim_key: " "
+      prefix: oracle.database_audit.
+  - grok:
+      field: log.file.path
+      patterns:
+        - "%{BASE10NUM:process.pid}\\_%{BASE10NUM}\\.aud(\\.log)?$"
+  # All field names are uppercase by default, converts them to lowercase
+  - script:
+      source: "ctx.oracle.database_audit = ctx.oracle.database_audit.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), Map.Entry::getValue));"
+      lang: painless
+  # Replace all field names that has spaces in them with _
+  - script:
+      lang: painless
+      source: "ctx.oracle.database_audit = ctx?.oracle?.database_audit.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().replace(' ', '_'), e -> e.getValue()));"
+  - gsub:
+      field: "oracle.database_audit.action"
+      pattern: "\\n"
+      replacement: ""
+  - gsub:
+      field: "oracle.database_audit.action"
+      pattern: "\\s{2,}"
+      replacement: " "
+  - trim:
+      field: "oracle.database_audit.action_number"
+      ignore_missing: true
+  # Removes all null values from ctx.*
+  - script:
+      lang: painless
+      if: ctx?.oracle?.database_audit != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
             if (x instanceof Map) {
                 handleMap(x);
             } else if (x instanceof List) {
                 handleList(x);
             }
+          }
+          map.values().removeIf(v -> v instanceof String && v.isEmpty() == true);
         }
-      }
-      handleMap(ctx);
-- remove:
-    field:
-      - '@timestamp'
-    ignore_missing: true
-- date:
-    field: tmp_timestamp
-    target_field: '@timestamp'
-    formats:
-    - EEE MMM  d HH:mm:ss uuuu XXX
-- grok:
-    field: tmp_timestamp
-    patterns:
-    - "%{ISO8601_TIMEZONE:event.timezone}$"
-- rename:
-    field: oracle.database_audit.privilege
-    target_field: host.user.roles
-    ignore_missing: true
-- rename:
-    field: LENGTH
-    target_field: oracle.database_audit.length
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.client_user
-    target_field: client.user.name
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.client_address
-    target_field: client.address
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.userhost
-    target_field: server.address
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.database_user
-    target_field: server.user.name
-    ignore_missing: true
-- convert:
-    field: oracle.database_audit.length
-    type: long
-    ignore_missing: true
-- grok:
-    field: client.address
-    patterns:
-      - "(?:%{IP:client.ip}|%{GREEDYDATA:client.domain})"
-    ignore_failure: true
-    ignore_missing: true
-- grok:
-    field: server.address
-    patterns:
-      - "(?:%{IP:server.ip}|%{GREEDYDATA:server.domain})"
-    ignore_failure: true
-    ignore_missing: true
-# Renaming certain fields for better data structure
-- rename:
-    field: oracle.database_audit.sessionid
-    target_field: oracle.database_audit.session_id
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.client_terminal
-    target_field: oracle.database_audit.client.terminal
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.client_address
-    target_field: oracle.database_audit.client.address
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.database_user
-    target_field: oracle.database_audit.database.user
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.userhost
-    target_field: oracle.database_audit.database.host
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.dbid
-    target_field: oracle.database_audit.database.id
-    ignore_missing: true
-- rename:
-    field: oracle.database_audit.entry_id
-    target_field: oracle.database_audit.entry.id
-    ignore_missing: true
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
+  - remove:
+      field:
+        - "@timestamp"
+      ignore_missing: true
+  - date:
+      field: tmp_timestamp
+      target_field: "@timestamp"
+      formats:
+        - EEE MMM  d HH:mm:ss uuuu XXX
+  - grok:
+      field: tmp_timestamp
+      patterns:
+        - "%{ISO8601_TIMEZONE:event.timezone}$"
+  - rename:
+      field: oracle.database_audit.privilege
+      target_field: user.roles
+      ignore_missing: true
+  - rename:
+      field: LENGTH
+      target_field: oracle.database_audit.length
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.client_user
+      target_field: client.user.name
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.client_address
+      target_field: client.address
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.userhost
+      target_field: server.address
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.database_user
+      target_field: server.user.name
+      ignore_missing: true
+  - convert:
+      field: oracle.database_audit.length
+      type: long
+      ignore_missing: true
+  - grok:
+      field: client.address
+      patterns:
+        - "(?:%{IP:client.ip}|%{GREEDYDATA:client.domain})"
+      ignore_failure: true
+      ignore_missing: true
+  - grok:
+      field: server.address
+      patterns:
+        - "(?:%{IP:server.ip}|%{GREEDYDATA:server.domain})"
+      ignore_failure: true
+      ignore_missing: true
+  # Renaming certain fields for better data structure
+  - rename:
+      field: oracle.database_audit.sessionid
+      target_field: oracle.database_audit.session_id
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.client_terminal
+      target_field: oracle.database_audit.client.terminal
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.client_address
+      target_field: oracle.database_audit.client.address
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.database_user
+      target_field: oracle.database_audit.database.user
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.userhost
+      target_field: oracle.database_audit.database.host
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.dbid
+      target_field: oracle.database_audit.database.id
+      ignore_missing: true
+  - rename:
+      field: oracle.database_audit.entry_id
+      target_field: oracle.database_audit.entry.id
+      ignore_missing: true
 
-- remove:
-    field:
-    - tmp_timestamp
-    - audit
-    - message
-    ignore_missing: true
+  - remove:
+      field:
+        - tmp_timestamp
+        - audit
+        - message
+      ignore_missing: true
 on_failure:
-- set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

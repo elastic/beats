@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -28,9 +29,11 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/generator/common/beatgen"
-
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	//mage:import
+	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
+
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
@@ -46,9 +49,11 @@ var (
 	}
 )
 
-// GenerateCustomBeat generates a new custom beat
-func GenerateCustomBeat() error {
-	return beatgen.Generate()
+// Aliases are shortcuts to long target names.
+//nolint: deadcode // it's used by `mage`.
+var Aliases = map[string]interface{}{
+	"llc":  mage.Linter.LastChange,
+	"lint": mage.Linter.All,
 }
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip

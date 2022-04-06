@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build openbsd
 // +build openbsd
 
 package cpu
@@ -35,11 +36,12 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Get is the OpenBSD implementation of get
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 
 	// see man 2 sysctl
 	loadGlobal := [C.CPUSTATES]C.long{

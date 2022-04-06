@@ -60,7 +60,7 @@ type process struct {
 	expiration time.Time
 }
 
-// Allow the OS-dependant implementation to be replaced by a mock for testing
+// Allow the OS-dependent implementation to be replaced by a mock for testing
 type processWatcherImpl interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 	// that owns them.
@@ -213,7 +213,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	if logp.HasSelector("procsdetailed") {
 		start := time.Now()
 		defer func() {
-			logp.Debug("procsdetailed", "updateMap() took %v", time.Now().Sub(start))
+			logp.Debug("procsdetailed", "updateMap() took %v", time.Since(start))
 		}()
 	}
 

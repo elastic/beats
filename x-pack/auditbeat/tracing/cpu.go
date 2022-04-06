@@ -2,17 +2,17 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package tracing
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -96,7 +96,7 @@ func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 		for _, numStr := range parts {
 			num16, err := strconv.ParseInt(numStr, 10, 16)
 			if err != nil || num16 < 0 {
-				return CPUSet{}, errors.Errorf("failed to parse integer '%s' from range '%s' at '%s'", numStr, expr, contents)
+				return CPUSet{}, fmt.Errorf("failed to parse integer '%s' from range '%s' at '%s'", numStr, expr, contents)
 			}
 			num := int(num16)
 			r = append(r, num)
@@ -123,7 +123,7 @@ func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 			to = r[1]
 		}
 		if from == -1 || to < from {
-			return CPUSet{}, errors.Errorf("invalid cpu range %v in '%s'", r, contents)
+			return CPUSet{}, fmt.Errorf("invalid cpu range %v in '%s'", r, contents)
 		}
 		for i := from; i <= to; i++ {
 			if !mask[i] {

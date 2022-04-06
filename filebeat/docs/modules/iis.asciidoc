@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == IIS module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module parses access and error logs created by the
 Internet Information Services (IIS) HTTP server.
 

@@ -1,7 +1,6 @@
 - name: audit
   type: group
   release: beta
-  default_field: false
   description: >
     Module for parsing MySQL Enterprise Audit Logs
   fields:

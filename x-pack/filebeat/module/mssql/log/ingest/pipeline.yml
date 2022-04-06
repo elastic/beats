@@ -33,7 +33,7 @@ processors:
     ignore_missing: true
 - rename:
     field: message
-    target_field: log.original
+    target_field: event.original
 - rename:
     field: msg_temp
     target_field: message

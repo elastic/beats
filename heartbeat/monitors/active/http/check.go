@@ -18,20 +18,12 @@
 package http
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
-
-	pkgerrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/conditions"
 )
 
 // multiValidator combines multiple validations of each type into a single easy to use object.
@@ -102,9 +94,9 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	}
 
 	if len(config.RecvJSON) > 0 {
-		jsonChecks, err := checkJSON(config.RecvJSON)
+		jsonChecks, err := checkJson(config.RecvJSON)
 		if err != nil {
-			return multiValidator{}, err
+			return multiValidator{}, fmt.Errorf("could not load JSON check: %w", err)
 		}
 		bodyValidators = append(bodyValidators, jsonChecks)
 	}
@@ -218,54 +210,4 @@ func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
 		}
 		return nil
 	}
-}
-
-func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
-	type compiledCheck struct {
-		description string
-		condition   conditions.Condition
-	}
-
-	var compiledChecks []compiledCheck
-
-	for _, check := range checks {
-		cond, err := conditions.NewCondition(check.Condition)
-		if err != nil {
-			return nil, err
-		}
-		compiledChecks = append(compiledChecks, compiledCheck{check.Description, cond})
-	}
-
-	return func(r *http.Response, body string) error {
-		decoded := &common.MapStr{}
-		decoder := json.NewDecoder(strings.NewReader(body))
-		decoder.UseNumber()
-		err := decoder.Decode(decoded)
-
-		if err != nil {
-			body, _ := ioutil.ReadAll(r.Body)
-			return pkgerrors.Wrapf(err, "could not parse JSON for body check with condition. Source: %s", body)
-		}
-
-		jsontransform.TransformNumbers(*decoded)
-
-		var errorDescs []string
-		for _, compiledCheck := range compiledChecks {
-			ok := compiledCheck.condition.Check(decoded)
-			if !ok {
-				errorDescs = append(errorDescs, compiledCheck.description)
-			}
-		}
-
-		if len(errorDescs) > 0 {
-			return fmt.Errorf(
-				"JSON body did not match %d conditions '%s' for monitor. Received JSON %+v",
-				len(errorDescs),
-				strings.Join(errorDescs, ","),
-				decoded,
-			)
-		}
-
-		return nil
-	}, nil
 }

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package translate_sid
@@ -29,6 +30,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
@@ -82,6 +84,33 @@ func TestTranslateSID(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		p, err := newFromConfig(config{
+			Field:             "@metadata.sid",
+			DomainTarget:      "@metadata.domain",
+			AccountNameTarget: "@metadata.account",
+			AccountTypeTarget: "@metadata.type",
+		})
+		assert.NoError(t, err)
+		evt := &beat.Event{
+			Meta: common.MapStr{
+				"sid": "S-1-5-7",
+			},
+		}
+
+		expMeta := common.MapStr{
+			"sid":     "S-1-5-32-544",
+			"domain":  "BUILTIN",
+			"account": "Administrators",
+			"type":    winevent.SidTypeAlias,
+		}
+
+		newEvt, err := p.Run(evt)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvt.Meta)
+		assert.Equal(t, evt.Fields, newEvt.Fields)
+	})
 }
 
 func TestTranslateSIDEmptyTarget(t *testing.T) {

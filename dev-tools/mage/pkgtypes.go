@@ -48,7 +48,7 @@ const (
 	packageStagingDir = "build/package"
 
 	// defaultBinaryName specifies the output file for zip and tar.gz.
-	defaultBinaryName = "{{.Name}}-{{if .Variant}}{{.Variant}}-{{end}}{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
@@ -60,7 +60,6 @@ const (
 	Deb
 	Zip
 	TarGz
-	DMG
 	Docker
 )
 
@@ -90,7 +89,6 @@ type PackageSpec struct {
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
-	Variants          []string               `yaml:"variants"`              // Optional
 
 	evalContext            map[string]interface{}
 	packageDir             string
@@ -125,10 +123,8 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		TarGz: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
-		},
-		DMG: map[string]string{
-			"386":   "x86",
-			"amd64": "x86_64",
+			"arm64": "aarch64",
+			// "universal": "universal",
 		},
 	},
 	"linux": map[PackageType]map[string]string{
@@ -177,6 +173,11 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"arm64": "arm64",
 		},
 	},
+	"aix": map[PackageType]map[string]string{
+		TarGz: map[string]string{
+			"ppc64": "ppc64",
+		},
+	},
 }
 
 // getOSArchName returns the architecture name to use in a package.
@@ -213,8 +214,6 @@ func (typ PackageType) String() string {
 		return "zip"
 	case TarGz:
 		return "tar.gz"
-	case DMG:
-		return "dmg"
 	case Docker:
 		return "docker"
 	default:
@@ -238,8 +237,6 @@ func (typ *PackageType) UnmarshalText(text []byte) error {
 		*typ = TarGz
 	case "zip":
 		*typ = Zip
-	case "dmg":
-		*typ = DMG
 	case "docker":
 		*typ = Docker
 	default:
@@ -285,8 +282,6 @@ func (typ PackageType) Build(spec PackageSpec) error {
 		return PackageZip(spec)
 	case TarGz:
 		return PackageTarGz(spec)
-	case DMG:
-		return PackageDMG(spec)
 	case Docker:
 		return PackageDocker(spec)
 	default:
@@ -329,10 +324,8 @@ func (s *PackageSpec) ExtraVar(key, value string) {
 
 // Expand expands a templated string using data from the spec.
 func (s PackageSpec) Expand(in string, args ...map[string]interface{}) (string, error) {
-	// Assign a default value for variant since it's not always passed in
 	return expandTemplate("inline", in, FuncMap,
-
-		EnvMap(append([]map[string]interface{}{s.evalContext, {"Variant": ""}, s.toMap()}, args...)...))
+		EnvMap(append([]map[string]interface{}{s.evalContext, s.toMap()}, args...)...))
 }
 
 // MustExpand expands a templated string using data from the spec. It panics if
@@ -432,12 +425,12 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 			}
 
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Target))
-			if err = ioutil.WriteFile(createDir(f.Source), []byte(content), 0644); err != nil {
+			if err = ioutil.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
 				panic(errors.Wrapf(err, "failed to write file containing content for target=%v", target))
 			}
 		case f.Template != "":
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Template))
-			if err := s.ExpandFile(f.Template, createDir(f.Source)); err != nil {
+			if err := s.ExpandFile(f.Template, CreateDir(f.Source)); err != nil {
 				panic(errors.Wrapf(err, "failed to expand template file for target=%v", target))
 			}
 		default:
@@ -575,7 +568,7 @@ func PackageZip(spec PackageSpec) error {
 	spec.OutputFile = Zip.AddFileExtension(spec.OutputFile)
 
 	// Write the zip file.
-	if err := ioutil.WriteFile(createDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
+	if err := ioutil.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
 		return errors.Wrap(err, "failed to write zip file")
 	}
 
@@ -596,6 +589,27 @@ func PackageTarGz(spec PackageSpec) error {
 	// Create a new tar archive.
 	w := tar.NewWriter(buf)
 	baseDir := spec.rootDir()
+
+	// // Replace the darwin-universal by darwin-x86_64 and darwin-arm64. Also
+	// // keep the other files.
+	// if spec.Name == "elastic-agent" && spec.OS == "darwin" && spec.Arch == "universal" {
+	// 	newFiles := map[string]PackageFile{}
+	// 	for filename, pkgFile := range spec.Files {
+	// 		if strings.Contains(pkgFile.Target, "darwin-universal") &&
+	// 			strings.Contains(pkgFile.Target, "downloads") {
+	//
+	// 			amdFilename, amdpkgFile := replaceFileArch(filename, pkgFile, "x86_64")
+	// 			armFilename, armpkgFile := replaceFileArch(filename, pkgFile, "aarch64")
+	//
+	// 			newFiles[amdFilename] = amdpkgFile
+	// 			newFiles[armFilename] = armpkgFile
+	// 		} else {
+	// 			newFiles[filename] = pkgFile
+	// 		}
+	// 	}
+	//
+	// 	spec.Files = newFiles
+	// }
 
 	// Add files to tar.
 	for _, pkgFile := range spec.Files {
@@ -641,7 +655,7 @@ func PackageTarGz(spec PackageSpec) error {
 
 	// Open the output file.
 	log.Println("Creating output file at", spec.OutputFile)
-	outFile, err := os.Create(createDir(spec.OutputFile))
+	outFile, err := os.Create(CreateDir(spec.OutputFile))
 	if err != nil {
 		return err
 	}
@@ -665,6 +679,14 @@ func PackageTarGz(spec PackageSpec) error {
 	}
 
 	return errors.Wrap(CreateSHA512File(spec.OutputFile), "failed to create .sha512 file")
+}
+
+func replaceFileArch(filename string, pkgFile PackageFile, arch string) (string, PackageFile) {
+	filename = strings.ReplaceAll(filename, "universal", arch)
+	pkgFile.Source = strings.ReplaceAll(pkgFile.Source, "universal", arch)
+	pkgFile.Target = strings.ReplaceAll(pkgFile.Target, "universal", arch)
+
+	return filename, pkgFile
 }
 
 // PackageDeb packages a deb file. This requires Docker to execute FPM.
@@ -969,21 +991,6 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 
 		return nil
 	})
-}
-
-// PackageDMG packages the Beat into a .dmg file containing an installer pkg
-// and uninstaller app.
-func PackageDMG(spec PackageSpec) error {
-	if runtime.GOOS != "darwin" {
-		return errors.New("packaging a dmg requires darwin")
-	}
-
-	b, err := newDMGBuilder(spec)
-	if err != nil {
-		return err
-	}
-
-	return b.Build()
 }
 
 // PackageDocker packages the Beat into a docker image.

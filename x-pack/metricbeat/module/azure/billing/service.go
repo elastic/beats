@@ -9,18 +9,26 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+
+	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// Service interface for the azure monitor service and mock for testing
+type Service interface {
+	GetForcast(filter string) (consumption.ForecastsListResult, error)
+	GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error)
+}
+
 // BillingService service wrapper to the azure sdk for go
 type UsageService struct {
-	forcastsClient *consumption.ForecastsClient
-	usageClient    *consumption.UsageDetailsClient
-	context        context.Context
-	log            *logp.Logger
+	usageDetailsClient *prevConsumption.UsageDetailsClient
+	forcastsClient     *consumption.ForecastsClient
+	context            context.Context
+	log                *logp.Logger
 }
 
 // NewService instantiates the Azure monitoring service
@@ -33,14 +41,15 @@ func NewService(config azure.Config) (*UsageService, error) {
 		return nil, err
 	}
 	forcastsClient := consumption.NewForecastsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	usageDetailsClient := consumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	usageDetailsClient := prevConsumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+
 	forcastsClient.Authorizer = authorizer
 	usageDetailsClient.Authorizer = authorizer
 	service := &UsageService{
-		forcastsClient: &forcastsClient,
-		usageClient:    &usageDetailsClient,
-		context:        context.Background(),
-		log:            logp.NewLogger("azure billing service"),
+		usageDetailsClient: &usageDetailsClient,
+		forcastsClient:     &forcastsClient,
+		context:            context.Background(),
+		log:                logp.NewLogger("azure billing service"),
 	}
 	return service, nil
 }
@@ -51,6 +60,6 @@ func (service *UsageService) GetForcast(filter string) (consumption.ForecastsLis
 }
 
 // GetUsageDetails
-func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (consumption.UsageDetailsListResultPage, error) {
-	return service.usageClient.List(service.context, scope, expand, filter, skiptoken, top, apply)
+func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error) {
+	return service.usageDetailsClient.List(service.context, scope, expand, filter, skiptoken, top, apply)
 }

@@ -15,14 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"

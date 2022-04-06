@@ -4,6 +4,7 @@
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -13,33 +14,39 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "86.104.194.30",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "86.104.194.30",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 102,
+        "otx.description": "MD5 of a5725af4391d21a232dc6d4ad33d7d915bd190bdac9b1826b73f364dc5c1aa65",
+        "otx.title": "Win32:Hoblig-B",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "90421f8531f963d81cf54245b72cde80",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of a5725af4391d21a232dc6d4ad33d7d915bd190bdac9b1826b73f364dc5c1aa65",
-        "threatintel.otx.title": "Win32:Hoblig-B"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "90421f8531f963d81cf54245b72cde80",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -49,14 +56,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "ip.anysrc.net"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "ip.anysrc.net"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -66,14 +76,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "107.173.58.176",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "107.173.58.176",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -83,32 +96,38 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "d8c70ca70fd3555a0828fede6cc1f59e2c320ede80157039b6a2f09c336d5f7a",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "d8c70ca70fd3555a0828fede6cc1f59e2c320ede80157039b6a2f09c336d5f7a",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 688,
+        "otx.description": "MD5 of df9b37477a83189cd4541674e64ce29bf7bf98338ed0d635276660e0c6419d09",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "f8e58af3ffefd4037fef246e93a55dc8",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of df9b37477a83189cd4541674e64ce29bf7bf98338ed0d635276660e0c6419d09"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "f8e58af3ffefd4037fef246e93a55dc8",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -118,32 +137,38 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "1c62f004d0c9b91d3467b1b8106772e667e7e2075470c2ec7982b63573c90c54",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "1c62f004d0c9b91d3467b1b8106772e667e7e2075470c2ec7982b63573c90c54",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 1053,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "8d24a14f2600482d0231396b6350cf21773335ec2f0b8919763317fdab78baae",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "8d24a14f2600482d0231396b6350cf21773335ec2f0b8919763317fdab78baae",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -153,14 +178,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "213.252.244.38",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "213.252.244.38",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -170,14 +198,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "c758ec922b173820374e552c2f015ac53cc5d9f99cc92080e608652aaa63695b",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "c758ec922b173820374e552c2f015ac53cc5d9f99cc92080e608652aaa63695b",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -187,32 +218,38 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 1671,
+        "otx.description": "MD5 of 0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "aeb08b0651bc8a13dcf5e5f6c0d482f8",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "aeb08b0651bc8a13dcf5e5f6c0d482f8",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -222,14 +259,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "6df5e1a017dff52020c7ff6ad92fdd37494e31769e1be242f6b23d1ea2d60140",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "6df5e1a017dff52020c7ff6ad92fdd37494e31769e1be242f6b23d1ea2d60140",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -239,14 +279,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "c72fef3835f65cb380f6920b22c3488554d1af6d298562ccee92284f265c9619",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "c72fef3835f65cb380f6920b22c3488554d1af6d298562ccee92284f265c9619",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -256,14 +299,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "e711fcd0f182b214c6ec74011a395f4c853068d59eb7c57f90c4a3e1de64434a",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "e711fcd0f182b214c6ec74011a395f4c853068d59eb7c57f90c4a3e1de64434a",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -273,14 +319,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "d3ec8f4a46b21fb189fc3d58f3d87bf9897653ecdf90b7952dcc71f3b4023b4e",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "d3ec8f4a46b21fb189fc3d58f3d87bf9897653ecdf90b7952dcc71f3b4023b4e",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -290,108 +339,126 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "70447996722e5c04514d20b7a429d162b46546002fb0c87f512b40f16bac99bb",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "70447996722e5c04514d20b7a429d162b46546002fb0c87f512b40f16bac99bb",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 2703,
+        "otx.description": "MD5 of 113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "29340643ca2e6677c19e1d3bf351d654",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "29340643ca2e6677c19e1d3bf351d654",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 2919,
+        "otx.description": "MD5 of 9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "86c314bc2dc37ba84f7364acd5108c2b",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "86c314bc2dc37ba84f7364acd5108c2b",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 3135,
+        "otx.description": "MD5 of 1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
+        "otx.title": "Trojan:Win32/Occamy.B",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "cb0c1248d3899358a375888bb4e8f3fe",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
-        "threatintel.otx.title": "Trojan:Win32/Occamy.B"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "cb0c1248d3899358a375888bb4e8f3fe",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 3355,
+        "otx.description": "MD5 of 3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "d348f536e214a47655af387408b4fca5",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "d348f536e214a47655af387408b4fca5",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 3571,
+        "otx.title": "vad_contains_network_strings",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "29ff1903832827e328ad9ec05fdf268eadd6db8b613597cf65f8740c211be413",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "vad_contains_network_strings"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "29ff1903832827e328ad9ec05fdf268eadd6db8b613597cf65f8740c211be413",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -401,14 +468,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "b105891f90b2a8730bbadf02b5adeccbba539883bf75dec2ff7a5a97625dd222",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "b105891f90b2a8730bbadf02b5adeccbba539883bf75dec2ff7a5a97625dd222",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -418,32 +488,38 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "e4db5405ac7ab517d43722e1ca8d653ea4a32802bc8a5410d032275eedc7b7ee",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "e4db5405ac7ab517d43722e1ca8d653ea4a32802bc8a5410d032275eedc7b7ee",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 4098,
+        "otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -453,52 +529,61 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "5051906d6ed1b2ae9c9a9f070ef73c9be8f591d2e41d144649a0dc96e28d0400",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "5051906d6ed1b2ae9c9a9f070ef73c9be8f591d2e41d144649a0dc96e28d0400",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 4470,
+        "otx.description": "MD5 of 465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
+        "otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "14b74cb9be8cad8eb5fa8842d00bb692",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
-        "threatintel.otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "14b74cb9be8cad8eb5fa8842d00bb692",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 4709,
+        "otx.description": "SHA1 of 465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
+        "otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "a5b59f7d133e354dfc73f40517aab730f322f0ef",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "SHA1 of 465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
-        "threatintel.otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "a5b59f7d133e354dfc73f40517aab730f322f0ef",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -508,52 +593,61 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "8d3f68b16f0710f858d8c1d2c699260e6f43161a5510abb0e7ba567bd72c965b",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "8d3f68b16f0710f858d8c1d2c699260e6f43161a5510abb0e7ba567bd72c965b",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 5125,
+        "otx.description": "MD5 of 5cb822616d2c9435c9ddd060d6abdbc286ab57cfcf6dc64768c52976029a925b",
+        "otx.title": "vad_contains_network_strings",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "ff2dcea4963e060a658f4dffbb119529",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 5cb822616d2c9435c9ddd060d6abdbc286ab57cfcf6dc64768c52976029a925b",
-        "threatintel.otx.title": "vad_contains_network_strings"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "ff2dcea4963e060a658f4dffbb119529",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 5352,
+        "otx.description": "MD5 of 29ff1903832827e328ad9ec05fdf268eadd6db8b613597cf65f8740c211be413",
+        "otx.title": "vad_contains_network_strings",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "0d73f1a1c4b2f8723fffc83eb3d00f31",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 29ff1903832827e328ad9ec05fdf268eadd6db8b613597cf65f8740c211be413",
-        "threatintel.otx.title": "vad_contains_network_strings"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "0d73f1a1c4b2f8723fffc83eb3d00f31",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -563,14 +657,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "185.25.50.167",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "185.25.50.167",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -580,14 +677,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "d35a30264c0698709ad554489004e0077e263d354ced0c54552a0b500f91ecc0",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "d35a30264c0698709ad554489004e0077e263d354ced0c54552a0b500f91ecc0",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -597,50 +697,59 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "5264b455f453820be629a324196131492ff03c80491e823ac06657c9387250dd",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "5264b455f453820be629a324196131492ff03c80491e823ac06657c9387250dd",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 6018,
+        "otx.title": "Trojan:Win32/Occamy.B",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Trojan:Win32/Occamy.B"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 6204,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -650,50 +759,59 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "b8e463789a076b16a90d1aae73cea9d3880ac0ead1fd16587b8cd79e37a1a3d8",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "b8e463789a076b16a90d1aae73cea9d3880ac0ead1fd16587b8cd79e37a1a3d8",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 6553,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 6735,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -703,90 +821,105 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "c51024bb119211c335f95e731cfa9a744fcdb645a57d35fb379d01b7dbdd098e",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "c51024bb119211c335f95e731cfa9a744fcdb645a57d35fb379d01b7dbdd098e",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 7084,
+        "otx.description": "SHA1 of 9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "ad20c6fac565f901c82a21b70f9739037eb54818",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "SHA1 of 9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "ad20c6fac565f901c82a21b70f9739037eb54818",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 7310,
+        "otx.description": "SHA1 of 3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "13f11e273f9a4a56557f03821c3bfd591cca6ebc",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "SHA1 of 3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "13f11e273f9a4a56557f03821c3bfd591cca6ebc",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 7536,
+        "otx.description": "SHA1 of 113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "1581fe76e3c96dc33182daafd09c8cf5c17004e0",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "SHA1 of 113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "1581fe76e3c96dc33182daafd09c8cf5c17004e0",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 7762,
+        "otx.description": "SHA1 of 1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
+        "otx.title": "Trojan:Win32/Occamy.B",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "b72e75e9e901a44b655a5cf89cf0eadcaff46037",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "SHA1 of 1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
-        "threatintel.otx.title": "Trojan:Win32/Occamy.B"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "b72e75e9e901a44b655a5cf89cf0eadcaff46037",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -796,14 +929,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "maper.info"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "maper.info"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -813,14 +949,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "213.252.244.126",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "213.252.244.126",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -830,140 +969,164 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "78.129.139.131",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "78.129.139.131",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 8309,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 8498,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "be9fb556a3c7aef0329e768d7f903e7dd42a821abc663e11fb637ce33b007087",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "be9fb556a3c7aef0329e768d7f903e7dd42a821abc663e11fb637ce33b007087",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 8687,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "3bfec096c4837d1e6485fe0ae0ea6f1c0b44edc611d4f2204cc9cf73c985cbc2",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "3bfec096c4837d1e6485fe0ae0ea6f1c0b44edc611d4f2204cc9cf73c985cbc2",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 8876,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "dff2e39b2e008ea89a3d6b36dcd9b8c927fb501d60c1ad5a52ed1ffe225da2e2",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "dff2e39b2e008ea89a3d6b36dcd9b8c927fb501d60c1ad5a52ed1ffe225da2e2",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 9065,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "6b4d271a48d118843aee3dee4481fa2930732ed7075db3241a8991418f00d92b",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "6b4d271a48d118843aee3dee4481fa2930732ed7075db3241a8991418f00d92b",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 9254,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "26de4265303491bed1424d85b263481ac153c2b3513f9ee48ffb42c12312ac43",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "26de4265303491bed1424d85b263481ac153c2b3513f9ee48ffb42c12312ac43",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 9443,
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "02f54da6c6f2f87ff7b713d46e058dedac1cedabd693643bb7f6dfe994b2105d",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "02f54da6c6f2f87ff7b713d46e058dedac1cedabd693643bb7f6dfe994b2105d",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -973,14 +1136,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "103.13.67.4",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "103.13.67.4",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -990,14 +1156,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "80.90.87.201",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "80.90.87.201",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1007,14 +1176,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "80.80.163.182",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "80.80.163.182",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1024,14 +1196,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "91.187.114.210",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "91.187.114.210",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1041,14 +1216,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "170.238.117.187",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "170.238.117.187",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1058,14 +1236,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha256": "e999b83629355ec7ff3b6fda465ef53ce6992c9327344fbf124f7eb37808389d",
-        "threatintel.indicator.type": "file"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha256": "e999b83629355ec7ff3b6fda465ef53ce6992c9327344fbf124f7eb37808389d",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1075,14 +1256,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "103.84.238.3",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "103.84.238.3",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1092,14 +1276,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "179.43.158.171",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "179.43.158.171",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1109,32 +1296,38 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "198.211.116.199",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "198.211.116.199",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 10641,
+        "otx.title": "Trickbot",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "203.176.135.102",
-        "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.title": "Trickbot"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "203.176.135.102",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1144,14 +1337,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "fotmailz.com"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "fotmailz.com"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1161,14 +1357,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "pori89g5jqo3v8.com"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "pori89g5jqo3v8.com"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1178,32 +1377,38 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "sebco.co.ke"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "sebco.co.ke"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 11077,
+        "otx.title": "Trickbot",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "177.74.232.124",
-        "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.title": "Trickbot"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "177.74.232.124",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1213,14 +1418,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "chishir.com"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "chishir.com"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1230,14 +1438,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "kostunivo.com"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "kostunivo.com"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1247,14 +1458,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "mangoclone.com"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "mangoclone.com"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1264,104 +1478,122 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "domain-name",
-        "threatintel.indicator.url.domain": "onixcellent.com"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "domain-name",
+        "threat.indicator.url.domain": "onixcellent.com"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 11618,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "fc0efd612ad528795472e99cae5944b68b8e26dc",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "fc0efd612ad528795472e99cae5944b68b8e26dc",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 11774,
+        "otx.title": "Sf:ShellCode-DZ\\ [Trj]",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "24d4bbc982a6a561f0426a683b9617de1a96a74a",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Sf:ShellCode-DZ\\ [Trj]"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "24d4bbc982a6a561f0426a683b9617de1a96a74a",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 11936,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "fa98074dc18ad7e2d357b5d168c00a91256d87d1",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "fa98074dc18ad7e2d357b5d168c00a91256d87d1",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 12092,
+        "otx.title": "Win64:Malware-gen",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.sha1": "e5dc7c8bfa285b61dda1618f0ade9c256be75d1a",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.title": "Win64:Malware-gen"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.sha1": "e5dc7c8bfa285b61dda1618f0ade9c256be75d1a",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 12248,
+        "otx.title": "Trickbot",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "96.9.77.142",
-        "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.title": "Trickbot"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "96.9.77.142",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1371,14 +1603,17 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "36.89.106.69",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "36.89.106.69",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1388,33 +1623,39 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.ip": "96.9.73.73",
-        "threatintel.indicator.type": "ipv4-addr"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.ip": "96.9.73.73",
+        "threat.indicator.type": "ipv4-addr"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
         "log.offset": 12563,
+        "otx.description": "MD5 of 9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6",
+        "otx.title": "xor_0x20_xord_javascript",
         "service.type": "threatintel",
         "tags": [
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.file.hash.md5": "10ec3571596c30b9993b89f12d29d23c",
-        "threatintel.indicator.type": "file",
-        "threatintel.otx.description": "MD5 of 9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6",
-        "threatintel.otx.title": "xor_0x20_xord_javascript"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.file.hash.md5": "10ec3571596c30b9993b89f12d29d23c",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1424,18 +1665,21 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "url",
-        "threatintel.indicator.url.domain": "www.playboysplus.com",
-        "threatintel.indicator.url.full": "http://www.playboysplus.com",
-        "threatintel.indicator.url.original": "http://www.playboysplus.com",
-        "threatintel.indicator.url.path": "",
-        "threatintel.indicator.url.scheme": "http"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "www.playboysplus.com",
+        "threat.indicator.url.full": "http://www.playboysplus.com",
+        "threat.indicator.url.original": "http://www.playboysplus.com",
+        "threat.indicator.url.path": "",
+        "threat.indicator.url.scheme": "http"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1445,18 +1689,21 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "url",
-        "threatintel.indicator.url.domain": "join.playboysplus.com",
-        "threatintel.indicator.url.full": "http://join.playboysplus.com/signup/",
-        "threatintel.indicator.url.original": "http://join.playboysplus.com/signup/",
-        "threatintel.indicator.url.path": "/signup/",
-        "threatintel.indicator.url.scheme": "http"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "join.playboysplus.com",
+        "threat.indicator.url.full": "http://join.playboysplus.com/signup/",
+        "threat.indicator.url.original": "http://join.playboysplus.com/signup/",
+        "threat.indicator.url.path": "/signup/",
+        "threat.indicator.url.scheme": "http"
     },
     {
         "event.category": "threat",
         "event.dataset": "threatintel.otx",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.timezone": "-02:00",
         "event.type": "indicator",
         "fileset.name": "otx",
         "input.type": "log",
@@ -1466,13 +1713,15 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.type": "url",
-        "threatintel.indicator.url.domain": "api.vk.com",
-        "threatintel.indicator.url.extension": "get",
-        "threatintel.indicator.url.full": "http://api.vk.com/method/wall.get?count=1&owner_id=-81972386",
-        "threatintel.indicator.url.original": "http://api.vk.com/method/wall.get?count=1&owner_id=-81972386",
-        "threatintel.indicator.url.path": "/method/wall.get",
-        "threatintel.indicator.url.query": "count=1&owner_id=-81972386",
-        "threatintel.indicator.url.scheme": "http"
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Alienvault OTX",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "api.vk.com",
+        "threat.indicator.url.extension": "get",
+        "threat.indicator.url.full": "http://api.vk.com/method/wall.get?count=1&owner_id=-81972386",
+        "threat.indicator.url.original": "http://api.vk.com/method/wall.get?count=1&owner_id=-81972386",
+        "threat.indicator.url.path": "/method/wall.get",
+        "threat.indicator.url.query": "count=1&owner_id=-81972386",
+        "threat.indicator.url.scheme": "http"
     }
 ]

@@ -5,6 +5,8 @@
 
 == Cisco module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for Cisco network device's logs and Cisco Umbrella. It includes the following
 filesets for receiving logs over syslog or read from a file:
 
@@ -298,7 +300,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "cisconxos" device r
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 
@@ -343,7 +345,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "ciscomeraki" device
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 

@@ -18,7 +18,7 @@
 package tls
 
 import (
-	"crypto/dsa"
+	"crypto/dsa" //lint:ignore SA1019 Deprecated, but still used. So we have to handle it.
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
@@ -54,21 +54,22 @@ type recordType uint8
 
 const (
 	recordTypeChangeCipherSpec recordType = 20
-	recordTypeAlert                       = 21
-	recordTypeHandshake                   = 22
-	recordTypeApplicationData             = 23
+	recordTypeAlert            recordType = 21
+	recordTypeHandshake        recordType = 22
+	recordTypeApplicationData  recordType = 23
 )
 
 type handshakeType uint8
 
 const (
 	helloRequest       handshakeType = 0
-	clientHello                      = 1
-	serverHello                      = 2
-	certificate                      = 11
-	serverKeyExchange                = 12
-	certificateRequest               = 13
-	clientKeyExchange                = 16
+	clientHello        handshakeType = 1
+	serverHello        handshakeType = 2
+	certificate        handshakeType = 11
+	serverKeyExchange  handshakeType = 12
+	certificateRequest handshakeType = 13
+	clientKeyExchange  handshakeType = 16
+	certificateStatus  handshakeType = 22
 )
 
 type parserResult int8
@@ -99,8 +100,34 @@ type parser struct {
 	// for a certificate
 	certRequested bool
 
+	// ocspResponse is the top level OCSP response status.
+	ocspResponse        ocspResponseStatus
+	ocspResponseIsValid bool
+
 	// If a key-exchange message has been sent. Used to detect session resumption
 	keyExchanged bool
+}
+
+// https://www.rfc-editor.org/rfc/rfc6960#section-4.2.1
+type ocspResponseStatus byte
+
+func (s ocspResponseStatus) String() string {
+	switch s {
+	case 0: // Response has valid confirmations
+		return "successful"
+	case 1: // Illegal confirmation request
+		return "malformedRequest"
+	case 2: // Internal error in issuer
+		return "internalError"
+	case 3: // Try again later
+		return "tryLater"
+	case 5: // Must sign the request
+		return "sigRequired"
+	case 6: // Request unauthorized
+		return "unauthorized"
+	default:
+		return fmt.Sprint(byte(s))
+	}
 }
 
 type tlsVersion struct {
@@ -120,6 +147,7 @@ type handshakeHeader struct {
 
 type helloMessage struct {
 	version   tlsVersion
+	random    []byte
 	timestamp uint32
 	sessionID string
 	ticket    tlsTicket
@@ -169,8 +197,10 @@ func readHandshakeHeader(buf *streambuf.Buffer) (*handshakeHeader, error) {
 	if len16, err = buf.ReadNetUint16At(2); err != nil {
 		return nil, err
 	}
-	return &handshakeHeader{handshakeType(typ),
-		int(len16) | (int(len8) << 16)}, nil
+	return &handshakeHeader{
+		handshakeType(typ),
+		int(len16) | (int(len8) << 16),
+	}, nil
 }
 
 func (header *recordHeader) String() string {
@@ -188,6 +218,9 @@ func (hello *helloMessage) toMap() common.MapStr {
 	}
 	if len(hello.sessionID) != 0 {
 		m["session_id"] = hello.sessionID
+	}
+	if len(hello.random) != 0 {
+		m["random"] = hex.EncodeToString(hello.random)
 	}
 
 	if len(hello.supported.compression) > 0 {
@@ -215,7 +248,6 @@ func (hello *helloMessage) supportedCiphers() []string {
 }
 
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
-
 	for buf.Avail(recordHeaderSize) {
 
 		header, err := readRecordHeader(buf)
@@ -360,6 +392,9 @@ func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferV
 	case serverKeyExchange:
 		parser.setDirection(dirServer)
 		parser.keyExchanged = true
+
+	case certificateStatus:
+		parser.ocspResponse, parser.ocspResponseIsValid = parseOCSPStatus(buffer)
 	}
 	return true
 }
@@ -393,12 +428,14 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 		return 0, false
 	}
 
-	if bytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength)); len(bytes) == int(sessionIDLength) {
-		dest.sessionID = hex.EncodeToString(bytes)
-	} else {
+	bytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength))
+	if len(bytes) != int(sessionIDLength) {
 		logp.Warn("Not a TLS hello (failed reading session ID)")
 		return 0, false
 	}
+	dest.sessionID = hex.EncodeToString(bytes)
+	dest.random = buffer.readBytes(2, 4+randomDataLength)
+
 	return helloHeaderLength + randomDataLength + int(sessionIDLength), true
 }
 
@@ -502,6 +539,23 @@ func parseCertificates(buffer bufferView) (certs []*x509.Certificate) {
 	return certs
 }
 
+func parseOCSPStatus(buffer bufferView) (status ocspResponseStatus, ok bool) {
+	const (
+		statusTypeLen     = 1
+		respLengthLen     = 3
+		ocspRespHeaderLen = 6
+
+		ocspStatusType = 1
+	)
+	var b byte
+	ok = buffer.read8(0, &b)
+	if !ok || b != ocspStatusType {
+		return 0, false
+	}
+	ok = buffer.read8(statusTypeLen+respLengthLen+ocspRespHeaderLen, &b)
+	return ocspResponseStatus(b), ok
+}
+
 func (version tlsVersion) String() string {
 	if version.major == 3 {
 		if version.minor > 0 {
@@ -571,14 +625,12 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		// remove this in 8.x
-		"version":        cert.Version,
-		"serial_number":  cert.SerialNumber.Text(10),
-		"issuer":         toMap(&cert.Issuer),
-		"subject":        toMap(&cert.Subject),
-		"not_before":     cert.NotBefore,
-		"not_after":      cert.NotAfter,
-		"version_number": cert.Version,
+		"serial_number":        cert.SerialNumber.Text(10),
+		"issuer":               toMap(&cert.Issuer),
+		"subject":              toMap(&cert.Subject),
+		"not_before":           cert.NotBefore,
+		"not_after":            cert.NotAfter,
+		"version_number":       cert.Version,
 	}
 	if keySize := getKeySize(cert.PublicKey); keySize > 0 {
 		certMap["public_key_size"] = keySize
@@ -604,8 +656,6 @@ func toMap(name *pkix.Name) common.MapStr {
 		{"organization", name.Organization},
 		{"organizational_unit", name.OrganizationalUnit},
 		{"locality", name.Locality},
-		// remove this in 8.x
-		{"province", name.Province},
 		{"postal_code", name.PostalCode},
 		{"serial_number", name.SerialNumber},
 		{"common_name", name.CommonName},

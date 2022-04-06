@@ -18,9 +18,6 @@
 package kafka
 
 import (
-	"errors"
-	"time"
-
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -32,18 +29,7 @@ import (
 )
 
 const (
-	defaultWaitRetry = 1 * time.Second
-
-	// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does
-	// not return ErrTempBulkFailure
-	defaultMaxWaitRetry = 60 * time.Second
-
 	logSelector = "kafka"
-)
-
-var (
-	errNoTopicSet = errors.New("No topic configured")
-	errNoHosts    = errors.New("No hosts configured")
 )
 
 func init() {
@@ -86,7 +72,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, config.Headers, codec, libCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}

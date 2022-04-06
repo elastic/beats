@@ -15,15 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
 // +build linux
 
 package diskio
 
 import (
-	"runtime"
+	"math"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 )
 
 // GetCLKTCK emulates the _SC_CLK_TCK syscall
@@ -51,6 +55,28 @@ func (stat *IOStat) OpenSampling() error {
 	return stat.curCPU.Get()
 }
 
+// a few of the diskio counters are actually 32-bit on the kernel side, which means they can roll over fairly easily.
+// Here we try to reconstruct the values by calculating the pre-rollover delta from unt32 max, then adding.
+// If you want to get technical, this could be a tad unsafe, as we don't actually have any way of knowing if the word size changes in a future kernel, and we've rolled over at UINT64_MAX
+
+// See https://docs.kernel.org/admin-guide/iostats.html and https://github.com/torvalds/linux/blob/master/block/genhd.c diskstats_show()
+func returnOrFix32BitRollover(current, prev uint64) uint64 {
+	var maxUint32 uint64 = math.MaxUint32 //4_294_967_295 Max value in uint32/unsigned int
+
+	if current >= prev {
+		return current - prev
+	}
+	// we're at a uint64 if we hit this
+	if prev > maxUint32 {
+		return 0
+	}
+
+	delta := maxUint32 - prev
+
+	return delta + current
+
+}
+
 // CalcIOStatistics calculates IO statistics.
 func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, error) {
 	var last disk.IOCountersStat
@@ -63,7 +89,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	}
 
 	// calculate the delta ms between the CloseSampling and OpenSampling
-	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(runtime.NumCPU()) / float64(GetCLKTCK())
+	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(numcpu.NumCPU()) / float64(GetCLKTCK())
 	if deltams <= 0 {
 		return IOMetric{}, errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
 	}
@@ -71,13 +97,14 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	rdIOs := counter.ReadCount - last.ReadCount
 	rdMerges := counter.MergedReadCount - last.MergedReadCount
 	rdBytes := counter.ReadBytes - last.ReadBytes
-	rdTicks := counter.ReadTime - last.ReadTime
+	rdTicks := returnOrFix32BitRollover(counter.ReadTime, last.ReadTime)
 	wrIOs := counter.WriteCount - last.WriteCount
 	wrMerges := counter.MergedWriteCount - last.MergedWriteCount
 	wrBytes := counter.WriteBytes - last.WriteBytes
-	wrTicks := counter.WriteTime - last.WriteTime
-	ticks := counter.IoTime - last.IoTime
-	aveq := counter.WeightedIO - last.WeightedIO
+	wrTicks := returnOrFix32BitRollover(counter.WriteTime, last.WriteTime)
+	ticks := returnOrFix32BitRollover(counter.IoTime, last.IoTime)
+	aveq := returnOrFix32BitRollover(counter.WeightedIO, last.WeightedIO)
+
 	nIOs := rdIOs + wrIOs
 	nTicks := rdTicks + wrTicks
 	nBytes := rdBytes + wrBytes
@@ -93,7 +120,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 
 	queue := float64(aveq) / deltams
 	perSec := func(x uint64) float64 {
-		return 1000.0 * float64(x) / deltams
+		return common.Round(1000.0*float64(x)/deltams, common.DefaultDecimalPlacesCount)
 	}
 
 	result := IOMetric{}
@@ -103,17 +130,17 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	result.WriteRequestCountPerSec = perSec(wrIOs)
 	result.ReadBytesPerSec = perSec(rdBytes)
 	result.WriteBytesPerSec = perSec(wrBytes)
-	result.AvgRequestSize = size
-	result.AvgQueueSize = queue
-	result.AvgAwaitTime = wait
+	result.AvgRequestSize = common.Round(size, common.DefaultDecimalPlacesCount)
+	result.AvgQueueSize = common.Round(queue, common.DefaultDecimalPlacesCount)
+	result.AvgAwaitTime = common.Round(wait, common.DefaultDecimalPlacesCount)
 	if rdIOs > 0 {
-		result.AvgReadAwaitTime = float64(rdTicks) / float64(rdIOs)
+		result.AvgReadAwaitTime = common.Round(float64(rdTicks)/float64(rdIOs), common.DefaultDecimalPlacesCount)
 	}
 	if wrIOs > 0 {
-		result.AvgWriteAwaitTime = float64(wrTicks) / float64(wrIOs)
+		result.AvgWriteAwaitTime = common.Round(float64(wrTicks)/float64(wrIOs), common.DefaultDecimalPlacesCount)
 	}
-	result.AvgServiceTime = svct
-	result.BusyPct = 100.0 * float64(ticks) / deltams
+	result.AvgServiceTime = common.Round(svct, common.DefaultDecimalPlacesCount)
+	result.BusyPct = common.Round(100.0*float64(ticks)/deltams, common.DefaultDecimalPlacesCount)
 	if result.BusyPct > 100.0 {
 		result.BusyPct = 100.0
 	}

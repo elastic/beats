@@ -1,6 +1,6 @@
 [
     {
-        "destination.ip": "1.2.3.4",
+        "destination.ip": "1.128.3.4",
         "destination.port": 5000,
         "event.category": [
             "network",
@@ -16,26 +16,20 @@
         "fileset.name": "log",
         "haproxy.frontend_name": "main",
         "haproxy.mode": "HTTP",
-        "haproxy.source": "1.2.3.4",
+        "haproxy.source": "1.128.3.4",
         "input.type": "log",
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 24551,
         "related.ip": [
-            "1.2.3.4",
-            "1.2.3.4"
+            "1.128.3.4",
+            "1.128.3.4"
         ],
         "service.type": "haproxy",
-        "source.address": "1.2.3.4",
-        "source.geo.city_name": "Moscow",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "RU",
-        "source.geo.country_name": "Russia",
-        "source.geo.location.lat": 55.7527,
-        "source.geo.location.lon": 37.6172,
-        "source.geo.region_iso_code": "RU-MOW",
-        "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
+        "source.address": "1.128.3.4",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
         "source.port": 40780
     }
 ]

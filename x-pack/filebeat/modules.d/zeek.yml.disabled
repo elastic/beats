@@ -3,83 +3,83 @@
 
 - module: zeek
   capture_loss:
-    enabled: true
+    enabled: false
   connection:
-    enabled: true
+    enabled: false
   dce_rpc:
-    enabled: true
+    enabled: false
   dhcp:
-    enabled: true
+    enabled: false
   dnp3:
-    enabled: true
+    enabled: false
   dns:
-    enabled: true
+    enabled: false
   dpd:
-    enabled: true
+    enabled: false
   files:
-    enabled: true
+    enabled: false
   ftp:
-    enabled: true
+    enabled: false
   http:
-    enabled: true
+    enabled: false
   intel:
-    enabled: true
+    enabled: false
   irc:
-    enabled: true
+    enabled: false
   kerberos:
-    enabled: true
+    enabled: false
   modbus:
-    enabled: true
+    enabled: false
   mysql:
-    enabled: true
+    enabled: false
   notice:
-    enabled: true
+    enabled: false
   ntp:
-    enabled: true
+    enabled: false
   ntlm:
-    enabled: true
+    enabled: false
   ocsp:
-    enabled: true
+    enabled: false
   pe:
-    enabled: true
+    enabled: false
   radius:
-    enabled: true
+    enabled: false
   rdp:
-    enabled: true
+    enabled: false
   rfb:
-    enabled: true
+    enabled: false
   signature:
-    enabled: true
+    enabled: false
   sip:
-    enabled: true
+    enabled: false
   smb_cmd:
-    enabled: true
+    enabled: false
   smb_files:
-    enabled: true
+    enabled: false
   smb_mapping:
-    enabled: true
+    enabled: false
   smtp:
-    enabled: true
+    enabled: false
   snmp:
-    enabled: true
+    enabled: false
   socks:
-    enabled: true
+    enabled: false
   ssh:
-    enabled: true
+    enabled: false
   ssl:
-    enabled: true
+    enabled: false
   stats:
-    enabled: true
+    enabled: false
   syslog:
-    enabled: true
+    enabled: false
   traceroute:
-    enabled: true
+    enabled: false
   tunnel:
-    enabled: true
+    enabled: false
   weird:
-    enabled: true
+    enabled: false
   x509:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

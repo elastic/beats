@@ -39,7 +39,7 @@ output.elasticsearch:
 ----
 output.elasticsearch:
   hosts: ["https://myEShost:9200"]
-  api_key: "KnR6yE41RrSowb0kQ0HWoA"
+  api_key: "ZCV7VnwBgnX0T19fN8Qe:KnR6yE41RrSowb0kQ0HWoA"
 ----
 
 *PKI certificate authentication:*
@@ -59,6 +59,9 @@ See <<securing-communication-elasticsearch>> for details on each authentication 
 This output works with all compatible versions of Elasticsearch. See the
 https://www.elastic.co/support/matrix#matrix_compatibility[Elastic Support
 Matrix].
+
+For optimal experience, {beatname_uc} only connects to instances that are at least on the
+same version as the Beat. The check can be disabled by setting `output.elasticsearch.allow_older_versions`.
 
 ==== Configuration options
 
@@ -429,7 +432,7 @@ ifndef::no-pipeline[]
 [[pipeline-option-es]]
 ===== `pipeline`
 
-A format string value that specifies the ingest node pipeline to write events to.
+A format string value that specifies the ingest pipeline to write events to.
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
@@ -441,7 +444,7 @@ output.elasticsearch:
 For more information, see <<configuring-ingest-node>>.
 
 ifndef::apm-server[]
-You can set the ingest node pipeline dynamically by using a format string to
+You can set the ingest pipeline dynamically by using a format string to
 access any event field. For example, this configuration uses a custom field,
 `fields.log_type`, to set the pipeline for each event:
 
@@ -458,7 +461,7 @@ pipeline named `critical_pipeline`.
 endif::apm-server[]
 
 ifdef::apm-server[]
-You can set the ingest node pipeline dynamically by using a format string to
+You can set the ingest pipeline dynamically by using a format string to
 access any event field. For example, this configuration uses the field,
 `processor.event`, to set the pipeline for each event:
 
@@ -481,12 +484,12 @@ TIP: To learn how to add custom fields to events, see the
 <<libbeat-configuration-fields,`fields`>> option.
 
 See the <<pipelines-option-es,`pipelines`>> setting for other ways to set the
-ingest node pipeline dynamically.
+ingest pipeline dynamically.
 
 [[pipelines-option-es]]
 ===== `pipelines`
 
-An array of pipeline selector rules. Each rule specifies the ingest node
+An array of pipeline selector rules. Each rule specifies the ingest
 pipeline to use for events that match the rule. During publishing, {beatname_uc}
 uses the first matching rule in the array. Rules can contain conditionals,
 format string-based fields, and name mappings. If the `pipelines` setting is
@@ -613,7 +616,7 @@ pipeline named `error_pipeline`, etc.
 NOTE: Defining any pipeline will deactivate the default `apm` pipeline.
 endif::apm-server[]
 
-For more information about ingest node pipelines, see
+For more information about ingest pipelines, see
 <<configuring-ingest-node>>.
 
 endif::[]
@@ -667,6 +670,14 @@ Elasticsearch after a network error. The default is `60s`.
 ===== `timeout`
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
+
+==== `allow_older_versions`
+
+By default, {beatname_uc} expects the Elasticsearch instance to be on the same or newer version to provide
+optimal experience. We suggest you connect to the same version to make sure all features {beatname_uc} is using are
+available in your Elasticsearch instance.
+
+You can disable the check for example during updating the Elastic Stack, so data collection can go on.
 
 ===== `ssl`
 

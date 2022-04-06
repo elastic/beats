@@ -10,7 +10,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -30,6 +29,7 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     }
 ]

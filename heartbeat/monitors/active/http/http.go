@@ -121,7 +121,7 @@ func create(
 		js[i] = wrappers.WithURLField(u, job)
 	}
 
-	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(config.Hosts)}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts)}, nil
 }
 
 func newRoundTripper(config *Config) (http.RoundTripper, error) {

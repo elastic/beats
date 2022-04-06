@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 request.url: {{ .url }}
@@ -91,14 +90,7 @@ processors:
   - fingerprint:
       fields: ["json.issue.id"]
       target_field: "@metadata._id"
-  - script:
-      lang: javascript
-      id: my_filter
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0

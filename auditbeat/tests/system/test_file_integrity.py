@@ -12,8 +12,8 @@ def escape_path(path):
 def has_file(objs, path, sha1hash):
     found = False
     for obj in objs:
-        if 'file.path' in obj and 'hash.sha1' in obj \
-                and obj['file.path'].lower() == path.lower() and obj['hash.sha1'] == sha1hash:
+        if 'file.path' in obj and 'file.hash.sha1' in obj \
+                and obj['file.path'].lower() == path.lower() and obj['file.hash.sha1'] == sha1hash:
             found = True
             break
     assert found, "File '{0}' with sha1sum '{1}' not found".format(path, sha1hash)
@@ -62,7 +62,7 @@ class Test(BaseTest):
             else:
                 break
 
-    @unittest.skipIf(os.getenv("BUILD_ID") is not None and platform.system() == 'Darwin',
+    @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin',
                      'Flaky test: https://github.com/elastic/beats/issues/24678')
     def test_non_recursive(self):
         """
@@ -98,7 +98,7 @@ class Test(BaseTest):
 
             # wait until file1 is reported before deleting. Otherwise the hash
             # might not be calculated
-            self.wait_log_contains("\"path\": \"{0}\"".format(escape_path(file1)), ignore_case=True)
+            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file1)), ignore_case=True)
 
             os.unlink(file1)
 
@@ -107,8 +107,9 @@ class Test(BaseTest):
             file3 = os.path.join(subdir, "other_file.txt")
             self.create_file(file3, "not reported.")
 
-            self.wait_log_contains("\"deleted\"")
-            self.wait_log_contains("\"path\": \"{0}\"".format(escape_path(subdir)), ignore_case=True)
+            # log entries are JSON formatted, this value shows up as an escaped json string.
+            self.wait_log_contains("\\\"deleted\\\"")
+            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(subdir)), ignore_case=True)
             self.wait_output(3)
             self.wait_until(lambda: any(
                 'file.path' in obj and obj['file.path'].lower() == subdir.lower() for obj in self.read_output()))
@@ -157,7 +158,7 @@ class Test(BaseTest):
             # wait until the directories to watch are printed in the logs
             # this happens when the file_integrity module starts
             self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
-            self.wait_log_contains("\"recursive\": true")
+            self.wait_log_contains("\"recursive\":true")
 
             # auditbeat_test/subdir/
             subdir = os.path.join(dirs[0], "subdir")
@@ -173,7 +174,7 @@ class Test(BaseTest):
             file2 = os.path.join(subdir2, "more.txt")
             self.create_file(file2, "")
 
-            self.wait_log_contains("\"path\": \"{0}\"".format(escape_path(file2)), ignore_case=True)
+            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file2)), ignore_case=True)
             self.wait_output(4)
             self.wait_until(lambda: any(
                 'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))

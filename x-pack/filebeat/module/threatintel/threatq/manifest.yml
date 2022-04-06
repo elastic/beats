@@ -1,0 +1,24 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 1m
+  - name: data_collection_id
+  - name: ssl
+  - name: token_url
+  - name: client_id
+  - name: client_secret
+  - name: host
+    default: "https://www.threatq.com"
+  - name: proxy_url
+  - name: http_client_timeout
+  - name: tags
+    default: [threatintel-threatq, forwarded]
+  - name: preserve_original_event
+    default: false
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

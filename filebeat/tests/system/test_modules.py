@@ -5,11 +5,67 @@ import unittest
 import glob
 import subprocess
 
-from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
 from deepdiff import DeepDiff
+
+# datasets for which @timestamp is removed due to date missing
+remove_timestamp = {
+    "activemq.audit",
+    "barracuda.spamfirewall",
+    "barracuda.waf",
+    "bluecoat.director",
+    "cef.log",
+    "cisco.asa",
+    "cisco.ios",
+    "citrix.netscaler",
+    "cylance.protect",
+    "f5.bigipafm",
+    "fortinet.clientendpoint",
+    "haproxy.log",
+    "icinga.startup",
+    "imperva.securesphere",
+    "infoblox.nios",
+    "iptables.log",
+    "juniper.junos",
+    "juniper.netscreen",
+    "netscout.sightline",
+    "proofpoint.emailsecurity",
+    "redis.log",
+    "snort.log",
+    "symantec.endpointprotection",
+    "system.auth",
+    "system.syslog",
+    "crowdstrike.falcon_endpoint",
+    "crowdstrike.falcon_audit",
+    "zoom.webhook",
+    "threatintel.otx",
+    "threatintel.abuseurl",
+    "threatintel.abusemalware",
+    "threatintel.anomali",
+    "threatintel.anomalithreatstream",
+    "threatintel.malwarebazaar",
+    "threatintel.recordedfuture",
+    "snyk.vulnerabilities",
+    "snyk.audit",
+    "awsfargate.log",
+}
+
+# dataset + log file pairs for which @timestamp is kept as an exception from above
+remove_timestamp_exception = {
+    ('system.syslog', 'tz-offset.log'),
+    ('system.auth', 'timestamp.log'),
+    ('cisco.asa', 'asa.log'),
+    ('cisco.asa', 'hostnames.log'),
+    ('cisco.asa', 'not-ip.log'),
+    ('cisco.asa', 'sample.log')
+}
+
+# array fields whose order is kept before comparison
+array_fields_dont_sort = {
+    "process.args"
+}
 
 
 def load_fileset_test_cases():
@@ -51,7 +107,7 @@ def load_fileset_test_cases():
                 continue
 
             test_files = glob.glob(os.path.join(modules_dir, module,
-                                                fileset, "test", "*.log"))
+                                                fileset, "test", os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log")))
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
@@ -61,9 +117,7 @@ def load_fileset_test_cases():
 class Test(BaseTest):
 
     def init(self):
-        self.elasticsearch_url = self.get_elasticsearch_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url])
+        self.es = self.get_elasticsearch_instance(user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -89,7 +143,7 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url,
+            elasticsearch=self.get_elasticsearch_template_config(user='admin')
         )
 
         self.run_on_file(
@@ -104,7 +158,7 @@ class Test(BaseTest):
         self.assert_explicit_ecs_version_set(module, fileset)
 
         try:
-            self.es.indices.delete(index=self.index_name)
+            self.es.indices.delete_data_stream(self.index_name)
         except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
@@ -124,11 +178,15 @@ class Test(BaseTest):
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
         ]
+        # allow connecting older versions of Elasticsearch
+        if os.getenv("TESTING_FILEBEAT_ALLOW_OLDER"):
+            cmd.extend(["-E", "output.elasticsearch.allow_older_versions=true"])
 
         # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
         if "-json" in test_file:
             cmd.append("-M")
-            cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
+            cmd.append("{module}.{fileset}.var.format=json".format(
+                module=module, fileset=fileset))
 
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
@@ -152,11 +210,14 @@ class Test(BaseTest):
         # List of errors to check in filebeat output logs
         errors = ["error loading pipeline for fileset"]
         # Checks if the output of filebeat includes errors
-        contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
-        assert contains_error is False, "Error found in log:{}".format(error_line)
+        contains_error, error_line = file_contains(
+            os.path.join(output_path, "output.log"), errors)
+        assert contains_error is False, "Error found in log:{}".format(
+            error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name))
+        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+                        name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
@@ -195,10 +256,11 @@ class Test(BaseTest):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
                     for key in objects[k].keys():
-                        if isinstance(objects[k][key], list):
+                        if isinstance(objects[k][key], list) and key not in array_fields_dont_sort:
                             objects[k][key].sort(key=str)
 
-                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
+                json.dump(objects, f, indent=4, separators=(
+                    ',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
@@ -226,7 +288,8 @@ class Test(BaseTest):
 
             d = DeepDiff(ev, obj, ignore_order=True)
 
-            assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
+            assert len(
+                d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
 
 
 def clean_keys(obj):
@@ -242,66 +305,6 @@ def clean_keys(obj):
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
-    # datasets for which @timestamp is removed due to date missing
-    remove_timestamp = {
-        "activemq.audit",
-        "barracuda.spamfirewall",
-        "barracuda.waf",
-        "bluecoat.director",
-        "cef.log",
-        "cisco.asa",
-        "cisco.ios",
-        "citrix.netscaler",
-        "cyberark.corepas",
-        "cylance.protect",
-        "f5.bigipafm",
-        "fortinet.clientendpoint",
-        "haproxy.log",
-        "icinga.startup",
-        "imperva.securesphere",
-        "infoblox.nios",
-        "iptables.log",
-        "juniper.junos",
-        "juniper.netscreen",
-        "netscout.sightline",
-        "proofpoint.emailsecurity",
-        "redis.log",
-        "snort.log",
-        "symantec.endpointprotection",
-        "system.auth",
-        "system.syslog",
-        "microsoft.defender_atp",
-        "crowdstrike.falcon_endpoint",
-        "crowdstrike.falcon_audit",
-        "gsuite.admin",
-        "gsuite.config",
-        "gsuite.drive",
-        "gsuite.groups",
-        "gsuite.ingest",
-        "gsuite.login",
-        "gsuite.saml",
-        "gsuite.user_accounts",
-        "zoom.webhook",
-        "threatintel.otx",
-        "threatintel.abuseurl",
-        "threatintel.abusemalware",
-        "threatintel.anomali",
-        "threatintel.anomalithreatstream",
-        "threatintel.malwarebazaar",
-        "threatintel.recordedfuture",
-        "snyk.vulnerabilities",
-        "snyk.audit",
-        "awsfargate.log",
-    }
-    # dataset + log file pairs for which @timestamp is kept as an exception from above
-    remove_timestamp_exception = {
-        ('system.syslog', 'tz-offset.log'),
-        ('system.auth', 'timestamp.log'),
-        ('cisco.asa', 'asa.log'),
-        ('cisco.asa', 'hostnames.log'),
-        ('cisco.asa', 'not-ip.log'),
-        ('cisco.asa', 'sample.log')
-    }
 
     # Keep source log filename for exceptions
     filename = None

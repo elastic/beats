@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package node
@@ -27,18 +28,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
 func TestEventMapping(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.node")
+
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	event, err := eventMapping(body)
+	event, err := eventMapping(body, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	testCases := map[string]interface{}{

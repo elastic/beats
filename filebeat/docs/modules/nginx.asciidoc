@@ -9,6 +9,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Nginx module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module parses access and error logs created by the
 http://nginx.org/[Nginx] HTTP server.
 

@@ -96,27 +96,36 @@ func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled
 }
 
-// Start the config manager
-func (cm *Manager) Start(stopFunc func()) {
-	if !cm.Enabled() {
-		return
-	}
-
+// SetStopCallback sets the callback to run when the manager want to shutdown the beats gracefully.
+func (cm *Manager) SetStopCallback(stopFunc func()) {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
+	cm.stopFunc = stopFunc
+}
+
+// Start the config manager.
+func (cm *Manager) Start() error {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
+	if !cm.Enabled() {
+		return nil
+	}
 
 	cfgwarn.Beta("Fleet management is enabled")
 	cm.logger.Info("Starting fleet management service")
 
-	cm.stopFunc = stopFunc
 	cm.isRunning = true
 	err := cm.client.Start(context.Background())
 	if err != nil {
 		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
+		return err
 	}
+	cm.logger.Info("Ready to receive configuration")
+	return nil
 }
 
-// Stop the config manager
+// Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *Manager) Stop() {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
@@ -133,6 +142,8 @@ func (cm *Manager) Stop() {
 // CheckRawConfig check settings are correct to start the beat. This method
 // checks there are no collision between the existing configuration and what
 // fleet management can configure.
+//
+// NOTE: This is currently not implemented for fleet.
 func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 	// TODO implement this method
 	return nil
@@ -195,6 +206,7 @@ func (cm *Manager) OnConfig(s string) {
 	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
+		cm.logger.Errorf("failed applying config blocks: %v", err)
 		return
 	}
 
@@ -216,6 +228,9 @@ func (cm *Manager) SetPayload(payload map[string]interface{}) {
 }
 
 func (cm *Manager) OnStop() {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
 	if cm.stopFunc != nil {
 		cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 		cm.stopFunc()
@@ -256,8 +271,8 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 	}
 
 	// Unset missing configs
-	for name := range missing {
-		if missing[name] {
+	for name, isMissing := range missing {
+		if isMissing {
 			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
 				errors = multierror.Append(errors, err)
 			}
@@ -319,6 +334,7 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (ConfigBlocks, error) {
 	for _, regName := range cm.registry.GetRegisteredNames() {
 		iBlock, err := cfg.GetValue(regName)
 		if err != nil {
+			cm.logger.Warnf("failed to get '%s' from config: %v. Continuing to next one", regName, err)
 			continue
 		}
 

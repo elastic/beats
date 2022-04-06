@@ -48,11 +48,12 @@ var (
 )
 
 type Connection struct {
-	URL      string
-	Username string
-	Password string
-	APIKey   string
-	Headers  http.Header
+	URL          string
+	Username     string
+	Password     string
+	APIKey       string
+	ServiceToken string
+	Headers      http.Header
 
 	HTTP    *http.Client
 	Version common.Version
@@ -196,12 +197,13 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, beatname 
 
 	client := &Client{
 		Connection: Connection{
-			URL:      kibanaURL,
-			Username: username,
-			Password: password,
-			APIKey:   config.APIKey,
-			Headers:  headers,
-			HTTP:     rt,
+			URL:          kibanaURL,
+			Username:     username,
+			Password:     password,
+			APIKey:       config.APIKey,
+			ServiceToken: config.ServiceToken,
+			Headers:      headers,
+			HTTP:         rt,
 		},
 		log: log,
 	}
@@ -265,6 +267,10 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 	}
 	if conn.APIKey != "" {
 		v := "ApiKey " + base64.StdEncoding.EncodeToString([]byte(conn.APIKey))
+		req.Header.Set("Authorization", v)
+	}
+	if conn.ServiceToken != "" {
+		v := "Bearer " + conn.ServiceToken
 		req.Header.Set("Authorization", v)
 	}
 
@@ -364,7 +370,6 @@ func (client *Client) ImportMultiPartFormFile(url string, params url.Values, fil
 
 	headers := http.Header{}
 	headers.Add("Content-Type", w.FormDataContentType())
-
 	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
 	if err != nil || statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)

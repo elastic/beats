@@ -1,4 +1,8 @@
-This is the STAN module. The STAN module uses https://github.com/nats-io/nats-streaming-server/blob/master/server/monitor.go[STAN monitoring server APIs] to collect metrics.
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The STAN module uses https://github.com/nats-io/nats-streaming-server/blob/master/server/monitor.go[STAN monitoring server APIs] to collect metrics.
 
 The default metricsets are `channels`, `stats` and `subscriptions`.
 

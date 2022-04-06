@@ -1,6 +1,6 @@
 - module: barracuda
   waf:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -19,7 +19,7 @@
     # var.tz_offset: local
 
   spamfirewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp

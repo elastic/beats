@@ -27,24 +27,13 @@ You only need to sign the CLA once.
 
 . Send a pull request! Push your changes to your fork of the repository and
 https://help.github.com/articles/using-pull-requests[submit a pull request] using our
-<<pr-review,pull request guidelines>>. New PRs go to the master branch. The Beats
+<<pr-review,pull request guidelines>>. New PRs go to the main branch. The Beats
 core team will backport your PR if it is necessary.
 
 
 In the pull request, describe what your changes do and mention
 any bugs/issues related to the pull request. Please also add a changelog entry to
-https://github.com/elastic/beats/blob/master/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
-
-[float]
-[[adding-new-beat]]
-=== Adding a New Beat
-
-If you want to create a new Beat, please read <<new-beat>>. You don't need to
-submit the code to this repository. Most new Beats start in their own repository
-and just make use of the libbeat packages. After you have a working Beat that
-you'd like to share with others, open a PR to add it to our list of
-https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[community
-Beats].
+https://github.com/elastic/beats/blob/main/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
 
 [float]
 [[setting-up-dev-environment]]
@@ -94,7 +83,7 @@ and documentation. The primary command used for this is:
 --------------------------------------------------------------------------------
 make update
 --------------------------------------------------------------------------------
-Each Beat has its own `update` target, as well as a master `update` in the repository root. 
+Each Beat has its own `update` target, as well as a master `update` in the repository root.
 If a PR adds or removes a dependency, run `make update` in the root `beats` directory.
 
 Another command properly formats go source files and adds a copyright header:
@@ -140,7 +129,22 @@ In addition, you can add or remove from the list of build targets by prepending 
 
 You can find the complete list of supported build targets with `go tool dist list`.
 
+[float]
+[[running-linter]]
+=== Linting
 
+You can run the pre-configured linter against your change:
+
+[source,shell]
+--------------------------------------------------------------------------------
+mage llc
+--------------------------------------------------------------------------------
+
+`llc` stands for `Lint Last Change` which includes all the Go files that were changed in either the last commit (if you're on the `main` branch) or in a difference between your feature branch and the `main` branch.
+
+It's expected that sometimes a contributor will be asked to fix linter issues unrelated to their contribution since the linter was introduced later than changes in some of the files.
+
+You would need https://github.com/magefile/mage[Mage] to run this task.
 
 [float]
 [[running-testsuite]]
@@ -210,4 +214,4 @@ The following packages are required to run `go generate`:
 
 To keep up to date with changes to the official Beats for community developers,
 follow the developer changelog
-https://github.com/elastic/beats/blob/master/CHANGELOG-developer.next.asciidoc[here].
+https://github.com/elastic/beats/blob/main/CHANGELOG-developer.next.asciidoc[here].

@@ -4,10 +4,10 @@ processors:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
 
-  # keep message as log.original.
+  # keep message as event.original.
   - rename:
       field: message
-      target_field: log.original
+      target_field: event.original
 
 # Get the timezone from the IETF header if present. Otherwise the timezone
 # value added by the add_locale processor will be used.

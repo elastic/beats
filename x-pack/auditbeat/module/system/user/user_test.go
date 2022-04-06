@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux && cgo
 // +build linux,cgo
 
 package user
@@ -63,11 +64,11 @@ func testUser() *User {
 		UID:  "9999",
 		GID:  "1001",
 		Groups: []*user.Group{
-			&user.Group{
+			{
 				Gid:  "1001",
 				Name: "__elastic",
 			},
-			&user.Group{
+			{
 				Gid:  "1002",
 				Name: "docker",
 			},

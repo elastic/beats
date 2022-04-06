@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package fileset
@@ -47,7 +48,8 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 							"field": "foo.http_user_agent",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: true,
 		},
 		{
@@ -127,7 +129,7 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -158,7 +160,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -184,7 +187,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -210,7 +214,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -237,7 +242,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":                 "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -247,7 +253,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":    "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -263,7 +270,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":                 "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -273,7 +281,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":    "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -287,7 +296,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -295,7 +305,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"field": "rule.name",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -304,7 +315,7 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -335,7 +346,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -360,7 +372,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -386,7 +399,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -412,7 +426,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -439,7 +454,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":               "ctx?.host?.hostname != null",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -449,7 +465,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -465,7 +482,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":               "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -475,7 +493,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":    "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -489,7 +508,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -497,7 +517,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"field": "related.hosts",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -506,7 +527,7 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -542,7 +563,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -572,7 +594,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -587,7 +610,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -607,7 +631,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -622,7 +647,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -631,7 +657,7 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -669,7 +695,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -701,7 +728,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -718,7 +746,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -740,7 +769,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -757,7 +787,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -766,7 +797,7 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -949,7 +980,7 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -984,7 +1015,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"field": "foo",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1013,7 +1045,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1027,7 +1060,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
@@ -1046,7 +1080,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1060,7 +1095,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -1069,7 +1105,7 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -1330,7 +1366,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -1368,7 +1404,8 @@ func TestRemoveDescription(t *testing.T) {
 							"description": "This is a description",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1399,7 +1436,8 @@ func TestRemoveDescription(t *testing.T) {
 							"description": "This is a description",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1425,7 +1463,8 @@ func TestRemoveDescription(t *testing.T) {
 							"description": "This is a description",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1445,7 +1484,7 @@ func TestRemoveDescription(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {

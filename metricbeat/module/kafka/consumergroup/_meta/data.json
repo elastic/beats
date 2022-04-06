@@ -7,28 +7,22 @@
     },
     "kafka": {
         "broker": {
-            "address": "localhost:32768",
+            "address": "172.21.0.2:9092",
             "id": 0
         },
         "consumergroup": {
-            "broker": {
-                "address": "localhost:32768",
-                "id": 0
-            },
             "client": {
                 "host": "127.0.0.1",
                 "id": "consumer-1",
-                "member_id": "consumer-1-a12ac7d4-00aa-45a0-8b35-0a9c6e880bf4"
+                "member_id": "consumer-1-8653cb3a-afed-4b1b-87d0-2a208319b41e"
             },
-            "consumer_lag": 1059,
+            "consumer_lag": 77,
             "error": {
                 "code": 0
             },
-            "id": "console-consumer-50413",
+            "id": "console-consumer-40539",
             "meta": "",
-            "offset": -1,
-            "partition": 0,
-            "topic": "test"
+            "offset": -1
         },
         "partition": {
             "id": 0,
@@ -43,7 +37,7 @@
         "period": 10000
     },
     "service": {
-        "address": "localhost:32768",
+        "address": "172.21.0.2:9092",
         "type": "kafka"
     }
 }

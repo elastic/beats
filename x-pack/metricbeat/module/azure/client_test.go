@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -36,7 +36,7 @@ var (
 	}
 )
 
-func mockMapResourceMetrics(client *Client, resources []resources.GenericResource, resourceConfig ResourceConfig) ([]Metric, error) {
+func mockMapResourceMetrics(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
 	return nil, nil
 }
 
@@ -50,7 +50,7 @@ func TestInitResources(t *testing.T) {
 		client := NewMockClient()
 		client.Config = resourceQueryConfig
 		m := &MockService{}
-		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]resources.GenericResource{}, errors.New("invalid resource query"))
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]resources.GenericResourceExpanded{}, errors.New("invalid resource query"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)

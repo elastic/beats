@@ -5,6 +5,8 @@
 
 == Azure module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The azure module retrieves different types of log data from Azure.
 There are several requirements before using the module since the logs will actually be read from azure event hubs.
 
@@ -15,16 +17,16 @@ There are several requirements before using the module since the logs will actua
 The module contains the following filesets:
 
 `activitylogs` ::
-Will retrieve azure activity logs. Control-plane events on Azure Resource Manager resources. Activity logs provide insight into the operations that were performed on resources in your subscription.
+Will retrieve azure activity logs. Control-plane events on Azure Resource Manager resources. Activity logs provide insight into the operations that were performed on resources in your subscription. To learn more, refer to the https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log[Azure Activity log] documentation.
 
 `platformlogs` ::
-Will retrieve azure platform logs. Platform logs provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on.
+Will retrieve azure platform logs. Platform logs provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on. To learn more, refer to the https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/platform-logs-overview[Azure platform logs] documentation.
 
 `signinlogs` ::
-Will retrieve azure Active Directory sign-in logs. The sign-ins report provides information about the usage of managed applications and user sign-in activities.
+Will retrieve azure Active Directory sign-in logs. The sign-ins report provides information about the usage of managed applications and user sign-in activities. To learn more, refer to the https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-sign-ins[Azure sign-in logs] documentation.
 
 `auditlogs` ::
-Will retrieve azure Active Directory audit logs. The audit logs provide traceability through logs for all changes done by various features within Azure AD. Examples of audit logs include changes made to any resources within Azure AD like adding or removing users, apps, groups, roles and policies.
+Will retrieve azure Active Directory audit logs. The audit logs provide traceability through logs for all changes done by various features within Azure AD. Examples of audit logs include changes made to any resources within Azure AD like adding or removing users, apps, groups, roles and policies. To learn more, refer to the https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-audit-logs[Azure audit logs] documentation.
 
 [float]
 === Module configuration
@@ -113,6 +115,7 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
+
 
 [float]
 === Dashboards

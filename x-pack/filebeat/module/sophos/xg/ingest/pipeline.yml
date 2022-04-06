@@ -6,7 +6,7 @@ processors:
 - grok:
     field: message
     patterns:
-    - '%{SYSLOG5424PRI}%{GREEDYDATA:log.original}$'
+    - '%{SYSLOG5424PRI}(%{SYSLOGTIMESTAMP} %{NOTSPACE} )?%{GREEDYDATA:log.original}$'
 
 # optimize fields / strings in log.original for KV processor
 - gsub:
@@ -17,7 +17,7 @@ processors:
 # split Sophos-XG fields
 - kv:
     field: log.original
-    field_split: " (?=[a-zA-Z0-9\\_\\-]+=)"
+    field_split: " (?=[a-zA-Z0-9_]+=)"
     value_split: "="
     prefix: "sophos.xg."
     ignore_missing: true
@@ -28,8 +28,15 @@ processors:
 - set:
     field: _temp_.time
     value: "{{sophos.xg.date}} {{sophos.xg.time}}"
+    if: "ctx?.sophos?.xg?.date != null && ctx?.sophos?.xg?.time != null"
+
+- set:
+    field: _temp_.time
+    value: "{{sophos.xg.timestamp}}"
+    ignore_empty_value: true
+
 - date:
-    if: "ctx?.event?.timezone == null"
+    if: "ctx?.event?.timezone == null && ctx._temp_?.time != null"
     field: _temp_.time
     target_field: "@timestamp"
     formats:
@@ -37,8 +44,9 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
+    - UNIX
 - date:
-    if: "ctx?.event?.timezone != null"
+    if: "ctx?.event?.timezone != null && ctx._temp_?.time != null"
     timezone: "{{ event.timezone }}"
     field: _temp_.time
     target_field: "@timestamp"
@@ -47,6 +55,7 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
+    - UNIX
 
 - date:
     if: "ctx?.event.timezone == null && ctx?.sophos?.xg?.eventtime != null"
@@ -239,6 +248,10 @@ processors:
     - sophos.xg.dir_disp
     - sophos.xg.srczone
     - sophos.xg.dstzone
+    - sophos.xg.log_occurrence
+    - sophos.xg.nat_rule_id
+    - sophos.xg.in_display_interface
+    - sophos.xg.out_display_interface
     - syslog5424_pri
     ignore_missing: true
 

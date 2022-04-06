@@ -1,0 +1,21 @@
+[
+    {
+        "@timestamp": "2021-10-20T19:20:59.121-02:00",
+        "apache.error.module": "rewrite",
+        "event.category": "web",
+        "event.dataset": "apache.error",
+        "event.kind": "event",
+        "event.module": "apache",
+        "event.original": "[Wed Oct 20 19:20:59.121211 2021] [rewrite:trace3] [pid 121591:tid 140413273032448] mod_rewrite.c(470): [client 10.121.192.8:38350] 10.121.192.8 - - [dev.elastic.co/sid#55a374e851c8][rid#7fb438083ac0/initial] applying pattern '^/import/?(.*)$' to uri '/'",
+        "event.timezone": "-02:00",
+        "event.type": "info",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "trace3",
+        "log.offset": 0,
+        "message": "mod_rewrite.c(470): [client 10.121.192.8:38350] 10.121.192.8 - - [dev.elastic.co/sid#55a374e851c8][rid#7fb438083ac0/initial] applying pattern '^/import/?(.*)$' to uri '/'",
+        "process.pid": 121591,
+        "process.thread.id": 140413273032448,
+        "service.type": "apache"
+    }
+]

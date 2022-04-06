@@ -29,11 +29,16 @@ type queryExecutor interface {
 	Query(ctx context.Context, sql string) ([]map[string]interface{}, error)
 }
 
+type namespaceProvider interface {
+	GetNamespace() string
+}
+
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
 	publisher publisher
 	queryExec queryExecutor
+	np        namespaceProvider
 }
 
 func (a *actionHandler) Name() string {
@@ -44,7 +49,7 @@ func (a *actionHandler) Name() string {
 func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
 
 	start := time.Now().UTC()
-	err := a.execute(ctx, req)
+	count, err := a.execute(ctx, req)
 	end := time.Now().UTC()
 
 	res := map[string]interface{}{
@@ -54,25 +59,36 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 
 	if err != nil {
 		res["error"] = err.Error()
+	} else {
+		res["count"] = count
 	}
 	return res, nil
 }
 
-func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) error {
+func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
-		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
+		return 0, fmt.Errorf("%v: %w", err, ErrQueryExecution)
 	}
-	return a.executeQuery(ctx, config.Datastream(config.DefaultNamespace), ac, "", req)
+
+	var namespace string
+	if a.np != nil {
+		namespace = a.np.GetNamespace()
+	}
+	if namespace == "" {
+		namespace = config.DefaultNamespace
+	}
+
+	return a.executeQuery(ctx, config.Datastream(namespace), ac, "", req)
 }
 
-func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) error {
+func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {
 
 	if a.queryExec == nil {
-		return ErrNoQueryExecutor
+		return 0, ErrNoQueryExecutor
 	}
 	if a.publisher == nil {
-		return ErrNoPublisher
+		return 0, ErrNoPublisher
 	}
 
 	a.log.Debugf("Execute query: %s", ac.Query)
@@ -83,11 +99,12 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
-		return err
+		return 0, err
 	}
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
 	a.publisher.Publish(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
-	return nil
+
+	return len(hits), nil
 }

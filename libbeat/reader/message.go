@@ -20,6 +20,7 @@ package reader
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -30,7 +31,8 @@ type Message struct {
 	Content []byte        // actual content read
 	Bytes   int           // total number of bytes read to generate the message
 	Fields  common.MapStr // optional fields that can be added by reader
-	Meta    common.MapStr
+	Meta    common.MapStr // deprecated
+	Private interface{}
 }
 
 // IsEmpty returns true in case the message is empty
@@ -74,4 +76,23 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 	}
 
 	return common.AddTagsWithKey(m.Fields, key, flags)
+}
+
+// ToEvent converts a Message to an Event that can be published
+// to the output.
+func (m *Message) ToEvent() beat.Event {
+
+	if len(m.Content) > 0 {
+		if m.Fields == nil {
+			m.Fields = common.MapStr{}
+		}
+		m.Fields["message"] = string(m.Content)
+	}
+
+	return beat.Event{
+		Timestamp: m.Ts,
+		Meta:      m.Meta,
+		Fields:    m.Fields,
+		Private:   m.Private,
+	}
 }

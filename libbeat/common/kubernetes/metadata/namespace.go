@@ -70,7 +70,6 @@ func (n *namespace) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) c
 	}
 
 	meta := n.resource.GenerateK8s(resource, obj, opts...)
-	// TODO: remove this call when moving to 8.0
 	meta = flattenMetadata(meta)
 
 	// TODO: Add extra fields in here if need be

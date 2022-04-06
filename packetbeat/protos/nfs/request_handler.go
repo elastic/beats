@@ -41,9 +41,7 @@ var acceptStatus = [...]string{
 	"system_err",
 }
 
-var (
-	unmatchedRequests = monitoring.NewInt(nil, "nfs.unmatched_requests")
-)
+var unmatchedRequests = monitoring.NewInt(nil, "nfs.unmatched_requests")
 
 // called by Cache, when re reply seen within expected time window
 func (r *rpc) handleExpiredPacket(nfs *nfs) {

@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -15,6 +16,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	// mage:import
@@ -45,12 +47,12 @@ func Build() error {
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	return filebeat.GolangCrossBuild()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return filebeat.CrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -61,6 +63,13 @@ func BuildGoDaemon() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.
@@ -130,6 +139,7 @@ func ExportDashboard() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, devtools.GenerateDirModulesD)
+	mg.SerialDeps(devtools.ValidateDirModulesD, devtools.ValidateDirModulesDDatasetsDisabled)
 }
 
 func configYML() error {
@@ -172,7 +182,7 @@ func GoIntegTest(ctx context.Context) error {
 // Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.Deps(Fields, Dashboards)
 	}
 	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {

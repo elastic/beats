@@ -1,4 +1,6 @@
-This is the iis module.
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 IIS (Internet Information Services) is a secure, reliable, and scalable Web server that provides an easy to manage platform for developing and hosting Web applications and services.
 

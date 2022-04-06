@@ -77,9 +77,34 @@ func TestReplaceIndexInDashboardObject(t *testing.T) {
 			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}`),
 		},
 		{
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}`),
+			[]byte(`{"attributes":{"layerListJSON":[{"joins":[{"leftField":"iso2","right":{"indexPatternTitle":"filebeat-*"}}]}]}}`),
 			"otherindex-*",
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}`),
+			[]byte(`{"attributes":{"layerListJSON":[{"joins":[{"leftField":"iso2","right":{"indexPatternTitle":"otherindex-*"}}]}]}}`),
+		},
+		{
+			[]byte(`{"attributes":{"panelsJSON":[{"embeddableConfig":{"attributes":{"references":[{"id":"filebeat-*","type":"index-pattern"}]}}}]}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"panelsJSON":[{"embeddableConfig":{"attributes":{"references":[{"id":"otherindex-*","type":"index-pattern"}]}}}]}}`),
+		},
+		{
+			[]byte(`{"attributes":{},"references":[{"id":"auditbeat-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"}]}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{},"references":[{"id":"otherindex-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"}]}`),
+		},
+		{
+			[]byte(`{"attributes":{"visState":{"params":{"index_pattern":"winlogbeat-*"}}}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"visState":{"params":{"index_pattern":"otherindex-*"}}}}`),
+		},
+		{
+			[]byte(`{"attributes":{"visState":{"params":{"series":[{"series_index_pattern":"filebeat-*"}]}}}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"visState":{"params":{"series":[{"series_index_pattern":"otherindex-*"}]}}}}`),
+		},
+		{
+			[]byte(`{"attributes":{"mapStateJSON":{"filters":[{"meta":{"index":"filebeat-*"}}]}}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"mapStateJSON":{"filters":[{"meta":{"index":"otherindex-*"}}]}}}`),
 		},
 	}
 
@@ -100,117 +125,67 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 		expected common.MapStr
 	}{
 		{
-			title: "Replace in []interface(map).map",
-			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"id":   "phonybeat-*",
-				"type": "index-pattern",
-				"attributes": map[string]interface{}{
-					"title":         "phonybeat-*",
-					"timeFieldName": "@timestamp",
-				}}}},
-			index: "otherindex-*",
-			expected: common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"id":   "otherindex-*",
-				"type": "index-pattern",
-				"attributes": map[string]interface{}{
-					"title":         "otherindex-*",
-					"timeFieldName": "@timestamp",
-				}}}},
-		},
-		{
-			title: "Replace in []interface(map).mapstr",
-			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"id":   "phonybeat-*",
-				"type": "index-pattern",
-				"attributes": common.MapStr{
-					"title":         "phonybeat-*",
-					"timeFieldName": "@timestamp",
-				}}}},
-			index: "otherindex-*",
-			expected: common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"id":   "otherindex-*",
-				"type": "index-pattern",
-				"attributes": common.MapStr{
-					"title":         "otherindex-*",
-					"timeFieldName": "@timestamp",
-				}}}},
-		},
-		{
-			title: "Replace in []map.mapstr",
-			input: common.MapStr{"objects": []map[string]interface{}{{
-				"id":   "phonybeat-*",
-				"type": "index-pattern",
-				"attributes": common.MapStr{
-					"title":         "phonybeat-*",
-					"timeFieldName": "@timestamp",
-				}}}},
-			index: "otherindex-*",
-			expected: common.MapStr{"objects": []map[string]interface{}{{
-				"id":   "otherindex-*",
-				"type": "index-pattern",
-				"attributes": common.MapStr{
-					"title":         "otherindex-*",
-					"timeFieldName": "@timestamp",
-				}}}},
-		},
-		{
 			title: "Replace in []mapstr.mapstr",
-			input: common.MapStr{"objects": []common.MapStr{{
+			input: common.MapStr{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
 					"title":         "phonybeat-*",
 					"timeFieldName": "@timestamp",
-				}}}},
+				}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
+			expected: common.MapStr{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
 					"title":         "otherindex-*",
 					"timeFieldName": "@timestamp",
-				}}}},
+				}},
 		},
 		{
 			title: "Replace in []mapstr.interface(mapstr)",
-			input: common.MapStr{"objects": []common.MapStr{{
+			input: common.MapStr{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": interface{}(common.MapStr{
 					"title":         "phonybeat-*",
 					"timeFieldName": "@timestamp",
-				})}}},
+				})},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
+			expected: common.MapStr{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": interface{}(common.MapStr{
 					"title":         "otherindex-*",
 					"timeFieldName": "@timestamp",
-				})}}},
+				})},
 		},
 		{
 			title: "Do not create missing attributes",
-			input: common.MapStr{"objects": []common.MapStr{{
-				"id":   "phonybeat-*",
-				"type": "index-pattern",
-			}}},
+			input: common.MapStr{
+				"attributes": common.MapStr{},
+				"id":         "phonybeat-*",
+				"type":       "index-pattern",
+			},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
-				"id":   "otherindex-*",
-				"type": "index-pattern",
-			}}},
+			expected: common.MapStr{
+				"attributes": common.MapStr{},
+				"id":         "otherindex-*",
+				"type":       "index-pattern",
+			},
 		},
 		{
 			title: "Create missing id",
-			input: common.MapStr{"objects": []common.MapStr{{
-				"type": "index-pattern",
-			}}},
+			input: common.MapStr{
+				"attributes": common.MapStr{},
+				"type":       "index-pattern",
+			},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
-				"id":   "otherindex-*",
-				"type": "index-pattern",
-			}}},
+			expected: common.MapStr{
+				"attributes": common.MapStr{},
+				"id":         "otherindex-*",
+				"type":       "index-pattern",
+			},
 		},
 	}
 

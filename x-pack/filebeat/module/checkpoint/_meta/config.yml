@@ -1,6 +1,6 @@
 - module: checkpoint
   firewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog

@@ -15,16 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package container
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -69,9 +70,9 @@ func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	// Fetch a list of all containers.
 	containers, err := m.dockerClient.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
-		return errors.Wrap(err, "failed to get docker containers list")
+		return fmt.Errorf("failed to get docker containers list: %w", err)
 	}
-	eventsMapping(r, containers, m.dedot)
+	eventsMapping(r, containers, m.dedot, m.Logger())
 
 	return nil
 }

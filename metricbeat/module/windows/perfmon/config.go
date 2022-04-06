@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -23,8 +24,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 var allowedFormats = []string{"float", "large", "long"}
@@ -35,18 +34,8 @@ type Config struct {
 	IgnoreNECounters        bool          `config:"perfmon.ignore_non_existent_counters"`
 	GroupMeasurements       bool          `config:"perfmon.group_measurements_by_instance"`
 	RefreshWildcardCounters bool          `config:"perfmon.refresh_wildcard_counters"`
-	Counters                []Counter     `config:"perfmon.counters"`
 	Queries                 []Query       `config:"perfmon.queries"`
 	GroupAllCountersTo      string        `config:"perfmon.group_all_counter"`
-}
-
-// Counter for the perfmon counters (old implementation deprecated).
-type Counter struct {
-	InstanceLabel    string `config:"instance_label"`
-	InstanceName     string `config:"instance_name"`
-	MeasurementLabel string `config:"measurement_label" validate:"required"`
-	Query            string `config:"query"             validate:"required"`
-	Format           string `config:"format"`
 }
 
 // QueryConfig for perfmon queries. This will be used as the new configuration format
@@ -73,19 +62,6 @@ func (counter *QueryCounter) InitDefaults() {
 	counter.Format = "float"
 }
 
-func (counter *Counter) InitDefaults() {
-	counter.Format = "float"
-}
-
-func (counter *Counter) Validate() error {
-	if !isValidFormat(counter.Format) {
-		return errors.Errorf("initialization failed: format '%s' "+
-			"for counter '%s' is invalid (must be float, large or long)",
-			counter.Format, counter.InstanceLabel)
-	}
-	return nil
-}
-
 func (counter *QueryCounter) Validate() error {
 	if !isValidFormat(counter.Format) {
 		return errors.Errorf("initialization failed: format '%s' "+
@@ -96,12 +72,8 @@ func (counter *QueryCounter) Validate() error {
 }
 
 func (conf *Config) Validate() error {
-	if len(conf.Counters) == 0 && len(conf.Queries) == 0 {
-		return errors.New("no perfmon counters or queries have been configured")
-	}
-	if len(conf.Counters) > 0 {
-		cfgwarn.Deprecate("8.0", "perfmon.counters configuration option is deprecated and will be removed in the future major version, "+
-			"we advise using the perfmon.queries configuration option instead.")
+	if len(conf.Queries) == 0 {
+		return errors.New("No perfmon queries have been configured. Please follow documentation on allowed configuration settings (perfmon.counters configuration option has been deprecated and is removed in 8.0, perfmon.queries configuration option can be used instead). ")
 	}
 	return nil
 }

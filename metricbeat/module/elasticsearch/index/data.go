@@ -113,7 +113,7 @@ type total struct {
 
 type shardStats struct {
 	Total     int `json:"total"`
-	Primaries int `json:"-"`
+	Primaries int `json:"primaries"`
 	Replicas  int `json:"-"`
 
 	ActiveTotal     int `json:"-"`
@@ -136,7 +136,7 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	clusterStateMetrics := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
@@ -190,6 +190,13 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		event.MetricSetFields = indexOutput
 		event.MetricSetFields.Put("name", name)
 		delete(event.MetricSetFields, "index")
+
+		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+		// When using Agent, the index name is overwritten anyways.
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
+		}
 
 		r.Event(event)
 	}

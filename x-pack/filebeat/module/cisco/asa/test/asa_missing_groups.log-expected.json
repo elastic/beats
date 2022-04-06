@@ -1,0 +1,192 @@
+[
+    {
+        "cisco.asa.message_id": "113019",
+        "cisco.asa.session_type": "AnyConnect-Parent",
+        "destination.address": "234.56.12.87",
+        "destination.bytes": 0,
+        "destination.ip": "234.56.12.87",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113019,
+        "event.dataset": "cisco.asa",
+        "event.duration": 112000000000,
+        "event.end": "2020-06-08T12:59:57.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-113019: Group = TheBeatles, Username = Ringo, IP = 234.56.12.87, Session disconnected. Session Type: AnyConnect-Parent, Duration: 0h:01m:52s, Bytes xmt: 32452, Bytes rcv: 0, Reason: User Requested",
+        "event.reason": "User Requested",
+        "event.severity": 4,
+        "event.start": "2020-06-08T14:58:05.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 0,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "234.56.12.87"
+        ],
+        "related.user": [
+            "Ringo"
+        ],
+        "service.type": "cisco",
+        "source.bytes": 32452,
+        "source.user.group.name": "TheBeatles",
+        "source.user.name": "Ringo",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113019",
+        "cisco.asa.session_type": "SSL",
+        "destination.address": "234.28.45.42",
+        "destination.bytes": 43252324,
+        "destination.ip": "234.28.45.42",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113019,
+        "event.dataset": "cisco.asa",
+        "event.duration": 8854000000000,
+        "event.end": "2019-10-20T15:42:53.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-113019: Group = TheBeatles, Username = John, IP = 234.28.45.42, Session disconnected. Session Type: SSL, Duration: 2h:27m:34s, Bytes xmt: 45323434, Bytes rcv: 43252324, Reason: Idle Timeout",
+        "event.reason": "Idle Timeout",
+        "event.severity": 4,
+        "event.start": "2019-10-20T15:15:19.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 226,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "234.28.45.42"
+        ],
+        "related.user": [
+            "John"
+        ],
+        "service.type": "cisco",
+        "source.bytes": 45323434,
+        "source.user.group.name": "TheBeatles",
+        "source.user.name": "John",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "722037",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 722037,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-722037: Group <GroupPolicy_TheBeatles> User <Paul> IP <83.212.241.149> SVC closing connection: DPD failure.",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 445,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "722037",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 722037,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-722037: Group <GroupPolicy_TheBeatles> User <Brian> IP <234.63.56.32> SVC closing connection: Transport closing.",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 582,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.assigned_ip": "234.56.47.98",
+        "cisco.asa.message_id": "722051",
+        "cisco.asa.webvpn.group_name": "GroupPolicy_TheBeatles",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 722051,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-722051: Group <GroupPolicy_TheBeatles> User <George> IP <234.24.156.94> IPv4 Address <234.56.47.98> IPv6 address <::> assigned to session",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 724,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "234.24.156.94"
+        ],
+        "related.user": [
+            "George"
+        ],
+        "service.type": "cisco",
+        "source.address": "234.24.156.94",
+        "source.ip": "234.24.156.94",
+        "source.user.name": "George",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    }
+]

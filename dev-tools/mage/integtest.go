@@ -135,7 +135,7 @@ type IntegrationTester interface {
 	Use(dir string) (bool, error)
 	// HasRequirements returns an error if requirements are missing.
 	HasRequirements() error
-	// Test performs excecuting the test inside the environment.
+	// Test performs executing the test inside the environment.
 	Test(dir string, mageTarget string, env map[string]string) error
 	// InsideTest performs the actual test on the inside of environment.
 	InsideTest(test func() error) error

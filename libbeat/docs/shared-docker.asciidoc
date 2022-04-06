@@ -80,16 +80,6 @@ setup -E setup.kibana.host=kibana:5601 \
 --------------------------------------------
 endif::[]
 
-ifeval::["{beatname_lc}"=="journalbeat"]
-["source", "sh", subs="attributes"]
---------------------------------------------
-docker run \
-{dockerimage} \
-setup -E setup.kibana.host=kibana:5601 \
--E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
---------------------------------------------
-endif::[]
-
 ifeval::["{beatname_lc}"=="packetbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
@@ -156,25 +146,7 @@ docker run -d \
   --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
-  {dockerimage} {beatname_lc} -e -strict.perms=false \
-  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
---------------------------------------------
-endif::[]
-
-ifeval::["{beatname_lc}"=="journalbeat"]
-Make sure you include the path to the host's journal. The path might be
-`/var/log/journal` or `/run/log/journal`.
-
-["source", "sh", subs="attributes"]
---------------------------------------------
-sudo docker run -d \
-  --name={beatname_lc} \
-  --user=root \
-  --volume="/var/log/journal:/var/log/journal" \
-  --volume="/etc/machine-id:/etc/machine-id" \
-  --volume="/run/systemd:/run/systemd" \
-  --volume="/etc/hostname:/etc/hostname:ro" \
-  {dockerimage} {beatname_lc} -e -strict.perms=false \
+  {dockerimage} {beatname_lc} -e --strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 --------------------------------------------
 endif::[]

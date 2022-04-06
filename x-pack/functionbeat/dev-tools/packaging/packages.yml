@@ -65,18 +65,6 @@ shared:
       pkg/functionbeat-aws:
         source: 'provider/aws/build/golang-crossbuild/aws-linux-amd64'
         mode: 0755
-      pkg/pubsub/vendor:
-        source: 'provider/gcp/build/pubsub/vendor'
-        mode: 0644
-      pkg/storage/vendor:
-        source: 'provider/gcp/build/storage/vendor'
-        mode: 0644
-      pkg/pubsub/pubsub.go:
-        source: 'provider/gcp/pubsub/pubsub.go'
-        mode: 0655
-      pkg/storage/storage.go:
-        source: 'provider/gcp/storage/storage.go'
-        mode: 0655
 
 # specs is a list of named packaging "flavors".
 specs:

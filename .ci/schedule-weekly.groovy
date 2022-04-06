@@ -15,13 +15,12 @@ pipeline {
     durabilityHint('PERFORMANCE_OPTIMIZED')
   }
   triggers {
-    cron('H H(1-4) * * 0')
+    cron('H H(1-2) * * 0')
   }
   stages {
-    stage('Nighly beats builds') {
+    stage('Weekly beats builds') {
       steps {
-        build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
-        build(quietPeriod: 1000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+        runBuilds(quietPeriodFactor: 1000, branches: ['main', '8.<minor>', '8.<next-patch>', '7.<minor>'])
       }
     }
   }
@@ -29,5 +28,16 @@ pipeline {
     cleanup {
       notifyBuildResult(prComment: false)
     }
+  }
+}
+
+def runBuilds(Map args = [:]) {
+  def branches = getBranchesFromAliases(aliases: args.branches)
+
+  def quietPeriod = 0
+  branches.each { branch ->
+    build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+    // Increate the quiet period for the next iteration
+    quietPeriod += args.quietPeriodFactor
   }
 }

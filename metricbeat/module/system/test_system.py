@@ -1,74 +1,97 @@
+"""
+Metricbeat system module tests
+"""
 import getpass
-import metricbeat
 import os
 import re
-import six
 import sys
 import unittest
+import six
+import metricbeat  # pylint: disable=import-error
+
+SYSTEM_CPU = {
+    metricbeat.P_WIN: ["cores", "idle.pct",
+                       "system.pct", "user.pct", "total.pct"]
+}
+SYSTEM_CPU[metricbeat.P_DARWIN] = SYSTEM_CPU[metricbeat.P_WIN] + ["nice.pct"]
+SYSTEM_CPU[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_DARWIN] + ["iowait.pct", "irq.pct", "nice.pct",
+                                                                    "softirq.pct", "steal.pct"]
+SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
 
-SYSTEM_CPU_FIELDS_LINUX = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                           "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
+SYSTEM_CPU_ALL = {
+    metricbeat.P_WIN: SYSTEM_CPU[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
+                                                      "idle.norm.pct", "system.norm.pct",
+                                                      "user.norm.pct", "total.norm.pct", "total.value"]
+}
+SYSTEM_CPU_ALL[metricbeat.P_DARWIN] = SYSTEM_CPU[metricbeat.P_DARWIN] + \
+    ["nice.ticks", "nice.norm.pct"]
 
-SYSTEM_CPU_FIELDS_WINDOWS = ["cores", "idle.pct",
-                             "system.pct", "user.pct", "total.pct"]
+SYSTEM_CPU_ALL[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_LINUX] + ["idle.ticks", "iowait.ticks",
+                                                                       "irq.ticks", "softirq.ticks", "nice.ticks",
+                                                                       "steal.ticks", "system.ticks", "user.ticks",
+                                                                       "idle.norm.pct", "iowait.norm.pct",
+                                                                       "irq.norm.pct", "nice.norm.pct",
+                                                                       "softirq.norm.pct", "steal.norm.pct",
+                                                                       "system.norm.pct", "user.norm.pct",
+                                                                       "total.norm.pct", "total.value"]
 
-SYSTEM_CPU_FIELDS_DARWIN = ["cores", "idle.pct",
-                            "system.pct", "user.pct", "total.pct", "nice.pct"]
 
-SYSTEM_CPU_FIELDS_LINUX_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
-                               "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
-                               "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct", "softirq.norm.pct",
-                               "steal.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
+SYSTEM_CORE = {
+    metricbeat.P_WIN: ["id", "idle.pct",
+                       "system.pct", "user.pct", "total.pct"]
+}
+SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
+SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
+    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct"]
 
-SYSTEM_CPU_FIELDS_WINDOWS_ALL = ["cores", "idle.pct", "idle.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
-                                 "idle.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
+SYSTEM_CORE_ALL = {
+    metricbeat.P_WIN: SYSTEM_CORE[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
+                                                       "idle.norm.pct", "system.norm.pct", "user.norm.pct"]
+}
+SYSTEM_CORE_ALL[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_DARWIN] + ["idle.ticks", "nice.ticks",
+                                                                           "system.ticks", "user.ticks",
+                                                                           "idle.norm.pct", "nice.norm.pct",
+                                                                           "system.norm.pct", "user.norm.pct"]
 
-SYSTEM_CPU_FIELDS_DARWIN_ALL = ["cores", "idle.pct", "idle.ticks", "nice.pct", "nice.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
-                                "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
+SYSTEM_CORE_ALL[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_LINUX] + ["idle.ticks", "iowait.ticks",
+                                                                         "irq.ticks", "nice.ticks",
+                                                                         "softirq.ticks", "steal.ticks",
+                                                                         "system.ticks", "user.ticks",
+                                                                         "idle.norm.pct", "iowait.norm.pct",
+                                                                         "irq.norm.pct", "nice.norm.pct",
+                                                                         "softirq.norm.pct", "steal.norm.pct",
+                                                                         "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
-SYSTEM_CORE_FIELDS_LINUX = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                            "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
+SYSTEM_DISKIO = {
+    metricbeat.P_DEF: ["name", "read.count", "write.count", "read.bytes",
+                       "write.bytes", "read.time", "write.time"]
+}
+SYSTEM_DISKIO[metricbeat.P_LINUX] = SYSTEM_DISKIO[metricbeat.P_DEF] + \
+    ["io.time", "io.ops"]
 
-SYSTEM_CORE_FIELDS_WINDOWS = ["id", "idle.pct",
-                              "system.pct", "user.pct", "total.pct"]
-
-SYSTEM_CORE_FIELDS_DARWIN = ["id", "idle.pct",
-                             "system.pct", "user.pct", "nice.pct", "total.pct"]
-
-SYSTEM_CORE_FIELDS_LINUX_ALL = SYSTEM_CORE_FIELDS_LINUX + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-                                                           "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
-                                                           "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct",
-                                                           "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
-
-SYSTEM_CORE_FIELDS_DARWIN_ALL = SYSTEM_CORE_FIELDS_DARWIN + ["idle.ticks", "nice.ticks", "system.ticks", "user.ticks",
-                                                             "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct"]
-
-SYSTEM_CORE_FIELDS_WINDOWS_ALL = SYSTEM_CORE_FIELDS_WINDOWS + ["idle.ticks", "system.ticks", "user.ticks",
-                                                               "idle.norm.pct", "system.norm.pct", "user.norm.pct"]
-
-SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
-                        "write.bytes", "read.time", "write.time"]
-
-SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
-                              "write.bytes", "read.time", "write.time", "io.time", "io.ops",
-                              "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
-                              "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
-
-SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
-                            "free_files", "mount_point", "total", "used.bytes",
-                            "used.pct"]
-
-SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
+SYSTEM_FILESYSTEM = {
+    metricbeat.P_WIN: ["available", "device_name", "type", "free",
                                     "mount_point", "total", "used.bytes",
                                     "used.pct"]
+}
+SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] + \
+    ["files", "free_files"]
+
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
+SYSTEM_MEMORY = {
+    metricbeat.P_DEF: ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
+                       "actual.used.pct"]
+}
+SYSTEM_MEMORY[metricbeat.P_LINUX] = SYSTEM_MEMORY[metricbeat.P_DEF] + \
+    ["cached", "hugepages", "page_stats"]
+
 SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", "used.bytes", "used.pct", "actual.used.bytes",
-                              "actual.used.pct", "hugepages", "page_stats"]
+                              "actual.used.pct"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
                                 "actual.used.pct", "hugepages", "page_stats"]
@@ -76,12 +99,12 @@ SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "u
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
-SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
 SYSTEM_NETWORK_HOST_FIELDS = ["ingress.bytes",
                               "egress.bytes", "ingress.packets", "egress.packets"]
 
 SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
+
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
@@ -91,6 +114,9 @@ SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
+    """
+    Test Impliments the BaseTest class for the system module
+    """
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
@@ -102,10 +128,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["cpu"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -114,15 +137,7 @@ class Test(metricbeat.BaseTest):
 
         if "system" in evt:
             cpu = evt["system"]["cpu"]
-            if sys.platform.startswith("linux"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CPU_FIELDS_LINUX), cpu.keys())
-            elif sys.platform.startswith("darwin"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CPU_FIELDS_DARWIN), cpu.keys())
-            elif sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CPU_FIELDS_WINDOWS), cpu.keys())
+            self.assert_fields_for_platform(SYSTEM_CPU, cpu)
         else:
             host_cpu = evt["host"]["cpu"]
             self.assertCountEqual(self.de_dot(
@@ -141,26 +156,15 @@ class Test(metricbeat.BaseTest):
                 "cpu.metrics": ["percentages", "ticks"],
             },
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            cpuStats = evt["system"]["cpu"]
-            if sys.platform.startswith("linux"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CPU_FIELDS_LINUX_ALL), cpuStats.keys())
-            elif sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CPU_FIELDS_WINDOWS_ALL), cpuStats.keys())
-            elif sys.platform.startswith("darwin"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CPU_FIELDS_DARWIN_ALL), cpuStats.keys())
+            cpu_stats = evt["system"]["cpu"]
+            self.assert_fields_for_platform(SYSTEM_CPU_ALL, cpu_stats)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
@@ -172,10 +176,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["core"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -183,15 +184,7 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core_stats = evt["system"]["core"]
-            if sys.platform.startswith("linux"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CORE_FIELDS_LINUX), core_stats.keys())
-            elif sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CORE_FIELDS_WINDOWS), core_stats.keys())
-            elif sys.platform.startswith("darwin"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CORE_FIELDS_DARWIN), core_stats.keys())
+            self.assert_fields_for_platform(SYSTEM_CORE, core_stats)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core_with_cpu_ticks(self):
@@ -206,10 +199,7 @@ class Test(metricbeat.BaseTest):
                 "core.metrics": ["percentages", "ticks"],
             },
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -217,15 +207,7 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core_stats = evt["system"]["core"]
-            if sys.platform.startswith("linux"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CORE_FIELDS_LINUX_ALL), core_stats.keys())
-            elif sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CORE_FIELDS_WINDOWS_ALL), core_stats.keys())
-            elif sys.platform.startswith("darwin"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_CORE_FIELDS_DARWIN_ALL), core_stats.keys())
+            self.assert_fields_for_platform(SYSTEM_CORE_ALL, core_stats)
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_load(self):
@@ -237,10 +219,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["load"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -250,7 +229,7 @@ class Test(metricbeat.BaseTest):
         cpu = evt["system"]["load"]
         self.assertCountEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)linux|freebsd|openbsd|win", sys.platform), "os")
     def test_diskio(self):
         """
         Test system/diskio output.
@@ -260,10 +239,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["diskio"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -273,41 +249,11 @@ class Test(metricbeat.BaseTest):
             if 'error' not in evt:
                 if "system" in evt:
                     diskio = evt["system"]["diskio"]
-                    self.assertCountEqual(self.de_dot(
-                        SYSTEM_DISKIO_FIELDS), diskio.keys())
+                    self.assert_fields_for_platform(SYSTEM_DISKIO, diskio)
                 elif "host" in evt:
                     host_disk = evt["host"]["disk"]
                     self.assertCountEqual(
                         SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
-
-    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
-    def test_diskio_linux(self):
-        """
-        Test system/diskio output on linux.
-        """
-        self.render_config_template(modules=[{
-            "name": "system",
-            "metricsets": ["diskio"],
-            "period": "5s"
-        }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
-
-        output = self.read_output_json()
-        self.assertGreater(len(output), 0)
-
-        for evt in output:
-            self.assert_fields_are_documented(evt)
-            if "system" in evt:
-                diskio = evt["system"]["diskio"]
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
-            else:
-                host_disk = evt["host"]["disk"]
-                self.assertCountEqual(
-                    SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
@@ -317,25 +263,27 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "system",
             "metricsets": ["filesystem"],
-            "period": "5s"
+            "period": "5s",
+            # prevent permissions issues on systems with docker
+            "extras": {
+                "filesystem.ignore_types": ["nsfs",
+                                            "sysfs", "tmpfs", "bdev", "proc", "cgroup", "cgroup2", "cpuset",
+                                            "devtmpfs", "configfs", "debugfs", "tracefs", "securityfs", "sockfs",
+                                            "bpf", "pipefs", "ramfs", "hugetlbfs", "devpts", "autofs", "efivarfs",
+                                            "mqueue", "selinuxfs", "binder", "pstore", "fuse", "fusectl", "rpc_pipefs",
+                                            "overlay", "binfmt_misc", "unavailable"],
+            }
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
+            print(evt)
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
-            if sys.platform.startswith("win"):
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_FILESYSTEM_FIELDS_WINDOWS), filesystem.keys())
-            else:
-                self.assertCountEqual(self.de_dot(
-                    SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
+            self.assert_fields_for_platform(SYSTEM_FILESYSTEM, filesystem)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
@@ -347,10 +295,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["fsstat"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -370,10 +315,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["memory"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -381,25 +323,20 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         memory = evt["system"]["memory"]
-        if not re.match("(?i)linux", sys.platform) and not "hugepages" in memory:
+        # these fields may not be on the event depending on the host system
+        if re.match("(?i)linux", sys.platform) and not "hugepages" in memory:
             # Ensure presence of hugepages only in Linux
             memory["hugepages"] = None
-        if not re.match("(?i)linux", sys.platform) and not "page_stats" in memory:
+        if re.match("(?i)linux", sys.platform) and not "page_stats" in memory:
             # Ensure presence of page_stats only in Linux
             memory["page_stats"] = None
 
-        if sys.platform.startswith("linux"):
-            self.assertCountEqual(self.de_dot(
-                SYSTEM_MEMORY_FIELDS_LINUX), memory.keys())
-        else:
-            self.assertCountEqual(self.de_dot(
-                SYSTEM_MEMORY_FIELDS), memory.keys())
+        self.assert_fields_for_platform(SYSTEM_MEMORY, memory)
 
         # Check that percentages are calculated.
-        mem = memory
-        if mem["total"] != 0:
-            used_p = float(mem["used"]["bytes"]) / mem["total"]
-            self.assertAlmostEqual(mem["used"]["pct"], used_p, places=4)
+        if memory["total"] != 0:
+            used_p = float(memory["used"]["bytes"]) / memory["total"]
+            self.assertAlmostEqual(memory["used"]["pct"], used_p, places=4)
 
         swap = memory["swap"]
         if swap["total"] != 0:
@@ -416,10 +353,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["network"],
             "period": "5s"
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -445,10 +379,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["process_summary"],
             "period": "5s",
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -458,21 +389,10 @@ class Test(metricbeat.BaseTest):
 
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
-            assert isinstance(summary["sleeping"], int)
-            assert isinstance(summary["running"], int)
-            assert isinstance(summary["unknown"], int)
-
-            if not sys.platform.startswith("win"):
-                assert isinstance(summary["idle"], int)
-                assert isinstance(summary["stopped"], int)
-                assert isinstance(summary["zombie"], int)
-                assert summary["total"] == summary["sleeping"] + summary["running"] + \
-                    summary["idle"] + summary["stopped"] + \
-                    summary["zombie"] + summary["unknown"]
 
             if sys.platform.startswith("windows"):
-                assert summary["total"] == summary["sleeping"] + \
-                    summary["running"] + summary["unknown"]
+                assert isinstance(summary["running"], int)
+                assert isinstance(summary["total"], int)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
@@ -491,10 +411,7 @@ class Test(metricbeat.BaseTest):
                 "process.include_per_cpu": False,
             }
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -523,7 +440,6 @@ class Test(metricbeat.BaseTest):
         """
         Test system/process output for fields specific of unix systems.
         """
-        import getpass
 
         self.render_config_template(
             modules=[{
@@ -546,10 +462,7 @@ class Test(metricbeat.BaseTest):
                 },
             }],
         )
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -565,7 +478,7 @@ class Test(metricbeat.BaseTest):
             found_env |= "env" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
-            env = process.pop("env", None)
+            process.pop("env", None)
             self.assert_fields_are_documented(evt)
 
             # Remove optional keys.
@@ -595,9 +508,9 @@ class Test(metricbeat.BaseTest):
             "processes": ["(?i)metricbeat.test"]
         }])
 
-        metricbeat = self.start_beat()
+        mb_handle = self.start_beat()
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
-        metricbeat.check_kill_and_wait()
+        mb_handle.check_kill_and_wait()
 
         output = self.read_output()[0]
 
@@ -621,10 +534,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["socket_summary"],
             "period": "5s",
         }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.run_beat_and_stop()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -650,14 +560,16 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipIf(sys.platform == "win32", "Flaky test")
     def check_username(self, observed, expected=None):
+        """
+        check username value
+        """
         if expected is None:
             expected = getpass.getuser()
 
         if os.name == 'nt':
             parts = observed.split("\\", 2)
             assert len(
-                parts) == 2, "Expected proc.username to be of form DOMAIN\\username, but was %s" % observed
+                parts) == 2, f"Expected proc.username to be of form DOMAIN\\username, but was {observed}"
             observed = parts[1]
 
-        assert expected == observed, "proc.username = %s, but expected %s" % (
-            observed, expected)
+        assert expected == observed, f"proc.username = {observed}, but expected {expected}"

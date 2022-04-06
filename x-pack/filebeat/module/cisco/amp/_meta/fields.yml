@@ -1,7 +1,6 @@
 - name: cisco.amp
   type: group
   release: beta
-  default_field: false
   description: >
     Module for parsing Cisco AMP logs.
   fields:

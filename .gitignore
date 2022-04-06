@@ -11,8 +11,6 @@
 *beat/logs
 *beat/data
 x-pack/functionbeat/pkg
-x-pack/elastic-agent/data
-x-pack/elastic-agent/pkg/agent/operation/tests/downloads
 
 # Files
 .DS_Store
@@ -28,10 +26,6 @@ mage_output_file.go
 x-pack/functionbeat/*/fields.yml
 x-pack/functionbeat/provider/*/functionbeat-*
 x-pack/dockerlogbeat/temproot.tar
-x-pack/elastic-agent/elastic_agent
-x-pack/elastic-agent/fleet.yml
-x-pack/elastic-agent/pkg/agent/operation/tests/scripts/configurable-1.0-darwin-x86_64/configurable
-x-pack/elastic-agent/pkg/agent/operation/tests/scripts/serviceable-1.0-darwin-x86_64/serviceable
 
 # Editor swap files
 *.swp

@@ -1,4 +1,4 @@
-:modulename: system nginx mysql
+:modulename: nginx
 
 [id="configuration-{beatname_lc}-modules"]
 == Configure modules
@@ -13,7 +13,7 @@ a log type that isn't supported, or you want to use a different setup.
 
 {beatname_uc} <<{beatname_lc}-modules,modules>> provide a quick way to
 get started processing common log formats. They contain default configurations,
-{es} ingest node pipeline definitions, and {kib} dashboards to help you
+{es} ingest pipeline definitions, and {kib} dashboards to help you
 implement and deploy a log monitoring solution.
 
 You can configure modules in the `modules.d` directory (recommended), or in the
@@ -75,8 +75,12 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 ----
 {beatname_lc}.modules:
 - module: nginx
+  access:
+  error:
 - module: mysql
+  slowlog:
 - module: system
+  auth:
 ----
 
 [[advanced-settings]]

@@ -32,10 +32,17 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
+)
+
+var (
+	logger = logp.NewLogger("kubernetes")
 )
 
 func TestBuildMetadataEnricher(t *testing.T) {
 	watcher := mockWatcher{}
+	nodeWatcher := mockWatcher{}
+	namespaceWatcher := mockWatcher{}
 	funcs := mockFuncs{}
 	resource := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -48,7 +55,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 		},
 	}
 
-	enricher := buildMetadataEnricher(&watcher, funcs.update, funcs.delete, funcs.index)
+	enricher := buildMetadataEnricher(&watcher, &nodeWatcher, &namespaceWatcher, funcs.update, funcs.delete, funcs.index)
 	assert.NotNil(t, watcher.handler)
 
 	enricher.Start()
@@ -126,9 +133,9 @@ func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) 
 		},
 	}
 	for k, v := range accessor.GetLabels() {
-		meta.Put(fmt.Sprintf("kubernetes.%v", k), v)
+		ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
 	}
-	meta.Put("orchestrator.cluster.name", "gke-4242")
+	ShouldPut(meta, "orchestrator.cluster.name", "gke-4242", logger)
 	m[accessor.GetName()] = meta
 }
 

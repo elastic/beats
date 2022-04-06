@@ -1,10 +1,11 @@
-FROM golang:1.16.6
+FROM golang:1.17.8
 
 RUN \
     apt update \
-      && apt install -qq -y --no-install-recommends \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends \
          netcat \
          python3 \
+         python3-dev \
          python3-pip \
          python3-venv \
          libaio-dev \

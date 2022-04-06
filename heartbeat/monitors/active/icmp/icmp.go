@@ -91,10 +91,6 @@ func (jf *jobFactory) checkConfig() error {
 }
 
 func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
-	if err := jf.loop.checkNetworkMode(jf.ipVersion); err != nil {
-		return plugin.Plugin{}, err
-	}
-
 	pingFactory := jf.pingIPFactory(&jf.config)
 
 	var j []jobs.Job
@@ -113,7 +109,7 @@ func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 		j = append(j, wrappers.WithURLField(u, job))
 	}
 
-	return plugin.Plugin{Jobs: j, Close: nil, Endpoints: len(jf.config.Hosts)}, nil
+	return plugin.Plugin{Jobs: j, Endpoints: len(jf.config.Hosts)}, nil
 }
 
 func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {

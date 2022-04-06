@@ -18,7 +18,9 @@
 package filestream
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"golang.org/x/text/transform"
@@ -27,9 +29,9 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -185,9 +187,9 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 			OnStateChange: inp.closerConfig.OnStateChange,
 		}
 	}
-	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
-	//       for new lines in input stream. Simple 8-bit based encodings, or plain
-	//       don't require 'complicated' logic.
+	// NewLineReader uses additional buffering to deal with encoding and testing
+	// for new lines in input stream. Simple 8-bit based encodings, or plain
+	// don't require 'complicated' logic.
 	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, closerCfg)
 	if err != nil {
 		return nil, err
@@ -235,7 +237,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
+		return nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
 	}
 
 	// it must be checked if the file is not a named pipe before we try to open it
@@ -245,15 +247,15 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 	}
 
 	ok := false
-	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
+	f, err := file.ReadOpen(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed opening %s: %s", path, err)
+		return nil, fmt.Errorf("failed opening %s: %w", path, err)
 	}
 	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
 	fi, err = f.Stat()
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat source file %s: %s", path, err)
+		return nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
 	}
 
 	err = checkFileBeforeOpening(fi)
@@ -273,10 +275,10 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 	inp.encoding, err = inp.encodingFactory(f)
 	if err != nil {
 		f.Close()
-		if err == transform.ErrShortSrc {
+		if errors.Is(err, transform.ErrShortSrc) {
 			return nil, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
 		}
-		return nil, fmt.Errorf("initialising encoding for '%v' failed: %v", f, err)
+		return nil, fmt.Errorf("initialising encoding for '%v' failed: %w", f, err)
 	}
 	ok = true
 
@@ -293,12 +295,12 @@ func checkFileBeforeOpening(fi os.FileInfo) error {
 
 func (inp *filestream) initFileOffset(file *os.File, offset int64) error {
 	if offset > 0 {
-		_, err := file.Seek(offset, os.SEEK_SET)
+		_, err := file.Seek(offset, io.SeekCurrent)
 		return err
 	}
 
 	// get offset from file in case of encoding factory was required to read some data.
-	_, err := file.Seek(0, os.SEEK_CUR)
+	_, err := file.Seek(0, io.SeekCurrent)
 	return err
 }
 
@@ -313,12 +315,13 @@ func (inp *filestream) readFromSource(
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
 		if err != nil {
-			switch err {
-			case ErrFileTruncate:
+			if errors.Is(err, ErrFileTruncate) {
 				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
-			case ErrClosed:
+			} else if errors.Is(err, ErrClosed) {
 				log.Info("Reader was closed. Closing.")
-			default:
+			} else if errors.Is(err, io.EOF) {
+				log.Debugf("EOF has been reached. Closing.")
+			} else {
 				log.Errorf("Read line error: %v", err)
 			}
 			return nil
@@ -330,8 +333,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
-		event := inp.eventFromMessage(message, path)
-		if err := p.Publish(event, s); err != nil {
+		if err := p.Publish(message.ToEvent(), s); err != nil {
 			return err
 		}
 	}
@@ -364,22 +366,4 @@ func matchAny(matchers []match.Matcher, text string) bool {
 		}
 	}
 	return false
-}
-
-func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
-	if m.Fields == nil {
-		m.Fields = common.MapStr{}
-	}
-
-	if len(m.Content) > 0 {
-		if _, ok := m.Fields["message"]; !ok {
-			m.Fields["message"] = string(m.Content)
-		}
-	}
-
-	return beat.Event{
-		Timestamp: m.Ts,
-		Meta:      m.Meta,
-		Fields:    m.Fields,
-	}
 }

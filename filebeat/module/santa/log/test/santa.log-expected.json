@@ -8,6 +8,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T06:45:16.802Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=/usr/sbin/newsyslog|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29678|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -19,15 +20,14 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 0,
-        "log.original": "[2018-12-10T06:45:16.802Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=/usr/sbin/newsyslog|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29678|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
             "/usr/libexec/xpcproxy",
             "/usr/sbin/newsyslog"
         ],
         "process.executable": "/usr/libexec/xpcproxy",
         "process.hash.sha256": "c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4",
+        "process.parent.pid": 1,
         "process.pid": 29678,
-        "process.ppid": 1,
         "process.start": "2018-12-10T06:45:16.802Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -55,6 +55,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T06:45:16.802Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=xpcproxy com.apple.systemstats.daily|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29679|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -66,16 +67,15 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 360,
-        "log.original": "[2018-12-10T06:45:16.802Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=xpcproxy com.apple.systemstats.daily|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29679|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
             "/usr/libexec/xpcproxy",
-            "com.apple.systemstats.daily",
-            "xpcproxy"
+            "xpcproxy",
+            "com.apple.systemstats.daily"
         ],
         "process.executable": "/usr/libexec/xpcproxy",
         "process.hash.sha256": "c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4",
+        "process.parent.pid": 1,
         "process.pid": 29679,
-        "process.ppid": 1,
         "process.start": "2018-12-10T06:45:16.802Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -103,6 +103,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T06:45:16.851Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=746f0dbafb7e675d5ce67131e5544772ee612b894e8ab51d3ce2d21f7cb7332d|path=/usr/sbin/newsyslog|args=/usr/sbin/newsyslog|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29678|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -114,15 +115,14 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 737,
-        "log.original": "[2018-12-10T06:45:16.851Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=746f0dbafb7e675d5ce67131e5544772ee612b894e8ab51d3ce2d21f7cb7332d|path=/usr/sbin/newsyslog|args=/usr/sbin/newsyslog|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29678|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
             "/usr/sbin/newsyslog",
             "/usr/sbin/newsyslog"
         ],
         "process.executable": "/usr/sbin/newsyslog",
         "process.hash.sha256": "746f0dbafb7e675d5ce67131e5544772ee612b894e8ab51d3ce2d21f7cb7332d",
+        "process.parent.pid": 1,
         "process.pid": 29678,
-        "process.ppid": 1,
         "process.start": "2018-12-10T06:45:16.851Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -150,6 +150,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T06:45:16.859Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=d6be9bfbd777ac5dcd30488014acc787a2df5ce840f1fe4d5742d323ee00392f|path=/usr/sbin/systemstats|args=/usr/sbin/systemstats --daily|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29679|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -161,16 +162,15 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 1095,
-        "log.original": "[2018-12-10T06:45:16.859Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=d6be9bfbd777ac5dcd30488014acc787a2df5ce840f1fe4d5742d323ee00392f|path=/usr/sbin/systemstats|args=/usr/sbin/systemstats --daily|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29679|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
-            "--daily",
             "/usr/sbin/systemstats",
-            "/usr/sbin/systemstats"
+            "/usr/sbin/systemstats",
+            "--daily"
         ],
         "process.executable": "/usr/sbin/systemstats",
         "process.hash.sha256": "d6be9bfbd777ac5dcd30488014acc787a2df5ce840f1fe4d5742d323ee00392f",
+        "process.parent.pid": 1,
         "process.pid": 29679,
-        "process.ppid": 1,
         "process.start": "2018-12-10T06:45:16.859Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -198,6 +198,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T08:45:27.810Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=/usr/sbin/newsyslog|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29681|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -209,15 +210,14 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 1465,
-        "log.original": "[2018-12-10T08:45:27.810Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=/usr/sbin/newsyslog|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29681|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
             "/usr/libexec/xpcproxy",
             "/usr/sbin/newsyslog"
         ],
         "process.executable": "/usr/libexec/xpcproxy",
         "process.hash.sha256": "c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4",
+        "process.parent.pid": 1,
         "process.pid": 29681,
-        "process.ppid": 1,
         "process.start": "2018-12-10T08:45:27.810Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -245,6 +245,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T08:45:27.810Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=xpcproxy com.adobe.AAM.Scheduler-1.0|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29680|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -256,16 +257,15 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 1825,
-        "log.original": "[2018-12-10T08:45:27.810Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4|path=/usr/libexec/xpcproxy|args=xpcproxy com.adobe.AAM.Scheduler-1.0|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=29680|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
             "/usr/libexec/xpcproxy",
-            "com.adobe.AAM.Scheduler-1.0",
-            "xpcproxy"
+            "xpcproxy",
+            "com.adobe.AAM.Scheduler-1.0"
         ],
         "process.executable": "/usr/libexec/xpcproxy",
         "process.hash.sha256": "c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4",
+        "process.parent.pid": 1,
         "process.pid": 29680,
-        "process.ppid": 1,
         "process.start": "2018-12-10T08:45:27.810Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -293,6 +293,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T21:37:27.247Z] I santad: action=EXEC|decision=ALLOW|reason=UNKNOWN|sha256=08bd61582657cd6d78c9e071d34d79a32bb59e7210077a44919d2c5477e988a1|path=/usr/local/Cellar/osquery/3.3.0_1/bin/osqueryd|args=/usr/local/bin/osqueryd --flagfile=/private/var/osquery/osquery.flags --logger_min_stderr=1|pid=45084|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -303,17 +304,16 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 2202,
-        "log.original": "[2018-12-10T21:37:27.247Z] I santad: action=EXEC|decision=ALLOW|reason=UNKNOWN|sha256=08bd61582657cd6d78c9e071d34d79a32bb59e7210077a44919d2c5477e988a1|path=/usr/local/Cellar/osquery/3.3.0_1/bin/osqueryd|args=/usr/local/bin/osqueryd --flagfile=/private/var/osquery/osquery.flags --logger_min_stderr=1|pid=45084|ppid=1|uid=0|user=root|gid=0|group=wheel|mode=M",
         "process.args": [
-            "--flagfile=/private/var/osquery/osquery.flags",
-            "--logger_min_stderr=1",
             "/usr/local/Cellar/osquery/3.3.0_1/bin/osqueryd",
-            "/usr/local/bin/osqueryd"
+            "/usr/local/bin/osqueryd",
+            "--flagfile=/private/var/osquery/osquery.flags",
+            "--logger_min_stderr=1"
         ],
         "process.executable": "/usr/local/Cellar/osquery/3.3.0_1/bin/osqueryd",
         "process.hash.sha256": "08bd61582657cd6d78c9e071d34d79a32bb59e7210077a44919d2c5477e988a1",
+        "process.parent.pid": 1,
         "process.pid": 45084,
-        "process.ppid": 1,
         "process.start": "2018-12-10T21:37:27.247Z",
         "related.hash": [
             "08bd61582657cd6d78c9e071d34d79a32bb59e7210077a44919d2c5477e988a1"
@@ -338,6 +338,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-10T16:24:43.992Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=63b6a54848d7b4adf726d68f11409a4ac05b43926cb0f2792f7d41dc0221c106|path=/usr/bin/basename|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=40757|ppid=40756|uid=501|user=akroh|gid=20|group=staff|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -349,14 +350,13 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 2560,
-        "log.original": "[2018-12-10T16:24:43.992Z] I santad: action=EXEC|decision=ALLOW|reason=CERT|sha256=63b6a54848d7b4adf726d68f11409a4ac05b43926cb0f2792f7d41dc0221c106|path=/usr/bin/basename|cert_sha256=2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32|cert_cn=Software Signing|pid=40757|ppid=40756|uid=501|user=akroh|gid=20|group=staff|mode=M",
         "process.args": [
             "/usr/bin/basename"
         ],
         "process.executable": "/usr/bin/basename",
         "process.hash.sha256": "63b6a54848d7b4adf726d68f11409a4ac05b43926cb0f2792f7d41dc0221c106",
+        "process.parent.pid": 40756,
         "process.pid": 40757,
-        "process.ppid": 40756,
         "process.start": "2018-12-10T16:24:43.992Z",
         "related.hash": [
             "2aa4b9973b7ba07add447ee4da8b5337c3ee2c3a991911e80e7282e8a751fc32",
@@ -384,6 +384,7 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-14T05:35:38.313Z] I santad: action=EXEC|decision=ALLOW|reason=UNKNOWN|sha256=a8defc1b24c45f6dabeb8298af5f8e1daf39e1504e16f878345f15ac94ae96d7|path=/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper|args=/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper --type=utility --field-trial-handle=120122713615061869,9401617251746517350,131072 --lang=en-US --service-sandbox-type=utility --service-request-channel-token=10458143409865682077 --seatbelt-client=262|cert_sha256=345a8e098bd04794aaeefda8c9ef56a0bf3d3706d67d35bc0e23f11bb3bffce5|cert_cn=Developer ID Application: Google, Inc. (EQHXZ8M8AV)|pid=89238|ppid=704|uid=501|user=akroh|gid=20|group=staff|mode=M",
         "event.outcome": "success",
         "event.type": [
             "start"
@@ -395,26 +396,25 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 2899,
-        "log.original": "[2018-12-14T05:35:38.313Z] I santad: action=EXEC|decision=ALLOW|reason=UNKNOWN|sha256=a8defc1b24c45f6dabeb8298af5f8e1daf39e1504e16f878345f15ac94ae96d7|path=/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper|args=/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper --type=utility --field-trial-handle=120122713615061869,9401617251746517350,131072 --lang=en-US --service-sandbox-type=utility --service-request-channel-token=10458143409865682077 --seatbelt-client=262|cert_sha256=345a8e098bd04794aaeefda8c9ef56a0bf3d3706d67d35bc0e23f11bb3bffce5|cert_cn=Developer ID Application: Google, Inc. (EQHXZ8M8AV)|pid=89238|ppid=704|uid=501|user=akroh|gid=20|group=staff|mode=M",
         "process.args": [
+            "/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "/Applications/Google",
+            "Chrome.app/Contents/Versions/70.0.3538.110/Google",
+            "Chrome",
+            "Helper.app/Contents/MacOS/Google",
+            "Chrome",
+            "Helper",
+            "--type=utility",
             "--field-trial-handle=120122713615061869,9401617251746517350,131072",
             "--lang=en-US",
-            "--seatbelt-client=262",
-            "--service-request-channel-token=10458143409865682077",
             "--service-sandbox-type=utility",
-            "--type=utility",
-            "/Applications/Google",
-            "/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
-            "Chrome",
-            "Chrome",
-            "Chrome.app/Contents/Versions/70.0.3538.110/Google",
-            "Helper",
-            "Helper.app/Contents/MacOS/Google"
+            "--service-request-channel-token=10458143409865682077",
+            "--seatbelt-client=262"
         ],
         "process.executable": "/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
         "process.hash.sha256": "a8defc1b24c45f6dabeb8298af5f8e1daf39e1504e16f878345f15ac94ae96d7",
+        "process.parent.pid": 704,
         "process.pid": 89238,
-        "process.ppid": 704,
         "process.start": "2018-12-14T05:35:38.313Z",
         "related.hash": [
             "345a8e098bd04794aaeefda8c9ef56a0bf3d3706d67d35bc0e23f11bb3bffce5",
@@ -439,11 +439,11 @@
         "event.dataset": "santa.log",
         "event.kind": "event",
         "event.module": "santa",
+        "event.original": "[2018-12-17T03:03:52.337Z] I santad: action=DISKAPPEAR|mount=/Volumes/Recovery|volume=Recovery|bsdname=disk1s3|fs=apfs|model=APPLE SSD SM0512L|serial=C026495006UHCHH1Q|bus=PCI-Express|dmgpath=",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
         "log.offset": 3712,
-        "log.original": "[2018-12-17T03:03:52.337Z] I santad: action=DISKAPPEAR|mount=/Volumes/Recovery|volume=Recovery|bsdname=disk1s3|fs=apfs|model=APPLE SSD SM0512L|serial=C026495006UHCHH1Q|bus=PCI-Express|dmgpath=",
         "santa.action": "DISKAPPEAR",
         "santa.disk.bsdname": "disk1s3",
         "santa.disk.bus": "PCI-Express",

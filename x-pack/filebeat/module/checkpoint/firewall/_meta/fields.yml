@@ -1,7 +1,6 @@
 - name: checkpoint
   type: group
-  release: beta
-  default_field: false
+  release: ga
   description: >
     Module for parsing Checkpoint syslog.
   fields:
@@ -2422,3 +2421,19 @@
       overwrite: true
       description: >
         In case of phishing event, the domain, which the attacker was impersonating.
+
+    - name: comment
+      type: keyword
+
+    - name: conn_direction
+      type: keyword
+      description: Connection direction
+
+    - name: db_ver
+      type: keyword
+      description: Database version
+
+    - name: update_status
+      type: keyword
+      overwrite: true
+      description: Status of database update

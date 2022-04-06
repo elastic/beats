@@ -1,6 +1,6 @@
 - module: oracle
   database_audit:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog or file (default).
     #var.input: file

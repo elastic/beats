@@ -40,7 +40,8 @@
         "source.packets": 54,
         "source.port": 34892,
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     }
 ]

@@ -67,6 +67,8 @@ described later.
 
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
+Paths should be absolute, although the file integrity module will attempt to
+resolve relative path events to their absolute file path.
 
 *`exclude_files`*:: A list of regular expressions used to filter out events
 for unwanted files. The expressions are matched against the full path of every

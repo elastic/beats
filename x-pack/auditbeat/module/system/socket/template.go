@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package socket
@@ -40,6 +41,7 @@ var functionAlternatives = map[string][]string{
 	"SYS_EXECVE":        syscallAlternatives("execve"),
 	"SYS_GETTIMEOFDAY":  syscallAlternatives("gettimeofday"),
 	"SYS_UNAME":         syscallAlternatives("newuname"),
+	"DO_FORK":           {"_do_fork", "do_fork", "kernel_clone"},
 }
 
 func syscallAlternatives(syscall string) []string {

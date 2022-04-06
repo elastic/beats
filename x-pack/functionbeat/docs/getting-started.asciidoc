@@ -45,16 +45,14 @@ details about the cloud functions that you want to deploy, including the
 function name and type, and the triggers that will cause the function to
 execute.
 
-. In +{beatname_lc}.yml+, configure the functions that you want to deploy. The
+In +{beatname_lc}.yml+, configure the functions that you want to deploy. The
 configuration settings vary depending on the type of function and cloud provider
-you're using. This section provides a couple of example configurations.
-+
---
-* *AWS example*: This example configures a function called `cloudwatch` that
-collects events from CloudWatch Logs. When a message is sent to the specified
-log group, the cloud function executes and sends message events to the
-configured output:
-+
+you're using. This section provides a an AWS example configuration.
+
+This example configures a function called `cloudwatch` that collects events from
+CloudWatch Logs. When a message is sent to the specified log group, the cloud
+function executes and sends message events to the configured output:
+
 ["source","sh",subs="attributes"]
 -------------------------------------------------------------------------------------
 {beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
@@ -72,37 +70,8 @@ uploaded.
 <2> Details about the function you want to deploy, including the name of the
 function, the type of service to monitor, and the log groups that trigger the
 function.
-+
+
 See <<configuration-{beatname_lc}-options>> for more examples.
-
-* *Google cloud example*: This example configures a function called
-`storage` that collects log events from Google Cloud Storage. When the specified
-event type occurs on the Cloud Storage bucket, the cloud function executes and
-sends events to the configured output:
-+
-["source","sh",subs="attributes"]
-----
-functionbeat.provider.gcp.location_id: "europe-west2"
-functionbeat.provider.gcp.project_id: "my-project-123456"
-functionbeat.provider.gcp.storage_name: "functionbeat-deploy" <1>
-functionbeat.provider.gcp.functions:
-  - name: storage <2>
-    enabled: true
-    type: storage
-    description: "Google Cloud Function for Cloud Storage"
-    trigger:
-      resource: "projects/my-project/buckets/my-storage"
-      event_type: "google.storage.object.finalize"
-----
-<1> The name of the GCP storage bucket where the function artifacts will be
-deployed.
-<2> Details about the function you want to deploy, including the name of the
-function, the type of resource to monitor, and the resource event that triggers
-the function.
-+
-See <<configuration-{beatname_lc}-gcp-options>> for more examples.
-
---
 
 include::{libbeat-dir}/shared/config-check.asciidoc[]
 
@@ -175,41 +144,6 @@ output.
 If deployment fails, see <<faq>> for help troubleshooting.
 
 :fnexample!:
-
-[float]
-[[deploy-to-gcp]]
-==== Deploy to Google Cloud Platform
-
-beta[]
-
-. In Google Cloud, create a service account that has these required roles:
-+
---
-include::iam-permissions.asciidoc[tag=gcp-roles-deployment]
---
-+
-See the https://cloud.google.com/docs/authentication/getting-started[Google
-Cloud documentation] for more information about creating a service account.
-
-. Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to
-the JSON file that contains your service account key. For example:
-+
---
-include::tab-widgets/credentials-google-widget.asciidoc[]
---
-
-. Deploy the cloud functions.
-+
-For example, the following command deploys a function called `storage`:
-+
---
-include::tab-widgets/deploy-google-widget.asciidoc[]
---
-+
-The function is deployed to Google Cloud Platform and ready to send events
-to the configured output.
-+
-If deployment fails, see <<faq>> for help troubleshooting.
 
 [float]
 [[view-data]]

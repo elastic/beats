@@ -41,19 +41,23 @@ func NewFilemeta(r reader.Reader, path string, offset int64) reader.Reader {
 func (r *FileMetaReader) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
 
-	r.offset += int64(message.Bytes)
-
 	// if the message is empty, there is no need to enrich it with file metadata
 	if message.IsEmpty() {
+		r.offset += int64(message.Bytes)
 		return message, err
 	}
 
 	message.Fields.DeepUpdate(common.MapStr{
 		"log": common.MapStr{
 			"offset": r.offset,
-			"path":   r.path,
+			"file": common.MapStr{
+				"path": r.path,
+			},
 		},
 	})
+
+	r.offset += int64(message.Bytes)
+
 	return message, err
 }
 

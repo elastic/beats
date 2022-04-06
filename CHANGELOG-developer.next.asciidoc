@@ -14,9 +14,9 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-rc2..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-rc2..main[Check the HEAD diff]
 
-The list below covers the major changes between 7.0.0-rc2 and master only.
+The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Breaking changes
 
@@ -55,6 +55,11 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
 - Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 - Update Darwin build image to a debian 10 base that increases the MacOS SDK and minimum supported version used in build to 10.14. {issue}24193[24193]
+- Removed the `common.Float` type. {issue}28279[28279] {pull}28280[28280] {pull}28376[28376]
+- Removed Beat generators. {pull}28816[28816]
+- libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
+- Removed deprecated disk spool from Beats. Use disk queue instead. {pull}28869[28869]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
 
 ==== Bugfixes
 
@@ -62,6 +67,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
 - Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
 - Remove `event.dataset` (ECS) annotion from `libbeat.logp`. {issue}27404[27404]
+- Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
+- Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
+- Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
 
 ==== Added
 
@@ -119,3 +127,16 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]
 - Update to go-concert 0.2.0 {pull}27162[27162]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
+- Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
+- Update Go version to 1.17.1. {pull}27543[27543]
+- Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+- Add support for `credentials_json` in `gcp` module, all metricsets {pull}29584[29584]
+- Add gcp firestore metricset. {pull}29918[29918]
+- Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
+- Add gcp dataproc metricset. {pull}30008[30008]
+- Add Github action for linting
+
+==== Deprecated
+
+- Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]
+- Deprecate Beat generators. {pull}28814[28814]

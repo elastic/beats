@@ -22,17 +22,19 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte) ([]common.MapStr, error) {
+func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) {
 	events := []common.MapStr{}
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -68,7 +70,10 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 				},
 			}
 			if volume.CapacityBytes > 0 {
-				volumeEvent.Put("fs.used.pct", float64(volume.UsedBytes)/float64(volume.CapacityBytes))
+				util.ShouldPut(volumeEvent, "fs.used.pct", float64(volume.UsedBytes)/float64(volume.CapacityBytes), logger)
+			}
+			if volume.Inodes > 0 {
+				util.ShouldPut(volumeEvent, "fs.inodes.pct", float64(volume.InodesUsed)/float64(volume.Inodes), logger)
 			}
 			events = append(events, volumeEvent)
 		}

@@ -2,17 +2,22 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "elasticsearch": {
         "cluster": {
-            "id": "tMjf3CQ_TyCXNfcoR9eTWw",
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster",
             "state": {
-                "id": "n-UoXaqYRoOe9qAC76IG6A"
+                "id": "XNIdeSZxQwyItvGfR5fHSw"
+            },
+            "stats": {
+                "state": {
+                    "state_uuid": "XNIdeSZxQwyItvGfR5fHSw"
+                }
             }
         },
         "index": {
-            "name": ".apm-agent-configuration"
+            "name": "pied_piper"
         },
         "node": {
-            "id": "hx-oJ1-aT_-5pRG22JMI1Q"
+            "id": "f5i3v9hMT_q__q6B9WOo5A"
         },
         "shard": {
             "number": 0,
@@ -22,8 +27,8 @@
                 "name": null
             },
             "source_node": {
-                "name": "1fb2aa83efac",
-                "uuid": "hx-oJ1-aT_-5pRG22JMI1Q"
+                "name": "27fb1c2fd783",
+                "uuid": "f5i3v9hMT_q__q6B9WOo5A"
             },
             "state": "STARTED"
         }
@@ -38,7 +43,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:44037",
+        "address": "172.19.0.2:9200",
         "type": "elasticsearch"
     }
 }

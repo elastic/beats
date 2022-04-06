@@ -4,7 +4,7 @@
         "cisco.asa.destination_interface": "Inside",
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "Outside",
-        "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.source_username": "LOCAL\\Elastic",
         "cisco.asa.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
@@ -33,6 +33,7 @@
         "log.level": "informational",
         "log.offset": 0,
         "network.bytes": 148,
+        "network.community_id": "1:9aBQ+NznvYals1agEGRVJm37dvQ=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "Inside",
@@ -48,10 +49,14 @@
             "10.123.123.123",
             "10.233.123.123"
         ],
+        "related.user": [
+            "Elastic"
+        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 53723,
+        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -73,18 +78,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny icmp src Inside:10.123.123.123 dst Outside:10.123.123.123 (type 11, code 0) by access-group \"Inside_access_in\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 200,
+        "network.community_id": "1:kV/6Jt4iMhVyUT1AW+UO0itOhqU=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "Outside",
@@ -124,17 +130,18 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.123.123.123/6316 dst outside:10.123.123.123/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3afb522, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 381,
+        "network.community_id": "1:7nrIUULEgk5A+nhbh4kNmEkwL3o=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -159,7 +166,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "Inside_access_in",
         "cisco.asa.source_interface": "Inside",
-        "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.source_username": "LOCAL\\Elastic",
         "destination.address": "10.123.123.123",
         "destination.ip": "10.123.123.123",
         "destination.port": 57621,
@@ -172,18 +179,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src Inside:10.123.123.123/57621(LOCAL\\Elastic) dst Outside:10.123.123.123/57621 by access-group \"Inside_access_in\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 545,
+        "network.community_id": "1:LM0R4Wi8tEf+1pe2ukofXQKxfMc=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "Outside",
@@ -198,10 +206,14 @@
         "related.ip": [
             "10.123.123.123"
         ],
+        "related.user": [
+            "Elastic"
+        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 57621,
+        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -220,12 +232,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106017: Deny IP due to Land Attack from 10.123.123.123 to 10.123.123.123",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -264,12 +276,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-313008: Denied IPv6-ICMP type=134, code=0 from fe80::1ff:fe23:4567:890a on interface ISP1",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -318,17 +330,18 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-313009: Denied invalid ICMP code 9, for Inside:10.255.0.206/8795 (10.255.0.206/8795) to identity:10.12.31.51/0 (10.12.31.51/0), ICMP id 295, ICMP type 8",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 989,
+        "network.community_id": "1:/zjqku0IM1BTHL37aH0DvJSecYY=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "identity",
@@ -371,12 +384,13 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1171,
+        "network.community_id": "1:F0lY+M777B6QL2SDSKa9RfuUJ7s=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -419,12 +433,13 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1334,
+        "network.community_id": "1:F0lY+M777B6QL2SDSKa9RfuUJ7s=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -468,12 +483,13 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "error",
         "log.offset": 1514,
+        "network.community_id": "1:kRCfRJ9T/IeRNAhAhzOsF6EjIV4=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -504,13 +520,6 @@
         "cisco.asa.rule_name": "filter",
         "cisco.asa.source_interface": "inside",
         "destination.address": "1.2.33.40",
-        "destination.geo.continent_name": "Asia",
-        "destination.geo.country_iso_code": "CN",
-        "destination.geo.country_name": "China",
-        "destination.geo.location.lat": 23.1167,
-        "destination.geo.location.lon": 113.25,
-        "destination.geo.region_iso_code": "CN-GD",
-        "destination.geo.region_name": "Guangdong",
         "destination.ip": "1.2.33.40",
         "destination.port": 8080,
         "event.action": "firewall-rule",
@@ -522,17 +531,18 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-1-106103: access-list filter denied icmp for user joe inside/10.1.2.3(64321) -> outside/1.2.33.40(8080) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 1723,
+        "network.community_id": "1:cJpy7sqGDQbchRUXDtR8k10HinM=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "outside",

@@ -1,9 +1,4 @@
-{{ if eq .input "syslog" }}
-
-type: udp
-host: "{{.syslog_host}}:{{.syslog_port}}"
-
-{{ else if eq .input "file" }}
+{{ if eq .input "file" }}
 
 type: log
 paths:
@@ -11,6 +6,16 @@ paths:
   - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+
+{{ else if eq .input "syslog" }}
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else }}
+
+type: {{.input}}
+host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl: {{ .ssl | tojson }}
 
 {{ end }}
 
@@ -22,7 +27,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0
 
 {{ if .external_zones }}
   - add_fields:

@@ -19,7 +19,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -55,7 +55,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -162,7 +162,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -339,7 +339,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -373,7 +373,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -419,7 +419,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -457,7 +457,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            tail_files="true"
+            tail_files="true",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -501,7 +501,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="utf-8"
+            encoding="utf-8",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -613,7 +613,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            include_lines=["^ERR", "^WARN"]
+            include_lines=["^ERR", "^WARN"],
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -648,9 +648,8 @@ class Test(BaseTest):
         """
         Checks if all the log lines are exported by default
         """
-
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -688,7 +687,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            exclude_lines=["^DBG"]
+            exclude_lines=["^DBG"],
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -727,7 +726,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             exclude_lines=["^DBG"],
-            include_lines=["apache"]
+            include_lines=["apache"],
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -762,6 +761,32 @@ class Test(BaseTest):
         """
         Checks that filebeat handles files without reading permission well
         """
+        if os.name == "nt":
+            # Currently skipping this test on windows as it requires `pip install win32api`
+            # which seems to have windows only dependencies.
+            # To solve this problem a requirements_windows.txt could be introduced which would
+            # then only be used on Windows.
+            #
+            # Below is some additional code to give some indication on how the implementation
+            # to remove permissions on Windows (where os.chmod isn't enough) could look like:
+            #
+            # from win32 import win32api
+            # import win32security
+            # import ntsecuritycon as con
+
+            # user, domain, type = win32security.LookupAccountName(
+            #     "", win32api.GetUserName())
+            # sd = win32security.GetFileSecurity(
+            #     testfile, win32security.DACL_SECURITY_INFORMATION)
+
+            # dacl = win32security.ACL()
+            # # Remove all access rights
+            # dacl.AddAccessAllowedAce(win32security.ACL_REVISION, 0, user)
+
+            # sd.SetSecurityDescriptorDacl(1, dacl, 0)
+            # win32security.SetFileSecurity(
+            #     testfile, win32security.DACL_SECURITY_INFORMATION, sd)
+            raise unittest.SkipTest("Requires win32api be installed")
         if os.name != "nt" and os.geteuid() == 0:
             # root ignores permission flags, so we have to skip the test
             raise unittest.SkipTest
@@ -781,36 +806,9 @@ class Test(BaseTest):
 
         file.close()
 
-        # Remove reading rights from file
+        # Remove reading rights from file. On Windows this can only set the read-only flag:
+        # https://docs.python.org/3/library/os.html#os.chmod
         os.chmod(testfile, 0o000)
-
-        if os.name == "nt":
-
-            raise unittest.SkipTest
-            # TODO: Currently skipping this test on windows as it requires `pip install win32api`
-            # which seems to have windows only dependencies.
-            # To solve this problem a requirements_windows.txt could be introduced which would
-            # then only be used on Windows.
-            #
-            # Below is some additional code to give some indication on how the implementation could
-            # look like.
-
-            from win32 import win32api
-            import win32security
-            import ntsecuritycon as con
-
-            user, domain, type = win32security.LookupAccountName(
-                "", win32api.GetUserName())
-            sd = win32security.GetFileSecurity(
-                testfile, win32security.DACL_SECURITY_INFORMATION)
-
-            dacl = win32security.ACL()
-            # Remove all access rights
-            dacl.AddAccessAllowedAce(win32security.ACL_REVISION, 0, user)
-
-            sd.SetSecurityDescriptorDacl(1, dacl, 0)
-            win32security.SetFileSecurity(
-                testfile, win32security.DACL_SECURITY_INFORMATION, sd)
 
         filebeat = self.start_beat()
 

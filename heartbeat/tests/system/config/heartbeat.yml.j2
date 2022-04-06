@@ -50,6 +50,10 @@ heartbeat.monitors:
   {% endif %}
 {% endfor -%}
 
+{%- if run_once is defined %}
+heartbeat.run_once: {{run_once}}
+{% endif -%}
+
 {% if reload or reload_path -%}
 heartbeat.config.monitors:
   path: {{ reload_path|default("${path.config}/monitors.d/*.yml") }}
@@ -101,6 +105,8 @@ queue.mem:
 {%- if elasticsearch %}
 output.elasticsearch:
   hosts: ["{{ elasticsearch.host }}"]
+  username: {{ elasticsearch.user }}
+  password: {{ elasticsearch.pass }}
 {%- else %}
 output.file:
   path: '{{ output_file_path|default(beat.working_dir + "/output") }}'

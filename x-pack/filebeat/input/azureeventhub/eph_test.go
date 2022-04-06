@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !aix
+// +build !aix
+
 package azureeventhub
 
 import (
@@ -12,15 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	invalidConfig = azureInputConfig{
-		SAKey:            "invalid_key",
-		SAName:           "storage",
-		SAContainer:      ephContainerName,
-		ConnectionString: "invalid_connection_string",
-		ConsumerGroup:    "$Default",
-	}
-)
+var invalidConfig = azureInputConfig{
+	SAKey:            "invalid_key",
+	SAName:           "storage",
+	SAContainer:      ephContainerName,
+	ConnectionString: "invalid_connection_string",
+	ConsumerGroup:    "$Default",
+}
 
 func TestRunWithEPH(t *testing.T) {
 	input := azureInput{config: invalidConfig}

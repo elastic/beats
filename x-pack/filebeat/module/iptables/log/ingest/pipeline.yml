@@ -53,7 +53,7 @@ processors:
       UDM_LOGS: '(%{UNSIGNED_INT}%{SPACE})?(TTL|TL|L)=(%{UNSIGNED_INT:iptables.ttl:int})%{SPACE}(ID=(%{UNSIGNED_INT:iptables.id:int})%{SPACE})?(DF%{SPACE})?'
 - rename:
     field: message
-    target_field: log.original
+    target_field: event.original
 - grok:
     field: iptables.ubiquiti.rule_set
     ignore_missing: true

@@ -71,7 +71,7 @@ processors:
 - date:
     field: cisco.amp.start_timestamp
     target_field: event.start
-    formats: 
+    formats:
       - UNIX
     ignore_failure: true
     if: ctx?.cisco?.amp?.start_timestamp != null
@@ -98,7 +98,7 @@ processors:
     if: ctx?.host?.name != null
 - rename:
     field: cisco.amp.computer.user
-    target_field: host.user.name
+    target_field: user.name
     ignore_missing: true
 
 #########################
@@ -244,8 +244,8 @@ processors:
 #########################
 - append:
     field: related.user
-    value: "{{ host.user.name }}"
-    if: ctx?.host?.user?.name != null
+    value: "{{ user.name }}"
+    if: ctx?.user?.name != null
     allow_duplicates: false
 - append:
     field: related.hash
@@ -324,7 +324,7 @@ processors:
         for (addr in ctx?.cisco?.amp?.computer?.network_addresses) {
             if (addr.ip != null && !addr.ip.isEmpty()) {
                 if (!ctx?.related?.ip.contains(addr.ip)) {
-                    ctx?.related?.ip.add(addr.ip);  
+                    ctx?.related?.ip.add(addr.ip);
                 }
             }
         }
@@ -341,7 +341,7 @@ processors:
         for (addr in ctx?.cisco?.amp?.computer?.network_addresses) {
             if (addr.mac != null && !addr.mac.isEmpty()) {
                 if (!ctx?.cisco?.amp?.related?.mac.contains(addr.mac)) {
-                    ctx?.cisco?.amp?.related?.mac.add(addr.mac);  
+                    ctx?.cisco?.amp?.related?.mac.add(addr.mac);
                 }
             }
         }
@@ -407,14 +407,14 @@ processors:
 - date:
     field: cisco.amp.threat_hunting.incident_start_time
     target_field: cisco.amp.threat_hunting.incident_start_time
-    formats: 
+    formats:
       - UNIX
     ignore_failure: true
     if: ctx?.cisco?.amp?.threat_hunting?.incident_start_time != null
 - date:
     field: cisco.amp.threat_hunting.incident_end_time
     target_field: cisco.amp.threat_hunting.incident_end_time
-    formats: 
+    formats:
       - UNIX
     ignore_failure: true
     if: ctx?.cisco?.amp?.threat_hunting?.incident_end_time != null

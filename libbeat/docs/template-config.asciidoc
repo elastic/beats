@@ -26,13 +26,6 @@ existing one.
 *`setup.template.enabled`*:: Set to false to disable template loading. If this is set to false,
 you must <<load-template-manually,load the template manually>>.
 
-ifndef::apm-server[]
-*`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
-before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `component`
-and `index`. Selecting `component` loads a component template which can be included in new index templates.
-The option `index` loads the new index template.
-endif::[]
-
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
 name, so the final name is +{beatname_lc}-%{[{beat_version_key}]}+.
@@ -44,17 +37,16 @@ name, so the final name is +{beatname_lc}-%{[{beat_version_key}]}+.
 // the example as expected.
 
 *`setup.template.pattern`*:: The template pattern to apply to the default index
-settings. The default pattern is +{beat_default_index_prefix}-\*+. The {beatname_uc} version is always
+settings. The default pattern is +{beat_default_index_prefix}+. The {beatname_uc} version is always
 included in the pattern, so the final pattern is
-+{beat_default_index_prefix}-%{[{beat_version_key}]}-*+. The wildcard character `-*` is used to
-match all daily indices.
++{beat_default_index_prefix}-%{[{beat_version_key}]}+. 
 +
 Example:
 +
 ["source","yaml",subs="attributes"]
 ----------------------------------------------------------------------
 setup.template.name: "{beatname_lc}"
-setup.template.pattern: "{beat_default_index_prefix}-*"
+setup.template.pattern: "{beat_default_index_prefix}"
 ----------------------------------------------------------------------
 
 *`setup.template.fields`*:: The path to the YAML file describing the fields. The default is +fields.yml+. If a
@@ -136,7 +128,10 @@ set the name of the template.
 setup.template.json.enabled: true
 setup.template.json.path: "template.json"
 setup.template.json.name: "template-name
+setup.template.json.data_stream: false
 ----------------------------------------------------------------------
 
 NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
 generation.
+
+NOTE: If the JSON template is a data stream, set `setup.template.json.data_stream`.

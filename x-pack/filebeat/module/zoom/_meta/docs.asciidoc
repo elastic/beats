@@ -5,7 +5,8 @@
 
 
 == Zoom module
-beta[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is a module for Zoom webhook logs. The module creates an HTTP listener that accepts incoming webhooks from Zoom.
 

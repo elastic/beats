@@ -15,7 +15,7 @@
                 "axis_scale": "normal",
                 "filter": {
                     "language": "kuery",
-                    "query": "gcp.loadbalancing.https.request_count.value : * "
+                    "query": "gcp.loadbalancing.https.request.count : * "
                 },
                 "id": "61ca57f0-469d-11e7-af02-69e470af7417",
                 "index_pattern": "metricbeat-*",
@@ -29,7 +29,7 @@
                         "fill": "0",
                         "filter": {
                             "language": "kuery",
-                            "query": "gcp.loadbalancing.https.request_count.value : * "
+                            "query": "gcp.loadbalancing.https.request.count : * "
                         },
                         "formatter": "number",
                         "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -37,7 +37,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "gcp.loadbalancing.https.request_count.value",
+                                "field": "gcp.loadbalancing.https.request.count",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }

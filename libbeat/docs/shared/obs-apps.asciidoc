@@ -15,14 +15,14 @@ ifeval::["{beatname_lc}"!="filebeat"]
 |Logs
 endif::[]
 ifeval::["{beatname_lc}"!="winlogbeat"]
-|{winlogbeat-ref}/winlogbeat-installation-configuration.html[{winlogbeat}] 
+|{winlogbeat-ref}/winlogbeat-installation-configuration.html[{winlogbeat}]
 |Windows event logs
 endif::[]
 ifeval::["{beatname_lc}"!="heartbeat"]
 |{heartbeat-ref}/heartbeat-installation-configuration.html[{heartbeat}]
 |Uptime information
 endif::[]
-|{apm-overview-ref-v}/index.html[APM]
+|{apm-guide-ref}/index.html[APM]
 |Application performance metrics
 ifeval::["{beatname_lc}"!="auditbeat"]
 |{auditbeat-ref}/auditbeat-installation-configuration.html[{auditbeat}]
@@ -48,7 +48,7 @@ endif::[]
 |Monitor availability issues across your apps and services
 
 |{kibana-ref}/xpack-apm.html[APM app]
-|Monitor application performance 
+|Monitor application performance
 
 |{kibana-ref}/xpack-siem.html[{siem-app}]
 |Analyze security events

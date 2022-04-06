@@ -1,4 +1,4 @@
-:modulename: system nginx mysql
+:modulename: nginx
 
 //TODO: Remove release-state override before merging.
 
@@ -19,6 +19,8 @@ You'll learn how to:
 
 [role="screenshot"]
 image::./images/kibana-system.png[{beatname_uc} System dashboard]
+
+//TODO: We should replace this with an nginx dashboard rather than system
 
 [float]
 === Before you begin
@@ -79,15 +81,14 @@ include::{libbeat-dir}/tab-widgets/list-modules-widget.asciidoc[]
 --
 
 . From the installation directory, enable one or more modules. For example, the
-following command enables the `system`, `nginx`, and `mysql` module
-configs:
+following command enables the +{modulename}+ module config:
 +
 --
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 --
 
-. In the module configs under `modules.d`, change the module settings to match
-your environment.
+. In the module config under `modules.d`, enable the desired datasets and
+change the module settings to match your environment. **Datasets are disabled by default.**
 +
 For example, log locations are set based on the OS. If your logs aren't in
 default locations, set the `paths` variable:
@@ -97,6 +98,7 @@ default locations, set the `paths` variable:
 ----
 - module: nginx
   access:
+    enabled: true
     var.paths: ["/var/log/nginx/access.log*"] <1>
 ----
 --

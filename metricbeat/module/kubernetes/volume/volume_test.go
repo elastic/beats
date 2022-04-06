@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package volume
@@ -27,18 +28,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
 func TestEventMapping(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.volume")
+
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -53,6 +57,7 @@ func TestEventMapping(t *testing.T) {
 		"fs.inodes.used":     9,
 		"fs.inodes.free":     473551,
 		"fs.inodes.count":    473560,
+		"fs.inodes.pct":      float64(9) / float64(473560),
 	}
 
 	for k, v := range testCases {

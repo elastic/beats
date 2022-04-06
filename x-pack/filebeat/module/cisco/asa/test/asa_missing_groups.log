@@ -1,0 +1,5 @@
+Jun 08 2020 12:59:57: %ASA-4-113019: Group = TheBeatles, Username = Ringo, IP = 234.56.12.87, Session disconnected. Session Type: AnyConnect-Parent, Duration: 0h:01m:52s, Bytes xmt: 32452, Bytes rcv: 0, Reason: User Requested
+Oct 20 2019 15:42:53: %ASA-4-113019: Group = TheBeatles, Username = John, IP = 234.28.45.42, Session disconnected. Session Type: SSL, Duration: 2h:27m:34s, Bytes xmt: 45323434, Bytes rcv: 43252324, Reason: Idle Timeout
+Oct 20 2019 15:42:54: %ASA-4-722037: Group <GroupPolicy_TheBeatles> User <Paul> IP <83.212.241.149> SVC closing connection: DPD failure.
+Aug  6 2020 11:01:37: %ASA-4-722037: Group <GroupPolicy_TheBeatles> User <Brian> IP <234.63.56.32> SVC closing connection: Transport closing.
+Aug  6 2020 11:01:38: %ASA-4-722051: Group <GroupPolicy_TheBeatles> User <George> IP <234.24.156.94> IPv4 Address <234.56.47.98> IPv6 address <::> assigned to session

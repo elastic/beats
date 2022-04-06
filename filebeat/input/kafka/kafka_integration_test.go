@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package kafka
@@ -43,8 +44,9 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "kafka"
-	kafkaDefaultPort = "9092"
+	kafkaDefaultHost     = "kafka"
+	kafkaDefaultPort     = "9092"
+	kafkaDefaultSASLPort = "9093"
 )
 
 type testMessage struct {
@@ -61,17 +63,18 @@ func recordHeader(key, value string) sarama.RecordHeader {
 
 func TestInput(t *testing.T) {
 	testTopic := createTestTopicName()
+	groupID := "filebeat"
 
 	// Send test messages to the topic for the input to read.
 	messages := []testMessage{
-		testMessage{message: "testing"},
-		testMessage{
+		{message: "testing"},
+		{
 			message: "stuff",
 			headers: []sarama.RecordHeader{
 				recordHeader("X-Test-Header", "test header value"),
 			},
 		},
-		testMessage{
+		{
 			message: "things",
 			headers: []sarama.RecordHeader{
 				recordHeader("keys and things", "3^3 = 27"),
@@ -87,7 +90,7 @@ func TestInput(t *testing.T) {
 	config := common.MustNewConfigFrom(common.MapStr{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
-		"group_id":   "filebeat",
+		"group_id":   groupID,
 		"wait_close": 0,
 	})
 
@@ -112,10 +115,21 @@ func TestInput(t *testing.T) {
 			assert.Equal(t, text, msg.message)
 
 			checkMatchingHeaders(t, event, msg.headers)
+
+			// emulating the pipeline (kafkaInput.Run)
+			meta, ok := event.Private.(eventMeta)
+			if !ok {
+				t.Fatal("could not get eventMeta and ack the message")
+			}
+			meta.ackHandler()
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
 	}
+
+	// sarama commits every second, we need to make sure
+	// all message acks are committed before the rest of the checks
+	<-time.After(2 * time.Second)
 
 	// Close the done channel and make sure the beat shuts down in a reasonable
 	// amount of time.
@@ -131,6 +145,8 @@ func TestInput(t *testing.T) {
 		t.Fatal("timeout waiting for beat to shut down")
 	case <-didClose:
 	}
+
+	assertOffset(t, groupID, testTopic, int64(len(messages)))
 }
 
 func TestInputWithMultipleEvents(t *testing.T) {
@@ -316,6 +332,90 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	}
 }
 
+func TestSASLAuthentication(t *testing.T) {
+	testTopic := createTestTopicName()
+	groupID := "filebeat"
+
+	// Send test messages to the topic for the input to read.
+	messages := []testMessage{
+		{message: "testing"},
+		{message: "sasl and stuff"},
+	}
+	for _, m := range messages {
+		writeToKafkaTopic(t, testTopic, m.message, m.headers, time.Second*20)
+	}
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":          []string{getTestSASLKafkaHost()},
+		"protocol":       "https",
+		"sasl.mechanism": "SCRAM-SHA-512",
+		"ssl.certificate_authorities": []string{
+			"../../../testing/environments/docker/kafka/certs/ca-cert",
+		},
+		"username": "beats",
+		"password": "KafkaTest",
+
+		"topics":     []string{testTopic},
+		"group_id":   groupID,
+		"wait_close": 0,
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	for range messages {
+		select {
+		case event := <-events:
+			v, err := event.Fields.GetValue("message")
+			if err != nil {
+				t.Fatal(err)
+			}
+			text, ok := v.(string)
+			if !ok {
+				t.Fatal("could not get message text from event")
+			}
+			msg := findMessage(t, text, messages)
+			assert.Equal(t, text, msg.message)
+
+			checkMatchingHeaders(t, event, msg.headers)
+
+			// emulating the pipeline (kafkaInput.Run)
+			meta, ok := event.Private.(eventMeta)
+			if !ok {
+				t.Fatal("could not get eventMeta and ack the message")
+			}
+			meta.ackHandler()
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
+		}
+	}
+
+	// sarama commits every second, we need to make sure
+	// all message acks are committed before the rest of the checks
+	<-time.After(2 * time.Second)
+
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	cancel()
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+
+	assertOffset(t, groupID, testTopic, int64(len(messages)))
+}
+
 func TestTest(t *testing.T) {
 	testTopic := createTestTopicName()
 
@@ -417,6 +517,44 @@ func getTestKafkaHost() string {
 		getenv("KAFKA_HOST", kafkaDefaultHost),
 		getenv("KAFKA_PORT", kafkaDefaultPort),
 	)
+}
+
+func getTestSASLKafkaHost() string {
+	return fmt.Sprintf("%v:%v",
+		getenv("KAFKA_HOST", kafkaDefaultHost),
+		getenv("KAFKA_SASL_PORT", kafkaDefaultSASLPort),
+	)
+}
+
+func assertOffset(t *testing.T, groupID, topic string, expected int64) {
+	client, err := sarama.NewClient([]string{getTestKafkaHost()}, nil)
+	assert.NoError(t, err)
+	defer client.Close()
+
+	ofm, err := sarama.NewOffsetManagerFromClient(groupID, client)
+	assert.NoError(t, err)
+	defer ofm.Close()
+
+	partitions, err := client.Partitions(topic)
+	assert.NoError(t, err)
+
+	var offsetSum int64
+
+	for _, partitionID := range partitions {
+		pom, err := ofm.ManagePartition(topic, partitionID)
+		assert.NoError(t, err)
+
+		offset, _ := pom.NextOffset()
+		// if the partition was not written to before
+		// it might return -1 which would affect the sum
+		if offset > 0 {
+			offsetSum += offset
+		}
+
+		pom.Close()
+	}
+
+	assert.Equal(t, expected, offsetSum, "offset does not match, perhaps messages were not acknowledged")
 }
 
 func writeToKafkaTopic(

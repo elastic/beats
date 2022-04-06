@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
 // +build linux
 
 package procs
@@ -38,14 +39,14 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 	var err error
 	for _, file := range files {
 		dir := filepath.Dir(file.path)
-		err = os.MkdirAll(filepath.Join(prefix, dir), 0755)
+		err = os.MkdirAll(filepath.Join(prefix, dir), 0o755)
 		if err != nil {
 			return err
 		}
 
 		if !file.isLink {
 			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
-				[]byte(file.contents), 0644)
+				[]byte(file.contents), 0o644)
 			if err != nil {
 				return err
 			}

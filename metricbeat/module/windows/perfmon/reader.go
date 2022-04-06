@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -23,7 +24,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
@@ -52,6 +52,7 @@ type Reader struct {
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
 	counters []PerfCounter
+	event    windows.Handle
 }
 
 type PerfCounter struct {
@@ -71,13 +72,18 @@ func NewReader(config Config) (*Reader, error) {
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
+	event, err := windows.CreateEvent(nil, 0, 0, nil)
+	if err != nil {
+		return nil, err
+	}
 	r := &Reader{
 		query:  query,
 		log:    logp.NewLogger("perfmon"),
 		config: config,
+		event:  event,
 	}
 	r.mapCounters(config)
-	_, err := r.getCounterPaths()
+	_, err = r.getCounterPaths()
 	if err != nil {
 		return nil, err
 	}
@@ -129,18 +135,12 @@ func (re *Reader) Read() ([]mb.Event, error) {
 
 func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	var val map[string][]pdh.CounterValue
-	rand.Seed(time.Now().UnixNano())
-	title := windows.StringToUTF16Ptr("metricbeat_perfmon" + randSeq(5))
-	event, err := windows.CreateEvent(nil, 0, 0, title)
+	var sec uint32 = 1
+	err := re.query.CollectDataEx(sec, re.event)
 	if err != nil {
 		return nil, err
 	}
-	defer windows.CloseHandle(event)
-	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
-	if err != nil {
-		return nil, err
-	}
-	waitFor, err := windows.WaitForSingleObject(event, windows.INFINITE)
+	waitFor, err := windows.WaitForSingleObject(re.event, windows.INFINITE)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +169,7 @@ func randSeq(n int) string {
 
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
+	defer windows.CloseHandle(re.event)
 	return re.query.Close()
 }
 
@@ -218,18 +219,6 @@ func (re *Reader) getCounter(query string) (bool, PerfCounter) {
 
 func (re *Reader) mapCounters(config Config) {
 	re.counters = []PerfCounter{}
-	if len(config.Counters) > 0 {
-		for _, counter := range config.Counters {
-			re.counters = append(re.counters, PerfCounter{
-				InstanceField: counter.InstanceLabel,
-				InstanceName:  counter.InstanceName,
-				QueryField:    counter.MeasurementLabel,
-				QueryName:     counter.Query,
-				Format:        counter.Format,
-				ChildQueries:  nil,
-			})
-		}
-	}
 	if len(config.Queries) > 0 {
 		for _, query := range config.Queries {
 			for _, counter := range query.Counters {

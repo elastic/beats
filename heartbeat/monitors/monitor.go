@@ -32,10 +32,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
 var ErrMonitorDisabled = errors.New("monitor not loaded, plugin is disabled")
+
+const (
+	MON_INIT = iota
+	MON_STARTED
+	MON_STOPPED
+)
+
+type WrappedClient struct {
+	Publish func(event beat.Event)
+	Close   func() error
+	wait    func()
+}
 
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
@@ -43,11 +56,10 @@ type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
 	config         *common.Config
-	registrar      *plugin.PluginsReg
-	uniqueName     string
-	scheduler      *scheduler.Scheduler
+	addTask        scheduler.AddTask
 	configuredJobs []*configuredJob
 	enabled        bool
+	state          int
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical
@@ -60,6 +72,8 @@ type Monitor struct {
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
+
+	runOnce bool
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -69,32 +83,22 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
-	m, err := newMonitor(config, registrar, nil, nil)
-	if m != nil {
-		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
-	}
+	_, err := newMonitor(config, registrar, nil, nil, nil, false)
+
 	return err
 }
 
-// uniqueMonitorIDs is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
-// given heartbeat instance.
-var uniqueMonitorIDs sync.Map
-
-// ErrDuplicateMonitorID is returned when a monitor attempts to start using an ID already in use by another monitor.
-type ErrDuplicateMonitorID struct{ ID string }
-
-func (e ErrDuplicateMonitorID) Error() string {
-	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
-}
-
-// newMonitor Creates a new monitor, without leaking resources in the event of an error.
+// newMonitor creates a new monitor, without leaking resources in the event of an error.
+// you do not need to call Stop(), it will be safely garbage collected unless Start is called.
 func newMonitor(
 	config *common.Config,
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
-	scheduler *scheduler.Scheduler,
+	taskAdder scheduler.AddTask,
+	onStop func(*Monitor),
+	runOnce bool,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, taskAdder, onStop, runOnce)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -107,7 +111,9 @@ func newMonitorUnsafe(
 	config *common.Config,
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
-	scheduler *scheduler.Scheduler,
+	addTask scheduler.AddTask,
+	onStop func(*Monitor),
+	runOnce bool,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -129,20 +135,17 @@ func newMonitorUnsafe(
 	m := &Monitor{
 		stdFields:         standardFields,
 		pluginName:        pluginFactory.Name,
-		scheduler:         scheduler,
+		addTask:           addTask,
 		configuredJobs:    []*configuredJob{},
 		pipelineConnector: pipelineConnector,
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             pluginFactory.Stats,
+		state:             MON_INIT,
+		runOnce:           runOnce,
 	}
 
-	if m.stdFields.ID != "" {
-		// Ensure we don't have duplicate IDs
-		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.stdFields.ID, m); loaded {
-			return m, ErrDuplicateMonitorID{m.stdFields.ID}
-		}
-	} else {
+	if m.stdFields.ID == "" {
 		// If there's no explicit ID generate one
 		hash, err := m.configHash()
 		if err != nil {
@@ -152,13 +155,33 @@ func newMonitorUnsafe(
 	}
 
 	p, err := pluginFactory.Create(config)
-	m.close = p.Close
+
+	m.close = func() error {
+		if onStop != nil {
+			onStop(m)
+		}
+		return p.Close()
+	}
+
+	// If we've hit an error at this point, still run on schedule, but always return an error.
+	// This way the error is clearly communicated through to kibana.
+	// Since the error is not recoverable in these instances, the user will need to reconfigure
+	// the monitor, which will destroy and recreate it in heartbeat, thus clearing this error.
+	//
+	// Note: we do this at this point, and no earlier, because at a minimum we need the
+	// standard monitor fields (id, name and schedule) to deliver an error to kibana in a way
+	// that it can render.
+	if err != nil {
+		// Note, needed to hoist err to this scope, not just to add a prefix
+		fullErr := fmt.Errorf("job could not be initialized: %s", err)
+		// A placeholder job that always returns an error
+		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
+			return nil, fullErr
+		}}
+	}
+
 	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
 	m.endpoints = p.Endpoints
-
-	if err != nil {
-		return m, fmt.Errorf("job err %v", err)
-	}
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
@@ -213,18 +236,46 @@ func (m *Monitor) Start() {
 	defer m.internalsMtx.Unlock()
 
 	for _, t := range m.configuredJobs {
-		t.Start()
+		if m.runOnce {
+			client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+			if err != nil {
+				logp.Err("could not start monitor: %v", err)
+				continue
+			}
+			t.Start(&WrappedClient{
+				Publish: func(event beat.Event) {
+					client.Publish(event)
+				},
+				Close: client.Close,
+				wait:  client.Wait,
+			})
+		} else {
+			client, err := m.pipelineConnector.Connect()
+			if err != nil {
+				logp.Err("could not start monitor: %v", err)
+				continue
+			}
+			t.Start(&WrappedClient{
+				Publish: client.Publish,
+				Close:   client.Close,
+				wait:    func() {},
+			})
+		}
 	}
 
 	m.stats.StartMonitor(int64(m.endpoints))
+	m.state = MON_STARTED
 }
 
-// Stop stops the Monitor's execution in its configured scheduler.
-// This is safe to call even if the Monitor was never started.
+// Stop stops the monitor without freeing it in global dedup
+// needed by dedup itself to avoid a reentrant lock.
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
-	defer m.freeID()
+
+	if m.state == MON_STOPPED {
+		return
+	}
 
 	for _, t := range m.configuredJobs {
 		t.Stop()
@@ -238,9 +289,5 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.StopMonitor(int64(m.endpoints))
-}
-
-func (m *Monitor) freeID() {
-	// Free up the monitor ID for reuse
-	uniqueMonitorIDs.Delete(m.stdFields.ID)
+	m.state = MON_STOPPED
 }

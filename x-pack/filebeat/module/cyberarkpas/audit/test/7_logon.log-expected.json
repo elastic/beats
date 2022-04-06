@@ -366,7 +366,7 @@
         "cyberarkpas.audit.message": "Logon",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 09 00:32:51",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
@@ -397,22 +397,19 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20",
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "Administrator"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -429,7 +426,7 @@
         "cyberarkpas.audit.message": "Logon",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
-        "cyberarkpas.audit.station": "37.223.7.45",
+        "cyberarkpas.audit.station": "216.160.83.61",
         "cyberarkpas.audit.timestamp": "Mar 09 02:14:58",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
@@ -451,7 +448,7 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 4908,
+        "log.offset": 4907,
         "log.syslog.priority": "5",
         "network.direction": "inbound",
         "observer.hostname": "VAULT",
@@ -460,22 +457,22 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20",
-            "37.223.7.45"
+            "216.160.83.61"
         ],
         "related.user": [
             "Administrator"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "37.223.7.45",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "37.223.7.45",
+        "source.address": "216.160.83.61",
+        "source.geo.city_name": "Milton",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 47.2513,
+        "source.geo.location.lon": -122.3149,
+        "source.geo.region_iso_code": "US-WA",
+        "source.geo.region_name": "Washington",
+        "source.ip": "216.160.83.61",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -491,7 +488,7 @@
         "cyberarkpas.audit.message": "Logon",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:48",
         "event.action": "authentication_success",
         "event.category": [
@@ -511,29 +508,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 5456,
+        "log.offset": 5457,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMP_ADB_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -549,7 +543,7 @@
         "cyberarkpas.audit.message": "Logon",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:48",
         "event.action": "authentication_success",
         "event.category": [
@@ -576,22 +570,19 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMPApp_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -607,7 +598,7 @@
         "cyberarkpas.audit.message": "Logon",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:49",
         "event.action": "authentication_success",
         "event.category": [
@@ -627,29 +618,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 6571,
+        "log.offset": 6570,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMPGW_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package logstash_test
@@ -40,7 +41,6 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/25043")
 	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {

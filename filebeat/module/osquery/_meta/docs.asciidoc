@@ -3,6 +3,8 @@
 
 == Osquery module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and decodes the result logs written by
 https://osquery.readthedocs.io/en/latest/introduction/using-osqueryd/[osqueryd]
 in the JSON format. To set up osqueryd follow the osquery installation
@@ -65,7 +67,7 @@ coming with this module won't work correctly. The default is true.
 === Example dashboard
 
 This module comes with a sample dashboard for visualizing the data collected by
-the "compliance" pack. To collect this data, enable the `id-compliance` pack in
+the "compliance" pack. To collect this data, enable the `it-compliance` pack in
 the osquery configuration file.
 
 [role="screenshot"]

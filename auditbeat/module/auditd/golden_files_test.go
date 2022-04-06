@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
 // +build linux
 
 package auditd
@@ -123,14 +124,16 @@ func configForGolden() map[string]interface{} {
 	}
 }
 
-type TerminateFn func(mb.Event) bool
-type terminableReporter struct {
-	events []mb.Event
-	ctx    context.Context
-	cancel context.CancelFunc
-	err    error
-	isLast TerminateFn
-}
+type (
+	TerminateFn        func(mb.Event) bool
+	terminableReporter struct {
+		events []mb.Event
+		ctx    context.Context
+		cancel context.CancelFunc
+		err    error
+		isLast TerminateFn
+	}
+)
 
 func (r *terminableReporter) Event(event mb.Event) bool {
 	if r.ctx.Err() != nil {
@@ -214,7 +217,7 @@ func TestGoldenFiles(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if err = ioutil.WriteFile(goldenPath, data, 0644); err != nil {
+				if err = ioutil.WriteFile(goldenPath, data, 0o644); err != nil {
 					t.Fatalf("failed writing golden file '%s': %v", goldenPath, err)
 				}
 			}

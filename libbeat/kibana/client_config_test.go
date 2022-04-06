@@ -47,6 +47,12 @@ func TestClientConfigValdiate(t *testing.T) {
 		},
 		err: nil,
 	}, {
+		name: "service_token",
+		c: &ClientConfig{
+			ServiceToken: "service_token",
+		},
+		err: nil,
+	}, {
 		name: "username and api_key",
 		c: &ClientConfig{
 			Username: "user",

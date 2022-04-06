@@ -242,6 +242,7 @@ processors:
     if: "ctx.client?.bytes != null"
 - trim:
     field: sophos.xg.sent_pkts
+    ignore_missing: true
 - convert:
     field: sophos.xg.sent_pkts
     target_field: source.packets

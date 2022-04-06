@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package login
@@ -10,8 +11,6 @@ import (
 	"fmt"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -96,12 +95,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
 	ms := &MetricSet{

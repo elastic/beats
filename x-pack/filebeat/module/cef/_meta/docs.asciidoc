@@ -5,6 +5,8 @@
 
 == CEF module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for receiving Common Event Format (CEF) data over Syslog. When
 messages are received over the syslog protocol the syslog input will parse the
 header and set the timestamp value. Then the

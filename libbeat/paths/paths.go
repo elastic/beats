@@ -28,8 +28,6 @@
 //
 // path.config - Configuration files and Elasticsearch template default location
 //
-// system.hostfs - supplies an alternate filesystem root for containerized environments
-//
 // These settings can be set via the configuration file or via command line flags.
 // The CLI flags overwrite the configuration file options.
 //
@@ -40,16 +38,9 @@
 package paths
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
-)
-
-var (
-	// TODO: remove this flag in 8.0 since it should be replaced by system.hostfs configuration option (config.HostFS)
-	// HostFS is an alternate mountpoint for the filesytem root, for when metricbeat is running inside a container.
-	hostFS = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")
 )
 
 // Path tracks user-configurable path locations and directories
@@ -58,7 +49,6 @@ type Path struct {
 	Config string
 	Data   string
 	Logs   string
-	Hostfs string
 }
 
 // FileType is an enumeration type representing the file types.
@@ -74,11 +64,6 @@ const (
 	Data FileType = "data"
 	// Logs is the path to the beats logs directory
 	Logs FileType = "logs"
-	// Hostfs is an alternate path to the filesystem root,
-	// used for system metrics that interact with procfs and sysfs.
-	// Unlike the other values here, this corrisponds to `system.hostfs`
-	// and not `path.hostfs`.
-	Hostfs FileType = "hostfs"
 )
 
 // Paths is the Path singleton on which the top level functions from this
@@ -135,23 +120,7 @@ func (paths *Path) initPaths(cfg *Path) error {
 		paths.Logs = filepath.Join(paths.Home, "logs")
 	}
 
-	if *hostFS != "" {
-		paths.Hostfs = *hostFS
-	}
-
-	if paths.Hostfs == "" {
-		paths.Hostfs = "/"
-	}
-
 	return nil
-}
-
-// IsCLISet returns true if the CLI system.hostfs value has been set
-func IsCLISet() bool {
-	if *hostFS != "" {
-		return true
-	}
-	return false
 }
 
 // Resolve resolves a path to a location in one of the default
@@ -159,7 +128,7 @@ func IsCLISet() bool {
 // path for "test" in the home path.
 func (paths *Path) Resolve(fileType FileType, path string) string {
 	// absolute paths are not changed for non-hostfs file types, since hostfs is a little odd
-	if filepath.IsAbs(path) && fileType != Hostfs {
+	if filepath.IsAbs(path) {
 		return path
 	}
 
@@ -172,8 +141,6 @@ func (paths *Path) Resolve(fileType FileType, path string) string {
 		return filepath.Join(paths.Data, path)
 	case Logs:
 		return filepath.Join(paths.Logs, path)
-	case Hostfs:
-		return filepath.Join(paths.Hostfs, path)
 	default:
 		panic(fmt.Sprintf("Unknown file type: %s", fileType))
 	}

@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 experimental[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for F5 network device's logs. It includes the following
 filesets for receiving logs over syslog or read from a file:
 
@@ -35,7 +37,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "bigipapm" device re
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 
@@ -80,7 +82,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "bigipafm" device re
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 

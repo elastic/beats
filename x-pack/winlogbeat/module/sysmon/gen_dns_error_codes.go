@@ -2,7 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//+build ignore
+//go:build ignore
+// +build ignore
 
 package main
 
@@ -30,8 +31,10 @@ import (
 // See https://docs.microsoft.com/en-us/windows/win32/debug/system-error-code-lookup-tool
 // for details about the Microsoft Error Lookup Tool.
 
-const microsoftErrorToolURL = "https://download.microsoft.com/download/4/3/2/432140e8-fb6c-4145-8192-25242838c542/Err_6.4.5/Err_6.4.5.exe"
-const microsoftErrorToolSha256 = "88739EC82BA16A0B4A3C83C1DD2FCA6336AD8E2A1E5F1238C085B1E86AB8834A"
+const (
+	microsoftErrorToolURL    = "https://download.microsoft.com/download/4/3/2/432140e8-fb6c-4145-8192-25242838c542/Err_6.4.5/Err_6.4.5.exe"
+	microsoftErrorToolSha256 = "88739EC82BA16A0B4A3C83C1DD2FCA6336AD8E2A1E5F1238C085B1E86AB8834A"
+)
 
 var includeCodes = []uint64{
 	5,

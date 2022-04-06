@@ -5,9 +5,9 @@ processors:
     value: '{{_ingest.timestamp}}'
 - rename:
     field: message
-    target_field: log.original
+    target_field: event.original
 - grok:
-    field: log.original
+    field: event.original
     trace_match: true
     patterns:
       - '%{TIMESTAMP_ISO8601:zookeeper.log.timestamp}%{SPACE}\[myid:(%{POSINT:service.node.name})?\]%{SPACE}-%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\[%{DATA:zookeeper.log.process}\]%{SPACE}-%{SPACE}%{GREEDYDATA:message}'
@@ -22,9 +22,9 @@ processors:
 - remove:
     field: zookeeper.log.process
     ignore_missing: true
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - date:
     if: ctx.event.timezone == null
     field: zookeeper.log.timestamp

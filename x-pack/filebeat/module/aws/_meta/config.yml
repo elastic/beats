@@ -8,6 +8,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -51,6 +54,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -59,6 +65,12 @@
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   cloudwatch:
     enabled: false
@@ -69,6 +81,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -100,6 +115,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -108,6 +126,12 @@
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   ec2:
     enabled: false
@@ -118,6 +142,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -149,6 +176,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -157,6 +187,12 @@
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   elb:
     enabled: false
@@ -167,6 +203,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -198,6 +237,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -206,6 +248,12 @@
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   s3access:
     enabled: false
@@ -216,6 +264,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -247,6 +298,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -255,6 +309,12 @@
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   vpcflow:
     enabled: false
@@ -265,6 +325,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -296,6 +359,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -304,3 +370,9 @@
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:

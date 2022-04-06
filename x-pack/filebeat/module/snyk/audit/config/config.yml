@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 {{ if .audit_type }}
 {{ if eq .audit_type "group" }}
@@ -68,14 +67,7 @@ processors:
   - fingerprint:
       fields: ["json.orgId", "json.created", "json.event"]
       target_field: "@metadata._id"
-  - script:
-      lang: javascript
-      id: my_filter
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0

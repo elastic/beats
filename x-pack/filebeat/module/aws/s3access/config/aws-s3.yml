@@ -14,6 +14,10 @@ number_of_workers: {{ .number_of_workers }}
 bucket_list_interval: {{ .bucket_list_interval }}
 {{ end }}
 
+{{ if .bucket_list_prefix }}
+bucket_list_prefix: {{ .bucket_list_prefix }}
+{{ end }}
+
 {{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}
 {{ end }}
@@ -32,6 +36,10 @@ api_timeout: {{ .api_timeout }}
 
 {{ if .endpoint }}
 endpoint: {{ .endpoint }}
+{{ end }}
+
+{{ if .default_region }}
+default_region: {{ .default_region }}
 {{ end }}
 
 {{ if .access_key_id }}
@@ -62,6 +70,10 @@ max_number_of_messages: {{ .max_number_of_messages }}
 proxy_url: {{ .proxy_url }}
 {{ end }}
 
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
@@ -69,4 +81,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0

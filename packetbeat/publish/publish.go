@@ -84,7 +84,6 @@ func (p *TransactionPublisher) Stop() {
 func (p *TransactionPublisher) CreateReporter(
 	config *common.Config,
 ) (func(beat.Event), error) {
-
 	// load and register the module it's fields, tags and processors settings
 	meta := struct {
 		Index      string                  `config:"index"`

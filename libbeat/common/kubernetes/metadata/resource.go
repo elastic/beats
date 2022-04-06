@@ -85,7 +85,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 		return nil
 	}
 
-	labelMap := common.MapStr{}
+	var labelMap common.MapStr
 	if len(r.config.IncludeLabels) == 0 {
 		labelMap = GenerateMap(accessor.GetLabels(), r.config.LabelsDedot)
 	} else {
@@ -107,22 +107,21 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	}
 
 	if accessor.GetNamespace() != "" {
-		// TODO make this namespace.name in 8.0
 		safemapstr.Put(meta, "namespace", accessor.GetNamespace())
 	}
 
 	// Add controller metadata if present
-	if r.config.IncludeCreatorMetadata {
-		for _, ref := range accessor.GetOwnerReferences() {
-			if ref.Controller != nil && *ref.Controller {
-				switch ref.Kind {
-				// TODO grow this list as we keep adding more `state_*` metricsets
-				case "Deployment",
-					"ReplicaSet",
-					"StatefulSet",
-					"DaemonSet":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
-				}
+	for _, ref := range accessor.GetOwnerReferences() {
+		if ref.Controller != nil && *ref.Controller {
+			switch ref.Kind {
+			// TODO grow this list as we keep adding more `state_*` metricsets
+			case "Deployment",
+				"ReplicaSet",
+				"StatefulSet",
+				"DaemonSet",
+				"Job",
+				"CronJob":
+				safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
 			}
 		}
 	}

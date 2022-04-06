@@ -17,18 +17,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 0,
+        "network.community_id": "1:3NxcSu9jwJUYIYwJ2TO4TSNnPX8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -67,18 +68,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 139,
+        "network.community_id": "1:3NxcSu9jwJUYIYwJ2TO4TSNnPX8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -100,7 +102,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T09:34:34.000-04:00",
+        "@timestamp": "2014-04-15T11:34:34.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
@@ -123,13 +125,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 294,
+        "network.community_id": "1:/AVpSqNe7QhujyFPgKMbMS9Ct44=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -168,12 +171,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "INT-FW01",
@@ -181,6 +184,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 465,
+        "network.community_id": "1:462QRxMFThXYxhSyvR50cIDJegg=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -228,7 +232,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "INT-FW01",
@@ -236,6 +240,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 632,
+        "network.community_id": "1:c8hH08+kxqP8+dYZZFCsPYYf0oo=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -287,6 +292,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 812,
+        "network.community_id": "1:oGT+RQ2PYVsSEX/LuKvEW6O6Jiw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -340,6 +346,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 938,
+        "network.community_id": "1:4NJbCZhuyrAJcj7S647C7IIhAM8=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -388,6 +395,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 1106,
+        "network.community_id": "1:ay9S7HyVcpV47ArwMPDsxLg6wBU=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -441,6 +449,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 1233,
+        "network.community_id": "1:JpGltiZUmRdP7Yj0gpMkjYQzWJY=",
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -491,6 +500,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 1401,
+        "network.community_id": "1:fZibb4nXPyoJv3pk+hIlafmMMMY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -545,6 +555,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 1527,
+        "network.community_id": "1:KAOD4KM9MUK44UkzQPDM20+aGPI=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -600,6 +611,7 @@
         "log.level": "informational",
         "log.offset": 1692,
         "network.bytes": 140,
+        "network.community_id": "1:JpGltiZUmRdP7Yj0gpMkjYQzWJY=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -631,6 +643,7 @@
         "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
+        "destination.user.name": "user2",
         "event.action": "flow-expiration",
         "event.category": [
             "network"
@@ -655,6 +668,7 @@
         "log.level": "informational",
         "log.offset": 1844,
         "network.bytes": 9999999,
+        "network.community_id": "1:JpGltiZUmRdP7Yj0gpMkjYQzWJY=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -666,14 +680,20 @@
             "10.123.1.35",
             "192.0.2.222"
         ],
+        "related.user": [
+            "user1",
+            "user2"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
+        "source.user.name": "user1",
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "user2"
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000-02:00",
@@ -702,6 +722,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 2008,
+        "network.community_id": "1:tTzSWYTCd+HV5W2Q/cSW6AszABM=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.hostname": "FJSG2NRFW01",
@@ -750,6 +771,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 2163,
+        "network.community_id": "1:EsAlPGwbpvnOIWG+1RbOLtWOWaI=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -804,6 +826,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 2289,
+        "network.community_id": "1:m/dSB7tetihSecuyjm6x4Rl/8I8=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -841,18 +864,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106007: Deny inbound UDP from 192.0.0.66/12981 to 10.1.2.60/53 due to DNS Query",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "critical",
         "log.offset": 2454,
+        "network.community_id": "1:cjsjwTI1K/FNwJ9mwZX971rPjfo=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -896,13 +920,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 2563,
+        "network.community_id": "1:Zboag8BrI6OW/Oo2vWMZ2CJe4tM=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -946,13 +971,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 2722,
+        "network.community_id": "1:Ne/QE55iCFiCg5J75DhSp3KZzQI=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -996,13 +1022,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 2883,
+        "network.community_id": "1:nVqNkC3HBTw1Le7RJD28aYfCDTg=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1046,13 +1073,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 3044,
+        "network.community_id": "1:c82bgYlFS2zsrs3He7w3jq7x6jY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1096,13 +1124,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 3205,
+        "network.community_id": "1:iQJvtLpa8CzCZimwacqAWJp9sZg=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1146,13 +1175,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 3366,
+        "network.community_id": "1:CHFAR3iwADiL0sMiLhocbg8YF4o=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1196,13 +1226,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 3527,
+        "network.community_id": "1:fW9fDNL4osH5ogPXIzh5huGyJLU=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1246,13 +1277,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 3688,
+        "network.community_id": "1:VqbI7AJvRLmCOZAb2tHFFBTeRZ8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1296,13 +1328,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 3847,
+        "network.community_id": "1:TUJhCk7pGNvVhgiAnf4YJJaoCpo=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "dmz",
@@ -1346,13 +1379,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 4004,
+        "network.community_id": "1:EItD1g2bG+b/iorMXbZ/3Bvjam8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1389,18 +1423,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106006: Deny inbound UDP from 192.0.2.66/137 to 10.1.2.42/137 on interface inside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "critical",
         "log.offset": 4163,
+        "network.community_id": "1:a6VFmKsjwlqdlhQIeSm95/lkWlY=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -1436,18 +1471,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106007: Deny inbound UDP from 192.0.2.66/12981 to 10.1.5.60/53 due to DNS Query",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "critical",
         "log.offset": 4274,
+        "network.community_id": "1:96NZ3spb6QBXPZwoL7NadaqTMac=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -1491,13 +1527,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 4383,
+        "network.community_id": "1:DbXtTF7Tt+LJ0/omdap4K0RmodY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1541,13 +1578,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 4542,
+        "network.community_id": "1:8enMIE4IqhVXWyyRuJRvdyDxiBA=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1591,13 +1629,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 4703,
+        "network.community_id": "1:3vGj3wfvZB2f5kZmDflH/qfkWYE=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1636,18 +1675,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2011) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 4862,
+        "network.community_id": "1:Wjdn68t3gwpMPxbO1bBTBvMkQKE=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1686,18 +1726,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2012) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 5018,
+        "network.community_id": "1:OHPCPPOkvDP3KMLJodW8pdmntUw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1736,18 +1777,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 5174,
+        "network.community_id": "1:7ujfPje/XmaZUbijXhcBn7jzz8Y=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1786,18 +1828,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 5321,
+        "network.community_id": "1:7ujfPje/XmaZUbijXhcBn7jzz8Y=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1841,13 +1884,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 5468,
+        "network.community_id": "1:IOafOGWxFLefP+hvoAc06Z1pBj8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1891,13 +1935,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 5631,
+        "network.community_id": "1:89qba0kw6T/uGNWcSzTTYvNoLeY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1919,7 +1964,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T09:34:34.000-04:00",
+        "@timestamp": "2018-04-15T11:34:34.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
@@ -1942,13 +1987,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
         "log.offset": 5792,
+        "network.community_id": "1:3EQcjAJCGY7yJRip464V5VZ2h00=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -2001,6 +2047,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 5963,
+        "network.community_id": "1:xQpx+K3UkeF1wQfNjT+9cuVvkHo=",
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -2041,18 +2088,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 6138,
+        "network.community_id": "1:/lWsjFt8GNAqxtRiPYxbyU20/N8=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -2092,18 +2140,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 6288,
+        "network.community_id": "1:/lWsjFt8GNAqxtRiPYxbyU20/N8=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -2271,6 +2320,7 @@
         "log.level": "informational",
         "log.offset": 6778,
         "network.bytes": 14804,
+        "network.community_id": "1:tVS/eeyng4tH7pSAcq77I2cbedw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "dmz",
@@ -2326,6 +2376,7 @@
         "log.level": "informational",
         "log.offset": 6943,
         "network.bytes": 134781,
+        "network.community_id": "1:Tc+oC6fll4kTgOTp2hiirhpXAuQ=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "dmz",
@@ -2381,6 +2432,7 @@
         "log.level": "informational",
         "log.offset": 7109,
         "network.bytes": 134781,
+        "network.community_id": "1:Tc+oC6fll4kTgOTp2hiirhpXAuQ=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "dmz",
@@ -2418,18 +2470,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 7275,
+        "network.community_id": "1:BX8uzuuLWZ5TLiZXPqdka12ZHOc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.ingress.interface.name": "outside",
@@ -2466,18 +2519,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 7417,
+        "network.community_id": "1:BX8uzuuLWZ5TLiZXPqdka12ZHOc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.ingress.interface.name": "outside",
@@ -2516,18 +2570,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group \"dmz\" [0x123a465e, 0x8c20f21]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 7559,
+        "network.community_id": "1:BouUIZD+TqJZdYklL1aMrJfnbQ0=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -2581,6 +2636,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 7710,
+        "network.community_id": "1:mUqH1e0FnddfDertRLbskQ9rX5Q=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2635,6 +2691,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 7884,
+        "network.community_id": "1:mUqH1e0FnddfDertRLbskQ9rX5Q=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2691,6 +2748,7 @@
         "log.level": "informational",
         "log.offset": 8058,
         "network.bytes": 11420,
+        "network.community_id": "1:kugTIYv6tVeitQAN8XRNgUPvZiw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "dmz",
@@ -2745,6 +2803,7 @@
         "log.level": "informational",
         "log.offset": 8223,
         "network.bytes": 1416,
+        "network.community_id": "1:n1IQHcbrWLb1u8dflqz8hfEElA0=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -2780,12 +2839,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2828,12 +2887,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2876,12 +2935,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2924,12 +2983,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2972,12 +3031,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3020,12 +3079,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3068,12 +3127,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3116,12 +3175,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3167,12 +3226,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.95/24069 dst inside:10.32.112.125/25 by access-group \"PERMIT_IN\" [0x0, 0x0]\"",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3180,6 +3239,7 @@
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 9335,
+        "network.community_id": "1:buRYH8vRkdq5apZqKHNDfmztnUo=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -3219,12 +3279,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-313001: Denied ICMP type=3, code=3 from 10.2.3.5 on interface Outside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3269,18 +3329,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-313004: Denied ICMP type=0, from laddr 172.16.30.2 on interface inside to 172.16.1.10: no matching session",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 9599,
+        "network.community_id": "1:XKWgpeop6LmXORBjS+D+pjammJ4=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.ingress.interface.name": "inside",
@@ -3327,13 +3388,14 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 9735,
+        "network.community_id": "1:ZWjuP5bJeA+f0NH342ubXOWI+Lc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -3396,6 +3458,7 @@
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 9986,
+        "network.community_id": "1:iQUXct+pq5A5+rR869ELbDtnuek=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outsidet",
@@ -3446,14 +3509,15 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 10285,
+        "network.community_id": "1:iQUXct+pq5A5+rR869ELbDtnuek=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outsidet",
@@ -3495,7 +3559,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3538,7 +3602,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3579,12 +3643,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3616,25 +3680,25 @@
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
         "cisco.asa.connection_id": "27215708",
         "cisco.asa.destination_interface": "vlan-42",
-        "cisco.asa.mapped_destination_ip": "1.2.3.4",
+        "cisco.asa.mapped_destination_ip": "81.2.69.143",
         "cisco.asa.mapped_destination_port": 80,
-        "cisco.asa.mapped_source_ip": "1.2.3.4",
+        "cisco.asa.mapped_source_ip": "81.2.69.143",
         "cisco.asa.mapped_source_port": 49926,
         "cisco.asa.message_id": "302013",
         "cisco.asa.source_interface": "internet",
         "cisco.asa.source_username": "LOCAL\\username",
-        "destination.address": "1.2.3.4",
-        "destination.geo.city_name": "Moscow",
+        "cisco.asa.termination_user": "username",
+        "destination.address": "81.2.69.143",
+        "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "RU",
-        "destination.geo.country_name": "Russia",
-        "destination.geo.location.lat": 55.7527,
-        "destination.geo.location.lon": 37.6172,
-        "destination.geo.region_iso_code": "RU-MOW",
-        "destination.geo.region_name": "Moscow",
-        "destination.ip": "1.2.3.4",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.5142,
+        "destination.geo.location.lon": -0.0931,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "81.2.69.143",
         "destination.port": 80,
-        "destination.user.name": "username",
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -3643,7 +3707,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (81.2.69.143/49926)(LOCAL\\username) to vlan-42:81.2.69.143/80 (81.2.69.143/80) (username)",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3654,6 +3718,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 10899,
+        "network.community_id": "1:6lxM3TRt46lcfZdd21pElFmogG0=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -3663,8 +3728,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "1.2.3.4",
-            "10.2.3.4"
+            "10.2.3.4",
+            "81.2.69.143"
         ],
         "related.user": [
             "username"
@@ -3672,12 +3737,1001 @@
         "service.type": "cisco",
         "source.address": "10.2.3.4",
         "source.ip": "10.2.3.4",
-        "source.nat.ip": "1.2.3.4",
+        "source.nat.ip": "81.2.69.143",
         "source.port": 49926,
+        "source.user.name": "username",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T19:12:37.000-02:00",
+        "cisco.asa.message_id": "304001",
+        "destination.address": "172.17.6.211",
+        "destination.ip": "172.17.6.211",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 304001,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-304001: USER001@192.168.0.1(LOCAL\\USER001) Accessed URL 172.17.6.211:http://testingserver.com/somewebpage.html",
+        "event.outcome": "success",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "notification",
+        "log.offset": 11092,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "172.17.6.211",
+            "192.168.0.1"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.0.1",
+        "source.ip": "192.168.0.1",
+        "source.user.name": "USER001",
         "tags": [
             "cisco-asa",
             "forwarded"
         ],
-        "user.name": "username"
+        "url.domain": "testingserver.com",
+        "url.extension": "html",
+        "url.original": "http://testingserver.com/somewebpage.html",
+        "url.path": "/somewebpage.html",
+        "url.scheme": "http"
+    },
+    {
+        "@timestamp": "2021-01-13T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "195207391",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.mapped_destination_ip": "89.160.20.156",
+        "cisco.asa.mapped_destination_port": 443,
+        "cisco.asa.mapped_source_ip": "62.0.0.1",
+        "cisco.asa.mapped_source_port": 34534,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\USER001",
+        "cisco.asa.termination_user": "USER001",
+        "destination.address": "89.160.20.156",
+        "destination.as.number": 29518,
+        "destination.as.organization.name": "Bredband2 AB",
+        "destination.geo.city_name": "Link\u00f6ping",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
+        "destination.geo.location.lat": 58.4167,
+        "destination.geo.location.lon": 15.6167,
+        "destination.geo.region_iso_code": "SE-E",
+        "destination.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "destination.ip": "89.160.20.156",
+        "destination.port": 443,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:1.128.3.4/12312 (62.0.0.1/34534)(LOCAL\\USER001) to OUTSIDE:89.160.20.156/443 (89.160.20.156/443) (USER001)",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "notification",
+        "log.offset": 11232,
+        "network.community_id": "1:k/bYSo4xyVOcBd5vnxfeC3/AAzY=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "1.128.3.4",
+            "62.0.0.1",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "1.128.3.4",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
+        "source.nat.ip": "62.0.0.1",
+        "source.nat.port": "34534",
+        "source.port": 12312,
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "195207391",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.mapped_destination_ip": "89.160.20.156",
+        "cisco.asa.mapped_destination_port": 443,
+        "cisco.asa.mapped_source_ip": "62.0.0.1",
+        "cisco.asa.mapped_source_port": 34534,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\user@domain.tld",
+        "cisco.asa.termination_user": "user@domain.tld",
+        "destination.address": "89.160.20.156",
+        "destination.as.number": 29518,
+        "destination.as.organization.name": "Bredband2 AB",
+        "destination.geo.city_name": "Link\u00f6ping",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
+        "destination.geo.location.lat": 58.4167,
+        "destination.geo.location.lon": 15.6167,
+        "destination.geo.region_iso_code": "SE-E",
+        "destination.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "destination.ip": "89.160.20.156",
+        "destination.port": 443,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:1.128.3.4/12312 (62.0.0.1/34534)(LOCAL\\user@domain.tld) to OUTSIDE:89.160.20.156/443 (89.160.20.156/443) (user@domain.tld)",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "notification",
+        "log.offset": 11427,
+        "network.community_id": "1:k/bYSo4xyVOcBd5vnxfeC3/AAzY=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain.tld"
+        ],
+        "related.ip": [
+            "1.128.3.4",
+            "62.0.0.1",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "user@domain.tld"
+        ],
+        "service.type": "cisco",
+        "source.address": "1.128.3.4",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
+        "source.nat.ip": "62.0.0.1",
+        "source.nat.port": "34534",
+        "source.port": 12312,
+        "source.user.domain": "domain.tld",
+        "source.user.name": "user@domain.tld",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T19:12:37.000-02:00",
+        "cisco.asa.destination_username": "LOCAL\\USER001",
+        "cisco.asa.icmp_code": 3,
+        "cisco.asa.icmp_type": 3,
+        "cisco.asa.mapped_source_ip": "89.160.20.156",
+        "cisco.asa.message_id": "302020",
+        "cisco.asa.source_username": "USER001",
+        "destination.address": "1.128.3.4",
+        "destination.as.number": 1221,
+        "destination.as.organization.name": "Telstra Pty Ltd",
+        "destination.ip": "1.128.3.4",
+        "destination.user.name": "USER001",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302020,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(LOCAL\\USER001) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (USER001) type 3 code 3",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "notification",
+        "log.offset": 11638,
+        "network.direction": "inbound",
+        "network.protocol": "icmp",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "1.128.3.4",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "USER001"
+    },
+    {
+        "@timestamp": "2021-01-13T19:12:37.000-02:00",
+        "cisco.asa.destination_username": "LOCAL\\user@domain.tld",
+        "cisco.asa.icmp_code": 3,
+        "cisco.asa.icmp_type": 3,
+        "cisco.asa.mapped_source_ip": "89.160.20.156",
+        "cisco.asa.message_id": "302020",
+        "cisco.asa.source_username": "user@domain.tld",
+        "destination.address": "1.128.3.4",
+        "destination.as.number": 1221,
+        "destination.as.organization.name": "Telstra Pty Ltd",
+        "destination.ip": "1.128.3.4",
+        "destination.user.domain": "domain.tld",
+        "destination.user.name": "user@domain.tld",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302020,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(LOCAL\\user@domain.tld) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (user@domain.tld) type 3 code 3",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "notification",
+        "log.offset": 11810,
+        "network.direction": "inbound",
+        "network.protocol": "icmp",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain.tld"
+        ],
+        "related.ip": [
+            "1.128.3.4",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "user@domain.tld"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.user.domain": "domain.tld",
+        "source.user.name": "user@domain.tld",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "user@domain.tld"
+    },
+    {
+        "@timestamp": "2021-01-13T19:12:37.000-02:00",
+        "cisco.asa.destination_username": "AD\\USER002",
+        "cisco.asa.icmp_code": 3,
+        "cisco.asa.icmp_type": 3,
+        "cisco.asa.mapped_source_ip": "89.160.20.156",
+        "cisco.asa.message_id": "302020",
+        "cisco.asa.source_username": "USER002",
+        "destination.address": "1.128.3.4",
+        "destination.as.number": 1221,
+        "destination.as.organization.name": "Telstra Pty Ltd",
+        "destination.ip": "1.128.3.4",
+        "destination.user.domain": "AD",
+        "destination.user.name": "USER002",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302020,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(AD\\USER002) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (USER002) type 3 code 3",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "notification",
+        "log.offset": 11998,
+        "network.direction": "inbound",
+        "network.protocol": "icmp",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "AD"
+        ],
+        "related.ip": [
+            "1.128.3.4",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER002"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.user.name": "USER002",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "USER002"
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "305012",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\USER001",
+        "destination.address": "75.0.0.1",
+        "destination.as.number": 7018,
+        "destination.as.organization.name": "AT&T Services, Inc.",
+        "destination.ip": "75.0.0.1",
+        "destination.port": 18449,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305012,
+        "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-01-15T19:12:37.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:192.168.0.1/59677(LOCAL\\USER001) to OUTSIDE:75.0.0.1/18449 duration 0:00:00",
+        "event.severity": 6,
+        "event.start": "2021-01-15T21:12:37.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12167,
+        "network.community_id": "1:kOYfvYjW0lZrPxD+ArQ6vDYnS7g=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.0.1",
+            "75.0.0.1"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.0.1",
+        "source.ip": "192.168.0.1",
+        "source.port": 59677,
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 134,
+        "cisco.asa.mapped_source_ip": "fe80::2205:baff:fe9d:f637",
+        "cisco.asa.message_id": "302021",
+        "destination.address": "ff02::1",
+        "destination.ip": "ff02::1",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302021,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr ff02::1/0 gaddr fe80::2205:baff:fe9d:f637/0 laddr fe80::2205:baff:fe9d:f637/0 type 134 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12326,
+        "network.community_id": "1:bHWN9qumWIGMl/MbjgS2bQi/Jsw=",
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "fe80::2205:baff:fe9d:f637",
+            "ff02::1"
+        ],
+        "service.type": "cisco",
+        "source.address": "fe80::2205:baff:fe9d:f637",
+        "source.ip": "fe80::2205:baff:fe9d:f637",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "251933191",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.mapped_destination_ip": "2a03:2880:f253:cb:face:b00c:0:43fe",
+        "cisco.asa.mapped_destination_port": 443,
+        "cisco.asa.mapped_source_ip": "fe00::fede:bbe1",
+        "cisco.asa.mapped_source_port": 62477,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.termination_user": "soc@danskecommodities.com",
+        "destination.address": "2a03:2880:f253:cb:face:b00c:0:43fe",
+        "destination.ip": "2a03:2880:f253:cb:face:b00c:0:43fe",
+        "destination.port": 443,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 251933191 for OUTSIDE:fe00::fede:bbe1/62477 (fe00::fede:bbe1/62477) to OUTSIDE:2a03:2880:f253:cb:face:b00c:0:43fe/443 (2a03:2880:f253:cb:face:b00c:0:43fe/443) (soc@danskecommodities.com)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12492,
+        "network.community_id": "1:lOTrEnVpsUc4jukAUBxF/BkD8jE=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "2a03:2880:f253:cb:face:b00c:0:43fe",
+            "fe00::fede:bbe1"
+        ],
+        "service.type": "cisco",
+        "source.address": "fe00::fede:bbe1",
+        "source.ip": "fe00::fede:bbe1",
+        "source.port": 62477,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "305012",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\domain\\USER001",
+        "destination.address": "189.160.20.156",
+        "destination.ip": "189.160.20.156",
+        "destination.port": 50120,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305012,
+        "event.dataset": "cisco.asa",
+        "event.duration": 125000000000,
+        "event.end": "2021-01-15T19:12:37.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:89.160.20.156/50120(LOCAL\\domain\\USER001) to OUTSIDE:189.160.20.156/50120 duration 0:02:05",
+        "event.severity": 6,
+        "event.start": "2021-01-15T21:10:32.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12745,
+        "network.community_id": "1:vXccEuUJmxpSB1JgjEhGeCaR+48=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain"
+        ],
+        "related.ip": [
+            "189.160.20.156",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.port": 50120,
+        "source.user.domain": "domain",
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "261246338",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "302014",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\domain\\USER001",
+        "cisco.asa.termination_initiator": "OUTSIDE",
+        "cisco.asa.termination_user": "domain\\USER001",
+        "destination.address": "40.0.0.1",
+        "destination.ip": "40.0.0.1",
+        "destination.port": 443,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302014,
+        "event.dataset": "cisco.asa",
+        "event.duration": 125000000000,
+        "event.end": "2021-01-15T19:12:37.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302014: Teardown TCP connection 261246338 for OUTSIDE:89.160.20.156/50120(LOCAL\\domain\\USER001) to OUTSIDE:40.0.0.1/443 duration 0:02:05 bytes 9610 TCP FINs from OUTSIDE (domain\\USER001)",
+        "event.reason": "TCP FINs",
+        "event.severity": 6,
+        "event.start": "2021-01-15T21:10:32.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12919,
+        "network.bytes": 9610,
+        "network.community_id": "1:G4ALpkc+kkJFzBlSGnNhTyQjj5c=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain"
+        ],
+        "related.ip": [
+            "40.0.0.1",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.port": 50120,
+        "source.user.domain": "domain",
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "261311655",
+        "cisco.asa.destination_interface": "INSIDE",
+        "cisco.asa.mapped_destination_ip": "192.168.0.1",
+        "cisco.asa.mapped_destination_port": 53,
+        "cisco.asa.mapped_source_ip": "67.43.156.13",
+        "cisco.asa.mapped_source_port": 63790,
+        "cisco.asa.message_id": "302015",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\domain\\USER001",
+        "cisco.asa.termination_user": "domain\\USER001",
+        "destination.address": "192.168.0.1",
+        "destination.ip": "192.168.0.1",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302015,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302015: Built inbound UDP connection 261311655 for OUTSIDE:89.160.20.156/63790 (67.43.156.13/63790)(LOCAL\\domain\\USER001) to INSIDE:192.168.0.1/53 (192.168.0.1/53) (domain\\USER001)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 13135,
+        "network.community_id": "1:4sghryHbfd+vkUilwrakMfDSXPg=",
+        "network.direction": "inbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "INSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain"
+        ],
+        "related.ip": [
+            "192.168.0.1",
+            "67.43.156.13",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.nat.ip": "67.43.156.13",
+        "source.port": 63790,
+        "source.user.domain": "domain",
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "261311655",
+        "cisco.asa.destination_interface": "INSIDE",
+        "cisco.asa.message_id": "302016",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\domain\\USER001",
+        "cisco.asa.termination_user": "domain\\USER001",
+        "destination.address": "192.168.0.1",
+        "destination.ip": "192.168.0.1",
+        "destination.port": 53,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302016,
+        "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-01-15T19:12:37.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302016: Teardown UDP connection 261311655 for OUTSIDE:89.160.20.156/63790(LOCAL\\domain\\USER001) to INSIDE:192.168.0.1/53 duration 0:00:00 bytes 139 (domain\\USER001)",
+        "event.severity": 6,
+        "event.start": "2021-01-15T21:12:37.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 13345,
+        "network.bytes": 139,
+        "network.community_id": "1:4sghryHbfd+vkUilwrakMfDSXPg=",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "INSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain"
+        ],
+        "related.ip": [
+            "192.168.0.1",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.port": 63790,
+        "source.user.domain": "domain",
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "261246338",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.mapped_destination_ip": "40.0.0.1",
+        "cisco.asa.mapped_destination_port": 443,
+        "cisco.asa.mapped_source_ip": "67.43.156.13",
+        "cisco.asa.mapped_source_port": 50120,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\domain\\USER001",
+        "cisco.asa.termination_user": "domain\\USER001",
+        "destination.address": "40.0.0.1",
+        "destination.ip": "40.0.0.1",
+        "destination.port": 443,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 261246338 for OUTSIDE:89.160.20.156/50120 (67.43.156.13/50120)(LOCAL\\domain\\USER001) to OUTSIDE:40.0.0.1/443 (40.0.0.1/443) (domain\\USER001)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 13539,
+        "network.community_id": "1:G4ALpkc+kkJFzBlSGnNhTyQjj5c=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "domain"
+        ],
+        "related.ip": [
+            "40.0.0.1",
+            "67.43.156.13",
+            "89.160.20.156"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.nat.ip": "67.43.156.13",
+        "source.port": 50120,
+        "source.user.domain": "domain",
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-07-29T08:35:29.000-02:00",
+        "cisco.asa.message_id": "602304",
+        "cisco.asa.tunnel_type": "LAN-to-LAN",
+        "destination.address": "81.2.69.1452",
+        "destination.domain": "81.2.69.1452",
+        "event.action": "deleted",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 602304,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 81.2.69.1452 and 81.2.69.1452 (user= 81.2.69.1452) has been deleted.",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "deletion",
+            "info",
+            "user"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 13746,
+        "network.direction": "outbound",
+        "network.type": "ipsec",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.1452"
+        ],
+        "related.user": [
+            "81.2.69.1452"
+        ],
+        "service.type": "cisco",
+        "source.address": "81.2.69.1452",
+        "source.domain": "81.2.69.1452",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "81.2.69.1452"
     }
 ]

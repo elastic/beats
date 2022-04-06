@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.abusemalware.virustotal.link"
+                            "field": "abusech.malware.virustotal.link"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.abusemalware.virustotal.link",
+                            "key": "abusech.malware.virustotal.link",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -47,13 +47,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.abusemalware.virustotal.result"
+                            "field": "abusech.malware.virustotal.result"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                            "key": "threatintel.abusemalware.virustotal.result",
+                            "key": "abusech.malware.virustotal.result",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -95,7 +95,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "VirusTotal URL",
-                        "field": "threatintel.abusemalware.virustotal.link",
+                        "field": "abusech.malware.virustotal.link",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -112,7 +112,7 @@
                     "id": "3",
                     "params": {
                         "customLabel": "VirusTotal Result",
-                        "field": "threatintel.abusemalware.virustotal.result",
+                        "field": "abusech.malware.virustotal.result",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

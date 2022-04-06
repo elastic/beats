@@ -27,7 +27,7 @@
                     "enabled": true,
                     "id": "2",
                     "params": {
-                        "field": "threatintel.indicator.file.type",
+                        "field": "threat.indicator.file.type",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

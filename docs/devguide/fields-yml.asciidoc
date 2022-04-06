@@ -121,3 +121,43 @@ use in aggregations or ordering, you can use a multi-field mapping:
 
 For more information, see the {ref}/multi-fields.html[{es} documentation about
 multi-fields].
+
+==== Defining a text analyzer in-line
+
+It is possible to define a new text analyzer or search analyzer in-line with
+the field definition in the field's mapping parameters.
+
+For example, you can define a new text analyzer that does not break hyphenated names:
+
+[source,yaml]
+----------------------------------------------------------------------
+- key: mybeat
+  title: mybeat
+  description: These are the fields used by mybeat.
+  fields:
+    - name: last_name
+      type: text
+      required: true
+      description: >
+        The last name.
+      analyzer:
+        mybeat_hyphenated_name: <1>
+          type: pattern <2>
+          pattern: "[\\W&&[^-]]+" <3>
+      search_analyzer:
+        mybeat_hyphenated_name: <4>
+          type: pattern
+          pattern: "[\\W&&[^-]]+"
+----------------------------------------------------------------------
+<1> Use a newly defined text analyzer
+<2> Define the custome analyzer type
+<3> Specify the analyzer behaviour
+<4> Use the same analyzer for the search
+
+The names of custom analyzers that are defined in-line may not be reused for a different
+text analyzer. If a text analyzer name is reused it is checked for matching existing
+instances of the analyzer. It is recommended that the analyzer name is prefixed with the
+beat name to avoid name clashes.
+
+For more information, see {ref}/analysis-custom-analyzer.html[{es} documentation about
+defining custom text analyzers].

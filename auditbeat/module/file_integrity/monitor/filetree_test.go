@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package monitor
@@ -49,24 +50,36 @@ func TestVisit(t *testing.T) {
 		result []string
 		isDir  []bool
 	}{
-		{"/",
+		{
+			"/",
 			[]string{"/", "/tmp", "/usr", "/usr/bin", "/usr/bin/python", "/usr/bin/tar", "/usr/lib", "/usr/lib/libz.a"},
-			[]bool{true, true, true, true, false, false, true, false}},
-		{"/usr",
+			[]bool{true, true, true, true, false, false, true, false},
+		},
+		{
+			"/usr",
 			[]string{"/usr", "/usr/bin", "/usr/bin/python", "/usr/bin/tar", "/usr/lib", "/usr/lib/libz.a"},
-			[]bool{true, true, false, false, true, false}},
-		{"/usr/bin",
+			[]bool{true, true, false, false, true, false},
+		},
+		{
+			"/usr/bin",
 			[]string{"/usr/bin", "/usr/bin/python", "/usr/bin/tar"},
-			[]bool{true, false, false}},
-		{"/usr/lib",
+			[]bool{true, false, false},
+		},
+		{
+			"/usr/lib",
 			[]string{"/usr/lib", "/usr/lib/libz.a"},
-			[]bool{true, false}},
-		{"/tmp/",
+			[]bool{true, false},
+		},
+		{
+			"/tmp/",
 			[]string{"/tmp"},
-			[]bool{true}},
-		{"/usr/bin/python",
+			[]bool{true},
+		},
+		{
+			"/usr/bin/python",
 			[]string{"/usr/bin/python"},
-			[]bool{false}},
+			[]bool{false},
+		},
 	} {
 		for _, order := range []VisitOrder{PreOrder, PostOrder} {
 			failMsg := fmt.Sprintf("test entry %d for path '%s' order:%v", testIdx, testData.dir, order)
@@ -147,14 +160,17 @@ func TestVisitCancel(t *testing.T) {
 		expected []visitParams
 	}{
 		{PreOrder, "/a", []visitParams{
-			{"/", true}}},
+			{"/", true},
+		}},
 		{PostOrder, "/a", []visitParams{
 			{"/a/b/file", false},
-			{"/a/b", true}}},
+			{"/a/b", true},
+		}},
 		{PreOrder, "/a/b/file", []visitParams{
 			{"/", true},
 			{"/a", true},
-			{"/a/b", true}}},
+			{"/a/b", true},
+		}},
 	} {
 		failMsg := fmt.Sprintf("test at index %d", idx)
 		var result []visitParams

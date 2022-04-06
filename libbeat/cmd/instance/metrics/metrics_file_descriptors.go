@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || (freebsd && cgo)
 // +build linux freebsd,cgo
 
 package metrics
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -48,40 +49,17 @@ func reportFDUsage(_ monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getFDUsage() (open, hardLimit, softLimit uint64, err error) {
-	state, err := getBeatProcessState()
+
+	state, err := beatProcessStats.GetSelf()
 	if err != nil {
-		return 0, 0, 0, err
+		return 0, 0, 0, errors.Wrap(err, "error fetching self process")
 	}
 
-	iOpen, err := state.GetValue("fd.open")
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("error getting number of open FD: %v", err)
-	}
+	open = state.FD.Open.ValueOr(0)
 
-	open, ok := iOpen.(uint64)
-	if !ok {
-		return 0, 0, 0, fmt.Errorf("error converting value of open FDs to uint64: %v", iOpen)
-	}
+	hardLimit = state.FD.Limit.Hard.ValueOr(0)
 
-	iHardLimit, err := state.GetValue("fd.limit.hard")
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("error getting FD hard limit: %v", err)
-	}
-
-	hardLimit, ok = iHardLimit.(uint64)
-	if !ok {
-		return 0, 0, 0, fmt.Errorf("error converting values of FD hard limit: %v", iHardLimit)
-	}
-
-	iSoftLimit, err := state.GetValue("fd.limit.soft")
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("error getting FD hard limit: %v", err)
-	}
-
-	softLimit, ok = iSoftLimit.(uint64)
-	if !ok {
-		return 0, 0, 0, fmt.Errorf("error converting values of FD hard limit: %v", iSoftLimit)
-	}
+	softLimit = state.FD.Limit.Soft.ValueOr(0)
 
 	return open, hardLimit, softLimit, nil
 }

@@ -13,9 +13,6 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     find {{ $beatHome }} -type d -exec chmod 0755 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0644 {} \; && \
     chmod 0755 {{ $beatBinary }} && \
-{{- if .linux_capabilities }}
-    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
-{{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
@@ -25,24 +22,50 @@ FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
 RUN microdnf -y update && \
-    microdnf install shadow-utils && \
+    microdnf install findutils shadow-utils && \
     microdnf clean all
 {{- else }}
-# FIXME: Package bind-license failed to update in arm
-RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
-    yum -y update $YUM_FLAGS \
-  {{- if (eq .BeatName "heartbeat") }}
-    && yum -y install epel-release \
-    && yum -y install atk cups gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
-        libXext libXi libXtst cups-libs libXScrnSaver libXrandr GConf2 \
-        alsa-lib atk gtk3 ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
-        xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc \
-  {{- end }}
-  && yum clean all && rm -rf /var/cache/yum
-  # See https://access.redhat.com/discussions/3195102 for why rm is needed
+RUN for iter in {1..10}; do \
+        apt-get update -y && \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
+        apt-get clean all && \
+        exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
 {{- end }}
 
 {{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+RUN apt-get update -y && \
+    for iter in {1..10}; do \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
+        libglib2.0-0\
+        libnss3\
+        libnspr4\
+        libatk1.0-0\
+        libatk-bridge2.0-0\
+        libcups2\
+        libdrm2\
+        libdbus-1-3\
+        libxcb1\
+        libxkbcommon0\
+        libx11-6\
+        libxcomposite1\
+        libxdamage1\
+        libxext6\
+        libxfixes3\
+        libxrandr2\
+        libgbm1\
+        libpango-1.0-0\
+        libcairo2\
+        libasound2\
+        libatspi2.0-0\
+        libxshmfence1 \
+        fonts-noto \
+        fonts-noto-cjk && \
+        apt-get clean all && \
+        exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
@@ -88,6 +111,7 @@ RUN set -e ; \
   TINI_BIN=""; \
   TINI_SHA256=""; \
   TINI_VERSION="v0.19.0"; \
+  echo "The arch value is $(arch)"; \
   case "$(arch)" in \
     x86_64) \
         TINI_BIN="tini-amd64"; \
@@ -114,6 +138,14 @@ COPY --from=home {{ $beatHome }} {{ $beatHome }}
 RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
+
+{{- if .linux_capabilities }}
+# Since the beat is stored at the other end of a symlink we must follow the symlink first
+# For security reasons setcap does not support symlinks. This is smart in the general case
+# but in our specific case since we're building a trusted image from trusted binaries this is
+# fine. Thus, we use readlink to follow the link and setcap on the actual binary
+RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
+{{- end }}
 
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}

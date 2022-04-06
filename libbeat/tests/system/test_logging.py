@@ -25,26 +25,12 @@ class TestLogging(BaseTest):
         assert self.log_contains(ecs_message_log, logfile=logfile)
         assert self.log_contains(ecs_log_level_log, logfile=logfile)
 
-    def assert_not_contains_ecs_log(self, logfile=None):
-        assert not self.log_contains(ecs_version_log, logfile=logfile)
-        assert not self.log_contains(ecs_timestamp_log, logfile=logfile)
-        assert not self.log_contains(ecs_log_level_log, logfile=logfile)
-
-    def test_console_default(self):
-        """
-        logs to console with default format
-        """
-        self.run_beat_with_args("mockbeat start running", logging_args=["-e"])
-        self.assert_not_contains_ecs_log()
-
     def test_console_ecs(self):
         """
         logs to console with ECS format
         """
         self.run_beat_with_args("mockbeat start running",
-                                logging_args=["-e"],
-                                extra_args=["-E", "logging.json=true",
-                                            "-E", "logging.ecs=true"])
+                                logging_args=["-e"])
         self.assert_contains_ecs_log()
 
     def test_file_default(self):
@@ -52,16 +38,12 @@ class TestLogging(BaseTest):
         logs to file with default format
         """
         self.run_beat_with_args("Mockbeat is alive!",
-                                logging_args=[],
-                                extra_args=["-E", "logging.json=true",
-                                            "-E", "logging.ecs=false"])
-        self.assert_not_contains_ecs_log(logfile="logs/mockbeat")
+                                logging_args=[])
+        self.assert_contains_ecs_log(logfile="logs/mockbeat-"+self.today+".ndjson")
 
     def test_file_ecs(self):
         """
         logs to file with ECS format
         """
-        self.run_beat_with_args("Mockbeat is alive!",
-                                extra_args=["-E", "logging.json=true",
-                                            "-E", "logging.ecs=true"])
-        self.assert_contains_ecs_log(logfile="logs/mockbeat")
+        self.run_beat_with_args("Mockbeat is alive!")
+        self.assert_contains_ecs_log(logfile="logs/mockbeat-"+self.today+".ndjson")

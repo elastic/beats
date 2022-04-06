@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 request.method: GET
@@ -56,17 +55,19 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags | tojson}}
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
+
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - decode_json_fields:
-      fields: [message]
-      target: json
-  - fingerprint:
-      fields: ["json.id"]
-      target_field: "@metadata._id"
+  - add_locale: ~
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0

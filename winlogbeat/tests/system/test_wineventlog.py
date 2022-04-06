@@ -52,7 +52,7 @@ class Test(WriteReadTest):
         # remove the output file, otherwise there is a race condition
         # in read_events() below where it reads the results of the previous
         # execution
-        os.unlink(os.path.join(self.working_dir, "output", self.beat_name))
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name + "-" + self.today + ".ndjson"))
 
         msg = "Second event"
         self.write_event_log(msg)
@@ -62,6 +62,84 @@ class Test(WriteReadTest):
             "winlog.keywords": ["Classic"],
             "winlog.opcode": "Info",
         })
+
+    def test_cleared_channel_restarts(self):
+        """
+        wineventlog - When a bookmark points to a cleared (stale) channel
+        the subscription starts from the beginning
+        """
+        msg1 = "First event"
+        self.write_event_log(msg1)
+        msg2 = "Second event"
+        self.write_event_log(msg2)
+
+        evts = self.read_events(expected_events=2)
+
+        self.assertTrue(len(evts), 2)
+        self.assert_common_fields(evts[0], msg=msg1)
+        self.assert_common_fields(evts[1], msg=msg2)
+
+        # remove the output file, otherwise there is a race condition
+        # in read_events() below where it reads the results of the previous
+        # execution
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name + "-" + self.today + ".ndjson"))
+
+        self.clear_event_log()
+
+        # we check that after clearing the event log the bookmark still points to the previous checkpoint
+        event_logs = self.read_registry(requireBookmark=True)
+        self.assertTrue(len(list(event_logs.keys())), 1)
+        self.assertIn(self.providerName, event_logs)
+        record_number = event_logs[self.providerName]["record_number"]
+        self.assertTrue(record_number, 2)
+
+        msg3 = "Third event"
+        self.write_event_log(msg3)
+
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg3)
+
+    def test_bad_bookmark_restart(self):
+        """
+        wineventlog - When a bookmarked event does not exist the subcription
+        restarts from the beginning
+        """
+        msg1 = "First event"
+        self.write_event_log(msg1)
+
+        evts = self.read_events(expected_events=1)
+
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg1)
+
+        event_logs = self.read_registry(requireBookmark=True)
+        self.assertTrue(len(list(event_logs.keys())), 1)
+        self.assertIn(self.providerName, event_logs)
+        record_number = event_logs[self.providerName]["record_number"]
+        self.assertTrue(record_number, 1)
+
+        # write invalid bookmark, it should start from the beginning again
+        f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "w")
+        f.write((
+            "update_time: 2100-01-01T00:00:00Z\n" +
+            "event_logs:\n" +
+            "  - name: {}\n" +
+            "    record_number: 1000\n" +
+            "    timestamp: 2100-01-01T00:00:00Z\n" +
+            "    bookmark: \"<BookmarkList>\\r\\n  <Bookmark Channel='{}' RecordId='1000' IsCurrent='true'/>\\r\\n</BookmarkList>\"\n").
+            format(self.providerName, self.providerName)
+        )
+        f.close()
+
+        # remove the output file, otherwise there is a race condition
+        # in read_events() below where it reads the results of the previous
+        # execution
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name + "-" + self.today + ".ndjson"))
+
+        evts = self.read_events(expected_events=1)
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg1)
 
     def test_read_unknown_event_id(self):
         """

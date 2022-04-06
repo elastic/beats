@@ -1,0 +1,59 @@
+[
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",
+				"memory": {
+					"usage": 0.9148046875
+				}
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"activeFiles": 1216512,
+			"cache": 140980224,
+			"inactiveFiles": 139284480,
+			"kernel": {
+				"fail": {
+					"count": 0
+				},
+				"limit": 9223372036854772000,
+				"max": 6496256,
+				"total": 6459392
+			},
+			"rss": 43794432,
+			"swap": {
+				"fail": {
+					"count": 0
+				},
+				"limit": 9223372036854772000,
+				"max": 209727488,
+				"total": 191959040
+			},
+			"usage": {
+				"fail": {
+					"count": 0
+				},
+				"limit": 209715200,
+				"max": 209608704,
+				"pct": 0.9148046875,
+				"total": 191848448
+			},
+			"workingset": {
+				"pct": 0.25064453125
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.memory",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package event
@@ -86,7 +87,7 @@ func createEvent(t *testing.T) {
 	resp, err := c.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
 		Cmd:   []string{"echo", "foo"},
-	}, nil, nil, "")
+	}, nil, nil, nil, "")
 	if err != nil {
 		t.Fatal(err)
 	}

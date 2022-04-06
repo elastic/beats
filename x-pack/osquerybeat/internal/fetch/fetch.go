@@ -5,21 +5,31 @@
 package fetch
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
 )
 
-func Download(url, fp string) (hashout string, err error) {
+// Download downloads the osquery distro package
+// writes the content into a given filepath
+// returns the sha256 hash
+func Download(ctx context.Context, url, fp string) (hashout string, err error) {
 	log.Printf("Download %s to %s", url, fp)
 
 	cli := http.Client{}
 
-	res, err := cli.Get(url)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return
+	}
+
+	res, err := cli.Do(req)
 	if err != nil {
 		return
 	}
@@ -32,7 +42,7 @@ func Download(url, fp string) (hashout string, err error) {
 		if err != nil {
 			log.Printf("Failed to read the error response body: %v", err)
 		} else {
-			s = string(b)
+			s = strings.TrimSpace(string(b))
 		}
 		return hashout, fmt.Errorf("failed fetch %s, status: %d, message: %s", url, res.StatusCode, s)
 	}

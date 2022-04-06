@@ -1,0 +1,147 @@
+- name: health
+  type: group
+  release: beta
+  description: Enterprise Search health
+  fields:
+    - name: name
+      type: keyword
+      description: Host name for the Enterprise Search node
+
+    - name: version
+      type: group
+      description: Enterprise Search version information
+      fields:
+        - name: number
+          type: keyword
+          description: Enterprise Search version number using the semantic versioning format
+
+        - name: build_hash
+          type: keyword
+          description: A unique build hash for the Enterprise Search package
+
+    - name: process
+      type: group
+      description: Enterprise Search process information
+      fields:
+        - name: pid
+          type: long
+          description: Process ID for the Enterprise Search instance
+
+        - name: uptime.sec
+          type: long
+          description: Process uptime for the Enterprise Search instance
+
+        - name: filebeat
+          type: group
+          description: Health information for the embedded Filebeat instance
+          fields:
+            - name: pid
+              type: long
+              description: Process ID for the embedded Filebeat instance
+
+            - name: restart_count
+              type: long
+              description: Number of times embedded Filebeat instance had to be restarted due to some issues
+
+            - name: time_since_last_restart.sec
+              type: long
+              description: Time since the last embedded Filebeat instance restart (-1 if never restarted)
+
+    - name: jvm
+      type: group
+      description: JVM health
+      fields:
+        - name: version
+          type: keyword
+          description: JVM version used to run Enterprise Search
+
+        - name: gc
+          type: group
+          description: Java garbage collection metrics
+          fields:
+            - name: collection_count
+              type: long
+              description: Total number of Java garbage collector invocations since the start of the process
+
+            - name: collection_time.ms
+              type: long
+              description: Total time spent running Java garbage collector since the start of the process
+
+        - name: memory_usage
+          type: group
+          description: Memory usage
+          fields:
+            - name: heap_init.bytes
+              type: long
+              format: bytes
+              description: Heap init used by the JVM in bytes.
+
+            - name: heap_used.bytes
+              type: long
+              format: bytes
+              description: Heap used by the JVM in bytes.
+
+            - name: heap_committed.bytes
+              type: long
+              format: bytes
+              description: Committed heap to the JVM in bytes.
+
+            - name: heap_max.bytes
+              type: long
+              format: bytes
+              description: Max heap used by the JVM in bytes
+
+            - name: non_heap_init.bytes
+              type: long
+              format: bytes
+              description: Non-Heap initial memory used by the JVM in bytes.
+
+            - name: non_heap_committed.bytes
+              type: long
+              format: bytes
+              description: Non-Heap committed memory used by the JVM in bytes.
+
+            - name: object_pending_finalization_count
+              type: long
+              description: >
+                Displays the approximate number of objects for which finalization is pending.
+
+        - name: threads
+          type: group
+          description: Threads information
+          fields:
+            - name: current
+              type: long
+              description: Current number of live threads.
+
+            - name: daemon
+              type: long
+              description: Current number of live daemon threads.
+
+            - name: max
+              type: long
+              description: Peak live thread count since the JVM started or the peak was reset.
+
+            - name: total_started
+              type: long
+              description: Total number of threads created and/or started since the JVM started.
+
+    - name: crawler
+      type: group
+      description: Crawler health
+      fields:
+        - name: workers
+          type: group
+          description: Crawler workers
+          fields:
+            - name: pool_size
+              type: long
+              description: Workers pool size.
+
+            - name: active
+              type: long
+              description: Number of active workers.
+
+            - name: available
+              type: long
+              description: Number of available workers.

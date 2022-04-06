@@ -1,6 +1,8 @@
 [[filebeat-modules-devguide]]
 == Creating a New Filebeat Module
 
+include::generator-support-note.asciidoc[tag=filebeat-generator]
+
 This guide will walk you through creating a new Filebeat module.
 
 All Filebeat modules currently live in the main
@@ -304,10 +306,9 @@ variables to dynamically switch between configurations.
 [float]
 ==== ingest/*.json
 
-The `ingest/` folder contains Elasticsearch
-{ref}/ingest.html[Ingest Node] pipeline configurations. The Ingest
-Node pipelines are responsible for parsing the log lines and doing other
-manipulations on the data.
+The `ingest/` folder contains {es} {ref}/ingest.html[ingest pipeline]
+configurations. Ingest pipelines are responsible for parsing the log lines and
+doing other manipulations on the data.
 
 The files in this folder are JSON or YAML documents representing
 {ref}/pipeline.html[pipeline definitions]. Just like with the `config/`
@@ -344,10 +345,10 @@ on_failure:
 ----
 
 From here, you would typically add processors to the `processors` array to do
-the actual parsing. For details on how to use ingest node processors, see the
-{ref}/ingest-processors.html[ingest node documentation]. In
+the actual parsing. For information about available ingest processors, see the
+{ref}/processors.html[processor reference documentation]. In
 particular, you will likely find the
-{ref}/grok-processor.html[Grok processor] to be useful for parsing.
+{ref}/grok-processor.html[grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.
 
 [source,json]
@@ -484,8 +485,46 @@ run.
 In order to test the filesets with the sample logs and/or generate the expected output one should run the tests
 locally for a specific module, using the following procedure under Filebeat directory:
 
-. Run an Elasticsearch instance locally using docker: `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT`
+. Start an Elasticsearch instance locally. For example, using Docker:
++
+[source,bash]
+----
+docker run \
+  --name elasticsearch \
+  -p 9200:9200 -p 9300:9300 \
+  -e "xpack.security.http.ssl.enabled=false"  -e "ELASTIC_PASSWORD=changeme" \
+  -e "discovery.type=single-node" \
+  --pull always --rm --detach \
+  docker.elastic.co/elasticsearch/elasticsearch:master-SNAPSHOT
+----
+. Create an "admin" user on that Elasticsearch instance:
++
+[source,bash]
+----
+curl -u elastic:changeme \
+  http://localhost:9200/_security/user/admin \
+  -X POST -H 'Content-Type: application/json' \
+  -d '{"password": "changeme", "roles": ["superuser"]}'
+----
+. Create the testing binary: `make filebeat.test`
+. Update fields yaml: `make update`
 . Create python env: `make python-env`
 . Source python env: `source ./build/python-env/bin/activate`
-. Create the testing binary: `make filebeat.test`
-. Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx pytest tests/system/test_modules.py`
+. Run a test, for example to check nginx access log parsing:
++
+[source,bash]
+----
+INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false ES_PASS=changeme \
+TESTING_FILEBEAT_MODULES=nginx \
+pytest tests/system/test_modules.py -v --full-trace
+----
+. Add and remove option env vars as required. Here are some useful ones:
+* `TESTING_FILEBEAT_ALLOW_OLDER`: if set to 1, allow connecting older versions of Elasticsearch
+* `TESTING_FILEBEAT_MODULES`: comma separated list of modules to test.
+* `TESTING_FILEBEAT_FILESETS`: comma separated list of filesets to test.
+* `TESTING_FILEBEAT_FILEPATTERN`: glob pattern for log files within the fileset to test.
+* `GENERATE`: if set to 1, the expected documents will be generated.
+
+The filebeat logs are writen to the `build` directory. It may be useful to tail them in another terminal using `tail -F build/system-tests/run/test_modules.Test.*/output.log`.
+
+For example if there's a syntax error in an ingest pipeline, the test will probably just hang. The filebeat log output will contain the error message from elasticsearch.

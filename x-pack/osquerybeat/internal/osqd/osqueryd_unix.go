@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !windows
 // +build !windows
 
 package osqd
@@ -44,7 +45,7 @@ func SocketPath(dir string) string {
 	return filepath.Join(dir, "osquery.sock")
 }
 
-func platformArgs() []string {
+func platformArgs() map[string]interface{} {
 	return nil
 }
 
@@ -57,8 +58,4 @@ func setpgid() *syscall.SysProcAttr {
 func killProcessGroup(cmd *exec.Cmd) error {
 	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	return errors.Wrapf(err, "kill process group %d", cmd.Process.Pid)
-}
-
-func osquerydFilename() string {
-	return osqueryDName
 }
