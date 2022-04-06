@@ -55,6 +55,7 @@
       "event_data": {
         "CommandLine": "\"C:\\Windows\\system32\\wevtutil.exe\" cl Security",
         "MandatoryLabel": "S-1-16-12288",
+        "ProcessId": "0x122c",
         "SubjectDomainName": "VAGRANT",
         "SubjectLogonId": "0x274a2",
         "SubjectUserName": "vagrant",

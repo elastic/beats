@@ -2875,7 +2875,6 @@ processors:
           } else {
             ctx.process.parent.put("pid", ctx.winlog.event_data.ProcessId);
           }
-          ctx.winlog.event_data.remove("ProcessId");
         }
         if (ctx?.winlog?.event_data?.CommandLine != null) {
           int start = 0;
