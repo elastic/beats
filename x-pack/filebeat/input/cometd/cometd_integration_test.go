@@ -5,7 +5,6 @@
 package cometd
 
 import (
-	"fmt"
 	"sync"
 	"testing"
 
