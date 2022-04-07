@@ -70,8 +70,8 @@ Versions above this are expected to work but have not been tested.
 
 [source,yaml]
 ----
-- module: junos
-  firewall:
+- module: juniper
+  junos:
     enabled: true
     var.input: udp
     var.syslog_host: 0.0.0.0
