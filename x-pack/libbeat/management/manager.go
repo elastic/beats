@@ -202,6 +202,7 @@ func (cm *Manager) OnConfig(s string) {
 		cm.updateStatusWithError(err)
 		return
 	}
+	logp.L().With("config_map", configMap.String()).Info("applying config")
 
 	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
@@ -251,10 +252,13 @@ func (cm *Manager) OnError(err error) {
 }
 
 func (cm *Manager) apply(blocks ConfigBlocks) error {
+	logp.L().Infof("Manager.apply: blocks: %v", blocks)
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
 		missing[name] = true
 	}
+
+	logp.L().Infof("Manager.apply: missing: %v", missing)
 
 	// Detect unwanted configs from the list
 	if err := cm.blacklist.Detect(blocks); err != nil {
@@ -264,18 +268,22 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 	var errors *multierror.Error
 	// Reload configs
 	for _, b := range blocks {
-		if err := cm.reload(b.Type, b.Blocks); err != nil {
+		err := cm.reload(b.Type, b.Blocks)
+		if err != nil {
 			errors = multierror.Append(errors, err)
 		}
+		logp.L().Infof("applied config block: %s, err: %v", b.Type, err)
 		missing[b.Type] = false
 	}
 
 	// Unset missing configs
 	for name, isMissing := range missing {
 		if isMissing {
-			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
+			err := cm.reload(name, []*ConfigBlock{})
+			if err != nil {
 				errors = multierror.Append(errors, err)
 			}
+			logp.L().Infof("unsetting config block %s, err: %v", name, err)
 		}
 	}
 
