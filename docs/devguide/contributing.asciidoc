@@ -46,6 +46,17 @@ After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
+NOTE: One deterministic manner to install the proper Go version to work with Beats is to use the
+https://github.com/andrewkroh/gvm[GVM] Go version manager. An example for Mac users would be:
+
+[source,shell,subs=attributes+]
+----------------------------------------------------------------------
+gvm use {go-version}
+eval $(gvm {go-version})
+----------------------------------------------------------------------
+
+Then you can clone Beats git repository:
+
 [source,shell]
 ----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
