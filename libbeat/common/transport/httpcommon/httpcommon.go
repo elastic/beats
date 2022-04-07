@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"time"
 
-	"go.elastic.co/apm/module/apmhttp"
+	"go.elastic.co/apm/module/apmhttp/v2"
 	"golang.org/x/net/http2"
 
 	"github.com/elastic/beats/v7/libbeat/common"

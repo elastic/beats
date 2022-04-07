@@ -141,24 +141,6 @@ pull_request_rules:
       comment:
         message: |
           This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
-  - name: notify the backport policy
-    conditions:
-      - -label~=^backport
-      - base=main
-      - -merged
-      - -closed
-    actions:
-      comment:
-        message: |
-          This pull request does not have a backport label. Could you fix it @{{author}}? 🙏
-          To fixup this pull request, you need to add the backport labels for the needed
-          branches, such as:
-          * `backport-v./d./d./d` is the label to automatically backport to the `7./d` branch. `/d` is the digit
-
-          **NOTE**: `backport-skip` has been added to this pull request.
-      label:
-        add:
-          - backport-skip
   - name: remove-backport label
     conditions:
       - label~=backport-v
