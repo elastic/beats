@@ -6,6 +6,7 @@ services:
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /sys:/sys
+      - /etc/machine-id:/etc/machine-id:ro
     command: make
     privileged: true
     pid: host

@@ -2201,6 +2201,15 @@ Fields for Azure activity logs.
 
 
 
+*`azure.activitylogs.identity_name`*::
++
+--
+identity name
+
+type: keyword
+
+--
+
 [float]
 === identity
 
@@ -2363,6 +2372,36 @@ type: keyword
 +
 --
 Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.level`*::
++
+--
+Level
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.operation_version`*::
++
+--
+Operation version
 
 
 type: keyword
@@ -3294,6 +3333,26 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.device_detail.is_compliant`*::
++
+--
+If the device is compliant
+
+
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.device_detail.is_managed`*::
++
+--
+If the device is managed
+
+
+type: boolean
+
+--
+
 *`azure.signinlogs.properties.applied_conditional_access_policies`*::
 +
 --
@@ -3324,6 +3383,35 @@ type: flattened
 
 --
 
+*`azure.signinlogs.properties.authentication_protocol`*::
++
+--
+Authentication protocol type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.incoming_token_type`*::
++
+--
+Incoming token type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.unique_token_identifier`*::
++
+--
+Unique token identifier for the request.
+
+type: keyword
+
+--
+
 *`azure.signinlogs.properties.authentication_requirement`*::
 +
 --
@@ -3340,7 +3428,7 @@ type: keyword
 Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
 
 
-type: keyword
+type: flattened
 
 --
 
@@ -20644,6 +20732,40 @@ type: keyword
 
 --
 
+*`checkpoint.comment`*::
++
+--
+type: keyword
+
+--
+
+*`checkpoint.conn_direction`*::
++
+--
+Connection direction
+
+type: keyword
+
+--
+
+*`checkpoint.db_ver`*::
++
+--
+Database version
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Status of database update
+
+type: keyword
+
+--
+
 [[exported-fields-cisco]]
 == Cisco fields
 
@@ -35626,9 +35748,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -35666,12 +35814,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 

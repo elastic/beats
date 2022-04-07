@@ -21,7 +21,7 @@ import (
 	"flag"
 	"fmt"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
