@@ -66,7 +66,7 @@ git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beat
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
 Beats developers primarily use https://github.com/magefile/mage[Mage] for development.
-You can install mage using our make target:
+You can install mage using a make target:
 
 [source,shell]
 --------------------------------------------------------------------------------
