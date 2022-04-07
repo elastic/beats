@@ -5,14 +5,21 @@
 package http_endpoint
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func Test_httpReadJSON(t *testing.T) {
@@ -134,6 +141,112 @@ func Test_httpReadJSON(t *testing.T) {
 				assert.Equal(t, tt.wantRawMessage, rawMessages)
 			}
 			assert.Equal(t, len(gotObjs), len(rawMessages))
+		})
+	}
+}
+
+type publisher struct {
+	events []beat.Event
+}
+
+func (p *publisher) Publish(event beat.Event) {
+	p.events = append(p.events, event)
+}
+
+func Test_apiResponse(t *testing.T) {
+	testCases := []struct {
+		name    string          // Sub-test name.
+		request *http.Request   // Input request.
+		events  []common.MapStr // Expected output events.
+	}{
+		{
+			name: "single event",
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events: []common.MapStr{
+				{
+					"json": common.MapStr{
+						"id": int64(0),
+					},
+				},
+			},
+		},
+		{
+			name: "single event gzip",
+			request: func() *http.Request {
+				buf := new(bytes.Buffer)
+				b := gzip.NewWriter(buf)
+				_, _ = io.WriteString(b, `{"id":0}`)
+				b.Close()
+
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Content-Encoding", "gzip")
+				return req
+			}(),
+			events: []common.MapStr{
+				{
+					"json": common.MapStr{
+						"id": int64(0),
+					},
+				},
+			},
+		},
+		{
+			name: "multiple events gzip",
+			request: func() *http.Request {
+				events := []string{
+					`{"id":0}`,
+					`{"id":1}`,
+				}
+
+				buf := new(bytes.Buffer)
+				b := gzip.NewWriter(buf)
+				_, _ = io.WriteString(b, strings.Join(events, "\n"))
+				b.Close()
+
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Content-Encoding", "gzip")
+				return req
+			}(),
+			events: []common.MapStr{
+				{
+					"json": common.MapStr{
+						"id": int64(0),
+					},
+				},
+				{
+					"json": common.MapStr{
+						"id": int64(1),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Setup
+			pub := new(publisher)
+			conf := defaultConfig()
+			apiHandler := newHandler(conf, pub, logp.NewLogger("http_endpoint.test"))
+
+			// Execute handler.
+			respRec := httptest.NewRecorder()
+			apiHandler.ServeHTTP(respRec, tc.request)
+
+			// Validate responses.
+			assert.Equal(t, http.StatusOK, respRec.Code)
+			assert.Equal(t, conf.ResponseBody, respRec.Body.String())
+			require.Len(t, pub.events, len(tc.events))
+
+			for i, evt := range pub.events {
+				assert.EqualValues(t, tc.events[i], evt.Fields)
+			}
 		})
 	}
 }

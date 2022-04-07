@@ -74,28 +74,26 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
-        withMageEnv(version: "${env.GO_VERSION}"){
-          dir("${BASE_DIR}"){
-            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-          }
+        dir("${BASE_DIR}"){
+          setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
         }
       }
     }
-    stage('Lint'){
+    stage('Checks'){
       options { skipDefaultCheckout() }
       environment {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: "Lint") {
-          stageStatusCache(id: 'Lint'){
-            withBeatsEnv(archive: false, id: "lint") {
+        withGithubNotify(context: "Checks") {
+          stageStatusCache(id: 'Checks'){
+            withBeatsEnv(archive: false, id: "checks") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'true') {
                 cmd(label: "make check", script: "make check")
               }
               whenTrue(env.ONLY_DOCS == 'false') {
-                runLinting()
+                runChecks()
               }
             }
           }
@@ -211,19 +209,16 @@ VERSION=${env.VERSION}-SNAPSHOT""")
   }
 }
 
-def runLinting() {
+def runChecks() {
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
-    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'lint').each { k,v ->
+    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'checks').each { k,v ->
       mapParallelTasks["${k}"] = v
     }
   }
   mapParallelTasks['default'] = {
     cmd(label: 'make check-default', script: 'make check-default')
-    cmd(label: 'Lint Last Change [Linux]', script: 'GOOS=linux mage -v llc')
-    cmd(label: 'Lint Last Change [Darwin]', script: 'GOOS=darwin mage -v llc')
-    cmd(label: 'Lint Last Change [Windows]', script: 'GOOS=windows mage -v llc')
   }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
@@ -407,7 +402,8 @@ def packagingLinux(Map args = [:]) {
                 //'linux/s390x',
                 'windows/amd64',
                 'windows/386',
-                (params.macos ? '' : 'darwin/amd64'),
+                'darwin/amd64',
+                'darwin/arm64'
               ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}"
@@ -1060,9 +1056,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
       //   2) All the remaining stages will retry the command within the same worker/workspace if any failure
       //
-      // NOTE: stage: lint uses target function while cloud and k8sTest use a different function
+      // NOTE: stage: checks uses target function while cloud and k8sTest use a different function
       //
-      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('lint') ||
+      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('checks') ||
                          args?.content?.containsKey('packaging-arm') ||
                          args?.content?.containsKey('packaging-linux')) ? false : true
       if(args?.content?.containsKey('make')) {

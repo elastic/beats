@@ -1,5 +1,5 @@
 # Module: couchdb
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-couchdb.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-couchdb.html
 
 - module: couchdb
   metricsets: ["server"]
