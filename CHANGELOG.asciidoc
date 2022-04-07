@@ -31,7 +31,7 @@ https://github.com/elastic/beats/compare/v8.1.1...v8.1.2[View commits]
 
 *Affecting all Beats*
 
-- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough priviledges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.1` or give `manage` permission on the data stream `{beatname}-8.1` temporarly to the publishing user. {issue}30647[30647] {pull}31048[31048]
+- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough privileges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.1` or to give `manage` permission on the data stream `{beatname}-8.1` to the publishing user temporarily. {issue}30647[30647] {pull}31048[31048]
 
 [[release-notes-8.1.1]]
 === Beats version 8.1.1
