@@ -158,7 +158,7 @@ You can find the complete list of supported build targets with `go tool dist lis
 [[running-linter]]
 === Linting
 
-You can run the pre-configured linter against your change:
+Beats uses https://golangci-lint.run/[golangci-lint]. You can run the pre-configured linter against your change:
 
 [source,shell]
 --------------------------------------------------------------------------------
@@ -169,7 +169,12 @@ mage llc
 
 It's expected that sometimes a contributor will be asked to fix linter issues unrelated to their contribution since the linter was introduced later than changes in some of the files.
 
-You would need https://github.com/magefile/mage[Mage] to run this task.
+You can also run the linter against an individual package, for example the filbeat command package:
+
+[source,shell]
+--------------------------------------------------------------------------------
+golangci-lint run ./filebeat/cmd/...
+--------------------------------------------------------------------------------
 
 [float]
 [[running-testsuite]]
