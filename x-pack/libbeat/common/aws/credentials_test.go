@@ -69,7 +69,7 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 			"",
 			awssdk.Config{},
 			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("https://ec2.amazonaws.com"),
+				EndpointResolverWithOptions: getEndpointResolverWithOptionsFunc("https://ec2.amazonaws.com"),
 			},
 		},
 		{
@@ -79,7 +79,7 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 			"us-west-1",
 			awssdk.Config{},
 			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("https://cloudwatch.us-west-1.amazonaws.com"),
+				EndpointResolverWithOptions: getEndpointResolverWithOptionsFunc("https://cloudwatch.us-west-1.amazonaws.com"),
 			},
 		},
 		{
@@ -89,7 +89,7 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 			"",
 			awssdk.Config{},
 			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("https://s3.test.com:9000"),
+				EndpointResolverWithOptions: getEndpointResolverWithOptionsFunc("https://s3.test.com:9000"),
 			},
 		},
 		{
@@ -99,15 +99,24 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 			"",
 			awssdk.Config{},
 			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("http://testobjects.com:9000"),
+				EndpointResolverWithOptions: getEndpointResolverWithOptionsFunc("http://testobjects.com:9000"),
 			},
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			enrichedAWSConfig := EnrichAWSConfigWithEndpoint(c.endpoint, c.serviceName, c.region, c.awsConfig)
+			enrichedAWSConfig, err := EnrichAWSConfigWithEndpoint(c.endpoint, c.serviceName, c.region, c.awsConfig)
+			if err != nil {
+				t.Fatal(err)
+			}
 			assert.Equal(t, c.expectedAWSConfig, enrichedAWSConfig)
 		})
+	}
+}
+
+func getEndpointResolverWithOptionsFunc(e string) awssdk.EndpointResolverWithOptionsFunc {
+	return func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+		return awssdk.Endpoint{URL: e}, nil
 	}
 }
 
