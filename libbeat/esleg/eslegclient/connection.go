@@ -27,7 +27,7 @@ import (
 	"net/url"
 	"time"
 
-	"go.elastic.co/apm/module/apmelasticsearch"
+	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
@@ -91,7 +91,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 
 	u, err := url.Parse(s.URL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %w", err)
 	}
 
 	if u.User != nil {
@@ -242,13 +242,16 @@ func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
 func (conn *Connection) Connect() error {
+	if conn.log == nil {
+		conn.log = logp.NewLogger("esclientleg")
+	}
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
 
 	if conn.OnConnectCallback != nil {
 		if err := conn.OnConnectCallback(); err != nil {
-			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
+			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %w", err)
 		}
 	}
 
@@ -266,7 +269,7 @@ func (conn *Connection) Ping() (string, error) {
 	}
 
 	if status >= 300 {
-		return "", fmt.Errorf("Non 2xx response code: %d", status)
+		return "", fmt.Errorf("non 2xx response code: %d", status)
 	}
 
 	var response struct {
@@ -277,7 +280,7 @@ func (conn *Connection) Ping() (string, error) {
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
+		return "", fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
 	conn.log.Debugf("Ping status code: %v", status)
@@ -362,7 +365,7 @@ func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, url, body) //nolint:noctx // keep legacy behaviour
 	if err != nil {
 		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err
@@ -376,7 +379,7 @@ func (conn *Connection) execRequest(
 // GetVersion returns the elasticsearch version the client is connected to.
 func (conn *Connection) GetVersion() common.Version {
 	if !conn.version.IsValid() {
-		conn.getVersion()
+		_ = conn.getVersion()
 	}
 
 	return conn.version
@@ -402,7 +405,7 @@ func (conn *Connection) getVersion() error {
 func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
 	status, body, err := conn.Request("PUT", path, "", nil, json)
 	if err != nil {
-		return body, fmt.Errorf("couldn't load json. Error: %s", err)
+		return body, fmt.Errorf("couldn't load json. Error: %w", err)
 	}
 	if status > 300 {
 		return body, fmt.Errorf("couldn't load json. Status: %v", status)
