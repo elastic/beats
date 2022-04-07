@@ -1,5 +1,5 @@
 # Module: gcp
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-gcp.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-gcp.html
 
 - module: gcp
   metricsets:
@@ -14,6 +14,8 @@
   metricsets:
     - pubsub
     - loadbalancing
+    - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -46,17 +48,11 @@
 
 - module: gcp
   metricsets:
-    - metrics
+    - gke
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  metrics:
-    - aligner: ALIGN_NONE
-      service: gke
-      service_metric_prefix: kubernetes.io/
-      metric_types:
-        - "container/cpu/core_usage_time"
 
 - module: gcp
   metricsets:

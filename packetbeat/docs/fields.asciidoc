@@ -3210,9 +3210,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -3250,12 +3276,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 
@@ -19402,11 +19455,31 @@ type: boolean
 
 --
 
+*`tls.detailed.ocsp_response`*::
++
+--
+The result of an OCSP request.
+
+
+type: keyword
+
+--
+
 
 *`tls.detailed.client_hello.version`*::
 +
 --
 The version of the TLS protocol by which the client wishes to communicate during this session.
+
+
+type: keyword
+
+--
+
+*`tls.detailed.client_hello.random`*::
++
+--
+Random data used by the TLS protocol to generate the encryption key.
 
 
 type: keyword
@@ -19508,6 +19581,39 @@ type: keyword
 
 --
 
+[float]
+=== status_request
+
+Status request made to the server.
+
+
+*`tls.detailed.client_hello.extensions.status_request.type`*::
++
+--
+The type of the status request. Always "ocsp" if present.
+
+type: keyword
+
+--
+
+*`tls.detailed.client_hello.extensions.status_request.responder_id_list_length`*::
++
+--
+The length of the list of trusted responders.
+
+type: short
+
+--
+
+*`tls.detailed.client_hello.extensions.status_request.request_extensions`*::
++
+--
+The number of certificate extensions for the request.
+
+type: short
+
+--
+
 *`tls.detailed.client_hello.extensions._unparsed_`*::
 +
 --
@@ -19523,6 +19629,16 @@ type: keyword
 +
 --
 The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
+
+
+type: keyword
+
+--
+
+*`tls.detailed.server_hello.random`*::
++
+--
+Random data used by the TLS protocol to generate the encryption key.
 
 
 type: keyword
@@ -19591,6 +19707,21 @@ List of Elliptic Curve (EC) point formats. Indicates the set of point formats th
 
 
 type: keyword
+
+--
+
+[float]
+=== status_request
+
+Status request made to the server.
+
+
+*`tls.detailed.server_hello.extensions.status_request.response`*::
++
+--
+Whether a certificate status request response was made.
+
+type: boolean
 
 --
 

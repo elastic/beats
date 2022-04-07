@@ -25,8 +25,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -67,12 +70,23 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		t.Fatal(err)
 	}
 	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
+	client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
+	s.requireDataStreamDoesNotExist("")
 	client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
 	s.requireTemplateDoesNotExist("")
 	return &s
 }
 
+func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig) *testSetup {
+	t.Helper()
+	if cfg.Name == "" {
+		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
+	}
+	return &testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
+}
+
 func (ts *testSetup) mustLoadTemplate(body map[string]interface{}) {
+	ts.t.Helper()
 	err := ts.loader.loadTemplate(ts.config.Name, body)
 	require.NoError(ts.t, err)
 	ts.requireTemplateExists("")
@@ -108,6 +122,11 @@ func (ts *testSetup) requireTemplateExists(name string) {
 	require.True(ts.t, exists, "template must exist: %s", name)
 }
 
+func (ts *testSetup) cleanupDataStream(name string) {
+	ts.client.Request("DELETE", "/_data_stream/"+name, "", nil, nil)
+	ts.requireDataStreamDoesNotExist(name)
+}
+
 func (ts *testSetup) cleanupTemplate(name string) {
 	ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
 	ts.requireTemplateDoesNotExist(name)
@@ -120,6 +139,48 @@ func (ts *testSetup) requireTemplateDoesNotExist(name string) {
 	exists, err := ts.loader.checkExistsTemplate(name)
 	require.NoError(ts.t, err, "failed to query template status")
 	require.False(ts.t, exists, "template must not exist")
+}
+
+func (ts *testSetup) requireDataStreamDoesNotExist(name string) {
+	if name == "" {
+		name = ts.config.Name
+	}
+	exists, err := ts.loader.checkExistsDatastream(name)
+	require.NoError(ts.t, err, "failed to query data stream status")
+	require.False(ts.t, exists, "data stream must not exist")
+}
+
+func (ts *testSetup) sendTestEvent() {
+	evt := map[string]interface{}{
+		"@timestamp": "2099-11-15T13:12:00",
+		"message":    "my super important message",
+	}
+	c, _, err := ts.client.Request(http.MethodPut, "/"+ts.config.Name+"/_create/1", "", nil, evt)
+	require.NoError(ts.t, err)
+	require.Equal(ts.t, c, http.StatusCreated, "document must be created with id 1")
+
+	// refresh index so the event becomes available immediately
+	_, _, err = ts.client.Request(http.MethodPost, "/"+ts.config.Name+"/_refresh", "", nil, nil)
+	require.NoError(ts.t, err)
+}
+
+// requireTestEventPresent validates that the event is available
+// returns the backing index of the event
+func (ts *testSetup) requireTestEventPresent() string {
+	c, b, err := ts.client.Request("GET", "/"+ts.config.Name+"/_search", "", nil, nil)
+	require.NoError(ts.t, err)
+	require.Equal(ts.t, http.StatusOK, c)
+
+	var resp eslegclient.SearchResults
+	err = json.Unmarshal(b, &resp)
+	require.Equal(ts.t, 1, resp.Hits.Total.Value, "the test event must be returned")
+
+	idx := struct {
+		Index string `json:"_index"`
+	}{Index: ""}
+	err = json.Unmarshal(resp.Hits.Hits[0], &idx)
+	require.NoError(ts.t, err, "backing index name must be parsed")
+	return idx.Index
 }
 
 func TestESLoader_Load(t *testing.T) {
@@ -138,6 +199,55 @@ func TestESLoader_Load(t *testing.T) {
 			err := setup.loader.Load(setup.config, beatInfo, nil, false)
 			require.Error(t, err)
 			require.Contains(t, err.Error(), "version is not semver")
+		})
+
+		t.Run("no Elasticsearch client", func(t *testing.T) {
+			setup := newTestSetupWithESClient(t, nil, TemplateConfig{Enabled: true})
+
+			beatInfo := beat.Info{Version: "9.9.9"}
+			err := setup.loader.Load(setup.config, beatInfo, nil, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "can not load template without active Elasticsearch client")
+		})
+
+		t.Run("cannot check template", func(t *testing.T) {
+			m := getMockElasticsearchClient(t, "HEAD", "/_index_template/", 500, []byte("cannot check template"))
+			setup := newTestSetupWithESClient(t, m, TemplateConfig{Enabled: true})
+
+			beatInfo := beat.Info{Version: "9.9.9"}
+			err := setup.loader.Load(setup.config, beatInfo, nil, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "failure while checking if template exists", "Load must return error because template cannot be checked")
+		})
+
+		t.Run("cannot load template", func(t *testing.T) {
+			m := getMockElasticsearchClient(t, "PUT", "/_index_template/", 503, []byte("cannot load template"))
+			setup := newTestSetupWithESClient(t, m, TemplateConfig{Enabled: true, Overwrite: true})
+
+			beatInfo := beat.Info{Version: "9.9.9"}
+			err := setup.loader.Load(setup.config, beatInfo, nil, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "failed to load template", "Load must return error because we cannot load the index template")
+		})
+
+		t.Run("cannot check data stream", func(t *testing.T) {
+			m := getMockElasticsearchClient(t, "GET", "/_data_stream/", 503, []byte("error checking data stream"))
+			setup := newTestSetupWithESClient(t, m, TemplateConfig{Enabled: true, Overwrite: true})
+
+			beatInfo := beat.Info{Version: "9.9.9"}
+			err := setup.loader.Load(setup.config, beatInfo, nil, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "failed to check data stream", "Load must return error because data stream cannot be checked")
+		})
+
+		t.Run("cannot load data stream", func(t *testing.T) {
+			m := getMockElasticsearchClient(t, "PUT", "/_data_stream/", 300, nil)
+			setup := newTestSetupWithESClient(t, m, TemplateConfig{Enabled: true, Overwrite: true})
+
+			beatInfo := beat.Info{Version: "9.9.9"}
+			err := setup.loader.Load(setup.config, beatInfo, nil, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "failed to put data stream", "Load must return error because data stream cannot be uploaded")
 		})
 	})
 
@@ -161,6 +271,25 @@ func TestESLoader_Load(t *testing.T) {
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, false, tmpl.SourceEnabled())
 		})
+
+		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
+			fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+			require.NoError(t, err)
+			setup := newTestSetup(t, TemplateConfig{Enabled: true, Overwrite: true})
+			setup.mustLoad(fields)
+
+			exists, err := setup.loader.checkExistsDatastream(setup.config.Name)
+			require.True(t, exists, "data stream must exits")
+
+			// send test event before reloading the template
+			setup.sendTestEvent()
+			backingIdx := setup.requireTestEventPresent()
+
+			setup.mustLoad(fields)
+
+			newBackingIdx := setup.requireTestEventPresent()
+			require.Equal(setup.t, backingIdx, newBackingIdx, "the event must be present in the same backing index")
+		})
 	})
 
 	t.Run("json.name", func(t *testing.T) {
@@ -171,10 +300,11 @@ func TestESLoader_Load(t *testing.T) {
 
 		// Load Template with same name, but different JSON.name and ensure it is used
 		setup.config.JSON = struct {
-			Enabled bool   `config:"enabled"`
-			Path    string `config:"path"`
-			Name    string `config:"name"`
-		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON}
+			Enabled      bool   `config:"enabled"`
+			Path         string `config:"path"`
+			Name         string `config:"name"`
+			IsDataStream bool   `config:"data_stream"`
+		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON, IsDataStream: false}
 		setup.load(nil)
 		setup.requireTemplateExists(nameJSON)
 		setup.cleanupTemplate(nameJSON)
@@ -205,10 +335,21 @@ func TestESLoader_Load(t *testing.T) {
 			},
 			"fields from json": {
 				cfg: TemplateConfig{Enabled: true, JSON: struct {
-					Enabled bool   `config:"enabled"`
-					Path    string `config:"path"`
-					Name    string `config:"name"`
-				}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: "json-template"}},
+					Enabled      bool   `config:"enabled"`
+					Path         string `config:"path"`
+					Name         string `config:"name"`
+					IsDataStream bool   `config:"data_stream"`
+				}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: "json-template", IsDataStream: false}},
+				fields:     fields,
+				properties: []string{"host_name"},
+			},
+			"fields from json with data stream": {
+				cfg: TemplateConfig{Enabled: true, JSON: struct {
+					Enabled      bool   `config:"enabled"`
+					Path         string `config:"path"`
+					Name         string `config:"name"`
+					IsDataStream bool   `config:"data_stream"`
+				}{Enabled: true, Path: path(t, []string{"testdata", "fields-data-stream.json"}), Name: "json-ds", IsDataStream: true}},
 				fields:     fields,
 				properties: []string{"host_name"},
 			},
@@ -234,6 +375,9 @@ func TestESLoader_Load(t *testing.T) {
 						properties = append(properties, k)
 					}
 					assert.ElementsMatch(t, properties, data.properties)
+				}
+				if !data.cfg.JSON.Enabled || data.cfg.JSON.IsDataStream {
+					setup.cleanupDataStream(setup.config.Name)
 				}
 				setup.cleanupTemplate(setup.config.Name)
 			})
@@ -401,6 +545,8 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       eslegtest.GetURL(),
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
+		Username:  eslegtest.GetUser(),
+		Password:  eslegtest.GetPass(),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -416,4 +562,46 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	}
 
 	return conn
+}
+
+func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int, body []byte) *eslegclient.Connection {
+	server := esMock(t, method, endpoint, code, body)
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL:       server.URL,
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
+	})
+	require.NoError(t, err)
+	err = conn.Connect()
+	require.NoError(t, err)
+	return conn
+}
+
+func esMock(t *testing.T, method, endpoint string, code int, body []byte) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"version":{"number":"5.0.0"}}`))
+			return
+		}
+
+		if r.Method == method && strings.HasPrefix(r.URL.Path, endpoint) {
+			w.WriteHeader(code)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(body)
+			return
+		}
+
+		c := 200
+		// if we are checking if the data stream is available,
+		// return 404 so the client will try to load it.
+		if r.Method == "GET" && strings.HasPrefix(r.URL.Path, "/_data_stream") {
+			c = 404
+		}
+		w.WriteHeader(c)
+		if body != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(body)
+		}
+	}))
 }

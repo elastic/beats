@@ -154,7 +154,21 @@ func tlsDialWith(
 		}
 	}
 
-	if tlsConfig.InsecureSkipVerify {
+	// config might be nil, so get the zero-value and then read what is in config.
+	// We assume that the zero-value is the default value
+	var verification tlscommon.TLSVerificationMode
+	if config != nil {
+		verification = config.Verification
+	}
+
+	// We only check the status of config.Verification (`ssl.verification_mode`
+	// in the configuration file) because we have a custom verification logic
+	// implemented by setting tlsConfig.VerifyConnection that runs regardless of
+	// the status of tlsConfig.InsecureSkipVerify.
+	// For verification modes VerifyFull and VerifyCeritifcate we set
+	// tlsConfig.InsecureSkipVerify to true, hence it's not an indicator of
+	// whether TLS verification is enabled or not.
+	if verification == tlscommon.VerifyNone {
 		d.Warn("security", "server's certificate chain verification is disabled")
 	} else {
 		d.Info("security", "server's certificate chain verification is enabled")

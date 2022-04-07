@@ -1,5 +1,5 @@
 # Module: containerd
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-containerd.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-containerd.html
 
 - module: containerd
   metricsets: ["cpu", "memory", "blkio"]
@@ -11,4 +11,5 @@
   # if set to true, cpu and memory usage percentages will be calculated. Default is true
   calcpct.cpu: true
   calcpct.memory: true
+  #metrics_path: "v1/metrics"
 

@@ -105,6 +105,8 @@ queue.mem:
 {%- if elasticsearch %}
 output.elasticsearch:
   hosts: ["{{ elasticsearch.host }}"]
+  username: {{ elasticsearch.user }}
+  password: {{ elasticsearch.pass }}
 {%- else %}
 output.file:
   path: '{{ output_file_path|default(beat.working_dir + "/output") }}'

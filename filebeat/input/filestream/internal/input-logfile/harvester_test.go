@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint: errcheck // It's a test file
 package input_logfile
 
 import (
@@ -94,7 +95,6 @@ func TestReaderGroup(t *testing.T) {
 		ctx, cf, err = rg.newContext("test-id", context.Background())
 		requireGroupError(t, ctx, cf, err)
 	})
-
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {
@@ -308,7 +308,7 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 		pipeline:   &pipelinemock.MockPipelineConnector{},
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
-		identifier: &sourceIdentifier{"filestream::.global::", false},
+		identifier: &sourceIdentifier{"filestream::.global::"},
 		tg:         unison.TaskGroup{},
 	}
 }

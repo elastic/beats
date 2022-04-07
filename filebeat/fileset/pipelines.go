@@ -60,35 +60,35 @@ func (m MultiplePipelineUnsupportedError) Error() string {
 
 // LoadPipelines loads the pipelines for each configured fileset.
 func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool) error {
-	for module, filesets := range reg.registry {
-		for name, fileset := range filesets {
+	for _, module := range reg.registry {
+		for _, fileset := range module.filesets {
 			// check that all the required Ingest Node plugins are available
 			requiredProcessors := fileset.GetRequiredProcessors()
 			reg.log.Debugf("Required processors: %s", requiredProcessors)
 			if len(requiredProcessors) > 0 {
 				err := checkAvailableProcessors(esClient, requiredProcessors)
 				if err != nil {
-					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module, name, err)
+					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 				}
 			}
 
 			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
-				return fmt.Errorf("error getting pipeline for fileset %s/%s: %v", module, name, err)
+				return fmt.Errorf("error getting pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 			}
 
 			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
 			esVersion := esClient.GetVersion()
 			minESVersionRequired := common.MustNewVersion("6.5.0")
 			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
-				return MultiplePipelineUnsupportedError{module, name, esVersion, *minESVersionRequired}
+				return MultiplePipelineUnsupportedError{module.config.Module, fileset.name, esVersion, *minESVersionRequired}
 			}
 
 			var pipelineIDsLoaded []string
 			for _, pipeline := range pipelines {
 				err = LoadPipeline(esClient, pipeline.id, pipeline.contents, overwrite, reg.log.With("pipeline", pipeline.id))
 				if err != nil {
-					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module, name, err)
+					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 					break
 				}
 				pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
@@ -182,7 +182,6 @@ func interpretError(initialErr error, body []byte) error {
 		return fmt.Errorf("this module requires an Elasticsearch plugin that provides the %s processor. "+
 			"Please visit the Elasticsearch documentation for instructions on how to install this plugin. "+
 			"Response body: %s", response.Error.RootCause[0].Header.ProcessorType, body)
-
 	}
 
 	// older ES version?

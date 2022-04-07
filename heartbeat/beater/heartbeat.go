@@ -37,7 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -114,6 +113,12 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 			return err
 		}
 	}
+	// Configure the beats Manager to start after all the reloadable hooks are initialized
+	// and shutdown when the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)

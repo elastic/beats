@@ -41,8 +41,8 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}{
 		"plugin with no user configured ID": {
 			sources: []*testSource{
-				&testSource{"unique_name"},
-				&testSource{"another_unique_name"},
+				{"unique_name"},
+				{"another_unique_name"},
 			},
 			expectedSourceIDs: []string{
 				testPluginName + "::.global::unique_name",
@@ -93,8 +93,6 @@ func TestSourceIdentifier_MachesInput(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
 			if err != nil {
@@ -111,17 +109,10 @@ func TestSourceIdentifier_MachesInput(t *testing.T) {
 }
 
 func TestSourceIdentifier_NotMachesInput(t *testing.T) {
-
 	testCases := map[string]struct {
 		userID         string
 		notMatchingIDs []string
 	}{
-		"plugin with no user configured ID": {
-			notMatchingIDs: []string{
-				"::my_id",
-				"::path::my_id::" + testPluginName,
-			},
-		},
 		"plugin with user configured ID": {
 			userID: "my-id",
 			notMatchingIDs: []string{
@@ -132,8 +123,6 @@ func TestSourceIdentifier_NotMachesInput(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
 			if err != nil {

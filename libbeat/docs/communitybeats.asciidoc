@@ -15,7 +15,7 @@ Have a question about developing a community Beat? You can post questions and di
 https://discuss.elastic.co/tags/c/elastic-stack/beats/28/beats-development[Beats discussion forum].
 
 Have you created a Beat that's not listed? Add the name and description of your Beat to the source document for
-https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
+https://github.com/elastic/beats/blob/main/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
 discussion forum.
 
 ifndef::dev-guide[]
@@ -118,6 +118,7 @@ https://github.com/philkra/springboot2beat[springboot2beat]:: Query and accumula
 https://github.com/sentient/statsdbeat[statsdbeat]:: Receives UDP https://github.com/etsy/statsd/wiki[statsd] events from a statsd client.
 https://github.com/Corwind/supervisorctlbeat.git[supervisorctlbeat]:: This beat aims to parse the supervisorctl status command output and send it to elasticsearch for indexation
 https://github.com/live-wire/terminalbeat[terminalbeat]:: Runs an external command and forwards the https://www.computerhope.com/jargon/s/stdout.htm[stdout] for the same to Elasticsearch/Logstash.
+https://timebeat.app/download.php[timebeat]:: NTP and PTP clock synchonisation beat that reports accuracy metrics to elastic. Includes Kibana dashboards.
 https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
 https://github.com/DmitryZ-outten/trivybeat[trivybeat]:: Fetches Docker containers which are running on the same machine, scan CVEs of those containers using Trivy server and index them into Elasticsearch.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.

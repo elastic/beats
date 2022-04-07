@@ -29,9 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
-var (
-	inputList = monitoring.NewUniqueList()
-)
+var inputList = monitoring.NewUniqueList()
 
 func init() {
 	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "input", inputList.Report, monitoring.Report)
