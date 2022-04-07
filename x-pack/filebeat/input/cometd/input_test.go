@@ -5,6 +5,7 @@
 package cometd
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +20,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -100,6 +103,99 @@ func TestNewInput_Run(t *testing.T) {
 		assertEventMatches(t, msg, event)
 	}
 	server.Close()
+}
+
+func TestNewInput_Run_Wait(t *testing.T) {
+	eventsCh := make(chan beat.Event)
+
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+	var inputContext finput.Context
+
+	var msg bay.TriggerEvent
+	msg.Data.Event.ReplayID = 1234
+	msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	msg.Channel = channelName
+
+	config := map[string]interface{}{
+		"channel_name":              channelName,
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	r := http.HandlerFunc(oauth2Handler)
+	server := httptest.NewServer(r)
+	serverURL = server.URL
+	config["auth.oauth2.token_url"] = server.URL + "/token"
+
+	cfg := common.MustNewConfigFrom(config)
+
+	input, err := NewInput(cfg, connector, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input)
+
+	input.Run()
+
+	go func() {
+		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+		for range eventsCh {
+		}
+	}()
+
+	input.Wait()
+}
+
+func TestStop(t *testing.T) {
+	conf := defaultConfig()
+	logger := logp.NewLogger("test")
+	authParams := bay.AuthenticationParameters{}
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	defer cancelInputCtx()
+
+	input := &cometdInput{
+		config:       conf,
+		log:          logger,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		ackedCount:   atomic.NewUint32(0),
+		authParams:   authParams,
+	}
+	input.out = make(chan bay.TriggerEvent)
+
+	input.Stop()
+}
+
+func TestWait(t *testing.T) {
+	conf := defaultConfig()
+	logger := logp.NewLogger("test")
+	authParams := bay.AuthenticationParameters{}
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	defer cancelInputCtx()
+
+	input := &cometdInput{
+		config:       conf,
+		log:          logger,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		ackedCount:   atomic.NewUint32(0),
+		authParams:   authParams,
+	}
+	input.out = make(chan bay.TriggerEvent)
+
+	input.Wait()
 }
 
 func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
