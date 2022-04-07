@@ -64,8 +64,8 @@ func New(
 	modulesPath string,
 	name string,
 	mname string,
-	fcfg *FilesetConfig) (*Fileset, error) {
-
+	fcfg *FilesetConfig) (*Fileset, error,
+) {
 	modulePath := filepath.Join(modulesPath, mname)
 	if _, err := os.Stat(modulePath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("module %s (%s) doesn't exist", mname, modulePath)

@@ -17,7 +17,12 @@ BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
-GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /scripts/cmd/ )
+ifeq ($(shell uname -s), AIX)
+	# Don't list packages with docker or kubernetes on AIX
+	GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ | grep -v docker | grep -v kubernetes | grep -v /libbeat/tests/compose )
+else
+	GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
+endif
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make release"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
@@ -73,8 +78,6 @@ GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
-GOLINT=golint
-GOLINT_REPO?=golang.org/x/lint/golint
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
@@ -268,7 +271,7 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
-python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1 
+python-env: export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \

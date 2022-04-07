@@ -64,7 +64,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:8.2.0
+        image: docker.elastic.co/beats/filebeat:8.3.0
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
@@ -187,6 +187,10 @@ rules:
 - apiGroups: ["apps"]
   resources:
     - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+    - jobs
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

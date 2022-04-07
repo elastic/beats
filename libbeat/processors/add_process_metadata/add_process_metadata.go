@@ -118,9 +118,7 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
 	}
 
-	var p addProcessMetadata
-
-	p = addProcessMetadata{
+	p := addProcessMetadata{
 		config:   config,
 		provider: provider,
 		log:      log,

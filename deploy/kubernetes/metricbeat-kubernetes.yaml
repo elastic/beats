@@ -156,7 +156,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.2.0
+        image: docker.elastic.co/beats/metricbeat:8.3.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -298,8 +298,7 @@ rules:
 - apiGroups: ["batch"]
   resources:
   - jobs
-  # Uncomment if need metadata for cronjob objects in versions >= v1.21
-  #- cronjobs
+  - cronjobs
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""

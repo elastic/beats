@@ -43,7 +43,8 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// SelectedPackageTypes is the list of package types
+// SelectedPackageTypes is the list of package types. If empty, all packages types
+// are considered to be selected (see isPackageTypeSelected).
 var SelectedPackageTypes []PackageType
 
 func init() {
@@ -65,7 +66,7 @@ func init() {
 	}
 }
 
-// CrossBuildOption defines a option to the CrossBuild target.
+// CrossBuildOption defines an option to the CrossBuild target.
 type CrossBuildOption func(params *crossBuildParams)
 
 // ImageSelectorFunc returns the name of the builder image.
@@ -171,7 +172,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		mg.Deps(func() error { return gotool.Mod.Download() })
 	}
 
-	// Build the magefile for Linux so we can run it inside the container.
+	// Build the magefile for Linux, so we can run it inside the container.
 	mg.Deps(buildMage)
 
 	log.Println("crossBuild: Platform list =", params.Platforms)
@@ -193,7 +194,47 @@ func CrossBuild(options ...CrossBuildOption) error {
 
 	// Each build runs in parallel.
 	Parallel(deps...)
+
+	// // It needs to run after all the builds, as it needs the darwin binaries.
+	// if err := assembleDarwinUniversal(params); err != nil {
+	// 	return err
+	// }
+
 	return nil
+}
+
+// assembleDarwinUniversal checks if darwin/amd64 and darwin/arm64 were build,
+// if so, it generates a darwin/universal binary that is the merge fo them two.
+func assembleDarwinUniversal(params crossBuildParams) error {
+	if !IsDarwinUniversal() {
+		return nil // nothing to do
+	}
+
+	fmt.Println("-----------------------------------------")
+	fmt.Println(">> assembleDarwinUniversal DEBUG")
+	out, err := sh.Output("pwd")
+	fmt.Println(">> assembleDarwinUniversal on:", out, err)
+	fmt.Println("-----------------------------------------")
+	out, err = sh.Output("ls", "build")
+	fmt.Println(">> assembleDarwinUniversal:", "ls", "build:", out, err)
+	fmt.Println("-----------------------------------------")
+	out, err = sh.Output("ls", "build/golang-crossbuild")
+	fmt.Println(">> assembleDarwinUniversal debug:", out, err)
+	fmt.Println("-----------------------------------------")
+	fmt.Println(">> assembleDarwinUniversal DEBUG END")
+	fmt.Println("-----------------------------------------")
+
+	builder := GolangCrossBuilder{
+		// the docker image for darwin/arm64 is the one capable of merging the binaries.
+		Platform:      "darwin/arm64",
+		Target:        "assembleDarwinUniversal",
+		InDir:         params.InDir,
+		ImageSelector: params.ImageSelector}
+	return errors.Wrapf(builder.Build(),
+		"failed merging darwin/amd64 and darwin/arm64 into darwin/universal target=%v for platform=%v",
+		builder.Target,
+		builder.Platform)
+
 }
 
 // CrossBuildXPack executes the 'golangCrossBuild' target in the Beat's
@@ -221,6 +262,8 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "darwin/amd64":
 		tagSuffix = "darwin-debian10"
 	case platform == "darwin/arm64":
+		tagSuffix = "darwin-arm64-debian10"
+	case platform == "darwin/universal":
 		tagSuffix = "darwin-arm64-debian10"
 	case platform == "linux/arm64":
 		tagSuffix = "arm"
