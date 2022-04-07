@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
 - Add ecs container fields {pull}31020[31020]
 - Fix docs reference for syslog processor {pull}31087[31087]
+- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 
 *Auditbeat*
 
@@ -60,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
 - Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
 - Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
+- Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
 - checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
 
 *Heartbeat*
