@@ -29,9 +29,10 @@ type TemplateConfig struct {
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
 	JSON    struct {
-		Enabled bool   `config:"enabled"`
-		Path    string `config:"path"`
-		Name    string `config:"name"`
+		Enabled      bool   `config:"enabled"`
+		Path         string `config:"path"`
+		Name         string `config:"name"`
+		IsDataStream bool   `config:"data_stream"`
 	} `config:"json"`
 	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`

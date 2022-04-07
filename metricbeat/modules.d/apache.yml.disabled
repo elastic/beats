@@ -1,5 +1,5 @@
 # Module: apache
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-apache.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-apache.html
 
 - module: apache
   #metricsets:

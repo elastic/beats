@@ -508,7 +508,8 @@ func (r *resource) copyInto(dst *resource) {
 	dst.pendingCursorValue = nil
 	dst.pendingUpdate = nil
 	dst.cursorMeta = r.cursorMeta
-	dst.lock = unison.MakeMutex()
+	// dst.lock should not be overwritten here because it's supposed to be locked
+	// before this function call and it's important to preserve the previous value.
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {

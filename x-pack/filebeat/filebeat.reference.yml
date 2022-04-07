@@ -3025,6 +3025,83 @@ filebeat.inputs:
   # default to `required` otherwise it will be set to `none`.
   #ssl.client_authentication: "required"
 
+
+#------------------------------ Kafka input --------------------------------
+# Accept events from topics in a Kafka cluster.
+#- type: kafka
+  #enabled: false
+
+  # A list of hosts/ports for the initial Kafka brokers.
+  #hosts:
+    #- kafka-broker-1:9092
+    #- kafka-broker-2:9092
+  
+  # A list of topics to read from.
+  #topics: ["my-topic", "important-logs"]
+
+  # The Kafka consumer group id to use when connecting.
+  #group_id: "filebeat"
+
+  # An optional Kafka client id to attach to Kafka requests.
+  #client_id: "my-client"
+
+  # The version of the Kafka protocol to use.
+  #version: 1.0
+
+  # Set to "newest" to start reading from the most recent message when connecting to a
+  # new topic, otherwise the input will begin reading at the oldest remaining event.
+  #initial_offset: oldest
+
+  # How long to wait before trying to reconnect to the kafka cluster after a fatal error.
+  #connect_backoff: 30s
+
+  # How long to wait before retrying a failed read.
+  #consume_backoff: 2s
+
+  # How long to wait for the minimum number of input bytes while reading.
+  #max_wait_time: 250ms
+
+  # The Kafka isolation level, "read_uncommitted" or "read_committed".
+  #isolation_level: read_uncommitted
+
+  # Some Kafka deployments such as Microsoft Azure can return multiple events packed into a
+  # single data field. Set this field to specify where events should be unpacked from.
+  #expand_event_list_from_field: "records"
+
+  # The minimum number of bytes to wait for.
+  #fetch.min: 1
+  
+  # The default number of bytes to read per request.
+  #fetch.default: 1MB
+
+  # The maximum number of bytes to read per request (0 for no limit).
+  #fetch.max: 0
+
+  # Consumer rebalance strategy, "range" or "roundrobin"
+  #rebalance.strategy: "range"
+
+  # How long to wait for an attempted rebalance.
+  #rebalance.timeout: 60s
+
+  # How many times to retry if rebalancing fails.
+  #rebalance.max_retries: 4
+
+  # How long to wait after an unsuccessful rebalance attempt.
+  #rebalance.retry_backoff: 2s
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
+  # Parsers can be used with the Kafka input. The available parsers are "ndjson" and
+  # "multiline". See the filestream input configuration for more details.
+  #parsers:
+  #- ndjson:
+  #   ...
+  #- multiline:
+  #   ...
+
+
 #------------------------------ Syslog input --------------------------------
 # Accept RFC3164 formatted syslog event via UDP.
 #- type: syslog
@@ -4442,6 +4519,9 @@ output.elasticsearch:
 
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
+
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
 
 # Overwrite existing template
 # Do not enable this option for more than one instance of filebeat as it might
