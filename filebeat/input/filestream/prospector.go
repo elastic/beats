@@ -42,12 +42,10 @@ const (
 	prospectorDebugKey               = "file_prospector"
 )
 
-var (
-	ignoreInactiveSettings = map[string]ignoreInactiveType{
-		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
-		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
-	}
-)
+var ignoreInactiveSettings = map[string]ignoreInactiveType{
+	ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
+	ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
+}
 
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
@@ -62,8 +60,31 @@ type fileProspector struct {
 	stateChangeCloser   stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+func (p *fileProspector) Init(
+	cleaner,
+	globalCleaner loginp.ProspectorCleaner,
+	newID func(loginp.Source) string,
+) error {
 	files := p.filewatcher.GetFiles()
+
+	// If this fileProspector belongs to an input that did not have an ID
+	// this will find its files in the registry and update them to use the
+	// new ID.
+	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+		var fm fileMeta
+		err := v.UnpackCursorMeta(&fm)
+		if err != nil {
+			return "", nil
+		}
+
+		fi, ok := files[fm.Source]
+		if !ok {
+			return "", fm
+		}
+
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
+		return newKey, fm
+	})
 
 	if p.cleanRemoved {
 		cleaner.CleanIf(func(v loginp.Value) bool {
@@ -103,6 +124,7 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 	return nil
 }
 
+//nolint: dupl // Different prospectors have a similar run method
 // Run starts the fileProspector which accepts FS events from a file watcher.
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
@@ -149,7 +171,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
@@ -173,7 +194,8 @@ func (p *fileProspector) onFSEvent(
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated", event.NewPath)
 
-		updater.ResetCursor(src, state{Offset: 0})
+		err := updater.ResetCursor(src, state{Offset: 0})
+		log.Errorf("resseting cursor on truncated file: %v", err)
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -187,7 +209,7 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unkown return value %v", event.Op)
+		log.Error("Unknown return value %v", event.Op)
 	}
 }
 

@@ -11,6 +11,8 @@ To use this output, edit the {beatname_uc} configuration file to disable the {es
 output by commenting it out, and enable the Kafka output by uncommenting the
 Kafka section.
 
+NOTE: For Kafka version 0.10.0.0+ the message creation timestamp is set by beats and equals to the initial timestamp of the event. This affects the retention policy in Kafka: for example, if a beat event was created 2 weeks ago, the retention policy is set to 7 days and the message from beats arrives to Kafka today, it's going to be immediately discarded since the timestamp value is before the last 7 days. It's possible to change this behavior by setting timestamps on message arrival instead, so the message is not discarded but kept for 7 more days. To do that, please set `log.message.timestamp.type` to `LogAppendTime` (default `CreateTime`) in the Kafka configuration.
+
 Example configuration:
 
 [source,yaml]
@@ -61,8 +63,6 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 ===== `version`
 
 Kafka version {beatname_lc} is assumed to run against. Defaults to 1.0.0.
-
-Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
 Valid values are all kafka releases in between `0.8.2.0` and `2.0.0`.
 
@@ -194,6 +194,22 @@ behavior. If `reachable_only` is set to `true`, events will be published to
 available partitions only.
 
 NOTE: Publishing to a subset of available partitions potentially increases resource usage because events may become unevenly distributed.
+
+===== `headers`
+
+A header is a key-value pair, and multiple headers can be included with the same `key`. Only string values are supported. These headers will be included in each produced Kafka message.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "logs-%{[agent.version]}"
+  headers:
+    - key: "some-key"
+      value: "some value"
+    - key: "another-key"
+      value: "another value"
+------------------------------------------------------------------------------
 
 ===== `client_id`
 

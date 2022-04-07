@@ -44,7 +44,6 @@ func TestExecMultiplexer(t *testing.T) {
 				TimestampEpochMicros: time,
 			})
 		}
-
 		testEvents = append(testEvents, &SynthEvent{
 			Journey:              journey,
 			Type:                 "journey/end",

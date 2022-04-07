@@ -1,0 +1,15 @@
+# Module: containerd
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-containerd.html
+
+- module: containerd
+  metricsets: ["cpu", "memory", "blkio"]
+  period: 10s
+  # containerd metrics endpoint is configured in /etc/containerd/config.toml
+  # Metrics endpoint does not listen by default
+  # https://github.com/containerd/containerd/blob/main/docs/man/containerd-config.toml.5.md
+  hosts: ["localhost:1338"]
+  # if set to true, cpu and memory usage percentages will be calculated. Default is true
+  calcpct.cpu: true
+  calcpct.memory: true
+  #metrics_path: "v1/metrics"
+

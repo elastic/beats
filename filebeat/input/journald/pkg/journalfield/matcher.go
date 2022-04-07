@@ -165,22 +165,22 @@ func ApplyUnitMatchers(j journal, units []string) error {
 
 		matchers := [][]Matcher{
 			// match for the messages of the service
-			[]Matcher{
+			{
 				systemdUnit,
 			},
 			// match for the coredumps of the service
-			[]Matcher{
+			{
 				coreDumpMsgID,
 				journaldUID,
 				coredumpUnit,
 			},
 			// match for messages about the service with PID value of 1
-			[]Matcher{
+			{
 				journaldPID,
 				journaldUnit,
 			},
 			// match for messages about the service from authorized daemons
-			[]Matcher{
+			{
 				journaldUID,
 				journaldObjectUnit,
 			},
@@ -200,7 +200,6 @@ func ApplyUnitMatchers(j journal, units []string) error {
 	}
 
 	return nil
-
 }
 
 // ApplyTransportMatcher adds matchers for the configured transports.
@@ -221,7 +220,6 @@ func ApplyTransportMatcher(j journal, transports []string) error {
 		return fmt.Errorf("error while adding %+v transport to matchers: %+v", transports, err)
 	}
 	return nil
-
 }
 
 // ApplySyslogIdentifierMatcher adds syslog identifier filtering to the journal reader.

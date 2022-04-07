@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2017-02-01T14:17:35.000-02:00",
         "event.code": "106025618011",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -37,6 +38,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-01T14:19:47.000-02:00",
         "event.code": "106025618011",
         "event.dataset": "sophos.xg",
         "event.kind": "event",

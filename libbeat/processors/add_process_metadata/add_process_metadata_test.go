@@ -76,7 +76,6 @@ func TestAddProcessMetadata(t *testing.T) {
 
 	// mock of the cgroup processCgroupPaths
 	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
-
 		testMap := map[int]cgroup.PathList{
 			1: {
 				V1: map[string]cgroup.ControllerPath{
@@ -181,9 +180,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"process": common.MapStr{
 						"ppid": "1",
 						"parent": common.MapStr{
-							"process": common.MapStr{
-								"name": "systemd",
-							},
+							"name": "systemd",
 						},
 					},
 				},
@@ -342,13 +339,11 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": "1",
 				"parent": common.MapStr{
-					"process": common.MapStr{
-						"env": map[string]string{
-							"HOME":       "/",
-							"TERM":       "linux",
-							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
-							"LANG":       "en_US.UTF-8",
-						},
+					"env": map[string]string{
+						"HOME":       "/",
+						"TERM":       "linux",
+						"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+						"LANG":       "en_US.UTF-8",
 					},
 				},
 			},
@@ -751,6 +746,42 @@ func TestAddProcessMetadata(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		c := common.MapStr{
+			"match_pids":     []string{"@metadata.system.ppid"},
+			"target":         "@metadata",
+			"include_fields": []string{"process.name"},
+		}
+
+		config, err := common.NewConfigFrom(c)
+		assert.NoError(t, err)
+
+		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
+		assert.NoError(t, err)
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"system": common.MapStr{
+					"ppid": "1",
+				},
+			},
+			Fields: common.MapStr{},
+		}
+		expMeta := common.MapStr{
+			"system": common.MapStr{
+				"ppid": "1",
+			},
+			"process": common.MapStr{
+				"name": "systemd",
+			},
+		}
+
+		result, err := proc.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, result.Meta)
+		assert.Equal(t, event.Fields, result.Fields)
+	})
 }
 
 func TestUsingCache(t *testing.T) {
@@ -782,7 +813,7 @@ func TestUsingCache(t *testing.T) {
 			selfPID: testStruct,
 		}
 
-		//testMap :=
+		// testMap :=
 		return testMap[pid], nil
 	}
 
@@ -791,7 +822,6 @@ func TestUsingCache(t *testing.T) {
 		"include_fields": []string{"container.id"},
 		"target":         "meta",
 	})
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1061,7 +1091,7 @@ func TestV2CID(t *testing.T) {
 	processCgroupPaths = func(_ resolve.Resolver, _ int) (cgroup.PathList, error) {
 		testMap := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
-				"cpu": cgroup.ControllerPath{IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
+				"cpu": {IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
 			},
 		}
 		return testMap, nil

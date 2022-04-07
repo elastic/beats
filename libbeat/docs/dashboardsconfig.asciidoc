@@ -46,6 +46,9 @@ You can specify the following options in the `setup.dashboards` section of the
 If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
 from the local `kibana` directory in the home path of the {beatname_uc} installation.
 
+NOTE: {beatname_uc} loads dashboards on startup if either `enabled` is set to `true`
+or the `setup.dashboards` section is included in the configuration.
+
 NOTE: When dashboard loading is enabled, {beatname_uc} overwrites any existing
 dashboards that match the names of the dashboards you are loading. This happens
 every time {beatname_uc} starts. 
@@ -125,3 +128,8 @@ Duration interval between Kibana connection retries. Defaults to 1 second.
 
 Maximum number of retries before exiting with an error. Set to 0 for unlimited retrying.
 Default is unlimited.
+
+[float]
+==== `setup.dashboards.string_replacements`
+
+The needle and replacements string map, which is used to replace needle string in dashboards and their references contents.

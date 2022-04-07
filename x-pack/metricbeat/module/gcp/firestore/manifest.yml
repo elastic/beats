@@ -1,0 +1,11 @@
+default: false
+input:
+  module: gcp
+  metricset: metrics
+  defaults:
+    metrics:
+      - service: firestore
+        metric_types:
+          - "document/delete_count"
+          - "document/read_count"
+          - "document/write_count"

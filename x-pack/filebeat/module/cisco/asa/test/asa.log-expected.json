@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -54,6 +55,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11757",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -114,6 +116,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11749",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -175,6 +178,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11748",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -236,6 +240,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11745",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -297,6 +302,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11744",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -358,6 +364,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11742",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -419,6 +426,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11738",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -480,6 +488,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11739",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -541,6 +550,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11731",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -602,6 +612,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11723",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -663,6 +674,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11715",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -724,6 +736,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11711",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -785,6 +798,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11712",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -846,6 +860,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11708",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -907,6 +922,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11746",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -968,6 +984,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11706",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -1029,6 +1046,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11702",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -1090,6 +1108,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11753",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -1151,6 +1170,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -1205,6 +1225,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11758",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -1265,6 +1286,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11758",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -1325,6 +1347,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11759",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -1385,6 +1408,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11759",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -1445,6 +1469,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -1499,6 +1524,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11760",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -1559,6 +1585,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -1613,6 +1640,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11761",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -1673,6 +1701,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11762",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -1733,6 +1762,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11763",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -1793,6 +1823,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11762",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -1853,6 +1884,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11763",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -1913,6 +1945,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -1967,6 +2000,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11764",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2027,6 +2061,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -2081,6 +2116,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11772",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2141,6 +2177,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11773",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2201,6 +2238,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11772",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -2261,6 +2299,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11773",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -2321,6 +2360,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -2375,6 +2415,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11774",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2435,6 +2476,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11775",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2495,6 +2537,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11776",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2555,6 +2598,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11775",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -2615,6 +2659,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11776",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -2675,6 +2720,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -2729,6 +2775,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11777",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2789,6 +2836,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11777",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -2850,6 +2898,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11779",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -2910,6 +2959,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11778",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -2970,6 +3020,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11779",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -3030,6 +3081,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -3084,6 +3136,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11780",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3144,6 +3197,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -3198,6 +3252,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11781",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3258,6 +3313,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -3312,6 +3368,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11782",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3372,6 +3429,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11783",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3432,6 +3490,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11783",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -3492,6 +3551,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -3546,6 +3606,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11784",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3606,6 +3667,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -3660,6 +3722,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11785",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3720,6 +3783,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11786",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3780,6 +3844,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11784",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -3841,6 +3906,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -3895,6 +3961,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11787",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -3955,6 +4022,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11786",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
@@ -4015,6 +4083,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -4069,6 +4138,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11788",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -4129,6 +4199,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4187,6 +4258,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -4241,6 +4313,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11797",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.156.80",
@@ -4301,6 +4374,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4359,6 +4433,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4417,6 +4492,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4475,6 +4551,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4533,6 +4610,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4591,6 +4669,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "inside",
@@ -4649,6 +4728,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11564",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -4710,6 +4790,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11797",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302014",
@@ -4771,6 +4852,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -4825,6 +4907,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11798",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.156.80",
@@ -4885,6 +4968,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -4901,12 +4985,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4942,6 +5026,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -4958,12 +5043,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -4999,6 +5084,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5015,12 +5101,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5056,6 +5142,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5072,12 +5159,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5113,6 +5200,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5129,12 +5217,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5170,6 +5258,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5186,12 +5275,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5227,6 +5316,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5243,12 +5333,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5284,6 +5374,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5300,12 +5391,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5341,6 +5432,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5357,12 +5449,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5398,6 +5490,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5414,12 +5507,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5455,6 +5548,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5471,12 +5565,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5512,6 +5606,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5528,12 +5623,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5569,6 +5664,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -5585,12 +5681,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
@@ -5626,6 +5722,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -5680,6 +5777,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11799",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",
@@ -5740,6 +5838,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "305011",
         "cisco.asa.source_interface": "inside",
@@ -5794,6 +5893,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.asa.connection_id": "11800",
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.mapped_destination_ip": "172.31.98.44",

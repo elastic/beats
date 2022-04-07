@@ -50,9 +50,6 @@ func DefaultBuildArgs() BuildArgs {
 	args := BuildArgs{
 		Name: BeatName,
 		CGO:  build.Default.CgoEnabled,
-		LDFlags: []string{
-			"-s", // Strip all debug symbols from binary (does not affect Go stack traces).
-		},
 		Vars: map[string]string{
 			elasticBeatsModulePath + "/libbeat/version.buildTime": "{{ date }}",
 			elasticBeatsModulePath + "/libbeat/version.commit":    "{{ commit }}",
@@ -63,18 +60,28 @@ func DefaultBuildArgs() BuildArgs {
 		args.Vars[elasticBeatsModulePath+"/libbeat/version.qualifier"] = "{{ .Qualifier }}"
 	}
 
-	if positionIndependendCodeSupported() {
+	if positionIndependentCodeSupported() {
 		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
+	}
+
+	if DevBuild {
+		// Disable optimizations (-N) and inlining (-l) for debugging.
+		args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+	} else {
+		// Strip all debug symbols from binary (does not affect Go stack traces).
+		args.LDFlags = append(args.LDFlags, "-s")
+		// Remove all file system paths from the compiled executable, to improve build reproducibility
+		args.ExtraFlags = append(args.ExtraFlags, "-trimpath")
 	}
 
 	return args
 }
 
-// positionIndependendCodeSupported checks if the target platform support position independen code (or ASLR).
+// positionIndependentCodeSupported checks if the target platform support position independent code (or ASLR).
 //
 // The list of supported platforms is compiled based on the Go release notes: https://golang.org/doc/devel/release.html
 // The list has been updated according to the Go version: 1.16
-func positionIndependendCodeSupported() bool {
+func positionIndependentCodeSupported() bool {
 	return oneOf(Platform.GOOS, "darwin") ||
 		(Platform.GOOS == "linux" && oneOf(Platform.GOARCH, "riscv64", "amd64", "arm", "arm64", "ppc64le", "386")) ||
 		(Platform.GOOS == "aix" && Platform.GOARCH == "ppc64") ||

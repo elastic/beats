@@ -1,6 +1,9 @@
 module_version: 1.0
 
 var:
+  - name: paths
+    default:
+      - /home/user/mysqlauditlogs/audit.*.log
   - name: tags
     default: [mysqlenterprise-audit]
   - name: input

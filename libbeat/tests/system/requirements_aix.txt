@@ -15,7 +15,7 @@ idna==2.6
 importlib-metadata==1.7.0
 iniconfig==1.0.1
 ipaddress==1.0.19
-Jinja2==2.11.2
+Jinja2==2.11.3
 jsondiff==1.1.2
 jsonschema==3.2.0
 kafka-python==1.4.3
@@ -30,6 +30,7 @@ pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
 pytest==6.2.4
+pytest-otel>=0.0.4
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
 PyYAML==5.4.1

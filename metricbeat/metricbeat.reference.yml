@@ -243,6 +243,12 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Skip metrics for certain device major numbers in docker/diskio. 
+  # Necessary on systems with software RAID, device mappers, 
+  # or other configurations where virtual disks will sum metrics from other disks.
+  # By default, it will skip devices with major numbers 9 or 253.
+  #skip_major: []
+
   # If set to true, collects metrics per core.
   #cpu.cores: true
 
@@ -496,7 +502,7 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
@@ -510,6 +516,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -540,10 +547,12 @@ metricbeat.modules:
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Set the namespace to watch for resources
+  #namespace: staging
   # To configure additionally node and namespace metadata, added to pod, service and container resource types,
   # `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
@@ -554,6 +563,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -1277,10 +1287,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "metricbeat" plus date
-  # and generates [metricbeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "metricbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -1322,6 +1331,10 @@ output.elasticsearch:
 
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
+
+  # metricbeat expects Elasticsearch to be the same version or newer than the Beat.
+  # Lift the version restriction by setting allow_older_versions to true.
+  #allow_older_versions: false
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -2063,6 +2076,9 @@ output.elasticsearch:
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
 
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
+
 # Overwrite existing template
 # Do not enable this option for more than one instance of metricbeat as it might
 # overload your Elasticsearch with too many update requests.
@@ -2085,10 +2101,8 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
 # Enable ILM support. Valid values are true, false.
 #setup.ilm.enabled: true

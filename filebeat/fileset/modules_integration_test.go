@@ -191,7 +191,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		"multibad": {Enabled: &disabled},
 	}
 	configs := []*ModuleConfig{
-		&ModuleConfig{"foo", &enabled, filesetConfigs},
+		{"foo", &enabled, filesetConfigs},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))
@@ -258,7 +258,9 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL: eslegtest.GetURL(),
+		URL:      eslegtest.GetURL(),
+		Username: eslegtest.GetUser(),
+		Password: eslegtest.GetPass(),
 	})
 	if err != nil {
 		t.Fatal(err)
