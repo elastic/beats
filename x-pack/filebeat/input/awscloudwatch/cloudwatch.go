@@ -6,13 +6,13 @@ package awscloudwatch
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	//"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -80,7 +80,7 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 	// make API request
 	logEventsFiltered, err := svc.FilterLogEvents(context.TODO(), filterLogEventsInput)
 	if err != nil {
-		return errors.Wrap(err, "aws describe log groups request returned an error")
+		return fmt.Errorf("aws describe log groups request returned an error: [%w]", err)
 	}
 
 	logEvents := logEventsFiltered.Events
@@ -93,7 +93,7 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 
 	p.log.Debugf("Processing #%v events", len(logEvents))
 	if err = logProcessor.processLogEvents(logEvents, logGroup, p.region); err != nil {
-		err = errors.Wrap(err, "processLogEvents failed")
+		err = fmt.Errorf("processLogEvents failed: [%w]", err)
 		p.log.Error(err)
 	}
 
