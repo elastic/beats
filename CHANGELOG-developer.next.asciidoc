@@ -135,6 +135,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add gcp firestore metricset. {pull}29918[29918]
 - Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
 - Add gcp dataproc metricset. {pull}30008[30008]
+- Add Github action for linting
 
 ==== Deprecated
 

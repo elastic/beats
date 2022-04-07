@@ -129,7 +129,22 @@ In addition, you can add or remove from the list of build targets by prepending 
 
 You can find the complete list of supported build targets with `go tool dist list`.
 
+[float]
+[[running-linter]]
+=== Linting
 
+You can run the pre-configured linter against your change:
+
+[source,shell]
+--------------------------------------------------------------------------------
+mage llc
+--------------------------------------------------------------------------------
+
+`llc` stands for `Lint Last Change` which includes all the Go files that were changed in either the last commit (if you're on the `main` branch) or in a difference between your feature branch and the `main` branch.
+
+It's expected that sometimes a contributor will be asked to fix linter issues unrelated to their contribution since the linter was introduced later than changes in some of the files.
+
+You would need https://github.com/magefile/mage[Mage] to run this task.
 
 [float]
 [[running-testsuite]]
