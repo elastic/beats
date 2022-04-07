@@ -61,21 +61,10 @@ ifndef::no_ilm[]
 |Set up and manage index lifecycle management (ILM) policy
 endif::no_ilm[]
 
-ifdef::has_ml_jobs[]
-|Cluster
-|`manage_ml`
-|Set up Machine Learning job configurations
-endif::has_ml_jobs[]
-
 |Index
 |`manage` on +{beat_default_index_prefix}-*+ indices
-|Set up aliases used by ILM
+|Load data stream
 
-ifdef::has_ml_jobs[]
-|Index
-|`read` on +{beat_default_index_prefix}-*+ indices
-|Read {beatname_uc} indices in order to set up Machine Learning jobs
-endif::has_ml_jobs[]
 |====
 +
 Omit any privileges that aren't relevant in your environment.
@@ -273,18 +262,6 @@ endif::[]
 |Index
 |`create_doc` on +{beat_default_index_prefix}-*+ indices
 |Write events into {es}
-
-ifndef::no_ilm[]
-|Index
-|`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
-|Check for alias when connecting to clusters that support ILM.
-Not needed when `setup.ilm.check_exists` is `false`.
-endif::no_ilm[]
-
-|Index
-|`create_index` on +{beat_default_index_prefix}-*+ indices
-|Create daily indices when connecting to clusters that do not support ILM.
-Not needed when using ILM.
 |====
 ifndef::apm-server[]
 +
