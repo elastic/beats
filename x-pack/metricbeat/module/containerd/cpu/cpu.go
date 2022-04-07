@@ -12,8 +12,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -30,6 +28,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
+		PathConfigKey: "metrics_path",
 	}.Build()
 
 	// Mapping of state metrics
@@ -103,12 +102,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	families, timestamp, err := m.mod.GetContainerdMetricsFamilies(m.prometheusClient)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 
 	events, err := m.prometheusClient.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting events")
+		return fmt.Errorf("error getting events: %w", err)
 	}
 
 	perContainerCpus := make(map[string]int)
@@ -130,9 +129,9 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		cID := containerd.GetAndDeleteCid(event)
 		namespace := containerd.GetAndDeleteNamespace(event)
 
-		containerFields.Put("id", cID)
-		rootFields.Put("container", containerFields)
-		moduleFields.Put("namespace", namespace)
+		_, _ = containerFields.Put("id", cID)
+		_, _ = rootFields.Put("container", containerFields)
+		_, _ = moduleFields.Put("namespace", namespace)
 
 		if m.calcPct {
 			contCpus, ok := perContainerCpus[cID]
@@ -150,9 +149,11 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				cpuUsageTotalPct := calcUsagePct(timestampDelta, cpuUsageTotal.(float64),
 					float64(contCpus), cID, m.preContainerCpuTotalUsage)
 				m.Logger().Debugf("cpuUsageTotalPct for %+v is %+v", cID, cpuUsageTotalPct)
-				event.Put("usage.total.pct", cpuUsageTotalPct)
+				_, _ = event.Put("usage.total.pct", cpuUsageTotalPct)
+				// Update container.cpu.usage ECS field
+				_, _ = containerFields.Put("cpu.usage", cpuUsageTotalPct)
 				// Update values
-				m.preContainerCpuTotalUsage[cID] = cpuUsageTotal.(float64)
+				m.preContainerCpuTotalUsage[cID], _ = cpuUsageTotal.(float64)
 			}
 
 			// Calculate cpu kernel usage percentage
@@ -162,9 +163,9 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				cpuUsageKernelPct := calcUsagePct(timestampDelta, cpuUsageKernel.(float64),
 					float64(contCpus), cID, m.preContainerCpuKernelUsage)
 				m.Logger().Debugf("cpuUsageKernelPct for %+v is %+v", cID, cpuUsageKernelPct)
-				event.Put("usage.kernel.pct", cpuUsageKernelPct)
+				_, _ = event.Put("usage.kernel.pct", cpuUsageKernelPct)
 				// Update values
-				m.preContainerCpuKernelUsage[cID] = cpuUsageKernel.(float64)
+				m.preContainerCpuKernelUsage[cID], _ = cpuUsageKernel.(float64)
 			}
 
 			// Calculate cpu user usage percentage
@@ -173,18 +174,18 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				cpuUsageUserPct := calcUsagePct(timestampDelta, cpuUsageUser.(float64),
 					float64(contCpus), cID, m.preContainerCpuUserUsage)
 				m.Logger().Debugf("cpuUsageUserPct for %+v is %+v", cID, cpuUsageUserPct)
-				event.Put("usage.user.pct", cpuUsageUserPct)
+				_, _ = event.Put("usage.user.pct", cpuUsageUserPct)
 				// Update values
-				m.preContainerCpuUserUsage[cID] = cpuUsageUser.(float64)
+				m.preContainerCpuUserUsage[cID], _ = cpuUsageUser.(float64)
 			}
 		}
 		if cpuId, err := event.GetValue("cpu"); err == nil {
 			perCpuNs, err := event.GetValue("usage.percpu.ns")
 			if err == nil {
 				key := fmt.Sprintf("usage.cpu.%s.ns", cpuId)
-				event.Put(key, perCpuNs)
-				event.Delete("cpu")
-				event.Delete("usage.percpu.ns")
+				_, _ = event.Put(key, perCpuNs)
+				_ = event.Delete("cpu")
+				_ = event.Delete("usage.percpu.ns")
 			}
 		}
 
@@ -205,16 +206,12 @@ func setContCpus(event common.MapStr, perContainerCpus map[string]int) {
 	if err != nil {
 		return
 	}
-	cid := val.(string)
+	cid, _ := val.(string)
 	_, err = event.GetValue("usage.percpu.ns")
 	if err != nil {
 		return
 	}
-	if _, ok := perContainerCpus[cid]; ok {
-		perContainerCpus[cid] += 1
-	} else {
-		perContainerCpus[cid] = 1
-	}
+	perContainerCpus[cid] += 1
 }
 
 func calcUsagePct(timestampDelta int64, newValue, contCpus float64,

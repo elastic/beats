@@ -7,13 +7,14 @@ package httpjson
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec // Bad linter!
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"hash"
+	"net/url"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -71,6 +72,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"uuid":                uuidString,
 			"userAgent":           userAgentString,
 			"beatInfo":            beatInfo,
+			"urlEncode":           urlEncode,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -120,21 +122,21 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	return val, nil
 }
 
-var (
-	predefinedLayouts = map[string]string{
-		"ANSIC":       time.ANSIC,
-		"UnixDate":    time.UnixDate,
-		"RubyDate":    time.RubyDate,
-		"RFC822":      time.RFC822,
-		"RFC822Z":     time.RFC822Z,
-		"RFC850":      time.RFC850,
-		"RFC1123":     time.RFC1123,
-		"RFC1123Z":    time.RFC1123Z,
-		"RFC3339":     time.RFC3339,
-		"RFC3339Nano": time.RFC3339Nano,
-		"Kitchen":     time.Kitchen,
-	}
-)
+const defaultTimeLayout = "RFC3339"
+
+var predefinedLayouts = map[string]string{
+	"ANSIC":       time.ANSIC,
+	"UnixDate":    time.UnixDate,
+	"RubyDate":    time.RubyDate,
+	"RFC822":      time.RFC822,
+	"RFC822Z":     time.RFC822Z,
+	"RFC850":      time.RFC850,
+	"RFC1123":     time.RFC1123,
+	"RFC1123Z":    time.RFC1123Z,
+	"RFC3339":     time.RFC3339,
+	"RFC3339Nano": time.RFC3339Nano,
+	"Kitchen":     time.Kitchen,
+}
 
 func now(add ...time.Duration) time.Time {
 	now := timeNow().UTC()
@@ -152,7 +154,7 @@ func parseDuration(s string) time.Duration {
 func parseDate(date string, layout ...string) time.Time {
 	var ly string
 	if len(layout) == 0 {
-		ly = "RFC3339"
+		ly = defaultTimeLayout
 	} else {
 		ly = layout[0]
 	}
@@ -172,7 +174,7 @@ func formatDate(date time.Time, layouttz ...string) string {
 	var layout, tz string
 	switch {
 	case len(layouttz) == 0:
-		layout = "RFC3339"
+		layout = defaultTimeLayout
 	case len(layouttz) == 1:
 		layout = layouttz[0]
 	case len(layouttz) > 1:
@@ -231,7 +233,7 @@ func toInt(v interface{}) int64 {
 	vv := reflect.ValueOf(v)
 	switch vv.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return int64(vv.Int())
+		return vv.Int()
 	case reflect.Float32, reflect.Float64:
 		return int64(vv.Float())
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -378,4 +380,11 @@ func beatInfo() map[string]string {
 		"buildtime": version.BuildTime().String(),
 		"version":   version.GetDefaultVersion(),
 	}
+}
+
+func urlEncode(value string) string {
+	if value == "" {
+		return ""
+	}
+	return url.QueryEscape(value)
 }

@@ -34,7 +34,7 @@
                     "id": "1",
                     "params": {
                         "customLabel": "IN bytes",
-                        "field": "docker.network.in.bytes"
+                        "field": "docker.network.inbound.bytes"
                     },
                     "schema": "metric",
                     "type": "max"
@@ -69,7 +69,7 @@
                     "id": "4",
                     "params": {
                         "customLabel": "OUT bytes",
-                        "field": "docker.network.out.bytes"
+                        "field": "docker.network.outbound.bytes"
                     },
                     "schema": "metric",
                     "type": "max"

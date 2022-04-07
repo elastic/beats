@@ -62,12 +62,12 @@ func main() {
 	}
 
 	var user, pass string
+	user = "beats"
+	pass = "testing"
 	if u.User != nil {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
-	user = "beats"
-	pass = "testing"
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
@@ -134,6 +134,6 @@ func exportSingleDashboard(client *kibana.Client, dashboard, folder string) erro
 	if err != nil {
 		return fmt.Errorf("failed to export the dashboard: %+v", err)
 	}
-
+	result = dashboards.DecodeExported(result)
 	return dashboards.SaveToFolder(result, folder, client.GetVersion())
 }

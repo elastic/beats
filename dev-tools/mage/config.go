@@ -149,6 +149,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	params := map[string]interface{}{
 		"GOOS":                           EnvOr("DEV_OS", "linux"),
 		"GOARCH":                         EnvOr("DEV_ARCH", "amd64"),
+		"BeatLicense":                    BeatLicense,
 		"Reference":                      false,
 		"Docker":                         false,
 		"ExcludeConsole":                 false,
@@ -179,6 +180,12 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		},
 	})
 	tmpl = tmpl.Funcs(funcs)
+
+	if params["GOOS"] == "aix" {
+		// Force the removal for docker and kubernetes parts for AIX.
+		params["UseDockerMetadataProcessor"] = false
+		params["UseKubernetesMetadataProcessor"] = false
+	}
 
 	fmt.Printf(">> Building %v for %v/%v\n", destination, params["GOOS"], params["GOARCH"])
 	var err error

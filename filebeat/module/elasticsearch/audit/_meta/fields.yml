@@ -70,3 +70,7 @@
       type: text
     - name: invalidate.apikeys.owned_by_authenticated_user
       type: boolean
+    - name: authentication.type
+      type: keyword
+    - name: opaque_id
+      type: text

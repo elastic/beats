@@ -5,17 +5,20 @@
 package proc
 
 import (
+	"io/fs"
 	"os"
-	"path/filepath"
 	"strconv"
 )
 
+// List returns all the processes in the proc folder
 func List(root string) ([]string, error) {
+	return ListFS(os.DirFS(root))
+}
+
+func ListFS(sysfs fs.FS) ([]string, error) {
 	var pids []string
 
-	root = filepath.Join(root, "/proc")
-
-	dirs, err := os.ReadDir(root)
+	dirs, err := fs.ReadDir(sysfs, "proc")
 
 	if err != nil {
 		return nil, err

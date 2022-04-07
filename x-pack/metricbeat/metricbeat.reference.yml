@@ -438,6 +438,7 @@ metricbeat.modules:
   # if set to true, cpu and memory usage percentages will be calculated. Default is true
   calcpct.cpu: true
   calcpct.memory: true
+  #metrics_path: "v1/metrics"
 
 
 #------------------------------- Coredns Module -------------------------------
@@ -478,6 +479,12 @@ metricbeat.modules:
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+
+  # Skip metrics for certain device major numbers in docker/diskio. 
+  # Necessary on systems with software RAID, device mappers, 
+  # or other configurations where virtual disks will sum metrics from other disks.
+  # By default, it will skip devices with major numbers 9 or 253.
+  #skip_major: []
 
   # If set to true, collects metrics per core.
   #cpu.cores: true
@@ -523,8 +530,8 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["http://localhost:3002"]
-  username: elastic
-  password: changeme
+  #username: "user"
+  #password: "secret"
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -552,6 +559,8 @@ metricbeat.modules:
   metricsets:
     - pubsub
     - loadbalancing
+    - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -584,17 +593,11 @@ metricbeat.modules:
 
 - module: gcp
   metricsets:
-    - metrics
+    - gke
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  metrics:
-    - aligner: ALIGN_NONE
-      service: gke
-      service_metric_prefix: kubernetes.io/
-      metric_types:
-        - "container/cpu/core_usage_time"
 
 - module: gcp
   metricsets:
@@ -895,6 +898,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -941,6 +945,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -1184,7 +1189,7 @@ metricbeat.modules:
   metricsets: ["tablespace", "performance"]
   enabled: true
   period: 10s
-  hosts: ["user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
+  hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
 
   # username: ""
   # password: ""
@@ -2601,6 +2606,9 @@ output.elasticsearch:
 
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
+
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
 
 # Overwrite existing template
 # Do not enable this option for more than one instance of metricbeat as it might

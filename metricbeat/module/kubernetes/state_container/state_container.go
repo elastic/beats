@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -34,8 +32,6 @@ import (
 const (
 	defaultScheme = "http"
 	defaultPath   = "/metrics"
-	// Nanocores conversion 10^9
-	nanocores = 1000000000
 )
 
 var (
@@ -73,6 +69,7 @@ var (
 			"kube_pod_container_status_waiting":                 p.KeywordMetric("status.phase", "waiting"),
 			"kube_pod_container_status_terminated_reason":       p.LabelMetric("status.reason", "reason"),
 			"kube_pod_container_status_waiting_reason":          p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_last_terminated_reason":  p.LabelMetric("status.last_terminated_reason", "reason"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -134,11 +131,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting event")
+		return fmt.Errorf("error getting event: %w", err)
 	}
 
 	m.enricher.Enrich(events)
@@ -150,18 +147,26 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
-			cID := (containerID).(string)
+			cID, ok := (containerID).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerID: %s", ok)
+			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				containerFields.Put("runtime", cID[:split])
-				containerFields.Put("id", cID[split+3:])
+				util.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
+
+				util.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
-			cImage := (containerImage).(string)
-			containerFields.Put("image.name", cImage)
+			cImage, ok := (containerImage).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+			}
+
+			util.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
-			event.Delete("image")
+			util.ShouldDelete(event, "image", m.Logger())
 		}
 
 		e, err := util.CreateEvent(event, "kubernetes.container")

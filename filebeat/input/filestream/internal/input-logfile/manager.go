@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -72,6 +71,7 @@ type InputManager struct {
 	store      *store
 	ackUpdater *updateWriter
 	ackCH      *updateChan
+	ids        map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -81,9 +81,10 @@ type Source interface {
 	Name() string
 }
 
-var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
+// globalInputID is a default ID for inputs created without an ID
+// Deprecated: Inputs without an ID are not supported any more.
 const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
@@ -109,6 +110,7 @@ func (cim *InputManager) init() error {
 		cim.store = store
 		cim.ackCH = newUpdateChan()
 		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
+		cim.ids = map[string]struct{}{}
 	})
 
 	return cim.initErr
@@ -155,7 +157,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
+func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -164,10 +166,22 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout, HarvesterLimit: 0}
+	}{CleanTimeout: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
+
+	if settings.ID == "" {
+		cim.Logger.Error("filestream input ID without ID might lead to data" +
+			" duplication, please add an ID and restart Filebeat")
+	}
+
+	if _, exists := cim.ids[settings.ID]; exists {
+		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
+			"will lead to data duplication, please use a different ID", settings.ID)
+	}
+
+	cim.ids[settings.ID] = struct{}{}
 
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
@@ -179,14 +193,23 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
-		return nil, fmt.Errorf("error while creating source identifier for input: %v", err)
+		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
 	}
 
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
-	err = prospector.Init(prospectorStore)
+
+	// create a store with the deprecated global ID. This will be used to
+	// migrate the entries in the registry to use the new input ID.
+	globalIdentifier, err := newSourceIdentifier(cim.Type, "")
+	if err != nil {
+		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
+	}
+	globalStore := newSourceStore(pStore, globalIdentifier)
+
+	err = prospector.Init(prospectorStore, globalStore, sourceIdentifier.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -210,23 +233,20 @@ func (cim *InputManager) getRetainedStore() *store {
 }
 
 type sourceIdentifier struct {
-	prefix           string
-	configuredUserID bool
+	prefix string
 }
 
 func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
 	if userID == globalInputID {
-		return nil, fmt.Errorf("invalid user ID: .global")
+		return nil, fmt.Errorf("invalid input ID: .global")
 	}
 
-	configuredUserID := true
 	if userID == "" {
-		configuredUserID = false
 		userID = globalInputID
 	}
+
 	return &sourceIdentifier{
-		prefix:           pluginName + "::" + userID + "::",
-		configuredUserID: configuredUserID,
+		prefix: pluginName + "::" + userID + "::",
 	}, nil
 }
 

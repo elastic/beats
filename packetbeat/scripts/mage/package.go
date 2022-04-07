@@ -18,6 +18,9 @@
 package mage
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -48,25 +51,49 @@ func CustomizePackaging() {
 				return devtools.Config(devtools.ReferenceConfigType, c, spec.MustExpand("{{.PackageDir}}"))
 			},
 		}
+		npcapNoticeTxt = devtools.PackageFile{
+			Mode:   0o644,
+			Source: "{{.PackageDir}}/NOTICE.txt",
+			Dep: func(spec devtools.PackageSpec) error {
+				repo, err := devtools.GetProjectRepoInfo()
+				if err != nil {
+					return err
+				}
+
+				notice, err := os.ReadFile(filepath.Join(repo.RootDir, "NOTICE.txt"))
+				if err != nil {
+					return err
+				}
+
+				if spec.OS == "windows" && spec.License == "Elastic License" {
+					license, err := os.ReadFile(devtools.XPackBeatDir("npcap/installer/LICENSE"))
+					if err != nil {
+						return err
+					}
+					notice = append(notice, license...)
+				}
+
+				return os.WriteFile(devtools.CreateDir(spec.MustExpand("{{.PackageDir}}/NOTICE.txt")), notice, 0o644)
+			},
+		}
 	)
 
 	for _, args := range devtools.Packages {
-		for _, pkgType := range args.Types {
-			switch pkgType {
-			case devtools.TarGz, devtools.Zip:
-				args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
-				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
-			case devtools.Deb, devtools.RPM, devtools.DMG:
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
-			case devtools.Docker:
-				args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin+eip")
-			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
-			}
-
-			// Match the first package type then continue.
-			break
+		if len(args.Types) == 0 {
+			continue
+		}
+		switch pkgType := args.Types[0]; pkgType {
+		case devtools.TarGz, devtools.Zip:
+			args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
+			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
+			args.Spec.ReplaceFile("NOTICE.txt", npcapNoticeTxt)
+		case devtools.Deb, devtools.RPM:
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
+		case devtools.Docker:
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin+eip")
+		default:
+			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}
 	}
 }

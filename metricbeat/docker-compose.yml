@@ -17,11 +17,11 @@ services:
 
   # Used by base tests
   elasticsearch:
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.14.0}-1
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-8.1.2}-1
     build:
       context: ./module/elasticsearch/_meta
       args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.14.0}
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-8.1.2}
     environment:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
@@ -39,11 +39,11 @@ services:
 
   # Used by base tests
   kibana:
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.14.0}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.1.2}-1
     build:
       context: ./module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-7.14.0}
+        KIBANA_VERSION: ${KIBANA_VERSION:-8.1.2}
     depends_on:
       - elasticsearch
     ports:
@@ -51,11 +51,11 @@ services:
 
   # Used by base tests
   metricbeat:
-    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-7.12.0}-1
+    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-8.1.2}-1
     build:
       context: ./module/beat/_meta
       args:
-        BEAT_VERSION: ${BEAT_VERSION:-7.12.0}
+        BEAT_VERSION: ${BEAT_VERSION:-8.1.2}
     command: '-e'
     ports:
       - 5066

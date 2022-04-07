@@ -241,6 +241,9 @@ filebeat.inputs:
 #--------------------------- Filestream input ----------------------------
 - type: filestream
 
+  # Unique ID among all inputs, an ID is required.
+  id: my-filestream-id
+
   # Change to true to enable this input configuration.
   enabled: false
 
@@ -292,6 +295,101 @@ filebeat.inputs:
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
+
+  ### Parsers configuration
+
+  #### JSON configuration
+
+  #parsers:
+    #- ndjson:
+      # Decode JSON options. Enable this if your logs are structured in JSON.
+      # JSON key on which to apply the line filtering and multiline settings. This key
+      # must be top level and its value must be a string, otherwise it is ignored. If
+      # no text key is defined, the line filtering and multiline features cannot be used.
+      #message_key:
+
+      # By default, the decoded JSON is placed under a "json" key in the output document.
+      # If you enable this setting, the keys are copied to the top level of the output document.
+      #keys_under_root: false
+
+      # If keys_under_root and this setting are enabled, then the values from the decoded
+      # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
+      # in case of conflicts.
+      #overwrite_keys: false
+
+      # If this setting is enabled, then keys in the decoded JSON object will be recursively
+      # de-dotted, and expanded into a hierarchical object structure.
+      # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+      #expand_keys: false
+
+      # If this setting is enabled, Filebeat adds an "error.message" and "error.key: json" key in case of JSON
+      # unmarshaling errors or when a text key is defined in the configuration but cannot
+      # be used.
+      #add_error_key: false
+
+  #### Multiline options
+
+  # Multiline can be used for log messages spanning multiple lines. This is common
+  # for Java Stack Traces or C-Line Continuation
+
+  #parsers:
+    #- multiline:
+      #type: pattern
+      # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+      #pattern: ^\[
+
+      # Defines if the pattern set under the pattern setting should be negated or not. Default is false.
+      #negate: false
+
+      # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+      # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+      # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
+      #match: after
+
+      # The maximum number of lines that are combined to one event.
+      # In case there are more than max_lines the additional lines are discarded.
+      # Default is 500
+      #max_lines: 500
+
+      # After the defined timeout, a multiline event is sent even if no new pattern was found to start a new event
+      # Default is 5s.
+      #timeout: 5s
+
+      # Do not add new line character when concatenating lines.
+      #skip_newline: false
+
+  # To aggregate constant number of lines into a single event use the count mode of multiline.
+
+  #parsers:
+    #- multiline:
+      #type: count
+
+      # The number of lines to aggregate into a single event.
+      #count_lines: 3
+
+      # The maximum number of lines that are combined to one event.
+      # In case there are more than max_lines the additional lines are discarded.
+      # Default is 500
+      #max_lines: 500
+
+      # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
+      # Default is 5s.
+      #timeout: 5s
+
+      # Do not add new line character when concatenating lines.
+      #skip_newline: false
+
+  #### Parsing container events
+
+  # You can parse container events with different formats from all streams.
+
+  #parsers:
+    #- container:
+       # Source of container events. Available options: all, stdin, stderr.
+       #stream: all
+
+       # Format of the container events. Available options: auto, cri, docker, json-file 
+       #format: auto
 
   ### Log rotation
 
@@ -389,7 +487,7 @@ filebeat.inputs:
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
-  #close.reader.eof: false
+  #close.reader.on_eof: false
 
   # Close timeout closes the harvester after the predefined time.
   # This is independent if the harvester did finish reading the file or not.
@@ -486,6 +584,83 @@ filebeat.inputs:
   # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
   # default to `required` otherwise it will be set to `none`.
   #ssl.client_authentication: "required"
+
+
+#------------------------------ Kafka input --------------------------------
+# Accept events from topics in a Kafka cluster.
+#- type: kafka
+  #enabled: false
+
+  # A list of hosts/ports for the initial Kafka brokers.
+  #hosts:
+    #- kafka-broker-1:9092
+    #- kafka-broker-2:9092
+  
+  # A list of topics to read from.
+  #topics: ["my-topic", "important-logs"]
+
+  # The Kafka consumer group id to use when connecting.
+  #group_id: "filebeat"
+
+  # An optional Kafka client id to attach to Kafka requests.
+  #client_id: "my-client"
+
+  # The version of the Kafka protocol to use.
+  #version: 1.0
+
+  # Set to "newest" to start reading from the most recent message when connecting to a
+  # new topic, otherwise the input will begin reading at the oldest remaining event.
+  #initial_offset: oldest
+
+  # How long to wait before trying to reconnect to the kafka cluster after a fatal error.
+  #connect_backoff: 30s
+
+  # How long to wait before retrying a failed read.
+  #consume_backoff: 2s
+
+  # How long to wait for the minimum number of input bytes while reading.
+  #max_wait_time: 250ms
+
+  # The Kafka isolation level, "read_uncommitted" or "read_committed".
+  #isolation_level: read_uncommitted
+
+  # Some Kafka deployments such as Microsoft Azure can return multiple events packed into a
+  # single data field. Set this field to specify where events should be unpacked from.
+  #expand_event_list_from_field: "records"
+
+  # The minimum number of bytes to wait for.
+  #fetch.min: 1
+  
+  # The default number of bytes to read per request.
+  #fetch.default: 1MB
+
+  # The maximum number of bytes to read per request (0 for no limit).
+  #fetch.max: 0
+
+  # Consumer rebalance strategy, "range" or "roundrobin"
+  #rebalance.strategy: "range"
+
+  # How long to wait for an attempted rebalance.
+  #rebalance.timeout: 60s
+
+  # How many times to retry if rebalancing fails.
+  #rebalance.max_retries: 4
+
+  # How long to wait after an unsuccessful rebalance attempt.
+  #rebalance.retry_backoff: 2s
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
+  # Parsers can be used with the Kafka input. The available parsers are "ndjson" and
+  # "multiline". See the filestream input configuration for more details.
+  #parsers:
+  #- ndjson:
+  #   ...
+  #- multiline:
+  #   ...
+
 
 #------------------------------ Syslog input --------------------------------
 # Accept RFC3164 formatted syslog event via UDP.
