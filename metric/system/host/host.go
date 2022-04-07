@@ -18,19 +18,19 @@
 package host
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 // MapHostInfo converts the HostInfo to a MapStr based on ECS.
-func MapHostInfo(info types.HostInfo) common.MapStr {
-	data := common.MapStr{
-		"host": common.MapStr{
+func MapHostInfo(info types.HostInfo) mapstr.M {
+	data := mapstr.M{
+		"host": mapstr.M{
 			"hostname":     info.Hostname,
 			"architecture": info.Architecture,
-			"os": common.MapStr{
+			"os": mapstr.M{
 				"platform": info.OS.Platform,
 				"version":  info.OS.Version,
 				"family":   info.OS.Family,
@@ -42,19 +42,19 @@ func MapHostInfo(info types.HostInfo) common.MapStr {
 
 	// Optional params
 	if info.UniqueID != "" {
-		data.Put("host.id", info.UniqueID)
+		_, _ = data.Put("host.id", info.UniqueID)
 	}
 	if info.Containerized != nil {
-		data.Put("host.containerized", *info.Containerized)
+		_, _ = data.Put("host.containerized", *info.Containerized)
 	}
 	if info.OS.Codename != "" {
-		data.Put("host.os.codename", info.OS.Codename)
+		_, _ = data.Put("host.os.codename", info.OS.Codename)
 	}
 	if info.OS.Build != "" {
-		data.Put("host.os.build", info.OS.Build)
+		_, _ = data.Put("host.os.build", info.OS.Build)
 	}
 	if info.OS.Type != "" {
-		data.Put("host.os.type", info.OS.Type)
+		_, _ = data.Put("host.os.type", info.OS.Type)
 	}
 	return data
 }

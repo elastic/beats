@@ -29,15 +29,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
-
-// numCPU is the number of CPUs of the host
-var numCPU = runtime.NumCPU()
 
 func TestGetOne(t *testing.T) {
 	testConfig := Stats{
@@ -89,19 +87,19 @@ func TestGetProcess(t *testing.T) {
 	assert.NotEqual(t, "unknown", process.State)
 
 	// Memory Checks
-	assert.True(t, (process.Memory.Size.ValueOr(0) >= 0))
-	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) >= 0))
-	assert.True(t, (process.Memory.Share.ValueOr(0) >= 0))
+	assert.True(t, (process.Memory.Size.ValueOr(0) >= 0))      //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) >= 0)) //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.Memory.Share.ValueOr(0) >= 0))     //nolint: staticcheck // it's not pointless in this case?
 
 	// CPU Checks
 	assert.True(t, (process.CPU.Total.Value.ValueOr(0) >= 0))
-	assert.True(t, (process.CPU.User.Ticks.ValueOr(0) >= 0))
-	assert.True(t, (process.CPU.System.Ticks.ValueOr(0) >= 0))
+	assert.True(t, (process.CPU.User.Ticks.ValueOr(0) >= 0))   //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, (process.CPU.System.Ticks.ValueOr(0) >= 0)) //nolint: staticcheck // it's not pointless in this case?
 
 	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
 	switch runtime.GOOS {
-	case "darwin", "linux", "freebsd":
+	case "darwin", "linux", "freebsd": //nolint: goconst // it is just a test file
 		assert.True(t, len(process.Env) > 0, "empty environment")
 	}
 
@@ -178,7 +176,7 @@ func TestProcCpuPercentage(t *testing.T) {
 	// So "un-normalize" it, then re-normalized with a constant.
 	cpu := float64(runtime.NumCPU())
 	unNormalized := newState.CPU.Total.Norm.Pct.ValueOr(0) * cpu
-	normalizedTest := common.Round(unNormalized/48, common.DefaultDecimalPlacesCount)
+	normalizedTest := metric.Round(unNormalized / 48)
 
 	assert.EqualValues(t, 0.0721, normalizedTest)
 	assert.EqualValues(t, 3.459, newState.CPU.Total.Pct.ValueOr(0))
@@ -192,7 +190,7 @@ func BenchmarkGetProcess(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Failed init: %s", err)
 	}
-	procs := make(map[int]common.MapStr, 1)
+	procs := make(map[int]mapstr.M, 1)
 	pid := os.Getpid()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -211,7 +209,7 @@ func BenchmarkGetTop(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Failed init: %s", err)
 	}
-	procs := make(map[int][]common.MapStr)
+	procs := make(map[int][]mapstr.M)
 
 	for i := 0; i < b.N; i++ {
 		list, _, err := stat.Get()
@@ -443,7 +441,10 @@ func TestIncludeTopProcesses(t *testing.T) {
 }
 
 func initTestResolver() (Stats, error) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	if err != nil {
+		return Stats{}, err
+	}
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),
@@ -461,6 +462,6 @@ func initTestResolver() (Stats, error) {
 			IgnoreRootCgroups: true,
 		},
 	}
-	err := testConfig.Init()
+	err = testConfig.Init()
 	return testConfig, err
 }

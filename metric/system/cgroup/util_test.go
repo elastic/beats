@@ -19,7 +19,7 @@ package cgroup
 
 import (
 	"archive/zip"
-	"fmt"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 const dockerTestData = "testdata/docker.zip"
@@ -35,7 +35,7 @@ const dockerTestData = "testdata/docker.zip"
 func TestMain(m *testing.M) {
 	err := extractTestData(dockerTestData)
 	if err != nil {
-		fmt.Println(err)
+		os.Stderr.WriteString(err.Error())
 		os.Exit(1)
 	}
 	os.Exit(m.Run())
@@ -58,13 +58,13 @@ func extractTestData(path string) error {
 		}
 		defer rc.Close()
 
-		path := filepath.Join(dest, f.Name)
+		path := filepath.Join(dest, f.Name) //nolint: gosec // test with controlled input
 		if found, err := exists(path); err != nil || found {
 			return err
 		}
 
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(path, f.Mode())
+			_ = os.MkdirAll(path, f.Mode())
 		} else {
 			destFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0700))
 			if err != nil {
@@ -72,12 +72,12 @@ func extractTestData(path string) error {
 			}
 			defer destFile.Close()
 
-			_, err = io.Copy(destFile, rc)
+			_, err = io.Copy(destFile, rc) //nolint: gosec // test with controlled input
 			if err != nil {
 				return err
 			}
 
-			os.Chmod(path, f.Mode())
+			_ = os.Chmod(path, f.Mode())
 		}
 		return nil
 	}
@@ -129,7 +129,7 @@ func TestSupportedSubsystems(t *testing.T) {
 
 func TestSupportedSubsystemsErrCgroupsMissing(t *testing.T) {
 	_, err := SupportedSubsystems(resolve.NewTestResolver("testdata/doesnotexist"))
-	if err != ErrCgroupsMissing {
+	if errors.Is(err, ErrCgroupsMissing) {
 		t.Fatalf("expected ErrCgroupsMissing, but got %v", err)
 	}
 }

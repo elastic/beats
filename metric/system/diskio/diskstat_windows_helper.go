@@ -30,15 +30,13 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
 	errorSuccess syscall.Errno = 0
 	// ioctlDiskPerformance is used to enable performance counters that provide disk performance information.
 	ioctlDiskPerformance = 0x70020
-	// ioctlDiskPerformanceOff used to disable performance counters that provide disk performance information.
-	ioctlDiskPerformanceOff = 0x70060
 )
 
 var (
@@ -108,7 +106,9 @@ func ioCounter(path string, diskPerformance *diskPerformance) error {
 	if err != nil {
 		return err
 	}
-	defer syscall.CloseHandle(hFile)
+	defer func() {
+		_ = syscall.CloseHandle(hFile)
+	}()
 	var diskPerformanceSize uint32
 	return syscall.DeviceIoControl(hFile,
 		ioctlDiskPerformance,
@@ -145,35 +145,6 @@ func enablePerformanceCounters() error {
 	}
 
 	return nil
-}
-
-// disablePerformanceCounters will disable performance counters using the IOCTL_DISK_PERFORMANCE_OFF IOCTL control code
-func disablePerformanceCounters(path string) error {
-	utfPath, err := syscall.UTF16PtrFromString(path)
-	if err != nil {
-		return err
-	}
-	hFile, err := syscall.CreateFile(utfPath,
-		syscall.GENERIC_READ|syscall.GENERIC_WRITE,
-		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE,
-		nil,
-		syscall.OPEN_EXISTING,
-		syscall.FILE_FLAG_BACKUP_SEMANTICS,
-		0)
-
-	if err != nil {
-		return err
-	}
-	defer syscall.CloseHandle(hFile)
-	var diskPerformanceSize uint32
-	return syscall.DeviceIoControl(hFile,
-		ioctlDiskPerformanceOff,
-		nil,
-		0,
-		nil,
-		0,
-		&diskPerformanceSize,
-		nil)
 }
 
 // getLogicalDriveStrings calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
@@ -222,7 +193,7 @@ func isValidLogicalDrive(path string) bool {
 	ret, _, err := syscall.Syscall(procGetDriveTypeW.Addr(), 1, uintptr(unsafe.Pointer(utfPath)), 0, 0)
 
 	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5 DRIVE_UNKNOWN = 0 DRIVE_RAMDISK = 6
-	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess {
+	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess { //nolint: errorlint // keep old behaviour
 		return false
 	}
 

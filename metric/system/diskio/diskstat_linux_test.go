@@ -27,7 +27,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -77,7 +77,7 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 	}
 
 	expected := IOMetric{
-		AvgAwaitTime:      common.Round(24.0/22.0, common.DefaultDecimalPlacesCount),
+		AvgAwaitTime:      metric.Round(24.0 / 22.0),
 		AvgReadAwaitTime:  1.2,
 		AvgWriteAwaitTime: 1,
 	}

@@ -19,6 +19,8 @@ package process
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/user"
@@ -26,10 +28,8 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // FetchPids returns a map and array of pids
@@ -44,7 +44,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		// getprocs first argument is a void*
 		num, err := C.getprocs(unsafe.Pointer(&info), C.sizeof_struct_procsinfo64, nil, 0, &pid, 1)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "error fetching PIDs")
+			return nil, nil, fmt.Errorf("error fetching PIDs: %w", err)
 		}
 		procMap, plist = procStats.pidIter(int(info.pi_pid), procMap, plist)
 
@@ -62,7 +62,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 
 	num, err := C.getprocs(unsafe.Pointer(&info), C.sizeof_struct_procsinfo64, nil, 0, &cpid, 1)
 	if err != nil {
-		return ProcState{}, errors.Wrap(err, "error in getprocs")
+		return ProcState{}, fmt.Errorf("error in getprocs: %w", err)
 	}
 	if num != 1 {
 		return ProcState{}, syscall.ESRCH
@@ -110,7 +110,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 
 	num, err := C.getprocs(unsafe.Pointer(&info), C.sizeof_struct_procsinfo64, nil, 0, &cpid, 1)
 	if err != nil {
-		return state, errors.Wrap(err, "error in getprocs")
+		return state, fmt.Errorf("error in getprocs: %w", err)
 	}
 	if num != 1 {
 		return state, syscall.ESRCH
@@ -131,7 +131,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 	info.pi_pid = C.pid_t(pid)
 
 	if _, err := C.getargs(unsafe.Pointer(&info), C.sizeof_struct_procsinfo64, (*C.char)(&buf[0]), 8192); err != nil {
-		return state, errors.Wrap(err, "error in gitargs")
+		return state, fmt.Errorf("error in gitargs: %w", err)
 	}
 
 	bbuf := bytes.NewBuffer(buf)
@@ -143,7 +143,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 			break
 		}
 		if err != nil {
-			return state, errors.Wrap(err, "error reading args buffer")
+			return state, fmt.Errorf("error reading args buffer: %w", err)
 		}
 
 		args = append(args, stripNullByte(arg))
@@ -155,7 +155,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 	buf = make([]byte, 8192)
 
 	if _, err := C.getevars(unsafe.Pointer(&info), C.sizeof_struct_procsinfo64, (*C.char)(&buf[0]), 8192); err != nil {
-		return state, errors.Wrap(err, "error in getevars")
+		return state, fmt.Errorf("error in getevars: %w", err)
 	}
 
 	if state.Env != nil {
@@ -167,16 +167,16 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 	vars := map[string]string{}
 	for {
 		line, err := bbuf.ReadBytes(0)
-		if err == io.EOF || line[0] == 0 {
+		if errors.Is(err, io.EOF) || line[0] == 0 {
 			break
 		}
 		if err != nil {
-			return state, errors.Wrap(err, "error")
+			return state, fmt.Errorf("error: %w", err)
 		}
 
 		pair := bytes.SplitN(stripNullByteRaw(line), delim, 2)
 		if len(pair) != 2 {
-			return state, errors.Wrap(err, "error reading environment")
+			return state, fmt.Errorf("error reading environment: %w", err)
 		}
 		eKey := string(pair[0])
 		if filter == nil || filter(eKey) {

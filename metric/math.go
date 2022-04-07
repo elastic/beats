@@ -15,16 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package metric
 
 import "math"
 
 // DefaultDecimalPlacesCount is the default number of decimal places
 const DefaultDecimalPlacesCount = 4
 
-// Round rounds the given float64 value and ensures that it has a maximum of
+// Round rounds the given float64 value to 4 digit precision.
+func Round(val float64) float64 {
+	return RoundWithPrecision(val, DefaultDecimalPlacesCount)
+}
+
+// RoundWithPrecision rounds the given float64 value and ensures that it has a maximum of
 // "precision" decimal places.
-func Round(val float64, precision int64) (newVal float64) {
+func RoundWithPrecision(val float64, precision int64) (newVal float64) {
 	var round float64
 	pow := math.Pow(10, float64(precision))
 	digit := pow * val
@@ -35,5 +40,5 @@ func Round(val float64, precision int64) (newVal float64) {
 		round = math.Floor(digit)
 	}
 	newVal = round / pow
-	return
+	return newVal
 }

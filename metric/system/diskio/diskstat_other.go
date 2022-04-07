@@ -21,7 +21,8 @@
 package diskio
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+
 	"github.com/shirou/gopsutil/v3/disk"
 )
 

@@ -12,7 +12,8 @@ jobs:
         include:
           - GOOS: windows
           - GOOS: linux
-          - GOOS: darwin
+          # issue: https://github.com/elastic/elastic-agent-system-metrics/issues/4
+          # - GOOS: darwin
     name: lint
     runs-on: ubuntu-latest
     steps:
