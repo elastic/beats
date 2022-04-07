@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
 - Add ecs container fields {pull}31020[31020]
 - Fix docs reference for syslog processor {pull}31087[31087]
+- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 
 *Auditbeat*
 
