@@ -9,6 +9,7 @@ package task_stats
 
 import (
 	"bytes"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -65,7 +66,14 @@ func TestData(t *testing.T) {
 	formattedStats := getStatsList(taskStatsOutput, taskOutput)
 	assert.Equal(t, 1, len(formattedStats))
 	event := createEvent(&formattedStats[0])
-	standardizeEvent := m.StandardizeEvent(event)
 
+	// Build a metricset to test the event
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	// The goal here is to make sure every element inside the
+	// event has a matching field ("no field left behind").
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, []mb.Event{event})
+
+	standardizeEvent := m.StandardizeEvent(event)
 	mbtest.WriteEventToDataJSON(t, standardizeEvent, "")
 }
