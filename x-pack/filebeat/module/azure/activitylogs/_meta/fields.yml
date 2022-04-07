@@ -91,7 +91,7 @@
       description: >
         Tenant ID
     - name: level
-      type: keyword
+      type: long
       description: >
         Level
     - name: operation_version
