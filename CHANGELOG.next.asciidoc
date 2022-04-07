@@ -41,7 +41,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 - Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 - Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
+- Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
 - Add ecs container fields {pull}31020[31020]
+- Fix docs reference for syslog processor {pull}31087[31087]
 
 *Auditbeat*
 
@@ -57,7 +59,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
 - Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
 - Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
+- Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
 - Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
+
 
 *Heartbeat*
 
@@ -76,6 +80,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Winlogbeat*
+
+- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
 
 
 *Functionbeat*
@@ -96,6 +102,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add syslog parser and processor. {issue}30139[30139] {pull}30541[30541]
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 - Add cronjob metadata by default {pull}30637[30637]
+- New option `setup.template.json.data_stream` is added to indicate if the JSON index template is a data stream. {pull}31048[31048]
 
 *Auditbeat*
 
