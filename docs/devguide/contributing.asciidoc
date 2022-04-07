@@ -194,13 +194,6 @@ In order to create Beats we rely on Golang libraries and other
 external tools.
 
 [float]
-==== Golang
-
-To manage the `vendor/` folder we use go modules.
-
-To update the contents of `vendor/`, run `mage vendor`.
-
-[float]
 ==== Other dependencies
 
 Besides Go libraries, we are using development tools to generate parsers for inputs and processors.
