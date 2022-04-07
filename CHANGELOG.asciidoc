@@ -27,6 +27,12 @@ https://github.com/elastic/beats/compare/v8.1.1...v8.1.2[View commits]
 
 - Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
 
+==== Known Issue
+
+*Affecting all Beats*
+
+- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough privileges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.1` or to give `manage` permission on the data stream `{beatname}-8.1` to the publishing user temporarily. {issue}30647[30647] {pull}31048[31048]
+
 [[release-notes-8.1.1]]
 === Beats version 8.1.1
 https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
@@ -50,6 +56,12 @@ https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
 *Packetbeat*
 
 - Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
+
+==== Known Issue
+
+*Affecting all Beats*
+
+- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough privileges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.1` or to give `manage` permission on the data stream `{beatname}-8.1` to the publishing user temporarily. {issue}30647[30647] {pull}31048[31048]
 
 [[release-notes-8.1.0]]
 === Beats version 8.1.0
@@ -119,6 +131,12 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 
 - Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
+
+==== Known Issue
+
+*Affecting all Beats*
+
+- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough privileges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.1` or to give `manage` permission on the data stream `{beatname}-8.1` to the publishing user temporarily. {issue}30647[30647] {pull}31048[31048]
 
 [[release-notes-8.0.1]]
 === Beats version 8.0.1
