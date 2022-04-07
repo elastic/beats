@@ -25,9 +25,9 @@ import (
 	"github.com/mitchellh/hashstructure"
 	dto "github.com/prometheus/client_model/go"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/helper"
+	p "github.com/elastic/beats/v8/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 func init() {

@@ -12,13 +12,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/feature"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
 // CloudwatchKinesis receives events from a kinesis stream and forward them to elasticsearch.

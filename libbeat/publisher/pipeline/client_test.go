@@ -26,16 +26,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/monitoring"
+	"github.com/elastic/beats/v8/libbeat/outputs"
+	"github.com/elastic/beats/v8/libbeat/publisher"
+	"github.com/elastic/beats/v8/libbeat/publisher/processing"
+	"github.com/elastic/beats/v8/libbeat/publisher/queue"
+	"github.com/elastic/beats/v8/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v8/libbeat/tests/resources"
 )
 
 func TestClient(t *testing.T) {

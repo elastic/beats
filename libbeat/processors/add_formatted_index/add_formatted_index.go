@@ -20,10 +20,10 @@ package add_formatted_index
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/beat/events"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/fmtstr"
 )
 
 // AddFormattedIndex is a Processor to set an event's "raw_index" metadata field

@@ -14,12 +14,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fetch"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
+	devtools "github.com/elastic/beats/v8/dev-tools/mage"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/fetch"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/hash"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/tar"
 )
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build

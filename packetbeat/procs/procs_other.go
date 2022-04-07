@@ -20,7 +20,7 @@
 
 package procs
 
-import "github.com/elastic/beats/v7/packetbeat/protos/applayer"
+import "github.com/elastic/beats/v8/packetbeat/protos/applayer"
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.

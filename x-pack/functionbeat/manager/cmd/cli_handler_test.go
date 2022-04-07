@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/function/provider"
 )
 
 type mockCLIManager struct {

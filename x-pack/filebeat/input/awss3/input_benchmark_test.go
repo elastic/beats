@@ -21,14 +21,14 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/monitoring"
+	pubtest "github.com/elastic/beats/v8/libbeat/publisher/testing"
+	"github.com/elastic/beats/v8/libbeat/statestore"
+	"github.com/elastic/beats/v8/libbeat/statestore/storetest"
+	awscommon "github.com/elastic/beats/v8/x-pack/libbeat/common/aws"
 )
 
 const (

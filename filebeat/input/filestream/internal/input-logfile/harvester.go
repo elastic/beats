@@ -25,10 +25,10 @@ import (
 	"sync"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	input "github.com/elastic/beats/v8/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v8/filebeat/input/v2"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )

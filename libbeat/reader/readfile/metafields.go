@@ -18,8 +18,8 @@
 package readfile
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/reader"
 )
 
 // Reader produces lines by reading lines from an io.Reader

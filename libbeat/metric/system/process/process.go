@@ -31,13 +31,13 @@ import (
 
 	"github.com/elastic/go-sysinfo/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/match"
+	"github.com/elastic/beats/v8/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v8/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v8/libbeat/opt"
 	sysinfo "github.com/elastic/go-sysinfo"
 )
 

@@ -22,10 +22,10 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/monitoring"
+	"github.com/elastic/beats/v8/libbeat/monitoring/report/log"
+	"github.com/elastic/beats/v8/libbeat/version"
 )
 
 var (

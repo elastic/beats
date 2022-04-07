@@ -13,8 +13,8 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/o365audit/auth"
 )
 
 // Transaction is the interface that wraps a request-response transaction to be

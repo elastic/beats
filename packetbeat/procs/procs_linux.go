@@ -33,8 +33,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/packetbeat/protos/applayer"
 	"github.com/elastic/gosigar"
 )
 

@@ -26,8 +26,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/metric/system/numcpu"
 )
 
 // GetCLKTCK emulates the _SC_CLK_TCK syscall

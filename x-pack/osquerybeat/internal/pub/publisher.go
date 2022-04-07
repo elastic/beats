@@ -8,13 +8,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/beat/events"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/processors"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/ecs"
 )
 
 const (

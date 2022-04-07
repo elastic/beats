@@ -25,9 +25,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/npcap"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/packetbeat/npcap"
 )
 
 const installTimeout = 120 * time.Second

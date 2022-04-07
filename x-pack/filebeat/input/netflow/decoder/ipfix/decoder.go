@@ -13,9 +13,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
-	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/template"
+	v9 "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 const (

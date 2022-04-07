@@ -10,9 +10,9 @@ package application_pool
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

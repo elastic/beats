@@ -9,7 +9,7 @@ import (
 	"errors"
 	"net/textproto"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v8/libbeat/common/transport/tlscommon"
 )
 
 // Config contains information about httpjson configuration

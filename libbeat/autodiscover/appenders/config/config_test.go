@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/bus"
 )
 
 func TestGenerateAppender(t *testing.T) {
@@ -60,8 +60,8 @@ config:
 				"test": "bar",
 			},
 			config: `
-config: 
-  test2: foo 
+config:
+  test2: foo
 condition.equals:
   field: bar`,
 		},
@@ -78,8 +78,8 @@ condition.equals:
 				"test": "bar",
 			},
 			config: `
-config: 
-  test2: foo 
+config:
+  test2: foo
 condition.equals:
   field: bar`,
 		},

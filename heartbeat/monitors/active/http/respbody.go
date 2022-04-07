@@ -27,9 +27,9 @@ import (
 
 	"github.com/docker/go-units"
 
-	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/mime"
+	"github.com/elastic/beats/v8/heartbeat/reason"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/mime"
 )
 
 const (

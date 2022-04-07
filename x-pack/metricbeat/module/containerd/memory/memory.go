@@ -7,14 +7,14 @@ package memory
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
+	"github.com/elastic/beats/v8/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb/parse"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/containerd"
 )
 
 const (

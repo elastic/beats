@@ -24,9 +24,9 @@ import (
 
 	"golang.org/x/net/netutil"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v8/filebeat/inputsource"
+	"github.com/elastic/beats/v8/filebeat/inputsource/common/streaming"
+	"github.com/elastic/beats/v8/libbeat/common/transport/tlscommon"
 )
 
 // Server represent a TCP server

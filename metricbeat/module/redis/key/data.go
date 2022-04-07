@@ -20,8 +20,8 @@ package key
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 func eventMapping(keyspace uint, info map[string]interface{}) mb.Event {

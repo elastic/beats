@@ -23,7 +23,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"go.uber.org/multierr"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v8/dev-tools/mage"
 )
 
 // declare journald dependencies for cross build target

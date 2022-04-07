@@ -12,9 +12,9 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/gcp"
 )
 
 func newIncomingFieldExtractor(l *logp.Logger, mc metricsConfig) *incomingFieldExtractor {

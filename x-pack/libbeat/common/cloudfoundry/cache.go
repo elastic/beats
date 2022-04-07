@@ -13,8 +13,8 @@ import (
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/libbeat/persistentcache"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/libbeat/persistentcache"
 )
 
 // cfClient interface is provided so unit tests can mock the actual client.

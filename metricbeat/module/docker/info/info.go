@@ -22,8 +22,8 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/module/docker"
 )
 
 func init() {

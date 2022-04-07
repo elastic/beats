@@ -7,8 +7,8 @@ package main
 import (
 	"os"
 
-	_ "github.com/elastic/beats/v7/x-pack/functionbeat/include" // imports features
-	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/cmd"
+	_ "github.com/elastic/beats/v8/x-pack/functionbeat/include" // imports features
+	"github.com/elastic/beats/v8/x-pack/functionbeat/manager/cmd"
 )
 
 func main() {

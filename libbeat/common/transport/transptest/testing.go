@@ -31,8 +31,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v8/libbeat/common/transport"
+	"github.com/elastic/beats/v8/libbeat/common/transport/tlscommon"
 )
 
 type MockServer struct {

@@ -11,9 +11,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	cfcommon "github.com/elastic/beats/v8/x-pack/libbeat/common/cloudfoundry"
 )
 
 type ModuleV2 struct {

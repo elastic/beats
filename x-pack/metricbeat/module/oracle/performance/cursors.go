@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/oracle"
 )
 
 type cursorsByUsernameAndMachine struct {
@@ -43,16 +43,16 @@ type totalCursors struct {
  */
 func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) ([]cursorsByUsernameAndMachine, error) {
 	rows, err := e.db.QueryContext(ctx, `
-		SELECT sum(a.value) total_cur, 
-					 avg(a.value) avg_cur, 
+		SELECT sum(a.value) total_cur,
+					 avg(a.value) avg_cur,
 					 max(a.value) max_cur,
 					 s.username,
 					 s.machine
 		FROM v$sesstat a, v$statname b, v$session s
-		WHERE a.statistic# = b.statistic#  
+		WHERE a.statistic# = b.statistic#
 			AND s.sid = a.sid
 			AND b.name = 'opened cursors current'
-		GROUP BY s.username, 
+		GROUP BY s.username,
 						 s.machine
 		ORDER BY 1 DESC`)
 	if err != nil {
@@ -112,11 +112,11 @@ func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachi
  */
 func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors, error) {
 	rows := e.db.QueryRowContext(ctx, `
-		SELECT total_cursors, 
-					 current_cursors, 
-					 sess_cur_cache_hits, 
-					 parse_count_total, 
-					 sess_cur_cache_hits / total_cursors, 
+		SELECT total_cursors,
+					 current_cursors,
+					 sess_cur_cache_hits,
+					 parse_count_total,
+					 sess_cur_cache_hits / total_cursors,
 					 sess_cur_cache_hits - parse_count_total
 		FROM (
 				SELECT sum ( decode ( name, 'opened cursors cumulative', value, 0)) total_cursors,

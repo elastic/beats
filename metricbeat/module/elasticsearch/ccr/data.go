@@ -20,17 +20,17 @@ package ccr
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v8/metricbeat/helper/elastic"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	s "github.com/elastic/beats/v8/libbeat/common/schema"
+	c "github.com/elastic/beats/v8/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/module/elasticsearch"
 )
 
 var (

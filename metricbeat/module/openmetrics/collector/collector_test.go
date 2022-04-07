@@ -28,13 +28,13 @@ import (
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/helper/openmetrics"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/v7/metricbeat/module/openmetrics"
+	_ "github.com/elastic/beats/v8/metricbeat/module/openmetrics"
 )
 
 func TestData(t *testing.T) {

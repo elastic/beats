@@ -22,17 +22,17 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/metricbeat/beater"
-	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	"github.com/elastic/beats/v8/libbeat/cmd"
+	"github.com/elastic/beats/v8/libbeat/cmd/instance"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/ecs"
+	"github.com/elastic/beats/v8/libbeat/publisher/processing"
+	"github.com/elastic/beats/v8/metricbeat/beater"
+	"github.com/elastic/beats/v8/metricbeat/cmd/test"
 
 	// import modules
-	_ "github.com/elastic/beats/v7/metricbeat/include"
-	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v8/metricbeat/include"
+	_ "github.com/elastic/beats/v8/metricbeat/include/fields"
 )
 
 const (

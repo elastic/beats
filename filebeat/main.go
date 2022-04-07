@@ -20,8 +20,8 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v8/filebeat/cmd"
+	inputs "github.com/elastic/beats/v8/filebeat/input/default-inputs"
 )
 
 // The basic model of execution:

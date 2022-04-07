@@ -33,13 +33,13 @@ import (
 	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v8/winlogbeat/sys"
+	"github.com/elastic/beats/v8/winlogbeat/sys/winevent"
+	win "github.com/elastic/beats/v8/winlogbeat/sys/wineventlog"
 )
 
 const (

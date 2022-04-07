@@ -25,10 +25,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/metricbeat/module/postgresql"
 )
 
 func TestFetch(t *testing.T) {

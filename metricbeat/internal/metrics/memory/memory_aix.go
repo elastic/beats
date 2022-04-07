@@ -36,8 +36,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v8/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v8/libbeat/opt"
 )
 
 var system struct {

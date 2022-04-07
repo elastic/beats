@@ -18,7 +18,7 @@
 package mage
 
 import (
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v8/dev-tools/mage/gotool"
 )
 
 var (

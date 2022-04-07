@@ -12,7 +12,7 @@ import (
 
 	badger "github.com/dgraph-io/badger/v3"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // Store is a store for a persistent cache. It can be shared between consumers.

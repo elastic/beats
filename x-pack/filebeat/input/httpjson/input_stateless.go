@@ -5,10 +5,10 @@
 package httpjson
 
 import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	v2 "github.com/elastic/beats/v8/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v8/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 type statelessInput struct {

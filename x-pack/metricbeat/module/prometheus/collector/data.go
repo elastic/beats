@@ -8,11 +8,11 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/module/prometheus/collector"
 
 	dto "github.com/prometheus/client_model/go"
 )

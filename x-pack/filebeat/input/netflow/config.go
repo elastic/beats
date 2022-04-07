@@ -9,8 +9,8 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v8/filebeat/harvester"
+	"github.com/elastic/beats/v8/filebeat/inputsource/udp"
 )
 
 type config struct {

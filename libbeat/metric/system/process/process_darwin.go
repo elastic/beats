@@ -42,9 +42,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v8/libbeat/opt"
 )
 
 // FetchPids returns a map and array of pids

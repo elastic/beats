@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v8/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v8/libbeat/common/transport/kerberos"
 )
 
 type elasticsearchConfig struct {

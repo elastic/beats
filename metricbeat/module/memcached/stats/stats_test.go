@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 func TestGetNetworkAddress_URL(t *testing.T) {

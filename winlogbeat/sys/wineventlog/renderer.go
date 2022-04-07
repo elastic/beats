@@ -33,9 +33,9 @@ import (
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/winlogbeat/sys"
+	"github.com/elastic/beats/v8/winlogbeat/sys/winevent"
 )
 
 // Renderer is used for converting event log handles into complete events.

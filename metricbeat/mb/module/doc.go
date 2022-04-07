@@ -18,7 +18,7 @@
 // Package module contains the low-level utilities for running Metricbeat
 // modules and metricsets. This is useful for building your own tool that
 // has a module and sub-module concept. If you want to reuse the whole
-// Metricbeat framework see the github.com/elastic/beats/v7/metricbeat/beater
+// Metricbeat framework see the github.com/elastic/beats/v8/metricbeat/beater
 // package that provides a higher level interface.
 //
 // This contains the tools for instantiating modules, running them, and

@@ -24,16 +24,16 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	cfg "github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/reader/multiline"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	cfg "github.com/elastic/beats/v8/filebeat/config"
+	"github.com/elastic/beats/v8/filebeat/harvester"
+	"github.com/elastic/beats/v8/filebeat/input/file"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v8/libbeat/common/match"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/reader/multiline"
+	"github.com/elastic/beats/v8/libbeat/reader/readfile"
+	"github.com/elastic/beats/v8/libbeat/reader/readjson"
 )
 
 type config struct {

@@ -28,7 +28,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // EventConverter is used to convert MapStr objects for publishing

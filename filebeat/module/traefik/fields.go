@@ -20,7 +20,7 @@
 package traefik
 
 import (
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v8/libbeat/asset"
 )
 
 func init() {

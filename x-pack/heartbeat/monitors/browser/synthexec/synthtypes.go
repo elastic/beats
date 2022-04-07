@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 type SynthEvent struct {

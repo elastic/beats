@@ -12,10 +12,10 @@ import (
 
 	"github.com/cloudfoundry/sonde-go/events"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	cfcommon "github.com/elastic/beats/v8/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/cloudfoundry"
 )
 
 // ModuleMock is a Module with a mocked hub

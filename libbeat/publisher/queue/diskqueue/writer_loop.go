@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // A segmentedFrame is a data frame waiting to be written to disk along with

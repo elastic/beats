@@ -26,7 +26,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v8/winlogbeat/sys"
 )
 
 // Bookmark is a handle to an event log bookmark.

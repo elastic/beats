@@ -22,12 +22,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/processors/script/javascript"
 
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/net"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
+	_ "github.com/elastic/beats/v8/libbeat/processors/script/javascript/module/net"
+	_ "github.com/elastic/beats/v8/libbeat/processors/script/javascript/module/require"
 )
 
 func TestNetIsIP(t *testing.T) {

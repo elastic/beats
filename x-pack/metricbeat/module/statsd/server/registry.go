@@ -9,9 +9,9 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/helper/labelhash"
 )
 
 var logger = logp.NewLogger("statd")

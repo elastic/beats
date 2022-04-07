@@ -10,7 +10,7 @@ package cloudfoundry
 import (
 	"context"
 
-	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	cfcommon "github.com/elastic/beats/v8/x-pack/libbeat/common/cloudfoundry"
 )
 
 // DopplerConsumer is the interface that a Doppler Consumer must implement for the Cloud Foundry module.

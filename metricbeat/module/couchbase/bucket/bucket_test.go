@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/libbeat/common"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )

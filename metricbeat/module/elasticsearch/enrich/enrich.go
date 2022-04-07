@@ -22,10 +22,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/module/elasticsearch"
 )
 
 func init() {

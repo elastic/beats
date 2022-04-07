@@ -10,12 +10,12 @@ package collector
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
+	_ "github.com/elastic/beats/v8/x-pack/metricbeat/module/prometheus"
 
 	// Import common fields for validation
-	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
+	_ "github.com/elastic/beats/v8/metricbeat/module/prometheus"
 )
 
 func TestData(t *testing.T) {

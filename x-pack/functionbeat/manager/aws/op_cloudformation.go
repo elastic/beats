@@ -15,8 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/manager/executor"
 )
 
 type opCreateCloudFormation struct {

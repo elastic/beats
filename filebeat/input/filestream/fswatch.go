@@ -23,12 +23,12 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/filebeat/input/file"
+	loginp "github.com/elastic/beats/v8/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v8/libbeat/common"
+	file_helper "github.com/elastic/beats/v8/libbeat/common/file"
+	"github.com/elastic/beats/v8/libbeat/common/match"
+	"github.com/elastic/beats/v8/libbeat/logp"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 )

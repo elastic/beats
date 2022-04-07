@@ -20,7 +20,7 @@ package add_observer_metadata
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/processors/util"
+	"github.com/elastic/beats/v8/libbeat/processors/util"
 )
 
 // Config for add_host_metadata processor.

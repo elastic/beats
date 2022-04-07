@@ -26,17 +26,17 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/beats/v7/winlogbeat/module"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v8/libbeat/paths"
+	"github.com/elastic/beats/v8/winlogbeat/module"
 
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/config"
-	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/elastic/beats/v8/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v8/winlogbeat/config"
+	"github.com/elastic/beats/v8/winlogbeat/eventlog"
 )
 
 const pipelinesWarning = "Winlogbeat is unable to load the ingest pipelines" +

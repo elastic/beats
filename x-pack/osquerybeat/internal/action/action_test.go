@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/ecs"
 )
 
 func TestActionFromMap(t *testing.T) {

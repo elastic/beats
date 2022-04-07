@@ -5,13 +5,13 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	winlogbeatCmd "github.com/elastic/beats/v7/winlogbeat/cmd"
-	"github.com/elastic/beats/v7/x-pack/winlogbeat/module"
+	"github.com/elastic/beats/v8/libbeat/cmd"
+	winlogbeatCmd "github.com/elastic/beats/v8/winlogbeat/cmd"
+	"github.com/elastic/beats/v8/x-pack/winlogbeat/module"
 
 	// Register fields.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/include"
+	_ "github.com/elastic/beats/v8/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v8/x-pack/winlogbeat/include"
 )
 
 // Name of this beat.

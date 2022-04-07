@@ -25,8 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/helper/windows/pdh"
 )
 
 func TestGroupToEvents(t *testing.T) {

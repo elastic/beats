@@ -21,8 +21,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v8/libbeat/common/atomic"
+	"github.com/elastic/beats/v8/winlogbeat/checkpoint"
 )
 
 type eventACKer struct {

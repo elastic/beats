@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 func Test_CounterCache(t *testing.T) {

@@ -20,7 +20,7 @@ package v2
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v8/libbeat/feature"
 )
 
 // Plugin describes an input type. Input types should provide a constructor

@@ -27,7 +27,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 	sigar "github.com/elastic/gosigar"
 )
 

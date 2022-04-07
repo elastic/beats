@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/common/file"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 const logMessage = "Test file rotator.\n"

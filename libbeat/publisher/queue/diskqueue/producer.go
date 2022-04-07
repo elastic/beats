@@ -18,8 +18,8 @@
 package diskqueue
 
 import (
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v8/libbeat/publisher"
+	"github.com/elastic/beats/v8/libbeat/publisher/queue"
 )
 
 type diskQueueProducer struct {

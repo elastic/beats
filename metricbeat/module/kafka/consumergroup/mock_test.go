@@ -23,7 +23,7 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/beats/v8/metricbeat/module/kafka"
 )
 
 type mockClient struct {

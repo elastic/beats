@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/netflow"
 )
 
 var (

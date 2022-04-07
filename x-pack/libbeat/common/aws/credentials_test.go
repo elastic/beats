@@ -12,7 +12,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v8/libbeat/common/transport/tlscommon"
 )
 
 func TestInitializeAWSConfig(t *testing.T) {

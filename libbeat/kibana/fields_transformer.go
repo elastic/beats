@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/mapping"
 )
 
 var v640 = common.MustNewVersion("6.4.0")

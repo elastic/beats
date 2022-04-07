@@ -16,7 +16,7 @@ import (
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 // TestPromHistogramToES tests that calling PromHistogramToES multiple

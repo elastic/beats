@@ -22,8 +22,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/winlogbeat/sys"
 )
 
 // AddOptional adds a key and value to the given MapStr if the value is not the

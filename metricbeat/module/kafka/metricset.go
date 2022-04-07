@@ -20,8 +20,8 @@ package kafka
 import (
 	"crypto/tls"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // MetricSet is the base metricset for all Kafka metricsets

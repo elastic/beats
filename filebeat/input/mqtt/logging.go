@@ -23,7 +23,7 @@ import (
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 var setupLoggingOnce sync.Once

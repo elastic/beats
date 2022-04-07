@@ -20,7 +20,7 @@ package amqp
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 type amqpMethod func(*amqpMessage, []byte) (bool, bool)

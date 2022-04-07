@@ -7,7 +7,7 @@ package add_nomad_metadata
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers

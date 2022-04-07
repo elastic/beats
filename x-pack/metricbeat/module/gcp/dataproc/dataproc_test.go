@@ -6,11 +6,11 @@ package dataproc
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
+	_ "github.com/elastic/beats/v8/x-pack/metricbeat/module/gcp"
+	_ "github.com/elastic/beats/v8/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func init() {

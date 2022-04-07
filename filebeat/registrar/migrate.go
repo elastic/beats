@@ -26,12 +26,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	helper "github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v8/filebeat/config"
+	"github.com/elastic/beats/v8/filebeat/input/file"
+	helper "github.com/elastic/beats/v8/libbeat/common/file"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/paths"
+	"github.com/elastic/beats/v8/libbeat/statestore/backend/memlog"
 )
 
 type registryVersion string

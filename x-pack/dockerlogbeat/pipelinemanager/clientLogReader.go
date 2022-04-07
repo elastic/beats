@@ -14,12 +14,12 @@ import (
 
 	"github.com/docker/docker/api/types/backend"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	helper "github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/acker"
+	helper "github.com/elastic/beats/v8/libbeat/common/docker"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/dockerlogbeat/pipereader"
 )
 
 // ClientLogger collects logs for a docker container logging to stdout and stderr, using the FIFO provided by the docker daemon.

@@ -20,7 +20,7 @@ package docs
 import (
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v8/dev-tools/mage"
 )
 
 var (

@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 func TestURLFields(t *testing.T) {

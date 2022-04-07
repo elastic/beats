@@ -23,7 +23,7 @@ This requires [python](https://www.python.org/downloads/) to be installed.
   - server: Send echo response upon receiving a message. Echo response begins
     with `<` character. Errors responses begin with `!` character. An error message
     will be returned for any received request not starting with `>`.
-    
+
 - Echo Server sample code:
 
 ```
@@ -99,7 +99,7 @@ func echo(sock net.Conn) {
 
 ### 2.1 Add protocol analyzer (echo) to packetbeat:
 
-Create analyzer skeleton from code generator template. 
+Create analyzer skeleton from code generator template.
 
 ```
   $ cd ${GOPATH}/src/github.com/elastic/beats/packetbeat
@@ -107,7 +107,7 @@ Create analyzer skeleton from code generator template.
 ```
 
 Load plugin into packetbeat by running `make update`. Or add `_
-"github.com/elastic/beats/v7/packetbeat/protos/echo"` to the import list in
+"github.com/elastic/beats/v8/packetbeat/protos/echo"` to the import list in
 `$GOPATH/src/github.com/elastic/beats/packetbeat/include/list.go`.
 
 ### 2.2 Standalone beat with protocol analyzer (echo):
@@ -132,8 +132,8 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/packetbeat/beater"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/packetbeat/beater"
 
 	// import supported protocol modules
 	_ "github.com/urso/pb_echo/protos/echo"

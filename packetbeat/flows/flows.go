@@ -20,10 +20,10 @@ package flows
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/packetbeat/config"
+	"github.com/elastic/beats/v8/packetbeat/procs"
 )
 
 type Flows struct {

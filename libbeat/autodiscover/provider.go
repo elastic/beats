@@ -23,10 +23,10 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v8/libbeat/cfgfile"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/bus"
+	"github.com/elastic/beats/v8/libbeat/keystore"
 )
 
 // Provider for autodiscover

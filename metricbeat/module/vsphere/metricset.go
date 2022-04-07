@@ -20,8 +20,8 @@ package vsphere
 import (
 	"net/url"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb/parse"
 )
 
 var HostParser = parse.URLHostParserBuilder{

@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/beats/v8/metricbeat/module/linux"
 )
 
 type ksmData struct {

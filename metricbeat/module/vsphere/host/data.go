@@ -18,7 +18,7 @@
 package host
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 
 	"github.com/vmware/govmomi/vim25/mo"
 )

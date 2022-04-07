@@ -20,7 +20,7 @@ package labelhash
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 var testLabels = common.MapStr{

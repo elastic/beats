@@ -28,13 +28,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	dockertest "github.com/elastic/beats/v7/libbeat/tests/docker"
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/docker"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/processors"
+	dockertest "github.com/elastic/beats/v8/libbeat/tests/docker"
+	"github.com/elastic/beats/v8/libbeat/tests/resources"
 )
 
 func TestAddDockerMetadata(t *testing.T) {

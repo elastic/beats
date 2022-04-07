@@ -20,11 +20,11 @@ package dns
 import (
 	"encoding/binary"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
 
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v8/packetbeat/protos"
+	"github.com/elastic/beats/v8/packetbeat/protos/tcp"
 
 	mkdns "github.com/miekg/dns"
 )

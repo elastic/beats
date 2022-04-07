@@ -31,7 +31,7 @@
                 "org_label-schema_schema-version": "1.0",
                 "org_label-schema_url": "https://www.elastic.co/beats/elastic-agent",
                 "org_label-schema_vcs-ref": "c52c43963ca8416dc92c7d3dbf6cb6e89dd00acf",
-                "org_label-schema_vcs-url": "github.com/elastic/beats/v7",
+                "org_label-schema_vcs-url": "github.com/elastic/beats/v8",
                 "org_label-schema_vendor": "Elastic",
                 "org_label-schema_version": "7.13.0-SNAPSHOT",
                 "org_opencontainers_image_created": "2021-04-21T06:45:43Z",

@@ -21,9 +21,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/processors"
+	"github.com/elastic/beats/v8/packetbeat/procs"
 )
 
 type Config struct {

@@ -20,7 +20,7 @@ package readfile
 import (
 	"bytes"
 
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v8/libbeat/reader"
 )
 
 // StripNewline reader removes the last trailing newline characters from

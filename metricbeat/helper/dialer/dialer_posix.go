@@ -26,7 +26,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v8/libbeat/common/transport"
 )
 
 // UnixDialerBuilder creates a builder to dial over unix domain socket.

@@ -9,9 +9,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/osqd"
 )
 
 type osqueryRunner struct {

@@ -8,7 +8,7 @@
 package helper
 
 import (
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v8/x-pack/auditbeat/tracing"
 )
 
 // Logger exposes logging functions.

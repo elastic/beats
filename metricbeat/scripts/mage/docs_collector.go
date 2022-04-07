@@ -32,7 +32,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v8/dev-tools/mage"
 )
 
 // moduleData provides module-level data that will be used to populate the module list

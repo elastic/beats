@@ -5,10 +5,10 @@
 package beater
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v8/libbeat/processors"
+	"github.com/elastic/beats/v8/libbeat/processors/add_formatted_index"
 )
 
 func processorsForFunction(beatInfo beat.Info, config fnExtraConfig) (*processors.Processors, error) {

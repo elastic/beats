@@ -18,10 +18,10 @@
 package container
 
 import (
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/log"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/filebeat/channel"
+	"github.com/elastic/beats/v8/filebeat/input"
+	"github.com/elastic/beats/v8/filebeat/input/log"
+	"github.com/elastic/beats/v8/libbeat/common"
 
 	"github.com/pkg/errors"
 )

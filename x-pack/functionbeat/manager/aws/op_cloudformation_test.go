@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 type mockCloudformationStack struct {

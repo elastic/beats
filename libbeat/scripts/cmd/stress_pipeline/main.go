@@ -25,17 +25,17 @@ import (
 	_ "net/http/pprof"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	logpcfg "github.com/elastic/beats/v7/libbeat/logp/configure"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
-	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
-	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/service"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	logpcfg "github.com/elastic/beats/v8/libbeat/logp/configure"
+	_ "github.com/elastic/beats/v8/libbeat/outputs/console"
+	_ "github.com/elastic/beats/v8/libbeat/outputs/elasticsearch"
+	_ "github.com/elastic/beats/v8/libbeat/outputs/fileout"
+	_ "github.com/elastic/beats/v8/libbeat/outputs/logstash"
+	"github.com/elastic/beats/v8/libbeat/paths"
+	"github.com/elastic/beats/v8/libbeat/publisher/pipeline/stress"
+	_ "github.com/elastic/beats/v8/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v8/libbeat/service"
 )
 
 var (

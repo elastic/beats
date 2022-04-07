@@ -17,7 +17,7 @@
 
 package metadata
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/beats/v8/libbeat/common"
 
 // Config declares supported configuration for metadata generation
 type Config struct {

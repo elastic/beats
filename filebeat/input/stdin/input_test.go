@@ -23,8 +23,8 @@ package stdin
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/filebeat/input/inputtest"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 func TestNewInputDone(t *testing.T) {

@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v8/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v8/libbeat/dashboards"
+	"github.com/elastic/beats/v8/libbeat/kibana"
 )
 
 var (

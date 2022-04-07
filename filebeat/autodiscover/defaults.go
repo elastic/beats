@@ -23,8 +23,8 @@ package autodiscover
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/docker"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v8/libbeat/autodiscover/providers/docker"
+	"github.com/elastic/beats/v8/libbeat/autodiscover/providers/kubernetes"
 )
 
 func init() {

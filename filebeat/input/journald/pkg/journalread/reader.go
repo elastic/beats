@@ -30,9 +30,9 @@ import (
 	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/urso/sderr"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/common/cleanup"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/common/backoff"
+	"github.com/elastic/beats/v8/libbeat/common/cleanup"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // Reader implements a Journald base reader with backoff support. The reader

@@ -16,12 +16,12 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/logs"
 	"github.com/awslabs/goformation/v4/cloudformation/tags"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core/bundle"
-	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/manager/core/bundle"
+	fnaws "github.com/elastic/beats/v8/x-pack/functionbeat/provider/aws/aws"
 )
 
 // zipData stores the data on the zip to be deployed

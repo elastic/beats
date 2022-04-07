@@ -7,9 +7,9 @@ package billing
 import (
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/azure"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 
 	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"

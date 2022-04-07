@@ -5,8 +5,8 @@
 package performance
 
 import (
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	s "github.com/elastic/beats/v8/libbeat/common/schema"
+	c "github.com/elastic/beats/v8/libbeat/common/schema/mapstrstr"
 )
 
 var (

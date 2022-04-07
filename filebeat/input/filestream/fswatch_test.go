@@ -27,9 +27,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	loginp "github.com/elastic/beats/v8/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v8/libbeat/common/match"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 var (

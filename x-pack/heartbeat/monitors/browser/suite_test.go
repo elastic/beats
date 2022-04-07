@@ -13,9 +13,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/x-pack/heartbeat/monitors/browser/source"
+	"github.com/elastic/beats/v8/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func TestValidLocal(t *testing.T) {

@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/elastic/beats/v7/filebeat/generator"
+	"github.com/elastic/beats/v8/filebeat/generator"
 )
 
 // Generate creates directories and placeholder files required by a fileset.

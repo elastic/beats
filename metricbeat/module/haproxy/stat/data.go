@@ -20,11 +20,11 @@ package stat
 import (
 	"reflect"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
+	"github.com/elastic/beats/v8/libbeat/common"
+	s "github.com/elastic/beats/v8/libbeat/common/schema"
+	c "github.com/elastic/beats/v8/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/module/haproxy"
 )
 
 var (

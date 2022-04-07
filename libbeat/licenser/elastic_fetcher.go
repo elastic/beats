@@ -25,8 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 const licenseURL = "/_license"

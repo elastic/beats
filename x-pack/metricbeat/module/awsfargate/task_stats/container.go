@@ -5,8 +5,8 @@
 package task_stats
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v8/libbeat/common"
+	helpers "github.com/elastic/beats/v8/libbeat/common/docker"
 )
 
 // container is a struct representation of a container

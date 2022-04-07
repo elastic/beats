@@ -20,15 +20,15 @@ package processing
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
-	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
+	"github.com/elastic/beats/v8/libbeat/asset"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/ecs"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/mapping"
+	"github.com/elastic/beats/v8/libbeat/processors"
+	"github.com/elastic/beats/v8/libbeat/processors/actions"
+	"github.com/elastic/beats/v8/libbeat/processors/timeseries"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The

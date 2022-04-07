@@ -26,7 +26,7 @@ import (
 	"github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v8/libbeat/monitoring"
 )
 
 var _ PTRResolver = (*MiekgResolver)(nil)

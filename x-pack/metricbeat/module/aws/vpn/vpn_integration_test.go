@@ -10,8 +10,8 @@ package vpn
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestData(t *testing.T) {

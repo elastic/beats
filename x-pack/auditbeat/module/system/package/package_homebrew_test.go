@@ -14,10 +14,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/auditbeat/core"
+	abtest "github.com/elastic/beats/v8/auditbeat/testing"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
 )
 
 func TestHomebrew(t *testing.T) {

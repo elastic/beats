@@ -20,7 +20,7 @@ package sysinit
 import (
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // Module represents the system/linux module

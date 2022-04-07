@@ -19,18 +19,18 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v8/dev-tools/mage"
+	"github.com/elastic/beats/v8/dev-tools/mage/target/build"
+	metricbeat "github.com/elastic/beats/v8/metricbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v8/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	_ "github.com/elastic/beats/v8/dev-tools/mage/target/compose"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/elastic/beats/v8/dev-tools/mage/target/test"
 	// mage:import
-	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
+	_ "github.com/elastic/beats/v8/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {

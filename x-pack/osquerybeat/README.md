@@ -3,7 +3,7 @@
 Welcome to {Beat}.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/src/github.com/elastic/beats/v7/x-pack/osquerybeat`
+`${GOPATH}/src/github.com/elastic/beats/v8/x-pack/osquerybeat`
 
 ## Getting Started with {Beat}
 
@@ -24,7 +24,7 @@ It will create a clean git history for each major step. Note that you can always
 To push {Beat} in the git repository, run the following commands:
 
 ```
-git remote set-url origin https://github.com/elastic/beats/v7/x-pack/osquerybeat
+git remote set-url origin https://github.com/elastic/beats/v8/x-pack/osquerybeat
 git push origin master
 ```
 

@@ -10,9 +10,9 @@ package counter
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/cloudfoundry"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.

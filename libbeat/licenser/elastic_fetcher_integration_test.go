@@ -26,9 +26,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v8/libbeat/common/cli"
+	"github.com/elastic/beats/v8/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v8/libbeat/esleg/eslegclient"
 )
 
 const (

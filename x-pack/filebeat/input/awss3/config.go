@@ -11,12 +11,12 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v8/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v8/libbeat/common/match"
+	"github.com/elastic/beats/v8/libbeat/reader/parser"
+	"github.com/elastic/beats/v8/libbeat/reader/readfile"
+	"github.com/elastic/beats/v8/libbeat/reader/readfile/encoding"
+	awscommon "github.com/elastic/beats/v8/x-pack/libbeat/common/aws"
 )
 
 type config struct {

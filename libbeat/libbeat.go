@@ -20,8 +20,8 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/mock"
+	"github.com/elastic/beats/v8/libbeat/cmd"
+	"github.com/elastic/beats/v8/libbeat/mock"
 )
 
 var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)

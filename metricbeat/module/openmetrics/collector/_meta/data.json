@@ -11,12 +11,12 @@
     },
     "openmetrics": {
         "labels": {
-            "device": "br-3a285aa5e58c",
             "job": "openmetrics"
         },
         "metrics": {
             "up": 1
-        }
+        },
+        "type": "gauge"
     },
     "service": {
         "address": "127.0.0.1:55555",

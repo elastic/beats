@@ -24,10 +24,10 @@ import (
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v8/libbeat/common"
+	p "github.com/elastic/beats/v8/metricbeat/helper/openmetrics"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb/parse"
 )
 
 const (

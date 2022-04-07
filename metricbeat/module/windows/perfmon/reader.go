@@ -26,7 +26,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/beats/v8/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
 
@@ -34,8 +34,8 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 const (

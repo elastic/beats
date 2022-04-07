@@ -8,7 +8,7 @@
 package config
 
 import (
-	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v8/libbeat/processors"
 )
 
 // Default index name for ad-hoc queries, since the dataset is defined at the stream level, for example:

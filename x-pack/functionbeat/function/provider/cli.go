@@ -5,8 +5,8 @@
 package provider
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // CLIManager is the interface implemented by each provider to expose a command CLI interface

@@ -27,7 +27,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v8/libbeat/metric/system/resolve"
 )
 
 // ParseMeminfo parses the contents of /proc/meminfo into a hashmap

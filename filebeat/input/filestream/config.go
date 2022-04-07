@@ -23,10 +23,10 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/match"
+	"github.com/elastic/beats/v8/libbeat/reader/parser"
+	"github.com/elastic/beats/v8/libbeat/reader/readfile"
 )
 
 // Config stores the options of a file stream.

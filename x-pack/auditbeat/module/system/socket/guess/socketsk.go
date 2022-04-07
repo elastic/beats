@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v8/x-pack/auditbeat/tracing"
 )
 
 // Guess the offset of (struct socket*)->sk (type struct sock*)

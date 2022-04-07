@@ -20,7 +20,7 @@
 
 package network_summary
 
-import "github.com/elastic/beats/v7/metricbeat/module/docker"
+import "github.com/elastic/beats/v8/metricbeat/module/docker"
 
 //Config is the config object for docker/network
 type Config struct {

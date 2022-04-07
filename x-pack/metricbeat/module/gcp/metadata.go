@@ -10,7 +10,7 @@ import (
 
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 // MetadataService must be implemented by GCP services that requires non out-of-the box code that is not fulfil by the Stackdriver

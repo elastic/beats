@@ -5,8 +5,8 @@
 package provider
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // TemplateBuilderFactory factory method to call to create a new template builder.

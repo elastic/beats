@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	awsauto "github.com/elastic/beats/v8/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type watcher struct {

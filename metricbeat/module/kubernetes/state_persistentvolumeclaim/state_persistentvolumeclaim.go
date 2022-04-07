@@ -20,9 +20,9 @@ package state_persistentvolumeclaim
 import (
 	"fmt"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	p "github.com/elastic/beats/v8/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v8/metricbeat/module/kubernetes"
 )
 
 func init() {

@@ -7,9 +7,9 @@ package main
 import (
 	"os"
 
-	_ "github.com/elastic/beats/v7/heartbeat/include"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/cmd"
-	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
+	_ "github.com/elastic/beats/v8/heartbeat/include"
+	"github.com/elastic/beats/v8/x-pack/heartbeat/cmd"
+	_ "github.com/elastic/beats/v8/x-pack/heartbeat/monitors/browser"
 )
 
 func main() {

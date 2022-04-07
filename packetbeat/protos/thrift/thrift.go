@@ -27,14 +27,14 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/monitoring"
 
-	"github.com/elastic/beats/v7/packetbeat/pb"
-	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v8/packetbeat/pb"
+	"github.com/elastic/beats/v8/packetbeat/procs"
+	"github.com/elastic/beats/v8/packetbeat/protos"
+	"github.com/elastic/beats/v8/packetbeat/protos/tcp"
 )
 
 type thriftPlugin struct {

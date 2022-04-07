@@ -7,7 +7,7 @@ package database_account
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 func init() {

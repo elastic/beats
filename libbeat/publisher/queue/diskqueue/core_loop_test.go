@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 func TestHandleProducerWriteRequest(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/o365audit/poll"
 )
 
 // paginator is a decorator around a poll.Transaction to parse paginated requests.

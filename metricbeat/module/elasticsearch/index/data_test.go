@@ -30,11 +30,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v8/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v8/metricbeat/helper"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/metricbeat/module/elasticsearch"
 )
 
 var info = elasticsearch.Info{

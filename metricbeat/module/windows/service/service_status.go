@@ -28,12 +28,12 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 	"github.com/elastic/gosigar"
 )
 

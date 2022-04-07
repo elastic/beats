@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/packetbeat/npcap"
+	"github.com/elastic/beats/v8/packetbeat/npcap"
 )
 
 // Keep in sync with NpcapVersion in magefile.go.

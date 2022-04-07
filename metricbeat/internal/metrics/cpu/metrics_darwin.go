@@ -21,8 +21,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/cpu"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v8/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v8/libbeat/opt"
 )
 
 // Get is the Darwin implementation of Get

@@ -8,8 +8,8 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/common/reload"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 type reloader struct {

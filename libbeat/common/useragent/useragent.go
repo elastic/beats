@@ -21,7 +21,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v8/libbeat/version"
 )
 
 // UserAgent takes the capitalized name of the current beat and returns

@@ -20,7 +20,7 @@ package event
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v8/libbeat/common/kubernetes"
 )
 
 type kubeEventsConfig struct {

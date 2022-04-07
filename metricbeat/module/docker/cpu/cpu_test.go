@@ -23,8 +23,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/module/docker"
 )
 
 var cpuService CPUService

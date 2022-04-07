@@ -20,9 +20,9 @@ package process
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/metric/system/numcpu"
+	"github.com/elastic/beats/v8/libbeat/opt"
 )
 
 // unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch

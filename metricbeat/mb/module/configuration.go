@@ -20,9 +20,9 @@ package module
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/cfgfile"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.

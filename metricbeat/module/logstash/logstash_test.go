@@ -22,12 +22,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/metricbeat/module/logstash"
 
 	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
+	_ "github.com/elastic/beats/v8/metricbeat/module/logstash/node"
+	_ "github.com/elastic/beats/v8/metricbeat/module/logstash/node_stats"
 )
 
 func TestGetVertexClusterUUID(t *testing.T) {

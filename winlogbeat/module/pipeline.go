@@ -30,11 +30,11 @@ import (
 	"github.com/joeshaw/multierror"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/filebeat/fileset"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/filebeat/fileset"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 // PipelinesFS is used from the x-pack/winlogbeat code to inject modules. The

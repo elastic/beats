@@ -10,10 +10,10 @@ package stats
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch"
+	_ "github.com/elastic/beats/v8/x-pack/metricbeat/module/enterprisesearch"
 )
 
 func TestEventMapping(t *testing.T) {

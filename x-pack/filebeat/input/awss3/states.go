@@ -8,11 +8,11 @@ import (
 	"strings"
 	"sync"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v8/filebeat/input/v2"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v8/libbeat/logp"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v8/libbeat/statestore"
 )
 
 const (

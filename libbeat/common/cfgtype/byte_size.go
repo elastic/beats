@@ -22,7 +22,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
 )
 
 // ByteSize defines a new configuration option that will parse `go-humanize` compatible values into a

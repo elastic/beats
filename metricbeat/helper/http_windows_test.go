@@ -30,9 +30,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/api/npipe"
-	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/api/npipe"
+	"github.com/elastic/beats/v8/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 func TestOverNamedpipe(t *testing.T) {

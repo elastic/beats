@@ -13,11 +13,11 @@ import (
 	"net/http"
 	"time"
 
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	stateless "github.com/elastic/beats/v8/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 const headerContentEncoding = "Content-Encoding"

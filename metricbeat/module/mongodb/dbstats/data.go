@@ -18,8 +18,8 @@
 package dbstats
 
 import (
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	s "github.com/elastic/beats/v8/libbeat/common/schema"
+	c "github.com/elastic/beats/v8/libbeat/common/schema/mapstriface"
 )
 
 var schema = s.Schema{

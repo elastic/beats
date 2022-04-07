@@ -25,7 +25,7 @@ called a Module. Each Module has one or more MetricSet implementations which
 do the work of collecting a particular set of metrics from the service.
 
 The public interfaces used in implementing Modules and MetricSets are defined in
-the github.com/elastic/beats/v7/metricbeat/mb package.
+the github.com/elastic/beats/v8/metricbeat/mb package.
 
 Event Format
 

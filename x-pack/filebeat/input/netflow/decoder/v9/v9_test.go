@@ -10,9 +10,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/test"
 )
 
 func TestNetflowV9Protocol_ID(t *testing.T) {

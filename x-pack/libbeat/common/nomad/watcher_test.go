@@ -16,7 +16,7 @@ import (
 	api "github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v8/libbeat/tests/resources"
 )
 
 const (

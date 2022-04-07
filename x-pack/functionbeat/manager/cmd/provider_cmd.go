@@ -10,10 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v8/libbeat/cmd/instance"
+	"github.com/elastic/beats/v8/libbeat/common/cli"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/config"
+	"github.com/elastic/beats/v8/x-pack/functionbeat/function/provider"
 )
 
 func initProviders() ([]provider.Provider, error) {

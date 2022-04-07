@@ -17,10 +17,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	v2 "github.com/elastic/beats/v8/filebeat/input/v2"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	beattest "github.com/elastic/beats/v8/libbeat/publisher/testing"
 )
 
 func TestInput(t *testing.T) {

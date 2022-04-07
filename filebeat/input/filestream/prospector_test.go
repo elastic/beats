@@ -28,10 +28,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	loginp "github.com/elastic/beats/v8/filebeat/input/filestream/internal/input-logfile"
+	input "github.com/elastic/beats/v8/filebeat/input/v2"
+	"github.com/elastic/beats/v8/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v8/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
 

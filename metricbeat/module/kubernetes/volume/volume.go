@@ -20,11 +20,11 @@ package volume
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/helper"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v8/metricbeat/module/kubernetes"
 )
 
 const (

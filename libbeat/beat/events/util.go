@@ -17,7 +17,7 @@
 
 package events
 
-import "github.com/elastic/beats/v7/libbeat/beat"
+import "github.com/elastic/beats/v8/libbeat/beat"
 
 const (
 	// FieldMetaID defines the ID for the event. Also see FieldMetaOpType.

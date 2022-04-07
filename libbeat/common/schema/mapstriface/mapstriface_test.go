@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/beats/v8/libbeat/common"
+	s "github.com/elastic/beats/v8/libbeat/common/schema"
 )
 
 func TestConversions(t *testing.T) {

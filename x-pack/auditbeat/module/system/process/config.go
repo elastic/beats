@@ -7,7 +7,7 @@ package process
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
+	"github.com/elastic/beats/v8/auditbeat/helper/hasher"
 )
 
 // Config defines the host metricset's configuration options.

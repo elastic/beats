@@ -7,7 +7,7 @@
 
 package socket
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/beats/v8/libbeat/common"
 
 var archVariables = common.MapStr{
 	// Regular function call parameters 1 to 6

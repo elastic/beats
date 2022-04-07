@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	p "github.com/elastic/beats/v7/libbeat/plugin"
+	p "github.com/elastic/beats/v8/libbeat/plugin"
 )
 
 var (

@@ -21,9 +21,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v8/heartbeat/monitors"
+	"github.com/elastic/beats/v8/libbeat/common/transport"
+	"github.com/elastic/beats/v8/libbeat/common/transport/tlscommon"
 )
 
 type config struct {

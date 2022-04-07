@@ -5,9 +5,9 @@
 package httpjson
 
 import (
-	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	inputcursor "github.com/elastic/beats/v8/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/logp"
 )
 
 type cursor struct {

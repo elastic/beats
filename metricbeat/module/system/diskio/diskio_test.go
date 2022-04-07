@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v8/metricbeat/internal/sysinit"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )

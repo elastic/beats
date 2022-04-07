@@ -20,8 +20,8 @@ package input
 import (
 	"time"
 
-	cfg "github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	cfg "github.com/elastic/beats/v8/filebeat/config"
+	"github.com/elastic/beats/v8/libbeat/common/cfgwarn"
 )
 
 var defaultConfig = inputConfig{

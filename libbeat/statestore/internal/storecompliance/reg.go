@@ -20,7 +20,7 @@ package storecompliance
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v8/libbeat/statestore/backend"
 )
 
 // Registry helper for writing tests.

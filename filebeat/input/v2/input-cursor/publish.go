@@ -20,10 +20,10 @@ package cursor
 import (
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	input "github.com/elastic/beats/v8/filebeat/input/v2"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v8/libbeat/statestore"
 )
 
 // Publisher is used to publish an event and update the cursor in a single call to Publish.

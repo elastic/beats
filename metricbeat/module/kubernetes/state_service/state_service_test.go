@@ -23,7 +23,7 @@ package state_service
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	"github.com/elastic/beats/v8/metricbeat/helper/prometheus/ptest"
 )
 
 func TestEventMapping(t *testing.T) {

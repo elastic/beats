@@ -23,13 +23,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/v7/heartbeat/hbregistry"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/plugin"
+	"github.com/elastic/beats/v8/heartbeat/hbregistry"
+	"github.com/elastic/beats/v8/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v8/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v8/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/plugin"
 )
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.

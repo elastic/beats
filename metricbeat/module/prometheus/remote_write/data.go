@@ -22,8 +22,8 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator

@@ -26,10 +26,10 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/prompb"
 
-	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
-	httpserver "github.com/elastic/beats/v7/metricbeat/helper/server/http"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	serverhelper "github.com/elastic/beats/v8/metricbeat/helper/server"
+	httpserver "github.com/elastic/beats/v8/metricbeat/helper/server/http"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	"github.com/elastic/beats/v8/metricbeat/mb/parse"
 )
 
 func init() {

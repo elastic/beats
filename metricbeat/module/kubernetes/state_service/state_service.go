@@ -20,11 +20,11 @@ package state_service
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v8/libbeat/common/kubernetes"
+	p "github.com/elastic/beats/v8/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v8/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v8/metricbeat/module/kubernetes/util"
 )
 
 func init() {

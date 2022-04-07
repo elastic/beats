@@ -1,4 +1,4 @@
-module github.com/elastic/beats/v7
+module github.com/elastic/beats/v8
 
 go 1.17
 

@@ -15,11 +15,11 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/elastic/beats/v8/dev-tools/mage"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/command"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v8/x-pack/osquerybeat/internal/fileutil"
 )
 
 func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) error {

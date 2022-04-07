@@ -25,11 +25,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v8/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v8/metricbeat/internal/metrics/memory"
+	metrics "github.com/elastic/beats/v8/metricbeat/internal/metrics/memory"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux

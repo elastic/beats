@@ -8,11 +8,11 @@ package decoder
 // into the protocol registry.
 
 import (
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/ipfix"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v1"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v5"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v6"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v7"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v8"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/ipfix"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v1"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v5"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v6"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v7"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v8"
+	_ "github.com/elastic/beats/v8/x-pack/filebeat/input/netflow/decoder/v9"
 )

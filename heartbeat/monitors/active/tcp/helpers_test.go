@@ -26,12 +26,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v8/heartbeat/hbtest"
+	"github.com/elastic/beats/v8/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v8/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v8/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v8/libbeat/beat"
+	"github.com/elastic/beats/v8/libbeat/common"
 )
 
 func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port uint16) *beat.Event {

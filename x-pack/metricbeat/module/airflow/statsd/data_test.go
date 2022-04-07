@@ -11,15 +11,15 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/statsd/server"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
+	"github.com/elastic/beats/v8/auditbeat/core"
+	_ "github.com/elastic/beats/v8/libbeat/processors/actions"
+	"github.com/elastic/beats/v8/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v8/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v8/x-pack/metricbeat/module/statsd/server"
 )
 
 func init() {

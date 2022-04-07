@@ -20,16 +20,16 @@ package beater
 import (
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/decoder"
-	"github.com/elastic/beats/v7/packetbeat/flows"
-	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
-	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
-	"github.com/elastic/beats/v7/packetbeat/protos/udp"
-	"github.com/elastic/beats/v7/packetbeat/publish"
-	"github.com/elastic/beats/v7/packetbeat/sniffer"
+	"github.com/elastic/beats/v8/packetbeat/config"
+	"github.com/elastic/beats/v8/packetbeat/decoder"
+	"github.com/elastic/beats/v8/packetbeat/flows"
+	"github.com/elastic/beats/v8/packetbeat/procs"
+	"github.com/elastic/beats/v8/packetbeat/protos"
+	"github.com/elastic/beats/v8/packetbeat/protos/icmp"
+	"github.com/elastic/beats/v8/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v8/packetbeat/protos/udp"
+	"github.com/elastic/beats/v8/packetbeat/publish"
+	"github.com/elastic/beats/v8/packetbeat/sniffer"
 )
 
 func workerFactory(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) func(dl layers.LinkType) (sniffer.Worker, error) {

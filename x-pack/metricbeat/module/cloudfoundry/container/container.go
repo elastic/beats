@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
+	"github.com/elastic/beats/v8/x-pack/metricbeat/module/cloudfoundry"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v8/libbeat/logp"
+	"github.com/elastic/beats/v8/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.

@@ -29,9 +29,9 @@ import (
 
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v8/libbeat/common"
+	"github.com/elastic/beats/v8/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v8/libbeat/common/safemapstr"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
