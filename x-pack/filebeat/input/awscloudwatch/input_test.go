@@ -5,15 +5,13 @@
 package awscloudwatch
 
 import (
-	"net/http"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -122,7 +120,7 @@ func TestGetStartPosition(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	logEvent := cloudwatchlogs.FilteredLogEvent{
+	logEvent := types.FilteredLogEvent{
 		EventId:       awssdk.String("id-1"),
 		IngestionTime: awssdk.Int64(1590000000000),
 		LogStreamName: awssdk.String("logStreamName1"),
