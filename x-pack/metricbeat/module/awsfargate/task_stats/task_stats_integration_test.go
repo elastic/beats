@@ -9,11 +9,12 @@ package task_stats
 
 import (
 	"bytes"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/stretchr/testify/assert"
 
