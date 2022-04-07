@@ -141654,6 +141654,16 @@ type: integer
 
 --
 
+*`sophos.xg.fw_rule_type`*::
++
+--
+Firewall Rule type which is applied on the traffic
+
+
+type: keyword
+
+--
+
 *`sophos.xg.user_name`*::
 +
 --
@@ -141908,6 +141918,16 @@ type: keyword
 +
 --
 ICMP code of ICMP traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.victim`*::
++
+--
+Target in which signature is classified
 
 
 type: keyword

@@ -74,6 +74,11 @@
       description: >
         Firewall Rule ID which is applied on the traffic
 
+    - name: fw_rule_type
+      type: keyword
+      description: >
+        Firewall Rule type which is applied on the traffic
+
     - name: user_name
       type: keyword
       description: >
@@ -203,6 +208,11 @@
       type: keyword
       description: >
         ICMP code of ICMP traffic
+
+    - name: victim
+      type: keyword
+      description: >
+        Target in which signature is classified
 
     - name: sent_pkts
       type: long

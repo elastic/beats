@@ -429,6 +429,9 @@ processors:
 ## Cleanup ##
 #############
 - lowercase:
+      field: sophos.xg.fw_rule_type
+      ignore_failure: true
+- lowercase:
       field: network.protocol
       ignore_failure: true
 - lowercase:
@@ -442,11 +445,25 @@ processors:
     - sophos.xg.dst_port
     - sophos.xg.tran_dst_port
     - sophos.xg.recv_bytes
+    - sophos.xg.bytes_received
     - sophos.xg.recv_pkts
+    - sophos.xg.packets_received
     - sophos.xg.src_port
     - sophos.xg.tran_src_port
     - sophos.xg.sent_bytes
+    - sophos.xg.bytes_sent
     - sophos.xg.sent_pkts
+    - sophos.xg.packets_sent
+    - sophos.xg.src_trans_ip
+    - sophos.xg.src_trans_port
+    - sophos.xg.dst_trans_ip
+    - sophos.xg.dst_trans_port
+    - sophos.xg.src_zone_type
+    - sophos.xg.dst_zone_type
+    - sophos.xg.src_zone
+    - sophos.xg.dst_zone
+    - sophos.xg.con_event
+    - sophos.xg.qualifier
     ignore_missing: true
 on_failure:
 - set:

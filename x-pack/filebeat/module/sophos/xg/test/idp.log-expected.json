@@ -366,5 +366,74 @@
             "forwarded",
             "sophos-xg"
         ]
+    },
+    {
+        "@timestamp": "2022-03-29T07:31:46.000-02:00",
+        "client.ip": "127.0.0.13",
+        "client.port": 30447,
+        "destination.ip": "127.0.0.1",
+        "destination.port": 53,
+        "event.action": "drop",
+        "event.category": [
+            "intrusion_detection",
+            "network"
+        ],
+        "event.code": "020804407002",
+        "event.dataset": "sophos.xg",
+        "event.kind": "alert",
+        "event.module": "sophos",
+        "event.original": "device_name=\"SFW\" timestamp=\"2022-03-29T11:31:46+0200\" device_model=\"XG310\" device_serial_id=\"C54AAAAAQDJQB7D\" log_id=\"020804407002\" log_type=\"IDP\" log_component=\"Signatures\" log_subtype=\"Drop\" log_version=1 severity=\"Warning\" ips_policy_id=13 fw_rule_id=\"5\" signature_id=1181127040 message=\"PROTOCOL-DNS PowerDNS Recursive Out of Bounds Read Denial of Service\" classification=\"Misc Attack\" rule_priority=\"Major\" src_ip=\"127.0.0.13\" src_country=\"CHN\" dst_ip=\"127.0.0.1\" dst_country=\"CHE\" protocol=\"UDP\" src_port=30447 dst_port=53 os_name=\"Linux\" category=\"protocol-dns\" victim=\"Server\"",
+        "event.outcome": "success",
+        "event.severity": "4",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 3001,
+        "network.transport": "UDP",
+        "observer.product": "XG",
+        "observer.serial_number": "C54AAAAAQDJQB7D",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
+        "related.ip": [
+            "127.0.0.1",
+            "127.0.0.13"
+        ],
+        "rule.category": "Misc Attack",
+        "rule.id": "1181127040",
+        "server.ip": "127.0.0.1",
+        "server.port": 53,
+        "service.type": "sophos",
+        "sophos.xg.category": "protocol-dns",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "XG310",
+        "sophos.xg.dst_country_code": "CHE",
+        "sophos.xg.fw_rule_id": "5",
+        "sophos.xg.ips_policy_id": "13",
+        "sophos.xg.log_component": "Signatures",
+        "sophos.xg.log_subtype": "Drop",
+        "sophos.xg.log_type": "IDP",
+        "sophos.xg.message": "PROTOCOL-DNS PowerDNS Recursive Out of Bounds Read Denial of Service",
+        "sophos.xg.message_id": "07002",
+        "sophos.xg.platform": "Linux",
+        "sophos.xg.priority": "Warning",
+        "sophos.xg.rule_priority": "Major",
+        "sophos.xg.src_country_code": "CHN",
+        "sophos.xg.timestamp": "2022-03-29T11:31:46+0200",
+        "sophos.xg.victim": "Server",
+        "source.ip": "127.0.0.13",
+        "source.port": 30447,
+        "tags": [
+            "forwarded",
+            "sophos-xg"
+        ]
     }
 ]

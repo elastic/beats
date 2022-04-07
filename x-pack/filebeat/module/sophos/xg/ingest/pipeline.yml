@@ -161,6 +161,72 @@ processors:
     if: "ctx.event.severity == '7' "
     value: debug
 
+# Fix up naming differences between products.
+- rename:
+    field: sophos.xg.device_name
+    target_field: sophos.xg.device
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.device_name != null && ctx.sophos?.xg?.device_model != null'
+- rename:
+    field: sophos.xg.device_model
+    target_field: sophos.xg.device_name
+    ignore_missing: true
+- rename:
+    field: sophos.xg.device_serial_id
+    target_field: sophos.xg.device_id
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.device_serial_id != null'
+- rename:
+    field: sophos.xg.severity
+    target_field: sophos.xg.priority
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.severity != null'
+- rename:
+    field: sophos.xg.src_country
+    target_field: sophos.xg.src_country_code
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.src_country != null'
+- rename:
+    field: sophos.xg.dst_country
+    target_field: sophos.xg.dst_country_code
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.dst_country != null'
+- rename:
+    field: sophos.xg.hb_status
+    target_field: sophos.xg.hb_health
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.hb_status != null'
+- rename:
+    field: sophos.xg.app_resolved_by
+    target_field: sophos.xg.appresolvedby
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.app_resolved_by != null'
+- rename:
+    field: sophos.xg.app_technology
+    target_field: sophos.xg.application_technology
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.app_technology != null'
+- rename:
+    field: sophos.xg.app_category
+    target_field: sophos.xg.application_category
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.app_category != null'
+- rename:
+    field: sophos.xg.app_name
+    target_field: sophos.xg.application_name
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.app_name != null'
+- rename:
+    field: sophos.xg.app_risk
+    target_field: sophos.xg.application_risk
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.app_risk != null'
+- rename:
+    field: sophos.xg.os_name
+    target_field: sophos.xg.platform
+    ignore_missing: true
+    if: 'ctx.sophos?.xg?.os_name != null'
+
 ##########################
 ## ECS Observer Mapping ##
 ##########################
@@ -249,11 +315,13 @@ processors:
     - sophos.xg.srczone
     - sophos.xg.dstzone
     - sophos.xg.log_occurrence
+    - sophos.xg.log_version
     - sophos.xg.nat_rule_id
     - sophos.xg.in_display_interface
     - sophos.xg.out_display_interface
     - syslog5424_pri
     ignore_missing: true
+
 
 ###############################
 ## Product Speific Pipelines ##
