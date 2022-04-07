@@ -84,7 +84,7 @@ type Source interface {
 var errNoInputRunner = errors.New("no input runner available")
 
 // globalInputID is a default ID for inputs created without an ID
-// Deprecated: Inputs without an ID are not supported any more.
+// Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.

@@ -253,11 +253,11 @@ func (cm *Manager) OnError(err error) {
 
 func (cm *Manager) apply(blocks ConfigBlocks) error {
 	logp.L().Infof("Manager.apply: blocks: %v", blocks)
+
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
 		missing[name] = true
 	}
-
 	logp.L().Infof("Manager.apply: missing: %v", missing)
 
 	// Detect unwanted configs from the list
@@ -268,6 +268,8 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 	var errors *multierror.Error
 	// Reload configs
 	for _, b := range blocks {
+		// apply output first
+		logp.L().Infof("before applied config block: %s, err: %v", b.Type, b.Blocks)
 		err := cm.reload(b.Type, b.Blocks)
 		if err != nil {
 			errors = multierror.Append(errors, err)
@@ -293,6 +295,8 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {
 	cm.logger.Infof("Applying settings for %s", t)
 	if obj := cm.registry.GetReloadable(t); obj != nil {
+		cm.logger.Infof("settings for %s is Reloadable", t)
+
 		// Single object
 		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
@@ -315,6 +319,8 @@ func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {
 			return err
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
+		cm.logger.Infof("settings for %s is ReloadableList", t)
+
 		// List
 		var configs []*reload.ConfigWithMeta
 		for _, block := range blocks {

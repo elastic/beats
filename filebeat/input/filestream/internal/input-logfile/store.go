@@ -23,13 +23,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-concert"
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/go-concert"
-	"github.com/elastic/go-concert/unison"
 )
 
 // sourceStore is a store which can access resources using the Source
@@ -222,12 +223,16 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			continue
 		}
 
+		logp.L().Infof("sourceStore.FixUpIdentifiers: %s res.lock.Lock(). res.key: %s",
+			key, res.key)
 		res.lock.Lock()
 
 		newKey, updatedMeta := getNewID(res)
 		if len(newKey) > 0 && res.internalState.TTL > 0 {
 			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
 				res.lock.Unlock()
+				logp.L().Infof("sourceStore.FixUpIdentifiers: %s res.lock.Unlock() continue. res.key: %s",
+					key, res.key)
 				continue
 			}
 
@@ -252,6 +257,8 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 		}
 
 		res.lock.Unlock()
+		logp.L().Infof("sourceStore.FixUpIdentifiers: %s res.lock.Unlock(). res.key: %s",
+			key, res.key)
 	}
 }
 
@@ -366,7 +373,7 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.activeCursorOperations = 0
 	r.pendingCursorValue = nil
 	r.pendingUpdate = nil
-	typeconv.Convert(&r.cursor, cur) //nolint: errcheck // not changing behaviour on this commit
+	typeconv.Convert(&r.cursor, cur) // nolint: errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
 
@@ -536,7 +543,7 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // pendingCursor returns the current published cursor state not yet ACKed.
 //
 // Note: The stateMutex must be locked when calling pendingCursor.
-//nolint: errcheck // not changing behaviour on this commit
+// nolint: errcheck // not changing behaviour on this commit
 func (r *resource) pendingCursor() interface{} {
 	if r.pendingUpdate != nil {
 		var tmp interface{}

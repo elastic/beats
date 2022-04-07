@@ -38,7 +38,7 @@ type InputManager interface {
 	// if inputs are only configured for testing/validation purposes.
 	Init(grp unison.Group, mode Mode) error
 
-	// Creates builds a new Input instance from the given configuation, or returns
+	// Create a new Input instance from the given configuation, or returns
 	// an error if the configuation is invalid.
 	// The input must establish any connection for data collection yet. The Beat
 	// will use the Test/Run methods of the input.

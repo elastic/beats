@@ -23,11 +23,12 @@ import (
 
 	"github.com/urso/sderr"
 
+	"github.com/elastic/go-concert/unison"
+
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 type ignoreInactiveType uint8
@@ -70,6 +71,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
+	// logp.
 	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
@@ -124,7 +126,7 @@ func (p *fileProspector) Init(
 	return nil
 }
 
-//nolint: dupl // Different prospectors have a similar run method
+// nolint: dupl // Different prospectors have a similar run method
 // Run starts the fileProspector which accepts FS events from a file watcher.
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
