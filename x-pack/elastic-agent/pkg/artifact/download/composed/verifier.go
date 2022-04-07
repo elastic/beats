@@ -5,6 +5,8 @@
 package composed
 
 import (
+	"errors"
+
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -30,17 +32,25 @@ func NewVerifier(verifiers ...download.Verifier) *Verifier {
 }
 
 // Verify checks the package from configured source.
-func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error) {
+func (e *Verifier) Verify(spec program.Spec, version string) error {
 	var err error
+	var checksumMismatchErr *download.ChecksumMismatchError
+	var invalidSignatureErr *download.InvalidSignatureError
 
 	for _, v := range e.vv {
-		b, e := v.Verify(spec, version, removeOnFailure)
+		e := v.Verify(spec, version)
 		if e == nil {
-			return b, nil
+			// Success
+			return nil
 		}
 
 		err = multierror.Append(err, e)
+
+		if errors.As(e, &checksumMismatchErr) || errors.As(err, &invalidSignatureErr) {
+			// Stop verification chain on checksum/signature errors.
+			break
+		}
 	}
 
-	return false, err
+	return err
 }

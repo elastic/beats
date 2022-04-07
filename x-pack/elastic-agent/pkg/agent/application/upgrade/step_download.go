@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (string, error) {
+func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (_ string, err error) {
 	// do not update source config
 	settings := *u.settings
 	if sourceURI != "" {
@@ -48,12 +48,8 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		return "", errors.New(err, "failed upgrade of agent binary")
 	}
 
-	matches, err := verifier.Verify(agentSpec, version, true)
-	if err != nil {
+	if err := verifier.Verify(agentSpec, version); err != nil {
 		return "", errors.New(err, "failed verification of agent binary")
-	}
-	if !matches {
-		return "", errors.New("failed verification of agent binary, hash does not match", errors.TypeSecurity)
 	}
 
 	return path, nil

@@ -18,9 +18,9 @@ type ErrorVerifier struct {
 	called bool
 }
 
-func (d *ErrorVerifier) Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error) {
+func (d *ErrorVerifier) Verify(spec program.Spec, version string) error {
 	d.called = true
-	return false, errors.New("failing")
+	return errors.New("failing")
 }
 
 func (d *ErrorVerifier) Called() bool { return d.called }
@@ -29,21 +29,20 @@ type FailVerifier struct {
 	called bool
 }
 
-func (d *FailVerifier) Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error) {
+func (d *FailVerifier) Verify(spec program.Spec, version string) error {
 	d.called = true
-	return false, nil
+	return &download.InvalidSignatureError{}
 }
 
 func (d *FailVerifier) Called() bool { return d.called }
 
 type SuccVerifier struct {
-	called          bool
-	removeOnFailure bool
+	called bool
 }
 
-func (d *SuccVerifier) Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error) {
+func (d *SuccVerifier) Verify(spec program.Spec, version string) error {
 	d.called = true
-	return true, nil
+	return nil
 }
 
 func (d *SuccVerifier) Called() bool { return d.called }
@@ -75,9 +74,9 @@ func TestVerifier(t *testing.T) {
 
 	for _, tc := range testCases {
 		d := NewVerifier(tc.verifiers[0], tc.verifiers[1], tc.verifiers[2])
-		r, _ := d.Verify(program.Spec{Name: "a", Cmd: "a", Artifact: "a/a"}, "b", true)
+		err := d.Verify(program.Spec{Name: "a", Cmd: "a", Artifact: "a/a"}, "b")
 
-		assert.Equal(t, tc.expectedResult, r)
+		assert.Equal(t, tc.expectedResult, err == nil)
 
 		assert.True(t, tc.checkFunc(tc.verifiers))
 	}
