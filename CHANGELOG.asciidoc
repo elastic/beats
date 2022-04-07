@@ -28,6 +28,11 @@ https://github.com/elastic/beats/compare/v8.0.0...v8.0.1[View commits]
 
 - Fix run loop when reading from evtx file {pull}30006[30006]
 
+==== Known Issue
+
+*Affecting all Beats*
+
+- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough privileges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.0` or to give `manage` permission on the data stream `{beatname}-8.0` to the publishing user temporarily. {issue}30647[30647] {pull}31048[31048]
 
 [[release-notes-8.0.0]]
 === Beats version 8.0.0
@@ -135,6 +140,12 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 *Elastic Log Driver*
 
 - Fixed docs for hosts. {pull}23644[23644]
+
+==== Known Issue
+
+*Affecting all Beats*
+
+- During setup the Beat does not load the data stream. Thus, when running the Beat with a user that does not have enough privileges, publishing fails with the following error: `action [indices:admin/auto_create] is unauthorized for user [publisher] with roles [publisher], this action is granted by the index privileges [auto_configure,create_index,manage,all]`. The workaround is to either install the data stream manually using the following call: `PUT /_data_stream/{beatname}-8.0` or to give `manage` permission on the data stream `{beatname}-8.0` to the publishing user temporarily. {issue}30647[30647] {pull}31048[31048]
 
 [[release-notes-7.17.0]]
 === Beats version 7.17.0
