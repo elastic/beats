@@ -1,5 +1,6 @@
 description: Pipeline for parsing checkpoint firewall logs
 processors:
+<<<<<<< HEAD
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
@@ -838,6 +839,773 @@ processors:
       ctx?.observer?.ingress?.zone != null &&
       ctx?.observer?.egress?.zone != null &&
       (
+=======
+  - set:
+      field: event.ingested
+      copy_from: _ingest.timestamp
+  - set:
+      field: ecs.version
+      value: '8.0.0'
+  - rename:
+      field: message
+      target_field: event.original
+      ignore_missing: true
+  - grok:
+      field: event.original
+      patterns:
+        - '%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-)
+          +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app})
+          +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid})
+          +\[%{GREEDYDATA:syslog5424_sd}\]'
+  - kv:
+      field: syslog5424_sd
+      field_split: "; "
+      value_split: ":"
+      trim_key: " "
+      trim_value: " "
+      prefix: checkpoint.
+      strip_brackets: true
+      ignore_failure: true
+      exclude_keys:
+        - flags
+        - layer_uuid
+        - originsicname
+        - __policy_id_tag
+        - version
+        - rounded_bytes
+        - db_tag
+        - update_service
+  - remove:
+      field:
+        - syslog5424_sd
+        - syslog5424_app
+        - syslog5424_host
+        - syslog5424_msgid
+        - syslog5424_pri
+        - syslog5424_proc
+        - syslog5424_ver
+        - host
+      ignore_missing: true
+  - rename:
+      field: "@timestamp"
+      target_field: "event.created"
+      ignore_missing: true
+  - date:
+      field: "syslog5424_ts"
+      formats: ["ISO8601", "UNIX"]
+      if: "ctx.checkpoint?.time == null"
+  - append:
+      field: event.category
+      value: network
+      if: ctx.checkpoint?.operation != 'Log In'
+  - set:
+      field: observer.vendor
+      value: Checkpoint
+  - set:
+      field: observer.type
+      value: firewall
+      if: ctx.checkpoint?.type == null
+  - set:
+      field: observer.product
+      value: "{{checkpoint.product}}"
+      ignore_empty_value: true
+  - rename:
+      field: checkpoint.src
+      target_field: source.ip
+      ignore_missing: true
+  - rename:
+      field: checkpoint.client_ip
+      target_field: source.ip
+      ignore_missing: true
+      if: ctx.source?.ip == null
+  - rename:
+      field: checkpoint.xlatesrc
+      target_field: source.nat.ip
+      if: "ctx.checkpoint?.xlatesrc != '0.0.0.0'"
+      ignore_missing: true
+  - rename:
+      field: checkpoint.dst
+      target_field: destination.ip
+      ignore_missing: true
+  - rename:
+      field: checkpoint.xlatedst
+      target_field: destination.nat.ip
+      if: "ctx.checkpoint?.xlatedst != '0.0.0.0'"
+      ignore_missing: true
+  - rename:
+      field: checkpoint.uid
+      target_field: source.user.id
+      ignore_missing: true
+  - rename:
+      field: checkpoint.administrator
+      target_field: source.user.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.source_user_name
+      target_field: source.user.name
+      if: ctx.source?.user?.name == null
+      ignore_missing: true
+  - convert:
+      field: checkpoint.client_outbound_packets
+      target_field: source.packets
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.server_outbound_packets
+      target_field: destination.packets
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.client_outbound_bytes
+      target_field: source.bytes
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.sent_byte
+      target_field: source.bytes
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx.source?.bytes == null
+  - convert:
+      field: checkpoint.server_outbound_bytes
+      target_field: destination.bytes
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.received_bytes
+      target_field: destination.bytes
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx.destination?.bytes == null
+  - convert:
+      field: checkpoint.service
+      target_field: destination.port
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.xlatedport
+      target_field: destination.nat.port
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+      if: "ctx.checkpoint?.xlatedport != '0'"
+  - convert:
+      field: checkpoint.s_port
+      target_field: source.port
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.xlatesport
+      target_field: source.nat.port
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+      if: "ctx.checkpoint?.xlatesport != '0'"
+  - rename:
+      field: checkpoint.mac_source_address
+      target_field: source.mac
+      ignore_missing: true
+  - rename:
+      field: checkpoint.from
+      target_field: source.user.email
+      ignore_missing: true
+  - rename:
+      field: checkpoint.src_machine_name
+      target_field: source.domain
+      ignore_missing: true
+  - rename:
+      field: checkpoint.destination_dns_hostname
+      target_field: destination.domain
+      ignore_missing: true
+  - rename:
+      field: checkpoint.dst_machine_name
+      target_field: destination.domain
+      if: ctx.server?.domain == null
+      ignore_missing: true
+  - rename:
+      field: checkpoint.src_user_group
+      target_field: source.user.group.name
+      ignore_missing: true
+  - append:
+      field: event.category
+      value: authentication
+      if: ctx.checkpoint?.operation == 'Log In'
+  - set:
+      field: event.kind
+      value: alert
+      if: "['Prevent', 'Detect', 'Quarantine'].contains(ctx.checkpoint?.rule_action)"
+  - set:
+      field: event.kind
+      value: event
+      if: ctx.event?.kind == null
+  - set:
+      field: event.outcome
+      value: success
+      if: "['Accept', 'Allow'].contains(ctx.checkpoint?.rule_action)"
+  - append:
+      field: event.type
+      value:
+        - allowed
+        - connection
+      if: "['Accept', 'Allow'].contains(ctx.checkpoint?.rule_action)"
+  - set:
+      field: event.outcome
+      value: success
+      if: ctx.checkpoint?.audit_status == 'Success'
+  - set:
+      field: event.outcome
+      value: failure
+      if: ctx.checkpoint?.audit_status == 'Failure'
+  - set:
+      field: event.outcome
+      value: success
+      if: "['Drop', 'Reject', 'Block', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+  - append:
+      field: event.type
+      value:
+        - connection
+        - denied
+      if: "['Drop', 'Reject', 'Block', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+  - append:
+      field: event.category
+      value: malware
+      if: ctx.checkpoint?.malware_action != null
+  - append:
+      field: event.category
+      value: intrusion_detection
+      if: "['Detect', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      if: ctx.source?.ip != null
+  - append:
+      field: related.ip
+      value: "{{source.nat.ip}}"
+      if: ctx.source?.nat?.ip != null
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      if: ctx.destination?.ip != null
+  - append:
+      field: related.ip
+      value: "{{destination.nat.ip}}"
+      if: ctx.destination?.nat?.ip != null
+  - append:
+      field: related.hash
+      value: "{{checkpoint.file_md5}}"
+      if: ctx.checkpoint?.file_md5 != null
+  - append:
+      field: related.hash
+      value: "{{checkpoint.file_sha1}}"
+      if: ctx.checkpoint?.file_sha1 != null
+  - append:
+      field: related.hash
+      value: "{{checkpoint.file_sha256}}"
+      if: ctx.checkpoint?.file_sha256 != null
+  - rename:
+      field: checkpoint.to
+      target_field: destination.user.email
+      ignore_missing: true
+  - rename:
+      field: checkpoint.usercheck_incident_uid
+      target_field: destination.user.id
+      ignore_missing: true
+  - rename:
+      field: checkpoint.service_name
+      target_field: destination.service.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.mac_destination_address
+      target_field: destination.mac
+      ignore_missing: true
+  - rename:
+      field: checkpoint.dns_type
+      target_field: dns.question.type
+      ignore_missing: true
+  - rename:
+      field: checkpoint.domain_name
+      target_field: dns.question.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.dns_message_type
+      target_field: dns.type
+      ignore_missing: true
+  - rename:
+      field: checkpoint.tid
+      target_field: dns.id
+      ignore_missing: true
+  - rename:
+      field: checkpoint.loguid
+      target_field: event.id
+      ignore_missing: true
+  - convert:
+      field: checkpoint.sequencenum
+      target_field: event.sequence
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: checkpoint.severity
+      target_field: event.severity
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: checkpoint.action
+      target_field: event.action
+      ignore_missing: true
+  - rename:
+      field: checkpoint.packet_capture
+      target_field: event.url
+      ignore_missing: true
+  - rename:
+      field: checkpoint.start_time
+      target_field: event.start
+      ignore_missing: true
+  - rename:
+      field: checkpoint.first_detection
+      target_field: event.start
+      ignore_missing: true
+      if: ctx.event?.start == null
+  - rename:
+      field: checkpoint.last_detection
+      target_field: event.end
+      ignore_missing: true
+  - rename:
+      field: checkpoint.app_risk
+      target_field: event.risk_score
+      ignore_missing: true
+  - rename:
+      field: checkpoint.file_id
+      target_field: file.inode
+      ignore_missing: true
+  - rename:
+      field: checkpoint.file_type
+      target_field: file.type
+      ignore_missing: true
+  - rename:
+      field: checkpoint.file_name
+      target_field: file.name
+      ignore_missing: true
+  - convert:
+      field: checkpoint.file_size
+      target_field: file.size
+      type: long
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: checkpoint.file_md5
+      target_field: file.hash.md5
+      ignore_missing: true
+  - rename:
+      field: checkpoint.file_sha1
+      target_field: file.hash.sha1
+      ignore_missing: true
+  - rename:
+      field: checkpoint.file_sha256
+      target_field: file.hash.sha256
+      ignore_missing: true
+  - rename:
+      field: checkpoint.dlp_file_name
+      target_field: file.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.user_group
+      target_field: group.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.os_version
+      target_field: host.os.version
+      ignore_missing: true
+  - rename:
+      field: checkpoint.os_name
+      target_field: host.os.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.method
+      target_field: http.request.method
+      ignore_missing: true
+  - rename:
+      field: checkpoint.referrer
+      target_field: http.request.referrer
+      ignore_missing: true
+  - rename:
+      field: checkpoint.service_id
+      target_field: network.application
+      ignore_missing: true
+  - rename:
+      field: checkpoint.ifdir
+      target_field: network.direction
+      ignore_missing: true
+  - rename:
+      field: checkpoint.bytes
+      target_field: network.bytes
+      ignore_missing: true
+  - rename:
+      field: checkpoint.proto
+      target_field: network.iana_number
+      ignore_missing: true
+  - script:
+      lang: painless
+      ignore_failure: true
+      if: ctx?.network?.iana_number != null
+      source: |
+        def iana_number = ctx.network.iana_number;
+        if (iana_number == '0') {
+            ctx.network.transport = 'hopopt';
+        } else if (iana_number == '1') {
+            ctx.network.transport = 'icmp';
+        } else if (iana_number == '2') {
+            ctx.network.transport = 'igmp';
+        } else if (iana_number == '6') {
+            ctx.network.transport = 'tcp';
+        } else if (iana_number == '8') {
+            ctx.network.transport = 'egp';
+        } else if (iana_number == '17') {
+            ctx.network.transport = 'udp';
+        } else if (iana_number == '47') {
+            ctx.network.transport = 'gre';
+        } else if (iana_number == '50') {
+            ctx.network.transport = 'esp';
+        } else if (iana_number == '58') {
+            ctx.network.transport = 'ipv6-icmp';
+        } else if (iana_number == '112') {
+            ctx.network.transport = 'vrrp';
+        } else if (iana_number == '132') {
+            ctx.network.transport = 'sctp';
+        }
+  - rename:
+      field: checkpoint.packets
+      target_field: network.packets
+      ignore_missing: true
+  - rename:
+      field: checkpoint.layer_name
+      target_field: network.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.app_name
+      target_field: network.application
+      ignore_missing: true
+  - rename:
+      field: checkpoint.client_inbound_interface
+      target_field: observer.ingress.interface.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.client_outbound_interface
+      target_field: observer.egress.interface.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.ifname
+      target_field: observer.ingress.interface.name
+      ignore_missing: true
+      if: ctx.network?.direction == 'inbound'
+  - rename:
+      field: checkpoint.ifname
+      target_field: observer.egress.interface.name
+      ignore_missing: true
+      if: ctx.network?.direction == 'outbound'
+  - rename:
+      field: checkpoint.type
+      target_field: observer.type
+      ignore_missing: true
+  - rename:
+      field: checkpoint.origin
+      target_field: observer.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.origin_ip
+      target_field: observer.ip
+      ignore_missing: true
+  - rename:
+      field: checkpoint.endpoint_ip
+      target_field: observer.ip
+      ignore_missing: true
+      if: ctx.observer?.ip == null
+  - rename:
+      field: checkpoint.outzone
+      target_field: observer.egress.zone
+      ignore_missing: true
+  - rename:
+      field: checkpoint.inzone
+      target_field: observer.ingress.zone
+      ignore_missing: true
+  - rename:
+      field: checkpoint.security_outzone
+      target_field: observer.egress.zone
+      ignore_missing: true
+      if: ctx.observer?.egress?.zone == null
+  - rename:
+      field: checkpoint.security_inzone
+      target_field: observer.ingress.zone
+      ignore_missing: true
+      if: ctx.observer?.ingress?.zone == null
+  - rename:
+      field: checkpoint.update_version
+      target_field: observer.version
+      ignore_missing: true
+  - rename:
+      field: checkpoint.process_md5
+      target_field: process.hash.md5
+      ignore_missing: true
+  - rename:
+      field: checkpoint.process_name
+      target_field: process.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.parent_process_md5
+      target_field: process.parent.hash.md5
+      ignore_missing: true
+  - rename:
+      field: checkpoint.parent_process_name
+      target_field: process.parent.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.matched_category
+      target_field: rule.category
+      ignore_missing: true
+  - rename:
+      field: checkpoint.categories
+      target_field: rule.category
+      ignore_missing: true
+      if: ctx.rule?.category == null
+  - rename:
+      field: checkpoint.malware_action
+      target_field: rule.description
+      ignore_missing: true
+  - rename:
+      field: checkpoint.malware_rule_id
+      target_field: rule.id
+      ignore_missing: true
+  - rename:
+      field: checkpoint.app_rule_id
+      target_field: rule.id
+      ignore_missing: true
+      if: ctx.rule?.id == null
+  - rename:
+      field: checkpoint.objectname
+      target_field: rule.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.rule_name
+      target_field: rule.name
+      ignore_missing: true
+      if: ctx.rule?.name == null
+  - rename:
+      field: checkpoint.malware_rule_name
+      target_field: rule.name
+      ignore_missing: true
+      if: ctx.rule?.name == null
+  - rename:
+      field: checkpoint.app_rule_name
+      target_field: rule.name
+      ignore_missing: true
+      if: ctx.rule?.name == null
+  - rename:
+      field: checkpoint.dlp_rule_name
+      target_field: rule.name
+      ignore_missing: true
+      if: ctx.rule?.name == null
+  - rename:
+      field: checkpoint.smartdefence_profile
+      target_field: rule.ruleset
+      ignore_missing: true
+  - rename:
+      field: checkpoint.policy
+      target_field: rule.ruleset
+      ignore_missing: true
+      if: ctx.rule?.ruleset == null
+  - rename:
+      field: checkpoint.rule_uid
+      target_field: rule.uuid
+      ignore_missing: true
+  - rename:
+      field: checkpoint.dlp_rule_uid
+      target_field: rule.uuid
+      ignore_missing: true
+      if: ctx.rule?.uuid == null
+  - rename:
+      field: checkpoint.url
+      target_field: url.original
+      ignore_missing: true
+  - rename:
+      field: checkpoint.resource
+      target_field: url.original
+      ignore_missing: true
+      if: ctx.url?.original == null
+  - rename:
+      field: checkpoint.http_host
+      target_field: url.domain
+      ignore_missing: true
+  - rename:
+      field: checkpoint.web_client_type
+      target_field: user_agent.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.user_agent
+      target_field: user_agent.original
+      ignore_missing: true
+  - rename:
+      field: checkpoint.industry_reference
+      target_field: vulnerability.id
+      ignore_missing: true
+  - date:
+      field: "checkpoint.time"
+      formats: ["ISO8601", "UNIX"]
+      if: "ctx.checkpoint?.time != null"
+  - rename:
+      field: checkpoint.message
+      target_field: message
+      ignore_missing: true
+  - rename:
+      field: checkpoint.reason
+      target_field: message
+      ignore_missing: true
+      if: ctx.message == null
+  - rename:
+      field: checkpoint.subject
+      target_field: message
+      ignore_missing: true
+      if: ctx.message == null
+  - gsub:
+      field: checkpoint.sys_message
+      pattern: ^:"
+      replacement: ""
+      if: ctx.checkpoint?.sys_message != null
+  - append:
+      field: related.user
+      value: "{{source.user.name}}"
+      if: ctx.source?.user?.name != null
+  - append:
+      field: related.user
+      value: "{{destination.user.name}}"
+      if: ctx.destination?.user?.name != null
+
+  # NOTE: This is a deviation from the pipeline in the Fleet Check Point integrations.
+  # Fleet does not set client/server. This was kept to avoid introducing a breaking change.
+  - set:
+      field: client
+      copy_from: source
+      ignore_failure: true
+  - set:
+      field: server
+      copy_from: destination
+      ignore_failure: true
+
+  - script:
+      lang: painless
+      source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
+      if: ctx?.source?.bytes != null && ctx?.destination?.bytes != null && ctx?.network?.bytes == null
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
+      if: ctx?.source?.packets != null && ctx?.destination?.packets != null && ctx?.network?.packets == null
+      ignore_failure: true
+  - rename:
+      field: checkpoint.action_reason
+      target_field: checkpoint.action_reason_msg
+      if: ctx.checkpoint?.action_reason != null && ctx.checkpoint?.action_reason.contains(" ")
+      ignore_missing: true
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+      if: ctx.source?.geo == null
+  - geoip:
+      field: destination.ip
+      target_field: destination.geo
+      ignore_missing: true
+      if: ctx.destination?.geo == null
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: destination.ip
+      target_field: destination.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - rename:
+      field: destination.as.asn
+      target_field: destination.as.number
+      ignore_missing: true
+  - rename:
+      field: destination.as.organization_name
+      target_field: destination.as.organization.name
+      ignore_missing: true
+  # Handle zone-based network directionality
+  - set:
+      field: network.direction
+      value: inbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+  - set:
+      field: network.direction
+      value: outbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: internal
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: external
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: unknown
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+>>>>>>> 6af35015db (Checkpoint firewall: Allow for trailing space (#31197))
         (
           !ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
           !ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
