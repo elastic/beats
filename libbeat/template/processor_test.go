@@ -719,6 +719,18 @@ func TestProcessDefaultField(t *testing.T) {
 				},
 			},
 		},
+		// Ensure that text_only_keyword fields can be added to default_field
+		mapping.Field{
+			Name:         "a_match_only_text_field",
+			Type:         "match_only_text",
+			DefaultField: &enableDefaultField,
+		},
+		// Ensure that wildcard fields can be added to default_field
+		mapping.Field{
+			Name:         "a_wildcard_field",
+			Type:         "wildcard",
+			DefaultField: &enableDefaultField,
+		},
 	}
 
 	version, err := common.NewVersion("7.0.0")
@@ -734,6 +746,8 @@ func TestProcessDefaultField(t *testing.T) {
 	}
 
 	expectedFields := []string{
+		"a_match_only_text_field",
+		"a_wildcard_field",
 		"bar",
 		"nested.bar",
 		"nested.foo",
@@ -791,46 +805,77 @@ func TestProcessWildcardOSS(t *testing.T) {
 }
 
 func TestProcessWildcardElastic(t *testing.T) {
-	// Test common fields are combined even if they come from different objects
-	fields := mapping.Fields{
-		mapping.Field{
-			Name: "test",
-			Type: "group",
-			Fields: mapping.Fields{
+	for _, test := range []struct {
+		title    string
+		fields   mapping.Fields
+		expected common.MapStr
+	}{
+		{
+			title: "default",
+			fields: mapping.Fields{
 				mapping.Field{
-					Name: "one",
-					Type: "wildcard",
+					Name: "test",
+					Type: "group",
+					Fields: mapping.Fields{
+						mapping.Field{
+							Name: "one",
+							Type: "wildcard",
+						},
+					},
+				},
+			},
+			expected: common.MapStr{
+				"test": common.MapStr{
+					"properties": common.MapStr{
+						"one": common.MapStr{
+							"type": "wildcard",
+						},
+					},
 				},
 			},
 		},
-	}
-
-	output := common.MapStr{}
-	analyzers := common.MapStr{}
-	version, err := common.NewVersion("8.0.0")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	p := Processor{EsVersion: *version, ElasticLicensed: true}
-	err = p.Process(fields, nil, output, analyzers)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Make sure fields without a name are skipped during template generation
-	expectedOutput := common.MapStr{
-		"test": common.MapStr{
-			"properties": common.MapStr{
-				"one": common.MapStr{
-					"ignore_above": 1024,
-					"type":         "wildcard",
+		{
+			title: "explicit ignore_above",
+			fields: mapping.Fields{
+				mapping.Field{
+					Name: "test",
+					Type: "group",
+					Fields: mapping.Fields{
+						mapping.Field{
+							Name:        "one",
+							Type:        "wildcard",
+							IgnoreAbove: 4096,
+						},
+					},
+				},
+			},
+			expected: common.MapStr{
+				"test": common.MapStr{
+					"properties": common.MapStr{
+						"one": common.MapStr{
+							"ignore_above": 4096,
+							"type":         "wildcard",
+						},
+					},
 				},
 			},
 		},
+	} {
+		t.Run(test.title, func(t *testing.T) {
+			output := common.MapStr{}
+			analyzers := common.MapStr{}
+			version, err := common.NewVersion("8.0.0")
+			if err != nil {
+				t.Fatal(err)
+			}
+			p := Processor{EsVersion: *version, ElasticLicensed: true}
+			err = p.Process(test.fields, nil, output, analyzers)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, test.expected, output)
+		})
 	}
-
-	assert.Equal(t, expectedOutput, output)
 }
 
 func TestProcessWildcardPreSupport(t *testing.T) {

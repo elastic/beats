@@ -126,11 +126,11 @@ func setupTestDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0600); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0600); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -138,11 +138,11 @@ func setupTestDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 
-	if err = os.Mkdir(filepath.Join(dir, "subdir"), 0700); err != nil {
+	if err = os.Mkdir(filepath.Join(dir, "subdir"), 0o700); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0600); err != nil {
+	if err = ioutil.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 

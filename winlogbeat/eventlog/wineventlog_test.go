@@ -31,6 +31,7 @@ import (
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -39,20 +40,130 @@ import (
 
 const (
 	// Names that are registered by the test for logging events.
-	providerName = "WinlogbeatTestGo"
-	sourceName   = "Integration Test"
+	providerName   = "WinlogbeatTestGo"
+	sourceName     = "Integration Test"
+	customXMLQuery = `<QueryList>
+    <Query Id="0" Path="WinlogbeatTestGo">
+        <Select Path="WinlogbeatTestGo">*</Select>
+    </Query>
+</QueryList>`
 
 	// Event message files used when logging events.
 
 	// EventCreate.exe has valid event IDs in the range of 1-1000 where each
 	// event message requires a single parameter.
 	eventCreateMsgFile = "%SystemRoot%\\System32\\EventCreate.exe"
-	// services.exe is used by the Service Control Manager as its event message
-	// file; these tests use it to log messages with more than one parameter.
-	servicesMsgFile = "%SystemRoot%\\System32\\services.exe"
-	// netevent.dll has messages that require no message parameters.
-	netEventMsgFile = "%SystemRoot%\\System32\\netevent.dll"
 )
+
+func TestWinEventLogConfig_Validate(t *testing.T) {
+	tests := []struct {
+		In      winEventLogConfig
+		WantErr bool
+		Desc    string
+	}{
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+			},
+			WantErr: false,
+			Desc:    "xml query: all good",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery[:len(customXMLQuery)-4], // Malformed XML by truncation.
+				},
+			},
+			WantErr: true,
+			Desc:    "xml query: malformed XML",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					XMLQuery: customXMLQuery,
+				},
+			},
+			WantErr: true,
+			Desc:    "xml query: missing ID",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					Name:     "test",
+					XMLQuery: customXMLQuery,
+				},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and name)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{IgnoreOlder: 1},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and ignore_older)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{Level: "error"},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and level)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{EventID: "1000"},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and event_id)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{Provider: []string{providerName}},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and provider)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{},
+			},
+			WantErr: true,
+			Desc:    "missing name",
+		},
+	}
+
+	for _, tc := range tests {
+		gotErr := tc.In.Validate()
+
+		if tc.WantErr {
+			assert.NotNil(t, gotErr, tc.Desc)
+		} else {
+			assert.Nil(t, gotErr, "%q got unexpected err: %v", tc.Desc, gotErr)
+		}
+	}
+}
 
 func TestWindowsEventLogAPI(t *testing.T) {
 	testWindowsEventLog(t, winEventLogAPIName)
@@ -72,12 +183,54 @@ func testWindowsEventLog(t *testing.T, api string) {
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
+		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000)+1, []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
 		return openLog(t, api, nil, config)
 	}
+
+	t.Run("has_message", func(t *testing.T) {
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
+		defer log.Close()
+
+		for i := 0; i < 10; i++ {
+			records, err := log.Read()
+			require.NotEmpty(t, records)
+			require.NoError(t, err)
+
+			r := records[0]
+			require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
+		}
+	})
+
+	// Test reading from an event log using a custom XML query.
+	t.Run("custom_xml_query", func(t *testing.T) {
+		cfg := map[string]interface{}{
+			"id":        "custom-xml-query",
+			"xml_query": customXMLQuery,
+		}
+
+		log := openLog(t, cfg)
+		defer log.Close()
+
+		var eventCount int
+
+		for eventCount < totalEvents {
+			records, err := log.Read()
+			if err != nil {
+				t.Fatal("read error", err)
+			}
+			if len(records) == 0 {
+				t.Fatal("read returned 0 records")
+			}
+
+			t.Logf("Read() returned %d events.", len(records))
+			eventCount += len(records)
+		}
+
+		assert.Equal(t, totalEvents, eventCount)
+	})
 
 	t.Run("batch_read_size_config", func(t *testing.T) {
 		const batchReadSize = 2
@@ -164,16 +317,18 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	}
 
 	if existed {
-		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
+		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "") //nolint:errcheck // This is just a resource release.
 	}
 
 	log, err = eventlog.Open(source)
+	//nolint:errcheck // This is just a resource release.
 	if err != nil {
 		eventlog.RemoveSource(name, source)
 		eventlog.RemoveProvider(name)
 		t.Fatal(err)
 	}
 
+	//nolint:errcheck // This is just a resource release.
 	tearDown = func() {
 		log.Close()
 		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
@@ -200,7 +355,7 @@ func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, m
 
 // setLogSize set the maximum number of bytes that an event log can hold.
 func setLogSize(t testing.TB, provider string, sizeBytes int) {
-	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput()
+	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput() //nolint:gosec // No possibility of command injection.
 	if err != nil {
 		t.Fatal("Failed to set log size", err, string(output))
 	}

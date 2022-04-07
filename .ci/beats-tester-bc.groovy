@@ -7,7 +7,7 @@ pipeline {
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     PIPELINE_LOG_LEVEL = "INFO"
-    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/master'
+    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/main'
     BASE_URL = "https://staging.elastic.co/${params.version}/downloads"
     APM_BASE_URL = "${env.BASE_URL}/apm-server"
     BEATS_BASE_URL = "${env.BASE_URL}/beats"
@@ -24,7 +24,7 @@ pipeline {
   }
   parameters {
     string(name: 'version', defaultValue: '', description: 'Id of the Build Candidate (7.10.0-b55684ff).')
-    string(name: 'BRANCH_REFERENCE', defaultValue: 'master', description: 'Branch to grab the Groovy script(for test changes).')
+    string(name: 'BRANCH_REFERENCE', defaultValue: 'main', description: 'Branch to grab the Groovy script(for test changes).')
   }
   stages {
     stage('Run Beat Tester') {

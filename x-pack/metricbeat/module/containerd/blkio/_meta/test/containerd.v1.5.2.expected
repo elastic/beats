@@ -1,0 +1,45 @@
+[
+	{
+		"RootFields": {
+			"container": {
+				"disk": {
+					"read": {
+						"bytes": 69246976
+					},
+					"write": {
+						"bytes": 24576
+					}
+				},
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"device": "/dev/vda",
+			"read": {
+				"bytes": 69246976,
+				"ops": 830
+			},
+			"summary": {
+				"bytes": 69271552,
+				"ops": 832
+			},
+			"write": {
+				"bytes": 24576,
+				"ops": 2
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.blkio",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

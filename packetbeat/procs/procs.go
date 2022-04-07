@@ -60,7 +60,7 @@ type process struct {
 	expiration time.Time
 }
 
-// Allow the OS-dependant implementation to be replaced by a mock for testing
+// Allow the OS-dependent implementation to be replaced by a mock for testing
 type processWatcherImpl interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 	// that owns them.

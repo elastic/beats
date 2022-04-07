@@ -470,10 +470,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "auditbeat" plus date
-  # and generates [auditbeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "auditbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "auditbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "auditbeat-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -515,6 +514,10 @@ output.elasticsearch:
 
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
+
+  # auditbeat expects Elasticsearch to be the same version or newer than the Beat.
+  # Lift the version restriction by setting allow_older_versions to true.
+  #allow_older_versions: false
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -1113,7 +1116,7 @@ output.elasticsearch:
   #path: "/tmp/auditbeat"
 
   # Name of the generated files. The default is `auditbeat` and it generates
-  # files: `auditbeat`, `auditbeat.1`, `auditbeat.2`, etc.
+  # files: `auditbeat-{datetime}.ndjson`, `auditbeat-{datetime}-1.ndjson`, etc.
   #filename: auditbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -1131,6 +1134,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -1255,6 +1259,9 @@ output.elasticsearch:
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
 
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
+
 # Overwrite existing template
 # Do not enable this option for more than one instance of auditbeat as it might
 # overload your Elasticsearch with too many update requests.
@@ -1277,10 +1284,8 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
 # Enable ILM support. Valid values are true, false.
 #setup.ilm.enabled: true

@@ -9,6 +9,7 @@ package socket
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -17,7 +18,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/unix"
 
@@ -511,7 +511,7 @@ func feedEvents(evs []event, st *state, t *testing.T) error {
 		t.Logf("Delivering event %d: %s", idx, ev.String())
 		// TODO: err
 		if err := ev.Update(st); err != nil {
-			return errors.Wrapf(err, "error feeding event '%s'", ev.String())
+			return fmt.Errorf("error feeding event '%s': %w", ev.String(), err)
 		}
 	}
 	return nil

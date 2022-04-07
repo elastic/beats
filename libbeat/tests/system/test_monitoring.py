@@ -7,7 +7,6 @@ import string
 import unittest
 
 from base import BaseTest
-from elasticsearch import Elasticsearch
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -18,8 +17,8 @@ class Test(BaseTest):
     def setUp(self):
         super(BaseTest, self).setUp()
 
-        self.es = Elasticsearch([self.get_elasticsearch_url()])
-        self.es_monitoring = Elasticsearch([self.get_elasticsearch_monitoring_url()])
+        self.es = self.get_elasticsearch_instance()
+        self.es_monitoring = self.get_elasticsearch_instance(url=self.get_elasticsearch_monitoring_url())
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')

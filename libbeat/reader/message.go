@@ -93,5 +93,6 @@ func (m *Message) ToEvent() beat.Event {
 		Timestamp: m.Ts,
 		Meta:      m.Meta,
 		Fields:    m.Fields,
+		Private:   m.Private,
 	}
 }

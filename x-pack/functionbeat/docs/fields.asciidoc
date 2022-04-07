@@ -456,9 +456,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -1295,9 +1298,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -1335,12 +1364,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 
@@ -1467,9 +1523,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -7963,9 +8022,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -8706,9 +8768,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 

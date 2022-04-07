@@ -7,22 +7,26 @@ package http_endpoint
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec // HMAC-SHA1 is allowed, but it also supports HMAC-SHA256.
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type validator interface {
-	// ValidateHeader checks the HTTP headers for compliance. The body must not
-	// be touched.
-	ValidateHeader(*http.Request) (int, error)
-}
+var (
+	errIncorrectUserOrPass    = errors.New("incorrect username or password")
+	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
+	errMissingHMACHeader      = errors.New("missing HMAC header")
+	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
+)
 
 type apiValidator struct {
 	basicAuth          bool
@@ -36,13 +40,6 @@ type apiValidator struct {
 	hmacType           string
 	hmacPrefix         string
 }
-
-var (
-	errIncorrectUserOrPass    = errors.New("incorrect username or password")
-	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
-	errMissingHMACHeader      = errors.New("missing HMAC header")
-	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
-)
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {
@@ -109,4 +106,38 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	}
 
 	return 0, nil
+}
+
+type apiValidationHandler struct {
+	next      http.Handler
+	validator *apiValidator
+	log       *logp.Logger
+}
+
+func newAPIValidationHandler(next http.Handler, v *apiValidator, log *logp.Logger) http.Handler {
+	return &apiValidationHandler{
+		next:      next,
+		validator: v,
+		log:       log,
+	}
+}
+
+func (v *apiValidationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if status, err := v.validator.ValidateHeader(r); status != 0 && err != nil {
+		sendAPIErrorResponse(w, r, v.log, status, err)
+		return
+	}
+
+	v.next.ServeHTTP(w, r)
+}
+
+func sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(false)
+	if err := enc.Encode(map[string]interface{}{"message": apiError.Error()}); err != nil {
+		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
+	}
 }

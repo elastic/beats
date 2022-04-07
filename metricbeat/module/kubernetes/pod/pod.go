@@ -20,8 +20,8 @@ package pod
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -39,8 +39,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.pod")
 )
 
 // init registers the MetricSet with the central registry.
@@ -75,6 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
@@ -96,7 +95,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	events, err := eventMapping(body, util.PerfMetrics, m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -112,12 +111,25 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Error(err)
 		}
 
+		// Enrich event with container ECS fields
+		containerEcsFields := ecsfields(event, m.Logger())
+		if len(containerEcsFields) != 0 {
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(common.MapStr{
+					"container": containerEcsFields,
+				})
+			} else {
+				e.RootFields = common.MapStr{
+					"container": containerEcsFields,
+				}
+			}
+		}
+
 		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}
 	}
-	return
 }
 
 // Close stops this metricset

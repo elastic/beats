@@ -3,16 +3,25 @@ queue_rules:
     conditions:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
-  - name: forward-port patches to master branch
+  - name: self-assign PRs
+    conditions:
+      - -merged
+      - -closed
+      - "#assignee=0"
+    actions:
+      assign:
+        add_users:
+          - "{{ author }}"
+  - name: forward-port patches to main branch
     conditions:
       - merged
-      - label=forwardport-master
+      - label=forwardport-main
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "master"
+          - "main"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
@@ -21,6 +30,7 @@ pull_request_rules:
       - -merged
       - -closed
       - conflict
+      - -author=apmmachine
     actions:
         comment:
           message: |
@@ -32,6 +42,18 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
+  - name: close automated pull requests with bump updates if any conflict
+    conditions:
+      - -merged
+      - -closed
+      - conflict
+      - author=apmmachine
+      - label=automation
+    actions:
+      close:
+        message: |
+          This pull request has been automatically closed by Mergify.
+          There are some other up-to-date pull requests.
   - name: automatic approval for automated pull requests with bump updates
     conditions:
       - author=apmmachine
@@ -119,24 +141,6 @@ pull_request_rules:
       comment:
         message: |
           This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
-  - name: notify the backport policy
-    conditions:
-      - -label~=^backport
-      - base=master
-      - -merged
-      - -closed
-    actions:
-      comment:
-        message: |
-          This pull request does not have a backport label. Could you fix it @{{author}}? 🙏
-          To fixup this pull request, you need to add the backport labels for the needed
-          branches, such as:
-          * `backport-v./d./d./d` is the label to automatically backport to the `7./d` branch. `/d` is the digit
-
-          **NOTE**: `backport-skip` has been added to this pull request.
-      label:
-        add:
-          - backport-skip
   - name: remove-backport label
     conditions:
       - label~=backport-v
@@ -185,6 +189,19 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.17 branch
+    conditions:
+      - merged
+      - label=backport-v7.17.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.17"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.0 branch
     conditions:
       - merged
@@ -195,6 +212,32 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.1 branch
+    conditions:
+      - merged
+      - label=backport-v8.1.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.1"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.2 branch
+    conditions:
+      - merged
+      - label=backport-v8.2.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.2"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

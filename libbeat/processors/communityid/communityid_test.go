@@ -147,6 +147,26 @@ func TestRun(t *testing.T) {
 		e.Put("network.iana_number", tcpProtocol)
 		testProcessor(t, 0, e, "1:LQU9qZlK+B5F3KDmev6m5PMibrg=")
 	})
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		event := &beat.Event{
+			Fields: evt(),
+			Meta:   common.MapStr{},
+		}
+		c := defaultConfig()
+		c.Target = "@metadata.community_id"
+		c.Seed = 0
+		p, err := newFromConfig(c)
+		assert.NoError(t, err)
+
+		out, err := p.Run(event)
+		assert.NoError(t, err)
+
+		id, err := out.Meta.GetValue("community_id")
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, "1:LQU9qZlK+B5F3KDmev6m5PMibrg=", id)
+	})
 }
 
 func testProcessor(t testing.TB, seed uint16, fields common.MapStr, expectedHash interface{}) {

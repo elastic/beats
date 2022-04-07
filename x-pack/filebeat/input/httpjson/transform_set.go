@@ -5,10 +5,9 @@
 package httpjson
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -77,10 +76,11 @@ func newSetResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
 	return &set, nil
 }
 
+//nolint:dupl // Bad linter! Claims duplication with newAppend. The duplication exists but is not resolvable without parameterised types.
 func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
 	c := &setConfig{}
 	if err := cfg.Unpack(c); err != nil {
-		return set{}, errors.Wrap(err, "fail to unpack the set configuration")
+		return set{}, fmt.Errorf("fail to unpack the set configuration: %w", err)
 	}
 
 	ti, err := getTargetInfo(c.Target)

@@ -25,20 +25,23 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/winlogbeat/module"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/config"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 )
 
-// Time the application was started.
-var startTime = time.Now().UTC()
+const pipelinesWarning = "Winlogbeat is unable to load the ingest pipelines" +
+	" because the Elasticsearch output is not configured/enabled. If you have" +
+	" already loaded the ingest pipelines, you can ignore this warning."
 
 // Winlogbeat is used to conform to the beat interface
 type Winlogbeat struct {
@@ -91,7 +94,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		if err != nil {
 			return fmt.Errorf("failed to create new event log: %w", err)
 		}
-		eb.log.Debugf("Initialized EventLog]", eventLog.Name())
+		eb.log.Debugf("initialized WinEventLog[%s]", eventLog.Name())
 
 		logger, err := newEventLogger(b.Info, eventLog, config, eb.log)
 		if err != nil {
@@ -100,7 +103,14 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 
 		eb.eventLogs = append(eb.eventLogs, logger)
 	}
-
+	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+		overwritePipelines := config.OverwritePipelines
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Winlogbeat")
+		if err != nil {
+			return err
+		}
+		return module.UploadPipelines(b.Info, esClient, overwritePipelines)
+	}
 	return nil
 }
 
@@ -112,7 +122,7 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	var err error
 	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, config.RegistryFlush)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize checkpoint registry: %w", err)
 	}
 
 	eb.pipeline = b.Publisher
@@ -125,6 +135,18 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	if b.Config.Output.Name() == "elasticsearch" {
+		callback := func(esClient *eslegclient.Connection) error {
+			return module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
+		}
+		_, err := elasticsearch.RegisterConnectCallback(callback)
+		if err != nil {
+			return err
+		}
+	} else {
+		eb.log.Warn(pipelinesWarning)
+	}
+
 	acker := newEventACKer(eb.checkpoint)
 	persistedState := eb.checkpoint.States()
 
@@ -133,7 +155,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {
-		state, _ := persistedState[log.source.Name()]
+		state := persistedState[log.source.Name()]
 
 		// Start a goroutine for each event log.
 		wg.Add(1)

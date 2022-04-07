@@ -35,7 +35,6 @@ type mockedMessage struct {
 	retained  bool
 	topic     string
 	payload   []byte
-	ack       func()
 }
 
 var _ libmqtt.Message = new(mockedMessage)
@@ -166,7 +165,7 @@ func (m *mockedClient) SubscribeMultiple(filters map[string]byte, callback libmq
 	m.onMessageHandler = callback
 
 	for _, msg := range m.messages {
-		var thatMsg = msg
+		thatMsg := msg
 		go func() {
 			m.onMessageHandler(m, &thatMsg)
 		}()
