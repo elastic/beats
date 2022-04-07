@@ -27,10 +27,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 //FSStat carries the metadata for a given filesystem
@@ -109,7 +109,7 @@ func (fs *FSStat) fillMetrics() {
 	}
 
 	perc := float64(fs.Used.Bytes.ValueOr(0)) / float64(percTotal)
-	fs.Used.Pct = opt.FloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
+	fs.Used.Pct = opt.FloatWith(metric.Round(perc))
 }
 
 // DefaultIgnoredTypes tries to guess a sane list of filesystem types that

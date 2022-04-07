@@ -25,9 +25,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestMountList(t *testing.T) {
@@ -41,7 +42,7 @@ func TestMountList(t *testing.T) {
 	for _, res := range result {
 		err := res.GetUsage()
 		assert.NoError(t, err, "getUsage")
-		out := common.MapStr{}
+		out := mapstr.M{}
 		err = typeconv.Convert(&out, res)
 		assert.NoError(t, err, "typeconv")
 		t.Logf("Usage: %s", out.StringToPrint())

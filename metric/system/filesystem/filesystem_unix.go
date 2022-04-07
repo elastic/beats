@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"syscall"
 
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // GetUsage returns the filesystem usage
