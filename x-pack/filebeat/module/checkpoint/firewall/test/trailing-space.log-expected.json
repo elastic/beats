@@ -31,7 +31,6 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
-        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
