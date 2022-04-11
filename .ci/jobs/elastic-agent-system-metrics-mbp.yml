@@ -1,6 +1,6 @@
 ---
 - job:
-    name: "elastic-agent-system-metrics-mbp"
+    name: "elastic-agent/elastic-agent-system-metrics-mbp"
     display-name: elastic-agent-system-metrics
     description: elastic-agent-system-metrics
     project-type: multibranch
