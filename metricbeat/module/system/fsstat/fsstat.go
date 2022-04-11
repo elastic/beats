@@ -52,7 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	sys := base.Module().(resolve.Resolver)
+	sys, _ := base.Module().(resolve.Resolver)
 	if config.IgnoreTypes == nil {
 		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
 	}
