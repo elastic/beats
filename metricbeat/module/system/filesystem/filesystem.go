@@ -27,10 +27,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	fs "github.com/elastic/beats/v7/libbeat/metric/system/filesystem"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 )
 
 func init() {
