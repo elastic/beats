@@ -27,6 +27,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/go-connections/nat"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -69,7 +72,17 @@ func TestDockerStart(t *testing.T) {
 	// Start
 	cmd := []string{"echo", "Hi!"}
 	labels := map[string]string{"label": "foo", "label.child": "bar"}
-	ID, err := d.ContainerStart("busybox:latest", cmd, labels)
+	hostConfig := &container.HostConfig{
+		PortBindings: nat.PortMap{
+			"4140/tcp": []nat.PortBinding{
+				{
+					HostIP:   "0.0.0.0",
+					HostPort: "4140",
+				},
+			},
+		},
+	}
+	ID, err := d.ContainerStart("busybox:latest", cmd, labels, hostConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,6 +133,7 @@ func checkEvent(t *testing.T, listener bus.Listener, id string, start bool) {
 			assert.NotNil(t, getValue(e, "container.id"))
 			assert.NotNil(t, getValue(e, "container.name"))
 			assert.NotNil(t, getValue(e, "host"))
+			assert.NotNil(t, getValue(e, "ports"))
 			assert.Equal(t, getValue(e, "docker.container.id"), getValue(e, "meta.container.id"))
 			assert.Equal(t, getValue(e, "docker.container.name"), getValue(e, "meta.container.name"))
 			assert.Equal(t, getValue(e, "docker.container.image"), getValue(e, "meta.container.image.name"))

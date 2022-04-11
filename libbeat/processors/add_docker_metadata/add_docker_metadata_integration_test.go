@@ -59,7 +59,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	image := "busybox"
 	cmd := []string{"sleep", "60"}
 	labels := map[string]string{"label": "foo"}
-	id, err := testClient.ContainerStart(image, cmd, labels)
+	id, err := testClient.ContainerStart(image, cmd, labels, nil)
 	require.NoError(t, err)
 	defer testClient.ContainerRemove(id)
 
