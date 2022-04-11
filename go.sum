@@ -97,6 +97,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/elastic/elastic-agent-libs v0.1.2-0.20220404104831-1e71d5e4ae50 h1:/e3B/D6ZEvsm9dcCtrg7a4htBvr9r0RtHth60SAW5bc=
 github.com/elastic/elastic-agent-libs v0.1.2-0.20220404104831-1e71d5e4ae50/go.mod h1:YEetbbH7EFxcNr+e4OXD1Re0fRIk4b8Rn+V71WT2pMY=
+github.com/elastic/elastic-agent-libs v0.1.2-0.20220411163553-45d6da9489d4 h1:VNfybGIFJO0XMKyKiKfLZVrc5Es3Ur2gcSKL8k9yTQs=
+github.com/elastic/elastic-agent-libs v0.1.2-0.20220411163553-45d6da9489d4/go.mod h1:xG0zNuqE4rDl/rM2B0OTh4SN+Q5+VxqtC27mcwVUNys=
 github.com/elastic/go-licenser v0.3.1/go.mod h1:D8eNQk70FOCVBl3smCGQt/lv7meBeQno2eI1S5apiHQ=
 github.com/elastic/go-structform v0.0.9 h1:HpcS7xljL4kSyUfDJ8cXTJC6rU5ChL1wYb6cx3HLD+o=
 github.com/elastic/go-structform v0.0.9/go.mod h1:CZWf9aIRYY5SuKSmOhtXScE5uQiLZNqAFnwKR4OrIM4=
