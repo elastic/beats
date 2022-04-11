@@ -20,9 +20,6 @@ package system
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -39,8 +36,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.system")
 )
 
 // init registers the MetricSet with the central registry.
@@ -87,12 +82,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	body, err := m.mod.GetKubeletStats(m.http)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'system' Metricset data")
+		return fmt.Errorf("error doing HTTP request to fetch 'system' Metricset data: %w", err)
 	}
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error in mapping")
+		return fmt.Errorf("error in mapping: %w", err)
 	}
 
 	for _, e := range events {

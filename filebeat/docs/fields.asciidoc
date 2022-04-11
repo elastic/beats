@@ -2201,6 +2201,15 @@ Fields for Azure activity logs.
 
 
 
+*`azure.activitylogs.identity_name`*::
++
+--
+identity name
+
+type: keyword
+
+--
+
 [float]
 === identity
 
@@ -2363,6 +2372,36 @@ type: keyword
 +
 --
 Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.level`*::
++
+--
+Level
+
+
+type: long
+
+--
+
+*`azure.activitylogs.operation_version`*::
++
+--
+Operation version
 
 
 type: keyword
@@ -20688,6 +20727,40 @@ type: keyword
 --
 In case of phishing event, the domain, which the attacker was impersonating.
 
+
+type: keyword
+
+--
+
+*`checkpoint.comment`*::
++
+--
+type: keyword
+
+--
+
+*`checkpoint.conn_direction`*::
++
+--
+Connection direction
+
+type: keyword
+
+--
+
+*`checkpoint.db_ver`*::
++
+--
+Database version
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Status of database update
 
 type: keyword
 
