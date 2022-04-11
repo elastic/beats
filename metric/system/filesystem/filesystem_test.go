@@ -26,7 +26,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -62,9 +61,7 @@ func TestFileSystemList(t *testing.T) {
 	assert.True(t, (len(fss) > 0))
 
 	for _, fs := range fss {
-
 		err := fs.GetUsage()
-
 		assert.NoError(t, err, "filesystem=%v: %v", fs, err)
 
 	}
