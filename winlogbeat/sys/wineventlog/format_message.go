@@ -21,9 +21,9 @@
 package wineventlog
 
 import (
+	"fmt"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -80,8 +80,8 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	// Determine the buffer size needed (given in WCHARs).
 	var bufferUsed uint32
 	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return "", errors.Wrap(err, "failed in EvtFormatMessage")
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
+		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	// Get a buffer from the pool and adjust its length.
@@ -89,16 +89,17 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	defer bb.Free()
 	bb.Reserve(int(bufferUsed * 2))
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()/2), bb.PtrAt(0), &bufferUsed)
-	if err != nil {
-		switch err {
-		// Ignore some errors so it can tolerate missing or mismatched parameter values.
-		case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT:
-		case windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT:
-		case windows.ERROR_EVT_MAX_INSERTS_REACHED:
-		default:
-			return "", errors.Wrap(err, "failed in EvtFormatMessage")
-		}
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed)
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil: // OK
+
+	// Ignore some errors so it can tolerate missing or mismatched parameter values.
+	case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
+		windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT,
+		windows.ERROR_EVT_MAX_INSERTS_REACHED:
+
+	default:
+		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	return sys.UTF16BytesToString(bb.Bytes())

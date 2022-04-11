@@ -111,7 +111,7 @@ The state has the following elements:
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
-- `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
+- `last_event`: A map representing the last event of the current request in the requests chain (result from applying transforms to `last_response.body`).
 - `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
 - `header`: A map containing the headers. References the next request headers when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
 - `body`: A map containing the body. References the next request body when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
@@ -222,6 +222,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
 - `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
 - `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
+- `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
@@ -1037,7 +1038,7 @@ request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
 response_json using id as '1':
 
 +
-[[response-json1]]
+[[response-json2]]
 ["source","json",subs="attributes"]
 ----
 {

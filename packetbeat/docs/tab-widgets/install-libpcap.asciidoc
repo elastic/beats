@@ -23,8 +23,12 @@ You probably do not need to install libpcap.
 // end::linux[]
 
 // tag::win[]
-Download and install a packet sniffing library,
-such as https://nmap.org/npcap/[Npcap], that implements the
+
+You probably do not need to install libpcap. The default distribution of
+{packetbeat} for Windows comes bundled with the Npcap library.
+
+For the OSS-only distribution, you must download and install a packet
+sniffing library, such as https://nmap.org/npcap/[Npcap], that implements the
 https://github.com/the-tcpdump-group/libpcap[libpcap] interfaces.
 
 If you use Npcap, make sure you install it in WinPcap API-compatible mode. If
