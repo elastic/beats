@@ -30,11 +30,12 @@ type FileParser interface {
 
 // FileParsers returns the set of file parsers required to satisfy the config.
 func FileParsers(c Config) []FileParser {
+	//nolint:godox // Bad linter!
 	// TODO: Consider whether to allow specification by fileparser name in
 	// addition to target field.
 
 	parserNames, fields := parserNamesAndFields(c)
-	var parsers []FileParser
+	parsers := make([]FileParser, 0, len(parserNames))
 	for name := range parserNames {
 		parsers = append(parsers, fileParsers[name](fields))
 	}

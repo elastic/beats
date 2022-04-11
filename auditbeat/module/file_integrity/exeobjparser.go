@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:errorlint,godox // Bad linters!
 package file_integrity
 
 import (
@@ -68,7 +69,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 
 	typ := strings.ToLower(f.Type())
 	if typ == "mach-o" {
-		typ = "macho"
+		typ = "macho" //nolint:goconst // Bad linter! The literal is meaningful.
 	}
 
 	var details common.MapStr
@@ -78,7 +79,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 			panic(err)
 		}
 		details = make(common.MapStr)
-		dst.Put(typ, details)
+		dst[typ] = details
 	} else {
 		switch d := d.(type) {
 		case common.MapStr:
@@ -144,7 +145,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 					VarEntropy: varEntropy,
 				}
 			}
-			details.Put("sections", stats)
+			details["sections"] = stats
 		}
 	}
 
@@ -162,31 +163,31 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		}
 		imphash := Digest(h)
 		if wantFields(fields, "file."+typ+".import_hash") {
-			details.Put("import_hash", imphash)
+			details["import_hash"] = imphash
 		}
 		switch typ {
 		case "pe":
 			if wantFields(fields, "file.pe.imphash") {
-				details.Put("imphash", imphash)
+				details["imphash"] = imphash
 			}
 		case "macho":
 			if wantFields(fields, "file.macho.symhash") {
-				details.Put("symhash", imphash)
+				details["symhash"] = imphash
 			}
 		}
 		if len(symbols) != 0 {
 			if wantFields(fields, "file."+typ+".imports") {
-				details.Put("imports", symbols)
+				details["imports"] = symbols
 			}
 			wantEntropy := wantFields(fields, "file."+typ+".imports_names_entropy")
 			wantVariance := wantFields(fields, "file."+typ+".imports_names_var_entropy")
 			if wantEntropy || wantVariance {
 				entropy, varEntropy := toutoumomoma.NameEntropy(symbols)
 				if wantEntropy {
-					details.Put("imports_names_entropy", entropy)
+					details["imports_names_entropy"] = entropy
 				}
 				if wantVariance {
-					details.Put("imports_names_var_entropy", varEntropy)
+					details["imports_names_var_entropy"] = varEntropy
 				}
 			}
 		}
@@ -206,21 +207,21 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 			return err
 		}
 		if wantFields(fields, "file."+typ+".go_import_hash") {
-			details.Put("go_import_hash", Digest(h))
+			details["go_import_hash"] = Digest(h)
 		}
 		if len(symbols) != 0 {
 			if wantFields(fields, "file."+typ+".go_imports") {
-				details.Put("go_imports", symbols)
+				details["go_imports"] = symbols
 			}
 			wantEntropy := wantFields(fields, "file."+typ+".go_imports_names_entropy")
 			wantVariance := wantFields(fields, "file."+typ+".go_imports_names_variance")
 			if wantEntropy || wantVariance {
 				entropy, varEntropy := toutoumomoma.NameEntropy(symbols)
 				if wantEntropy {
-					details.Put("go_imports_names_entropy", entropy)
+					details["go_imports_names_entropy"] = entropy
 				}
 				if wantVariance {
-					details.Put("go_imports_names_var_entropy", varEntropy)
+					details["go_imports_names_var_entropy"] = varEntropy
 				}
 			}
 		}
@@ -231,7 +232,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		if err != nil {
 			return err
 		}
-		details.Put("go_stripped", stripped)
+		details["go_stripped"] = stripped
 	}
 
 	return nil

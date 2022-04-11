@@ -15,13 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:errorlint,goconst,dupl // Bad linters!
 package file_integrity
 
 import (
 	"fmt"
 	"math"
-	"os"
-	"os/exec"
 	"reflect"
 	"strconv"
 	"testing"
@@ -82,13 +81,6 @@ func TestExeObjParser(t *testing.T) {
 			})
 		}
 	}
-}
-
-func build(goos, builder, path, target string, flags []string) (*exec.Cmd, error) {
-	cmd := exec.Command(builder, append(flags[:len(flags):len(flags)], "build", "-o", target, path)...)
-	cmd.Env = append([]string{"GOOS=" + goos}, os.Environ()...)
-	cmd.Stderr = os.Stderr
-	return cmd, cmd.Run()
 }
 
 func approxHash(format, builder string) func(a, b interface{}) bool {

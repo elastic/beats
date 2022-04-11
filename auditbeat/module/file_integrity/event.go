@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:gosec,goconst // Bad linters!
 package file_integrity
 
 import (
@@ -332,14 +333,14 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file[k] = v
 	}
 
-	out.MetricSetFields.Put("event.kind", "event")
-	out.MetricSetFields.Put("event.category", []string{"file"})
+	out.MetricSetFields.Put("event.kind", "event")              //nolint:errcheck // Will not error.
+	out.MetricSetFields.Put("event.category", []string{"file"}) //nolint:errcheck // Will not error.
 	if e.Action > 0 {
 		actions := e.Action.InOrder(existedBefore, e.Info != nil)
-		out.MetricSetFields.Put("event.type", actions.ECSTypes())
-		out.MetricSetFields.Put("event.action", actions.StringArray())
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())      //nolint:errcheck // Will not error.
+		out.MetricSetFields.Put("event.action", actions.StringArray()) //nolint:errcheck // Will not error.
 	} else {
-		out.MetricSetFields.Put("event.type", None.ECSTypes())
+		out.MetricSetFields.Put("event.type", None.ECSTypes()) //nolint:errcheck // Will not error.
 	}
 
 	if n := len(e.errors); n > 0 {
@@ -348,9 +349,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			errors[idx] = err.Error()
 		}
 		if n == 1 {
-			out.MetricSetFields.Put("error.message", errors[0])
+			out.MetricSetFields.Put("error.message", errors[0]) //nolint:errcheck // Will not error.
 		} else {
-			out.MetricSetFields.Put("error.message", errors)
+			out.MetricSetFields.Put("error.message", errors) //nolint:errcheck // Will not error.
 		}
 	}
 	return out

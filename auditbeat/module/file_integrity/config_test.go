@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:errorlint // Bad linter!
 package file_integrity
 
 import (

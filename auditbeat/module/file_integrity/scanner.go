@@ -177,7 +177,7 @@ func (s *scanner) walkDir(dir string, action Action) error {
 
 		return nil
 	})
-	if err == errDone {
+	if err == errDone { //nolint:errorlint // Bad linter! This is never wrapped.
 		err = nil
 	}
 	return err

@@ -21,6 +21,7 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"syscall"
@@ -78,7 +79,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	// deadlock. Do it on all platforms for simplicity.
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
-			if err == syscall.EMFILE {
+			if errors.Is(err, syscall.EMFILE) {
 				r.log.Warnw("Failed to add watch (check the max number of "+
 					"open files allowed with 'ulimit -a')",
 					"file_path", p, "error", err)
