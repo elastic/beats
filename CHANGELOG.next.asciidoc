@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 - Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
+- Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
 
 *Filebeat*
 
