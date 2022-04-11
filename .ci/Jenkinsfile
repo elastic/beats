@@ -33,12 +33,12 @@ pipeline {
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
-	stage('Lint'){
+	  stage('Lint'){
       steps {
         withGithubNotify(context: "Lint") {
           dir("${BASE_DIR}"){
             withMageEnv(){
-              sh(label: 'Mage check', script: 'mage -v check')
+              sh(label: 'Mage lint', script: 'mage -v lint')
             }
           }
         }
@@ -55,7 +55,7 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'macosx && x86_64', 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable'
+            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable'
           }
           axis {
             name 'GO_VERSION'
@@ -84,7 +84,6 @@ pipeline {
         }
       }
     }
-
   }
   post {
     cleanup {

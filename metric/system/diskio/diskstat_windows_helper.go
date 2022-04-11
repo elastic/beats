@@ -21,11 +21,11 @@
 package diskio
 
 import (
+	"fmt"
 	"strings"
 	"syscall"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
@@ -134,12 +134,12 @@ func enablePerformanceCounters() error {
 	}()
 
 	if err != nil {
-		return errors.Errorf("cannot open new key in the registry in order to enable the performance counters: %s", err)
+		return fmt.Errorf("cannot open new key in the registry in order to enable the performance counters: %w", err)
 	}
 	val, _, err := key.GetIntegerValue("EnableCounterForIoctl")
 	if val != 1 || err != nil {
 		if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
-			return errors.Errorf("cannot create HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
+			return fmt.Errorf("cannot create HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry in order to enable the performance counters: %w", err)
 		}
 		logp.L().Named("diskio").Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
 	}
