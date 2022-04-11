@@ -130,12 +130,12 @@ nextHash:
 				}
 			}
 			if !found {
-				errs = append(errs, errors.Errorf("invalid file_parsers value '%v'", p))
+				errs = append(errs, fmt.Errorf("invalid file_parsers value '%v'", p))
 			}
 			continue
 		}
 		if _, ok := fileParserFor[p]; !ok {
-			errs = append(errs, errors.Errorf("invalid file_parsers value '%v'", p))
+			errs = append(errs, fmt.Errorf("invalid file_parsers value '%v'", p))
 		}
 	}
 
