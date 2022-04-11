@@ -134,6 +134,8 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
+    w.log.Debug("Start next scan")
+
 	paths := w.scanner.GetFiles()
 
 	newFiles := make(map[string]os.FileInfo)
