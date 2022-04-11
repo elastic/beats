@@ -22,6 +22,7 @@ package docker
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -274,6 +275,7 @@ func (d *Provider) stopContainer(container *docker.Container, meta *dockerMetada
 
 func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetadata, flag string) {
 	var host string
+	var ports common.MapStr
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
 	}
@@ -292,9 +294,14 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 		}
 
 		events = append(events, event)
+	} else {
+		ports = common.MapStr{}
+		for _, port := range container.Ports {
+			ports[strconv.FormatUint(uint64(port.PrivatePort), 10)] = port.PublicPort
+		}
 	}
-
 	// Emit container container and port information
+
 	for _, port := range container.Ports {
 		event := bus.Event{
 			"provider":  d.uuid,
@@ -302,6 +309,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 			flag:        true,
 			"host":      host,
 			"port":      port.PrivatePort,
+			"ports":     ports,
 			"docker":    meta.Docker,
 			"container": meta.Container,
 			"meta":      meta.Metadata,
@@ -334,6 +342,7 @@ func (d *Provider) publish(events []bus.Event) {
 	event := bus.Event(common.MapStr(events[0]).Clone())
 	// Remove the port to avoid ambiguity during debugging
 	delete(event, "port")
+	delete(event, "ports")
 	event["config"] = configs
 
 	// Call all appenders to append any extra configuration
@@ -357,6 +366,9 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	}
 	if port, ok := event["port"]; ok {
 		e["port"] = port
+	}
+	if ports, ok := event["ports"]; ok {
+		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
