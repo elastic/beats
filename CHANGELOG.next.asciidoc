@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 - Add cronjob metadata by default {pull}30637[30637]
 - New option `setup.template.json.data_stream` is added to indicate if the JSON index template is a data stream. {pull}31048[31048]
+- Add support for port mapping in docker hints. {pull}31243[31243]
 
 *Auditbeat*
 
