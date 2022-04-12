@@ -71,7 +71,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
-		return fmt.Errorf("error setting up docker autodiscover provider: %v", err)
+		return fmt.Errorf("error setting up docker autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()
