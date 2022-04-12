@@ -41,11 +41,25 @@ func SafeFileRotate(path, tempfile string) error {
 		return e
 	}
 
+	// .old file will still exist if path file is already there, it should be removed
+	_ = os.Remove(old)
+
 	// sync all files
+	return SyncParent(path)
+}
+
+// SyncParent fsyncs parent directory
+func SyncParent(path string) error {
 	parent := filepath.Dir(path)
 	if f, err := os.OpenFile(parent, os.O_SYNC|os.O_RDWR, 0755); err == nil {
-		_ = f.Sync()
-		f.Close()
+		err := f.Sync()
+		if err != nil {
+			return err
+		}
+		err = f.Close()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
