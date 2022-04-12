@@ -72,7 +72,7 @@ jobs:
         id: add_labels_to_closed_issue
         with:
           query: |
-            mutation add_label($issueid:String!, $labelids:[String!]!) {
+            mutation add_label($issueid:ID!, $labelids:[String!]!) {
               addLabelsToLabelable(input: {labelableId: $issueid, labelIds: $labelids}) {
                 clientMutationId
               }
