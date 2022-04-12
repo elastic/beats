@@ -22,7 +22,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:7.17.2
+          image: docker.elastic.co/beats/elastic-agent:7.17.3
           env:
             - name: FLEET_ENROLL
               value: "1"
