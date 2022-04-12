@@ -146,9 +146,9 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 	}
 
 	evt := w.Event()
-	require.Equal(t, evt.Op, loginp.OpCreate, "new file should be detected")
-	require.Equal(t, evt.OldPath, "", "new file does not have an old path set")
-	require.Equal(t, evt.NewPath, appLogPath, "new file does not have an old path set")
+	require.Equal(t, loginp.OpCreate, evt.Op, "new file should be detected")
+	require.Equal(t, "", evt.OldPath, "new file does not have an old path set")
+	require.Equal(t, appLogPath, evt.NewPath, "new file does not have an old path set")
 
 	err = os.Rename(appLogPath, rotatedAppLogPath)
 	if err != nil {
