@@ -19,7 +19,7 @@
 // +build !linux
 // +build !freebsd !cgo
 
-package metrics
+package report
 
 import (
 	"github.com/elastic/elastic-agent-libs/logp"
