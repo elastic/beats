@@ -167,8 +167,8 @@ The multiline message is stored under the key `msg`.
         keys_under_root: true
         message_key: msg
     - multiline:
-        type: counter
-        lines_count: 3
+        type: count
+        count_lines: 3
 ----
 
 See the available parser settings in detail below.
