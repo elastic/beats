@@ -40,10 +40,7 @@ import (
 )
 
 func init() {
-	err := autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
-	if err != nil {
-		fmt.Println("error while adding docker provider: %v", err)
-	}
+	_ = autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -74,7 +71,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
-		return errors.New(fmt.Sprintf("error setting up docker autodiscover provider: %v", err))
+		return fmt.Errorf("error setting up docker autodiscover provider: %v", err)
 	}
 
 	config := defaultConfig()
@@ -179,7 +176,7 @@ type dockerMetadata struct {
 func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dockerMetadata) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
-		d.logger.Error(errors.New("Couldn't get a container from watcher event"))
+		d.logger.Error(errors.New("couldn't get a container from watcher event"))
 		return nil, nil
 	}
 
