@@ -183,8 +183,7 @@ variables are ignored.
 ===== `proxy_url`
 
 The URL of the proxy to use when connecting to the Elasticsearch servers. The
-value may be either a complete URL or a "host[:port]", in which case the "http"
-scheme is assumed. If a value is not specified through the configuration file
+value must be a complete URL. If a value is not specified through the configuration file
 then proxy environment variables are used. See the
 https://golang.org/pkg/net/http/#ProxyFromEnvironment[Go documentation]
 for more information about the environment variables.
