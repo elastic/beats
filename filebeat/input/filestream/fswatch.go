@@ -127,7 +127,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	// run initial scan before starting regular
 	w.watch(ctx)
 
-	timed.Periodic(ctx, w.interval, func() error {
+	_ = timed.Periodic(ctx, w.interval, func() error {
 		w.watch(ctx)
 
 		return nil
@@ -296,13 +296,13 @@ func (s *fileScanner) resolveRecursiveGlobs(c fileScannerConfig) error {
 
 // normalizeGlobPatterns calls `filepath.Abs` on all the globs from config
 func (s *fileScanner) normalizeGlobPatterns() error {
-	var paths []string
-	for _, path := range s.paths {
+	paths := make([]string, len(s.paths))
+	for i, path := range s.paths {
 		pathAbs, err := filepath.Abs(path)
 		if err != nil {
-			return fmt.Errorf("failed to get the absolute path for %s: %v", path, err)
+			return fmt.Errorf("failed to get the absolute path for %s: %w", path, err)
 		}
-		paths = append(paths, pathAbs)
+		paths[i] = pathAbs
 	}
 	s.paths = paths
 	return nil

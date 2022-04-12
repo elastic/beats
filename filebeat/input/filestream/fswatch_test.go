@@ -106,7 +106,7 @@ func TestFileScanner(t *testing.T) {
 }
 
 func setupFilesForScannerTest(t *testing.T, tmpDir string) {
-	err := os.Mkdir(filepath.Join(tmpDir, directoryPath), 750)
+	err := os.Mkdir(filepath.Join(tmpDir, directoryPath), 0750)
 	if err != nil {
 		t.Fatalf("cannot create non harvestable directory: %v", err)
 	}
