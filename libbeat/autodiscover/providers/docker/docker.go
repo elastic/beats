@@ -21,10 +21,10 @@
 package docker
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
-	"errors"
 
 	"github.com/gofrs/uuid"
 
@@ -74,7 +74,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up docker autodiscover provider")
+		return errors.New(fmt.Sprintf("error setting up docker autodiscover provider: %v", err))
 	}
 
 	config := defaultConfig()
