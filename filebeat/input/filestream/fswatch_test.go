@@ -128,7 +128,6 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 		t.Fatal(err)
 	}
 	w := fileWatcher{
-		interval:     1 * time.Second,
 		log:          logp.L(),
 		scanner:      fs,
 		events:       make(chan loginp.FSEvent),
@@ -137,7 +136,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go w.Run(ctx)
+	go w.watch(ctx)
 
 	appLogPath := filepath.Join(tmpDir, "app.log")
 	rotatedAppLogPath := filepath.Join(tmpDir, "app.log.1")
@@ -150,6 +149,8 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 	require.Equal(t, loginp.OpCreate, evt.Op, "new file should be detected")
 	require.Equal(t, "", evt.OldPath, "new file does not have an old path set")
 	require.Equal(t, appLogPath, evt.NewPath, "new file does not have an old path set")
+
+	go w.watch(ctx)
 
 	err = os.Rename(appLogPath, rotatedAppLogPath)
 	if err != nil {
