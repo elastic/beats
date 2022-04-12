@@ -61,7 +61,7 @@ func openHandlesReporter(logger *logp.Logger) func(_ monitoring.Mode, V monitori
 
 		n, err := handleCounter.OpenHandleCount()
 		if err != nil {
-			logger.Err("Error while retrieving the number of open file handles: %v", err)
+			logger.Error("Error while retrieving the number of open file handles: %v", err)
 			return
 		}
 		monitoring.ReportInt(V, "open", int64(n))
