@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -79,5 +80,22 @@ func TestEventMapping(t *testing.T) {
 			_, err := m.extractAndTransform(context.Background())
 			assert.Error(t, err)
 		})
+	})
+}
+
+func TestPeriod(t *testing.T) {
+	t.Run("Check lower period", func(t *testing.T) {
+		var printWarning = CheckCollectionPeriod(time.Second * 59)
+		assert.True(t, printWarning, "Warning expected.")
+	})
+
+	t.Run("Check period", func(t *testing.T) {
+		var printWarning = CheckCollectionPeriod(time.Minute * 10)
+		assert.False(t, printWarning, "Warning not expected.")
+	})
+
+	t.Run("Check higher period", func(t *testing.T) {
+		var printWarning = CheckCollectionPeriod(time.Minute * 11)
+		assert.False(t, printWarning, "Warning not expected.")
 	})
 }

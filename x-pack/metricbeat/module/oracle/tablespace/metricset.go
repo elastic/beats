@@ -6,6 +6,8 @@ package tablespace
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -40,10 +42,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error parsing config file")
 	}
 
+	// Print the warning if the collection period value is less than 10 minutes.
+	if CheckCollectionPeriod(base.Module().Config().Period) {
+		fmt.Println("Warning: The current value of period is significantly low and might waste cycles and resources. Please set the period value to at least 10 minutes or more.")
+	}
+
 	return &MetricSet{
 		BaseMetricSet:     base,
 		connectionDetails: config,
 	}, nil
+}
+
+// CheckCollectionPeriod method returns true if the passed value for period is less than 10 minutes.
+// This method is responsible to print the warning.
+func CheckCollectionPeriod(period time.Duration) bool {
+	return period < time.Minute*10
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
