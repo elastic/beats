@@ -55,12 +55,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 - Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
+- Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
 - Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
 - Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
 - Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
 - Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
 - Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
 - checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
+- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 
 *Heartbeat*
