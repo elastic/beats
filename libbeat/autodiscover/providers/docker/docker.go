@@ -362,9 +362,10 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	// Builders are Beat specific.
 	e := bus.Event{}
 	var dockerMeta common.MapStr
+	var ok bool
 
 	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
-		dockerMeta, ok := rawDocker.(common.MapStr)
+		dockerMeta, ok = rawDocker.(common.MapStr)
 		if ok {
 			e["container"] = dockerMeta
 		}
