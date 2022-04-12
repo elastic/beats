@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -140,7 +141,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 
 	appLogPath := filepath.Join(tmpDir, "app.log")
 	rotatedAppLogPath := filepath.Join(tmpDir, "app.log.1")
-	err = ioutil.WriteFile(appLogPath, []byte("my longer log line"), 0o600)
+	err = os.WriteFile(appLogPath, []byte("my longer log line"), 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,20 +156,24 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 		t.Fatalf("failed to rotate active file: %v", err)
 	}
 
-	err = ioutil.WriteFile(appLogPath, []byte("shorter line"), 0o600)
+	if _, err := os.Stat(appLogPath); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("app.log should not exist")
+	}
+
+	err = os.WriteFile(appLogPath, []byte("shorter line"), 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	evt = w.Event()
-	require.Equal(t, evt.Op, loginp.OpRename, "app.log has been renamed to app.log.1, got: %s old_path=%s new_path=%s", evt.Op.String(), evt.OldPath, evt.NewPath)
-	require.Equal(t, evt.OldPath, appLogPath, "old_path should be set to app.log because of rename")
-	require.Equal(t, evt.NewPath, rotatedAppLogPath, "new_path should be set to app.log.1 because of rename")
+	require.Equal(t, loginp.OpRename, evt.Op, "app.log has been renamed to app.log.1, got: %s old_path=%s new_path=%s", evt.Op.String(), evt.OldPath, evt.NewPath)
+	require.Equal(t, appLogPath, evt.OldPath, "old_path should be set to app.log because of rename")
+	require.Equal(t, rotatedAppLogPath, evt.NewPath, "new_path should be set to app.log.1 because of rename")
 
 	evt = w.Event()
-	require.Equal(t, evt.Op, loginp.OpCreate, "new file app.log should be detected, got: %s for old_path=%s new_path=%s", evt.Op.String(), evt.OldPath, evt.NewPath)
-	require.Equal(t, evt.OldPath, "", "new file should not have an old path set")
-	require.Equal(t, evt.NewPath, appLogPath, "new file should be called app.log")
+	require.Equal(t, loginp.OpCreate, evt.Op, "new file app.log should be detected, got: %s for old_path=%s new_path=%s", evt.Op.String(), evt.OldPath, evt.NewPath)
+	require.Equal(t, "", evt.OldPath, "new file should not have an old path set")
+	require.Equal(t, appLogPath, evt.NewPath, "new file should be called app.log")
 }
 
 func TestFileWatchNewDeleteModified(t *testing.T) {
