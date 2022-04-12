@@ -27,9 +27,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/go-connections/nat"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -72,17 +69,7 @@ func TestDockerStart(t *testing.T) {
 	// Start
 	cmd := []string{"echo", "Hi!"}
 	labels := map[string]string{"label": "foo", "label.child": "bar"}
-	hostConfig := &container.HostConfig{
-		PortBindings: nat.PortMap{
-			"4140/tcp": []nat.PortBinding{
-				{
-					HostIP:   "0.0.0.0",
-					HostPort: "4140",
-				},
-			},
-		},
-	}
-	ID, err := d.ContainerStart("busybox:latest", cmd, labels, hostConfig)
+	ID, err := d.ContainerStart("busybox:latest", cmd, labels)
 	if err != nil {
 		t.Fatal(err)
 	}

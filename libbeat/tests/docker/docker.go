@@ -43,7 +43,7 @@ func NewClient() (Client, error) {
 }
 
 // ContainerStart pulls and starts the given container
-func (c Client) ContainerStart(image string, cmd []string, labels map[string]string, hostConfig *container.HostConfig) (string, error) {
+func (c Client) ContainerStart(image string, cmd []string, labels map[string]string) (string, error) {
 	err := c.imagePull(image)
 	if err != nil {
 		return "", err
@@ -54,7 +54,7 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 		Image:  image,
 		Cmd:    cmd,
 		Labels: labels,
-	}, hostConfig, nil, nil, "")
+	}, nil, nil, nil, "")
 	if err != nil {
 		return "", errors.Wrap(err, "creating container")
 	}

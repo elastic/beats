@@ -40,7 +40,10 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
+	err := autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
+	if err != nil {
+		fmt.Printf("error while adding docker provider: %v\n", err)
+	}
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -184,12 +187,21 @@ func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dock
 	labelMap := common.MapStr{}
 	metaLabelMap := common.MapStr{}
 	for k, v := range container.Labels {
-		safemapstr.Put(labelMap, k, v)
+		err := safemapstr.Put(labelMap, k, v)
+		if err != nil {
+			d.logger.Debugf("error adding k:v (%v:%v): %v", k, v, err)
+		}
 		if d.config.Dedot {
 			label := common.DeDot(k)
-			metaLabelMap.Put(label, v)
+			_, err := metaLabelMap.Put(label, v)
+			if err != nil {
+				d.logger.Debugf("error adding value (%v): %v", v, err)
+			}
 		} else {
-			safemapstr.Put(metaLabelMap, k, v)
+			err := safemapstr.Put(metaLabelMap, k, v)
+			if err != nil {
+				d.logger.Debugf("error adding k:v (%v:%v): %v", k, v, err)
+			}
 		}
 	}
 
