@@ -75,6 +75,7 @@ type fileWatcher struct {
 	scanner         loginp.FSScanner
 	log             *logp.Logger
 	events          chan loginp.FSEvent
+	sameFileFunc    func(os.FileInfo, os.FileInfo) bool
 }
 
 func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
@@ -108,6 +109,7 @@ func newScannerWatcher(paths []string, c *common.Config) (loginp.FSWatcher, erro
 		prev:            make(map[string]os.FileInfo, 0),
 		scanner:         scanner,
 		events:          make(chan loginp.FSEvent),
+		sameFileFunc:    os.SameFile,
 	}, nil
 }
 
@@ -141,12 +143,16 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	for path, info := range paths {
 
+		// if the scanner found a new path or an existing path
+		// with a different file, it is a new file
 		prevInfo, ok := w.prev[path]
-		if !ok {
-			newFiles[path] = paths[path]
+		if !ok || !w.sameFileFunc(prevInfo, info) {
+			newFiles[path] = info
 			continue
 		}
 
+		// if the two infos belong to the same file and it has been modified
+		// if the size is smaller than before, it is truncated, if bigger, it is a write event
 		if prevInfo.ModTime() != info.ModTime() {
 			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
 				select {
@@ -171,7 +177,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// either because they have been deleted or renamed
 	for removedPath, removedInfo := range w.prev {
 		for newPath, newInfo := range newFiles {
-			if os.SameFile(removedInfo, newInfo) {
+			if w.sameFileFunc(removedInfo, newInfo) {
 				select {
 				case <-ctx.Done():
 					return

@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -118,6 +119,58 @@ func setupFilesForScannerTest(t *testing.T, tmpDir string) {
 	}
 }
 
+func TestFileWatcherRenamedTruncated(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	fs, err := newFileScanner([]string{filepath.Join(tmpDir, "app.log*")}, fileScannerConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := fileWatcher{
+		interval:     1 * time.Second,
+		log:          logp.L(),
+		scanner:      fs,
+		events:       make(chan loginp.FSEvent),
+		sameFileFunc: os.SameFile,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go w.Run(ctx)
+
+	appLogPath := filepath.Join(tmpDir, "app.log")
+	rotatedAppLogPath := filepath.Join(tmpDir, "app.log.1")
+	err = ioutil.WriteFile(appLogPath, []byte("my longer log line"), 0o600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt := w.Event()
+	require.Equal(t, evt.Op, loginp.OpCreate, "new file should be detected")
+	require.Equal(t, evt.OldPath, "", "new file does not have an old path set")
+	require.Equal(t, evt.NewPath, appLogPath, "new file does not have an old path set")
+
+	err = os.Rename(appLogPath, rotatedAppLogPath)
+	if err != nil {
+		t.Fatalf("failed to rotate active file: %v", err)
+	}
+
+	err = ioutil.WriteFile(appLogPath, []byte("shorter line"), 0o600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt = w.Event()
+	require.Equal(t, evt.Op, loginp.OpRename, "app.log has been renamed to app.log.1, got: %s old_path=%s new_path=%s", evt.Op.String(), evt.OldPath, evt.NewPath)
+	require.Equal(t, evt.OldPath, appLogPath, "old_path should be set to app.log because of rename")
+	require.Equal(t, evt.NewPath, rotatedAppLogPath, "new_path should be set to app.log.1 because of rename")
+
+	evt = w.Event()
+	require.Equal(t, evt.Op, loginp.OpCreate, "new file app.log should be detected, got: %s for old_path=%s new_path=%s", evt.Op.String(), evt.OldPath, evt.NewPath)
+	require.Equal(t, evt.OldPath, "", "new file should not have an old path set")
+	require.Equal(t, evt.NewPath, appLogPath, "new file should be called app.log")
+}
+
 func TestFileWatchNewDeleteModified(t *testing.T) {
 	oldTs := time.Now()
 	newTs := oldTs.Add(5 * time.Second)
@@ -201,10 +254,11 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			w := fileWatcher{
-				log:     logp.L(),
-				prev:    test.prevFiles,
-				scanner: &mockScanner{test.nextFiles},
-				events:  make(chan loginp.FSEvent),
+				log:          logp.L(),
+				prev:         test.prevFiles,
+				scanner:      &mockScanner{test.nextFiles},
+				events:       make(chan loginp.FSEvent),
+				sameFileFunc: testSameFile,
 			}
 
 			go w.watch(context.Background())
@@ -241,3 +295,7 @@ func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
 func (t testFileInfo) Sys() interface{}   { return t.sys }
+
+func testSameFile(fi1, fi2 os.FileInfo) bool {
+	return fi1.Name() == fi2.Name()
+}
