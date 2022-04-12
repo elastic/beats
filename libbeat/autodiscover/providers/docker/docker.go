@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"errors"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
@@ -42,7 +42,7 @@ import (
 func init() {
 	err := autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
 	if err != nil {
-		fmt.Printf("error while adding docker provider: %v\n", err)
+		fmt.Println("error while adding docker provider: %v", err)
 	}
 }
 
@@ -278,9 +278,7 @@ func (d *Provider) scheduleStopContainer(event bus.Event) {
 }
 
 func (d *Provider) stopContainer(container *docker.Container, meta *dockerMetadata) {
-	if _, ok := d.stoppers[container.ID]; ok {
-		delete(d.stoppers, container.ID)
-	}
+	delete(d.stoppers, container.ID)
 
 	d.emitContainer(container, meta, "stop")
 }
@@ -292,7 +290,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 		host = container.IPAddresses[0]
 	}
 
-	var events []bus.Event
+	events := make([]bus.Event, 0)
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -369,8 +367,10 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	var dockerMeta common.MapStr
 
 	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
-		dockerMeta = rawDocker.(common.MapStr)
-		e["container"] = dockerMeta
+		dockerMeta, ok := rawDocker.(common.MapStr)
+		if ok {
+			e["container"] = dockerMeta
+		}
 	}
 
 	if host, ok := event["host"]; ok {
