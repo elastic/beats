@@ -144,9 +144,10 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	w := fileWatcher{
-		log:     logp.L(),
-		scanner: scanner,
-		events:  make(chan loginp.FSEvent),
+		log:          logp.L(),
+		scanner:      scanner,
+		events:       make(chan loginp.FSEvent),
+		sameFileFunc: testSameFile,
 	}
 
 	go w.watch(context.Background())
