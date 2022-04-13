@@ -15,11 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build darwin || freebsd || linux || windows || aix
-// +build darwin freebsd linux windows aix
+//go:build tools
+// +build tools
 
 package tools
 
 import (
+	_ "go.elastic.co/go-licence-detector"
+
 	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
 )
