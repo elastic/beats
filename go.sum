@@ -612,7 +612,6 @@ github.com/elastic/beats/v7 v7.0.0-alpha2.0.20220303073437-a28c413604b8/go.mod h
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 h1:lnDkqiRFKm0rxdljqrj3lotWinO9+jFmeDXIC4gvIQs=
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3/go.mod h1:aPqzac6AYkipvp4hufTyMj5PDIphF3+At8zr7r51xjY=
 github.com/elastic/e2e-testing v1.99.2-0.20220117192005-d3365c99b9c4/go.mod h1:UcNuf4pX/qDVNQr0zybm1NL2YoWik+jKBaINZqQCA40=
-github.com/elastic/elastic-agent v0.0.0-20220330154707-da786a47a0c5 h1:js0dqutP/z6TLmSwKR+0LuN7u+4n5tLhLS0UWw6AbSE=
 github.com/elastic/elastic-agent v0.0.0-20220330154707-da786a47a0c5/go.mod h1:MPXbia65XYO5n/40pKfCstXGceXWOIQ0fIPEQiXmyEE=
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6 h1:nFvXHBjYK3e9+xF0WKDeAKK4aOO51uC28s+L9rBmilo=
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6/go.mod h1:uh/Gj9a0XEbYoM4NYz4LvaBVARz3QXLmlNjsrKY9fTc=

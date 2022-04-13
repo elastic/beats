@@ -294,10 +294,7 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-require (
-	github.com/containerd/containerd v1.6.1 // indirect
-	github.com/elastic/elastic-agent v0.0.0-20220330154707-da786a47a0c5 // indirect
-)
+require github.com/containerd/containerd v1.6.1 // indirect
 
 replace (
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
