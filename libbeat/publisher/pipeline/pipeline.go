@@ -211,7 +211,7 @@ func (p *Pipeline) Close() error {
 
 	}
 
-	// TODO: close/disconnect still active clients
+	// Note: active clients are not closed / disconnected.
 
 	// close output before shutting down queue
 	p.output.Close()
@@ -359,18 +359,19 @@ func (p *Pipeline) runSignalPropagation() {
 			}
 
 			// new client -> register client for signal propagation.
-			client := recv.Interface().(*client)
-			channels = append(channels,
-				reflect.SelectCase{
-					Dir:  reflect.SelectRecv,
-					Chan: reflect.ValueOf(client.closeRef.Done()),
-				},
-				reflect.SelectCase{
-					Dir:  reflect.SelectRecv,
-					Chan: reflect.ValueOf(client.done),
-				},
-			)
-			clients = append(clients, client)
+			if client := recv.Interface().(*client); client != nil {
+				channels = append(channels,
+					reflect.SelectCase{
+						Dir:  reflect.SelectRecv,
+						Chan: reflect.ValueOf(client.closeRef.Done()),
+					},
+					reflect.SelectCase{
+						Dir:  reflect.SelectRecv,
+						Chan: reflect.ValueOf(client.done),
+					},
+				)
+				clients = append(clients, client)
+			}
 			continue
 		}
 
