@@ -160,6 +160,7 @@ require (
 
 require (
 	github.com/elastic/elastic-agent-libs v0.1.1
+	github.com/elastic/elastic-agent-shipper v0.1.0
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
@@ -293,10 +294,7 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-require (
-	github.com/containerd/containerd v1.6.1 // indirect
-	github.com/elastic/elastic-agent-shipper v0.1.0
-)
+require github.com/containerd/containerd v1.6.1 // indirect
 
 replace (
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
