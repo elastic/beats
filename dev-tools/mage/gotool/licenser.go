@@ -15,29 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mage
+package gotool
 
-import (
-	"fmt"
+import "github.com/magefile/mage/sh"
 
-	"github.com/magefile/mage/mg"
+type goLicenser func(opts ...ArgOpt) error
 
-	"github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
-)
+// Licenser runs `go-licenser` and provides optionals for adding command line arguments.
+var Licenser goLicenser = runGoLicenser
 
-// Deps contains targets related to checking dependencies
-type Deps mg.Namespace
-
-// CheckModuleTidy checks if `go mod tidy` was run before the last commit.
-func (Deps) CheckModuleTidy() error {
-	err := gotool.Mod.Tidy()
-	if err != nil {
-		return err
-	}
-	err = assertUnchanged("go.mod")
-	if err != nil {
-		return fmt.Errorf("`go mod tidy` was not called before the last commit: %w", err)
-	}
-
-	return nil
+func runGoLicenser(opts ...ArgOpt) error {
+	args := buildArgs(opts).build()
+	return sh.RunV("go-licenser", args...)
 }
+
+func (goLicenser) Check() ArgOpt                 { return flagBoolIf("-d", true) }
+func (goLicenser) License(license string) ArgOpt { return flagArgIf("-license", license) }
+func (goLicenser) Exclude(path string) ArgOpt    { return flagArgIf("-exclude", path) }
+func (goLicenser) Path(path string) ArgOpt       { return posArg(path) }

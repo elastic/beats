@@ -17,27 +17,26 @@
 
 package mage
 
-import (
-	"fmt"
+import "github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
 
-	"github.com/magefile/mage/mg"
+var (
+	// GoLicenserImportPath controls the import path used to install go-licenser.
+	GoLicenserImportPath = "github.com/elastic/go-licenser"
 
-	"github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
+	// GoNoticeGeneratorImportPath controls the import path used to install go-licence-detector.
+	GoNoticeGeneratorImportPath = "go.elastic.co/go-licence-detector"
 )
 
-// Deps contains targets related to checking dependencies
-type Deps mg.Namespace
+// InstallGoLicenser target installs go-licenser
+func InstallGoLicenser() error {
+	return gotool.Install(
+		gotool.Install.Package(GoLicenserImportPath),
+	)
+}
 
-// CheckModuleTidy checks if `go mod tidy` was run before the last commit.
-func (Deps) CheckModuleTidy() error {
-	err := gotool.Mod.Tidy()
-	if err != nil {
-		return err
-	}
-	err = assertUnchanged("go.mod")
-	if err != nil {
-		return fmt.Errorf("`go mod tidy` was not called before the last commit: %w", err)
-	}
-
-	return nil
+// InstallGoLicenser target installs go-licenser
+func InstallGoNoticeGen() error {
+	return gotool.Install(
+		gotool.Install.Package(GoNoticeGeneratorImportPath),
+	)
 }
