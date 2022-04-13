@@ -76,7 +76,7 @@ func lineToMap(line string) (map[string]string, error) {
 	capturedPatterns := capturer.FindStringSubmatch(line)
 	if len(capturedPatterns) < 1 {
 		//Nothing captured
-		return nil, fmt.Errorf("no data captured in '%s'", line)
+		return nil, fmt.Errorf("no data captured,'%s'", line)
 	}
 
 	keyMap := make(map[string]string)
