@@ -617,8 +617,8 @@ github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6 h1
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6/go.mod h1:uh/Gj9a0XEbYoM4NYz4LvaBVARz3QXLmlNjsrKY9fTc=
 github.com/elastic/elastic-agent-libs v0.1.1 h1:13Y268vfgkZK99Ql1X2WdT8jjpd01stln2wLvlewkbo=
 github.com/elastic/elastic-agent-libs v0.1.1/go.mod h1:h8K/f7RcdxM2f19VahcS1jeco170ItqV9N7HyYsn9Ss=
-github.com/elastic/elastic-agent-shipper v0.1.0 h1:ht0pjTBJVoWbbyO8sMQNMuet+cab7nhFhOCPDY8i5Ew=
-github.com/elastic/elastic-agent-shipper v0.1.0/go.mod h1:/aeQqdZPOudbHKmV7zkf5ksjkvEVCZmO3QClYONhgyg=
+github.com/elastic/elastic-agent-shipper v0.2.0 h1:4ehxAWEoyN8/vEg7vIgjxt3o74GBRYekeLx3bYlSmkU=
+github.com/elastic/elastic-agent-shipper v0.2.0/go.mod h1:/aeQqdZPOudbHKmV7zkf5ksjkvEVCZmO3QClYONhgyg=
 github.com/elastic/elastic-package v0.32.1/go.mod h1:l1fEnF52XRBL6a5h6uAemtdViz2bjtjUtgdQcuRhEAY=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
