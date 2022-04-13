@@ -77,6 +77,7 @@ type fileWatcher struct {
 	scanner         loginp.FSScanner
 	log             *logp.Logger
 	events          chan loginp.FSEvent
+	sameFileFunc    func(os.FileInfo, os.FileInfo) bool
 }
 
 func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
@@ -110,6 +111,7 @@ func newScannerWatcher(paths []string, c *common.Config) (loginp.FSWatcher, erro
 		prev:            make(map[string]os.FileInfo, 0),
 		scanner:         scanner,
 		events:          make(chan loginp.FSEvent),
+		sameFileFunc:    os.SameFile,
 	}, nil
 }
 
@@ -127,7 +129,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	// run initial scan before starting regular
 	w.watch(ctx)
 
-	timed.Periodic(ctx, w.interval, func() error {
+	_ = timed.Periodic(ctx, w.interval, func() error {
 		w.watch(ctx)
 
 		return nil
@@ -143,12 +145,16 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	for path, info := range paths {
 
+		// if the scanner found a new path or an existing path
+		// with a different file, it is a new file
 		prevInfo, ok := w.prev[path]
-		if !ok {
-			newFiles[path] = paths[path]
+		if !ok || !w.sameFileFunc(prevInfo, info) {
+			newFiles[path] = info
 			continue
 		}
 
+		// if the two infos belong to the same file and it has been modified
+		// if the size is smaller than before, it is truncated, if bigger, it is a write event
 		if prevInfo.ModTime() != info.ModTime() {
 			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
 				select {
@@ -173,7 +179,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// either because they have been deleted or renamed
 	for removedPath, removedInfo := range w.prev {
 		for newPath, newInfo := range newFiles {
-			if os.SameFile(removedInfo, newInfo) {
+			if w.sameFileFunc(removedInfo, newInfo) {
 				select {
 				case <-ctx.Done():
 					return
@@ -293,13 +299,13 @@ func (s *fileScanner) resolveRecursiveGlobs(c fileScannerConfig) error {
 
 // normalizeGlobPatterns calls `filepath.Abs` on all the globs from config
 func (s *fileScanner) normalizeGlobPatterns() error {
-	var paths []string
-	for _, path := range s.paths {
+	paths := make([]string, len(s.paths))
+	for i, path := range s.paths {
 		pathAbs, err := filepath.Abs(path)
 		if err != nil {
-			return fmt.Errorf("failed to get the absolute path for %s: %v", path, err)
+			return fmt.Errorf("failed to get the absolute path for %s: %w", path, err)
 		}
-		paths = append(paths, pathAbs)
+		paths[i] = pathAbs
 	}
 	s.paths = paths
 	return nil
