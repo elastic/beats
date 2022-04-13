@@ -23,6 +23,7 @@ services:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      cometd: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -33,3 +34,8 @@ services:
       retries: 300
       interval: 1s
 
+  cometd:
+    build: ${ES_BEATS}/testing/environments/docker/cometd
+    hostname: cometd
+    ports:
+      - 8080:8080

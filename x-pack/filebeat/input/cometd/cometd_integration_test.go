@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build integration
+// +build integration
+
 package cometd
 
 import (
@@ -55,12 +58,12 @@ func TestInput(t *testing.T) {
 
 	// Setup the input config.
 	config := common.MustNewConfigFrom(common.MapStr{
-		"channel_name":              "channel_name",
+		"channel_name":              "channel_name1",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
 		"auth.oauth2.password":      "password",
-		"auth.oauth2.token_url":     "http://127.0.0.1:8080/token",
+		"auth.oauth2.token_url":     "http://cometd:8080/token",
 	})
 
 	// Route input events through our captor instead of sending through ES.
@@ -85,21 +88,19 @@ func TestInput(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
+	var msg bay.MaybeMsg
+	msg.Msg.Data.Event.ReplayID = 1234
+	msg.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	msg.Msg.Channel = "channel_name1"
+
 	// Run the input.
 	input.Run()
 
-	verifiedCh := make(chan struct{})
-	defer close(verifiedCh)
+	event := <-eventsCh
 
-	var msg bay.TriggerEvent
-	msg.Data.Event.ReplayID = 1234
-	msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	msg.Channel = "first-channel"
+	val, err := event.GetValue("message")
+	require.NoError(t, err)
+	require.Equal(t, string(msg.Msg.Data.Payload), val)
 
-	for _, event := range []beat.Event{<-eventsCh} {
-		require.NoError(t, err)
-		message, err := event.GetValue("message")
-		require.NoError(t, err)
-		require.Equal(t, string(msg.Data.Payload), message)
-	}
+	input.Stop()
 }

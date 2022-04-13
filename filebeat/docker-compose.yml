@@ -68,17 +68,3 @@ services:
 
   redis:
     build: ${PWD}/input/redis/_meta
-
-  cometd:
-    image: docker.elastic.co/observability/stream:v0.6.1
-    hostname: cometd
-    ports:
-      - 8080:8080
-    volumes:
-      - ${ES_BEATS}/testing/environments/docker/cometd/files/:/files:ro
-    environment:
-      PORT: "8080"
-    command:
-      - http-server
-      - --addr=:8080
-      - --config=/files/config.yml

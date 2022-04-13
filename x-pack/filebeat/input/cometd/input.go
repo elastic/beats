@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	bay "github.com/elastic/bayeux"
@@ -51,30 +50,31 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
-	in.out = in.b.Channel(in.out, "-1", *in.creds, in.config.ChannelName)
-
-	var event Event
-	for e := range in.out {
-		if !e.Successful {
+	in.msgCh = in.b.Channel(in.workerCtx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
+	for e := range in.msgCh {
+		if e.Failed() {
+			return fmt.Errorf("error collecting events: %w", e.Err)
+		}
+		if !e.Msg.Successful {
+			var event Event
 			// To handle the last response where the object received was empty
-			if e.Data.Payload == nil {
+			if e.Msg.Data.Payload == nil {
 				return nil
 			}
 
 			// Convert json.RawMessage response to []byte
-			msg, err := e.Data.Payload.MarshalJSON()
+			msg, err := e.Msg.Data.Payload.MarshalJSON()
 			if err != nil {
 				return fmt.Errorf("JSON error: %w", err)
 			}
 
 			// Extract event IDs from json.RawMessage
-			err = json.Unmarshal(e.Data.Payload, &event)
+			err = json.Unmarshal(e.Msg.Data.Payload, &event)
 			if err != nil {
 				return fmt.Errorf("error while parsing JSON: %w", err)
 			}
 			if ok := in.outlet.OnEvent(makeEvent(event.EventId, string(msg))); !ok {
 				in.log.Debug("OnEvent returned false. Stopping input worker.")
-				close(in.out)
 				return fmt.Errorf("error ingesting data to elasticsearch")
 			}
 		}
@@ -115,7 +115,10 @@ func NewInput(
 	// Wrap input.Context's Done channel with a context.Context. This goroutine
 	// stops with the parent closes the Done channel.
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-	defer cancelInputCtx()
+	go func() {
+		<-inputContext.Done
+		cancelInputCtx()
+	}()
 
 	// If the input ever needs to be made restartable, then context would need
 	// to be recreated with each restart.
@@ -127,12 +130,11 @@ func NewInput(
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
-		ackedCount:   atomic.NewUint32(0),
 		authParams:   authParams,
 	}
 
-	// Creating a new channel for cometd input
-	in.out = make(chan bay.TriggerEvent)
+	// Creating a new channel for cometd input.
+	in.msgCh = make(chan bay.MaybeMsg)
 
 	// Build outlet for events.
 	in.outlet, err = connector.Connect(cfg)
@@ -141,12 +143,12 @@ func NewInput(
 	}
 	in.log.Infof("Initialized %s input.", inputName)
 	return in, nil
+
 }
 
 // Stop stops the input and waits for it to fully stop.
 func (in *cometdInput) Stop() {
 	in.workerCancel()
-	close(in.out)
 	in.workerWg.Wait()
 }
 
@@ -167,8 +169,7 @@ type cometdInput struct {
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
 
-	ackedCount *atomic.Uint32 // Total number of successfully ACKed messages.
-	out        chan bay.TriggerEvent
+	msgCh      chan bay.MaybeMsg
 	b          bay.Bayeux
 	creds      *bay.Credentials
 	authParams bay.AuthenticationParameters

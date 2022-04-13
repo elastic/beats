@@ -4,7 +4,7 @@ rules:
     responses:
       - status_code: 200
         body: |
-          {"instance_url": "http://127.0.0.1:8080", "expires_in": "60", "access_token": "abcd"}
+          {"instance_url": "http://cometd:8080", "expires_in": "60", "access_token": "abcd"}
   - path: /cometd/38.0
     methods: ["POST"]
     request_body: '{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}'
