@@ -21,12 +21,14 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
 
 	// mage:import
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
 )
 
 // Aliases are shortcuts to long target names.
@@ -39,8 +41,38 @@ var Aliases = map[string]interface{}{
 // Check runs all the checks
 // nolint: deadcode,unparam // it's used as a `mage` target and requires returning an error
 func Check() error {
-	mg.Deps(mage.Deps.CheckModuleTidy)
+	mg.Deps(mage.Deps.CheckModuleTidy, CheckLicenseHeaders)
 	return nil
+}
+
+// Fmt formats code and adds license headers.
+func Fmt() {
+	mg.Deps(AddLicenseHeaders)
+}
+
+// AddLicenseHeaders adds ASL2 headers to .go files
+func AddLicenseHeaders() error {
+	fmt.Println(">> fmt - go-licenser: Adding missing headers")
+
+	mg.Deps(mage.InstallGoLicenser)
+
+	licenser := gotool.Licenser
+
+	return licenser(
+		licenser.License("ASL2"),
+	)
+}
+
+// CheckLicenseHeaders checks ASL2 headers in .go files
+func CheckLicenseHeaders() error {
+	mg.Deps(mage.InstallGoLicenser)
+
+	licenser := gotool.Licenser
+
+	return licenser(
+		licenser.Check(),
+		licenser.License("ASL2"),
+	)
 }
 
 // Notice generates a NOTICE.txt file for the module.
