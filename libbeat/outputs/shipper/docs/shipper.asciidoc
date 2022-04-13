@@ -1,0 +1,106 @@
+[[shipper-output]]
+=== Configure the Shipper output
+
+++++
+<titleabbrev>Shipper</titleabbrev>
+++++
+
+The Shipper output sends events to a shipper service via gRPC.
+
+WARNING: This output is experimental and is not supposed to be used by anyone other than developers.
+
+To use this output, edit the {beatname_uc} configuration file and enable the shipper output by adding `output.shipper`.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.shipper:
+  server: "localhost:50051"
+  ssl:
+    enabled: true
+    certificate_authorities: ["/etc/client/ca.pem"]
+    certificate: "/etc/client/cert.pem"
+    ssl.key: "/etc/client/cert.key"
+  timeout: 30
+  max_retries: 3
+  bulk_max_size: 50
+  backoff:
+    base_delay: 1
+    multiplier: 1.6
+    jitter: 0.2
+    max_delay: 120
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+You can specify the following `output.shipper` options in the +{beatname_lc}.yml+ config file:
+
+===== `server`
+
+The address of the gRPC server where the shipper service is hosted.
+
+===== `ssl`
+
+Configuration options for SSL parameters like the root CA for gRPC connections.
+See <<configuration-ssl>> for more information.
+
+===== `timeout`
+
+The number of seconds to wait for responses from the gRPC server before timing
+out. The default is 30 (seconds).
+
+===== `max_retries`
+
+ifdef::ignores_max_retries[]
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+endif::[]
+
+ifndef::ignores_max_retries[]
+The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped.
+
+Set `max_retries` to a value less than 0 to retry until all events are published.
+
+The default is 3.
+endif::[]
+
+===== `bulk_max_size`
+
+The maximum number of events to buffer internally during publishing. The default is 50.
+
+Specifying a larger batch size may add some latency and buffering during publishing.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
+
+Fore more information see the [official gRPC documentation](https://github.com/grpc/grpc/blob/master/doc/connection-backoff.md).
+
+===== `backoff`
+
+The backoff configuration used for the gRPC connection.
+
+===== `backoff.base_delay`
+
+The base delay is the amount of time in seconds to backoff after the first failure.
+
+The default is 1.
+
+===== `backoff.multiplier`
+
+Multiplier is the factor with which to multiply backoffs after a failed retry. Should ideally be greater than 1.
+
+The default is 1.6.
+
+===== `backoff.jitter`
+
+Jitter is the factor with which backoffs are randomized.
+
+The default is 0.2.
+
+===== `backoff.max_delay`
+
+Max delay is the upper bound of backoff delay in seconds.
+
+The default is 120.
