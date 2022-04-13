@@ -359,6 +359,7 @@ func (p *Pipeline) runSignalPropagation() {
 			}
 
 			// new client -> register client for signal propagation.
+			//nolint: errcheck // The linter doesn't understand that `client != nil` checks the return value of Interface().
 			if client := recv.Interface().(*client); client != nil {
 				channels = append(channels,
 					reflect.SelectCase{
