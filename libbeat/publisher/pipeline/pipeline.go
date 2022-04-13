@@ -100,10 +100,6 @@ const (
 	// to ACK any outstanding events. This is independent of Clients asking for
 	// ACK and/or WaitClose. Clients can still optionally configure WaitClose themselves.
 	WaitOnPipelineClose
-
-	// WaitOnClientClose applies WaitClose timeout to each client connecting to
-	// the pipeline. Clients are still allowed to overwrite WaitClose with a timeout > 0s.
-	WaitOnClientClose
 )
 
 // OutputReloader interface, that can be queried from an active publisher pipeline.
@@ -165,6 +161,8 @@ func New(
 	return p, nil
 }
 
+// OnACK implements the queue.ACKListener interface, so the queue can notify the
+// Pipeline when events are acknowledged.
 func (p *Pipeline) OnACK(n int) {
 	p.observer.queueACKed(n)
 
