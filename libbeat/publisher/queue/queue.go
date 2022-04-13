@@ -34,6 +34,21 @@ type ACKListener interface {
 	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
 
+//Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
+type Metrics struct {
+	//QueueLimitCount is the count of times that the queue has reached it's user-configured limit, either in terms of storage space, or count of events.
+	QueueLimitCount uint64
+	//QueueIsFull is a simple bool value that indicates if the queue is currently full as per it's user-configured limits.
+	QueueIsFull bool
+	//QueueLevelPct is the current "full level" of the queue, expressed as percentage from 0.0 to 1.0.
+	QueueLevelPct float64
+	//QueueLevelCurrent is the current capacity of the queue, expressed in the "native" units of the queue implementation, be it event count, MBs, etc.
+	QueueLevelCurrent uint64
+	//LongestWaitingItem is the timestamp of the oldest item in the queue.
+	LongestWaitingItem common.Time
+	//QueueLag is the difference between the consumer and producer position in the queue.
+}
+
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
 // Consumers will receive events in batches from the queues buffers.
@@ -50,6 +65,8 @@ type Queue interface {
 
 	Producer(cfg ProducerConfig) Producer
 	Consumer() Consumer
+
+	Metrics() (Metrics, error)
 }
 
 // BufferConfig returns the pipelines buffering settings,
