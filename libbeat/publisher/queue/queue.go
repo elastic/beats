@@ -66,7 +66,9 @@ type Queue interface {
 	Producer(cfg ProducerConfig) Producer
 	Consumer() Consumer
 
-	Metrics() (Metrics, error)
+	// Leave this commented out for now so we don't break the interfaces
+	// Should the main Queue implementation itself expose the metrics, or some other component in the interfaces?
+	//Metrics() (Metrics, error)
 }
 
 // BufferConfig returns the pipelines buffering settings,
