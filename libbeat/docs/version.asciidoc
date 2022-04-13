@@ -1,6 +1,6 @@
 :stack-version: 8.3.0
 :doc-branch: main
-:go-version: 1.17.8
+:go-version: 1.18.1
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
