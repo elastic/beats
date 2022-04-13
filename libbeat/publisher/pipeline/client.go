@@ -124,7 +124,7 @@ func (c *client) publish(e beat.Event) {
 	}
 
 	if c.reportEvents {
-		c.pipeline.waitCloser.inc()
+		c.pipeline.waitCloseGroup.Add(1)
 	}
 
 	var published bool
@@ -139,7 +139,7 @@ func (c *client) publish(e beat.Event) {
 	} else {
 		c.onDroppedOnPublish(e)
 		if c.reportEvents {
-			c.pipeline.waitCloser.dec(1)
+			c.pipeline.waitCloseGroup.Add(-1)
 		}
 	}
 }
@@ -189,7 +189,7 @@ func (c *client) unlink() {
 	if c.reportEvents {
 		log.Debugf("client: remove client events")
 		if n > 0 {
-			c.pipeline.waitCloser.dec(n)
+			c.pipeline.waitCloseGroup.Add(-n)
 		}
 	}
 
