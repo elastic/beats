@@ -85,13 +85,18 @@ func makeShipper(
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
 	defer cancel()
+
+	log := logp.NewLogger("shipper")
+	log.Debugf("trying to connect to %s...", config.Server)
+
 	conn, err := grpc.DialContext(ctx, config.Server, opts...)
 	if err != nil {
 		return outputs.Fail(fmt.Errorf("shipper connection failed with: %w", err))
 	}
+	log.Debugf("connect to %s established.", config.Server)
 
 	s := &shipper{
-		log:      logp.NewLogger("shipper"),
+		log:      log,
 		observer: observer,
 		conn:     conn,
 		client:   sc.NewProducerClient(conn),
@@ -110,6 +115,8 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	dropped := 0
 
 	grpcEvents := make([]*sc.Event, 0, len(events))
+
+	c.log.Debugf("converting %d events to protobuf...", len(events))
 
 	for i, e := range events {
 
@@ -148,6 +155,8 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		})
 	}
 
+	c.log.Debugf("all %d events converted to protobuf", len(events))
+
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 	_, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
@@ -156,6 +165,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	if err != nil {
 		if status.Code(err) == codes.ResourceExhausted {
+			c.log.Warn("shipper's queue is full, more events cannot be accepted")
 			batch.Cancelled()
 		} else {
 			batch.Retry()
