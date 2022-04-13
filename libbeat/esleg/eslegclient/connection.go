@@ -27,7 +27,7 @@ import (
 	"net/url"
 	"time"
 
-	"go.elastic.co/apm/module/apmelasticsearch"
+	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
@@ -177,6 +177,7 @@ func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
+		logp.Debug("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
 		logp.Info("using proxy URL: %s", proxyURL.URI().String())
 	}
 

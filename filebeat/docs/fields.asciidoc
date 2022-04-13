@@ -2201,6 +2201,15 @@ Fields for Azure activity logs.
 
 
 
+*`azure.activitylogs.identity_name`*::
++
+--
+identity name
+
+type: keyword
+
+--
+
 [float]
 === identity
 
@@ -2363,6 +2372,36 @@ type: keyword
 +
 --
 Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.level`*::
++
+--
+Level
+
+
+type: long
+
+--
+
+*`azure.activitylogs.operation_version`*::
++
+--
+Operation version
 
 
 type: keyword

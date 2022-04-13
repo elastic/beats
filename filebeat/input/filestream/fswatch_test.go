@@ -105,7 +105,7 @@ func TestFileScanner(t *testing.T) {
 }
 
 func setupFilesForScannerTest(t *testing.T, tmpDir string) {
-	err := os.Mkdir(filepath.Join(tmpDir, directoryPath), 750)
+	err := os.Mkdir(filepath.Join(tmpDir, directoryPath), 0750)
 	if err != nil {
 		t.Fatalf("cannot create non harvestable directory: %v", err)
 	}
@@ -201,10 +201,11 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			w := fileWatcher{
-				log:     logp.L(),
-				prev:    test.prevFiles,
-				scanner: &mockScanner{test.nextFiles},
-				events:  make(chan loginp.FSEvent),
+				log:          logp.L(),
+				prev:         test.prevFiles,
+				scanner:      &mockScanner{test.nextFiles},
+				events:       make(chan loginp.FSEvent),
+				sameFileFunc: testSameFile,
 			}
 
 			go w.watch(context.Background())
@@ -241,3 +242,7 @@ func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
 func (t testFileInfo) Sys() interface{}   { return t.sys }
+
+func testSameFile(fi1, fi2 os.FileInfo) bool {
+	return fi1.Name() == fi2.Name()
+}
