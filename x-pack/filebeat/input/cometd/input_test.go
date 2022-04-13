@@ -155,7 +155,7 @@ func TestNewMultiInput_Run(t *testing.T) {
 
 	var inputContext finput.Context
 
-	// intialize inputs
+	// initialize inputs
 	input1, err := NewInput(cfg1, connector, inputContext)
 	require.NoError(t, err)
 	require.NotNil(t, input1)
