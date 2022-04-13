@@ -59,7 +59,7 @@ func makeShipper(
 	cfg *common.Config,
 ) (outputs.Group, error) {
 
-	config := defaultConfig
+	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return outputs.Fail(err)

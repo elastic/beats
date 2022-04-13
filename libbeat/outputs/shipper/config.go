@@ -69,10 +69,12 @@ type Config struct {
 	Backoff Backoff `config:"backoff"`
 }
 
-var defaultConfig = Config{
-	TLS:         nil,
-	Timeout:     30 * time.Second,
-	MaxRetries:  3,
-	BulkMaxSize: 50,
-	Backoff:     FromGRPCBackOff(backoff.DefaultConfig),
+func defaultConfig() Config {
+	return Config{
+		TLS:         nil,
+		Timeout:     30 * time.Second,
+		MaxRetries:  3,
+		BulkMaxSize: 50,
+		Backoff:     FromGRPCBackOff(backoff.DefaultConfig),
+	}
 }
