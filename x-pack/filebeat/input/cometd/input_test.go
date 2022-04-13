@@ -33,7 +33,7 @@ var (
 	serverURL string
 )
 
-func TestInput(t *testing.T) {
+func TestNewInput(t *testing.T) {
 	t.Run("Check input Done", func(t *testing.T) {
 		config := common.MapStr{
 			"channel_name":              firstChannel,
