@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
@@ -36,17 +37,19 @@ type ACKListener interface {
 
 //Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
-	//QueueLimitCount is the count of times that the queue has reached it's user-configured limit, either in terms of storage space, or count of events.
-	QueueLimitCount uint64
-	//QueueIsFull is a simple bool value that indicates if the queue is currently full as per it's user-configured limits.
-	QueueIsFull bool
-	//QueueLevelPct is the current "full level" of the queue, expressed as percentage from 0.0 to 1.0.
-	QueueLevelPct float64
-	//QueueLevelCurrent is the current capacity of the queue, expressed in the "native" units of the queue implementation, be it event count, MBs, etc.
-	QueueLevelCurrent uint64
+	//EventCount is the total events currently in the queue
+	EventCount opt.Uint
+	//ByteCount is the total byte size of the queue
+	ByteCount opt.Uint
+	//ByteLimit is the user-configured byte limit of the queue
+	ByteLimit opt.Uint
+	//EventLimit is the user-configured event limit of the queue
+	EventLimit opt.Uint
+
 	//LongestWaitingItem is the timestamp of the oldest item in the queue.
 	LongestWaitingItem common.Time
 	//QueueLag is the difference between the consumer and producer position in the queue.
+	QueueLag uint64
 }
 
 // Queue is responsible for accepting, forwarding and ACKing events.
