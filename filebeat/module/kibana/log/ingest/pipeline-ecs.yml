@@ -1,0 +1,103 @@
+description: Pipeline for parsing Kibana ecs logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    copy_from: '@timestamp'
+    field: event.created
+- rename:
+    field: json
+    target_field: kibana.log.meta
+- date:
+    field: kibana.log.meta.@timestamp
+    formats:
+    - ISO8601
+    target_field: '@timestamp'
+- remove:
+    field: kibana.log.meta.@timestamp
+- rename:
+    field: kibana.log.meta.message
+    target_field: message
+- rename:
+    field: kibana.log.meta.state
+    target_field: kibana.log.state
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.tags
+    target_field: kibana.log.tags
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.res.statusCode
+    target_field: http.response.status_code
+    ignore_missing: true
+- script:
+    lang: painless
+    source: ctx.event.duration = Math.round(ctx.kibana.log.meta.res.responseTime * 1000000L)
+    if: ctx?.kibana?.log?.meta?.res?.responseTime != null
+- remove:
+    field: kibana.log.meta.res.responseTime
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.res.contentLength
+    target_field: http.response.body.bytes
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.req.method
+    target_field: http.request.method
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.req.headers.referer
+    target_field: http.request.referrer
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.req.headers.user-agent
+    target_field: user_agent.original
+    ignore_missing: true
+- rename:
+    field: kibana.log.meta.req.remoteAddress
+    target_field: source.address
+    ignore_missing: true
+- set:
+    field: source.ip
+    value: '{{source.address}}'
+    ignore_empty_value: true
+- rename:
+    field: kibana.log.meta.req.url
+    target_field: url.original
+    ignore_missing: true
+- remove:
+    field: kibana.log.meta.req.referer
+    ignore_missing: true
+- remove:
+    field: kibana.log.meta.statusCode
+    ignore_missing: true
+- remove:
+    field: kibana.log.meta.method
+    ignore_missing: true
+- append:
+    field: service.name
+    value: kibana
+- set:
+    field: event.kind
+    value: event
+- script:
+    lang: painless
+    source: >-
+      if (ctx?.kibana?.log?.state != null) {
+        if (ctx.kibana.log.state == "red") {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
+      }
+
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+
