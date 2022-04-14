@@ -6,7 +6,6 @@ package tablespace
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -29,7 +28,7 @@ func TestEventMapping(t *testing.T) {
 	events, err := m.extractAndTransform(context.Background())
 	assert.NoError(t, err)
 
-	fmt.Printf("Total %d events\n", len(events))
+	t.Logf("Total %d events\n", len(events))
 
 	t.Run("Happy Path", func(t *testing.T) {
 		for _, event := range events {
