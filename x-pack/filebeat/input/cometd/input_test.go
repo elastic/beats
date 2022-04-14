@@ -282,14 +282,12 @@ func TestNewInput(t *testing.T) {
 		input.msgCh = make(chan bay.MaybeMsg)
 
 		go func() {
-			time.Sleep(1000 * time.Millisecond)
 			input.Wait()
 		}()
 
-		time.Sleep(1000 * time.Millisecond) // let input.Stop() be executed.
 		select {
 		case <-workerCtx.Done():
-		default:
+		case <-time.After(time.Second): // let input.Stop() be executed.
 			require.NoError(t, fmt.Errorf("input is not stopped."))
 		}
 	})
