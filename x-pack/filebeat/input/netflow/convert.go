@@ -281,7 +281,7 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) beat.Event {
 		if biflowDir == 2 {
 			ecsDest, ecsSource = ecsSource, ecsDest
 		}
-		ecsEvent["category"] = "network_session"
+		ecsEvent["category"] = []string{"network", "session"}
 
 		// Assume source is the client in biflows.
 		event.Fields["client"] = ecsSource
