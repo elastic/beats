@@ -50,7 +50,7 @@ func TestConvertMapStr(t *testing.T) {
 			value: common.MapStr{
 				"key": time.Now(),
 			},
-			expErr: "proto:\u00a0invalid type: time.Time",
+			expErr: "proto: invalid type: time.Time",
 		},
 		{
 			name: "values are preserved",
