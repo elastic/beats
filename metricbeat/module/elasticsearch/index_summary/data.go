@@ -62,6 +62,9 @@ var indexSummaryDict = s.Schema{
 var indexingDict = c.Dict("indexing", s.Schema{
 	"index": s.Object{
 		"count": c.Int("index_total"),
+		"time": s.Object{
+			"ms": c.Int("index_time_in_millis"),
+		},
 	},
 })
 
