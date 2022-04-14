@@ -258,7 +258,7 @@ func getValueFromPoint(p *monitoring.Point) (out interface{}) {
 	case *monitoring.TypedValue_StringValue:
 		out = v.StringValue
 	case *monitoring.TypedValue_DistributionValue:
-		//TODO Distribution values aren't simple values. Take a look at this
+		// Distribution values aren't simple values. Take a look at this
 		out = v.DistributionValue
 	}
 

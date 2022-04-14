@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
@@ -166,6 +165,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *Met
 	return m.String(), nil
 }
 
+/*
 func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Point) (t time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p != nil && p.Interval != nil {
@@ -174,6 +174,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Po
 
 	return time.Time{}, fmt.Errorf("error trying to extract the timestamp from the point data")
 }
+*/
 
 func getRegionName(availabilityZone string) string {
 	azSplit := strings.Split(availabilityZone, "-")
