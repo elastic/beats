@@ -30,10 +30,6 @@ import (
 )
 
 // client connects a beat with the processors and pipeline queue.
-//
-// TODO: All ackers currently drop any late incoming ACK. Some beats still might
-//       be interested in handling/waiting for event ACKs more globally
-//       -> add support for not dropping pending ACKs
 type client struct {
 	pipeline   *Pipeline
 	processors beat.Processor
@@ -101,8 +97,8 @@ func (c *client) publish(e beat.Event) {
 		event, err = c.processors.Run(event)
 		publish = event != nil
 		if err != nil {
-			// TODO: introduce dead-letter queue?
-
+			// If we introduce a dead-letter queue, this is where we should
+			// route the event to it.
 			log.Errorf("Failed to publish event: %v", err)
 		}
 	}
@@ -178,7 +174,7 @@ func (c *client) Close() error {
 	return nil
 }
 
-// unlink is the final step of closing a client. It cancells the connect of the
+// unlink is the final step of closing a client. It cancels the connect of the
 // client as producer to the queue.
 func (c *client) unlink() {
 	log := c.logger()
@@ -271,7 +267,7 @@ func (w *clientCloseWaiter) ACKEvents(n int) {
 }
 
 // The Close signal from the pipeline is ignored. Instead the client
-// explicitely uses `signalClose` and `wait` before it continues with the
+// explicitly uses `signalClose` and `wait` before it continues with the
 // closing sequence.
 func (w *clientCloseWaiter) Close() {}
 
