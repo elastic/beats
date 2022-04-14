@@ -207,6 +207,7 @@ var ackChanPool = sync.Pool{
 }
 
 func newACKChan(seq uint, start, count int, states []clientState) *ackChan {
+	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*ackChan)
 	ch.next = nil
 	ch.seq = seq
