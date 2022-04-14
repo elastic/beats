@@ -36,7 +36,7 @@ type timeSeriesWithAligner struct {
 	aligner    string
 }
 
-func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
+func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) timeSeriesWithAligner {
 	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
@@ -66,10 +66,12 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 		timeSeries = append(timeSeries, resp)
 	}
 
-	out.aligner = aligner
-	out.timeSeries = timeSeries
+	out := timeSeriesWithAligner{
+		aligner:    aligner,
+		timeSeries: timeSeries,
+	}
 
-	return
+	return out
 }
 
 func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
@@ -99,10 +101,10 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
-func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) {
-	f = fmt.Sprintf(`metric.type="%s"`, m)
+func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
+	f := fmt.Sprintf(`metric.type="%s"`, m)
 	if r.config.Zone == "" && r.config.Region == "" {
-		return
+		return f
 	}
 
 	switch serviceName {
@@ -131,10 +133,10 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		}
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore, gcp.ServiceDataproc:
-		return
+		return f
 	case gcp.ServiceStorage:
 		if r.config.Region == "" {
-			return
+			return f
 		}
 
 		f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
@@ -163,7 +165,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
 
-	return
+	return f
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
