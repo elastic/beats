@@ -73,7 +73,6 @@ func (b *eventBuffer) Set(idx int, event interface{}, st clientState) {
 	b.events[idx] = queueEntry{event, st}
 }
 
-<<<<<<< HEAD
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	*b = ringBuffer{
 		buf: newEventBuffer(logger, size),
@@ -81,15 +80,6 @@ func (b *ringBuffer) init(logger *logp.Logger, size int) {
 }
 
 func (b *ringBuffer) insert(event interface{}, client clientState) int {
-=======
-func (b *ringBuffer) init(log *logp.Logger, size int) {
-	*b = ringBuffer{}
-	b.buf.init(size)
-	b.buf.logger = log
-}
-
-func (b *ringBuffer) insert(event publisher.Event, client clientState) int {
->>>>>>> main
 	// log := b.buf.logger
 	// log.Debug("insert:")
 	// log.Debug("  region A:", b.regA)
