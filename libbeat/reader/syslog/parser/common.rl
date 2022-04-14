@@ -34,17 +34,17 @@
     }
 
     action err_priority {
-        err = ErrPriority
+        err = multierr.Append(ErrPriority, err)
         fhold;
     }
 
     action err_timestamp {
-        err = ErrTimestamp
+        err = multierr.Append(ErrTimestamp, err)
         fhold;
     }
 
     action err_hostname {
-        err = ErrHostname
+        err = multierr.Append(ErrHostname, err)
         fhold;
     }
 

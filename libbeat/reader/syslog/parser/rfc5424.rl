@@ -39,11 +39,9 @@
     action set_sd_id {
         s.sdID = data[tok:p]
         if _, ok := m.structuredData[s.sdID]; ok {
-            err = ErrSDIDDuplicated
-            fhold;
-        } else {
-            m.structuredData[s.sdID] = map[string]string{}
+            err = multierr.Append(ErrSDIDDuplicated, err)
         }
+        m.structuredData[s.sdID] = map[string]string{}
     }
 
     action set_escape {
@@ -51,37 +49,37 @@
     }
 
     action err_version {
-        err = ErrVersion
+        err = multierr.Append(ErrVersion, err)
         fhold;
     }
 
     action err_app_name {
-        err = ErrAppName
+        err = multierr.Append(ErrAppName, err)
         fhold;
     }
 
     action err_proc_id {
-        err = ErrProcID
+        err = multierr.Append(ErrProcID, err)
         fhold;
     }
 
     action err_msg_id {
-        err = ErrMsgID
+        err = multierr.Append(ErrMsgID, err)
         fhold;
     }
 
     action err_structured_data {
-        err = ErrStructuredData
+        err = multierr.Append(ErrStructuredData, err)
         fhold;
     }
 
     action err_sd_id {
-        err = ErrSDID
+        err = multierr.Append(ErrSDID, err)
         fhold;
     }
 
     action err_sd_param {
-        err = ErrSDParam
+        err = multierr.Append(ErrSDParam, err)
         fhold;
     }
 

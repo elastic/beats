@@ -171,14 +171,16 @@ func (p *processor) run(event *beat.Event) error {
 	fields, ts, err := syslog.ParseMessage(data, p.Format, p.TimeZone.Location())
 	if err != nil {
 		p.stats.Failure.Inc()
-		return err
+	} else {
+		p.stats.Success.Inc()
 	}
 
 	jsontransform.WriteJSONKeys(event, fields, false, p.OverwriteKeys, !p.IgnoreFailure)
-	event.Timestamp = ts
-	p.stats.Success.Inc()
+	if ts != nil {
+		event.Timestamp = *ts
+	}
 
-	return nil
+	return err
 }
 
 // String will return a string representation of this processor (the configuration).

@@ -84,11 +84,15 @@ type message struct {
 	msgID          string
 	version        int
 	structuredData map[string]map[string]string
+
+	prioritySet  bool
+	timestampSet bool
 }
 
 // setTimestampRFC3339 sets the timestamp for this message using an RFC3339 timestamp (time.RFC3339Nano).
 func (m *message) setTimestampRFC3339(v string) {
 	if t, err := time.Parse(time.RFC3339Nano, v); err == nil {
+		m.timestampSet = true
 		m.timestamp = t
 	}
 }
@@ -102,6 +106,7 @@ func (m *message) setTimestampBSD(v string, loc *time.Location) {
 	}
 	if t, err := time.ParseInLocation(time.Stamp, v, loc); err == nil {
 		t = t.AddDate(time.Now().In(loc).Year(), 0, 0)
+		m.timestampSet = true
 		m.timestamp = t
 	}
 }
@@ -109,6 +114,7 @@ func (m *message) setTimestampBSD(v string, loc *time.Location) {
 // setPriority sets the priority for this message. The facility and severity are
 // derived from the priority and associated values are set.
 func (m *message) setPriority(v string) {
+	m.prioritySet = true
 	m.priority = stringToInt(v)
 	m.facility = m.priority >> facilityShift
 	m.severity = m.priority & severityMask
@@ -177,14 +183,16 @@ func (m message) fields() common.MapStr {
 	f := common.MapStr{}
 
 	// Syslog fields.
-	_, _ = f.Put("log.syslog.priority", m.priority)
-	_, _ = f.Put("log.syslog.facility.code", m.facility)
-	_, _ = f.Put("log.syslog.severity.code", m.severity)
-	if v, ok := mapIndexToString(m.severity, severityLabels); ok {
-		_, _ = f.Put("log.syslog.severity.name", v)
-	}
-	if v, ok := mapIndexToString(m.facility, facilityLabels); ok {
-		_, _ = f.Put("log.syslog.facility.name", v)
+	if m.prioritySet {
+		_, _ = f.Put("log.syslog.priority", m.priority)
+		_, _ = f.Put("log.syslog.facility.code", m.facility)
+		_, _ = f.Put("log.syslog.severity.code", m.severity)
+		if v, ok := mapIndexToString(m.severity, severityLabels); ok {
+			_, _ = f.Put("log.syslog.severity.name", v)
+		}
+		if v, ok := mapIndexToString(m.facility, facilityLabels); ok {
+			_, _ = f.Put("log.syslog.facility.name", v)
+		}
 	}
 	if m.process != "" {
 		_, _ = f.Put("log.syslog.appname", m.process)

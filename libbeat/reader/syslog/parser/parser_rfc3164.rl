@@ -3,6 +3,8 @@ package syslog
 
 import (
     "time"
+
+    "go.uber.org/multierr"
 )
 
 %%{
@@ -25,15 +27,11 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
         include common "common.rl";
         include rfc3164 "rfc3164.rl";
 
-        main := pri timestamp sp hostname sp msg;
+        main := pri? timestamp sp hostname sp msg;
 
         write init;
         write exec;
     }%%
 
-    if err != nil {
-        return message{}, err
-    }
-
-    return m, nil
+    return m, err
 }
