@@ -20,10 +20,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.Metada
 	for _, tsa := range tsas {
 		aligner := tsa.aligner
 		for _, ts := range tsa.timeSeries {
-			keyValues, err := e.extractTimeSeriesMetricValues(ts, aligner)
-			if err != nil {
-				return nil, err
-			}
+			keyValues := e.extractTimeSeriesMetricValues(ts, aligner)
 
 			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
 			if gcpService == nil {

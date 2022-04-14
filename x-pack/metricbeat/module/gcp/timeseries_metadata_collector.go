@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
@@ -170,9 +169,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *Met
 func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Point) (t time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p != nil && p.Interval != nil {
-		if t, err = ptypes.Timestamp(p.Interval.StartTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.StartTime)
-		}
+		return p.Interval.StartTime.AsTime(), nil
 	}
 
 	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
