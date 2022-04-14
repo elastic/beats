@@ -11,8 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
@@ -52,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create connection to db")
+		return nil, fmt.Errorf("could not create connection to db %w", err)
 	}
 
 	return &MetricSet{
@@ -93,7 +91,7 @@ WHERE  counter_name = 'SQL Compilations/sec'
                   'Active Temp Tables' )
              AND object_name LIKE '%:General Statistics%' )`)
 	if err != nil {
-		reporter.Error(errors.Wrapf(err, "error closing rows"))
+		reporter.Error(fmt.Errorf("error closing rows %w", err))
 		return
 	}
 	defer func() {
@@ -106,7 +104,7 @@ WHERE  counter_name = 'SQL Compilations/sec'
 	for rows.Next() {
 		var row performanceCounter
 		if err = rows.Scan(&row.objectName, &row.counterName, &row.instanceName, &row.counterValue); err != nil {
-			reporter.Error(errors.Wrap(err, "error scanning rows"))
+			reporter.Error(fmt.Errorf("error scanning rows %w", err))
 			continue
 		}
 
@@ -124,7 +122,7 @@ WHERE  counter_name = 'SQL Compilations/sec'
 
 	res, err := schema.Apply(mapStr)
 	if err != nil {
-		m.log.Error(errors.Wrap(err, "error applying schema"))
+		m.log.Error(fmt.Errorf("error applying schema %w", err))
 		return
 	}
 
