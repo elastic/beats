@@ -75,6 +75,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Winlogbeat*
 
 - Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
+- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
 
 
 *Functionbeat*
