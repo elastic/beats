@@ -35,7 +35,7 @@ const (
 type broker struct {
 	done chan struct{}
 
-	logger logger
+	logger *logp.Logger
 
 	bufSize int
 
@@ -51,8 +51,7 @@ type broker struct {
 	ackListener queue.ACKListener
 
 	// wait group for worker shutdown
-	wg          sync.WaitGroup
-	waitOnClose bool
+	wg sync.WaitGroup
 }
 
 type Settings struct {
@@ -60,7 +59,6 @@ type Settings struct {
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
-	WaitOnClose    bool
 	InputQueueSize int
 }
 
@@ -112,7 +110,7 @@ func create(
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
-	logger logger,
+	logger *logp.Logger,
 	settings Settings,
 ) queue.Queue {
 	var (
@@ -151,8 +149,6 @@ func NewQueue(
 		acks:          make(chan int),
 		scheduledACKs: make(chan chanList),
 
-		waitOnClose: settings.WaitOnClose,
-
 		ackListener: settings.ACKListener,
 	}
 
@@ -185,9 +181,6 @@ func NewQueue(
 
 func (b *broker) Close() error {
 	close(b.done)
-	if b.waitOnClose {
-		b.wg.Wait()
-	}
 	return nil
 }
 
@@ -214,6 +207,7 @@ var ackChanPool = sync.Pool{
 }
 
 func newACKChan(seq uint, start, count int, states []clientState) *ackChan {
+	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*ackChan)
 	ch.next = nil
 	ch.seq = seq
@@ -257,14 +251,6 @@ func (l *chanList) append(ch *ackChan) {
 		l.tail.next = ch
 	}
 	l.tail = ch
-}
-
-func (l *chanList) count() (elems, count int) {
-	for ch := l.head; ch != nil; ch = ch.next {
-		elems++
-		count += ch.count
-	}
-	return
 }
 
 func (l *chanList) empty() bool {

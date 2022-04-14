@@ -49,5 +49,3 @@ type getResponse struct {
 }
 
 type batchAckMsg struct{}
-
-type batchCancelRequest struct{ ack *ackChan }

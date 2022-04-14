@@ -37,17 +37,6 @@ func (b *batchBuffer) init(sz int) {
 	b.clients = make([]clientState, 0, sz)
 }
 
-func (b *batchBuffer) initWith(sz int, old batchBuffer) {
-	events, clients := old.events, old.clients
-	L := len(events)
-
-	b.events = make([]publisher.Event, L, sz)
-	b.clients = make([]clientState, L, sz)
-
-	copy(b.events, events)
-	copy(b.clients, clients)
-}
-
 func (b *batchBuffer) add(event publisher.Event, st clientState) {
 	b.events = append(b.events, event)
 	b.clients = append(b.clients, st)
@@ -55,10 +44,6 @@ func (b *batchBuffer) add(event publisher.Event, st clientState) {
 
 func (b *batchBuffer) length() int {
 	return len(b.events)
-}
-
-func (b *batchBuffer) capacity() int {
-	return cap(b.events)
 }
 
 func (b *batchBuffer) cancel(st *produceState) int {
