@@ -37,7 +37,7 @@ const (
 	linterInstallURL             = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
 	linterInstallFilename        = "./build/intall-golang-ci.sh"
 	linterBinaryFilename         = "./build/golangci-lint"
-	linterVersion                = "v1.44.0"
+	linterVersion                = "v1.45.2"
 	linterConfigFilename         = "./.golangci.yml"
 	linterConfigTemplateFilename = "./dev-tools/templates/.golangci.yml"
 )
