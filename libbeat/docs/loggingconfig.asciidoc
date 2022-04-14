@@ -92,7 +92,7 @@ ifndef::serverless[]
 ==== `logging.to_stderr`
 
 When true, writes all logging output to standard error output. This is
-equivalent to using the `-e` command line option.
+equivalent to using the `-e` command line option: "Log to stderr and disable syslog/file output"
 
 [float]
 ==== `logging.to_syslog`
