@@ -77,7 +77,7 @@ func (b *ringBuffer) init(log *logp.Logger, size int) {
 	b.buf.logger = log
 }
 
-func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, int) {
+func (b *ringBuffer) insert(event publisher.Event, client clientState) int {
 	// log := b.buf.logger
 	// log.Debug("insert:")
 	// log.Debug("  region A:", b.regA)
@@ -97,13 +97,13 @@ func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, in
 		idx := b.regB.index + b.regB.size
 		avail := b.regA.index - idx
 		if avail == 0 {
-			return false, 0
+			return 0
 		}
 
 		b.buf.Set(idx, event, client)
 		b.regB.size++
 
-		return true, avail - 1
+		return avail - 1
 	}
 
 	// region B does not exist yet, check if region A is available for use
@@ -119,7 +119,7 @@ func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, in
 
 			// log.Debug("  - no space in region B")
 
-			return false, 0
+			return 0
 		}
 
 		// create region B and insert events
@@ -127,14 +127,14 @@ func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, in
 		b.regB.index = 0
 		b.regB.size = 1
 		b.buf.Set(0, event, client)
-		return true, b.regA.index - 1
+		return b.regA.index - 1
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
 	b.buf.Set(idx, event, client)
 	b.regA.size++
-	return true, avail - 1
+	return avail - 1
 }
 
 // cancel removes all buffered events matching `st`, not yet reserved by
@@ -150,8 +150,6 @@ func (b *ringBuffer) cancel(st *produceState) int {
 	// 	log.Debug("  -> region B:", b.regB)
 	// 	log.Debug("  -> reserved:", b.reserved)
 	// }()
-
-	// TODO: return if st has no pending events
 
 	cancelB := b.cancelRegion(st, b.regB)
 	b.regB.size -= cancelB

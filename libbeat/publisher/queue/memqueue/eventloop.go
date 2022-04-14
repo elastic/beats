@@ -147,7 +147,7 @@ func (l *directEventLoop) insert(req *pushRequest) (int, bool) {
 	log := l.broker.logger
 
 	if req.state == nil {
-		_, avail = l.buf.insert(req.event, clientState{})
+		avail = l.buf.insert(req.event, clientState{})
 		return avail, true
 	}
 
@@ -157,7 +157,7 @@ func (l *directEventLoop) insert(req *pushRequest) (int, bool) {
 		return -1, false
 	}
 
-	_, avail = l.buf.insert(req.event, clientState{
+	avail = l.buf.insert(req.event, clientState{
 		seq:   req.seq,
 		state: st,
 	})
@@ -234,9 +234,6 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	acks := lst.front()
 	start := acks.start
 	states := acks.states
-
-	// TODO: global boolean to check if clients will need an ACK
-	//       no need to report ACKs if no client is interested in ACKs
 
 	idx := start + N - 1
 	if idx >= len(states) {
