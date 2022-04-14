@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-//nolint:unparam // Parameter layout can potentially use different values in the future.
 func mustParseTime(layout string, value string) time.Time {
 	t, err := time.Parse(layout, value)
 	if err != nil {
@@ -36,7 +35,6 @@ func mustParseTime(layout string, value string) time.Time {
 	return t
 }
 
-//nolint:unparam // Parameter layout can potentially use different values in the future.
 func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time {
 	t, err := time.ParseInLocation(layout, value, loc)
 	if err != nil {
