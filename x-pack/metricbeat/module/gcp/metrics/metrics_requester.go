@@ -6,6 +6,7 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -13,7 +14,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/duration"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -50,9 +51,10 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
+
 	for {
 		resp, err := it.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
@@ -66,6 +68,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 
 	out.aligner = aligner
 	out.timeSeries = timeSeries
+
 	return
 }
 
@@ -111,17 +114,20 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 
 		region := r.config.Region
 		if region != "" {
-			if strings.HasSuffix(region, "*") {
-				region = strings.TrimSuffix(region, "*")
-			}
+			// if strings.HasSuffix(region, "*") {
+			// region = strings.TrimSuffix(region, "*")
+			// }
+			region = strings.TrimSuffix(region, "*")
+
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
 			break
 		}
 		zone := r.config.Zone
 		if zone != "" {
-			if strings.HasSuffix(zone, "*") {
-				zone = strings.TrimSuffix(zone, "*")
-			}
+			// if strings.HasSuffix(zone, "*") {
+			// zone = strings.TrimSuffix(zone, "*")
+			// }
+			zone = strings.TrimSuffix(zone, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		}
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore, gcp.ServiceDataproc:
@@ -138,20 +144,25 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 				"both are provided, only use region", r.config.Region, r.config.Zone)
 		}
 		if r.config.Region != "" {
-			region := r.config.Region
-			if strings.HasSuffix(r.config.Region, "*") {
-				region = strings.TrimSuffix(r.config.Region, "*")
-			}
+			// region := r.config.Region
+			// if strings.HasSuffix(r.config.Region, "*") {
+			// region = strings.TrimSuffix(r.config.Region, "*")
+			// }
+
+			region := strings.TrimSuffix(r.config.Region, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
 		} else if r.config.Zone != "" {
-			zone := r.config.Zone
-			if strings.HasSuffix(r.config.Zone, "*") {
-				zone = strings.TrimSuffix(r.config.Zone, "*")
-			}
+			// zone := r.config.Zone
+			// if strings.HasSuffix(r.config.Zone, "*") {
+			// zone = strings.TrimSuffix(r.config.Zone, "*")
+			// }
+			zone := strings.TrimSuffix(r.config.Zone, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, zone)
 		}
 	}
+
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
+
 	return
 }
 

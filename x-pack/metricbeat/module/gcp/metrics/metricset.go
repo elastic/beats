@@ -6,11 +6,12 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -231,7 +232,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 		}
 
 		for _, singleEvent := range groupedEvents {
-			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
+			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
 		}
 
 		if sdc.ServiceName == "compute" {
@@ -286,8 +287,8 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 			for {
 				out, err := it.Next()
-				if err != nil && err != iterator.Done {
-					err = fmt.Errorf("Could not make ListMetricDescriptors request for metric type %s: %w", mt, err)
+				if err != nil && !errors.Is(err, iterator.Done) {
+					err = fmt.Errorf("could not make ListMetricDescriptors request for metric type %s: %w", mt, err)
 					m.Logger().Error(err)
 					return metricsWithMeta, err
 				}
@@ -296,7 +297,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 					metricsWithMeta = m.getMetadata(out, metricsWithMeta)
 				}
 
-				if err == iterator.Done {
+				if errors.Is(err, iterator.Done) {
 					break
 				}
 
@@ -339,11 +340,11 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 	hostRootFields := groupedEvents[0].ECS
 	// add host.id and host.name
 	if hostID, err := groupedEvents[0].ECS.GetValue("cloud.instance.id"); err == nil {
-		hostRootFields.Put("host.id", hostID)
+		_, _ = hostRootFields.Put("host.id", hostID)
 	}
 
 	if hostName, err := groupedEvents[0].ECS.GetValue("cloud.instance.name"); err == nil {
-		hostRootFields.Put("host.name", hostName)
+		_, _ = hostRootFields.Put("host.name", hostName)
 	}
 
 	hostFieldTable := map[string]string{
@@ -358,7 +359,7 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 
 	for _, singleEvent := range groupedEvents {
 		if hostMetricName, ok := hostFieldTable[singleEvent.Key]; ok {
-			hostRootFields.Put(hostMetricName, singleEvent.Value)
+			_, _ = hostRootFields.Put(hostMetricName, singleEvent.Value)
 		}
 	}
 	return hostRootFields
