@@ -110,7 +110,7 @@ func (l *directEventLoop) run() {
 			l.handleCancel(&req)
 
 		case req := <-l.get: // consumer asking for next batch
-			l.handleConsumer(&req)
+			l.handleGetRequest(&req)
 
 		case l.schedACKS <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list and queue
@@ -190,7 +190,7 @@ func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
 	}
 }
 
-func (l *directEventLoop) handleConsumer(req *getRequest) {
+func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	// log := l.broker.logger
 	// log.Debugf("try reserve %v events", req.sz)
 
@@ -201,7 +201,7 @@ func (l *directEventLoop) handleConsumer(req *getRequest) {
 	}
 
 	// log.Debug("newACKChan: ", b.ackSeq, count)
-	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.clients)
+	ackCH := newACKChan(l.ackSeq, start, count, l.buf.clients)
 	l.ackSeq++
 
 	req.resp <- getResponse{ackCH, buf}

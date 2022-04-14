@@ -32,12 +32,6 @@ type ackLoop struct {
 	processACK func(chanList, int)
 }
 
-func newACKLoop(b *broker, processACK func(chanList, int)) *ackLoop {
-	l := &ackLoop{broker: b}
-	l.processACK = processACK
-	return l
-}
-
 func (l *ackLoop) run() {
 	var (
 		// log = l.broker.logger

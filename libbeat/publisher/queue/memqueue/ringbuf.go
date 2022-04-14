@@ -21,10 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/beats/v7/libbeat/publisher"
->>>>>>> main
 )
 
 // Internal event ring buffer.

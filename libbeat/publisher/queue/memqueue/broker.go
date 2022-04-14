@@ -164,7 +164,9 @@ func NewQueue(
 	}
 
 	b.bufSize = sz
-	ack := newACKLoop(b, eventLoop.processACK)
+	ack := &ackLoop{
+		broker:     b,
+		processACK: eventLoop.processACK}
 
 	b.wg.Add(2)
 	go func() {
