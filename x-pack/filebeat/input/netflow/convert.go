@@ -35,6 +35,12 @@ func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Even
 }
 
 func toBeatEventCommon(flow record.Record) beat.Event {
+	const (
+		flowType    = "netflow_flow"
+		optionsType = "netflow_options"
+		unknownType = "netflow_unknown"
+	)
+
 	// replace net.HardwareAddress with its String() representation
 	fixMacAddresses(flow.Fields)
 	// Nest Exporter into netflow fields
@@ -43,11 +49,11 @@ func toBeatEventCommon(flow record.Record) beat.Event {
 	// Nest Type into netflow fields
 	switch flow.Type {
 	case record.Flow:
-		flow.Fields["type"] = "netflow_flow"
+		flow.Fields["type"] = flowType
 	case record.Options:
-		flow.Fields["type"] = "netflow_options"
+		flow.Fields["type"] = optionsType
 	default:
-		flow.Fields["type"] = "netflow_unknown"
+		flow.Fields["type"] = unknownType
 	}
 
 	// ECS Fields -- event
@@ -57,7 +63,7 @@ func toBeatEventCommon(flow record.Record) beat.Event {
 		"category": []string{"network_traffic", "network"},
 		"action":   flow.Fields["type"],
 	}
-	if ecsEvent["action"] == "netflow_flow" {
+	if ecsEvent["action"] == flowType {
 		ecsEvent["type"] = []string{"connection"}
 	}
 	// ECS Fields -- device
