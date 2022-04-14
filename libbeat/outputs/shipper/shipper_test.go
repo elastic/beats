@@ -50,7 +50,7 @@ func TestConvertMapStr(t *testing.T) {
 			value: common.MapStr{
 				"key": time.Now(),
 			},
-			expErr: "proto: invalid type: time.Time",
+			expErr: "invalid type: time.Time",
 		},
 		{
 			name: "values are preserved",
@@ -84,7 +84,7 @@ func TestConvertMapStr(t *testing.T) {
 			converted, err := convertMapStr(tc.value)
 			if tc.expErr != "" {
 				require.Error(t, err)
-				require.Equal(t, tc.expErr, err.Error())
+				require.Contains(t, err.Error(), tc.expErr)
 				require.Nil(t, converted)
 				return
 			}
