@@ -63,12 +63,10 @@ type Pipeline struct {
 
 	observer observer
 
-	eventer pipelineEventer
-
 	// wait close support
-	waitCloseMode    WaitCloseMode
+	waitOnClose      bool
 	waitCloseTimeout time.Duration
-	waitCloser       *waitCloser
+	waitCloseGroup   sync.WaitGroup
 
 	// closeRef signal propagation support
 	guardStartSigPropagation sync.Once
@@ -102,10 +100,6 @@ const (
 	// to ACK any outstanding events. This is independent of Clients asking for
 	// ACK and/or WaitClose. Clients can still optionally configure WaitClose themselves.
 	WaitOnPipelineClose
-
-	// WaitOnClientClose applies WaitClose timeout to each client connecting to
-	// the pipeline. Clients are still allowed to overwrite WaitClose with a timeout > 0s.
-	WaitOnClientClose
 )
 
 // OutputReloader interface, that can be queried from an active publisher pipeline.
@@ -115,16 +109,6 @@ type OutputReloader interface {
 		cfg *reload.ConfigWithMeta,
 		factory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
 	) error
-}
-
-type pipelineEventer struct {
-	observer  queueObserver
-	waitClose *waitCloser
-}
-
-type waitCloser struct {
-	// keep track of total number of active events (minus dropped by processors)
-	events sync.WaitGroup
 }
 
 type queueFactory func(queue.ACKListener) (queue.Queue, error)
@@ -149,7 +133,7 @@ func New(
 		beatInfo:         beat,
 		monitors:         monitors,
 		observer:         nilObserver,
-		waitCloseMode:    settings.WaitCloseMode,
+		waitOnClose:      settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
 	}
@@ -157,16 +141,8 @@ func New(
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
-	p.eventer.observer = p.observer
 
-	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
-		p.waitCloser = &waitCloser{}
-
-		// waitCloser decrements counter on queue ACK (not per client)
-		p.eventer.waitClose = p.waitCloser
-	}
-
-	p.queue, err = queueFactory(&p.eventer)
+	p.queue, err = queueFactory(p)
 	if err != nil {
 		return nil, err
 	}
@@ -185,6 +161,16 @@ func New(
 	return p, nil
 }
 
+// OnACK implements the queue.ACKListener interface, so the queue can notify the
+// Pipeline when events are acknowledged.
+func (p *Pipeline) OnACK(n int) {
+	p.observer.queueACKed(n)
+
+	if p.waitOnClose {
+		p.waitCloseGroup.Add(-n)
+	}
+}
+
 // Close stops the pipeline, outputs and queue.
 // If WaitClose with WaitOnPipelineClose mode is configured, Close will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
@@ -194,10 +180,10 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.waitCloser != nil {
+	if p.waitOnClose {
 		ch := make(chan struct{})
 		go func() {
-			p.waitCloser.wait()
+			p.waitCloseGroup.Wait()
 			ch <- struct{}{}
 		}()
 
@@ -208,7 +194,6 @@ func (p *Pipeline) Close() error {
 		case <-time.After(p.waitCloseTimeout):
 			// timeout -> close pipeline with pending events
 		}
-
 	}
 
 	// Note: active clients are not closed / disconnected.
@@ -258,16 +243,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	waitClose := cfg.WaitClose
-	reportEvents := p.waitCloser != nil
-
-	switch p.waitCloseMode {
-	case NoWaitOnClose:
-
-	case WaitOnClientClose:
-		if waitClose <= 0 {
-			waitClose = p.waitCloseTimeout
-		}
-	}
+	reportEvents := p.waitOnClose
 
 	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
 	if err != nil {
@@ -296,7 +272,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 				cfg.Events.DroppedOnPublish(event)
 			}
 			if reportEvents {
-				p.waitCloser.dec(1)
+				p.waitCloseGroup.Add(-1)
 			}
 		}
 	}
@@ -418,28 +394,6 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 		return nil, nil
 	}
 	return p.processors.Create(cfg, noPublish)
-}
-
-func (e *pipelineEventer) OnACK(n int) {
-	e.observer.queueACKed(n)
-
-	if wc := e.waitClose; wc != nil {
-		wc.dec(n)
-	}
-}
-
-func (e *waitCloser) inc() {
-	e.events.Add(1)
-}
-
-func (e *waitCloser) dec(n int) {
-	for i := 0; i < n; i++ {
-		e.events.Done()
-	}
-}
-
-func (e *waitCloser) wait() {
-	e.events.Wait()
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
