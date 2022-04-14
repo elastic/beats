@@ -6,11 +6,31 @@ package httpjson
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestDecodeZip(t *testing.T) {
+	const expected = "[{\"a\":\"b\"},{\"a\":\"b\"},{\"c\":\"d\"},{\"a\":\"b\"},{\"c\":\"d\"}]"
+	b, err := ioutil.ReadFile("./testdata/test.zip")
+	require.NoError(t, err)
+
+	resp := &response{}
+	if err := decodeAsZip(b, resp); err != nil {
+		t.Fatalf("decodeAsZip failed: %v", err)
+	}
+
+	j, err := json.Marshal(resp.body)
+	if err != nil {
+		t.Fatalf("Marshal failed: %v", err)
+	}
+
+	assert.Equal(t, expected, string(j))
+}
 
 func TestDecodeNdjson(t *testing.T) {
 	tests := []struct {
