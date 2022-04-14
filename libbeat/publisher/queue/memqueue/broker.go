@@ -35,7 +35,7 @@ const (
 type broker struct {
 	done chan struct{}
 
-	logger logger
+	logger *logp.Logger
 
 	bufSize int
 
@@ -110,7 +110,7 @@ func create(
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
-	logger logger,
+	logger *logp.Logger,
 	settings Settings,
 ) queue.Queue {
 	var (

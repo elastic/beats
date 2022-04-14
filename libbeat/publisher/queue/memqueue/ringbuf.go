@@ -263,24 +263,8 @@ func (b *ringBuffer) ack(sz int) {
 	}
 }
 
-func (b *ringBuffer) Empty() bool {
-	return (b.regA.size - b.reserved) == 0
-}
-
 func (b *ringBuffer) Avail() int {
 	return b.regA.size - b.reserved
-}
-
-func (b *ringBuffer) RegionBActive() bool {
-	return b.regB.size > 0
-}
-
-func (b *ringBuffer) RegionSizes() (int, int) {
-	return b.regA.size, b.regB.size
-}
-
-func (b *ringBuffer) TotalAvail() int {
-	return b.regA.size + b.regB.size - b.reserved
 }
 
 func (b *ringBuffer) Full() bool {
