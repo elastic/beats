@@ -51,8 +51,7 @@ type broker struct {
 	ackListener queue.ACKListener
 
 	// wait group for worker shutdown
-	wg          sync.WaitGroup
-	waitOnClose bool
+	wg sync.WaitGroup
 }
 
 type Settings struct {
@@ -60,7 +59,6 @@ type Settings struct {
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
-	WaitOnClose    bool
 	InputQueueSize int
 }
 
@@ -151,8 +149,6 @@ func NewQueue(
 		acks:          make(chan int),
 		scheduledACKs: make(chan chanList),
 
-		waitOnClose: settings.WaitOnClose,
-
 		ackListener: settings.ACKListener,
 	}
 
@@ -185,9 +181,6 @@ func NewQueue(
 
 func (b *broker) Close() error {
 	close(b.done)
-	if b.waitOnClose {
-		b.wg.Wait()
-	}
 	return nil
 }
 
@@ -257,14 +250,6 @@ func (l *chanList) append(ch *ackChan) {
 		l.tail.next = ch
 	}
 	l.tail = ch
-}
-
-func (l *chanList) count() (elems, count int) {
-	for ch := l.head; ch != nil; ch = ch.next {
-		elems++
-		count += ch.count
-	}
-	return
 }
 
 func (l *chanList) empty() bool {

@@ -70,12 +70,6 @@ func (b *eventBuffer) Set(idx int, event publisher.Event, st clientState) {
 	b.clients[idx] = st
 }
 
-func newRingBuffer(log logger, size int) *ringBuffer {
-	b := &ringBuffer{}
-	b.init(log, size)
-	return b
-}
-
 func (b *ringBuffer) init(log logger, size int) {
 	*b = ringBuffer{}
 	b.buf.init(size)
@@ -200,12 +194,6 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) (removed int) {
 	return len(events)
 }
 
-// activeBufferOffsets returns start and end offset
-// of all available events in region A.
-func (b *ringBuffer) activeBufferOffsets() (int, int) {
-	return b.regA.index, b.regA.index + b.regA.size
-}
-
 // reserve returns up to `sz` events from the brokerBuffer,
 // exclusively marking the events as 'reserved'. Subsequent calls to `reserve`
 // will only return enqueued and non-reserved events from the buffer.
@@ -253,7 +241,7 @@ func (b *ringBuffer) ack(sz int) {
 	// }()
 
 	if b.regA.size < sz {
-		panic(fmt.Errorf("Commit region to big (commit region=%v, buffer size=%v)",
+		panic(fmt.Errorf("commit region to big (commit region=%v, buffer size=%v)",
 			sz, b.regA.size,
 		))
 	}
