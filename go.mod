@@ -149,7 +149,7 @@ require (
 	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
 	go.elastic.co/ecszap v1.0.1
-	go.elastic.co/go-licence-detector v0.4.0
+	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.9.0
 	go.uber.org/multierr v1.8.0
@@ -186,8 +186,8 @@ require (
 )
 
 require (
-	github.com/elastic/elastic-agent-libs v0.1.2-0.20220411163553-45d6da9489d4
-	github.com/elastic/elastic-agent-system-metrics v0.0.0-20220411191610-8410d640fe3a
+	github.com/elastic/elastic-agent-libs v0.1.3-0.20220413130536-4b45f2742994
+	github.com/elastic/elastic-agent-system-metrics v0.0.0-20220413153735-05ffe60fc5c7
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
