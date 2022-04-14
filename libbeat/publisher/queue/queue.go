@@ -46,8 +46,8 @@ type Metrics struct {
 	//EventLimit is the user-configured event limit of the queue
 	EventLimit opt.Uint
 
-	//LongestWaitingItem is the timestamp of the oldest item in the queue.
-	LongestWaitingItem common.Time
+	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
+	OldestActiveTimestamp common.Time
 	//QueueLag is the difference between the consumer and producer position in the queue.
 	QueueLag uint64
 }
