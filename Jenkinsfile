@@ -53,11 +53,11 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
-        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
         gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
             // with a `git fetch` as would happen if we used the `gitCheckout` step.
@@ -342,29 +342,45 @@ def k8sTest(Map args = [:]) {
 */
 def withTools(Map args = [:], Closure body) {
   if (args.get('k8s', false)) {
-    withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
-      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
-      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
-      try {
-        // Add some environmental resilience when setup does not work the very first time.
-        def i = 0
-        retryWithSleep(retries: 3, seconds: 5, backoff: true){
-          try {
-            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
-          } catch(err) {
-            i++
-            sh(label: 'Delete cluster', script: 'kind delete cluster')
-            if (i > 2) {
-              error("Setup kind failed with error '${err.toString()}'")
-            }
-          }
-        }
-        body()
-      } finally {
-        sh(label: 'Delete cluster', script: 'kind delete cluster')
-      }
+    withK8s() {
+      body()
+    }
+  } else if (args.get('gcp', false)) {
+    withGCP() {
+      body()
     }
   } else {
+    body()
+  }
+}
+
+def withK8s(Closure body) {
+  withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
+    try {
+      // Add some environmental resilience when setup does not work the very first time.
+      def i = 0
+      retryWithSleep(retries: 3, seconds: 5, backoff: true){
+        try {
+          sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+        } catch(err) {
+          i++
+          sh(label: 'Delete cluster', script: 'kind delete cluster')
+          if (i > 2) {
+            error("Setup kind failed with error '${err.toString()}'")
+          }
+        }
+      }
+      body()
+    } finally {
+      sh(label: 'Delete cluster', script: 'kind delete cluster')
+    }
+  }
+}
+
+def withGCP(Closure body) {
+  withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
     body()
   }
 }
@@ -555,11 +571,12 @@ def target(Map args = [:]) {
   def installK8s = args.get('installK8s', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
+  def withGCP = args.get('withGCP', false)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
-        withTools(k8s: installK8s) {
+        withTools(k8s: installK8s, gcp: withGCP) {
           // make commands use -C <folder> while mage commands require the dir(folder)
           // let's support this scenario with the location variable.
           dir(isMage ? directory : '') {
@@ -982,7 +999,8 @@ def dumpVariables(){
   GOX_OS: ${env.GOX_OS}
   GOX_OSARCH: ${env.GOX_OSARCH}
   HOME: ${env.HOME}
-  NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}
+  PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}
+  PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}
   NOW: ${env.NOW}
   PATH: ${env.PATH}
   PKG_BUILD_DIR: ${env.PKG_BUILD_DIR}
@@ -1051,6 +1069,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       def withModule = args.content.get('withModule', false)
       def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
+      def withGCP = args.content.get('withGCP', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1080,6 +1099,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      installK8s: installK8s,
                      withModule: withModule,
                      isMage: true,
+                     withGCP: withGCP,
                      id: args.id,
                      enableRetry: enableRetry)
       }

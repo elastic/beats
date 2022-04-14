@@ -35,11 +35,10 @@ type consumer struct {
 }
 
 type batch struct {
-	consumer     *consumer
-	events       []publisher.Event
-	clientStates []clientState
-	ack          *ackChan
-	state        ackState
+	consumer *consumer
+	events   []publisher.Event
+	ack      *ackChan
+	state    ackState
 }
 
 type ackState uint8
