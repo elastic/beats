@@ -225,11 +225,15 @@ func TestNewInput(t *testing.T) {
 		input.Run()
 
 		go func() {
-			time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+			time.Sleep(time.Second) // let input.Stop() be executed.
 			input.Wait()
 		}()
 
+		start := time.Now()
 		for range []beat.Event{<-eventsCh} {
+			if time.Since(start) > time.Second {
+				require.Fail(t, "Channel was not closed after Wait()")
+			}
 		}
 	})
 

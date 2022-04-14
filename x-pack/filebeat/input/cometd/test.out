@@ -1,0 +1,88 @@
+channel closed
+panic: test timed out after 30s
+
+goroutine 41 [running]:
+testing.(*M).startAlarm.func1()
+	/usr/local/go/src/testing/testing.go:1788 +0x8e
+created by time.goFunc
+	/usr/local/go/src/time/sleep.go:180 +0x31
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0xc0000ae9c0, {0x115ca75, 0x806033}, 0x11945f0)
+	/usr/local/go/src/testing/testing.go:1307 +0x375
+testing.runTests.func1(0xc0000ae9c0)
+	/usr/local/go/src/testing/testing.go:1598 +0x6e
+testing.tRunner(0xc0000ae9c0, 0xc00063fd18)
+	/usr/local/go/src/testing/testing.go:1259 +0x102
+testing.runTests(0xc0005dd580, {0x1a5db80, 0x7, 0x7}, {0x82088d, 0x115e89c, 0x1c11b00})
+	/usr/local/go/src/testing/testing.go:1596 +0x43f
+testing.(*M).Run(0xc0005dd580)
+	/usr/local/go/src/testing/testing.go:1504 +0x51d
+main.main()
+	_testmain.go:55 +0x14b
+
+goroutine 50 [chan receive]:
+testing.(*T).Run(0xc0000aeb60, {0x1164e82, 0xfc11d58024ad}, 0x11945c8)
+	/usr/local/go/src/testing/testing.go:1307 +0x375
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.TestNewInput(0x0)
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input_test.go:64 +0x6f
+testing.tRunner(0xc0000aeb60, 0x11945f0)
+	/usr/local/go/src/testing/testing.go:1259 +0x102
+created by testing.(*T).Run
+	/usr/local/go/src/testing/testing.go:1306 +0x35a
+
+goroutine 60 [semacquire]:
+sync.runtime_Semacquire(0x126d701)
+	/usr/local/go/src/runtime/sema.go:56 +0x25
+sync.(*WaitGroup).Wait(0xc0005ee080)
+	/usr/local/go/src/sync/waitgroup.go:130 +0x71
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.(*cometdInput).Stop(0xc00027a2c0)
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input.go:152 +0x30
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.TestNewInput.func3(0xd40010)
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input_test.go:110 +0x6cc
+testing.tRunner(0xc0000af520, 0x11945c8)
+	/usr/local/go/src/testing/testing.go:1259 +0x102
+created by testing.(*T).Run
+	/usr/local/go/src/testing/testing.go:1306 +0x35a
+
+goroutine 61 [IO wait]:
+internal/poll.runtime_pollWait(0x7fa9d9969928, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:229 +0x89
+internal/poll.(*pollDesc).wait(0xc0005dd680, 0x203000, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x32
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Accept(0xc0005dd680)
+	/usr/local/go/src/internal/poll/fd_unix.go:402 +0x22c
+net.(*netFD).accept(0xc0005dd680)
+	/usr/local/go/src/net/fd_unix.go:173 +0x35
+net.(*TCPListener).accept(0xc00000e5a0)
+	/usr/local/go/src/net/tcpsock_posix.go:140 +0x28
+net.(*TCPListener).Accept(0xc00000e5a0)
+	/usr/local/go/src/net/tcpsock.go:262 +0x3d
+net/http.(*Server).Serve(0xc0002ae000, {0x127cb68, 0xc00000e5a0})
+	/usr/local/go/src/net/http/server.go:3001 +0x394
+net/http/httptest.(*Server).goServe.func1()
+	/usr/local/go/src/net/http/httptest/server.go:308 +0x6a
+created by net/http/httptest.(*Server).goServe
+	/usr/local/go/src/net/http/httptest/server.go:306 +0x6f
+
+goroutine 68 [chan receive (nil chan)]:
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.NewInput.func1()
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input.go:119 +0x28
+created by github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.NewInput
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input.go:118 +0x2ff
+
+goroutine 69 [chan send]:
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.TestNewInput.func3.1({{0x3581a67, 0xed9ea1c45, 0x0}, 0xc000124c90, 0xc000124bd0, {0x100ee00, 0xc0001e2070}, 0x0})
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input_test.go:69 +0x88
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.mockedOutleter.OnEvent(...)
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/client_mocked.go:46
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.(*cometdInput).run(0xc00027a2c0)
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input.go:76 +0x3af
+github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.(*cometdInput).Run.func1.1()
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input.go:44 +0x2fa
+created by github.com/elastic/beats/v7/x-pack/filebeat/input/cometd.(*cometdInput).Run.func1
+	/usr/local/go/src/github.com/elastic/kush-elastic/beats/x-pack/filebeat/input/cometd/input.go:33 +0x93
+FAIL	github.com/elastic/beats/v7/x-pack/filebeat/input/cometd	30.043s
+FAIL
