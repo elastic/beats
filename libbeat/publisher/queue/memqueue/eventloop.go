@@ -323,7 +323,7 @@ func (l *bufferingEventLoop) run() {
 			l.handleCancel(&req)
 
 		case req := <-l.get: // consumer asking for next batch
-			l.handleConsumer(&req)
+			l.handleGetRequest(&req)
 
 		case l.schedACKS <- l.pendingACKs:
 			l.schedACKS = nil
@@ -424,8 +424,8 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 	}
 }
 
-func (l *bufferingEventLoop) handleConsumer(req *getRequest) {
-	buf := l.flushList.head
+func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
+	/*buf := l.flushList.head
 	if buf == nil {
 		panic("get from non-flushed buffers")
 	}
@@ -458,7 +458,7 @@ func (l *bufferingEventLoop) handleConsumer(req *getRequest) {
 	buf.clients = buf.clients[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
-	}
+	}*/
 }
 
 func (l *bufferingEventLoop) handleACK(count int) {

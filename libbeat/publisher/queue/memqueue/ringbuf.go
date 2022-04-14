@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 // Internal event ring buffer.
@@ -46,8 +45,7 @@ type region struct {
 type eventBuffer struct {
 	logger *logp.Logger
 
-	events  []publisher.Event
-	clients []clientState
+	events []queueEntry
 }
 
 type clientState struct {
@@ -55,29 +53,29 @@ type clientState struct {
 	state *produceState // the producer it's state used to compute and signal the ACK count
 }
 
-func (b *eventBuffer) init(size int) {
-	b.events = make([]publisher.Event, size)
-	b.clients = make([]clientState, size)
+func newEventBuffer(logger *logp.Logger, size int) eventBuffer {
+	return eventBuffer{
+		events: make([]queueEntry, size),
+	}
 }
 
 func (b *eventBuffer) Len() int {
 	return len(b.events)
 }
 
-func (b *eventBuffer) Set(idx int, event publisher.Event, st clientState) {
+func (b *eventBuffer) Set(idx int, event interface{}, st clientState) {
 	// b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
 
-	b.events[idx] = event
-	b.clients[idx] = st
+	b.events[idx] = queueEntry{event, st}
 }
 
-func (b *ringBuffer) init(log *logp.Logger, size int) {
-	*b = ringBuffer{}
-	b.buf.init(size)
-	b.buf.logger = log
+func (b *ringBuffer) init(logger *logp.Logger, size int) {
+	*b = ringBuffer{
+		buf: newEventBuffer(logger, size),
+	}
 }
 
-func (b *ringBuffer) insert(event publisher.Event, client clientState) int {
+func (b *ringBuffer) insert(event interface{}, client clientState) int {
 	// log := b.buf.logger
 	// log.Debug("insert:")
 	// log.Debug("  region A:", b.regA)
@@ -163,7 +161,7 @@ func (b *ringBuffer) cancel(st *produceState) int {
 	return cancelA + cancelB
 }
 
-func (b *ringBuffer) cancelRegion(st *produceState, reg region) (removed int) {
+func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	start := reg.index
 	end := start + reg.size
 	events := b.buf.events[start:end]
@@ -186,8 +184,7 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) (removed int) {
 	events = events[len(toEvents):]
 	clients = clients[len(toClients):]
 	for i := range events {
-		events[i] = publisher.Event{}
-		clients[i] = clientState{}
+		events[i] = queueEntry{}
 	}
 
 	return len(events)
@@ -197,7 +194,7 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) (removed int) {
 // exclusively marking the events as 'reserved'. Subsequent calls to `reserve`
 // will only return enqueued and non-reserved events from the buffer.
 // If `sz == -1`, all available events will be reserved.
-func (b *ringBuffer) reserve(sz int) (int, []publisher.Event) {
+func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 	// log := b.buf.logger
 	// log.Debug("reserve: ", sz)
 	// log.Debug("  region A:", b.regA)
@@ -248,7 +245,7 @@ func (b *ringBuffer) ack(sz int) {
 	// clear region, so published events can be collected by the garbage collector:
 	end := b.regA.index + sz
 	for i := b.regA.index; i < end; i++ {
-		b.buf.events[i] = publisher.Event{}
+		b.buf.events[i] = queueEntry{}
 	}
 
 	b.regA.index = end

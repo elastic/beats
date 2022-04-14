@@ -45,7 +45,7 @@ type getRequest struct {
 
 type getResponse struct {
 	ack *ackChan
-	buf []publisher.Event
+	buf []queueEntry
 }
 
 type batchAckMsg struct{}

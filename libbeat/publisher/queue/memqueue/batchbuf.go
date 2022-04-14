@@ -19,49 +19,44 @@ package memqueue
 
 import "github.com/elastic/beats/v7/libbeat/publisher"
 
+type queueEntry struct {
+	event  interface{}
+	client clientState
+}
+
 type batchBuffer struct {
 	next    *batchBuffer
 	flushed bool
-	events  []publisher.Event
-	clients []clientState
+	//events  []publisher.Event
+	//clients []clientState
+	entries []queueEntry
 }
 
 func newBatchBuffer(sz int) *batchBuffer {
 	b := &batchBuffer{}
-	b.init(sz)
+	b.entries = make([]queueEntry, 0, sz)
 	return b
 }
 
-func (b *batchBuffer) init(sz int) {
-	b.events = make([]publisher.Event, 0, sz)
-	b.clients = make([]clientState, 0, sz)
-}
-
 func (b *batchBuffer) add(event publisher.Event, st clientState) {
-	b.events = append(b.events, event)
-	b.clients = append(b.clients, st)
+	b.entries = append(b.entries, queueEntry{event, st})
 }
 
 func (b *batchBuffer) length() int {
-	return len(b.events)
+	return len(b.entries)
 }
 
 func (b *batchBuffer) cancel(st *produceState) int {
-	events := b.events[:0]
-	clients := b.clients[:0]
+	entries := b.entries[:0]
 
-	removed := 0
-	for i := range b.clients {
-		if b.clients[i].state == st {
-			removed++
+	removedCount := 0
+	for _, entry := range b.entries {
+		if entry.client.state == st {
+			removedCount++
 			continue
 		}
-
-		events = append(events, b.events[i])
-		clients = append(clients, b.clients[i])
+		entries = append(entries, entry)
 	}
-
-	b.events = events
-	b.clients = clients
-	return removed
+	b.entries = entries
+	return removedCount
 }
