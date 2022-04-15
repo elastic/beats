@@ -155,7 +155,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		// and could also prevent us from creating new ones, so we treat this as a
 		// fatal error on startup rather than quietly providing degraded
 		// performance.
-		return nil, fmt.Errorf("couldn't write to state file: %v", err)
+		return nil, fmt.Errorf("couldn't write to state file: %w", err)
 	}
 
 	// Index any existing data segments to be placed in segments.reading.
@@ -193,7 +193,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 	// events that are still present on disk but were already sent and
 	// acknowledged on a previous run (we probably want to track these as well
 	// in the future.)
-	// TODO: pass in a context that queues can use to report these events.
+	// TODO: pass in a context that queues can use to report these events. //nolint:godox //Ignore This
 	activeFrameCount := 0
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
