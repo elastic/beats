@@ -27,11 +27,7 @@ type ackLoop struct {
 	sig    chan batchAckMsg
 	lst    chanList
 
-	totalACK   uint64
-	totalSched uint64
-
-	batchesSched uint64
-	batchesACKed uint64
+	totalACK uint64
 
 	processACK func(chanList, int)
 }
@@ -59,25 +55,13 @@ func (l *ackLoop) run() {
 	for {
 		select {
 		case <-l.broker.done:
-			// TODO: handle pending ACKs?
-			// TODO: panic on pending batches?
 			return
 
 		case acks <- acked:
 			acks, acked = nil, 0
 
 		case lst := <-l.broker.scheduledACKs:
-			count, events := lst.count()
 			l.lst.concat(&lst)
-
-			// log.Debug("ACK List:")
-			// for current := l.lst.head; current != nil; current = current.next {
-			// 	log.Debugf("  ack entry(seq=%v, start=%v, count=%v",
-			// 		current.seq, current.start, current.count)
-			// }
-
-			l.batchesSched += uint64(count)
-			l.totalSched += uint64(events)
 
 		case <-l.sig:
 			acked += l.handleBatchSig()
@@ -136,7 +120,7 @@ func (l *ackLoop) collectAcked() chanList {
 	lst := chanList{}
 
 	acks := l.lst.pop()
-	l.onACK(acks)
+	l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 	lst.append(acks)
 
 	done := false
@@ -144,7 +128,7 @@ func (l *ackLoop) collectAcked() chanList {
 		acks := l.lst.front()
 		select {
 		case <-acks.ch:
-			l.onACK(acks)
+			l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 			lst.append(l.lst.pop())
 
 		default:
@@ -153,9 +137,4 @@ func (l *ackLoop) collectAcked() chanList {
 	}
 
 	return lst
-}
-
-func (l *ackLoop) onACK(acks *ackChan) {
-	l.batchesACKed++
-	l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 }
