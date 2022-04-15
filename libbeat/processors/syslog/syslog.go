@@ -176,8 +176,8 @@ func (p *processor) run(event *beat.Event) error {
 	}
 
 	jsontransform.WriteJSONKeys(event, fields, false, p.OverwriteKeys, !p.IgnoreFailure)
-	if ts != nil {
-		event.Timestamp = *ts
+	if !ts.IsZero() {
+		event.Timestamp = ts
 	}
 
 	return err

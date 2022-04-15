@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+//nolint:unparam // Parameter layout can potentially use different values in the future.
 func mustParseTime(layout string, value string) time.Time {
 	t, err := time.Parse(layout, value)
 	if err != nil {
@@ -35,6 +36,7 @@ func mustParseTime(layout string, value string) time.Time {
 	return t
 }
 
+//nolint:unparam // Parameter layout can potentially use different values in the future.
 func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time {
 	t, err := time.ParseInLocation(layout, value, loc)
 	if err != nil {
@@ -467,17 +469,16 @@ func TestMessage_Fields(t *testing.T) {
 	}{
 		"valid": {
 			In: &message{
-				timestamp:   mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00"),
-				facility:    1,
-				severity:    5,
-				priority:    13,
-				prioritySet: true,
-				hostname:    "test-host",
-				msg:         "this is a test message",
-				process:     "su",
-				pid:         "1024",
-				msgID:       "msg123",
-				version:     1,
+				timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00"),
+				facility:  1,
+				severity:  5,
+				priority:  13,
+				hostname:  "test-host",
+				msg:       "this is a test message",
+				process:   "su",
+				pid:       "1024",
+				msgID:     "msg123",
+				version:   1,
 				structuredData: map[string]map[string]string{
 					"a": {
 						"b": "c",

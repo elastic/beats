@@ -19,13 +19,15 @@ type machineState struct {
 
 // ParseRFC5424 parses an RFC 5424-formatted syslog message.
 func parseRFC5424(data string) (message, error) {
-    var m message
     var s machineState
     var err error
     var p, cs, tok int
 
     pe := len(data)
     eof := len(data)
+    m := message{
+        priority: -1,
+    }
 
     %%{
         include common "common.rl";
@@ -37,11 +39,7 @@ func parseRFC5424(data string) (message, error) {
         write exec;
     }%%
 
-    if err != nil {
-        return message{}, err
-    }
-
-    return m, nil
+    return m, err
 }
 
 %%{

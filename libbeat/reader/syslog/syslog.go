@@ -97,9 +97,8 @@ func DefaultConfig() Config {
 
 // ParseMessage will parse syslog message data formatted as format into fields. loc is used to enrich
 // timestamps that lack a time zone.
-func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr, *time.Time, error) {
+func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr, time.Time, error) {
 	var m message
-	var ts *time.Time
 	var err error
 
 	switch format {
@@ -114,11 +113,8 @@ func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr
 	case FormatRFC5424:
 		m, err = parseRFC5424(data)
 	}
-	if m.timestampSet {
-		ts = &m.timestamp
-	}
 
-	return m.fields(), ts, err
+	return m.fields(), m.timestamp, err
 }
 
 // Parser is a syslog parser that implements parser.Parser.
@@ -159,8 +155,8 @@ func (p *Parser) Next() (reader.Message, error) {
 		msg.Bytes = len(msg.Content)
 	}
 	msg.AddFields(fields)
-	if ts != nil {
-		msg.Ts = *ts
+	if !ts.IsZero() {
+		msg.Ts = ts
 	}
 
 	return msg, nil

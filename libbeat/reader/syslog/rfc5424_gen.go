@@ -23,14 +23,14 @@ import (
 	"go.uber.org/multierr"
 )
 
-//line rfc5424_gen.go:13
+//line rfc5424_gen.go:12
 const rfc5424_start int = 1
 const rfc5424_first_final int = 589
 const rfc5424_error int = 0
 
 const rfc5424_en_main int = 1
 
-//line parser/parser_rfc5424.rl:13
+//line parser/parser_rfc5424.rl:12
 
 type machineState struct {
 	sdID           string
@@ -40,20 +40,22 @@ type machineState struct {
 
 // ParseRFC5424 parses an RFC 5424-formatted syslog message.
 func parseRFC5424(data string) (message, error) {
-	var m message
 	var s machineState
 	var err error
 	var p, cs, tok int
 
 	pe := len(data)
 	eof := len(data)
+	m := message{
+		priority: -1,
+	}
 
-//line rfc5424_gen.go:41
+//line rfc5424_gen.go:42
 	{
 		cs = rfc5424_start
 	}
 
-//line rfc5424_gen.go:46
+//line rfc5424_gen.go:47
 	{
 		if p == pe {
 			goto _test_eof
@@ -1332,7 +1334,7 @@ func parseRFC5424(data string) (message, error) {
 		p--
 
 		goto st0
-//line rfc5424_gen.go:1337
+//line rfc5424_gen.go:1338
 	st_case_0:
 	st0:
 		cs = 0
@@ -1363,7 +1365,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line rfc5424_gen.go:1368
+//line rfc5424_gen.go:1369
 		if data[p] == 62 {
 			goto tr5
 		}
@@ -1379,7 +1381,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line rfc5424_gen.go:1384
+//line rfc5424_gen.go:1385
 		if 49 <= data[p] && data[p] <= 57 {
 			goto tr7
 		}
@@ -1395,7 +1397,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line rfc5424_gen.go:1400
+//line rfc5424_gen.go:1401
 		if data[p] == 32 {
 			goto tr8
 		}
@@ -1414,7 +1416,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof6
 		}
 	st_case_6:
-//line rfc5424_gen.go:1419
+//line rfc5424_gen.go:1420
 		if data[p] == 45 {
 			goto st7
 		}
@@ -1442,7 +1444,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof8
 		}
 	st_case_8:
-//line rfc5424_gen.go:1447
+//line rfc5424_gen.go:1448
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr16
 		}
@@ -1458,7 +1460,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof9
 		}
 	st_case_9:
-//line rfc5424_gen.go:1463
+//line rfc5424_gen.go:1464
 		if data[p] == 32 {
 			goto tr17
 		}
@@ -1477,7 +1479,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof10
 		}
 	st_case_10:
-//line rfc5424_gen.go:1482
+//line rfc5424_gen.go:1483
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr20
 		}
@@ -1493,7 +1495,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof11
 		}
 	st_case_11:
-//line rfc5424_gen.go:1498
+//line rfc5424_gen.go:1499
 		if data[p] == 32 {
 			goto tr21
 		}
@@ -1512,7 +1514,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof12
 		}
 	st_case_12:
-//line rfc5424_gen.go:1517
+//line rfc5424_gen.go:1518
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr24
 		}
@@ -1528,7 +1530,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof13
 		}
 	st_case_13:
-//line rfc5424_gen.go:1533
+//line rfc5424_gen.go:1534
 		if data[p] == 32 {
 			goto tr25
 		}
@@ -1547,7 +1549,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof14
 		}
 	st_case_14:
-//line rfc5424_gen.go:1552
+//line rfc5424_gen.go:1553
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr28
 		}
@@ -1563,7 +1565,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof15
 		}
 	st_case_15:
-//line rfc5424_gen.go:1568
+//line rfc5424_gen.go:1569
 		if data[p] == 32 {
 			goto tr29
 		}
@@ -1582,7 +1584,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof16
 		}
 	st_case_16:
-//line rfc5424_gen.go:1587
+//line rfc5424_gen.go:1588
 		switch data[p] {
 		case 45:
 			goto st589
@@ -1616,7 +1618,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof591
 		}
 	st_case_591:
-//line rfc5424_gen.go:1621
+//line rfc5424_gen.go:1622
 		goto st591
 	tr33:
 //line parser/rfc5424.rl:23
@@ -1629,7 +1631,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof17
 		}
 	st_case_17:
-//line rfc5424_gen.go:1634
+//line rfc5424_gen.go:1635
 		if data[p] == 33 {
 			goto tr35
 		}
@@ -1657,7 +1659,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof18
 		}
 	st_case_18:
-//line rfc5424_gen.go:1662
+//line rfc5424_gen.go:1663
 		switch data[p] {
 		case 32:
 			goto tr36
@@ -1690,7 +1692,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof19
 		}
 	st_case_19:
-//line rfc5424_gen.go:1695
+//line rfc5424_gen.go:1696
 		if data[p] == 33 {
 			goto tr39
 		}
@@ -1718,7 +1720,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof20
 		}
 	st_case_20:
-//line rfc5424_gen.go:1723
+//line rfc5424_gen.go:1724
 		switch data[p] {
 		case 33:
 			goto st21
@@ -2354,7 +2356,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof52
 		}
 	st_case_52:
-//line rfc5424_gen.go:2359
+//line rfc5424_gen.go:2360
 		if data[p] == 34 {
 			goto st53
 		}
@@ -2384,7 +2386,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof54
 		}
 	st_case_54:
-//line rfc5424_gen.go:2389
+//line rfc5424_gen.go:2390
 		switch data[p] {
 		case 34:
 			goto tr76
@@ -2409,7 +2411,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof55
 		}
 	st_case_55:
-//line rfc5424_gen.go:2414
+//line rfc5424_gen.go:2415
 		switch data[p] {
 		case 32:
 			goto st19
@@ -2432,7 +2434,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof592
 		}
 	st_case_592:
-//line rfc5424_gen.go:2437
+//line rfc5424_gen.go:2438
 		switch data[p] {
 		case 32:
 			goto st590
@@ -2461,7 +2463,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof56
 		}
 	st_case_56:
-//line rfc5424_gen.go:2466
+//line rfc5424_gen.go:2467
 		if data[p] == 34 {
 			goto st54
 		}
@@ -8648,7 +8650,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof547
 		}
 	st_case_547:
-//line rfc5424_gen.go:8653
+//line rfc5424_gen.go:8654
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st548
 		}
@@ -9076,7 +9078,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof586
 		}
 	st_case_586:
-//line rfc5424_gen.go:9081
+//line rfc5424_gen.go:9082
 		switch data[p] {
 		case 57:
 			goto st588
@@ -9098,7 +9100,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof587
 		}
 	st_case_587:
-//line rfc5424_gen.go:9103
+//line rfc5424_gen.go:9104
 		if data[p] == 62 {
 			goto tr5
 		}
@@ -10982,7 +10984,7 @@ func parseRFC5424(data string) (message, error) {
 				err = multierr.Append(ErrStructuredData, err)
 				p--
 
-//line rfc5424_gen.go:9815
+//line rfc5424_gen.go:9816
 			}
 		}
 
@@ -10991,23 +10993,19 @@ func parseRFC5424(data string) (message, error) {
 		}
 	}
 
-//line parser/parser_rfc5424.rl:39
+//line parser/parser_rfc5424.rl:40
 
-	if err != nil {
-		return message{}, err
-	}
-
-	return m, nil
+	return m, err
 }
 
-//line rfc5424_gen.go:9833
+//line rfc5424_gen.go:9830
 const check_start int = 1
 const check_first_final int = 15
 const check_error int = 0
 
 const check_en_main int = 1
 
-//line parser/parser_rfc5424.rl:52
+//line parser/parser_rfc5424.rl:49
 
 // isRFC5424 returns true if data is formatted as an RFC 5424 syslog message.
 func isRFC5424(data string) bool {
@@ -11016,12 +11014,12 @@ func isRFC5424(data string) bool {
 
 	pe := len(data)
 
-//line rfc5424_gen.go:9852
+//line rfc5424_gen.go:9849
 	{
 		cs = check_start
 	}
 
-//line rfc5424_gen.go:9857
+//line rfc5424_gen.go:9854
 	{
 		if p == pe {
 			goto _test_eof
@@ -11125,7 +11123,7 @@ func isRFC5424(data string) bool {
 		}
 		goto st0
 	tr9:
-//line parser/parser_rfc5424.rl:62
+//line parser/parser_rfc5424.rl:59
 
 		isRFC5424 = true
 
@@ -11135,7 +11133,7 @@ func isRFC5424(data string) bool {
 			goto _test_eof7
 		}
 	st_case_7:
-//line rfc5424_gen.go:9971
+//line rfc5424_gen.go:9968
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st8
 		}
@@ -11276,7 +11274,7 @@ func isRFC5424(data string) bool {
 		}
 	}
 
-//line parser/parser_rfc5424.rl:73
+//line parser/parser_rfc5424.rl:70
 
 	return isRFC5424
 }
