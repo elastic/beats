@@ -49,8 +49,6 @@ type Metrics struct {
 
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time
-	//QueueLag is the difference between the consumer and producer position in the queue.
-	QueueLag uint64
 }
 
 // ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented
