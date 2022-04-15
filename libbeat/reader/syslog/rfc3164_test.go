@@ -87,6 +87,17 @@ var parseRFC3164Cases = map[string]struct {
 			msg:       "this is the message",
 		},
 	},
+	"non-standard-date": {
+		In: "<123>Sep 01 02:03:04 hostname message",
+		Want: message{
+			timestamp: mustParseTimeLoc(time.Stamp, "Sep 1 02:03:04", time.Local),
+			priority:  123,
+			facility:  15,
+			severity:  3,
+			hostname:  "hostname",
+			msg:       "message",
+		},
+	},
 	"err-pri-not-a-number": {
 		In:      "<abc>Oct 11 22:14:15 test-host this is the message",
 		WantErr: ErrPriority,

@@ -20,6 +20,7 @@ package memqueue
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
@@ -43,7 +44,7 @@ type region struct {
 }
 
 type eventBuffer struct {
-	logger logger
+	logger *logp.Logger
 
 	events  []publisher.Event
 	clients []clientState
@@ -70,19 +71,13 @@ func (b *eventBuffer) Set(idx int, event publisher.Event, st clientState) {
 	b.clients[idx] = st
 }
 
-func newRingBuffer(log logger, size int) *ringBuffer {
-	b := &ringBuffer{}
-	b.init(log, size)
-	return b
-}
-
-func (b *ringBuffer) init(log logger, size int) {
+func (b *ringBuffer) init(log *logp.Logger, size int) {
 	*b = ringBuffer{}
 	b.buf.init(size)
 	b.buf.logger = log
 }
 
-func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, int) {
+func (b *ringBuffer) insert(event publisher.Event, client clientState) int {
 	// log := b.buf.logger
 	// log.Debug("insert:")
 	// log.Debug("  region A:", b.regA)
@@ -102,13 +97,13 @@ func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, in
 		idx := b.regB.index + b.regB.size
 		avail := b.regA.index - idx
 		if avail == 0 {
-			return false, 0
+			return 0
 		}
 
 		b.buf.Set(idx, event, client)
 		b.regB.size++
 
-		return true, avail - 1
+		return avail - 1
 	}
 
 	// region B does not exist yet, check if region A is available for use
@@ -124,7 +119,7 @@ func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, in
 
 			// log.Debug("  - no space in region B")
 
-			return false, 0
+			return 0
 		}
 
 		// create region B and insert events
@@ -132,14 +127,14 @@ func (b *ringBuffer) insert(event publisher.Event, client clientState) (bool, in
 		b.regB.index = 0
 		b.regB.size = 1
 		b.buf.Set(0, event, client)
-		return true, b.regA.index - 1
+		return b.regA.index - 1
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
 	b.buf.Set(idx, event, client)
 	b.regA.size++
-	return true, avail - 1
+	return avail - 1
 }
 
 // cancel removes all buffered events matching `st`, not yet reserved by
@@ -155,8 +150,6 @@ func (b *ringBuffer) cancel(st *produceState) int {
 	// 	log.Debug("  -> region B:", b.regB)
 	// 	log.Debug("  -> reserved:", b.reserved)
 	// }()
-
-	// TODO: return if st has no pending events
 
 	cancelB := b.cancelRegion(st, b.regB)
 	b.regB.size -= cancelB
@@ -198,12 +191,6 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) (removed int) {
 	}
 
 	return len(events)
-}
-
-// activeBufferOffsets returns start and end offset
-// of all available events in region A.
-func (b *ringBuffer) activeBufferOffsets() (int, int) {
-	return b.regA.index, b.regA.index + b.regA.size
 }
 
 // reserve returns up to `sz` events from the brokerBuffer,
@@ -253,7 +240,7 @@ func (b *ringBuffer) ack(sz int) {
 	// }()
 
 	if b.regA.size < sz {
-		panic(fmt.Errorf("Commit region to big (commit region=%v, buffer size=%v)",
+		panic(fmt.Errorf("commit region to big (commit region=%v, buffer size=%v)",
 			sz, b.regA.size,
 		))
 	}
@@ -275,24 +262,8 @@ func (b *ringBuffer) ack(sz int) {
 	}
 }
 
-func (b *ringBuffer) Empty() bool {
-	return (b.regA.size - b.reserved) == 0
-}
-
 func (b *ringBuffer) Avail() int {
 	return b.regA.size - b.reserved
-}
-
-func (b *ringBuffer) RegionBActive() bool {
-	return b.regB.size > 0
-}
-
-func (b *ringBuffer) RegionSizes() (int, int) {
-	return b.regA.size, b.regB.size
-}
-
-func (b *ringBuffer) TotalAvail() int {
-	return b.regA.size + b.regB.size - b.reserved
 }
 
 func (b *ringBuffer) Full() bool {
