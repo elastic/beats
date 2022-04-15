@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
 - Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
 - Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
+- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 
 *Packetbeat*
 
