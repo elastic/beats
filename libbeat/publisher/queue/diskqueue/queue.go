@@ -193,7 +193,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 	// events that are still present on disk but were already sent and
 	// acknowledged on a previous run (we probably want to track these as well
 	// in the future.)
-	// TODO: pass in a context that queues can use to report these events. //nolint:godox //Ignore This
+	//nolint:godox // Ignore This
+	// TODO: pass in a context that queues can use to report these events.
 	activeFrameCount := 0
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
