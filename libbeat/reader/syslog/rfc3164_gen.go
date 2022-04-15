@@ -5079,6 +5079,8 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		switch data[p] {
 		case 32:
 			goto st303
+		case 48:
+			goto st303
 		case 51:
 			goto st316
 		}
@@ -5235,7 +5237,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof318
 		}
 	st_case_318:
-//line rfc3164_gen.go:5230
+//line rfc3164_gen.go:5232
 		if data[p] == 101 {
 			goto st319
 		}
@@ -5260,7 +5262,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof320
 		}
 	st_case_320:
-//line rfc3164_gen.go:5255
+//line rfc3164_gen.go:5257
 		if data[p] == 101 {
 			goto st321
 		}
@@ -5285,7 +5287,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof322
 		}
 	st_case_322:
-//line rfc3164_gen.go:5280
+//line rfc3164_gen.go:5282
 		switch data[p] {
 		case 97:
 			goto st323
@@ -5325,7 +5327,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof325
 		}
 	st_case_325:
-//line rfc3164_gen.go:5320
+//line rfc3164_gen.go:5322
 		if data[p] == 97 {
 			goto st326
 		}
@@ -5353,7 +5355,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof327
 		}
 	st_case_327:
-//line rfc3164_gen.go:5348
+//line rfc3164_gen.go:5350
 		if data[p] == 111 {
 			goto st328
 		}
@@ -5378,7 +5380,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof329
 		}
 	st_case_329:
-//line rfc3164_gen.go:5373
+//line rfc3164_gen.go:5375
 		if data[p] == 99 {
 			goto st330
 		}
@@ -5403,7 +5405,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof331
 		}
 	st_case_331:
-//line rfc3164_gen.go:5398
+//line rfc3164_gen.go:5400
 		if data[p] == 101 {
 			goto st332
 		}
@@ -5428,7 +5430,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof333
 		}
 	st_case_333:
-//line rfc3164_gen.go:5423
+//line rfc3164_gen.go:5425
 		switch data[p] {
 		case 57:
 			goto st335
@@ -5450,7 +5452,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 			goto _test_eof334
 		}
 	st_case_334:
-//line rfc3164_gen.go:5445
+//line rfc3164_gen.go:5447
 		if data[p] == 62 {
 			goto tr5
 		}
@@ -6622,7 +6624,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 				err = ErrHostname
 				p--
 
-//line rfc3164_gen.go:5870
+//line rfc3164_gen.go:5872
 			}
 		}
 
