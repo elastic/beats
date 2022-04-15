@@ -205,6 +205,10 @@ func (b *broker) Consumer() queue.Consumer {
 	return newConsumer(b)
 }
 
+func (b *broker) Metrics() (queue.Metrics, error) {
+	return queue.Metrics{}, queue.ErrMetricsNotImplemented
+}
+
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
 		return &ackChan{

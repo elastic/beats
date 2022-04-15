@@ -18,6 +18,7 @@
 package queue
 
 import (
+	"errors"
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -52,6 +53,9 @@ type Metrics struct {
 	QueueLag uint64
 }
 
+// ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented
+var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
+
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
 // Consumers will receive events in batches from the queues buffers.
@@ -69,9 +73,7 @@ type Queue interface {
 	Producer(cfg ProducerConfig) Producer
 	Consumer() Consumer
 
-	// Leave this commented out for now so we don't break the interfaces
-	// Should the main Queue implementation itself expose the metrics, or some other component in the interfaces?
-	//Metrics() (Metrics, error)
+	Metrics() (Metrics, error)
 }
 
 // BufferConfig returns the pipelines buffering settings,
