@@ -152,6 +152,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Populate new container ECS fields in Docker module. {pull}30399[30399]
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
+- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 
 *Packetbeat*
 
