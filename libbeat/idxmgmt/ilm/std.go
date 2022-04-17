@@ -20,7 +20,7 @@ package ilm
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 type stdSupport struct {

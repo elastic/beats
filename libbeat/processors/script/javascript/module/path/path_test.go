@@ -22,12 +22,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/processors/script/javascript"
 
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/path"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
+	_ "github.com/menderesk/beats/v7/libbeat/processors/script/javascript/module/path"
+	_ "github.com/menderesk/beats/v7/libbeat/processors/script/javascript/module/require"
 )
 
 func TestWin32(t *testing.T) {

@@ -23,10 +23,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 // Product supported by X-Pack Monitoring
@@ -117,7 +117,7 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // FixTimestampField converts the given timestamp field in the given map from a float64 to an
 // int, so that it is not serialized in scientific notation in the event. This is because
 // Elasticsearch cannot accepts scientific notation to represent millis-since-epoch values
-// for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
+// for it's date fields: https://github.com/menderesk/elasticsearch/pull/36691
 func FixTimestampField(m common.MapStr, field string) error {
 	v, err := m.GetValue(field)
 	if err == common.ErrKeyNotFound {

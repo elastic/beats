@@ -17,7 +17,7 @@
 
 package seccomp
 
-import "github.com/elastic/go-seccomp-bpf"
+import "github.com/menderesk/go-seccomp-bpf"
 
 func init() {
 	defaultPolicy = &seccomp.Policy{

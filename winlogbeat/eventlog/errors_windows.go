@@ -18,7 +18,7 @@
 package eventlog
 
 import (
-	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	win "github.com/menderesk/beats/v7/winlogbeat/sys/wineventlog"
 )
 
 // IsRecoverable returns a boolean indicating whether the error represents

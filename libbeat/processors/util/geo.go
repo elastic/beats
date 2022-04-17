@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // GeoConfig contains geo configuration data.

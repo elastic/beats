@@ -22,7 +22,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // directEventLoop implements the broker main event loop. It buffers events,

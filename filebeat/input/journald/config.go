@@ -25,12 +25,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/go-ucfg"
+	"github.com/menderesk/go-ucfg"
 
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/menderesk/beats/v7/filebeat/input/journald/pkg/journalfield"
+	"github.com/menderesk/beats/v7/filebeat/input/journald/pkg/journalread"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/reader/parser"
 )
 
 // includeMatchesWarnOnce allow for a config deprecation warning to be

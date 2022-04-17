@@ -14,15 +14,15 @@ import (
 	"sync"
 	"time"
 
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	awscommon "github.com/menderesk/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/monitoring"
 )
 
 const (

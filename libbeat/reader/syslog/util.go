@@ -20,7 +20,7 @@ package syslog
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // stringToInt converts a string, assumed to be ASCII numeric characters, to an int.

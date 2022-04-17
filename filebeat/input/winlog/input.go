@@ -22,16 +22,16 @@ import (
 	"io"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	cursor "github.com/menderesk/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/go-concert/ctxtool"
+	"github.com/menderesk/go-concert/timed"
 
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/menderesk/beats/v7/winlogbeat/checkpoint"
+	"github.com/menderesk/beats/v7/winlogbeat/eventlog"
 )
 
 type eventlogRunner struct{}

@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/paths"
 )
 
 // ModuleConfig contains the configuration file options for a module

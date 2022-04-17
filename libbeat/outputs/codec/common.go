@@ -20,9 +20,9 @@ package codec
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
-	"github.com/elastic/go-structform"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/dtfmt"
+	"github.com/menderesk/go-structform"
 )
 
 // MakeTimestampEncoder creates encoder function that formats time

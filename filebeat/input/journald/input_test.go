@@ -26,7 +26,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func TestInputFieldsTranslation(t *testing.T) {

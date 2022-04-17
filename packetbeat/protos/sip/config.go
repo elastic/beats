@@ -18,8 +18,8 @@
 package sip
 
 import (
-	cfg "github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/protos"
+	cfg "github.com/menderesk/beats/v7/packetbeat/config"
+	"github.com/menderesk/beats/v7/packetbeat/protos"
 )
 
 type config struct {

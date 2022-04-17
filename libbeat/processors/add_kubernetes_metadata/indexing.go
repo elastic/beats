@@ -20,7 +20,7 @@ package add_kubernetes_metadata
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers

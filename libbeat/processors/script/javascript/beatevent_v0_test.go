@@ -25,11 +25,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/beat/events"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/monitoring"
+	"github.com/menderesk/beats/v7/libbeat/tests/resources"
 )
 
 const (

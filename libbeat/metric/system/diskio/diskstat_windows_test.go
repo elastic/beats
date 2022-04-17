@@ -23,16 +23,16 @@ package diskio
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 )
 
 func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
 	// Test if flakey.
-	t.Skip("See https://github.com/elastic/beats/issues/17126")
+	t.Skip("See https://github.com/menderesk/beats/issues/17126")
 
 	conf := map[string]interface{}{
 		"module":                 "system",

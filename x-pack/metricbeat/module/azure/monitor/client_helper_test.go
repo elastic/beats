@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 func MockResourceExpanded() resources.GenericResourceExpanded {

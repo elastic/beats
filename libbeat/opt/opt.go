@@ -17,7 +17,7 @@
 
 package opt
 
-import "github.com/elastic/go-structform"
+import "github.com/menderesk/go-structform"
 
 // ZeroInterface is a type interface for cases where we need to cast from a void pointer
 type ZeroInterface interface {

@@ -5,7 +5,7 @@
 package synthexec
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
 )
 
 type ExecMultiplexer struct {

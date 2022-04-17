@@ -18,7 +18,7 @@
 package seccomp
 
 import (
-	"github.com/elastic/go-seccomp-bpf"
+	"github.com/menderesk/go-seccomp-bpf"
 )
 
 func init() {

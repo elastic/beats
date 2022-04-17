@@ -35,9 +35,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/winlogbeat/sys/winevent"
 )
 
 func TestRenderer(t *testing.T) {

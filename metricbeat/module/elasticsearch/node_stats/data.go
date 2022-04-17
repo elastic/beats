@@ -21,16 +21,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/menderesk/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	s "github.com/menderesk/beats/v7/libbeat/common/schema"
+	c "github.com/menderesk/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -235,7 +235,7 @@ var (
 				}),
 				"memory": c.Dict("memory", s.Schema{
 					"control_group": c.Str("control_group"),
-					// The two following values are currently string. See https://github.com/elastic/elasticsearch/pull/26166
+					// The two following values are currently string. See https://github.com/menderesk/elasticsearch/pull/26166
 					"limit": s.Object{
 						"bytes": c.Str("limit_in_bytes"),
 					},

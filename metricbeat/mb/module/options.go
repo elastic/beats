@@ -20,8 +20,8 @@ package module
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 // Option specifies some optional arguments used for configuring the behavior

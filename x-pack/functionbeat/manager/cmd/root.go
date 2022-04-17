@@ -9,10 +9,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/beater"
+	cmd "github.com/menderesk/beats/v7/libbeat/cmd"
+	"github.com/menderesk/beats/v7/libbeat/cmd/instance"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/config"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/manager/beater"
 )
 
 // Name of this beat

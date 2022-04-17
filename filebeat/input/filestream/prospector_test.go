@@ -28,11 +28,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/unison"
+	loginp "github.com/menderesk/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/go-concert/unison"
 )
 
 func TestProspector_InitCleanIfRemoved(t *testing.T) {

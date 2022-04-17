@@ -18,7 +18,7 @@
 package hbtestllext
 
 import (
-	"github.com/elastic/go-lookslike"
+	"github.com/menderesk/go-lookslike"
 )
 
 // MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.

@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func TestNetworkConfigUnpack(t *testing.T) {

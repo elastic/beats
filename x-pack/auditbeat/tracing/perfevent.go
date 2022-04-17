@@ -20,7 +20,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/go-perf"
+	"github.com/menderesk/go-perf"
 )
 
 var (

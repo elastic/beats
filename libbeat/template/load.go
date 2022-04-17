@@ -25,10 +25,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/paths"
 )
 
 // Loader interface for loading templates.

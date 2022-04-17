@@ -20,10 +20,10 @@ package protos
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
 
-	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/menderesk/beats/v7/packetbeat/procs"
 )
 
 type ProtocolPlugin func(

@@ -18,7 +18,7 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/beat"
 )
 
 type nilPipeline struct{}

@@ -21,10 +21,10 @@ import (
 	"flag"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/common/fleetmode"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 var hostfsCLI = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")

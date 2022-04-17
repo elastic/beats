@@ -35,18 +35,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/menderesk/beats/v7/libbeat/common"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/menderesk/beats/v7/heartbeat/hbtestllext"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common/x509util"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/validator"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/menderesk/beats/v7/libbeat/common/x509util"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/isdef"
+	"github.com/menderesk/go-lookslike/validator"
 )
 
 // HelloWorldBody is the body of the HelloWorldHandler.

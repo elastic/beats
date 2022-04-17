@@ -24,7 +24,7 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
 )
 
 type schedJob struct {

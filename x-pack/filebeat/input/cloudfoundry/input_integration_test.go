@@ -17,12 +17,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	pubtest "github.com/menderesk/beats/v7/libbeat/publisher/testing"
+	cftest "github.com/menderesk/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
 )
 
 func TestInput(t *testing.T) {

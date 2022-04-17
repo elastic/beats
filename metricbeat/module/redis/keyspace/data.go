@@ -20,11 +20,11 @@ package keyspace
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/redis"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	s "github.com/menderesk/beats/v7/libbeat/common/schema"
+	c "github.com/menderesk/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/redis"
 )
 
 // Map data to MapStr

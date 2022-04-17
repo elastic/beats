@@ -26,12 +26,12 @@ import (
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/require"
 
-	finput "github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	finput "github.com/menderesk/beats/v7/filebeat/input"
+	"github.com/menderesk/beats/v7/filebeat/input/inputtest"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/backoff"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 var logger = logp.NewLogger("test")

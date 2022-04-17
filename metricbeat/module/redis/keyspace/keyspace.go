@@ -20,9 +20,9 @@ package keyspace
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/redis"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/mb/parse"
+	"github.com/menderesk/beats/v7/metricbeat/module/redis"
 )
 
 var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()

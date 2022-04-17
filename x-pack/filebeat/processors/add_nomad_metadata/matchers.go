@@ -10,9 +10,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/libbeat/processors/add_nomad_metadata"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/x-pack/libbeat/processors/add_nomad_metadata"
 )
 
 // LogPathMatcherName is the name of LogPathMatcher

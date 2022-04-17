@@ -20,8 +20,8 @@ package jolokia
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/autodiscover/template"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 var (
@@ -58,7 +58,7 @@ type InterfaceConfig struct {
 // Unpack implements the config unpacker for interface configs
 func (c *InterfaceConfig) Unpack(from *common.Config) error {
 	// Overriding Unpack just to set defaults
-	// See https://github.com/elastic/go-ucfg/issues/104
+	// See https://github.com/menderesk/go-ucfg/issues/104
 	type tmpConfig InterfaceConfig
 	defaults := defaultInterfaceConfig()
 	tmp := tmpConfig(defaults)

@@ -14,7 +14,7 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/menderesk/beats/v7/x-pack/dockerlogbeat/pipereader"
 
 	"github.com/pkg/errors"
 
@@ -24,9 +24,9 @@ import (
 
 	protoio "github.com/gogo/protobuf/io"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/publisher/pipeline"
 )
 
 // containerConfig is the common.Config unpacking type

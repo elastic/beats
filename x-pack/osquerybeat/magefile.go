@@ -19,20 +19,20 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
+	"github.com/menderesk/beats/v7/dev-tools/mage/target/build"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/command"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/distro"
+	osquerybeat "github.com/menderesk/beats/v7/x-pack/osquerybeat/scripts/mage"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -147,7 +147,7 @@ func GolangCrossBuild() error {
 	// This is to fix a defect in the field where msiexec fails to extract the osqueryd.exe
 	// from bundled osquery.msi, with error code 1603
 	// https://docs.microsoft.com/en-us/troubleshoot/windows-server/application-management/msi-installation-error-1603
-	// SDH: https://github.com/elastic/sdh-beats/issues/1575
+	// SDH: https://github.com/menderesk/sdh-beats/issues/1575
 	// Currently we can't reproduce this is issue, but here we can eliminate the need for calling msiexec
 	// if extract the osqueryd.exe binary during the build.
 	//

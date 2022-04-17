@@ -18,11 +18,11 @@ import (
 	"google.golang.org/genproto/googleapis/api/metric"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/gcp"
 )
 
 const (
@@ -179,7 +179,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		// m.metricsMeta contains all metrics to be collected, not just the one in the current MetricsConfig.
 		// this loop filters the metrics in metricsMeta so requester.Metrics can collect only the appropriate
 		// ones.
-		// See https://github.com/elastic/beats/pull/29514
+		// See https://github.com/menderesk/beats/pull/29514
 		metricsToCollect := map[string]metricMeta{}
 		for _, v := range sdc.MetricTypes {
 			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]

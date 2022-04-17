@@ -16,8 +16,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/kinesis"
 	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // Centralize anything related to ECS into a common file.

@@ -25,15 +25,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
+	"github.com/menderesk/beats/v7/heartbeat/hbtest"
+	"github.com/menderesk/beats/v7/heartbeat/look"
+	"github.com/menderesk/beats/v7/heartbeat/monitors"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/menderesk/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/testslike"
 )
 
 func TestICMPFields(t *testing.T) {

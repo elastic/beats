@@ -22,11 +22,11 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/reload"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/elastic-agent-client/v7/pkg/client"
 )
 
 // Status describes the current status of the beat.

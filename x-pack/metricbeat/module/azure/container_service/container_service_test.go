@@ -7,7 +7,7 @@ package container_service
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 func init() {

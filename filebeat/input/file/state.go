@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
 )
 
 // State is used to communicate the reading state of a file

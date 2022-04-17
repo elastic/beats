@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 
 	"github.com/digitalocean/go-libvirt/libvirttest"
 )

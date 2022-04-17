@@ -8,7 +8,7 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
+	"github.com/menderesk/beats/v7/libbeat/tests/system/template"
 )
 
 var systemTest *bool

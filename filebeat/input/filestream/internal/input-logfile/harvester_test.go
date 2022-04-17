@@ -27,11 +27,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
-	"github.com/elastic/go-concert/unison"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/tests/resources"
+	"github.com/menderesk/beats/v7/x-pack/dockerlogbeat/pipelinemock"
+	"github.com/menderesk/go-concert/unison"
 )
 
 func TestReaderGroup(t *testing.T) {
@@ -98,7 +98,7 @@ func TestReaderGroup(t *testing.T) {
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/26727")
+	t.Skip("flaky test: https://github.com/menderesk/beats/issues/26727")
 	source := &testSource{"/path/to/test"}
 
 	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
@@ -133,7 +133,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25805")
+		t.Skip("flaky test: https://github.com/menderesk/beats/issues/25805")
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 

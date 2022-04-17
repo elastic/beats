@@ -16,16 +16,16 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/beats/v7/auditbeat/datastore"
+	"github.com/menderesk/beats/v7/auditbeat/helper/hasher"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/cache"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/menderesk/go-sysinfo"
+	"github.com/menderesk/go-sysinfo/types"
 )
 
 const (
@@ -119,7 +119,7 @@ func (p Process) Hash() uint64 {
 
 func (p Process) toMapStr() common.MapStr {
 	return common.MapStr{
-		// https://github.com/elastic/ecs#-process-fields
+		// https://github.com/menderesk/ecs#-process-fields
 		"name": p.Info.Name,
 		"args": p.Info.Args,
 		"pid":  p.Info.PID,

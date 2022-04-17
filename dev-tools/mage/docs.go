@@ -36,7 +36,7 @@ import (
 )
 
 const (
-	elasticDocsRepoURL = "https://github.com/elastic/docs.git"
+	elasticDocsRepoURL = "https://github.com/menderesk/docs.git"
 )
 
 type docsBuilder struct{}
@@ -112,12 +112,12 @@ func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {
 
 	// Clone if elastic_docs_repo does not exist.
 	if _, err := os.Stat(cloneDir); err != nil {
-		log.Println("Cloning elastic/docs to", cloneDir)
+		log.Println("Cloning menderesk/docs to", cloneDir)
 		if err = sh.Run("git", "clone", "--depth=1", elasticDocsRepoURL, cloneDir); err != nil {
 			return err
 		}
 	} else {
-		log.Println("Using existing elastic/docs at", cloneDir)
+		log.Println("Using existing menderesk/docs at", cloneDir)
 	}
 
 	// Render HTML.

@@ -18,7 +18,7 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
 )
 
 // config generates short/reference configs.

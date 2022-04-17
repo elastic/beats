@@ -22,10 +22,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
-	"github.com/elastic/go-lookslike/validator"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/testslike"
+	"github.com/menderesk/go-lookslike/validator"
 )
 
 func TestUnnestStream(t *testing.T) {

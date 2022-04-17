@@ -24,7 +24,7 @@ import (
 
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
 )
 
 // Build builds the Beat binary.

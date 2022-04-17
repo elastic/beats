@@ -23,9 +23,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/filebeat/input/inputtest"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func TestCreateEvent(t *testing.T) {

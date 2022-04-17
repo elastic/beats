@@ -7,11 +7,11 @@ package storage
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
+	_ "github.com/menderesk/beats/v7/x-pack/metricbeat/module/gcp"
+	_ "github.com/menderesk/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func init() {

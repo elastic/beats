@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 )
 
 // Registry is the global instance of the ProtocolRegistry. Protocol handlers

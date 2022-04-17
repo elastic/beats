@@ -25,18 +25,18 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/validator"
+	"github.com/menderesk/beats/v7/heartbeat/eventext"
+	"github.com/menderesk/beats/v7/heartbeat/hbtest"
+	"github.com/menderesk/beats/v7/heartbeat/hbtestllext"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/jobs"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/plugin"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/monitoring"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/isdef"
+	"github.com/menderesk/go-lookslike/validator"
 )
 
 type MockBeatClient struct {

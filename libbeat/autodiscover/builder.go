@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/go-ucfg"
+	"github.com/menderesk/go-ucfg"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/bus"
+	"github.com/menderesk/beats/v7/libbeat/keystore"
 )
 
 // Builder provides an interface by which configs can be built from provider metadata

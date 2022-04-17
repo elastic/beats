@@ -28,11 +28,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
+	"github.com/menderesk/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/metricbeat/module/logstash"
+	_ "github.com/menderesk/beats/v7/metricbeat/module/logstash/node"
+	_ "github.com/menderesk/beats/v7/metricbeat/module/logstash/node_stats"
 )
 
 var metricSets = []string{

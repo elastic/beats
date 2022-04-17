@@ -27,7 +27,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/menderesk/beats/v7/dev-tools/mage"
 )
 
 const moduleDocsGlob = "module/*/_meta/docs.asciidoc"

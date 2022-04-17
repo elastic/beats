@@ -29,10 +29,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/libbeat/statestore/internal/storecompliance"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/statestore"
+	"github.com/menderesk/beats/v7/libbeat/statestore/backend"
+	"github.com/menderesk/beats/v7/libbeat/statestore/internal/storecompliance"
 )
 
 func init() {

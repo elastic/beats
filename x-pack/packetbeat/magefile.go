@@ -21,18 +21,18 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
+	"github.com/menderesk/beats/v7/dev-tools/mage/target/build"
+	packetbeat "github.com/menderesk/beats/v7/packetbeat/scripts/mage"
 
 	//mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/menderesk/beats/v7/dev-tools/mage/target/common"
 	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/compose"
 	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/unittest"
 	//mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/menderesk/beats/v7/dev-tools/mage/target/test"
 )
 
 // NpcapVersion specifies the version of the OEM Npcap installer to bundle with
@@ -93,7 +93,7 @@ func GolangCrossBuild() error {
 func CrossBuild() error {
 	return devtools.CrossBuild(
 		// Run all builds serially to try to address failures that might be caused
-		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+		// by concurrent builds. See https://github.com/menderesk/beats/issues/24304.
 		devtools.Serially(),
 
 		devtools.ImageSelector(func(platform string) (string, error) {

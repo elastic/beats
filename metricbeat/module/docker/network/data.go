@@ -18,8 +18,8 @@
 package network
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {

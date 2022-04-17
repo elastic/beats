@@ -20,9 +20,9 @@ package actions
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/processors"
+	"github.com/menderesk/beats/v7/libbeat/processors/checks"
 )
 
 // LabelsKey is the default target key for the add_labels processor.

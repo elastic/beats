@@ -32,17 +32,17 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/go-concert/unison"
+	loginp "github.com/menderesk/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/acker"
+	"github.com/menderesk/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/statestore"
+	"github.com/menderesk/beats/v7/libbeat/statestore/storetest"
+	"github.com/menderesk/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {

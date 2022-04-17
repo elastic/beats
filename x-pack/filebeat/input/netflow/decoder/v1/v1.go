@@ -14,11 +14,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 const (

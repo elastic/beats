@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/menderesk/beats/v7/metricbeat/helper/windows/pdh"
 )
 
 // TestNewReaderValid should successfully instantiate the reader.

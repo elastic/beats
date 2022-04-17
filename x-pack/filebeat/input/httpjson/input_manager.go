@@ -7,13 +7,13 @@ package httpjson
 import (
 	"go.uber.org/multierr"
 
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/unison"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	inputcursor "github.com/menderesk/beats/v7/filebeat/input/v2/input-cursor"
+	stateless "github.com/menderesk/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // inputManager wraps one stateless input manager

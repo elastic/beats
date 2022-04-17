@@ -18,9 +18,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/timed"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	awscommon "github.com/menderesk/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/menderesk/go-concert/timed"
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {

@@ -20,8 +20,8 @@ package memlog
 import (
 	"io"
 
-	"github.com/elastic/go-structform/gotype"
-	"github.com/elastic/go-structform/json"
+	"github.com/menderesk/go-structform/gotype"
+	"github.com/menderesk/go-structform/json"
 )
 
 type jsonEncoder struct {

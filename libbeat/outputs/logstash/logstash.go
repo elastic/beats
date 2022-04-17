@@ -18,11 +18,11 @@
 package logstash
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/transport"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/menderesk/beats/v7/libbeat/outputs"
 )
 
 const (

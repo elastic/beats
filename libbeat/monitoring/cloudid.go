@@ -22,8 +22,8 @@ import (
 
 	errw "github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/cloudid"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 type cloudConfig struct {

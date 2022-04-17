@@ -18,8 +18,8 @@
 package ml_job
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/elasticsearch"
 )
 
 func init() {

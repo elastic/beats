@@ -22,9 +22,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/filebeat/harvester"
+	"github.com/menderesk/beats/v7/filebeat/input/file"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // Log contains all log related data
@@ -183,7 +183,7 @@ func (f *Log) checkFileDisappearedErrors() error {
 	}
 
 	if f.config.CloseRemoved {
-		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
+		// Check if the file name exists. See https://github.com/menderesk/filebeat/issues/93
 		if f.fs.Removed() {
 			f.logger.Debugf("close_removed is enabled and file %s has been removed", f.fs.Name())
 			return ErrRemoved

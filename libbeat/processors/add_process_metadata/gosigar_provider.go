@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/gosigar"
+	"github.com/menderesk/gosigar"
 )
 
 type gosigarProvider struct{}

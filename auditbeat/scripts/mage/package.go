@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
 )
 
 // PackagingFlavor specifies the type of packaging (OSS vs X-Pack).

@@ -26,11 +26,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/flowhash"
-	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/flowhash"
+	"github.com/menderesk/beats/v7/libbeat/conditions"
+	"github.com/menderesk/beats/v7/libbeat/ecs"
 )
 
 // FieldsKey is the key under which a *pb.Fields value may be stored in a

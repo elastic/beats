@@ -17,11 +17,11 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/gcp"
 )
 
 const (
@@ -316,7 +316,7 @@ func generateEventID(currentDate string, rowItems []bigquery.Value) string {
 func generateQuery(tableName, month, costType string) string {
 	// The table name is user provided, so it may contains special characters.
 	// In order to allow any character in the table identifier, use the Quoted identifier format.
-	// See https://github.com/elastic/beats/issues/26855
+	// See https://github.com/menderesk/beats/issues/26855
 	// NOTE: is not possible to escape backtics (`) in a multiline string
 	escapedTableName := fmt.Sprintf("`%s`", tableName)
 	query := fmt.Sprintf(`

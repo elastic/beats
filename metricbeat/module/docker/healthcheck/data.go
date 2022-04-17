@@ -24,9 +24,9 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/docker"
 )
 
 func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {

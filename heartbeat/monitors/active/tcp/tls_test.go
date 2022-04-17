@@ -30,24 +30,24 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/menderesk/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
+	"github.com/menderesk/beats/v7/heartbeat/hbtest"
+	"github.com/menderesk/beats/v7/heartbeat/monitors"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/testslike"
 )
 
 // Tests that we can check a TLS connection with a cert for a SAN IP
 func TestTLSSANIPConnection(t *testing.T) {
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
+		t.Skip("flaky test: https://github.com/menderesk/beats/issues/25857")
 	}
 	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
 	defer teardown()

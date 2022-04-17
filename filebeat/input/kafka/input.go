@@ -26,21 +26,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
 
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/common/kafka"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/acker"
+	"github.com/menderesk/beats/v7/libbeat/common/backoff"
+	"github.com/menderesk/beats/v7/libbeat/common/kafka"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/reader"
+	"github.com/menderesk/beats/v7/libbeat/reader/parser"
 )
 
 const pluginName = "kafka"
@@ -243,7 +243,7 @@ func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
 // A barebones implementation of context.Context wrapped around the done
 // channels that are more common in the beats codebase.
 // TODO(faec): Generalize this to a common utility in a shared library
-// (https://github.com/elastic/beats/issues/13125).
+// (https://github.com/menderesk/beats/issues/13125).
 type channelCtx struct {
 	ctx input.Context
 }

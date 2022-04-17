@@ -5,13 +5,13 @@
 package cmd
 
 import (
-	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	fbcmd "github.com/menderesk/beats/v7/filebeat/cmd"
+	cmd "github.com/menderesk/beats/v7/libbeat/cmd"
 
 	// Register the includes.
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/include"
-	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/menderesk/beats/v7/x-pack/filebeat/include"
+	inputs "github.com/menderesk/beats/v7/x-pack/filebeat/input/default-inputs"
+	_ "github.com/menderesk/beats/v7/x-pack/libbeat/include"
 )
 
 const Name = fbcmd.Name

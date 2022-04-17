@@ -20,16 +20,16 @@ package state
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/menderesk/beats/v7/metricbeat/helper/elastic"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/beat"
+	s "github.com/menderesk/beats/v7/libbeat/common/schema"
+	c "github.com/menderesk/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/beat"
 )
 
 var (

@@ -13,9 +13,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
 func TestDecoderV9_ReadPacketHeader(t *testing.T) {

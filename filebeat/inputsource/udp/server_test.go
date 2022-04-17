@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
 )
 
 const (

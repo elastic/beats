@@ -12,10 +12,10 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/timed"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/monitoring"
+	awscommon "github.com/menderesk/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/menderesk/go-concert/timed"
 )
 
 const (

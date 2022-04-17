@@ -21,9 +21,9 @@ import (
 	"errors"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
+	"github.com/menderesk/beats/v7/libbeat/publisher/queue"
 )
 
 type consumer struct {

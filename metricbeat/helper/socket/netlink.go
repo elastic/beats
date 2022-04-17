@@ -26,7 +26,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/gosigar/sys/linux"
+	"github.com/menderesk/gosigar/sys/linux"
 )
 
 // NetlinkSession communicates with the kernel's netlink subsystem.

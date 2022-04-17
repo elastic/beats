@@ -37,7 +37,7 @@ import (
 
 // test_close_renamed from test_harvester.py
 func TestFilestreamCloseRenamed(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/26727")
+	t.Skip("flaky test: https://github.com/menderesk/beats/issues/26727")
 	if runtime.GOOS == "windows" {
 		t.Skip("renaming files while Filebeat is running is not supported on Windows")
 	}
@@ -83,7 +83,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 }
 
 func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/26608")
+	t.Skip("Flaky test: https://github.com/menderesk/beats/issues/26608")
 
 	if runtime.GOOS == "windows" {
 		t.Skip("renaming files while Filebeat is running is not supported on Windows")
@@ -713,7 +713,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 }
 
 func TestFilestreamTruncateBlockedOutput(t *testing.T) {
-	t.Skip("Flaky test https://github.com/elastic/beats/issues/27085")
+	t.Skip("Flaky test https://github.com/menderesk/beats/issues/27085")
 	env := newInputTestingEnvironment(t)
 	env.pipeline = &mockPipelineConnector{blocking: true}
 

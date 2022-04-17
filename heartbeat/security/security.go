@@ -30,8 +30,8 @@ import (
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 
-	"github.com/elastic/beats/v7/libbeat/common/seccomp"
-	seccomp_default "github.com/elastic/go-seccomp-bpf"
+	"github.com/menderesk/beats/v7/libbeat/common/seccomp"
+	seccomp_default "github.com/menderesk/go-seccomp-bpf"
 )
 
 func init() {

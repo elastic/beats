@@ -26,8 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	_ "github.com/menderesk/beats/v7/metricbeat/module/system"
 )
 
 func TestFetch(t *testing.T) {

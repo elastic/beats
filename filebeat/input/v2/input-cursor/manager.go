@@ -25,12 +25,12 @@ import (
 
 	"github.com/urso/sderr"
 
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/unison"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/statestore"
 )
 
 // InputManager is used to create, manage, and coordinate stateful inputs and

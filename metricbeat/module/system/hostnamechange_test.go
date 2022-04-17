@@ -33,6 +33,6 @@ func TestHostDashboardHasChangeableHost(t *testing.T) {
 		t.Fatalf("Error reading file %s: %v", dashPath, err)
 	}
 	if !bytes.Contains(contents, []byte("CHANGEME_HOSTNAME")) {
-		t.Errorf("Dashboard '%s' doesn't contain string 'CHANGEME_HOSTNAME'. See elastic/beats#5340", dashPath)
+		t.Errorf("Dashboard '%s' doesn't contain string 'CHANGEME_HOSTNAME'. See menderesk/beats#5340", dashPath)
 	}
 }

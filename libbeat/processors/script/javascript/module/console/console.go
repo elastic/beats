@@ -22,7 +22,7 @@ import (
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 
 	// Require the util module for handling the log format arguments.
 	_ "github.com/dop251/goja_nodejs/util"

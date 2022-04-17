@@ -32,7 +32,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/menderesk/beats/v7/winlogbeat/sys/winevent"
 )
 
 var updateXML = flag.Bool("update", false, "update XML golden files from evtx files in testdata")

@@ -29,15 +29,15 @@ import (
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/productorigin"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/productorigin"
+	"github.com/menderesk/beats/v7/libbeat/common/transport"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/menderesk/beats/v7/libbeat/common/useragent"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/testing"
 )
 
 type esHTTPClient interface {
@@ -134,7 +134,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		httpcommon.WithKeepaliveSettings{IdleConnTimeout: s.IdleConnTimeout},
 		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
 			// when dropping the legacy client in favour of the official Go client, it should be instrumented
-			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
+			// eg, like in https://github.com/menderesk/apm-server/blob/7.7/elasticsearch/client.go
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),

@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/menderesk/beats/v7/libbeat/common/transport"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/menderesk/beats/v7/libbeat/outputs/codec"
 )
 
 type redisConfig struct {

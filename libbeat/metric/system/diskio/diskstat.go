@@ -23,7 +23,7 @@ package diskio
 import (
 	"github.com/shirou/gopsutil/v3/disk"
 
-	sigar "github.com/elastic/gosigar"
+	sigar "github.com/menderesk/gosigar"
 )
 
 // IOMetric contains mapping fields which are outputed by `iostat -x` on linux

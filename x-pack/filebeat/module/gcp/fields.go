@@ -7,7 +7,7 @@
 package gcp
 
 import (
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/menderesk/beats/v7/libbeat/asset"
 )
 
 func init() {

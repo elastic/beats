@@ -20,7 +20,7 @@ package fleetmode
 import (
 	"flag"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // Enabled checks to see if filebeat/metricbeat is running under Agent

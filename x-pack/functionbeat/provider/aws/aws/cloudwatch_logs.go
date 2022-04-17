@@ -19,13 +19,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 	"github.com/awslabs/goformation/v4/cloudformation/policies"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/publisher/pipeline"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
 var (

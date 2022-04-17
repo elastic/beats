@@ -24,8 +24,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // PipelineLoaderFactory builds and returns a PipelineLoader
@@ -97,7 +97,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			if err != nil {
 				// Rollback pipelines and return errors
 				// TODO: Instead of attempting to load all pipelines and then rolling back loaded ones when there's an
-				// error, validate all pipelines before loading any of them. This requires https://github.com/elastic/elasticsearch/issues/35495.
+				// error, validate all pipelines before loading any of them. This requires https://github.com/menderesk/elasticsearch/issues/35495.
 				errs := multierror.Errors{err}
 				for _, pipelineID := range pipelineIDsLoaded {
 					err = DeletePipeline(esClient, pipelineID)

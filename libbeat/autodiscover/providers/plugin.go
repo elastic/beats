@@ -20,8 +20,8 @@ package providers
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	p "github.com/elastic/beats/v7/libbeat/plugin"
+	"github.com/menderesk/beats/v7/libbeat/autodiscover"
+	p "github.com/menderesk/beats/v7/libbeat/plugin"
 )
 
 type providerPlugin struct {

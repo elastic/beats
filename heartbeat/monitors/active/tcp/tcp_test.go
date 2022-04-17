@@ -28,14 +28,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	btesting "github.com/elastic/beats/v7/libbeat/testing"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/testslike"
-	"github.com/elastic/go-lookslike/validator"
+	"github.com/menderesk/beats/v7/heartbeat/hbtest"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	btesting "github.com/menderesk/beats/v7/libbeat/testing"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/isdef"
+	"github.com/menderesk/go-lookslike/testslike"
+	"github.com/menderesk/go-lookslike/validator"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {

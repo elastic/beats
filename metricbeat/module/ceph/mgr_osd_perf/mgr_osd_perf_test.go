@@ -20,8 +20,8 @@ package mgr_osd_perf
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/metricbeat/module/ceph"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	_ "github.com/menderesk/beats/v7/metricbeat/module/ceph"
 )
 
 func TestDataFiles(t *testing.T) {

@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/azure"
 
 	"github.com/pkg/errors"
 
 	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients

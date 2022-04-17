@@ -24,13 +24,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/go-lookslike/isdef"
+	"github.com/menderesk/go-lookslike/isdef"
 
-	"github.com/elastic/go-lookslike"
+	"github.com/menderesk/go-lookslike"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/packetbeat/procs"
 )
 
 // Use `go test -data` to update sample event files.

@@ -22,12 +22,12 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/ctxtool"
+	"github.com/menderesk/go-concert/unison"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgtype"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 const windowErrBuffer = "A message sent on a datagram socket was larger than the internal message" +

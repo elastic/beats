@@ -20,8 +20,8 @@ package pipeline
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
+	"github.com/menderesk/beats/v7/libbeat/publisher/queue"
 )
 
 type retryer interface {

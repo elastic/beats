@@ -409,7 +409,7 @@ func TestEventUnpack(t *testing.T) {
 	})
 
 	t.Run("error recovery with escape", func(t *testing.T) {
-		// Ensure no panic or regression of https://github.com/elastic/beats/issues/30010.
+		// Ensure no panic or regression of https://github.com/menderesk/beats/issues/30010.
 		// key1 contains an escape, but then an invalid non-escaped =.
 		// This triggers the error recovery to try to read the next key.
 		var e Event

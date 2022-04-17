@@ -20,16 +20,16 @@ package node
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/menderesk/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	s "github.com/menderesk/beats/v7/libbeat/common/schema"
+	c "github.com/menderesk/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (

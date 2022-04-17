@@ -28,8 +28,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
-	"github.com/elastic/gosigar/sys/linux"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/cgroup/cgcommon"
+	"github.com/menderesk/gosigar/sys/linux"
 )
 
 var clockTicks = uint64(linux.GetClockTicks())

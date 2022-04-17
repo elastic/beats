@@ -24,9 +24,9 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/metricbeat/module/docker"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {

@@ -24,11 +24,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/outputs/codec"
-	"github.com/elastic/go-structform/gotype"
-	"github.com/elastic/go-structform/json"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/outputs/codec"
+	"github.com/menderesk/go-structform/gotype"
+	"github.com/menderesk/go-structform/json"
 )
 
 type BodyEncoder interface {

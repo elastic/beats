@@ -10,13 +10,13 @@ import (
 	"net"
 	"net/http"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/ctxtool"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	stateless "github.com/menderesk/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/go-concert/ctxtool"
 )
 
 const (

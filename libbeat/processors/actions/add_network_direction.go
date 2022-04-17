@@ -23,12 +23,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/conditions"
+	"github.com/menderesk/beats/v7/libbeat/processors"
+	"github.com/menderesk/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/menderesk/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 func init() {

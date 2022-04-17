@@ -10,12 +10,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/publisher/pipeline"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/menderesk/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 // Create a new pipeline client based on the function configuration.

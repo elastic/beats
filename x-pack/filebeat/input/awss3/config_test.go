@@ -13,10 +13,10 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/match"
+	"github.com/menderesk/beats/v7/libbeat/reader/parser"
+	"github.com/menderesk/beats/v7/libbeat/reader/readfile"
 )
 
 func TestConfig(t *testing.T) {

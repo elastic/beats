@@ -18,9 +18,9 @@
 package http
 
 import (
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	"github.com/menderesk/beats/v7/packetbeat/config"
+	"github.com/menderesk/beats/v7/packetbeat/protos"
+	"github.com/menderesk/beats/v7/packetbeat/protos/tcp"
 )
 
 type httpConfig struct {

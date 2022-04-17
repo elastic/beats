@@ -20,7 +20,7 @@ package file_integrity
 import (
 	"github.com/h2non/filetype"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
 )
 
 const (

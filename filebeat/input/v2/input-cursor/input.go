@@ -25,13 +25,13 @@ import (
 
 	"github.com/urso/sderr"
 
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/ctxtool"
+	"github.com/menderesk/go-concert/unison"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common/acker"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // Input interface for cursor based inputs. This interface must be implemented

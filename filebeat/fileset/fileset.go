@@ -32,15 +32,15 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/elastic/go-ucfg"
+	"github.com/menderesk/go-ucfg"
 
 	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // Fileset struct is the representation of a fileset.

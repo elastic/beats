@@ -18,9 +18,9 @@
 package idxmgmt
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/menderesk/beats/v7/libbeat/template"
 )
 
 // ClientHandler defines the interface between a remote service and the Manager for ILM and templates.

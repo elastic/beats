@@ -18,7 +18,7 @@
 package collectors
 
 import (
-	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+	metricbeat "github.com/menderesk/beats/v7/metricbeat/scripts/mage"
 )
 
 //CollectDocs creates the documentation under docs/

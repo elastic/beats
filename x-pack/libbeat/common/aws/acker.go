@@ -8,8 +8,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common/acker"
 )
 
 // EventACKTracker tracks the publishing state of S3 objects. Specifically

@@ -20,8 +20,8 @@ package eslegclient
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/kerberos"
 )
 
 type config struct {

@@ -10,7 +10,7 @@ package socket
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 const (

@@ -14,10 +14,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/testutil"
 )
 
 func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {

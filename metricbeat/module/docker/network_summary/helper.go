@@ -32,9 +32,9 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo"
+	"github.com/menderesk/go-sysinfo"
 
-	sysinfotypes "github.com/elastic/go-sysinfo/types"
+	sysinfotypes "github.com/menderesk/go-sysinfo/types"
 )
 
 // NoSumStats lists "stats", often config/state values, that can't be safely summed across PIDs

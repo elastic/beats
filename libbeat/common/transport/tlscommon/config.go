@@ -23,7 +23,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
 )
 
 var warnOnce sync.Once

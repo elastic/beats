@@ -23,11 +23,11 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/filebeat/input"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/cfgfile"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 type crawler struct {
@@ -112,7 +112,7 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
-	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
+	// TODO: Either use debug or remove it after https://github.com/menderesk/beats/pull/30534
 	// is fixed.
 	c.log.Infof("starting input, keys present on the config: %v",
 		config.FlattenedKeys())

@@ -7,8 +7,8 @@ package storage
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 const defaultStorageAccountNamespace = "Microsoft.Storage/storageAccounts"

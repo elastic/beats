@@ -20,7 +20,7 @@ package kibana
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 // ClientConfig to connect to Kibana

@@ -23,8 +23,8 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/elastic/go-libaudit/v2"
-	"github.com/elastic/go-libaudit/v2/auparse"
+	"github.com/menderesk/go-libaudit/v2"
+	"github.com/menderesk/go-libaudit/v2/auparse"
 )
 
 type MockNetlinkSendReceiver struct {

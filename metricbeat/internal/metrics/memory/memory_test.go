@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/resolve"
+	"github.com/menderesk/beats/v7/libbeat/opt"
 )
 
 func TestGetMemory(t *testing.T) {

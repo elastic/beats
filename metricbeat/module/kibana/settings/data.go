@@ -22,12 +22,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/metricbeat/helper/elastic"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	s "github.com/menderesk/beats/v7/libbeat/common/schema"
+	c "github.com/menderesk/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {

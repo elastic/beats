@@ -18,8 +18,8 @@
 package statement
 
 import (
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	s "github.com/menderesk/beats/v7/libbeat/common/schema"
+	c "github.com/menderesk/beats/v7/libbeat/common/schema/mapstrstr"
 )
 
 // Based on: https://www.postgresql.org/docs/13/pgstatstatements.html

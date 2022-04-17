@@ -21,14 +21,14 @@ import (
 	"net"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/go-concert/ctxtool"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	stateless "github.com/menderesk/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/filebeat/inputsource/unix"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/go-concert/ctxtool"
 )
 
 type server struct {

@@ -17,14 +17,14 @@ import (
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/cloudid"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/outputs"
+	"github.com/menderesk/beats/v7/libbeat/publisher/pipeline"
+	"github.com/menderesk/beats/v7/libbeat/publisher/processing"
+	"github.com/menderesk/beats/v7/libbeat/version"
 )
 
 // makeConfigHash is the helper function that turns a user config into a hash

@@ -14,11 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/bus"
+	"github.com/menderesk/beats/v7/libbeat/keystore"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	awsauto "github.com/menderesk/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type testEventAccumulator struct {

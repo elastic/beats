@@ -24,14 +24,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/ctxtool"
+	"github.com/menderesk/go-concert/timed"
+	"github.com/menderesk/go-concert/unison"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	"github.com/menderesk/beats/v7/libbeat/common/backoff"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 var (
@@ -199,7 +199,7 @@ func (f *logFile) shouldBeClosed() bool {
 	}
 
 	if f.closeRemoved {
-		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
+		// Check if the file name exists. See https://github.com/menderesk/filebeat/issues/93
 		if file.IsRemoved(f.file) {
 			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true

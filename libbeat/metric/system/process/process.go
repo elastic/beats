@@ -29,16 +29,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/go-sysinfo/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/match"
+	"github.com/menderesk/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/resolve"
+	"github.com/menderesk/beats/v7/libbeat/opt"
+	sysinfo "github.com/menderesk/go-sysinfo"
 )
 
 // ProcsMap is a map where the keys are the names of processes and the value is the Process with that name

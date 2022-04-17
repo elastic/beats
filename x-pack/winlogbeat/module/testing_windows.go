@@ -20,14 +20,14 @@ import (
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/mapping"
+	"github.com/menderesk/beats/v7/libbeat/processors/script/javascript"
+	"github.com/menderesk/beats/v7/winlogbeat/checkpoint"
+	"github.com/menderesk/beats/v7/winlogbeat/eventlog"
 
 	// Register javascript modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
+	_ "github.com/menderesk/beats/v7/libbeat/processors/script/javascript/module"
 )
 
 var update = flag.Bool("update", false, "update golden files")

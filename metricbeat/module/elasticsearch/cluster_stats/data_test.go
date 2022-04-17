@@ -28,10 +28,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/menderesk/beats/v7/metricbeat/helper"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/metricbeat/module/elasticsearch"
 )
 
 func createEsMuxer(license string) *http.ServeMux {

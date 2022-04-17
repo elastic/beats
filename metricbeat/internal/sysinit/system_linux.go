@@ -21,7 +21,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/gosigar"
+	"github.com/menderesk/gosigar"
 )
 
 func InitModule(config string) {

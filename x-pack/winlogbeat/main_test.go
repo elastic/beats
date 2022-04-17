@@ -8,8 +8,8 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	"github.com/elastic/beats/v7/x-pack/winlogbeat/cmd"
+	"github.com/menderesk/beats/v7/libbeat/tests/system/template"
+	"github.com/menderesk/beats/v7/x-pack/winlogbeat/cmd"
 )
 
 var systemTest *bool

@@ -22,8 +22,8 @@ import (
 	"crypto/x509"
 	"net"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // MetadataCallback returns common metadata about a tcp connection

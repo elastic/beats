@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 var (

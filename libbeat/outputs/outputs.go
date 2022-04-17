@@ -23,7 +23,7 @@ package outputs
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
 )
 
 // Client provides the minimal interface an output must implement to be usable

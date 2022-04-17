@@ -23,24 +23,24 @@ package main
 import (
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/build"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/dashboards"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/docs"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/test"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/menderesk/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	winlogbeat "github.com/elastic/beats/v7/winlogbeat/scripts/mage"
+	winlogbeat "github.com/menderesk/beats/v7/winlogbeat/scripts/mage"
 )
 
 func init() {

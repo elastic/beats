@@ -17,7 +17,7 @@
 
 package server
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/menderesk/beats/v7/libbeat/common"
 
 type Meta common.MapStr
 

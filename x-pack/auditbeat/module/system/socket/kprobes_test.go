@@ -12,9 +12,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/socket/guess"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/tracing"
 )
 
 func probeName(p tracing.Probe) string {

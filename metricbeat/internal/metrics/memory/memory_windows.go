@@ -20,9 +20,9 @@ package memory
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/go-windows"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/resolve"
+	"github.com/menderesk/beats/v7/libbeat/opt"
+	"github.com/menderesk/go-windows"
 )
 
 // get is the windows implementation of get for memory metrics

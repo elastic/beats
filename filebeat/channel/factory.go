@@ -18,7 +18,7 @@
 package channel
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/beat"
 )
 
 type OutletFactory struct {

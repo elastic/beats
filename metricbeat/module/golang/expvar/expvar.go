@@ -20,10 +20,10 @@ package expvar
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/golang"
+	"github.com/menderesk/beats/v7/metricbeat/helper"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/mb/parse"
+	"github.com/menderesk/beats/v7/metricbeat/module/golang"
 )
 
 const (

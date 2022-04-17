@@ -26,16 +26,16 @@ import (
 	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/urso/sderr"
 
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/menderesk/beats/v7/filebeat/input/journald/pkg/journalfield"
+	"github.com/menderesk/beats/v7/filebeat/input/journald/pkg/journalread"
+	input "github.com/menderesk/beats/v7/filebeat/input/v2"
+	cursor "github.com/menderesk/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/backoff"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/reader"
+	"github.com/menderesk/beats/v7/libbeat/reader/parser"
 )
 
 type journald struct {

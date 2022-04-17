@@ -22,7 +22,7 @@ import (
 	"net"
 )
 
-// Golang port of https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/MacAddressProvider.java
+// Golang port of https://github.com/menderesk/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/MacAddressProvider.java
 
 type id []byte
 

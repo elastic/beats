@@ -18,12 +18,12 @@
 package mage
 
 import (
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/menderesk/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
 	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
+	GoLicenserImportPath = "github.com/menderesk/go-licenser"
 )
 
 // InstallVendored uses go get to install a command from its vendored source

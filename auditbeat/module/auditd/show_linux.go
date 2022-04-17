@@ -23,10 +23,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/go-libaudit/v2"
-	"github.com/elastic/go-libaudit/v2/rule"
+	"github.com/menderesk/go-libaudit/v2"
+	"github.com/menderesk/go-libaudit/v2/rule"
 
-	"github.com/elastic/beats/v7/auditbeat/cmd"
+	"github.com/menderesk/beats/v7/auditbeat/cmd"
 )
 
 var (

@@ -20,7 +20,7 @@ package input_logfile
 import (
 	"os"
 
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/unison"
 )
 
 const (

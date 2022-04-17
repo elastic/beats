@@ -18,9 +18,9 @@
 package statestore
 
 import (
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/go-concert/atomic"
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/beats/v7/libbeat/statestore/backend"
+	"github.com/menderesk/go-concert/atomic"
+	"github.com/menderesk/go-concert/unison"
 )
 
 type sharedStore struct {

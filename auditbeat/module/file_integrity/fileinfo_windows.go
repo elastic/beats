@@ -29,7 +29,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is

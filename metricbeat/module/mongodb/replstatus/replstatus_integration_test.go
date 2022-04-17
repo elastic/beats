@@ -28,14 +28,14 @@ import (
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/metricbeat/module/mongodb"
 )
 
 func TestFetch(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/29208")
+	t.Skip("Flaky test: https://github.com/menderesk/beats/issues/29208")
 	service := compose.EnsureUp(t, "mongodb")
 
 	err := initiateReplicaSet(t, service.Host())

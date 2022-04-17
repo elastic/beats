@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/gcp"
 )
 
 // ID returns a generated ID for a Compute resource based on its labels, projectID, zone, timestamp and instance ID

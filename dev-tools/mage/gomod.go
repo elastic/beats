@@ -23,7 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/menderesk/beats/v7/dev-tools/mage/gotool"
 )
 
 // CopyModule contains a module name and the list of files or directories

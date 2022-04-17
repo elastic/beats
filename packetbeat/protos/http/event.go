@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/ecs"
 )
 
 // ProtocolFields contains HTTP fields. This contains all the HTTP fields from

@@ -24,13 +24,13 @@ import (
 	"bytes"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/outputs/codec"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/go-structform/cborl"
-	"github.com/elastic/go-structform/gotype"
-	"github.com/elastic/go-structform/json"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/outputs/codec"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
+	"github.com/menderesk/go-structform/cborl"
+	"github.com/menderesk/go-structform/gotype"
+	"github.com/menderesk/go-structform/json"
 )
 
 type eventEncoder struct {

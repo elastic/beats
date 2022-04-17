@@ -18,8 +18,8 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/publisher/queue"
 )
 
 // queueReader is a standalone stateless helper goroutine to dispatch

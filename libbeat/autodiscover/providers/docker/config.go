@@ -23,9 +23,9 @@ package docker
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/menderesk/beats/v7/libbeat/autodiscover/template"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/docker"
 )
 
 // Config for docker autodiscover provider

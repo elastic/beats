@@ -5,19 +5,19 @@
 package cmd
 
 import (
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	cmd "github.com/menderesk/beats/v7/libbeat/cmd"
+	"github.com/menderesk/beats/v7/libbeat/cmd/instance"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cli"
+	"github.com/menderesk/beats/v7/libbeat/ecs"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/publisher/processing"
 
 	"github.com/spf13/cobra"
 
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
+	_ "github.com/menderesk/beats/v7/x-pack/libbeat/include"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/beater"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/install"
 )
 
 // Name of this beat

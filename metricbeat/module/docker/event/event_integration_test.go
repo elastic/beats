@@ -31,10 +31,10 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/auditbeat/core"
+	"github.com/menderesk/beats/v7/libbeat/common/docker"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {

@@ -20,13 +20,13 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/flowhash"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/go-libaudit/v2/aucoalesce"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/flowhash"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/socket/dns"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/menderesk/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/menderesk/go-libaudit/v2/aucoalesce"
 )
 
 const (

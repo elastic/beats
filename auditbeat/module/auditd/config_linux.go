@@ -30,8 +30,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/go-libaudit/v2/rule"
-	"github.com/elastic/go-libaudit/v2/rule/flags"
+	"github.com/menderesk/go-libaudit/v2/rule"
+	"github.com/menderesk/go-libaudit/v2/rule/flags"
 )
 
 // Config defines the kernel metricset's possible configuration options.

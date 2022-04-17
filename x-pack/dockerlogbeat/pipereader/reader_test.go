@@ -10,7 +10,7 @@ import (
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
+	"github.com/menderesk/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 )
 
 func TestPipeReader(t *testing.T) {

@@ -29,7 +29,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	sigar "github.com/elastic/gosigar"
+	sigar "github.com/menderesk/gosigar"
 )
 
 func TestFileSystemList(t *testing.T) {

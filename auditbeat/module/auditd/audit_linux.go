@@ -28,15 +28,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/go-libaudit/v2"
-	"github.com/elastic/go-libaudit/v2/aucoalesce"
-	"github.com/elastic/go-libaudit/v2/auparse"
-	"github.com/elastic/go-libaudit/v2/rule"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/monitoring"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/mb/parse"
+	"github.com/menderesk/go-libaudit/v2"
+	"github.com/menderesk/go-libaudit/v2/aucoalesce"
+	"github.com/menderesk/go-libaudit/v2/auparse"
+	"github.com/menderesk/go-libaudit/v2/rule"
 )
 
 const (

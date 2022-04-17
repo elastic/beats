@@ -17,7 +17,7 @@
 
 package stress
 
-import "github.com/elastic/beats/v7/libbeat/common/atomic"
+import "github.com/menderesk/beats/v7/libbeat/common/atomic"
 
 type closeSignaler struct {
 	active atomic.Bool

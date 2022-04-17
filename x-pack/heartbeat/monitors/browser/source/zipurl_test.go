@@ -17,8 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
 )
 
 func TestSimpleCases(t *testing.T) {

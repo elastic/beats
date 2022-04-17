@@ -8,10 +8,10 @@
 package cloudfoundry
 
 import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
-	"github.com/elastic/go-concert/ctxtool"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	stateless "github.com/menderesk/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/menderesk/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/menderesk/go-concert/ctxtool"
 )
 
 // inputV2 defines a Cloudfoundry input that uses the consumer V2 API

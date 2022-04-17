@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	metrics "github.com/menderesk/beats/v7/metricbeat/internal/metrics/cpu"
 )
 
 // Core metric types.

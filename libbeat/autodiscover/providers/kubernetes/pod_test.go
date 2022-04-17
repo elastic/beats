@@ -29,12 +29,12 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/autodiscover/template"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/bus"
+	"github.com/menderesk/beats/v7/libbeat/common/kubernetes"
+	"github.com/menderesk/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -338,7 +338,7 @@ func TestPod_EmitEvent(t *testing.T) {
 	podIP := "127.0.0.1"
 	containerID := "docker://foobar"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
-	containerImage := "elastic/filebeat:6.3.0"
+	containerImage := "menderesk/filebeat:6.3.0"
 	node := "node"
 	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
 	UUID, err := uuid.NewV4()
@@ -434,7 +434,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -462,7 +462,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -562,7 +562,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -590,7 +590,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"runtime": "docker",
 							"id":      "foobar",
 						},
@@ -607,7 +607,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -635,7 +635,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -729,7 +729,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -757,7 +757,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"runtime": "docker",
 							"id":      "foobar",
 						},
@@ -772,7 +772,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -800,7 +800,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -940,7 +940,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "",
 						},
 						"pod": common.MapStr{
@@ -966,7 +966,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"runtime": "",
 							"id":      "",
 						},
@@ -1044,7 +1044,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "",
 						},
 						"pod": common.MapStr{
@@ -1072,7 +1072,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "",
 							"runtime": "",
 						},
@@ -1166,7 +1166,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1194,7 +1194,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"runtime": "docker",
 							"id":      "foobar",
 						},
@@ -1209,7 +1209,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1237,7 +1237,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1347,7 +1347,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1375,7 +1375,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1390,7 +1390,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat-init",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1418,7 +1418,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1504,7 +1504,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1532,7 +1532,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1620,7 +1620,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1648,7 +1648,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1768,7 +1768,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar",
 							"name":    "filebeat",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1796,7 +1796,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1814,7 +1814,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar-init",
 							"name":    "filebeat-init",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1842,7 +1842,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar-init",
 							"runtime": "docker",
 						},
@@ -1860,7 +1860,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						"container": common.MapStr{
 							"id":      "foobar-ephemeral",
 							"name":    "filebeat-ephemeral",
-							"image":   "elastic/filebeat:6.3.0",
+							"image":   "menderesk/filebeat:6.3.0",
 							"runtime": "docker",
 						},
 						"pod": common.MapStr{
@@ -1888,7 +1888,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"image":   common.MapStr{"name": "menderesk/filebeat:6.3.0"},
 							"id":      "foobar-ephemeral",
 							"runtime": "docker",
 						},

@@ -20,14 +20,14 @@ package template
 import (
 	"fmt"
 
-	"github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/parse"
+	"github.com/menderesk/go-ucfg"
+	"github.com/menderesk/go-ucfg/parse"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/bus"
+	"github.com/menderesk/beats/v7/libbeat/conditions"
+	"github.com/menderesk/beats/v7/libbeat/keystore"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // Mapper maps config templates with conditions in ConditionMaps, if a match happens on a discover event

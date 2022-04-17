@@ -9,20 +9,20 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/validator"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/processors"
+	"github.com/menderesk/beats/v7/libbeat/processors/script/javascript"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/isdef"
+	"github.com/menderesk/go-lookslike/validator"
 
 	// Register JS "require" modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
+	_ "github.com/menderesk/beats/v7/libbeat/processors/script/javascript/module"
 	// Register required processors.
-	_ "github.com/elastic/beats/v7/libbeat/cmd/instance"
-	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
+	_ "github.com/menderesk/beats/v7/libbeat/cmd/instance"
+	_ "github.com/menderesk/beats/v7/libbeat/processors/timestamp"
 )
 
 var logInputHeaders = []string{

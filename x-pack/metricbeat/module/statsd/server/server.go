@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
-	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	serverhelper "github.com/menderesk/beats/v7/metricbeat/helper/server"
+	"github.com/menderesk/beats/v7/metricbeat/helper/server/udp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.

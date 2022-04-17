@@ -20,7 +20,7 @@ package readfile
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/menderesk/beats/v7/libbeat/reader"
 )
 
 // Reader sets an upper limited on line length. Lines longer

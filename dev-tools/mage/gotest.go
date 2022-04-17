@@ -34,7 +34,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/menderesk/beats/v7/dev-tools/mage/gotool"
 )
 
 // GoTestArgs are the arguments used for the "go*Test" targets and they define

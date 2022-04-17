@@ -29,16 +29,16 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/menderesk/beats/v7/filebeat/channel"
+	"github.com/menderesk/beats/v7/filebeat/harvester"
+	"github.com/menderesk/beats/v7/filebeat/input"
+	"github.com/menderesk/beats/v7/filebeat/input/file"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/monitoring"
 )
 
 const (
@@ -647,7 +647,7 @@ func (p *Input) handleIgnoreOlder(logger *logp.Logger, isNewState bool, newState
 	}
 
 	// Set offset to end of file to be consistent with files which were harvested before
-	// See https://github.com/elastic/beats/pull/2907
+	// See https://github.com/menderesk/beats/pull/2907
 	newState.Offset = newState.Fileinfo.Size()
 
 	// Write state for ignore_older file as none exists yet

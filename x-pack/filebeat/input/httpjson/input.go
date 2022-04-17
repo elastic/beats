@@ -16,16 +16,16 @@ import (
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	inputcursor "github.com/menderesk/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/menderesk/beats/v7/libbeat/common/useragent"
+	"github.com/menderesk/beats/v7/libbeat/feature"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/go-concert/ctxtool"
+	"github.com/menderesk/go-concert/timed"
 )
 
 const (

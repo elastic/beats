@@ -20,7 +20,7 @@ package file
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 type File struct {

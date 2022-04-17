@@ -17,7 +17,7 @@
 
 package harvester
 
-import "github.com/elastic/beats/v7/libbeat/common/match"
+import "github.com/menderesk/beats/v7/libbeat/common/match"
 
 // Contains available input types
 const (

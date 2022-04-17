@@ -26,13 +26,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/testslike"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/heartbeat/look"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // Tests for the non-cert fields

@@ -33,9 +33,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
-	"github.com/elastic/gosigar"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/packetbeat/protos/applayer"
+	"github.com/menderesk/gosigar"
 )
 
 type socketInfo struct {

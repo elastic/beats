@@ -17,7 +17,7 @@
 
 package remote_write
 
-import "github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+import "github.com/menderesk/beats/v7/libbeat/common/transport/tlscommon"
 
 type Config struct {
 	Host string                  `config:"host"`

@@ -20,8 +20,8 @@ package harvester
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // Outlet interface is used for forwarding events

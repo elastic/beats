@@ -27,7 +27,7 @@ import (
 )
 
 func TestGetServiceStates(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/22172")
+	t.Skip("Flaky test: https://github.com/menderesk/beats/issues/22172")
 
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)

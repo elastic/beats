@@ -29,9 +29,9 @@ import (
 
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	sigar "github.com/elastic/gosigar"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/resolve"
+	sigar "github.com/menderesk/gosigar"
 )
 
 // Config stores the metricset-local config

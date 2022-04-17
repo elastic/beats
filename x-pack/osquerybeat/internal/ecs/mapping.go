@@ -84,7 +84,7 @@ func (d Doc) Set(key string, val interface{}) {
 			// Need to use the map[string]interface{} for the tree nodes
 			// otherwise the large numbers are serialized into scientific notation in bulk json
 			// which breaks values like unix timestamp in seconds
-			// Fixes the issue https://github.com/elastic/security-team/issues/1950
+			// Fixes the issue https://github.com/menderesk/security-team/issues/1950
 			m := make(map[string]interface{})
 			node[keys[i]] = m
 			node = m

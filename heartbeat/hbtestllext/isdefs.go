@@ -20,9 +20,9 @@ package hbtestllext
 import (
 	"time"
 
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/llpath"
-	"github.com/elastic/go-lookslike/llresult"
+	"github.com/menderesk/go-lookslike/isdef"
+	"github.com/menderesk/go-lookslike/llpath"
+	"github.com/menderesk/go-lookslike/llresult"
 )
 
 // IsTime checks that the value is a time.Time instance.

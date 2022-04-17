@@ -20,9 +20,9 @@ package schema
 import (
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // Schema describes how a map[string]interface{} object can be parsed and converted into

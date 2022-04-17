@@ -17,11 +17,11 @@
 
 package mage
 
-import devtools "github.com/elastic/beats/v7/dev-tools/mage"
+import devtools "github.com/menderesk/beats/v7/dev-tools/mage"
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	// Run all builds serially to try to address failures that might be caused
-	// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+	// by concurrent builds. See https://github.com/menderesk/beats/issues/24304.
 	return devtools.CrossBuild(devtools.Serially())
 }

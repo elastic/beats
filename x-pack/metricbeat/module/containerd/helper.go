@@ -4,7 +4,7 @@
 
 package containerd
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/menderesk/beats/v7/libbeat/common"
 
 // GetAndDeleteCid deletes and returns container id from an event
 func GetAndDeleteCid(event common.MapStr) (cID string) {

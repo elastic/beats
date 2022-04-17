@@ -14,10 +14,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/auditbeat/core"
+	abtest "github.com/menderesk/beats/v7/auditbeat/testing"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 )
 
 func TestHomebrew(t *testing.T) {
@@ -59,7 +59,7 @@ func TestHomebrew(t *testing.T) {
 			checkFieldValue(t, event, "system.audit.package.summary", "Test package")
 			checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
 			checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
-			// FIXME: The value of this field changes on each execution in CI - https://github.com/elastic/beats/issues/18855
+			// FIXME: The value of this field changes on each execution in CI - https://github.com/menderesk/beats/issues/18855
 			// checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
 			checkFieldValue(t, event, "package.name", "test-package")
 			checkFieldValue(t, event, "package.description", "Test package")

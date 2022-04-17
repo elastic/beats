@@ -24,8 +24,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 // HandlerFactory returns a ConnectionHandler func

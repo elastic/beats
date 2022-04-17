@@ -18,8 +18,8 @@
 package network
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	sysinfotypes "github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	sysinfotypes "github.com/menderesk/go-sysinfo/types"
 )
 
 // MapProcNetCounters converts the NetworkCountersInfo struct into a MapStr acceptable for sending upstream

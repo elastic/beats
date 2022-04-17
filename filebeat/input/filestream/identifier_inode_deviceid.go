@@ -27,10 +27,10 @@ import (
 	"path/filepath"
 	"time"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	loginp "github.com/menderesk/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 type inodeMarkerIdentifier struct {

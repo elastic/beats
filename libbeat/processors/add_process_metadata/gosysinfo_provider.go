@@ -21,8 +21,8 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/go-sysinfo"
+	"github.com/menderesk/go-sysinfo/types"
 )
 
 type gosysinfoProvider struct{}

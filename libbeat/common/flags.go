@@ -21,8 +21,8 @@ import (
 	"flag"
 	"strings"
 
-	ucfg "github.com/elastic/go-ucfg"
-	cfgflag "github.com/elastic/go-ucfg/flag"
+	ucfg "github.com/menderesk/go-ucfg"
+	cfgflag "github.com/menderesk/go-ucfg/flag"
 )
 
 // StringsFlag collects multiple usages of the same flag into an array of strings.

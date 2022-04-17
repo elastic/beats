@@ -23,8 +23,8 @@ import (
 	"sync"
 	"time"
 
-	structform "github.com/elastic/go-structform"
-	"github.com/elastic/go-structform/gotype"
+	structform "github.com/menderesk/go-structform"
+	"github.com/menderesk/go-structform/gotype"
 )
 
 // Converter converts structured data between arbitrary typed (serializable)

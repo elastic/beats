@@ -21,9 +21,9 @@
 package cpu
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
-	sigar "github.com/elastic/gosigar"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/numcpu"
+	sigar "github.com/menderesk/gosigar"
 )
 
 // Load returns CPU load information for the previous 1, 5, and 15 minute

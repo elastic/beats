@@ -9,22 +9,22 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/metricbeat/beater"
-	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
-	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	"github.com/menderesk/beats/v7/libbeat/cmd"
+	"github.com/menderesk/beats/v7/libbeat/cmd/instance"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/ecs"
+	"github.com/menderesk/beats/v7/libbeat/publisher/processing"
+	"github.com/menderesk/beats/v7/metricbeat/beater"
+	mbcmd "github.com/menderesk/beats/v7/metricbeat/cmd"
+	"github.com/menderesk/beats/v7/metricbeat/cmd/test"
 
 	// Register the includes.
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
+	_ "github.com/menderesk/beats/v7/x-pack/libbeat/include"
+	_ "github.com/menderesk/beats/v7/x-pack/metricbeat/include"
 
 	// Import OSS modules.
-	_ "github.com/elastic/beats/v7/metricbeat/include"
-	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
+	_ "github.com/menderesk/beats/v7/metricbeat/include"
+	_ "github.com/menderesk/beats/v7/metricbeat/include/fields"
 )
 
 const (

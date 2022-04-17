@@ -512,7 +512,7 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 }
 
 // ensureNoBuildIDLinks checks for regressions related to
-// https://github.com/elastic/beats/issues/12956.
+// https://github.com/menderesk/beats/issues/12956.
 func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
 	t.Run(fmt.Sprintf("%s no build_id links", p.Name), func(t *testing.T) {
 		for name := range p.Contents {
@@ -524,7 +524,7 @@ func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
 }
 
 // checkRPMDigestTypeSHA256 verifies that the RPM contains sha256 digests.
-// https://github.com/elastic/beats/issues/23670
+// https://github.com/menderesk/beats/issues/23670
 func checkRPMDigestTypeSHA256(t *testing.T, rpmPkg *rpm.PackageFile) {
 	t.Run("rpm_digest_type_is_sha256", func(t *testing.T) {
 		if rpmPkg.ChecksumType() != "sha256" {

@@ -20,7 +20,7 @@ package numcpu
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/gosigar/sys/windows"
+	"github.com/menderesk/gosigar/sys/windows"
 )
 
 // getCPU implements NumCPU on windows

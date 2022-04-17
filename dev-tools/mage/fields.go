@@ -221,7 +221,7 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 }
 
 // toLibbeatLicenseName translates the license type used in packages to
-// the identifiers used by github.com/elastic/beatslibbeat/licenses.
+// the identifiers used by github.com/menderesk/beatslibbeat/licenses.
 func toLibbeatLicenseName(name string) string {
 	switch name {
 	case "ASL 2.0":

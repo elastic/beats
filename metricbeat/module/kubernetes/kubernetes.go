@@ -25,9 +25,9 @@ import (
 	"github.com/mitchellh/hashstructure"
 	dto "github.com/prometheus/client_model/go"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/helper"
+	p "github.com/menderesk/beats/v7/metricbeat/helper/prometheus"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -116,7 +116,7 @@ func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.Metric
 	now := time.Now()
 	// NOTE: These entries will be never removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
-	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	// (https://github.com/menderesk/beats/pull/25640#discussion_r633395213)
 	familiesCache := m.kubeStateMetricsCache.getCacheMapEntry(m.cacheHash)
 
 	if familiesCache.lastFetchTimestamp.IsZero() || now.Sub(familiesCache.lastFetchTimestamp) > m.Config().Period {
@@ -135,7 +135,7 @@ func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
 
 	// NOTE: These entries will be never removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
-	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	// (https://github.com/menderesk/beats/pull/25640#discussion_r633395213)
 	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
 
 	if statsCache.lastFetchTimestamp.IsZero() || now.Sub(statsCache.lastFetchTimestamp) > m.Config().Period {

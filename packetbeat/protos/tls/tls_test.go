@@ -30,12 +30,12 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/packetbeat/procs"
+	"github.com/menderesk/beats/v7/packetbeat/protos"
+	"github.com/menderesk/beats/v7/packetbeat/publish"
 )
 
 type eventStore struct {
@@ -219,7 +219,7 @@ func TestOCSPStatus(t *testing.T) {
 		msg  string
 		want interface{}
 	}{
-		// Packets from https://github.com/elastic/beats/issues/29962#issue-1112502582
+		// Packets from https://github.com/menderesk/beats/issues/29962#issue-1112502582
 		//
 		// 6	0.017079	TLSv1.2	1516	Server Hello
 		{ // TLSv1.2 Record Layer: Handshake Protocol: Server Hello

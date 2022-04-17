@@ -34,20 +34,20 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/tools/go/vcs"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/menderesk/beats/v7/dev-tools/mage/gotool"
 )
 
 const (
 	fpmVersion = "1.13.1"
 
-	// Docker images. See https://github.com/elastic/golang-crossbuild.
+	// Docker images. See https://github.com/menderesk/golang-crossbuild.
 	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
 	// BeatsCrossBuildImage is the image used for crossbuilding Beats.
 	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
-	elasticBeatsImportPath = "github.com/elastic/beats"
+	elasticBeatsImportPath = "github.com/menderesk/beats"
 
-	elasticBeatsModulePath = "github.com/elastic/beats/v7"
+	elasticBeatsModulePath = "github.com/menderesk/beats/v7"
 )
 
 // Common settings with defaults derived from files, CWD, and environment.
@@ -562,7 +562,7 @@ type ProjectRepoInfo struct {
 }
 
 // IsElasticBeats returns true if the current project is
-// github.com/elastic/beats.
+// github.com/menderesk/beats.
 func (r *ProjectRepoInfo) IsElasticBeats() bool {
 	return r.CanonicalRootImportPath == elasticBeatsImportPath
 }

@@ -27,11 +27,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	ucfg "github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/cfgutil"
-	"github.com/elastic/go-ucfg/yaml"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	ucfg "github.com/menderesk/go-ucfg"
+	"github.com/menderesk/go-ucfg/cfgutil"
+	"github.com/menderesk/go-ucfg/yaml"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -46,7 +46,7 @@ func IsStrictPerms() bool {
 }
 
 // Config object to store hierarchical configurations into.
-// See https://godoc.org/github.com/elastic/go-ucfg#Config
+// See https://godoc.org/github.com/menderesk/go-ucfg#Config
 type Config ucfg.Config
 
 // ConfigNamespace storing at most one configuration section by name and sub-section.

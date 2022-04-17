@@ -22,12 +22,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/go-ucfg/yaml"
+	"github.com/menderesk/go-ucfg/yaml"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/fmtstr"
+	"github.com/menderesk/beats/v7/libbeat/mapping"
 )
 
 var (

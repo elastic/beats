@@ -11,12 +11,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/common"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/beats/v7/auditbeat/core"
+	"github.com/menderesk/beats/v7/auditbeat/helper/hasher"
+	abtest "github.com/menderesk/beats/v7/auditbeat/testing"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/go-sysinfo/types"
 )
 
 func TestData(t *testing.T) {

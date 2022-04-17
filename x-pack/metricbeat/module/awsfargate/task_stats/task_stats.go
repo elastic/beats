@@ -13,11 +13,11 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/module/docker/cpu"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/awsfargate"
 )
 
 var (

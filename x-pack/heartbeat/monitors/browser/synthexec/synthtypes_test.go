@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/testslike"
 
 	"github.com/stretchr/testify/require"
 )

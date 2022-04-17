@@ -5,13 +5,13 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/libbeat/cmd"
-	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
+	"github.com/menderesk/beats/v7/libbeat/cmd"
+	packetbeatCmd "github.com/menderesk/beats/v7/packetbeat/cmd"
 
-	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/menderesk/beats/v7/x-pack/libbeat/include"
 
 	// This registers the Npcap installer on Windows.
-	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
+	_ "github.com/menderesk/beats/v7/x-pack/packetbeat/npcap"
 )
 
 // Name of this beat.

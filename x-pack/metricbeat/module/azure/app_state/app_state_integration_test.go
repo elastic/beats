@@ -10,14 +10,14 @@ package app_state
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/test"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/azure/test"
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/app_insights"
+	_ "github.com/menderesk/beats/v7/x-pack/metricbeat/module/azure/app_insights"
 )
 
 func TestFetchMetricset(t *testing.T) {

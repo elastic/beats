@@ -20,9 +20,9 @@ package process
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/menderesk/beats/v7/libbeat/opt"
 )
 
 // ProcState is the main struct for process information and metrics.

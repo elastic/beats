@@ -14,9 +14,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 const (

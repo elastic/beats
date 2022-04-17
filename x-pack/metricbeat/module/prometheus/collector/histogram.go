@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 
 	dto "github.com/prometheus/client_model/go"
 )

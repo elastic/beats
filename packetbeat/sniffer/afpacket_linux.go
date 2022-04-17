@@ -32,7 +32,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/net/bpf"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 type afpacketHandle struct {
@@ -150,7 +150,7 @@ func isPromiscEnabled(device string) (bool, error) {
 
 // setPromiscMode enables promisc mode if configured.
 // this makes maintenance for user simpler without any additional manual steps
-// issue [700](https://github.com/elastic/beats/issues/700)
+// issue [700](https://github.com/menderesk/beats/issues/700)
 func setPromiscMode(device string, enabled bool) error {
 	if device == "any" {
 		logp.Warn("Cannot set promiscuous mode to device 'any'")

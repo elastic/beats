@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func newJob(jobID string) *Job {

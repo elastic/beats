@@ -20,19 +20,19 @@ package cmd
 import (
 
 	// include all heartbeat specific autodiscovery builders
-	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
+	_ "github.com/menderesk/beats/v7/heartbeat/autodiscover/builder/hints"
 
-	"github.com/elastic/beats/v7/heartbeat/beater"
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/menderesk/beats/v7/heartbeat/beater"
+	cmd "github.com/menderesk/beats/v7/libbeat/cmd"
+	"github.com/menderesk/beats/v7/libbeat/cmd/instance"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/ecs"
+	"github.com/menderesk/beats/v7/libbeat/publisher/processing"
 
 	// Import packages that need to register themselves.
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	_ "github.com/menderesk/beats/v7/heartbeat/monitors/active/http"
+	_ "github.com/menderesk/beats/v7/heartbeat/monitors/active/icmp"
+	_ "github.com/menderesk/beats/v7/heartbeat/monitors/active/tcp"
 )
 
 const (

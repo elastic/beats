@@ -18,8 +18,8 @@
 package thrift
 
 import (
-	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/menderesk/beats/v7/packetbeat/config"
+	"github.com/menderesk/beats/v7/packetbeat/protos"
 )
 
 type thriftConfig struct {

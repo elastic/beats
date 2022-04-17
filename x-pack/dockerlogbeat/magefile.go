@@ -27,15 +27,15 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/test"
 )
 
 const (

@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
 
 type testProto int

@@ -32,8 +32,8 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/dev-tools/mage/gotool"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
 )
 
 const defaultCrossBuildTarget = "golangCrossBuild"
@@ -366,7 +366,7 @@ func (b GolangCrossBuilder) Build() error {
 		image,
 
 		// Arguments for docker crossbuild entrypoint. For details see
-		// https://github.com/elastic/golang-crossbuild/blob/main/go1.17/base/rootfs/entrypoint.go.
+		// https://github.com/menderesk/golang-crossbuild/blob/main/go1.17/base/rootfs/entrypoint.go.
 		"--build-cmd", buildCmd+" "+b.Target,
 		"--platforms", b.Platform,
 	)

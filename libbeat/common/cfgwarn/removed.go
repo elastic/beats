@@ -23,7 +23,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func checkRemovedSettings(cfg *common.Config, settings ...string) error {

@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/install"
 )
 
 func installOsquery(ctx context.Context) error {

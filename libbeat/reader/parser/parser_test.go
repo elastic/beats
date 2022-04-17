@@ -25,11 +25,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/multiline"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/reader"
+	"github.com/menderesk/beats/v7/libbeat/reader/multiline"
+	"github.com/menderesk/beats/v7/libbeat/reader/readfile"
+	"github.com/menderesk/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 func TestParsersConfigSuffix(t *testing.T) {
@@ -444,7 +444,7 @@ func TestContainerParser(t *testing.T) {
 		expectedMessages []reader.Message
 	}{
 		"simple docker lines": {
-			lines: `{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+			lines: `{"log":"Fetching main repository github.com/menderesk/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 {"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 {"log":"patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n","stream":"stdout","time":"2016-03-02T22:59:04.626534779Z"}
@@ -458,7 +458,7 @@ func TestContainerParser(t *testing.T) {
 			},
 			expectedMessages: []reader.Message{
 				reader.Message{
-					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
+					Content: []byte("Fetching main repository github.com/menderesk/beats...\n"),
 					Fields: common.MapStr{
 						"stream": "stdout",
 					},
@@ -505,7 +505,7 @@ func TestContainerParser(t *testing.T) {
 			},
 		},
 		"corrupt docker lines are skipped": {
-			lines: `{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+			lines: `{"log":"Fetching main repository github.com/menderesk/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 "log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 `,
@@ -518,7 +518,7 @@ func TestContainerParser(t *testing.T) {
 			},
 			expectedMessages: []reader.Message{
 				reader.Message{
-					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
+					Content: []byte("Fetching main repository github.com/menderesk/beats...\n"),
 					Fields: common.MapStr{
 						"stream": "stdout",
 					},

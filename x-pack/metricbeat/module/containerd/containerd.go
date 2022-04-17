@@ -12,8 +12,8 @@ import (
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	p "github.com/menderesk/beats/v7/metricbeat/helper/prometheus"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 // Licensed to Elasticsearch B.V. under one or more contributor
@@ -96,7 +96,7 @@ func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.M
 	now := time.Now()
 	// NOTE: These entries will be never removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
-	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	// (https://github.com/menderesk/beats/pull/25640#discussion_r633395213)
 	familiesCache := m.containerdMetricsCache.getCacheMapEntry(m.cacheHash)
 
 	if familiesCache.lastFetchTimestamp.IsZero() || now.Sub(familiesCache.lastFetchTimestamp) > m.Config().Period {

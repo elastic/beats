@@ -25,7 +25,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/menderesk/beats/v7/libbeat/esleg/eslegclient"
 
 	"github.com/stretchr/testify/assert"
 )

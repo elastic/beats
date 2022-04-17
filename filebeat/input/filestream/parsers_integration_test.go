@@ -80,7 +80,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 		"exclude_lines": []string{"main"},
 	})
 
-	testline := []byte(`{"log":"Fetching main repository github.com/elastic/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+	testline := []byte(`{"log":"Fetching main repository github.com/menderesk/beats...\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
 {"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 `)

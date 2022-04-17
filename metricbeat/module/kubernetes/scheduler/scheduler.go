@@ -18,8 +18,8 @@
 package scheduler
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/helper/prometheus"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -40,7 +40,7 @@ func init() {
 				prometheus.OpMultiplyBuckets(1000000)),
 			"scheduler_pod_preemption_victims": prometheus.Metric("scheduling.pod.preemption.victims",
 				// this is needed in order to solve compatibility issue of different
-				// different k8s versions, issue: https://github.com/elastic/beats/issues/19332
+				// different k8s versions, issue: https://github.com/menderesk/beats/issues/19332
 				prometheus.OpSetNumericMetricSuffix("count")),
 			"scheduler_schedule_attempts_total":     prometheus.Metric("scheduling.pod.attempts.count"),
 			"scheduler_scheduling_duration_seconds": prometheus.Metric("scheduling.duration.seconds"),

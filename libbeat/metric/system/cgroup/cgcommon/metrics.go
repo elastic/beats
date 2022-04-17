@@ -24,7 +24,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/menderesk/beats/v7/libbeat/opt"
 )
 
 // CPUUsage wraps the CPU usage time values for the CPU controller metrics

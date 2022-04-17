@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/menderesk/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 var logstashName2Decoder = map[string]fields.Decoder{

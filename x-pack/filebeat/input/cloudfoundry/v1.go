@@ -10,10 +10,10 @@ package cloudfoundry
 import (
 	"github.com/pkg/errors"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
-	"github.com/elastic/go-concert/ctxtool"
+	v2 "github.com/menderesk/beats/v7/filebeat/input/v2"
+	stateless "github.com/menderesk/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/menderesk/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/menderesk/go-concert/ctxtool"
 )
 
 // inputV1 defines a udp input to receive event on a specific host:port.

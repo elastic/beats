@@ -25,11 +25,11 @@ import (
 	"github.com/gofrs/uuid"
 	rd "github.com/gomodule/redigo/redis"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/menderesk/beats/v7/filebeat/harvester"
 )
 
 // Harvester contains all redis harvester data

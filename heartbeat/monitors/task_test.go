@@ -21,17 +21,17 @@ import (
 	"context"
 	"testing"
 
-	"github.com/elastic/go-lookslike/validator"
+	"github.com/menderesk/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
+	"github.com/menderesk/go-lookslike"
+	"github.com/menderesk/go-lookslike/testslike"
 
-	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/heartbeat/eventext"
+	"github.com/menderesk/beats/v7/heartbeat/monitors/jobs"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func Test_runPublishJob(t *testing.T) {

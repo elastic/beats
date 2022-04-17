@@ -26,8 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-ucfg/yaml"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/go-ucfg/yaml"
 )
 
 func TestFieldsHasNode(t *testing.T) {

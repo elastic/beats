@@ -18,13 +18,13 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/beats/v7/auditbeat/datastore"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/go-sysinfo"
+	"github.com/menderesk/go-sysinfo/types"
 )
 
 const (
@@ -116,7 +116,7 @@ func (host *Host) changeDetectionHash() uint64 {
 
 func (host *Host) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
-		// https://github.com/elastic/ecs#-host-fields
+		// https://github.com/menderesk/ecs#-host-fields
 		"uptime":              host.Uptime,
 		"boottime":            host.Info.BootTime,
 		"timezone.name":       host.Info.Timezone,
@@ -125,7 +125,7 @@ func (host *Host) toMapStr() common.MapStr {
 		"id":                  host.Info.UniqueID,
 		"architecture":        host.Info.Architecture,
 
-		// https://github.com/elastic/ecs#-operating-system-fields
+		// https://github.com/menderesk/ecs#-operating-system-fields
 		"os": common.MapStr{
 			"platform": host.Info.OS.Platform,
 			"name":     host.Info.OS.Name,

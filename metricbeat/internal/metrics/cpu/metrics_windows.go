@@ -27,9 +27,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/gosigar/sys/windows"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/resolve"
+	"github.com/menderesk/beats/v7/libbeat/opt"
+	"github.com/menderesk/gosigar/sys/windows"
 )
 
 // Get fetches Windows CPU system times

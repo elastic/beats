@@ -20,11 +20,11 @@ package network_summary
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/metric/system/network"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	sysinfo "github.com/elastic/go-sysinfo"
-	sysinfotypes "github.com/elastic/go-sysinfo/types"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/metric/system/network"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	sysinfo "github.com/menderesk/go-sysinfo"
+	sysinfotypes "github.com/menderesk/go-sysinfo/types"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

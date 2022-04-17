@@ -20,17 +20,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/auditbeat/core"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/auditbeat/core"
+	abtest "github.com/menderesk/beats/v7/auditbeat/testing"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 )
 
 var flagUpdateGob = flag.Bool("update-gob", false, "update persisted gob testdata")
 
 func TestData(t *testing.T) {
 	if runtime.GOOS == "darwin" {
-		t.Skip("FIXME: https://github.com/elastic/beats/issues/18855")
+		t.Skip("FIXME: https://github.com/menderesk/beats/issues/18855")
 	}
 
 	defer abtest.SetupDataDir(t)()
@@ -222,7 +222,7 @@ func TestPackageGobEncodeDecode(t *testing.T) {
 	})
 }
 
-// Regression test for https://github.com/elastic/beats/issues/18536 to verify
+// Regression test for https://github.com/menderesk/beats/issues/18536 to verify
 // that error isn't made public.
 func TestPackageWithErrorGobEncode(t *testing.T) {
 	pkg := Package{

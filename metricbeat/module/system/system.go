@@ -20,8 +20,8 @@ package system
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/metricbeat/internal/sysinit"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
 )
 
 var once sync.Once

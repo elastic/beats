@@ -8,11 +8,11 @@ package include
 
 import (
 	// Import packages that need to register themselves.
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/host"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/login"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/process"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/host"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/login"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/package"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/process"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/socket"
+	_ "github.com/menderesk/beats/v7/x-pack/auditbeat/module/system/user"
 )

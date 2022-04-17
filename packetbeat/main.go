@@ -20,7 +20,7 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/packetbeat/cmd"
+	"github.com/menderesk/beats/v7/packetbeat/cmd"
 )
 
 // Setups and Runs Packetbeat

@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"os"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	genmod "github.com/elastic/beats/v7/filebeat/generator/module"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
+	genmod "github.com/menderesk/beats/v7/filebeat/generator/module"
 )
 
 // Module creates a new Filebeat module.

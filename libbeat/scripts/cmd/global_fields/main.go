@@ -25,8 +25,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/generator/fields"
-	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/menderesk/beats/v7/libbeat/generator/fields"
+	"github.com/menderesk/beats/v7/libbeat/mapping"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 		beatPath    string
 		output      string
 	)
-	flag.StringVar(&esBeatsPath, "es_beats_path", "..", "Path to elastic/beats")
+	flag.StringVar(&esBeatsPath, "es_beats_path", "..", "Path to menderesk/beats")
 	flag.StringVar(&beatPath, "beat_path", ".", "Path to your Beat")
 	flag.StringVar(&output, "out", "-", "Path to output. Default: stdout")
 	flag.Parse()
@@ -50,7 +50,7 @@ func main() {
 
 	esBeats, err := os.Open(esBeatsPath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening elastic/beats: %+v\n", err)
+		fmt.Fprintf(os.Stderr, "Error opening menderesk/beats: %+v\n", err)
 		os.Exit(1)
 	}
 	beat, err := os.Open(beatPath)
@@ -60,7 +60,7 @@ func main() {
 	}
 	esBeatsInfo, err := esBeats.Stat()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error getting file info of elastic/beats: %+v\n", err)
+		fmt.Fprintf(os.Stderr, "Error getting file info of menderesk/beats: %+v\n", err)
 		os.Exit(1)
 	}
 	beatInfo, err := beat.Stat()

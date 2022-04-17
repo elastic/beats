@@ -23,8 +23,8 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	b "github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	b "github.com/menderesk/beats/v7/libbeat/common/backoff"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
 )
 
 type backoffClient struct {

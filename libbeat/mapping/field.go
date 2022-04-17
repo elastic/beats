@@ -24,8 +24,8 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-ucfg/yaml"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/go-ucfg/yaml"
 )
 
 // This reflects allowed attributes for field definitions in the fields.yml.

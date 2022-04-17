@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 // FlagField fields used to keep information or errors when events are parsed.

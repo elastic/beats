@@ -16,20 +16,20 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
+	devtools "github.com/menderesk/beats/v7/dev-tools/mage"
+	"github.com/menderesk/beats/v7/dev-tools/mage/target/build"
+	functionbeat "github.com/menderesk/beats/v7/x-pack/functionbeat/scripts/mage"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/menderesk/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {

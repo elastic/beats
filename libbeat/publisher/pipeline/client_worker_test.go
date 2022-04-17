@@ -30,10 +30,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/internal/testutil"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/internal/testutil"
+	"github.com/menderesk/beats/v7/libbeat/outputs"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
 )
 
 func TestMakeClientWorker(t *testing.T) {
@@ -95,7 +95,7 @@ func TestMakeClientWorker(t *testing.T) {
 }
 
 func TestReplaceClientWorker(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/17965")
+	t.Skip("Flaky test: https://github.com/menderesk/beats/issues/17965")
 
 	tests := map[string]func(mockPublishFn) outputs.Client{
 		"client":         newMockClient,

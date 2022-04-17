@@ -23,8 +23,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/mapping"
 )
 
 // DefaultField controls the default value for the default_field flag.

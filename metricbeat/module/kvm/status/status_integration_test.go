@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {

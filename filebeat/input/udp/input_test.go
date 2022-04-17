@@ -23,8 +23,8 @@ package udp
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/filebeat/input/inputtest"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 func TestNewInputDone(t *testing.T) {

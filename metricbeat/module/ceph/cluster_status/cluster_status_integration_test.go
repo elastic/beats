@@ -23,14 +23,14 @@ package cluster_status
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
+	"github.com/menderesk/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/menderesk/beats/v7/metricbeat/mb/testing"
+	"github.com/menderesk/beats/v7/metricbeat/mb/testing/flags"
 )
 
 func TestData(t *testing.T) {
 	if !*flags.DataFlag {
-		t.Skip("Flaky test: https://github.com/elastic/beats/issues/22612")
+		t.Skip("Flaky test: https://github.com/menderesk/beats/issues/22612")
 	}
 
 	service := compose.EnsureUpWithTimeout(t, 120, "ceph-api")

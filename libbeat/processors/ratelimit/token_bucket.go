@@ -24,10 +24,10 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/unison"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/common/atomic"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 func init() {

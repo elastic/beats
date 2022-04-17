@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
+	"github.com/menderesk/beats/v7/x-pack/osquerybeat/internal/hash"
 )
 
 // Download downloads the osquery distro package

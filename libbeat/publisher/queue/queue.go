@@ -21,11 +21,11 @@ import (
 	"errors"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/menderesk/beats/v7/libbeat/beat"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/opt"
+	"github.com/menderesk/beats/v7/libbeat/publisher"
 )
 
 // Factory for creating a queue used by a pipeline instance.

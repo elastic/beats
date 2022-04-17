@@ -21,7 +21,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/elastic/go-concert/unison"
+	"github.com/menderesk/go-concert/unison"
 )
 
 // updateWriter asynchronously writes all updates to the persistent store.

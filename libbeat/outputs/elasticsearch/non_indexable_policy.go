@@ -20,9 +20,9 @@ package elasticsearch
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/menderesk/beats/v7/libbeat/common/cfgwarn"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common"
 )
 
 const (

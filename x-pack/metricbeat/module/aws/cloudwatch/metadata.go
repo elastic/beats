@@ -7,10 +7,10 @@ package cloudwatch
 import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/ec2"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/rds"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/sqs"
+	"github.com/menderesk/beats/v7/metricbeat/mb"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/ec2"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/rds"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/sqs"
 )
 
 // AWS namespaces

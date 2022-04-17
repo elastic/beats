@@ -44,7 +44,7 @@ var (
 
 // NextID returns a base64-encoded, randomly-generated, but roughly ordered (over time), unique
 // ID. The algorithm used to generate the ID is the same as used by Elasticsearch.
-// See https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
+// See https://github.com/menderesk/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
 func (*esTimeBasedUUIDGenerator) NextID() string {
 	// Initialize sequence number and mac address. We do this here instead of doing it in a package-level
 	// init function to give the runtime time to generate enough entropy for randomization.
@@ -131,5 +131,5 @@ func packID(buf []byte, ts uint64, seq uint64) {
 	buf[14] = byte(ts)
 
 	// See also: more detailed explanation of byte choices at
-	// https://github.com/elastic/elasticsearch/blob/a666fb22664284d8e2114841ebb58ea4e1924691/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java#L80-L95
+	// https://github.com/menderesk/elasticsearch/blob/a666fb22664284d8e2114841ebb58ea4e1924691/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java#L80-L95
 }

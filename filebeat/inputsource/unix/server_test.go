@@ -34,10 +34,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/filebeat/inputsource"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 func defaultConfig() Config {
@@ -72,7 +72,7 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 
 func TestReceiveEventsAndMetadata(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/19641")
+		t.Skip("test is only supported on non-windows. See https://github.com/menderesk/beats/issues/19641")
 		return
 	}
 	expectedMessages := generateMessages(5, 100)
@@ -259,7 +259,7 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 
 func TestSocketCleanup(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+		t.Skip("test is only supported on non-windows. See https://github.com/menderesk/beats/issues/21757")
 		return
 	}
 	path := filepath.Join(os.TempDir(), "test.sock")
@@ -306,13 +306,13 @@ func TestSocketCleanupRefusal(t *testing.T) {
 
 func TestReceiveNewEventsConcurrently(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+		t.Skip("test is only supported on non-windows. See https://github.com/menderesk/beats/issues/21757")
 		return
 	}
 
 	for socketType := range socketTypes {
 		if runtime.GOOS == "darwin" && socketType == "datagram" {
-			t.Skip("test is only supported on linux. See https://github.com/elastic/beats/issues/22775")
+			t.Skip("test is only supported on linux. See https://github.com/menderesk/beats/issues/22775")
 			return
 		}
 

@@ -11,7 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/menderesk/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 const resourceIDExtension = "/default"

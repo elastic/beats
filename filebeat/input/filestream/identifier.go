@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"os"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	loginp "github.com/menderesk/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/menderesk/beats/v7/libbeat/common"
+	"github.com/menderesk/beats/v7/libbeat/common/file"
 )
 
 type identifierFeature uint8

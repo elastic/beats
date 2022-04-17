@@ -17,7 +17,7 @@
 
 package outputs
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/menderesk/beats/v7/libbeat/common"
 
 // ReadHostList reads a list of hosts to connect to from an configuration
 // object. If the `workers` settings is > 1, each host is duplicated in the final

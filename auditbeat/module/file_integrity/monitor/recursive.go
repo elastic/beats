@@ -25,7 +25,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/menderesk/beats/v7/libbeat/logp"
 )
 
 type recursiveWatcher struct {

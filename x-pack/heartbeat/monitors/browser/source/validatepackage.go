@@ -20,10 +20,10 @@ const ExpectedSynthVersion = "<2.0.0"
 
 type packageJson struct {
 	Dependencies struct {
-		SynthVersion string `json:"@elastic/synthetics"`
+		SynthVersion string `json:"@menderesk/synthetics"`
 	} `json:"dependencies"`
 	DevDependencies struct {
-		SynthVersion string `json:"@elastic/synthetics"`
+		SynthVersion string `json:"@menderesk/synthetics"`
 	} `json:"devDependencies"`
 }
 
@@ -54,12 +54,12 @@ func validateVersion(expected string, current string) error {
 	parsed := parseVersion(current)
 	currentVersion, err := semver.NewVersion(parsed)
 	if err != nil {
-		return fmt.Errorf("error parsing @elastic/synthetics version: '%s' %w", currentVersion, err)
+		return fmt.Errorf("error parsing @menderesk/synthetics version: '%s' %w", currentVersion, err)
 	}
 
 	isValid := expectedRange.Check(currentVersion)
 	if !isValid {
-		return fmt.Errorf("parsed @elastic/synthetics version '%s' is not compatible", current)
+		return fmt.Errorf("parsed @menderesk/synthetics version '%s' is not compatible", current)
 	}
 	return nil
 }
@@ -72,7 +72,7 @@ func validatePackageJSON(path string) error {
 	pkgJson := packageJson{}
 	err = json.Unmarshal(pkgData, &pkgJson)
 	if err != nil {
-		return fmt.Errorf("could not unmarshall @elastic/synthetics version: %w", err)
+		return fmt.Errorf("could not unmarshall @menderesk/synthetics version: %w", err)
 	}
 
 	synthVersion := pkgJson.Dependencies.SynthVersion
@@ -82,7 +82,7 @@ func validatePackageJSON(path string) error {
 
 	err = validateVersion(ExpectedSynthVersion, synthVersion)
 	if err != nil {
-		return fmt.Errorf("could not validate @elastic/synthetics version: '%s' %w", synthVersion, err)
+		return fmt.Errorf("could not validate @menderesk/synthetics version: '%s' %w", synthVersion, err)
 	}
 	return nil
 }
