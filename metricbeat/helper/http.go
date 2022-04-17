@@ -73,7 +73,8 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		if err != nil {
 			return nil, err
 		}
-		headers.Set("Authorization", header)
+		headers.Set("Accept: application/vnd.ceph.api.v1.0+json", "Authorization", header)
+
 	}
 
 	// Ensure backward compatibility
