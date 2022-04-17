@@ -1,4 +1,4 @@
-import { journey } from '@elastic/synthetics';
+import { journey } from '@menderesk/synthetics';
 import {
   loadAppStep,
   addTaskStep,

@@ -18,9 +18,9 @@ services:
       - KIBANA_PORT=5601
       - MOSQUITTO_HOST=mosquitto
       - MOSQUITTO_PORT=1883
-    working_dir: /go/src/github.com/elastic/beats/filebeat
+    working_dir: /go/src/github.com/menderesk/beats/filebeat
     volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - ${PWD}/..:/go/src/github.com/menderesk/beats/
       # We launch docker containers to test docker autodiscover:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make

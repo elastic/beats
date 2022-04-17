@@ -31,7 +31,7 @@ To download the manifest file, run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/filebeat-kubernetes.yaml
+curl -L -O https://raw.githubusercontent.com/menderesk/beats/{branch}/deploy/kubernetes/filebeat-kubernetes.yaml
 ------------------------------------------------
 
 [WARNING]

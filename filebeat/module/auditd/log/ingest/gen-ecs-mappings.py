@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# This script generates auditd to ECS mappings from github.com/elastic/go-libaudit
+# This script generates auditd to ECS mappings from github.com/menderesk/go-libaudit
 #
-# Usage: ./gen-ecs-mappings.py ~/go/src/github.com/elastic/go-libaudit
+# Usage: ./gen-ecs-mappings.py ~/go/src/github.com/menderesk/go-libaudit
 #
 # It will output to stdout the `params` section for the script processor in the ingest pipeline.
 import copy

@@ -6,7 +6,7 @@ include::generator-support-note.asciidoc[tag=filebeat-generator]
 This guide will walk you through creating a new Filebeat module.
 
 All Filebeat modules currently live in the main
-https://github.com/elastic/beats[Beats] repository. To clone the repository and
+https://github.com/menderesk/beats[Beats] repository. To clone the repository and
 build Filebeat (which you will need for testing), please follow the general
 instructions in <<beats-contributing>>.
 

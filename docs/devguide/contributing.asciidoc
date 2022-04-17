@@ -33,7 +33,7 @@ core team will backport your PR if it is necessary.
 
 In the pull request, describe what your changes do and mention
 any bugs/issues related to the pull request. Please also add a changelog entry to
-https://github.com/elastic/beats/blob/main/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
+https://github.com/menderesk/beats/blob/main/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
 
 [float]
 [[setting-up-dev-environment]]
@@ -60,7 +60,7 @@ Then you can clone Beats git repository:
 [source,shell]
 ----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
-git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
+git clone https://github.com/menderesk/beats ${GOPATH}/src/github.com/menderesk/beats
 ----------------------------------------------------------------------
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
@@ -203,7 +203,7 @@ For more details check the <<testing>> guide.
 The documentation for each Beat is located under `{beatname}/docs` and is based
 on asciidoc. After changing the docs, you should verify that the docs are still
 building to avoid breaking the automated docs build. To learn more about
-contributing docs, see the https://github.com/elastic/docs/blob/master/README.asciidoc[Docs HOWTO].
+contributing docs, see the https://github.com/menderesk/docs/blob/master/README.asciidoc[Docs HOWTO].
 
 [float]
 [[dependencies]]
@@ -237,4 +237,4 @@ The following packages are required to run `go generate`:
 
 To keep up to date with changes to the official Beats for community developers,
 follow the developer changelog
-https://github.com/elastic/beats/blob/main/CHANGELOG-developer.next.asciidoc[here].
+https://github.com/menderesk/beats/blob/main/CHANGELOG-developer.next.asciidoc[here].

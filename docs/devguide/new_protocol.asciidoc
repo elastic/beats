@@ -37,7 +37,7 @@ following commands:
 ----------------------------------------------------------------------
 $ mkdir -p ${GOPATH}/src/github.com/elastic
 $ cd ${GOPATH}/src/github.com/elastic
-$ git clone https://github.com/elastic/beats.git
+$ git clone https://github.com/menderesk/beats.git
 ----------------------------------------------------------------------
 
 Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.
@@ -52,7 +52,7 @@ $ make
 
 Note that the location where you clone is important. If you prefer working
 outside of the `GOPATH` environment, you can clone to another directory and only
-create a symlink to the `$GOPATH/src/github.com/elastic/` directory.
+create a symlink to the `$GOPATH/src/github.com/menderesk/` directory.
 
 [float]
 === Forking and Branching
@@ -61,7 +61,7 @@ We recommend the following work flow for contributing to Packetbeat:
 
 * Fork Beats in GitHub to your own account
 
-* In the `$GOPATH/src/github.com/elastic/beats` folder, add your fork
+* In the `$GOPATH/src/github.com/menderesk/beats` folder, add your fork
   as a new remote. For example (replace `tsg` with your GitHub account):
 
 [source,shell]
@@ -93,7 +93,7 @@ $ git push --set-upstream tsg cool_new_protocol
 
 We are working on updating this section. While you're waiting for updates, you
 might want to try out the TCP protocol generator at
-https://github.com/elastic/beats/tree/master/packetbeat/scripts/tcp-protocol.
+https://github.com/menderesk/beats/tree/master/packetbeat/scripts/tcp-protocol.
 
 [[protocol-testing]]
 === Testing

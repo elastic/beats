@@ -114,7 +114,7 @@ def ecs_fields():
     Fetch flattened ECS fields based on ECS 1.6.0 spec
     The result of this function is cached
     """
-    url = "https://raw.githubusercontent.com/elastic/ecs/v1.6.0/generated/ecs/ecs_flat.yml"
+    url = "https://raw.githubusercontent.com/menderesk/ecs/v1.6.0/generated/ecs/ecs_flat.yml"
     resp = requests.get(url)
     if resp.status_code != 200:
         raise ValueError(resp.content)

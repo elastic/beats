@@ -63,7 +63,7 @@ The first file is `{metricset}.go`. It contains the logic on how to fetch data f
 
 The generated file looks like this:
 
-https://github.com/elastic/beats/blob/main/metricbeat/scripts/module/metricset/metricset.go.tmpl
+https://github.com/menderesk/beats/blob/main/metricbeat/scripts/module/metricset/metricset.go.tmpl
 
 [source,go]
 ----
@@ -169,7 +169,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 The JSON output derived from the reported event will be identical to the naming and
 structure you use in `common.MapStr`. For more details about `MapStr` and its functions, see the
-https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[MapStr API docs].
+https://godoc.org/github.com/menderesk/beats/libbeat/common#MapStr[MapStr API docs].
 
 
 [float]
@@ -188,7 +188,7 @@ respect a common <<event-conventions,set of conventions>>. This
 makes it easy for users to find and interpret metrics. To simplify parsing,
 converting, renaming, and restructuring of the object read from the monitored
 system to the Metricbeat format, we have created the
-https://godoc.org/github.com/elastic/beats/libbeat/common/schema[schema] package
+https://godoc.org/github.com/menderesk/beats/libbeat/common/schema[schema] package
 that allows you to declaratively define transformations.
 
 For example, assuming this input object:
@@ -224,8 +224,8 @@ You can use the schema package to transform the data, and optionally mark some f
 [source,go]
 ----
 import (
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+	s "github.com/menderesk/beats/libbeat/common/schema"
+	c "github.com/menderesk/beats/libbeat/common/schema/mapstrstr"
 )
 
 var (

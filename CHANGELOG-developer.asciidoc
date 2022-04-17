@@ -1,7 +1,7 @@
 // Use these for links to issue and pulls. Note issues and pulls redirect one to
 // each other on Github, so don't worry too much on using the right prefix.
-:issue: https://github.com/elastic/beats/issues/
-:pull: https://github.com/elastic/beats/pull/
+:issue: https://github.com/menderesk/beats/issues/
+:pull: https://github.com/menderesk/beats/pull/
 
 This changelog is intended for community Beat developers. It covers the major
 breaking changes to the internal APIs in the official Beats and changes related
@@ -13,7 +13,7 @@ other Beats should be migrated.
 Note: This changelog was only started after the 6.3 release.
 
 === Beats version 8.0.0
-https://github.com/elastic/beats/compare/7.x..main[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/7.x..main[Check the HEAD diff]
 
 ==== Breaking changes
  - Replace custom Pins type for a slice of string for defining the `ca_sha256` values.
@@ -22,10 +22,10 @@ https://github.com/elastic/beats/compare/7.x..main[Check the HEAD diff]
  - Added linter step to the CI pipeline based on golangci-lint linter and Mage
 
 === Beats version 7.5.1
-https://github.com/elastic/beats/compare/v7.5.0..v7.5.1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.5.0..v7.5.1[Check the HEAD diff]
 
 === Beats version 7.5.0
-https://github.com/elastic/beats/compare/v7.4.1..v7.5.0[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.4.1..v7.5.0[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -37,10 +37,10 @@ https://github.com/elastic/beats/compare/v7.4.1..v7.5.0[Check the HEAD diff]
 - Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
 
 === Beats version 7.4.1
-https://github.com/elastic/beats/compare/v7.4.0..v7.4.1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.4.0..v7.4.1[Check the HEAD diff]
 
 === Beats version 7.4.0
-https://github.com/elastic/beats/compare/v7.3.1..v7.4.0[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.3.1..v7.4.0[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -56,23 +56,23 @@ https://github.com/elastic/beats/compare/v7.3.1..v7.4.0[Check the HEAD diff]
 - Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
 
 === Beats version 7.3.2
-https://github.com/elastic/beats/compare/v7.3.1..v7.3.2[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.3.1..v7.3.2[Check the HEAD diff]
 
 === Beats version 7.3.1
-https://github.com/elastic/beats/compare/v7.3.0..v7.3.1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.3.0..v7.3.1[Check the HEAD diff]
 
 === Beats version 7.3.0
-https://github.com/elastic/beats/compare/v7.2.1..v7.3.0[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.2.1..v7.3.0[Check the HEAD diff]
 
 ==== Added
 
 - Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
 
 === Beats version 7.2.1
-https://github.com/elastic/beats/compare/v7.2.0..v7.2.1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.2.0..v7.2.1[Check the HEAD diff]
 
 === Beats version 7.2.0
-https://github.com/elastic/beats/compare/v7.1.1..v7.2.0[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.1.1..v7.2.0[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -95,16 +95,16 @@ https://github.com/elastic/beats/compare/v7.1.1..v7.2.0[Check the HEAD diff]
 - Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]
 
 === Beats version 7.1.1
-https://github.com/elastic/beats/compare/v7.1.0..v7.1.1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.1.0..v7.1.1[Check the HEAD diff]
 
 === Beats version 7.1.0
-https://github.com/elastic/beats/compare/v7.0.0..v7.1.0[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.0.0..v7.1.0[Check the HEAD diff]
 
 === Beats version 7.0.1
-https://github.com/elastic/beats/compare/v7.0.0..v7.0.1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.0.0..v7.0.1[Check the HEAD diff]
 
 === Beats version 7.0.0-GA
-https://github.com/elastic/beats/compare/v7.0.0-rc2..v7.0.0[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.0.0-rc2..v7.0.0[Check the HEAD diff]
 
 The list below covers the major changes between 7.0.0-rc2 and 7.0 only.
 
@@ -114,10 +114,10 @@ The list below covers the major changes between 7.0.0-rc2 and 7.0 only.
   by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
 
 === Beats version 7.0.0-rc2
-https://github.com/elastic/beats/compare/v7.0.0-rc1..v7.0.0-rc2[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.0.0-rc1..v7.0.0-rc2[Check the HEAD diff]
 
 === Beats version 7.0.0-rc1
-https://github.com/elastic/beats/compare/v7.0.0-beta1..v7.0.0-rc1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.0.0-beta1..v7.0.0-rc1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -134,7 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1..v7.0.0-rc1[Check the HEAD
 - Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]
 
 === Beats version 7.0.0-beta1
-https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the HEAD diff]
 
 ==== Breaking changes
 - Outputs receive Index Manager as additional parameter. The index manager can
@@ -150,7 +150,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the H
 - Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
 
 === Beats version 7.0.0-alpha2
-https://github.com/elastic/beats/compare/v6.3.0..v7.0.0-alpha2[Check the HEAD diff]
+https://github.com/menderesk/beats/compare/v6.3.0..v7.0.0-alpha2[Check the HEAD diff]
 
 The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
 
@@ -159,8 +159,8 @@ The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
 - The beat.Pipeline is now passed to cfgfile.RunnerFactory. Beats using libbeat for module reloading or autodiscovery need to be adapted. {pull}7018[7017]
 - Moving of TLS helper functions and structs from `output/tls` to `tlscommon`. {pull}7054[7054]
 - Port fields.yml collector to Golang {pull}6911[6911]
-- Dashboards under _meta/kibana are expected to be decoded. See https://github.com/elastic/beats/pull/7224 for a conversion script. {pull}7265[7265]
-- Constructor `(github.com/elastic/beats/libbeat/output/codec/json).New` expects a new `escapeHTML` parameter. {pull}7445[7445]
+- Dashboards under _meta/kibana are expected to be decoded. See https://github.com/menderesk/beats/pull/7224 for a conversion script. {pull}7265[7265]
+- Constructor `(github.com/menderesk/beats/libbeat/output/codec/json).New` expects a new `escapeHTML` parameter. {pull}7445[7445]
 - Packaging has been refactored and updates are required. See the PR for migration details. {pull}7388[7388]
 - `make fields` has been modified to use Mage (https://magefile.org/) in an effort to make
   the building a Beat more cross-platform friendly (e.g. Windows). This requires that your Beat

@@ -1,4 +1,4 @@
-import { journey, step } from '@elastic/synthetics';
+import { journey, step } from '@menderesk/synthetics';
 import { deepStrictEqual } from 'assert';
 import { join } from 'path';
 

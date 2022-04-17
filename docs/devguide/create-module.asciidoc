@@ -75,7 +75,7 @@ Make sure that you update at least the description of the module.
 It's a common pattern to use a `testing.go` file in the module package to share some testing functionality among
 the metricsets. This file does not have `_test.go` in the name because otherwise it would not be compiled for sub packages.
 
-To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
+To see an example of the `testing.go` file, look at the https://github.com/menderesk/beats/tree/master/metricbeat/module/mysql[mysql module].
 
 [float]
 ===== Test a Metricbeat module manually

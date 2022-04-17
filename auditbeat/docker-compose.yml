@@ -4,7 +4,7 @@ services:
     build: ${PWD}/.
     depends_on:
       - proxy_dep
-    working_dir: /go/src/github.com/elastic/beats/auditbeat
+    working_dir: /go/src/github.com/menderesk/beats/auditbeat
     environment:
       - ES_HOST=elasticsearch
       - ES_PORT=9200
@@ -13,7 +13,7 @@ services:
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
     volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - ${PWD}/..:/go/src/github.com/menderesk/beats/
     command: make
     privileged: true
     pid: host

@@ -1,4 +1,4 @@
-import { step } from '@elastic/synthetics';
+import { step } from '@menderesk/synthetics';
 import * as assert from 'assert';
 import { join } from 'path';
 import { Page } from 'playwright-core';

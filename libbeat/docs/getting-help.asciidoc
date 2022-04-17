@@ -19,6 +19,6 @@ you troubleshoot the problem:
 problem. See <<enable-{beatname_lc}-debugging>> for more details.
 
 If you're sure you found a bug, you can open a ticket on
-https://github.com/elastic/{github_repo_name}/issues?state=open[GitHub]. Note, however,
+https://github.com/menderesk/{github_repo_name}/issues?state=open[GitHub]. Note, however,
 that we close GitHub issues containing questions or requests for help if they
 don't indicate the presence of a bug.

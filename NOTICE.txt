@@ -1831,12 +1831,12 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/sarama
+Dependency : github.com/menderesk/sarama
 Version: v1.19.1-0.20220310193331-ebc2b0d8eef3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20220310193331-ebc2b0d8eef3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/sarama@v1.19.1-0.20220310193331-ebc2b0d8eef3/LICENSE:
 
 Copyright (c) 2013 Shopify
 
@@ -5040,12 +5040,12 @@ Contents of probable licence file $GOMODCACHE/github.com/docker/go-connections@v
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-plugins-helpers
+Dependency : github.com/menderesk/go-plugins-helpers
 Version: v0.0.0-20200207104224-bdf17607b79f
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-plugins-helpers@v0.0.0-20200207104224-bdf17607b79f/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-plugins-helpers@v0.0.0-20200207104224-bdf17607b79f/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -5806,12 +5806,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/elastic-agent-client/v7
+Dependency : github.com/menderesk/elastic-agent-client/v7
 Version: v7.0.0-20210727140539-f0905d9377f6
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.0-20210727140539-f0905d9377f6/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/elastic-agent-client/v7@v7.0.0-20210727140539-f0905d9377f6/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -6039,12 +6039,12 @@ SOFTWARE
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/elastic-agent-libs
+Dependency : github.com/menderesk/elastic-agent-libs
 Version: v0.1.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.1.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/elastic-agent-libs@v0.1.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -6250,12 +6250,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-l
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-concert
+Dependency : github.com/menderesk/go-concert
 Version: v0.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-concert@v0.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-concert@v0.2.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -6461,12 +6461,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-concert@v0.2
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-libaudit/v2
+Dependency : github.com/menderesk/go-libaudit/v2
 Version: v2.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-libaudit/v2@v2.2.0/LICENSE.txt:
 
 
                                  Apache License
@@ -6673,12 +6673,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-licenser
+Dependency : github.com/menderesk/go-licenser
 Version: v0.4.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-licenser@v0.4.0/LICENSE:
 
 
                                  Apache License
@@ -6885,12 +6885,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-lookslike
+Dependency : github.com/menderesk/go-lookslike
 Version: v0.3.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-lookslike@v0.3.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-lookslike@v0.3.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -7096,12 +7096,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-lookslike@v0
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-lumber
+Dependency : github.com/menderesk/go-lumber
 Version: v0.1.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-lumber@v0.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-lumber@v0.1.0/LICENSE:
 
 Copyright (c) 2012–2016 Elasticsearch <http://www.elastic.co>
 
@@ -7119,12 +7119,12 @@ limitations under the License.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-perf
+Dependency : github.com/menderesk/go-perf
 Version: v0.0.0-20191212140718-9c656876f595
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-perf@v0.0.0-20191212140718-9c656876f595/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-perf@v0.0.0-20191212140718-9c656876f595/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -7156,12 +7156,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-seccomp-bpf
+Dependency : github.com/menderesk/go-seccomp-bpf
 Version: v1.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-seccomp-bpf@v1.2.0/LICENSE.txt:
 
 
                                  Apache License
@@ -7368,12 +7368,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-structform
+Dependency : github.com/menderesk/go-structform
 Version: v0.0.9
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v0.0.9/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-structform@v0.0.9/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -7579,12 +7579,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-sysinfo
+Dependency : github.com/menderesk/go-sysinfo
 Version: v1.7.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.7.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-sysinfo@v1.7.1/LICENSE.txt:
 
 
                                  Apache License
@@ -7791,12 +7791,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.7
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-ucfg
+Dependency : github.com/menderesk/go-ucfg
 Version: v0.8.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-ucfg@v0.8.3/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -8002,12 +8002,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.3/
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-windows
+Dependency : github.com/menderesk/go-windows
 Version: v1.0.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-windows@v1.0.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/go-windows@v1.0.1/LICENSE.txt:
 
 
                                  Apache License
@@ -8214,12 +8214,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-windows@v1.0
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/gosigar
+Dependency : github.com/menderesk/gosigar
 Version: v0.14.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/gosigar@v0.14.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/gosigar@v0.14.2/LICENSE:
 
                               Apache License
                         Version 2.0, January 2004
@@ -8666,12 +8666,12 @@ Contents of probable licence file $GOMODCACHE/github.com/fearful-symmetry/gorapl
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/fsevents
+Dependency : github.com/menderesk/fsevents
 Version: v0.0.0-20181029231046-e1d381a4d270
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/fsevents@v0.0.0-20181029231046-e1d381a4d270/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/fsevents@v0.0.0-20181029231046-e1d381a4d270/LICENSE:
 
 Copyright (c) 2014 The fsevents Authors. All rights reserved.
 
@@ -10295,12 +10295,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/gopacket
+Dependency : github.com/menderesk/gopacket
 Version: v1.1.20-0.20211202005954-d412fca7f83a
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/gopacket@v1.1.20-0.20211202005954-d412fca7f83a/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/gopacket@v1.1.20-0.20211202005954-d412fca7f83a/LICENSE:
 
 Copyright (c) 2012 Google, Inc. All rights reserved.
 Copyright (c) 2009-2011 Andreas Krennmair. All rights reserved.
@@ -12116,12 +12116,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/dhcp
+Dependency : github.com/menderesk/dhcp
 Version: v0.0.0-20200227161230-57ec251c7eb3
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/dhcp@v0.0.0-20200227161230-57ec251c7eb3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/dhcp@v0.0.0-20200227161230-57ec251c7eb3/LICENSE:
 
 BSD 3-Clause License
 
@@ -26176,12 +26176,12 @@ Contents of probable licence file $GOMODCACHE/github.com/golang-sql/civil@v0.0.0
    limitations under the License.
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/glog
+Dependency : github.com/menderesk/glog
 Version: v1.0.1-0.20210831205241-7d8b5c89dfc4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/glog@v1.0.1-0.20210831205241-7d8b5c89dfc4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/menderesk/glog@v1.0.1-0.20210831205241-7d8b5c89dfc4/LICENSE:
 
 Apache License
 Version 2.0, January 2004

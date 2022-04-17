@@ -16,7 +16,7 @@ dependencies, to a local directory.
 
 To make sure the dashboards are compatible with the latest version of Kibana and Elasticsearch, we
 recommend that you use the virtual environment under
-https://github.com/elastic/beats/tree/master/testing/environments[beats/testing/environments] to import, create, and
+https://github.com/menderesk/beats/tree/master/testing/environments[beats/testing/environments] to import, create, and
 export the Kibana dashboards.
 
 The following topics provide more detail about importing and working with Beats dashboards:
@@ -219,8 +219,8 @@ make update
 
 To export all the dashboards for any Elastic Beat or any community Beat, including any new or modified dashboards and all dependencies such as
 visualizations, searches, you can use the Go script `export_dashboards.go` from
-https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools].  
-See the dev-tools https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
+https://github.com/menderesk/beats/tree/master/dev-tools/cmd/dashboards[dev-tools].  
+See the dev-tools https://github.com/menderesk/beats/tree/master/dev-tools/README.md[readme] for more info.
 
 Alternatively, if the scripts above are not available, you can use your Beat binary to export Kibana 6.0 dashboards or later.
 

@@ -46,8 +46,8 @@ below provide the basic steps for getting it up and running.
 curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 cd {beatname_lc}-{version}-linux-x86_64
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/cloudfoundry/{beatname_lc}/{beatname_lc}.yml
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/cloudfoundry/{beatname_lc}/manifest.yml
+curl -L -O https://raw.githubusercontent.com/menderesk/beats/{branch}/deploy/cloudfoundry/{beatname_lc}/{beatname_lc}.yml
+curl -L -O https://raw.githubusercontent.com/menderesk/beats/{branch}/deploy/cloudfoundry/{beatname_lc}/manifest.yml
 ------------------------------------------------
 
 You need to modify the +{beatname_lc}.yml+ file to set the `api_address`,

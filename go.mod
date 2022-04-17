@@ -1,4 +1,4 @@
-module github.com/elastic/beats/v7
+module github.com/menderesk/beats/v7
 
 go 1.17
 
@@ -61,19 +61,19 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
-	github.com/elastic/go-concert v0.2.0
-	github.com/elastic/go-libaudit/v2 v2.2.0
-	github.com/elastic/go-licenser v0.4.0
-	github.com/elastic/go-lookslike v0.3.0
-	github.com/elastic/go-lumber v0.1.0
-	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
-	github.com/elastic/go-seccomp-bpf v1.2.0
-	github.com/elastic/go-structform v0.0.9
-	github.com/elastic/go-sysinfo v1.7.1
-	github.com/elastic/go-ucfg v0.8.4
-	github.com/elastic/go-windows v1.0.1
-	github.com/elastic/gosigar v0.14.2
+	github.com/menderesk/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
+	github.com/menderesk/go-concert v0.2.0
+	github.com/menderesk/go-libaudit/v2 v2.2.0
+	github.com/menderesk/go-licenser v0.4.0
+	github.com/menderesk/go-lookslike v0.3.0
+	github.com/menderesk/go-lumber v0.1.0
+	github.com/menderesk/go-perf v0.0.0-20191212140718-9c656876f595
+	github.com/menderesk/go-seccomp-bpf v1.2.0
+	github.com/menderesk/go-structform v0.0.9
+	github.com/menderesk/go-sysinfo v1.7.1
+	github.com/menderesk/go-ucfg v0.8.4
+	github.com/menderesk/go-windows v1.0.1
+	github.com/menderesk/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
@@ -186,7 +186,7 @@ require (
 )
 
 require (
-	github.com/elastic/elastic-agent-libs v0.1.1
+	github.com/menderesk/elastic-agent-libs v0.1.1
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
@@ -295,18 +295,18 @@ require (
 
 replace (
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3
-	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
+	github.com/Shopify/sarama => github.com/menderesk/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3
+	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/menderesk/beats/pull/29780 for details.
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
-	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
+	github.com/docker/go-plugins-helpers => github.com/menderesk/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
-	github.com/elastic/go-ucfg => github.com/elastic/go-ucfg v0.8.3 // starting with v0.8.4 we need to re-write a lot of tests
-	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
+	github.com/menderesk/go-ucfg => github.com/menderesk/go-ucfg v0.8.3 // starting with v0.8.4 we need to re-write a lot of tests
+	github.com/fsnotify/fsevents => github.com/menderesk/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
-	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
-	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
-	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
+	github.com/golang/glog => github.com/menderesk/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
+	github.com/google/gopacket => github.com/menderesk/gopacket v1.1.20-0.20211202005954-d412fca7f83a
+	github.com/insomniacslk/dhcp => github.com/menderesk/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 )
 

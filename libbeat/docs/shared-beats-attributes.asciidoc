@@ -2,7 +2,7 @@
 :beats-ref-all: https://www.elastic.co/guide/en/beats/libbeat
 :dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{version}.zip
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
-:dockerconfig: https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/docker/{beatname_lc}.docker.yml
+:dockerconfig: https://raw.githubusercontent.com/menderesk/beats/{branch}/deploy/docker/{beatname_lc}.docker.yml
 :downloads: https://artifacts.elastic.co/downloads/beats
 :libbeat-processors-dir: {beats-root}/libbeat/processors
 :x-libbeat-processors-dir: {beats-root}/x-pack/libbeat/processors

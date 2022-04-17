@@ -459,7 +459,7 @@
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
-        "kibana.log.meta.plugin.config.@elastic/eslint-import-resolver-kibana.projectRoot": false,
+        "kibana.log.meta.plugin.config.@menderesk/eslint-import-resolver-kibana.projectRoot": false,
         "kibana.log.meta.plugin.name": "kibana",
         "kibana.log.meta.plugin.version": "kibana",
         "kibana.log.meta.type": "log",

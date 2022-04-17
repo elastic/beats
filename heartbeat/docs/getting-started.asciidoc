@@ -151,7 +151,7 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}.
 It does not install {beatname_uc} dashboards.  Heartbeat dashboards and
 installation steps are available in the
-https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.
+https://github.com/menderesk/uptime-contrib[uptime-contrib] GitHub repository.
 
 [TIP]
 =====
@@ -183,7 +183,7 @@ events to your defined output.
 
 {beatname_uc} comes with pre-built {kib} dashboards and UIs for visualizing the
 status of your services. The dashboards are available in the
-https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.
+https://github.com/menderesk/uptime-contrib[uptime-contrib] GitHub repository.
 
 If you loaded the dashboards earlier, open them now.
 
