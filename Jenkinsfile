@@ -53,11 +53,11 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
-        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
         gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
             // with a `git fetch` as would happen if we used the `gitCheckout` step.
@@ -74,28 +74,26 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
-        withMageEnv(version: "${env.GO_VERSION}"){
-          dir("${BASE_DIR}"){
-            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-          }
+        dir("${BASE_DIR}"){
+          setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
         }
       }
     }
-    stage('Lint'){
+    stage('Checks'){
       options { skipDefaultCheckout() }
       environment {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: "Lint") {
-          stageStatusCache(id: 'Lint'){
-            withBeatsEnv(archive: false, id: "lint") {
+        withGithubNotify(context: "Checks") {
+          stageStatusCache(id: 'Checks'){
+            withBeatsEnv(archive: false, id: "checks") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'true') {
                 cmd(label: "make check", script: "make check")
               }
               whenTrue(env.ONLY_DOCS == 'false') {
-                runLinting()
+                runChecks()
               }
             }
           }
@@ -211,15 +209,17 @@ VERSION=${env.VERSION}-SNAPSHOT""")
   }
 }
 
-def runLinting() {
+def runChecks() {
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
-    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'lint').each { k,v ->
+    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'checks').each { k,v ->
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
+  mapParallelTasks['default'] = {
+    cmd(label: 'make check-default', script: 'make check-default')
+  }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
 }
@@ -342,10 +342,20 @@ def k8sTest(Map args = [:]) {
 */
 def withTools(Map args = [:], Closure body) {
   if (args.get('k8s', false)) {
-    withKindEnv(k8sVersion: "${K8S_VERSION}", kindVersion: "${KIND_VERSION}"){
+    withKindEnv(k8sVersion: "${K8S_VERSION}", kindVersion: "${KIND_VERSION}") {
+      body()
+    }
+  } else if (args.get('gcp', false)) {
+    withGCP() {
       body()
     }
   } else {
+    body()
+  }
+}
+
+def withGCP(Closure body) {
+  withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
     body()
   }
 }
@@ -383,7 +393,8 @@ def packagingLinux(Map args = [:]) {
                 //'linux/s390x',
                 'windows/amd64',
                 'windows/386',
-                (params.macos ? '' : 'darwin/amd64'),
+                'darwin/amd64',
+                'darwin/arm64'
               ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}"
@@ -397,32 +408,14 @@ def packagingLinux(Map args = [:]) {
 * @param beatsFolder beats folder
 */
 def publishPackages(beatsFolder){
-  def bucketUri = "gs://beats-ci-artifacts/snapshots"
-  if (isPR()) {
-    bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
-  }
-  def beatsFolderName = getBeatsName(beatsFolder)
-  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
-
-  // Copy those files to another location with the sha commit to test them
-  // afterward.
-  bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
-  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
-}
-
-/**
-* Upload the distribution files to google cloud.
-* TODO: There is a known issue with Google Storage plugin.
-* @param bucketUri the buckets URI.
-* @param beatsFolder the beats folder.
-*/
-def uploadPackages(bucketUri, beatsFolder){
-  // sometimes google storage reports ResumableUploadException: 503 Server Error
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    googleStorageUploadExt(bucket: bucketUri,
-      credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-      pattern: "${beatsFolder}/build/distributions/**/*",
-      sharedPublicly: true)
+  dir(beatsFolder) {
+    uploadPackagesToGoogleBucket(
+      credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
+      repo: env.REPO,
+      bucket: env.JOB_GCS_BUCKET,
+      folder: getBeatsName(beatsFolder),
+      pattern: "build/distributions/**/*"
+    )
   }
 }
 
@@ -435,91 +428,42 @@ def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
     if (beatsFolder.endsWith('auditbeat')) {
-      tagAndPush(beatName: 'auditbeat', arch: arch)
+      tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('filebeat')) {
-      tagAndPush(beatName: 'filebeat', arch: arch)
+      tagAndPush(beatName: 'filebeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('heartbeat')) {
-      tagAndPush(beatName: 'heartbeat', arch: arch)
+      tagAndPush(beatName: 'heartbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('metricbeat')) {
-      tagAndPush(beatName: 'metricbeat', arch: arch)
+      tagAndPush(beatName: 'metricbeat', arch: arch, variants: defaultVariants)
+    } else if (beatsFolder.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch, variants: defaultVariants)
     } else if ("${beatsFolder}" == "packetbeat"){
-      tagAndPush(beatName: 'packetbeat', arch: arch)
-    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch)
+      tagAndPush(beatName: 'packetbeat', arch: arch, variants: defaultVariants)
     }
   }
 }
 
 /**
-* Tag and push all the docker images for the given beat.
 * @param beatName name of the Beat
+* @param arch what architecture
+* @param variants list of docker variants
 */
 def tagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def arch = args.get('arch', 'amd64')
-  def libbetaVer = env.VERSION
-  if("${env?.SNAPSHOT.trim()}" == "true"){
-    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
-
-    libbetaVer += "-SNAPSHOT"
-    aliasVersion += "-SNAPSHOT"
+  def images = [ ]
+  args.variants.each { variant, sourceNamespace ->
+    images += [ source: "${sourceNamespace}/${args.beatName}${variant}",
+                target: "observability-ci/${args.beatName}",
+                arch: args.arch ]
   }
-
-  def tagName = "${libbetaVer}"
-  if (isPR()) {
-    tagName = "pr-${env.CHANGE_ID}"
-  }
-
-  // supported tags
-  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
-  if (!isPR() && aliasVersion != "") {
-    tags << aliasVersion
-  }
-  // supported image flavours
-  def variants = ["", "-oss", "-ubi8"]
-
-  if(beatName == 'elastic-agent'){
-    variants.add("-complete")
-    variants.add("-cloud")
-  }
-
-  variants.each { variant ->
-    // cloud docker images are stored in the private docker namespace.
-    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
-    tags.each { tag ->
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
-    }
-  }
-}
-
-/**
-* @param beatName name of the Beat
-* @param variant name of the variant used to build the docker image name
-* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
-* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
-*/
-def doTagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def variant = args.variant
-  def sourceTag = args.sourceTag
-  def targetTag = args.targetTag
-  def sourceNamespace = args.sourceNamespace
-  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
-  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-
-  def iterations = 0
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    iterations++
-    def status = sh(label: "Change tag and push ${targetName}",
-                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
-                    returnStatus: true)
-    if ( status > 0 && iterations < 3) {
-      error("tag and push failed for ${beatName}, retry")
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-    }
-  }
+  pushDockerImages(
+    registry: env.DOCKER_REGISTRY,
+    secret: env.DOCKER_ELASTIC_SECRET,
+    snapshot: env.SNAPSHOT,
+    version: env.VERSION,
+    images: images
+  )
 }
 
 /**
@@ -602,11 +546,12 @@ def target(Map args = [:]) {
   def installK8s = args.get('installK8s', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
+  def withGCP = args.get('withGCP', false)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
-        withTools(k8s: installK8s) {
+        withTools(k8s: installK8s, gcp: withGCP) {
           // make commands use -C <folder> while mage commands require the dir(folder)
           // let's support this scenario with the location variable.
           dir(isMage ? directory : '') {
@@ -708,7 +653,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
           if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
-          body()
+          withOtelEnv() {
+            body()
+          }
         } catch(err) {
           // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
           upload = true
@@ -1022,14 +969,13 @@ def dumpVariables(){
   GOIMPORTS: ${env.GOIMPORTS}
   GOIMPORTS_REPO: ${env.GOIMPORTS_REPO}
   GOIMPORTS_LOCAL_PREFIX: ${env.GOIMPORTS_LOCAL_PREFIX}
-  GOLINT: ${env.GOLINT}
-  GOLINT_REPO: ${env.GOLINT_REPO}
   GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}
   GOX_FLAGS: ${env.GOX_FLAGS}
   GOX_OS: ${env.GOX_OS}
   GOX_OSARCH: ${env.GOX_OSARCH}
   HOME: ${env.HOME}
-  NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}
+  PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}
+  PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}
   NOW: ${env.NOW}
   PATH: ${env.PATH}
   PKG_BUILD_DIR: ${env.PKG_BUILD_DIR}
@@ -1098,14 +1044,15 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       def withModule = args.content.get('withModule', false)
       def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
+      def withGCP = args.content.get('withGCP', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
       //   2) All the remaining stages will retry the command within the same worker/workspace if any failure
       //
-      // NOTE: stage: lint uses target function while cloud and k8sTest use a different function
+      // NOTE: stage: checks uses target function while cloud and k8sTest use a different function
       //
-      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('lint') ||
+      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('checks') ||
                          args?.content?.containsKey('packaging-arm') ||
                          args?.content?.containsKey('packaging-linux')) ? false : true
       if(args?.content?.containsKey('make')) {
@@ -1127,6 +1074,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      installK8s: installK8s,
                      withModule: withModule,
                      isMage: true,
+                     withGCP: withGCP,
                      id: args.id,
                      enableRetry: enableRetry)
       }

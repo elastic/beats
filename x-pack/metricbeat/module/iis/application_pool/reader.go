@@ -145,7 +145,7 @@ func (r *Reader) read() ([]mb.Event, error) {
 	// Get the values.
 	values, err := r.query.GetFormattedCounterValues()
 	if err != nil {
-		r.query.Close()
+		r.close()
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event

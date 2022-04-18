@@ -146,7 +146,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 	// values to keys in the event
 	header, err := r.Read()
 	if err != nil {
-		if err == io.EOF {
+		if err == io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
 			return nil
 		}
 		return err
@@ -167,7 +167,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 	}
 
 	if err != nil {
-		if err != io.EOF {
+		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
 			return err
 		}
 	}

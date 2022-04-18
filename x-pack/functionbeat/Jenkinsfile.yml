@@ -13,12 +13,12 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
+    checks:
         make: |
           make -C x-pack/functionbeat check;
           make -C x-pack/functionbeat update;
           make check-no-changes;
-        stage: lint
+        stage: checks
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -30,6 +30,7 @@ stages:
                 - "arm"
             parameters:
                 - "armTest"
+        stage: extended
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory

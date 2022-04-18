@@ -8,8 +8,13 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -17,25 +22,31 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	//mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 // NpcapVersion specifies the version of the OEM Npcap installer to bundle with
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
-// image to use.
-const NpcapVersion = "1.60"
+// image to use and the installer to obtain from the cloud store for testing.
+const (
+	NpcapVersion = "1.60"
+	installer    = "npcap-" + NpcapVersion + "-oem.exe"
+)
 
 func init() {
 	common.RegisterCheckDeps(Update)
+
+	test.RegisterDeps(SystemTest)
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
@@ -65,7 +76,6 @@ func Build() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
-		const installer = "npcap-" + NpcapVersion + "-oem.exe"
 		err := sh.Copy("./npcap/installer/"+installer, "/installer/"+installer)
 		if err != nil {
 			return fmt.Errorf("failed to copy Npcap installer into source tree: %w", err)
@@ -113,6 +123,13 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -138,4 +155,43 @@ func Package() {
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
+}
+
+func SystemTest(ctx context.Context) error {
+	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"./tests/system/..."}
+	return devtools.GoTest(ctx, args)
+}
+
+// getNpcapInstaller gets the installer from the Google Cloud Storage service.
+//
+// On Windows platforms, if getNpcapInstaller is invoked with the environment variables
+// CI or NPCAP_LOCAL set to "true" and the OEM Npcap installer is not available it is
+// obtained from the cloud storage. This behaviour requires access to the private store.
+// If NPCAP_LOCAL is set to "true" and the file is in the npcap/installer directory, no
+// fetch will be made.
+func getNpcapInstaller() error {
+	// TODO: Consider whether to expose this as a target.
+	if runtime.GOOS != "windows" {
+		return nil
+	}
+	if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
+		return errors.New("only available if running in the CI or with NPCAP_LOCAL=true")
+	}
+	dstPath := filepath.Join("./npcap/installer", installer)
+	if os.Getenv("NPCAP_LOCAL") == "true" {
+		fi, err := os.Stat(dstPath)
+		if err == nil && !fi.IsDir() {
+			fmt.Println("using local Npcap installer with NPCAP_LOCAL=true")
+			return nil
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+	}
+
+	fmt.Printf("getting %s from private cache\n", installer)
+	return sh.RunV("gsutil", "cp", "gs://obs-ci-cache/private/"+installer, dstPath)
 }
