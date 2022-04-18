@@ -7,31 +7,6 @@
 === Beats version 8.1.3
 https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -40,9 +15,6 @@ https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 - Add ecs container fields {pull}31020[31020]
 - Fix docs reference for syslog processor {pull}31087[31087]
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -58,8 +30,6 @@ https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 - Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
 - checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
 
-*Heartbeat*
-
 *Metricbeat*
 
 - Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
@@ -71,13 +41,6 @@ https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 *Winlogbeat*
 
 - Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -91,66 +54,9 @@ https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 - Add cronjob metadata by default {pull}30637[30637]
 - New option `setup.template.json.data_stream` is added to indicate if the JSON index template is a data stream. {pull}31048[31048]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
 *Winlogbeat*
 
 - Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.1.2]]
