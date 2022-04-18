@@ -7,36 +7,11 @@
 === Beats version 7.17.3
 https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
 
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -48,77 +23,6 @@ https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
 - Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
 - Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
 - checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
-==== Added
-
-*Affecting all Beats*
-
-*Auditbeat*
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
 
 
 [[release-notes-7.17.2]]
