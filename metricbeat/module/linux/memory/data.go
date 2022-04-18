@@ -74,6 +74,9 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 	}
 	swap := common.MapStr{}
 	err = typeconv.Convert(&swap, &eventRaw.Swap)
+	if err != nil {
+		return errors.Wrap(err, "error converting raw event")
+	}
 
 	baseMap["swap"] = swap
 

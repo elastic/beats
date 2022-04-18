@@ -181,6 +181,8 @@ Kubernetes cluster overview example:
 
 image::./images/metricbeat-kubernetes-clusteroverview.png[]
 
+If you are setting collection period to a value bigger than `2m` you will need to increase
+the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 
@@ -288,6 +290,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
