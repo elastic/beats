@@ -210,7 +210,7 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
-		outputTar, err := b.Expand(defaultBinaryName+".docker-image"+defaultArchName+".tar.gz", map[string]interface{}{
+		outputTar, err := b.Expand(defaultDockerBinaryName+".tar.gz", map[string]interface{}{
 			"Name": b.imageName,
 		})
 		if err != nil {
