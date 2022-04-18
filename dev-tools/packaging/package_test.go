@@ -236,6 +236,7 @@ func checkDocker(t *testing.T, file string) {
 		return
 	}
 
+	checkDockerAmd64(t, file)
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
@@ -463,6 +464,14 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 			}
 		} else {
 			t.Fatal("TODO: check if binary is in $PATH")
+		}
+	})
+}
+
+func checkDockerAmd64(t *testing.T, file string) {
+	t.Run(fmt.Sprintf("%s docker file name", file), func(t *testing.T) {
+		if strings.Contains(file, "amd64") {
+			t.Errorf("unexpected amd64 suffix in the file name %s", file)
 		}
 	})
 }
