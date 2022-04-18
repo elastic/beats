@@ -19,10 +19,12 @@ package event
 
 import (
 	"fmt"
+	k8sclient "k8s.io/client-go/kubernetes"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -44,6 +46,7 @@ type MetricSet struct {
 	watchOptions kubernetes.WatchOptions
 	dedotConfig  dedotConfig
 	skipOlder    bool
+	clusterMeta  common.MapStr
 }
 
 // dedotConfig defines LabelsDedot and AnnotationsDedot.
@@ -85,13 +88,38 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		AnnotationsDedot: config.AnnotationsDedot,
 	}
 
-	return &MetricSet{
+
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		dedotConfig:   dedotConfig,
 		watcher:       watcher,
 		watchOptions:  watchOptions,
 		skipOlder:     config.SkipOlder,
-	}, nil
+	}
+
+	// add ECS orchestrator fields
+	cfg, _ := common.NewConfigFrom(&config)
+	ecsClusterMeta, err := getClusterECSMeta(cfg, client)
+	if ecsClusterMeta != nil {
+		ms.clusterMeta = ecsClusterMeta
+	}
+
+	return ms, nil
+}
+
+func getClusterECSMeta(cfg *common.Config, client k8sclient.Interface) (common.MapStr, error) {
+	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
+	if err != nil {
+		return nil, fmt.Errorf("fail to init kubernetes watcher: %w", err)
+	}
+	ecsClusterMeta := common.MapStr{}
+	if clusterInfo.Url != "" {
+		ecsClusterMeta.Put("orchestrator.cluster.url", clusterInfo.Url)
+	}
+	if clusterInfo.Name != "" {
+		ecsClusterMeta.Put("orchestrator.cluster.name", clusterInfo.Name)
+	}
+	return ecsClusterMeta, nil
 }
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
@@ -100,11 +128,19 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
-			reporter.Event(mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil))
+			event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
+			if m.clusterMeta != nil {
+				event.RootFields.DeepUpdate(m.clusterMeta)
+			}
+			reporter.Event(event)
 		},
 		UpdateFunc: func(obj interface{}) {
 			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
-			reporter.Event(mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil))
+			event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
+			if m.clusterMeta != nil {
+				event.RootFields.DeepUpdate(m.clusterMeta)
+			}
+			reporter.Event(event)
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
