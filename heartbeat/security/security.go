@@ -71,33 +71,33 @@ func changeUser(localUserName string) error {
 	if err != nil {
 		return fmt.Errorf("could not lookup '%s': %w", localUser, err)
 	}
-	localUserUid, err := strconv.Atoi(localUser.Uid)
+	localUserUID, err := strconv.Atoi(localUser.Uid)
 	if err != nil {
 		return fmt.Errorf("could not parse UID '%s' as int: %w", localUser.Uid, err)
 	}
-	localUserGid, err := strconv.Atoi(localUser.Gid)
+	localUserGID, err := strconv.Atoi(localUser.Gid)
 	if err != nil {
 		return fmt.Errorf("could not parse GID '%s' as int: %w", localUser.Uid, err)
 	}
 	// We include the root group because the docker image contains many directories (data,logs)
 	// that are owned by root:root with 0775 perms. The heartbeat user is in both groups
 	// in the container, but we need to repeat that here.
-	err = syscall.Setgroups([]int{localUserGid, 0})
+	err = syscall.Setgroups([]int{localUserGID, 0})
 	if err != nil {
 		return fmt.Errorf("could not set groups: %w", err)
 	}
 
 	// Set the main group as localUserUid so new files created are owned by the user's group
-	err = syscall.Setgid(localUserGid)
+	err = syscall.Setgid(localUserGID)
 	if err != nil {
-		return fmt.Errorf("could not set gid to %d: %w", localUserGid, err)
+		return fmt.Errorf("could not set gid to %d: %w", localUserGID, err)
 	}
 
 	// Note this is not the regular SetUID! Look at the 'cap' package docs for it, it preserves
 	// capabilities post-SetUID, which we use to lock things down immediately
-	err = cap.SetUID(localUserUid)
+	err = cap.SetUID(localUserUID)
 	if err != nil {
-		return fmt.Errorf("could not setuid to %d: %w", localUserUid, err)
+		return fmt.Errorf("could not setuid to %d: %w", localUserUID, err)
 	}
 
 	// This may not be necessary, but is good hygiene, we do some shelling out to node/npm etc.
