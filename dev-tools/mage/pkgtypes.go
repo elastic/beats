@@ -51,7 +51,7 @@ const (
 	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 
 	// defaultDockerBinaryName specifies the output file for the docker tar.gz.
-	defaultDockerBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}.docker-image{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultDockerBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}.docker-image-linux{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).

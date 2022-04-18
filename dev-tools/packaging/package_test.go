@@ -86,10 +86,10 @@ func TestDeb(t *testing.T) {
 }
 
 func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker-image.tar.gz
+	// Regexp matches *-arch.tar.gz, but not *docker-image-linux.tar.gz
 	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
 	for _, tar := range tars {
-		if !strings.Contains(tar, "docker-image") {
+		if !strings.Contains(tar, "docker-image-linux") {
 			checkTar(t, tar)
 		}
 	}
@@ -103,7 +103,7 @@ func TestZip(t *testing.T) {
 }
 
 func TestDocker(t *testing.T) {
-	dockers := getFiles(t, regexp.MustCompile(`\.docker-image(-\w+)?\.tar\.gz$`))
+	dockers := getFiles(t, regexp.MustCompile(`\.docker-image-linux-\w+\.tar\.gz$`))
 	for _, docker := range dockers {
 		checkDocker(t, docker)
 	}
