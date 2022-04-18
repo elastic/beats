@@ -41,10 +41,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 - Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 - Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
-- Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
-- Add ecs container fields {pull}31020[31020]
-- Fix docs reference for syslog processor {pull}31087[31087]
-- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 
 *Auditbeat*
 
@@ -83,9 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
 - Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
-
 
 *Functionbeat*
 
@@ -183,4 +177,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
+
+
+
 
