@@ -244,3 +244,5 @@ This is a list of Snyk Vulnerability fields that are mapped to ECS.
 For a description of each field in the module, see the
 <<exported-fields-snyk,exported fields>> section.
 
+
+:edit_url!:

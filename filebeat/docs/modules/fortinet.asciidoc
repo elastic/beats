@@ -322,3 +322,5 @@ This is a list of FortiOS fields that are mapped to ECS.
 For a description of each field in the module, see the
 <<exported-fields-fortinet,exported fields>> section.
 
+
+:edit_url!:

@@ -187,3 +187,5 @@ image::./images/filebeat-cyberarkpas-overview.png[]
 For a description of each field in the module, see the
 <<exported-fields-cyberarkpas,exported fields>> section.
 
+
+:edit_url!:

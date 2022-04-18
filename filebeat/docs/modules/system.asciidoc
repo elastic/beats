@@ -93,3 +93,5 @@ image::./images/kibana-system.png[]
 For a description of each field in the module, see the
 <<exported-fields-system,exported fields>> section.
 
+
+:edit_url!:

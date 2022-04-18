@@ -334,3 +334,5 @@ include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-aws,exported fields>> section.
 
+
+:edit_url!:

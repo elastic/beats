@@ -64,3 +64,5 @@ image::./images/kibana-coredns.jpg[]
 For a description of each field in the module, see the
 <<exported-fields-coredns,exported fields>> section.
 
+
+:edit_url!:

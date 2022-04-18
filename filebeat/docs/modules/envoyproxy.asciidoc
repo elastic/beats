@@ -37,3 +37,5 @@ image::./images/kibana-envoyproxy.jpg[]
 For a description of each field in the module, see the
 <<exported-fields-envoyproxy,exported fields>> section.
 
+
+:edit_url!:

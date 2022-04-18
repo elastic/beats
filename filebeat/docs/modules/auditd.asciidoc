@@ -88,3 +88,5 @@ image::./images/kibana-audit-auditd.png[]
 For a description of each field in the module, see the
 <<exported-fields-auditd,exported fields>> section.
 
+
+:edit_url!:

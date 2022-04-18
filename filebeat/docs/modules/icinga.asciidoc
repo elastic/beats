@@ -96,3 +96,5 @@ image::./images/kibana-icinga-main.png[]
 For a description of each field in the module, see the
 <<exported-fields-icinga,exported fields>> section.
 
+
+:edit_url!:

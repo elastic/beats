@@ -78,3 +78,5 @@ image::./images/filebeat-mongodb-overview.png[]
 For a description of each field in the module, see the
 <<exported-fields-mongodb,exported fields>> section.
 
+
+:edit_url!:

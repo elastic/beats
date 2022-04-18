@@ -86,3 +86,5 @@ image::./images/filebeat-activemq-audit-events.png[]
 For a description of each field in the module, see the
 <<exported-fields-activemq,exported fields>> section.
 
+
+:edit_url!:

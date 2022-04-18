@@ -115,3 +115,5 @@ image::./images/kibana-redis.png[]
 For a description of each field in the module, see the
 <<exported-fields-redis,exported fields>> section.
 
+
+:edit_url!:

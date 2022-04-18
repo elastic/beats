@@ -51,3 +51,5 @@ include::../include/var-paths.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-kibana,exported fields>> section.
 
+
+:edit_url!:

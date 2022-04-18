@@ -136,3 +136,5 @@ include::../include/timezone-support.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-elasticsearch,exported fields>> section.
 
+
+:edit_url!:

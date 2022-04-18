@@ -65,6 +65,8 @@ For a description of each field in the module, see the
 
 """
 
+        module_file += "\n:edit_url!:"
+
         # Write module docs
         docs_path = os.path.join(os.path.abspath("docs"), "modules", module + ".asciidoc")
         with open(docs_path, 'w', encoding='utf_8') as f:
@@ -79,7 +81,6 @@ For a description of each field in the module, see the
     module_list_output += "include::modules-overview.asciidoc[]\n"
     for m, title in sorted(six.iteritems(modules_list)):
         module_list_output += "include::modules/" + m + ".asciidoc[]\n"
-    module_list_output += ":edit_url!:"
     # Write module link list
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w', encoding='utf_8') as f:
         f.write(module_list_output)
