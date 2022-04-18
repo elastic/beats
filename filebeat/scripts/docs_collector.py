@@ -29,7 +29,7 @@ This file is generated! See scripts/docs_collector.py
     for module in sorted(modules):
         module_dir = os.path.abspath(module)
         start = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        module_rel_path = os.path.relpath(module,start)
+        module_rel_path = os.path.relpath(module, start)
         module = os.path.basename(module)
         module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
 
