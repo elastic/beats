@@ -28,6 +28,8 @@ This file is generated! See scripts/docs_collector.py
     # Iterate over all modules
     for module in sorted(modules):
         module_dir = os.path.abspath(module)
+        start = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        module_rel_path = os.path.relpath(module,start)
         module = os.path.basename(module)
         module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
 
@@ -36,6 +38,9 @@ This file is generated! See scripts/docs_collector.py
             continue
 
         module_file = generated_note
+
+        module_file += ":edit_url: https://github.com/elastic/beats/edit/main/" + module_rel_path + "/_meta/docs.asciidoc\n\n"
+
         module_file += "[[filebeat-module-" + module + "]]\n"
 
         with open(module_doc, encoding='utf_8') as f:
@@ -74,7 +79,7 @@ For a description of each field in the module, see the
     module_list_output += "include::modules-overview.asciidoc[]\n"
     for m, title in sorted(six.iteritems(modules_list)):
         module_list_output += "include::modules/" + m + ".asciidoc[]\n"
-
+    module_list_output += ":edit_url:"
     # Write module link list
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w', encoding='utf_8') as f:
         f.write(module_list_output)

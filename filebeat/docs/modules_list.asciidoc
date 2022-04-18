@@ -144,3 +144,4 @@ include::modules/zeek.asciidoc[]
 include::modules/zookeeper.asciidoc[]
 include::modules/zoom.asciidoc[]
 include::modules/zscaler.asciidoc[]
+:edit_url:

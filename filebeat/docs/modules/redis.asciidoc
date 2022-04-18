@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/redis/_meta/docs.asciidoc
+
 [[filebeat-module-redis]]
 :modulename: redis
 :has-dashboards: true
