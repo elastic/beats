@@ -50,8 +50,8 @@ const (
 	// defaultBinaryName specifies the output file for zip and tar.gz.
 	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 
-	// defaultDockerBinaryName specifies the output file for the docker tar.gz. amd64 arch is not needed as per unified release requirements
-	defaultDockerBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}.docker-image{{if ne .Arch \"amd64\"}}-{{.Arch}}{{end}}"
+	// defaultDockerBinaryName specifies the output file for the docker tar.gz.
+	defaultDockerBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}.docker-image{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
