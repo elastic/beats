@@ -222,7 +222,10 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			continue
 		}
 
-		res.lock.Lock()
+		if !res.lock.TryLock() {
+			s.store.log.Infof("cannot lock '%s', will not update registry for it", key)
+			continue
+		}
 
 		newKey, updatedMeta := getNewID(res)
 		if len(newKey) > 0 && res.internalState.TTL > 0 {
@@ -508,7 +511,8 @@ func (r *resource) copyInto(dst *resource) {
 	dst.pendingCursorValue = nil
 	dst.pendingUpdate = nil
 	dst.cursorMeta = r.cursorMeta
-	dst.lock = unison.MakeMutex()
+	// dst.lock should not be overwritten here because it's supposed to be locked
+	// before this function call and it's important to preserve the previous value.
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {

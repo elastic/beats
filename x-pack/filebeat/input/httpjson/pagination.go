@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -123,23 +124,24 @@ func (iter *pageIterator) next() (*response, bool, error) {
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
-	if err != nil {
-		if err == errNewURLValueNotSet ||
-			err == errEmptyTemplateResult ||
-			err == errExecutingTemplate {
-			// if this error happens here it means a transform
-			// did not find any new value and we can stop paginating without error
-			iter.done = true
-			return nil, false, nil
-		}
+	switch {
+	case err == nil:
+		// OK
+	case errors.Is(err, errNewURLValueNotSet),
+		errors.Is(err, errEmptyTemplateResult),
+		errors.Is(err, errExecutingTemplate):
+		// If this error happens here it means a transform
+		// did not find any new value and we can stop paginating without error.
+		iter.done = true
+		return nil, false, nil
+	default:
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq) //nolint:bodyclose // Bad linter! The body is closed in the call.
 	if err != nil {
 		return nil, false, err
 	}
-
 	iter.resp = resp
 
 	r, err := iter.getPage()

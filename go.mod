@@ -148,9 +148,6 @@ require (
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
-	go.elastic.co/apm v1.11.0
-	go.elastic.co/apm/module/apmelasticsearch v1.7.2
-	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.elastic.co/ecszap v1.0.0
 	go.elastic.co/go-licence-detector v0.4.0
 	go.etcd.io/bbolt v1.3.6
@@ -166,7 +163,7 @@ require (
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
-	golang.org/x/tools v0.1.7
+	golang.org/x/tools v0.1.9
 	google.golang.org/api v0.62.0
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
 	google.golang.org/grpc v1.43.0
@@ -181,7 +178,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
 	gotest.tools/gotestsum v0.6.0
-	howett.net/plist v0.0.0-20181124034731-591f970eefbb
+	howett.net/plist v1.0.0
 	k8s.io/api v0.23.0
 	k8s.io/apimachinery v0.23.0
 	k8s.io/client-go v0.23.0
@@ -192,6 +189,9 @@ require (
 	github.com/elastic/bayeux v1.0.4
 	github.com/elastic/elastic-agent-libs v0.1.1
 	github.com/shirou/gopsutil/v3 v3.21.12
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
+	go.elastic.co/apm/v2 v2.0.0
 )
 
 require (
@@ -246,6 +246,7 @@ require (
 	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jcchavezs/porto v0.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.0.0 // indirect

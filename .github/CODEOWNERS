@@ -1,55 +1,129 @@
 # GitHub CODEOWNERS definition
 # See: https://help.github.com/articles/about-codeowners/
 
-# * @elastic/beats
+# The beats repository is owned by the @elastic/elastic-agent-data-plane team. Many teams contribute to this repository.
+# The goal is to cover all directories in the CODEOWNERS file which are owned by the different teams.
+# The list is sorted alphabetically by directory and sub directories.
 
-# libbeat
-/libbeat/ @elastic/elastic-agent-data-plane
-# /auditbeat/ @elastic/beats
-# /packetbeat/ @elastic/beats
-# /filebeat/ @elastic/beats
-# /metricbeat/ @elastic/beats
-# /journalbeat/ @elastic/beats
-# /winlogbeat/ @elastic/beats
+* @elastic/elastic-agent-data-plane
 
-# Auditbeat
-/auditbeat/module/ @elastic/security-external-integrations
-/x-pack/auditbeat/ @elastic/security-external-integrations
-
-# Packetbeat
-/packetbeat/protos/ @elastic/security-external-integrations
-/x-pack/packetbeat/ @elastic/security-external-integrations
-
-# Filebeat
-# /filebeat/module/ @elastic/integrations
+/.ci/ @elastic/elastic-agent-data-plane
+/.github/ @elastic/elastic-agent-data-plane
+/auditbeat/ @elastic/security-external-integrations
+/deploy/ @elastic/elastic-agent-data-plane
+/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
+/dev-tools/ @elastic/elastic-agent-data-plane
+/docs/ @elastic/elastic-agent-data-plane
+/filebeat @elastic/elastic-agent-data-plane
+/filebeat/input/syslog/ @elastic/security-external-integrations
+/filebeat/input/winlog/ @elastic/security-external-integrations
+/filebeat/module/ @elastic/integrations
+/filebeat/module/apache @elastic/integrations
+/filebeat/module/auditd @elastic/security-external-integrations
 /filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
+/filebeat/module/haproxy @elastic/integrations
+/filebeat/module/icinga @elastic/integrations
+/filebeat/module/iis @elastic/integrations
+/filebeat/module/kafka @elastic/integrations
+/filebeat/module/kibana @elastic/integrations
 /filebeat/module/kibana/ @elastic/infra-monitoring-ui
+/filebeat/module/logstash @elastic/integrations
 /filebeat/module/logstash/ @elastic/infra-monitoring-ui
-# /x-pack/filebeat/module/ @elastic/integrations
-# /x-pack/filebeat/module/suricata/ @elastic/security-external-integrations
-
-# Metricbeat
-# /metricbeat/module/ @elastic/integrations
+/filebeat/module/mongodb @elastic/integrations
+/filebeat/module/mysql @elastic/security-external-integrations
+/filebeat/module/nats @elastic/integrations
+/filebeat/module/nginx @elastic/integrations
+/filebeat/module/osquery @elastic/security-asset-management
+/filebeat/module/pensando @elastic/security-external-integrations
+/filebeat/module/postgresql @elastic/integrations
+/filebeat/module/redis @elastic/integrations
+/filebeat/module/santa @elastic/security-external-integrations
+/filebeat/module/system @elastic/elastic-agent-data-plane
+/filebeat/module/traefik @elastic/integrations
+/heartbeat/ @elastic/uptime
+/journalbeat @elastic/elastic-agent-data-plane
+/libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/community_id/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml_wineventlog/ @elastic/security-external-integrations
+/libbeat/processors/dns/ @elastic/security-external-integrations
+/libbeat/processors/registered_domain/ @elastic/security-external-integrations
+/libbeat/processors/translate_sid/ @elastic/security-external-integrations
+/licenses/ @elastic/elastic-agent-data-plane
+/metricbeat/ @elastic/elastic-agent-data-plane
+/metricbeat/module/ @elastic/integrations
+/metricbeat/module/beat/ @elastic/infra-monitoring-ui
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /metricbeat/module/kibana/ @elastic/infra-monitoring-ui
 /metricbeat/module/logstash/ @elastic/infra-monitoring-ui
-/metricbeat/module/beat/ @elastic/infra-monitoring-ui
-# /x-pack/metricbeat/module/ @elastic/integrations
-
-# Heartbeat
-/heartbeat/ @elastic/uptime
-
-# Winlogbeat
-/x-pack/winlogbeat/ @elastic/security-external-integrations
-
-# Elastic Agent
+/metricbeat/module/system/ @elastic/elastic-agent-data-plane
+/packetbeat/ @elastic/security-external-integrations
+/script/ @elastic/elastic-agent-data-plane
+/testing/ @elastic/elastic-agent-data-plane
+/tools/ @elastic/elastic-agent-data-plane
+/winlogbeat/ @elastic/security-external-integrations
+/x-pack/auditbeat/ @elastic/security-external-integrations
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
-
-# Beats Build Specific
-/dev-tools/mage/ @elastic/beats
-/dev-tools/make/ @elastic/beats
-/dev-tools/packaging/ @elastic/beats
-
-# CI Specific
-/.ci/ @elastic/observablt-robots
-/Jenkinsfile @elastic/observablt-robots
+/x-pack/filebeat @elastic/elastic-agent-data-plane
+/x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
+/x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
+/x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
+/x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
+/x-pack/filebeat/module/ @elastic/integrations
+/x-pack/filebeat/module/activemq @elastic/integrations
+/x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/azure @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/barracuda @elastic/security-external-integrations
+/x-pack/filebeat/module/bluecoat @elastic/security-external-integrations
+/x-pack/filebeat/module/cef @elastic/security-external-integrations
+/x-pack/filebeat/module/checkpoint @elastic/security-external-integrations
+/x-pack/filebeat/module/cisco @elastic/security-external-integrations
+/x-pack/filebeat/module/coredns @elastic/security-external-integrations
+/x-pack/filebeat/module/crowdstrike @elastic/security-external-integrations
+/x-pack/filebeat/module/cyberarkpas @elastic/security-external-integrations
+/x-pack/filebeat/module/cylance @elastic/security-external-integrations
+/x-pack/filebeat/module/envoyproxy @elastic/security-external-integrations
+/x-pack/filebeat/module/f5 @elastic/security-external-integrations
+/x-pack/filebeat/module/fortinet @elastic/security-external-integrations
+/x-pack/filebeat/module/gcp @elastic/security-external-integrations
+/x-pack/filebeat/module/google_workspace @elastic/security-external-integrations
+/x-pack/filebeat/module/ibmmq @elastic/integrations
+/x-pack/filebeat/module/imperva @elastic/security-external-integrations
+/x-pack/filebeat/module/infoblox @elastic/security-external-integrations
+/x-pack/filebeat/module/iptables @elastic/security-external-integrations
+/x-pack/filebeat/module/juniper @elastic/security-external-integrations
+/x-pack/filebeat/module/microsoft @elastic/security-external-integrations
+/x-pack/filebeat/module/misp @elastic/security-external-integrations
+/x-pack/filebeat/module/mssql @elastic/integrations
+/x-pack/filebeat/module/mysqlenterprise @elastic/security-external-integrations
+/x-pack/filebeat/module/netflow @elastic/security-external-integrations
+/x-pack/filebeat/module/netscout @elastic/security-external-integrations
+/x-pack/filebeat/module/o365 @elastic/security-external-integrations
+/x-pack/filebeat/module/okta @elastic/security-external-integrations
+/x-pack/filebeat/module/oracle @elastic/security-external-integrations
+/x-pack/filebeat/module/panw @elastic/security-external-integrations
+/x-pack/filebeat/module/proofpoint @elastic/security-external-integrations
+/x-pack/filebeat/module/rabbitmq @elastic/integrations
+/x-pack/filebeat/module/radware @elastic/security-external-integrations
+/x-pack/filebeat/module/snort @elastic/security-external-integrations
+/x-pack/filebeat/module/snyk @elastic/security-external-integrations
+/x-pack/filebeat/module/sonicwall @elastic/security-external-integrations
+/x-pack/filebeat/module/sophos @elastic/security-external-integrations
+/x-pack/filebeat/module/squid @elastic/security-external-integrations
+/x-pack/filebeat/module/suricata @elastic/security-external-integrations
+/x-pack/filebeat/module/threatintel @elastic/security-external-integrations
+/x-pack/filebeat/module/tomcat @elastic/security-external-integrations
+/x-pack/filebeat/module/zeek @elastic/security-external-integrations
+/x-pack/filebeat/module/zookeeper @elastic/integrations
+/x-pack/filebeat/module/zoom @elastic/security-external-integrations
+/x-pack/filebeat/module/zscaler @elastic/security-external-integrations
+/x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
+/x-pack/heartbeat/ @elastic/uptime
+/x-pack/metricbeat/ @elastic/elastic-agent-data-plane
+/x-pack/metricbeat/module/ @elastic/integrations
+/x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
+/x-pack/packetbeat/ @elastic/security-external-integrations
+/x-pack/winlogbeat/ @elastic/security-external-integrations

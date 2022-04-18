@@ -204,18 +204,17 @@ func TestFileLoader_Load(t *testing.T) {
       type: text
       analyzer: simple
 `),
-			wantErr: errors.New(`error creating template: inconsistent definitions for analyzers with the name "test_powershell"`),
+			wantErr: fmt.Errorf(`error creating template: %w`, errors.New(`inconsistent definitions for analyzers with the name "test_powershell"`)),
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			fc, err := newFileClient(ver)
-			require.NoError(t, err)
+			fc := newFileClient(ver)
 			fl := NewFileLoader(fc)
 
 			cfg := DefaultConfig(info)
 			cfg.Settings = test.settings
 
-			err = fl.Load(cfg, info, test.fields, false)
+			err := fl.Load(cfg, info, test.fields, false)
 			require.Equal(t, test.wantErr, err)
 			if err != nil {
 				return
@@ -235,8 +234,8 @@ type fileClient struct {
 	component, name, body, ver string
 }
 
-func newFileClient(ver string) (*fileClient, error) {
-	return &fileClient{ver: ver}, nil
+func newFileClient(ver string) *fileClient {
+	return &fileClient{ver: ver}
 }
 
 func (c *fileClient) GetVersion() common.Version {

@@ -15,7 +15,42 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package memqueue provides an in-memory queue.Queue implementation for
-// use with the publisher pipeline.
-// The queue implementation is registered as queue type "mem".
-package memqueue
+package util
+
+import (
+	"reflect"
+	"sort"
+	"testing"
+)
+
+func TestUnique(t *testing.T) {
+	var tests = [][]string{
+		{},
+		{"a"},
+		{"a", "a"},
+		{"a", "b"},
+		{"b", "a"},
+		{"a", "b", "c"},
+		{"c", "b", "a"},
+		{"c", "a", "a", "b", "c", "a"},
+	}
+
+	for i, test := range tests {
+		// Allocating naive implementation of unique.
+		seen := make(map[string]bool)
+		for _, e := range test {
+			seen[e] = true
+		}
+		want := make([]string, 0, len(seen))
+		for e := range seen {
+			want = append(want, e)
+		}
+		sort.Strings(want)
+
+		got := unique(test)
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("unexpected result for test %d: got:%q want:%q", i, got, want)
+		}
+	}
+}

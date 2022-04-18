@@ -14,6 +14,8 @@
 
 The directory layout of an installation is as follows:
 
+TIP: Archive installation has a different layout. See <<directory-layout-archive>>.
+
 [cols="<h,<,<m,<m",options="header",]
 |=======================================================================
 | Type   | Description | Default Location | Config Option
@@ -70,6 +72,7 @@ endif::docker_platform[]
 
 ifdef::mac_os,win_os[]
 [float]
+[[directory-layout-archive]]
 ===== zip, tar.gz, or tgz
 [cols="<h,<,<m",options="header",]
 |=======================================================================
