@@ -65,7 +65,7 @@ For a description of each field in the module, see the
 
 """
 
-        module_file += "\n:edit_url!:"
+        module_file += "edit_url!:"
 
         # Write module docs
         docs_path = os.path.join(os.path.abspath("docs"), "modules", module + ".asciidoc")

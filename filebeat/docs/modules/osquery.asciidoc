@@ -93,5 +93,4 @@ image::./images/kibana-osquery-compatibility.png[]
 For a description of each field in the module, see the
 <<exported-fields-osquery,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

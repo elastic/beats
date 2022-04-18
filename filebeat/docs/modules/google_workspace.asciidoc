@@ -144,5 +144,4 @@ These are the common ones to all filesets.
 For a description of each field in the module, see the
 <<exported-fields-google_workspace,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

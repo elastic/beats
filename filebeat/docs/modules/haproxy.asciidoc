@@ -75,5 +75,4 @@ image::./images/kibana-haproxy-overview.png[]
 For a description of each field in the module, see the
 <<exported-fields-haproxy,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

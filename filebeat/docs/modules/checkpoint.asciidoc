@@ -195,5 +195,4 @@ Check Point Syslog extensions are mapped as follows to ECS:
 For a description of each field in the module, see the
 <<exported-fields-checkpoint,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

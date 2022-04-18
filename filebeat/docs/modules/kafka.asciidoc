@@ -98,5 +98,4 @@ image::./images/filebeat-kafka-logs-overview.png[]
 For a description of each field in the module, see the
 <<exported-fields-kafka,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

@@ -82,5 +82,4 @@ MySQL Enterprise Audit fields are mapped to ECS in the following way:
 For a description of each field in the module, see the
 <<exported-fields-mysqlenterprise,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

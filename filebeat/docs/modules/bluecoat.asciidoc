@@ -81,5 +81,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-bluecoat,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

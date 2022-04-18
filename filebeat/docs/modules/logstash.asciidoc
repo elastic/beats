@@ -105,5 +105,4 @@ the JSON object starts on a new line, the fileset may not parse the multiline pl
 For a description of each field in the module, see the
 <<exported-fields-logstash,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

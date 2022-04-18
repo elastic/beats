@@ -76,5 +76,4 @@ Oracle Database fields are mapped to the current ECS Fields:
 For a description of each field in the module, see the
 <<exported-fields-oracle,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

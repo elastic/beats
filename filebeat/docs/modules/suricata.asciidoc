@@ -89,5 +89,4 @@ image::./images/filebeat-suricata-alerts.png[]
 For a description of each field in the module, see the
 <<exported-fields-suricata,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

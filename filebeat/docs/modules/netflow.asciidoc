@@ -102,5 +102,4 @@ events. Defaults to `[forwarded]`.
 For a description of each field in the module, see the
 <<exported-fields-netflow,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

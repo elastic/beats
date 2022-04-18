@@ -679,5 +679,4 @@ Overview of the information provided by the ThreatQuotient feed.
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

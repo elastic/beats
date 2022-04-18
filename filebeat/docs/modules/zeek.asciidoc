@@ -800,5 +800,4 @@ image::./images/kibana-zeek.png[]
 For a description of each field in the module, see the
 <<exported-fields-zeek,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

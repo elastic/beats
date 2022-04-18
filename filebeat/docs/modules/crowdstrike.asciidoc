@@ -77,5 +77,4 @@ And for all over event CrowdStrike Falcon event types, go to Host -> Events.
 For a description of each field in the module, see the
 <<exported-fields-crowdstrike,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:

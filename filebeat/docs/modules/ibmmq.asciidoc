@@ -63,5 +63,4 @@ image::./images/filebeat-ibmmq.png[]
 For a description of each field in the module, see the
 <<exported-fields-ibmmq,exported fields>> section.
 
-
-:edit_url!:
+edit_url!:
