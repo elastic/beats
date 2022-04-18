@@ -57,8 +57,6 @@ https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 - Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
 - Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
 - checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
-- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
-- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 
 *Heartbeat*
 
@@ -73,8 +71,6 @@ https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
 *Winlogbeat*
 
 - Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
-- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
-
 
 *Functionbeat*
 

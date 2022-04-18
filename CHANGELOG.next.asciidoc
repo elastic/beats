@@ -42,9 +42,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
-
-*Filebeat*
-
+- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
+- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 
 *Heartbeat*
 
@@ -56,7 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-
+- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
 
 *Functionbeat*
 
