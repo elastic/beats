@@ -130,6 +130,8 @@ def fields_to_asciidoc(input, output, beat):
 This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
+:edit_url:
+
 [[exported-fields]]
 = Exported fields
 
@@ -183,6 +185,7 @@ grouped in the following categories:
             section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
 
+    output.write(":edit_url!:")
 
 if __name__ == "__main__":
 
