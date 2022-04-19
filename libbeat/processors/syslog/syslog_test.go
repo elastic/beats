@@ -28,9 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 )
 
-//nolint:unparam // Parameter layout can potentially use different values in the future.
-func mustParseTime(layout string, value string) time.Time {
-	t, err := time.Parse(layout, value)
+func mustParseTime(value string) time.Time {
+	t, err := time.Parse(time.RFC3339Nano, value)
 	if err != nil {
 		panic(err)
 	}
@@ -38,15 +37,12 @@ func mustParseTime(layout string, value string) time.Time {
 	return t
 }
 
-//nolint:unparam // Parameter layout can potentially use different values in the future.
-func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time {
-	t, err := time.ParseInLocation(layout, value, loc)
+func mustParseTimeLoc(value string, loc *time.Location) time.Time {
+	t, err := time.ParseInLocation(time.Stamp, value, loc)
 	if err != nil {
 		panic(err)
 	}
-	if layout == time.Stamp {
-		t = t.AddDate(time.Now().In(loc).Year(), 0, 0)
-	}
+	t = t.AddDate(time.Now().In(loc).Year(), 0, 0)
 
 	return t
 }
@@ -84,7 +80,7 @@ var syslogCases = map[string]struct {
 			},
 			"message": "this is the message",
 		},
-		WantTime: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
+		WantTime: mustParseTimeLoc("Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
 	},
 	"rfc-5424": {
 		Cfg: common.MustNewConfigFrom(common.MapStr{}),
@@ -122,7 +118,7 @@ var syslogCases = map[string]struct {
 			},
 			"message": "this is the message",
 		},
-		WantTime: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
+		WantTime: mustParseTime("2003-10-11T22:14:15.003Z"),
 	},
 }
 

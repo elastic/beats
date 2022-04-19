@@ -26,9 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-//nolint:unparam // Parameter layout can potentially use different values in the future.
-func mustParseTime(layout string, value string) time.Time {
-	t, err := time.Parse(layout, value)
+func mustParseTime(value string) time.Time {
+	t, err := time.Parse(time.RFC3339Nano, value)
 	if err != nil {
 		panic(err)
 	}
@@ -36,15 +35,12 @@ func mustParseTime(layout string, value string) time.Time {
 	return t
 }
 
-//nolint:unparam // Parameter layout can potentially use different values in the future.
-func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time {
-	t, err := time.ParseInLocation(layout, value, loc)
+func mustParseTimeLoc(value string, loc *time.Location) time.Time {
+	t, err := time.ParseInLocation(time.Stamp, value, loc)
 	if err != nil {
 		panic(err)
 	}
-	if layout == time.Stamp {
-		t = t.AddDate(time.Now().Year(), 0, 0)
-	}
+	t = t.AddDate(time.Now().Year(), 0, 0)
 
 	return t
 }
@@ -58,12 +54,12 @@ func TestMessage_SetTimestampBSD(t *testing.T) {
 		"bsd-timestamp": {
 			In:    "Oct 1 22:04:15",
 			InLoc: time.Local,
-			Want:  mustParseTimeLoc(time.Stamp, "Oct 1 22:04:15", time.Local),
+			Want:  mustParseTimeLoc("Oct 1 22:04:15", time.Local),
 		},
 		"loc-nil": {
 			In:    "Oct 1 22:04:15",
 			InLoc: nil,
-			Want:  mustParseTimeLoc(time.Stamp, "Oct 1 22:04:15", time.Local),
+			Want:  mustParseTimeLoc("Oct 1 22:04:15", time.Local),
 		},
 		"invalid-timestamp-1": {
 			In:    "1985-04-12T23:20:50.52Z",
@@ -98,23 +94,23 @@ func TestMessage_SetTimestampRFC3339(t *testing.T) {
 	}{
 		"rfc3339-timestamp": {
 			In:   "1985-04-12T23:20:50.52Z",
-			Want: mustParseTime(time.RFC3339Nano, "1985-04-12T23:20:50.52Z"),
+			Want: mustParseTime("1985-04-12T23:20:50.52Z"),
 		},
 		"rfc3339-timestamp-with-tz": {
 			In:   "1985-04-12T19:20:50.52-04:00",
-			Want: mustParseTime(time.RFC3339Nano, "1985-04-12T19:20:50.52-04:00"),
+			Want: mustParseTime("1985-04-12T19:20:50.52-04:00"),
 		},
 		"rfc3339-timestamp-with-milliseconds": {
 			In:   "2003-10-11T22:14:15.123Z",
-			Want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123Z"),
+			Want: mustParseTime("2003-10-11T22:14:15.123Z"),
 		},
 		"rfc3339-timestamp-with-microseconds": {
 			In:   "2003-10-11T22:14:15.123456Z",
-			Want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456Z"),
+			Want: mustParseTime("2003-10-11T22:14:15.123456Z"),
 		},
 		"rfc3339-timestamp-with-microseconds-with-tz": {
 			In:   "2003-10-11T22:14:15.123456-06:00",
-			Want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00"),
+			Want: mustParseTime("2003-10-11T22:14:15.123456-06:00"),
 		},
 		"invalid-timestamp-1": {
 			In: "Oct 1 22:04:15",
@@ -469,7 +465,7 @@ func TestMessage_Fields(t *testing.T) {
 	}{
 		"valid": {
 			In: &message{
-				timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00"),
+				timestamp: mustParseTime("2003-10-11T22:14:15.123456-06:00"),
 				facility:  1,
 				severity:  5,
 				priority:  13,

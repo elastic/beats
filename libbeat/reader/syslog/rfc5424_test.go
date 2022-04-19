@@ -19,7 +19,6 @@ package syslog
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,7 +31,7 @@ var parseRFC5424Cases = map[string]struct {
 	"example-1": {
 		In: "<13>1 2003-08-24T05:14:15.000003-07:00 test-host su 1234 msg-5678 - This is a test message",
 		Want: message{
-			timestamp: mustParseTime(time.RFC3339Nano, "2003-08-24T05:14:15.000003-07:00"),
+			timestamp: mustParseTime("2003-08-24T05:14:15.000003-07:00"),
 			priority:  13,
 			facility:  1,
 			severity:  5,
@@ -47,7 +46,7 @@ var parseRFC5424Cases = map[string]struct {
 	"example-2": {
 		In: `<13>1 2003-08-24T05:14:15.000003-07:00 test-host su 1234 msg-5678 [sd-id-1 foo="bar"] This is a test message`,
 		Want: message{
-			timestamp: mustParseTime(time.RFC3339Nano, "2003-08-24T05:14:15.000003-07:00"),
+			timestamp: mustParseTime("2003-08-24T05:14:15.000003-07:00"),
 			priority:  13,
 			facility:  1,
 			severity:  5,
@@ -76,7 +75,7 @@ var parseRFC5424Cases = map[string]struct {
 	"example-4": {
 		In: `<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - ` + utf8BOM + `'su root' failed for user1 on /dev/pts/8`,
 		Want: message{
-			timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
+			timestamp: mustParseTime("2003-10-11T22:14:15.003Z"),
 			priority:  34,
 			facility:  4,
 			severity:  2,
@@ -90,7 +89,7 @@ var parseRFC5424Cases = map[string]struct {
 	"example-5": {
 		In: `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
 		Want: message{
-			timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
+			timestamp: mustParseTime("2003-10-11T22:14:15.003Z"),
 			priority:  165,
 			facility:  20,
 			severity:  5,
