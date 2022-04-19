@@ -47,7 +47,12 @@ func (conf *azureInputConfig) Validate() error {
 	return nil
 }
 
+// storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
+// naming rules.
+// To learn more, please check the Azure documentation visiting:
+// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata#container-names
 func storageContainerValidate(name string) error {
+	var previousRune rune
 	runes := []rune(name)
 	length := len(runes)
 	if length < 3 {
@@ -59,10 +64,17 @@ func storageContainerValidate(name string) error {
 	if !unicode.IsLower(runes[0]) && !unicode.IsNumber(runes[0]) {
 		return fmt.Errorf("storage_account_container (%s) must start with a lowercase letter or number", name)
 	}
+	if !unicode.IsLower(runes[length-1]) && !unicode.IsNumber(runes[length-1]) {
+		return fmt.Errorf("storage_account_container (%s) must end with a lowercase letter or number", name)
+	}
 	for i := 0; i < length; i++ {
-		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && !('-' == runes[i]) {
+		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && !(runes[i] == '-') {
 			return fmt.Errorf("rune %d of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
 		}
+		if runes[i] == '-' && previousRune == runes[i] {
+			return fmt.Errorf("consecutive dashes ('-') are not permitted in storage_account_container (%s)", name)
+		}
+		previousRune = runes[i]
 	}
 	return nil
 }
