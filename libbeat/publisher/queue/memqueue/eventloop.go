@@ -201,7 +201,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	}
 
 	// log.Debug("newACKChan: ", b.ackSeq, count)
-	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.events)
+	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.entries)
 	l.ackSeq++
 
 	req.resp <- getResponse{ackCH, buf}
@@ -233,20 +233,20 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 
 	acks := lst.front()
 	start := acks.start
-	events := acks.events
+	entries := acks.entries
 
 	idx := start + N - 1
-	if idx >= len(events) {
-		idx -= len(events)
+	if idx >= len(entries) {
+		idx -= len(entries)
 	}
 
 	total := 0
 	for i := N - 1; i >= 0; i-- {
 		if idx < 0 {
-			idx = len(events) - 1
+			idx = len(entries) - 1
 		}
 
-		client := &events[idx].client
+		client := &entries[idx].client
 		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, client.seq)
 
 		idx--
@@ -511,10 +511,10 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 	lst.reverse()
 	for !lst.empty() {
 		current := lst.pop()
-		events := current.events
+		entries := current.entries
 
-		for i := len(events) - 1; i >= 0; i-- {
-			st := &events[i].client
+		for i := len(entries) - 1; i >= 0; i-- {
+			st := &entries[i].client
 			if st.state == nil {
 				continue
 			}

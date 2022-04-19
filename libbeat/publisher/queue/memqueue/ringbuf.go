@@ -48,7 +48,7 @@ type region struct {
 type eventBuffer struct {
 	logger *logp.Logger
 
-	events []queueEntry
+	entries []queueEntry
 }
 
 type clientState struct {
@@ -58,18 +58,18 @@ type clientState struct {
 
 func newEventBuffer(logger *logp.Logger, size int) eventBuffer {
 	return eventBuffer{
-		events: make([]queueEntry, size),
+		entries: make([]queueEntry, size),
 	}
 }
 
 func (b *eventBuffer) Len() int {
-	return len(b.events)
+	return len(b.entries)
 }
 
 func (b *eventBuffer) Set(idx int, event interface{}, st clientState) {
 	// b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
 
-	b.events[idx] = queueEntry{event, st}
+	b.entries[idx] = queueEntry{event, st}
 }
 
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
@@ -170,7 +170,7 @@ func (b *ringBuffer) cancel(st *produceState) int {
 func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	start := reg.index
 	end := start + reg.size
-	events := b.buf.events[start:end]
+	events := b.buf.entries[start:end]
 	//clients := b.buf.clients[start:end]
 
 	//toEvents := events[:0]
@@ -226,7 +226,7 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 	b.reserved += use
 	// log.Debug("  - start:", start)
 	// log.Debug("  - end:", end)
-	return start, b.buf.events[start:end]
+	return start, b.buf.entries[start:end]
 }
 
 // ack up to sz events in region A
@@ -251,7 +251,7 @@ func (b *ringBuffer) ack(sz int) {
 	// clear region, so published events can be collected by the garbage collector:
 	end := b.regA.index + sz
 	for i := b.regA.index; i < end; i++ {
-		b.buf.events[i] = queueEntry{}
+		b.buf.entries[i] = queueEntry{}
 	}
 
 	b.regA.index = end
