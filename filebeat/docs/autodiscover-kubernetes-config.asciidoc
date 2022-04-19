@@ -12,7 +12,7 @@ filebeat.autodiscover:
           config:
             - type: container
               paths:
-                - /var/log/containers/*-${data.kubernetes.container.id}.log
+                - /var/log/containers/*-${data.container.id}.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
@@ -36,5 +36,5 @@ filebeat.autodiscover:
                 input:
                   type: container
                   paths:
-                    - /var/log/containers/*-${data.kubernetes.container.id}.log
+                    - /var/log/containers/*-${data.container.id}.log
 -------------------------------------------------------------------------------------

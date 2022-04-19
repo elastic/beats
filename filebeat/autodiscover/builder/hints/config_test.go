@@ -30,7 +30,7 @@ func TestUnpackCopiesDefault(t *testing.T) {
 		"default_config": common.MapStr{
 			"type": "container",
 			"paths": []string{
-				"/var/log/containers/*${data.kubernetes.container.id}.log",
+				"/var/log/containers/*${data.container.id}.log",
 			},
 		},
 	})

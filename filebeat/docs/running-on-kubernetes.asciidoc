@@ -189,14 +189,14 @@ filebeat.autodiscover:
             config:
               - type: container
                 paths:
-                  - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+                  - "/var/log/containers/*-${data.container.id}.log"
           - condition:
               contains:
                 kubernetes.container.name: "json-logging"
             config:
               - type: container
                 paths:
-                  - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+                  - "/var/log/containers/*-${data.container.id}.log"
                 json.keys_under_root: true
                 json.add_error_key: true
                 json.message_key: message
@@ -221,7 +221,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: container
         paths:
-          - /var/log/containers/*${data.kubernetes.container.id}.log
+          - /var/log/containers/*${data.container.id}.log
 ------------------------------------------------
 +
 Then annotate the pod properly:

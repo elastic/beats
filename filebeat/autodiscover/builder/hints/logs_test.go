@@ -745,7 +745,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 					"id":   "abc",
 				},
 			},
-			path: "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
+			path: "/var/lib/docker/containers/${data.container.id}/*-json.log",
 			len:  1,
 			result: common.MapStr{
 				"type": "docker",
