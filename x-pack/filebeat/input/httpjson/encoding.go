@@ -198,7 +198,7 @@ func decodeAsZip(p []byte, dst *response) error {
 		for dec.More() {
 			var o interface{}
 			if err := dec.Decode(&o); err != nil {
-				func() { _ = rc.Close() }()
+				rc.Close()
 				return err
 			}
 			results = append(results, o)
