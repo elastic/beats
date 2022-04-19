@@ -19,14 +19,14 @@ package index_summary
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -91,28 +91,34 @@ var bulkStatsDict = c.Dict("bulk", s.Schema{
 	},
 }, c.DictOptional)
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool, logger *logp.Logger) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Stats API response: %v", err)
 	}
 
 	fields, err := schema.Apply(all.Data, s.FailOnRequired)
 	if err != nil {
-		return errors.Wrap(err, "failure applying stats schema")
+		return fmt.Errorf("failure applying stats schema: %v", err)
 	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", elasticsearch.ModuleName)
+	if _, err = event.RootFields.Put("service.name", elasticsearch.ModuleName); err != nil {
+		logger.Warnf("error inserting key %s: %v", "service.name", err)
+	}
 
 	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("cluster.name", info.ClusterName)
-	event.ModuleFields.Put("cluster.id", info.ClusterID)
+	if _, err = event.ModuleFields.Put("cluster.name", info.ClusterName); err != nil {
+		logger.Warnf("error inserting key %s: %v", "cluster.name", err)
+	}
+	if _, err = event.ModuleFields.Put("cluster.id", info.ClusterID); err != nil {
+		logger.Warnf("error inserting key %s: %v", "cluster.id", err)
+	}
 
 	event.MetricSetFields = fields
 
