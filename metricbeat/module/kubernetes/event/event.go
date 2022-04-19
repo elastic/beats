@@ -99,7 +99,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	// add ECS orchestrator fields
 	cfg, _ := common.NewConfigFrom(&config)
-	ecsClusterMeta, err := getClusterECSMeta(cfg, client)
+	ecsClusterMeta, err := getClusterECSMeta(cfg, client, ms.Logger())
 	if err != nil {
 		ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
 	}
@@ -110,17 +110,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return ms, nil
 }
 
-func getClusterECSMeta(cfg *common.Config, client k8sclient.Interface) (common.MapStr, error) {
+func getClusterECSMeta(cfg *common.Config, client k8sclient.Interface, logger *logp.Logger) (common.MapStr, error) {
 	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
 	if err != nil {
 		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
 	}
 	ecsClusterMeta := common.MapStr{}
 	if clusterInfo.Url != "" {
-		ecsClusterMeta.Put("orchestrator.cluster.url", clusterInfo.Url)
+		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
 	}
 	if clusterInfo.Name != "" {
-		ecsClusterMeta.Put("orchestrator.cluster.name", clusterInfo.Name)
+		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
 	}
 	return ecsClusterMeta, nil
 }
