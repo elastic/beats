@@ -5,8 +5,9 @@
 package httpjson
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"net/url"
 	"testing"
 
@@ -15,12 +16,38 @@ import (
 )
 
 func TestDecodeZip(t *testing.T) {
-	const expected = "[{\"a\":\"b\"},{\"a\":\"b\"},{\"c\":\"d\"},{\"a\":\"b\"},{\"c\":\"d\"}]"
-	b, err := ioutil.ReadFile("./testdata/test.zip")
-	require.NoError(t, err)
+	buf := new(bytes.Buffer)
+	w := zip.NewWriter(buf)
+	var files = []struct {
+		Name, Body string
+	}{
+		{
+			"a.json",
+			`{"a":"b"}`,
+		},
+		{
+			"b.ndjson",
+			`{"a":"b"}` + "\n" + `{"c":"d"}`,
+		},
+		{
+			"c.ndjson",
+			"{\n\t" + `"a":"b"` + "\n}\n{\n\t" + `"c":"d"` + "\n}",
+		},
+	}
+	for _, file := range files {
+		f, err := w.Create(file.Name)
+		require.NoError(t, err)
+		_, err = f.Write([]byte(file.Body))
+		require.NoError(t, err)
+	}
+
+	// Make sure to check the error on Close.
+	require.NoError(t, w.Close())
+
+	const expected = `[{"a":"b"},{"a":"b"},{"c":"d"},{"a":"b"},{"c":"d"}]`
 
 	resp := &response{}
-	if err := decodeAsZip(b, resp); err != nil {
+	if err := decodeAsZip(buf.Bytes(), resp); err != nil {
 		t.Fatalf("decodeAsZip failed: %v", err)
 	}
 

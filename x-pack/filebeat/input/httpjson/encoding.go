@@ -203,7 +203,7 @@ func decodeAsZip(p []byte, dst *response) error {
 			}
 			results = append(results, o)
 		}
-		func() { _ = rc.Close() }()
+		rc.Close()
 	}
 
 	dst.body = results
