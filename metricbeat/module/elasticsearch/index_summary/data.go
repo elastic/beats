@@ -91,7 +91,7 @@ var bulkStatsDict = c.Dict("bulk", s.Schema{
 	},
 }, c.DictOptional)
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool, logger *logp.Logger) error {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -109,15 +109,15 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 	var event mb.Event
 	event.RootFields = common.MapStr{}
 	if _, err = event.RootFields.Put("service.name", elasticsearch.ModuleName); err != nil {
-		logger.Warnf("error inserting key %s: %v", "service.name", err)
+		fmt.Println("error inserting key %s: %v", "service.name", err)
 	}
 
 	event.ModuleFields = common.MapStr{}
 	if _, err = event.ModuleFields.Put("cluster.name", info.ClusterName); err != nil {
-		logger.Warnf("error inserting key %s: %v", "cluster.name", err)
+		fmt.Println("error inserting key %s: %v", "cluster.name", err)
 	}
 	if _, err = event.ModuleFields.Put("cluster.id", info.ClusterID); err != nil {
-		logger.Warnf("error inserting key %s: %v", "cluster.id", err)
+		fmt.Println("error inserting key %s: %v", "cluster.id", err)
 	}
 
 	event.MetricSetFields = fields
