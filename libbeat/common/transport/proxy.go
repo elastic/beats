@@ -67,6 +67,7 @@ func ProxyDialer(log *logp.Logger, config *ProxyConfig, forward Dialer) (Dialer,
 		return nil, err
 	}
 
+	log.Debugf("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", url.Scheme, url.Host, url.Path)
 	log.Infof("proxy host: '%s'", url.Host)
 	return DialerFunc(func(network, address string) (net.Conn, error) {
 		var err error

@@ -120,7 +120,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 	// can optionally stop requests "early"
 	var activeLimit int64 = 0
 	if r.earlyLimit != nil {
-		var earlyLimit float64 = *r.earlyLimit
+		earlyLimit := *r.earlyLimit
 		if earlyLimit > 0 && earlyLimit < 1 {
 			limit, _ := r.limit.Execute(ctx, tr, nil, r.log)
 			if limit != "" {

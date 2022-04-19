@@ -25,18 +25,13 @@ import (
 	"os"
 	"time"
 
-	"go.elastic.co/apm"
-	apmtransport "go.elastic.co/apm/transport"
+	"go.elastic.co/apm/v2"
+	apmtransport "go.elastic.co/apm/v2/transport"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
-
-func init() {
-	// we need to close the default tracer to prevent the beat sending events to localhost:8200
-	apm.DefaultTracer.Close()
-}
 
 // Instrumentation is an interface that can return an APM tracer a net.listener
 type Instrumentation interface {
@@ -50,12 +45,14 @@ type instrumentation struct {
 }
 
 // Tracer returns the configured tracer
-// If there is not configured tracer, it returns the DefaultTracer, which is always disabled
+// If there is no configured tracer, it returns the DefaultTracer, which is always closed.
 func (t *instrumentation) Tracer() *apm.Tracer {
-	if t.tracer == nil {
-		return apm.DefaultTracer
+	if t.tracer != nil {
+		return t.tracer
 	}
-	return t.tracer
+	tracer := apm.DefaultTracer()
+	tracer.Close()
+	return tracer
 }
 
 // Listener is only relevant for APM Server sending tracing data to itself
@@ -192,11 +189,12 @@ func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, err
 
 	if cfg.Hosts == nil {
 		pipeListener := transport.NewPipeListener()
-		pipeTransport, err := apmtransport.NewHTTPTransport()
+		pipeTransport, err := apmtransport.NewHTTPTransport(apmtransport.HTTPTransportOptions{
+			ServerURLs: []*url.URL{{Scheme: "http", Host: "localhost:8200"}},
+		})
 		if err != nil {
 			return nil, err
 		}
-		pipeTransport.SetServerURL(&url.URL{Scheme: "http", Host: "localhost:8200"})
 		pipeTransport.Client.Transport = &http.Transport{
 			DialContext:     pipeListener.DialContext,
 			MaxIdleConns:    100,
@@ -205,19 +203,14 @@ func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, err
 		tracerTransport = pipeTransport
 		// the traceListener will allow APM Server to create an ad-hoc server for tracing
 		tracerListener = pipeListener
-
 	} else {
-		t, err := apmtransport.NewHTTPTransport()
+		t, err := apmtransport.NewHTTPTransport(apmtransport.HTTPTransportOptions{
+			APIKey:      cfg.APIKey,
+			SecretToken: cfg.SecretToken,
+			ServerURLs:  cfg.Hosts,
+		})
 		if err != nil {
 			return nil, err
-		}
-		if len(cfg.Hosts) > 0 {
-			t.SetServerURL(cfg.Hosts...)
-		}
-		if cfg.APIKey != "" {
-			t.SetAPIKey(cfg.APIKey)
-		} else {
-			t.SetSecretToken(cfg.SecretToken)
 		}
 		tracerTransport = t
 	}
@@ -236,9 +229,19 @@ func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, err
 		return nil, err
 	}
 
-	tracer.SetLogger(logger)
+	tracer.SetLogger(warningLogger{logger})
 	return &instrumentation{
 		tracer:   tracer,
 		listener: tracerListener,
 	}, nil
+}
+
+// warningLogger wraps logp.Logger to allow to be set in the apm.Tracer.
+type warningLogger struct {
+	*logp.Logger
+}
+
+// Warningf logs a message at warning level.
+func (l warningLogger) Warningf(format string, args ...interface{}) {
+	l.Warnf(format, args...)
 }
