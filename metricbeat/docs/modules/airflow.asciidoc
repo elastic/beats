@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: airflow
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/airflow/_meta/docs.asciidoc
+
 
 [[metricbeat-module-airflow]]
 [role="xpack"]
@@ -35,6 +37,8 @@ statsd_prefix =
 ```
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -60,3 +64,4 @@ The following metricsets are available:
 
 include::airflow/statsd.asciidoc[]
 
+:edit_url!:

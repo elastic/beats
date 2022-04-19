@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: prometheus
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/prometheus/_meta/docs.asciidoc
+
 
 [[metricbeat-module-prometheus]]
 == Prometheus module
@@ -24,6 +26,8 @@ image::./images/metricbeat-prometheus-overview.png[]
 
 
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -109,3 +113,4 @@ include::prometheus/query.asciidoc[]
 
 include::prometheus/remote_write.asciidoc[]
 
+:edit_url!:
