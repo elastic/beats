@@ -100,6 +100,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// add ECS orchestrator fields
 	cfg, _ := common.NewConfigFrom(&config)
 	ecsClusterMeta, err := getClusterECSMeta(cfg, client)
+	if err != nil {
+		ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
+	}
 	if ecsClusterMeta != nil {
 		ms.clusterMeta = ecsClusterMeta
 	}
@@ -110,7 +113,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func getClusterECSMeta(cfg *common.Config, client k8sclient.Interface) (common.MapStr, error) {
 	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
 	if err != nil {
-		return nil, fmt.Errorf("fail to init kubernetes watcher: %w", err)
+		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
 	}
 	ecsClusterMeta := common.MapStr{}
 	if clusterInfo.Url != "" {
@@ -127,20 +130,10 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
-			event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
-			if m.clusterMeta != nil {
-				event.RootFields.DeepUpdate(m.clusterMeta)
-			}
-			reporter.Event(event)
+			m.reportEvent(obj, reporter)
 		},
 		UpdateFunc: func(obj interface{}) {
-			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
-			event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
-			if m.clusterMeta != nil {
-				event.RootFields.DeepUpdate(m.clusterMeta)
-			}
-			reporter.Event(event)
+			m.reportEvent(obj, reporter)
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
@@ -174,6 +167,15 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 	<-reporter.Done()
 	m.watcher.Stop()
+}
+
+func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) {
+	mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+	event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
+	if m.clusterMeta != nil {
+		event.RootFields.DeepUpdate(m.clusterMeta)
+	}
+	reporter.Event(event)
 }
 
 func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) common.MapStr {
