@@ -73,7 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Winlogbeat*
 
 - Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
-- Fix missing annotation of event.module. {issue}31330[31330] {pull}[]
+- Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
 
 *Functionbeat*
 
