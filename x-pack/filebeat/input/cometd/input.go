@@ -38,7 +38,7 @@ func (in *cometdInput) Run() {
 			in.b = bay.Bayeux{}
 			in.creds, err = bay.GetSalesforceCredentials(in.authParams)
 			if err != nil {
-				in.log.Error("not able to get access token", err)
+				in.log.Error("not able to get access token: ", err)
 				return
 			}
 			if err := in.run(); err != nil {
@@ -134,7 +134,7 @@ func NewInput(
 	}
 
 	// Creating a new channel for cometd input.
-	in.msgCh = make(chan bay.MaybeMsg)
+	in.msgCh = make(chan bay.MaybeMsg, 1)
 
 	// Build outlet for events.
 	in.outlet, err = connector.Connect(cfg)
