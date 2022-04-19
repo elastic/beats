@@ -201,7 +201,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	}
 
 	// log.Debug("newACKChan: ", b.ackSeq, count)
-	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.entries)
+	ackCH := newACKChan(l.ackSeq, start, count, l.buf.entries)
 	l.ackSeq++
 
 	req.resp <- getResponse{ackCH, buf}

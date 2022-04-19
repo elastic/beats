@@ -33,7 +33,8 @@ import (
 type ringBuffer struct {
 	logger *logp.Logger
 
-	buf eventBuffer
+	//buf eventBuffer
+	entries []queueEntry
 
 	regA, regB region
 	reserved   int // amount of events in region A actively processed/reserved
@@ -49,35 +50,15 @@ type region struct {
 	size int
 }
 
-type eventBuffer struct {
-	entries []queueEntry
-}
-
 type clientState struct {
 	seq   uint32        // event sequence number
 	state *produceState // the producer it's state used to compute and signal the ACK count
 }
 
-func newEventBuffer(size int) eventBuffer {
-	return eventBuffer{
-		entries: make([]queueEntry, size),
-	}
-}
-
-func (b *eventBuffer) Len() int {
-	return len(b.entries)
-}
-
-func (b *eventBuffer) Set(idx int, event interface{}, st clientState) {
-	// b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
-
-	b.entries[idx] = queueEntry{event, st}
-}
-
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	*b = ringBuffer{
-		logger: logger,
-		buf:    newEventBuffer(size),
+		logger:  logger,
+		entries: make([]queueEntry, size),
 	}
 }
 
@@ -104,7 +85,7 @@ func (b *ringBuffer) insert(event interface{}, client clientState) int {
 			return 0
 		}
 
-		b.buf.Set(idx, event, client)
+		b.entries[idx] = queueEntry{event, client}
 		b.regB.size++
 
 		return avail - 1
@@ -114,7 +95,7 @@ func (b *ringBuffer) insert(event interface{}, client clientState) int {
 	idx := b.regA.index + b.regA.size
 	// log.Debug("  - index: ", idx)
 	// log.Debug("  - buffer size: ", b.buf.Len())
-	avail := b.buf.Len() - idx
+	avail := len(b.entries) - idx
 	if avail == 0 { // no more space in region A
 		// log.Debug("  - region A full")
 
@@ -130,13 +111,13 @@ func (b *ringBuffer) insert(event interface{}, client clientState) int {
 		// log.Debug("  - create region B")
 		b.regB.index = 0
 		b.regB.size = 1
-		b.buf.Set(0, event, client)
+		b.entries[0] = queueEntry{event, client}
 		return b.regA.index - 1
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
-	b.buf.Set(idx, event, client)
+	b.entries[idx] = queueEntry{event, client}
 	b.regA.size++
 	return avail - 1
 }
@@ -173,7 +154,7 @@ func (b *ringBuffer) cancel(st *produceState) int {
 func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	start := reg.index
 	end := start + reg.size
-	entries := b.buf.entries[start:end]
+	entries := b.entries[start:end]
 
 	toEntries := entries[:0]
 
@@ -224,7 +205,7 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 	b.reserved += use
 	// log.Debug("  - start:", start)
 	// log.Debug("  - end:", end)
-	return start, b.buf.entries[start:end]
+	return start, b.entries[start:end]
 }
 
 // ack up to sz events in region A
@@ -249,7 +230,7 @@ func (b *ringBuffer) ack(sz int) {
 	// clear region, so published events can be collected by the garbage collector:
 	end := b.regA.index + sz
 	for i := b.regA.index; i < end; i++ {
-		b.buf.entries[i] = queueEntry{}
+		b.entries[i] = queueEntry{}
 	}
 
 	b.regA.index = end
@@ -272,11 +253,11 @@ func (b *ringBuffer) Full() bool {
 	if b.regB.size > 0 {
 		avail = b.regA.index - b.regB.index - b.regB.size
 	} else {
-		avail = b.buf.Len() - b.regA.index - b.regA.size
+		avail = len(b.entries) - b.regA.index - b.regA.size
 	}
 	return avail == 0
 }
 
 func (b *ringBuffer) Size() int {
-	return b.buf.Len()
+	return len(b.entries)
 }
