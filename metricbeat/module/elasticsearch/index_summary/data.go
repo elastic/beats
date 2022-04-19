@@ -107,17 +107,11 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 
 	var event mb.Event
 	event.RootFields = common.MapStr{}
-	if _, err = event.RootFields.Put("service.name", elasticsearch.ModuleName); err != nil {
-		fmt.Println("error inserting key %s: %v", "service.name", err)
-	}
+	_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 	event.ModuleFields = common.MapStr{}
-	if _, err = event.ModuleFields.Put("cluster.name", info.ClusterName); err != nil {
-		fmt.Println("error inserting key %s: %v", "cluster.name", err)
-	}
-	if _, err = event.ModuleFields.Put("cluster.id", info.ClusterID); err != nil {
-		fmt.Println("error inserting key %s: %v", "cluster.id", err)
-	}
+	_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+	_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 	event.MetricSetFields = fields
 
