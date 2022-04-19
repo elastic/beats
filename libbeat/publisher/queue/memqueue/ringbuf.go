@@ -31,6 +31,8 @@ import (
 // []publisher.Event to the consumer without having to copy and/or grow/shrink the
 // buffers.
 type ringBuffer struct {
+	logger *logp.Logger
+
 	buf eventBuffer
 
 	regA, regB region
@@ -48,8 +50,6 @@ type region struct {
 }
 
 type eventBuffer struct {
-	logger *logp.Logger
-
 	entries []queueEntry
 }
 
@@ -58,7 +58,7 @@ type clientState struct {
 	state *produceState // the producer it's state used to compute and signal the ACK count
 }
 
-func newEventBuffer(logger *logp.Logger, size int) eventBuffer {
+func newEventBuffer(size int) eventBuffer {
 	return eventBuffer{
 		entries: make([]queueEntry, size),
 	}
@@ -76,7 +76,8 @@ func (b *eventBuffer) Set(idx int, event interface{}, st clientState) {
 
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	*b = ringBuffer{
-		buf: newEventBuffer(logger, size),
+		logger: logger,
+		buf:    newEventBuffer(size),
 	}
 }
 
@@ -173,12 +174,9 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	start := reg.index
 	end := start + reg.size
 	entries := b.buf.entries[start:end]
-	//clients := b.buf.clients[start:end]
-
-	//toEvents := events[:0]
-	//toClients := clients[:0]
 
 	toEntries := entries[:0]
+
 	// filter loop
 	for i := 0; i < reg.size; i++ {
 		if entries[i].client.state == st {
@@ -192,7 +190,6 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	for i := range entries {
 		entries[i] = queueEntry{}
 	}
-	// TODO: finish this function
 
 	return len(entries)
 }
