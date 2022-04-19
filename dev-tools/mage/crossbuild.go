@@ -278,11 +278,11 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "linux/armv7":
 		tagSuffix = "armhf"
 	case strings.HasPrefix(platform, "linux/mips"):
-		tagSuffix = "mips"
+		tagSuffix = "mips-debian10"
 	case strings.HasPrefix(platform, "linux/ppc"):
-		tagSuffix = "ppc"
+		tagSuffix = "ppc-debian10"
 	case platform == "linux/s390x":
-		tagSuffix = "s390x"
+		tagSuffix = "s390x-debian10"
 	case strings.HasPrefix(platform, "linux"):
 		// Use an older version of libc to gain greater OS compatibility.
 		// Debian 8 uses glibc 2.19.
