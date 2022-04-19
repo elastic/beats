@@ -1,5 +1,14 @@
 provider "aws" {
   version = "~> 2.58"
+  default_tags {
+    tags = {
+      Environment = "CI"
+      Owner       = "Beats"
+      Branch      = var.BRANCH_NAME
+      Build       = var.BUILD_ID
+      CreatedDate = var.CREATED_DATE
+    }
+  }
 }
 
 provider "random" {

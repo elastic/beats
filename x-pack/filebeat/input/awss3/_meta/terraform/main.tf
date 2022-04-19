@@ -9,6 +9,15 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+  default_tags {
+    tags = {
+      Environment = "CI"
+      Owner       = "Beats"
+      Branch      = var.BRANCH_NAME
+      Build       = var.BUILD_ID
+      CreatedDate = var.CREATED_DATE
+    }
+  }
 }
 
 resource "random_string" "random" {
