@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -31,266 +33,315 @@ const (
 
 var (
 	serverURL string
+	called1   uint64
+	called2   uint64
+	clientId  uint64
 )
 
-func TestNewInput(t *testing.T) {
-	t.Run("Check input Done", func(t *testing.T) {
-		config := common.MapStr{
-			"channel_name":              firstChannel,
-			"auth.oauth2.client.id":     "DEMOCLIENTID",
-			"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
-			"auth.oauth2.user":          "salesforce_user",
-			"auth.oauth2.password":      "pwd",
-			"auth.oauth2.token_url":     "https://example.com/token",
-		}
-		inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
-	})
+func TestInputDone(t *testing.T) {
+	config := common.MapStr{
+		"channel_name":              firstChannel,
+		"auth.oauth2.client.id":     "DEMOCLIENTID",
+		"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
+		"auth.oauth2.user":          "salesforce_user",
+		"auth.oauth2.password":      "pwd",
+		"auth.oauth2.token_url":     "https://example.com/token",
+	}
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+}
 
-	t.Run("Check make event failure", func(t *testing.T) {
-		event := beat.Event{
-			Timestamp: time.Now().UTC(),
-			Fields: common.MapStr{
-				"event": common.MapStr{
-					"id":      "DEMOID",
-					"created": time.Now().UTC(),
-				},
-				"message": "DEMOBODYFAIL",
+func TestMakeEventFailure(t *testing.T) {
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"event": common.MapStr{
+				"id":      "DEMOID",
+				"created": time.Now().UTC(),
 			},
-			Private: "DEMOBODYFAIL",
+			"message": "DEMOBODYFAIL",
+		},
+		Private: "DEMOBODYFAIL",
+	}
+	assert.NotEqual(t, event, makeEvent("DEMOID", "DEMOBODY"))
+}
+
+func TestSingleInput(t *testing.T) {
+	eventsCh := make(chan beat.Event)
+
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+	var inputContext finput.Context
+
+	var expected bay.MaybeMsg
+	expected.Msg.Data.Event.ReplayID = 1234
+	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	expected.Msg.Channel = firstChannel
+
+	config := map[string]interface{}{
+		"channel_name":              firstChannel,
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	r := http.HandlerFunc(oauth2Handler)
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	serverURL = server.URL
+	config["auth.oauth2.token_url"] = server.URL + "/token"
+
+	cfg := common.MustNewConfigFrom(config)
+
+	input, err := NewInput(cfg, connector, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input)
+
+	input.Run()
+
+	event := <-eventsCh
+	assertEventMatches(t, expected, event)
+	input.Stop()
+	atomic.StoreUint64(&called1, 0)
+	atomic.StoreUint64(&clientId, 0)
+}
+
+func TestInputStop_Wait(t *testing.T) {
+	eventsCh := make(chan beat.Event)
+
+	const numMessages = 1
+
+	var eventProcessing sync.WaitGroup
+	eventProcessing.Add(numMessages)
+
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventProcessing.Done()
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+	var inputContext finput.Context
+
+	var expected bay.MaybeMsg
+	expected.Msg.Data.Event.ReplayID = 1234
+	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	expected.Msg.Channel = firstChannel
+
+	config := map[string]interface{}{
+		"channel_name":              firstChannel,
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	r := http.HandlerFunc(oauth2Handler)
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	serverURL = server.URL
+	config["auth.oauth2.token_url"] = server.URL + "/token"
+
+	cfg := common.MustNewConfigFrom(config)
+
+	bayClient := bay.Client{}
+
+	newBayeuxMockClient := func() bay.Client {
+		b := bay.Bayeux{}
+		bayClient = bay.Client{
+			BayOb: b,
 		}
-		assert.NotEqual(t, event, makeEvent("DEMOID", "DEMOBODY"))
-	})
+		return bayClient
+	}
 
-	t.Run("Check new single input", func(t *testing.T) {
-		eventsCh := make(chan beat.Event)
+	input, err := newInput(cfg, connector, newBayeuxMockClient, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input)
 
-		outlet := &mockedOutleter{
-			onEventHandler: func(event beat.Event) bool {
-				eventsCh <- event
-				return true
-			},
+	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	input.Run()
+	eventProcessing.Wait()
+	require.Equal(t, 1, bayClient.BayOb.GetConnectedCount())
+
+	go func() {
+		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+		for range eventsCh {
 		}
-		connector := &mockedConnector{
-			outlet: outlet,
+	}()
+
+	input.Wait()
+	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	atomic.StoreUint64(&called1, 0)
+	atomic.StoreUint64(&clientId, 0)
+}
+
+func TestMultiInput(t *testing.T) {
+	eventsCh := make(chan beat.Event)
+
+	const numMessages = 2
+
+	var eventProcessing sync.WaitGroup
+	eventProcessing.Add(numMessages)
+
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventProcessing.Done()
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+
+	var expected1 bay.MaybeMsg
+	expected1.Msg.Data.Event.ReplayID = 1234
+	expected1.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	expected1.Msg.Channel = firstChannel
+
+	var expected2 bay.MaybeMsg
+	expected2.Msg.Data.Event.ReplayID = 1234
+	expected2.Msg.Data.Payload = []byte(`{"CountryIso": "US"}`)
+	expected2.Msg.Channel = firstChannel
+
+	config1 := map[string]interface{}{
+		"channel_name":              firstChannel,
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+	config2 := map[string]interface{}{
+		"channel_name":              secondChannel,
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	// create Server
+	r := http.HandlerFunc(oauth2Handler)
+	server := httptest.NewServer(r)
+	serverURL = server.URL
+	config1["auth.oauth2.token_url"] = serverURL + "/token"
+	config2["auth.oauth2.token_url"] = serverURL + "/token"
+
+	// get common config
+	cfg1 := common.MustNewConfigFrom(config1)
+	cfg2 := common.MustNewConfigFrom(config2)
+
+	var inputContext finput.Context
+
+	bayClient := bay.Client{}
+
+	newBayeuxMockClient := func() bay.Client {
+		b := bay.Bayeux{}
+		bayClient = bay.Client{
+			BayOb: b,
 		}
-		var inputContext finput.Context
+		return bayClient
+	}
 
-		var expected bay.MaybeMsg
-		expected.Msg.Data.Event.ReplayID = 1234
-		expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-		expected.Msg.Channel = firstChannel
+	// initialize inputs
+	input1, err := newInput(cfg1, connector, newBayeuxMockClient, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input1)
 
-		config := map[string]interface{}{
-			"channel_name":              firstChannel,
-			"auth.oauth2.client.id":     "client.id",
-			"auth.oauth2.client.secret": "client.secret",
-			"auth.oauth2.user":          "user",
-			"auth.oauth2.password":      "password",
-		}
+	input2, err := newInput(cfg2, connector, newBayeuxMockClient, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input2)
 
-		r := http.HandlerFunc(oauth2Handler)
-		server := httptest.NewServer(r)
-		defer server.Close()
+	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	// run input
+	input1.Run()
 
-		serverURL = server.URL
-		config["auth.oauth2.token_url"] = server.URL + "/token"
-
-		cfg := common.MustNewConfigFrom(config)
-
-		input, err := NewInput(cfg, connector, inputContext)
-		require.NoError(t, err)
-		require.NotNil(t, input)
-
-		input.Run()
-		defer input.Stop()
+	go func() {
+		time.Sleep(200 * time.Millisecond) // let input.Stop() be executed.
 		event := <-eventsCh
-		message, err := event.GetValue("message")
-		require.NoError(t, err)
-		require.Equal(t, string(expected.Msg.Data.Payload), message)
-	})
+		assertEventMatches(t, expected1, event)
+	}()
 
-	t.Run("Check new multi inputs", func(t *testing.T) {
-		eventsCh := make(chan beat.Event)
-		defer close(eventsCh)
+	// run input
+	input2.Run()
+	eventProcessing.Wait()
+	require.Equal(t, 2, bayClient.BayOb.GetConnectedCount())
 
-		outlet := &mockedOutleter{
-			onEventHandler: func(event beat.Event) bool {
-				eventsCh <- event
-				return true
-			},
-		}
-		connector := &mockedConnector{
-			outlet: outlet,
-		}
+	go func() {
+		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+		event := <-eventsCh
+		assertEventMatches(t, expected2, event)
+	}()
 
-		var expected bay.MaybeMsg
-		expected.Msg.Data.Event.ReplayID = 1234
-		expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-		expected.Msg.Channel = firstChannel
+	input1.Wait()
+	input2.Wait()
 
-		config1 := map[string]interface{}{
-			"channel_name":              firstChannel,
-			"auth.oauth2.client.id":     "client.id",
-			"auth.oauth2.client.secret": "client.secret",
-			"auth.oauth2.user":          "user",
-			"auth.oauth2.password":      "password",
-		}
-		config2 := map[string]interface{}{
-			"channel_name":              secondChannel,
-			"auth.oauth2.client.id":     "client.id",
-			"auth.oauth2.client.secret": "client.secret",
-			"auth.oauth2.user":          "user",
-			"auth.oauth2.password":      "password",
-		}
+	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+}
 
-		// create Server
-		r := http.HandlerFunc(oauth2Handler)
-		server := httptest.NewServer(r)
-		serverURL = server.URL
-		config1["auth.oauth2.token_url"] = serverURL + "/token"
-		config2["auth.oauth2.token_url"] = serverURL + "/token"
+func TestStop(t *testing.T) {
+	conf := defaultConfig()
+	logger := logp.NewLogger("test")
+	authParams := bay.AuthenticationParameters{}
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	defer cancelInputCtx()
+	input := &cometdInput{
+		config:       conf,
+		log:          logger,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		authParams:   authParams,
+	}
+	input.msgCh = make(chan bay.MaybeMsg)
 
-		// get common config
-		cfg1 := common.MustNewConfigFrom(config1)
-		cfg2 := common.MustNewConfigFrom(config2)
+	input.Stop()
+	select {
+	case <-workerCtx.Done():
+	default:
+		require.NoError(t, fmt.Errorf("input is not stopped."))
+	}
+}
 
-		var inputContext finput.Context
+func TestWait(t *testing.T) {
+	conf := defaultConfig()
+	logger := logp.NewLogger("test")
+	authParams := bay.AuthenticationParameters{}
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	defer cancelInputCtx()
 
-		// initialize inputs
-		input1, err := NewInput(cfg1, connector, inputContext)
-		require.NoError(t, err)
-		require.NotNil(t, input1)
+	input := &cometdInput{
+		config:       conf,
+		log:          logger,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		authParams:   authParams,
+	}
+	input.msgCh = make(chan bay.MaybeMsg)
 
-		input2, err := NewInput(cfg2, connector, inputContext)
-		require.NoError(t, err)
-		require.NotNil(t, input2)
+	go func() {
+		input.Wait()
+	}()
 
-		// run input
-		input1.Run()
-		defer input1.Stop()
-
-		event1 := <-eventsCh
-		assertEventMatches(t, expected, event1)
-
-		// run input
-		input2.Run()
-		defer input2.Stop()
-
-		event2 := <-eventsCh
-		assertEventMatches(t, expected, event2)
-
-		// close server
-		server.Close()
-	})
-
-	t.Run("Check gracefully shutdown input", func(t *testing.T) {
-		eventsCh := make(chan beat.Event)
-
-		outlet := &mockedOutleter{
-			onEventHandler: func(event beat.Event) bool {
-				eventsCh <- event
-				return true
-			},
-		}
-		connector := &mockedConnector{
-			outlet: outlet,
-		}
-		var inputContext finput.Context
-
-		var msg bay.MaybeMsg
-		msg.Msg.Data.Event.ReplayID = 1234
-		msg.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-		msg.Msg.Channel = firstChannel
-
-		config := map[string]interface{}{
-			"channel_name":              firstChannel,
-			"auth.oauth2.client.id":     "client.id",
-			"auth.oauth2.client.secret": "client.secret",
-			"auth.oauth2.user":          "user",
-			"auth.oauth2.password":      "password",
-		}
-
-		r := http.HandlerFunc(oauth2Handler)
-		server := httptest.NewServer(r)
-		serverURL = server.URL
-		config["auth.oauth2.token_url"] = serverURL + "/token"
-
-		cfg := common.MustNewConfigFrom(config)
-
-		input, err := NewInput(cfg, connector, inputContext)
-		require.NoError(t, err)
-		require.NotNil(t, input)
-
-		// run input
-		input.Run()
-
-		go func() {
-			time.Sleep(time.Second) // let input.Stop() be executed.
-			input.Wait()
-		}()
-
-		start := time.Now()
-		for range []beat.Event{<-eventsCh} {
-			if time.Since(start) > time.Second {
-				require.Fail(t, "Channel was not closed after Wait()")
-			}
-		}
-	})
-
-	t.Run("Check input stop", func(t *testing.T) {
-		conf := defaultConfig()
-		logger := logp.NewLogger("test")
-		authParams := bay.AuthenticationParameters{}
-		inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-		workerCtx, workerCancel := context.WithCancel(inputCtx)
-		defer cancelInputCtx()
-
-		input := &cometdInput{
-			config:       conf,
-			log:          logger,
-			inputCtx:     inputCtx,
-			workerCtx:    workerCtx,
-			workerCancel: workerCancel,
-			authParams:   authParams,
-		}
-		input.msgCh = make(chan bay.MaybeMsg)
-
-		input.Stop()
-		select {
-		case <-workerCtx.Done():
-		default:
-			require.NoError(t, fmt.Errorf("input is not stopped."))
-		}
-	})
-
-	t.Run("Check input wait", func(t *testing.T) {
-		conf := defaultConfig()
-		logger := logp.NewLogger("test")
-		authParams := bay.AuthenticationParameters{}
-		inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-		workerCtx, workerCancel := context.WithCancel(inputCtx)
-		defer cancelInputCtx()
-
-		input := &cometdInput{
-			config:       conf,
-			log:          logger,
-			inputCtx:     inputCtx,
-			workerCtx:    workerCtx,
-			workerCancel: workerCancel,
-			authParams:   authParams,
-		}
-		input.msgCh = make(chan bay.MaybeMsg)
-
-		go func() {
-			input.Wait()
-		}()
-
-		select {
-		case <-workerCtx.Done():
-		case <-time.After(time.Second): // let input.Stop() be executed.
-			require.NoError(t, fmt.Errorf("input is not stopped."))
-		}
-	})
+	select {
+	case <-workerCtx.Done():
+	case <-time.After(time.Second): // let input.Stop() be executed.
+		require.NoError(t, fmt.Errorf("input is not stopped."))
+	}
 }
 
 func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
@@ -314,11 +365,19 @@ func oauth2ClientIdHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
-		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"94b112sp7ph1c9s41mycpzik4rkj3","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
+		switch clientId {
+		case 0:
+			atomic.StoreUint64(&clientId, 1)
+			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id1","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
+		case 1:
+			atomic.StoreUint64(&clientId, 0)
+			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id2","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
+		default:
+		}
 	}
 }
 
-func oauth2SubscribeHandler(w http.ResponseWriter, r *http.Request) {
+func oauth2SubscribeHandlerChannel1(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
@@ -326,11 +385,11 @@ func oauth2SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
-		_, _ = w.Write([]byte(`[{"clientId": "94b112sp7ph1c9s41mycpzik4rkj3", "channel": "/meta/subscribe", "subscription": "/event/LoginEventStream", "successful":true}]`))
+		_, _ = w.Write([]byte(`[{"clientId": "client_id1", "channel": "/meta/subscribe", "subscription": "channel_name1", "successful":true}]`))
 	}
 }
 
-func oauth2EventHandler(w http.ResponseWriter, r *http.Request) {
+func oauth2SubscribeHandlerChannel2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
@@ -338,7 +397,37 @@ func oauth2EventHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	default:
-		_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "/event/LoginEventStream"}]`))
+		_, _ = w.Write([]byte(`[{"clientId": "client_id2", "channel": "/meta/subscribe", "subscription": "channel_name2", "successful":true}]`))
+	}
+}
+
+func oauth2EventHandlerChannel1(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	_ = r.ParseForm()
+	switch {
+	case r.Method != http.MethodPost:
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
+	default:
+		if called1 < 1 {
+			atomic.AddUint64(&called1, 1)
+			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name1"}]`))
+		}
+	}
+}
+
+func oauth2EventHandlerChannel2(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	_ = r.ParseForm()
+	switch {
+	case r.Method != http.MethodPost:
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
+	default:
+		if called2 < 1 {
+			atomic.AddUint64(&called2, 1)
+			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "US"}, "event": {"replayId":1234}}, "channel": "channel_name2"}]`))
+		}
 	}
 }
 
@@ -351,18 +440,31 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 	if string(body) == `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}` {
 		oauth2ClientIdHandler(w, r)
 		return
-	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "94b112sp7ph1c9s41mycpzik4rkj3"} ` {
-		oauth2EventHandler(w, r)
+	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id1"} ` {
+		oauth2EventHandlerChannel1(w, r)
+		return
+	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id2"} ` {
+		oauth2EventHandlerChannel2(w, r)
 		return
 	} else if string(body) == `{
 								"channel": "/meta/subscribe",
-								"subscription": "first-channel",
-								"clientId": "94b112sp7ph1c9s41mycpzik4rkj3",
+								"subscription": "channel_name1",
+								"clientId": "client_id1",
 								"ext": {
-									"replay": {"first-channel": "-1"}
+									"replay": {"channel_name1": "-1"}
 									}
 								}` {
-		oauth2SubscribeHandler(w, r)
+		oauth2SubscribeHandlerChannel1(w, r)
+		return
+	} else if string(body) == `{
+								"channel": "/meta/subscribe",
+								"subscription": "channel_name2",
+								"clientId": "client_id2",
+								"ext": {
+									"replay": {"channel_name2": "-1"}
+									}
+								}` {
+		oauth2SubscribeHandlerChannel2(w, r)
 		return
 	}
 }
