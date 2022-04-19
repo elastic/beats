@@ -217,6 +217,7 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 
 [float]
 ====== Pod specific:
+  * container.id
   * kubernetes.container.id
   * kubernetes.container.image
   * kubernetes.container.name

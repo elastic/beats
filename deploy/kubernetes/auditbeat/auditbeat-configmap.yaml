@@ -24,8 +24,8 @@ data:
     #      - config:
     #        - module: 'file_integrity'
     #          paths:
-    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/bin'
-    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/etc'
+    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.container.id}/rootfs/bin'
+    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.container.id}/rootfs/etc'
     #          scan_at_start: false
     #          recursive: true
 

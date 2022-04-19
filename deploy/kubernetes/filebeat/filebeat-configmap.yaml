@@ -28,7 +28,7 @@ data:
     #      hints.default_config:
     #        type: container
     #        paths:
-    #          - /var/log/containers/*${data.kubernetes.container.id}.log
+    #          - /var/log/containers/*${data.container.id}.log
 
     processors:
       - add_cloud_metadata:
