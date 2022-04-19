@@ -37,6 +37,8 @@ type ringBuffer struct {
 	reserved   int // amount of events in region A actively processed/reserved
 }
 
+// region represents a contiguous region in ringBuffer's internal storage (i.e.
+// one that does not cross the end of the array).
 type region struct {
 	// The starting position of this region within the full event buffer.
 	index int
@@ -170,30 +172,29 @@ func (b *ringBuffer) cancel(st *produceState) int {
 func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	start := reg.index
 	end := start + reg.size
-	events := b.buf.entries[start:end]
+	entries := b.buf.entries[start:end]
 	//clients := b.buf.clients[start:end]
 
 	//toEvents := events[:0]
 	//toClients := clients[:0]
 
+	toEntries := entries[:0]
 	// filter loop
-	/*for i := 0; i < reg.size; i++ {
-		if events[i].client.state == st {
+	for i := 0; i < reg.size; i++ {
+		if entries[i].client.state == st {
 			continue // remove
 		}
-
-		toEvents = append(toEvents, events[i])
-		toClients = append(toClients, clients[i])
+		toEntries = append(toEntries, entries[i])
 	}
 
 	// re-initialize old buffer elements to help garbage collector
-	events = events[len(toEvents):]
-	for i := range events {
-		events[i] = queueEntry{}
-	}*/
+	entries = entries[len(toEntries):]
+	for i := range entries {
+		entries[i] = queueEntry{}
+	}
 	// TODO: finish this function
 
-	return len(events)
+	return len(entries)
 }
 
 // reserve returns up to `sz` events from the brokerBuffer,
