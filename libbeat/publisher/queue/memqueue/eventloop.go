@@ -201,7 +201,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	}
 
 	// log.Debug("newACKChan: ", b.ackSeq, count)
-	ackCH := newACKChan(l.ackSeq, start, count, l.buf.clients)
+	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.events)
 	l.ackSeq++
 
 	req.resp <- getResponse{ackCH, buf}
@@ -233,42 +233,42 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 
 	acks := lst.front()
 	start := acks.start
-	states := acks.states
+	events := acks.events
 
 	idx := start + N - 1
-	if idx >= len(states) {
-		idx -= len(states)
+	if idx >= len(events) {
+		idx -= len(events)
 	}
 
 	total := 0
 	for i := N - 1; i >= 0; i-- {
 		if idx < 0 {
-			idx = len(states) - 1
+			idx = len(events) - 1
 		}
 
-		st := &states[idx]
-		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, st.seq)
+		client := &events[idx].client
+		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, client.seq)
 
 		idx--
-		if st.state == nil {
+		if client.state == nil {
 			log.Debug("no state set")
 			continue
 		}
 
-		count := (st.seq - st.state.lastACK)
+		count := (client.seq - client.state.lastACK)
 		if count == 0 || count > math.MaxUint32/2 {
 			// seq number comparison did underflow. This happens only if st.seq has
 			// already been acknowledged
 			// log.Debug("seq number already acked: ", st.seq)
 
-			st.state = nil
+			client.state = nil
 			continue
 		}
 
 		log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
 			count,
-			st.state.lastACK+1,
-			st.seq,
+			client.state.lastACK+1,
+			client.seq,
 		)
 
 		total += int(count)
@@ -278,9 +278,9 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 			))
 		}
 
-		st.state.cb(int(count))
-		st.state.lastACK = st.seq
-		st.state = nil
+		client.state.cb(int(count))
+		client.state.lastACK = client.seq
+		client.state = nil
 	}
 }
 
@@ -459,6 +459,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	if buf.length() == 0 {
 		l.advanceFlushList()
 	}*/
+	// TODO: finish this function
 }
 
 func (l *bufferingEventLoop) handleACK(count int) {
@@ -513,10 +514,10 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 	lst.reverse()
 	for !lst.empty() {
 		current := lst.pop()
-		states := current.states
+		events := current.events
 
-		for i := len(states) - 1; i >= 0; i-- {
-			st := &states[i]
+		for i := len(events) - 1; i >= 0; i-- {
+			st := &events[i].client
 			if st.state == nil {
 				continue
 			}

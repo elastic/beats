@@ -67,7 +67,7 @@ type ackChan struct {
 	ch           chan batchAckMsg
 	seq          uint
 	start, count int // number of events waiting for ACK
-	states       []clientState
+	events       []queueEntry
 }
 
 type chanList struct {
@@ -208,14 +208,14 @@ var ackChanPool = sync.Pool{
 	},
 }
 
-func newACKChan(seq uint, start, count int, states []clientState) *ackChan {
+func newACKChan(seq uint, start, count int, events []queueEntry) *ackChan {
 	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*ackChan)
 	ch.next = nil
 	ch.seq = seq
 	ch.start = start
 	ch.count = count
-	ch.states = states
+	ch.events = events
 	return ch
 }
 

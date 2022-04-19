@@ -38,8 +38,11 @@ type ringBuffer struct {
 }
 
 type region struct {
+	// The starting position of this region within the full event buffer.
 	index int
-	size  int
+
+	// The number of events currently stored in this region.
+	size int
 }
 
 type eventBuffer struct {
@@ -149,30 +152,33 @@ func (b *ringBuffer) cancel(st *produceState) int {
 	// 	log.Debug("  -> reserved:", b.reserved)
 	// }()
 
-	cancelB := b.cancelRegion(st, b.regB)
-	b.regB.size -= cancelB
+	cancelledB := b.cancelRegion(st, b.regB)
+	b.regB.size -= cancelledB
 
-	cancelA := b.cancelRegion(st, region{
+	cancelledA := b.cancelRegion(st, region{
 		index: b.regA.index + b.reserved,
 		size:  b.regA.size - b.reserved,
 	})
-	b.regA.size -= cancelA
+	b.regA.size -= cancelledA
 
-	return cancelA + cancelB
+	return cancelledA + cancelledB
 }
 
+// cancelRegion removes the events in the specified range having
+// the specified produceState. It returns the number of events
+// removed.
 func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 	start := reg.index
 	end := start + reg.size
 	events := b.buf.events[start:end]
-	clients := b.buf.clients[start:end]
+	//clients := b.buf.clients[start:end]
 
-	toEvents := events[:0]
-	toClients := clients[:0]
+	//toEvents := events[:0]
+	//toClients := clients[:0]
 
 	// filter loop
-	for i := 0; i < reg.size; i++ {
-		if clients[i].state == st {
+	/*for i := 0; i < reg.size; i++ {
+		if events[i].client.state == st {
 			continue // remove
 		}
 
@@ -182,10 +188,10 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 
 	// re-initialize old buffer elements to help garbage collector
 	events = events[len(toEvents):]
-	clients = clients[len(toClients):]
 	for i := range events {
 		events[i] = queueEntry{}
-	}
+	}*/
+	// TODO: finish this function
 
 	return len(events)
 }
