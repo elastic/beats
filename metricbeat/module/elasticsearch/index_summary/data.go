@@ -97,12 +97,12 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		return fmt.Errorf("failure parsing Elasticsearch Stats API response: %v", err)
+		return fmt.Errorf("failure parsing Elasticsearch Stats API response: %w", err)
 	}
 
 	fields, err := schema.Apply(all.Data, s.FailOnRequired)
 	if err != nil {
-		return fmt.Errorf("failure applying stats schema: %v", err)
+		return fmt.Errorf("failure applying stats schema: %w", err)
 	}
 
 	var event mb.Event
