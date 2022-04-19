@@ -53,7 +53,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 - Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
 
-
 *Heartbeat*
 
 - Heartbeat now successfully runs synthetic monitors on ARM processors. {pull}31114[31114]
