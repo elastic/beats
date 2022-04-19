@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support in httpjson input for chain calls. {pull}29816[29816]
 - checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
 - Add URL Encode template function for httpjson input. {pull}30962[30962]
+- Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
 
 *Auditbeat*
 
