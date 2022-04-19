@@ -44,8 +44,8 @@ type getRequest struct {
 }
 
 type getResponse struct {
-	ack *ackChan
-	buf []queueEntry
+	ack     *ackChan
+	entries []queueEntry
 }
 
 type batchAckMsg struct{}

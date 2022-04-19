@@ -69,8 +69,8 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 
 	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
-	events := make([]publisher.Event, 0, len(resp.buf))
-	for _, entry := range resp.buf {
+	events := make([]publisher.Event, 0, len(resp.entries))
+	for _, entry := range resp.entries {
 		event := entry.event.(*publisher.Event)
 		events = append(events, *event)
 	}

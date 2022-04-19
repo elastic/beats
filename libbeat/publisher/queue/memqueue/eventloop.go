@@ -425,7 +425,7 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 }
 
 func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
-	/*buf := l.flushList.head
+	buf := l.flushList.head
 	if buf == nil {
 		panic("get from non-flushed buffers")
 	}
@@ -445,21 +445,18 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 		panic("empty batch returned")
 	}
 
-	events := buf.events[:count]
-	clients := buf.clients[:count]
-	ackChan := newACKChan(l.ackSeq, 0, count, clients)
+	entries := buf.entries[:count]
+	ackChan := newACKChan(l.ackSeq, 0, count, entries)
 	l.ackSeq++
 
-	req.resp <- getResponse{ackChan, events}
+	req.resp <- getResponse{ackChan, entries}
 	l.pendingACKs.append(ackChan)
 	l.schedACKS = l.broker.scheduledACKs
 
-	buf.events = buf.events[count:]
-	buf.clients = buf.clients[count:]
+	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
-	}*/
-	// TODO: finish this function
+	}
 }
 
 func (l *bufferingEventLoop) handleACK(count int) {
