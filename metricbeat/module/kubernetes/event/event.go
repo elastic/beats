@@ -19,8 +19,9 @@ package event
 
 import (
 	"fmt"
-	k8sclient "k8s.io/client-go/kubernetes"
 	"time"
+
+	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -87,7 +88,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		LabelsDedot:      config.LabelsDedot,
 		AnnotationsDedot: config.AnnotationsDedot,
 	}
-
 
 	ms := &MetricSet{
 		BaseMetricSet: base,
