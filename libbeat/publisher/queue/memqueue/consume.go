@@ -71,8 +71,9 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 	resp := <-c.resp
 	events := make([]publisher.Event, 0, len(resp.entries))
 	for _, entry := range resp.entries {
-		event := entry.event.(*publisher.Event)
-		events = append(events, *event)
+		if event, ok := entry.event.(*publisher.Event); ok {
+			events = append(events, *event)
+		}
 	}
 	return &batch{
 		consumer: c,
