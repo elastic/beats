@@ -613,7 +613,7 @@
                   type: alias
                 - name: rejected
                   path: elasticsearch.node.stats.thread_pool.write.rejected.count
-                  type: alias    
+                  type: alias
     - name: indices_stats
       type: group
       fields:
@@ -684,4 +684,3 @@
               type: boolean
               description: >
                 Is mlockall enabled on the node?
-
