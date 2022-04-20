@@ -32283,6 +32283,60 @@ format: bytes
 
 --
 
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
 *`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`*::
 +
 --
@@ -32293,6 +32347,42 @@ format: bytes
 --
 
 *`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.all.bytes`*::
 +
 --
 type: long
