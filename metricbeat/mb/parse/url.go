@@ -210,7 +210,7 @@ func getURL(
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, t, fmt.Errorf("error parsing URL: %v", err)
+		return nil, t, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	// discover the transport to use to communicate with the host if we have a combined scheme.
@@ -262,7 +262,7 @@ func getURL(
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
 			} else {
-				return nil, t, fmt.Errorf("error parsing URL: %v", err)
+				return nil, t, fmt.Errorf("error parsing URL: %w", err)
 			}
 		}
 		if host == "" {
