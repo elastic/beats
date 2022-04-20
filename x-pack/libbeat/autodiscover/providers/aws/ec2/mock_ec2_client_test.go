@@ -4,15 +4,13 @@
 
 package ec2
 
-import (
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-)
+import "github.com/aws/aws-sdk-go-v2/service/ec2"
 
 func newMockEC2Client(numResults int) mockEC2Client {
 	return mockEC2Client{numResults: numResults}
 }
 
 type mockEC2Client struct {
-	ec2iface.ClientAPI
+	*ec2.Client
 	numResults int
 }
