@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	"github.com/elastic/beats/v7/libbeat/reader/split"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -86,6 +87,13 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 	for _, ns := range parsers {
 		name := ns.Name()
 		switch name {
+		case "split":
+			var config split.Config
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing multiline parser config: %+v", err)
+			}
 		case "multiline":
 			var config multiline.Config
 			cfg := ns.Config()
@@ -138,6 +146,14 @@ func (c *Config) Create(in reader.Reader) Parser {
 	for _, ns := range c.parsers {
 		name := ns.Name()
 		switch name {
+		case "split":
+			var config split.Config
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return p
+			}
+			p = split.New(p, &config)
 		case "multiline":
 			var config multiline.Config
 			cfg := ns.Config()

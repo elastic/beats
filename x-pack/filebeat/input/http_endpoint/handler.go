@@ -11,14 +11,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+
+	// "github.com/elastic/beats/v7/libbeat/common/split"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -38,7 +41,19 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
-	split                 *split.SplitConfig
+	parsers               parser.Config
+	context               v2.Context
+}
+
+type readertest struct {
+	msg mapstr.M
+}
+
+func (a readertest) Close() error { return nil }
+func (a readertest) Next() (reader.Message, error) {
+	return reader.Message{
+		Content: []byte(a.msg.String()),
+	}, nil
 }
 
 // Triggers if middleware validation returns successful
@@ -62,29 +77,23 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, obj := range objs {
-		if h.split != nil {
-			split, err := split.NewSplit(h.split, h.log)
-			if err != nil {
-				return
-			}
-			// We want to be able to identify which split is the root of the chain.
-			split.IsRoot = true
-			data, _ := json.Marshal(obj)
-			eventsCh, err := split.StartSplit(data)
-			if err != nil {
-				return
-			}
-			for maybeMsg := range eventsCh {
-				if maybeMsg.Failed() {
-					h.log.Errorf("error processing response: %v", maybeMsg)
-					continue
-				}
-				// MAKE EVENT
-				h.publishEvent(maybeMsg.Msg, headers)
-			}
-			continue
+		b := readertest{
+			msg: obj,
 		}
-		h.publishEvent(obj, headers)
+		a := h.parsers.Create(b)
+		for h.context.Cancelation.Err() == nil {
+			message, err := a.Next()
+			if err != nil {
+				h.log.Error("%v", err)
+			}
+			if message.IsEmpty() {
+				continue
+			}
+			h.publishEvent(message.ToEvent(), headers)
+		}
+		// for _, obj := range a {
+		// 	h.publishEvent(obj, headers)
+		// }
 	}
 
 	h.sendResponse(w, h.responseCode, h.responseBody)
@@ -98,14 +107,16 @@ func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message st
 	}
 }
 
-func (h *httpHandler) publishEvent(obj, headers mapstr.M) error {
-	event := beat.Event{
-		Timestamp: time.Now().UTC(),
-		Fields:    mapstr.M{},
-	}
+func (h *httpHandler) publishEvent(event beat.Event, headers mapstr.M) error {
+	// event := beat.Event{
+	// 	Timestamp: time.Now().UTC(),
+	// 	Fields: mapstr.M{
+	// 		h.messageField: obj,
+	// 	},
+	// }
 	if h.preserveOriginalEvent {
 		event.Fields["event"] = mapstr.M{
-			"original": obj.String(),
+			"original": event.Fields["message"],
 		}
 	}
 	if len(headers) > 0 {
