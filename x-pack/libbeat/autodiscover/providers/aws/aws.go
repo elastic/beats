@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 )
 
@@ -24,9 +25,10 @@ func SafeString(str *string) string {
 }
 
 // GetRegions makes DescribeRegions API call to list all regions from AWS
-func GetRegions(svc *ec2.Client) (completeRegionsList []string, err error) {
+func GetRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
 	input := &ec2.DescribeRegionsInput{}
-	output, err := svc.DescribeRegions(context.TODO(), input)
+	req := svc.DescribeRegionsRequest(input)
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		err = errors.Wrap(err, "Failed DescribeRegions")
 		return

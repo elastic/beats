@@ -5,18 +5,24 @@
 package ec2
 
 import (
-	ecs2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type ec2Instance struct {
-	ec2Instance ecs2types.Instance
+	ec2Instance ec2.Instance
 }
 
 // toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
 func (i *ec2Instance) toMap() common.MapStr {
-	architecture := string(i.ec2Instance.Architecture)
+	architecture, err := i.ec2Instance.Architecture.MarshalValue()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "MarshalValue failed for architecture: "))
+	}
 
 	m := common.MapStr{
 		"image":            i.toImage(),
@@ -48,7 +54,11 @@ func (i *ec2Instance) toImage() common.MapStr {
 }
 
 func (i *ec2Instance) toMonitoringState() common.MapStr {
-	monitoringState := string(i.ec2Instance.Monitoring.State)
+	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
+	}
+
 	m := common.MapStr{}
 	m["state"] = monitoringState
 	return m
@@ -99,7 +109,10 @@ func (i *ec2Instance) toCloudMap() common.MapStr {
 	instance["id"] = i.instanceID()
 	m["instance"] = instance
 
-	instanceType := string(i.ec2Instance.InstanceType)
+	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
+	}
 	machine := common.MapStr{}
 	machine["type"] = instanceType
 	m["machine"] = machine
@@ -110,7 +123,10 @@ func (i *ec2Instance) toCloudMap() common.MapStr {
 func (i *ec2Instance) stateMap() (stateMap common.MapStr) {
 	state := i.ec2Instance.State
 	stateMap = common.MapStr{}
-	nameString := string(state.Name)
+	nameString, err := state.Name.MarshalValue()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "MarshalValue failed for instance state name: "))
+	}
 
 	stateMap["name"] = nameString
 	stateMap["code"] = state.Code
