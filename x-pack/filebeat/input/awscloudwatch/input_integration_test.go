@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -23,10 +24,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/stretchr/testify/assert"
+
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -135,14 +136,13 @@ region_name: %s
 `, logGroupNamePrefix, regionName))
 }
 
-func uploadLogMessage(t *testing.T, svc cloudwatchlogsiface.ClientAPI, message string, timestamp int64, logGroupName string, logStreamName string) {
+func uploadLogMessage(t *testing.T, svc *cloudwatchlogs.Client, message string, timestamp int64, logGroupName string, logStreamName string) {
 	describeLogStreamsInput := cloudwatchlogs.DescribeLogStreamsInput{
 		LogGroupName:        awssdk.String(logGroupName),
 		LogStreamNamePrefix: awssdk.String(logStreamName),
 	}
 
-	reqDescribeLogStreams := svc.DescribeLogStreamsRequest(&describeLogStreamsInput)
-	resp, err := reqDescribeLogStreams.Send(context.TODO())
+	resp, err := svc.DescribeLogStreams(context.TODO(), &describeLogStreamsInput)
 	if err != nil {
 		t.Fatalf("Failed to describe log stream %q in log group %q: %v", logStreamName, logGroupName, err)
 	}
@@ -151,19 +151,17 @@ func uploadLogMessage(t *testing.T, svc cloudwatchlogsiface.ClientAPI, message s
 		t.Fatalf("Describe log stream %q in log group %q should return 1 and only 1 value", logStreamName, logGroupName)
 	}
 
-	inputLogEvent := cloudwatchlogs.InputLogEvent{
+	inputLogEvent := &cloudwatchlogstypes.InputLogEvent{
 		Message:   awssdk.String(message),
 		Timestamp: awssdk.Int64(timestamp),
 	}
 
-	reqPutLogEvents := svc.PutLogEventsRequest(
-		&cloudwatchlogs.PutLogEventsInput{
-			LogEvents:     []cloudwatchlogs.InputLogEvent{inputLogEvent},
-			LogGroupName:  awssdk.String(logGroupName),
-			LogStreamName: awssdk.String(logStreamName),
-			SequenceToken: resp.LogStreams[0].UploadSequenceToken,
-		})
-	_, err = reqPutLogEvents.Send(context.TODO())
+	_, err = svc.PutLogEvents(context.TODO(), &cloudwatchlogs.PutLogEventsInput{
+		LogEvents:     []*cloudwatchlogstypes.InputLogEvent{inputLogEvent},
+		LogGroupName:  awssdk.String(logGroupName),
+		LogStreamName: awssdk.String(logStreamName),
+		SequenceToken: resp.LogStreams[0].UploadSequenceToken,
+	})
 	if err != nil {
 		t.Fatalf("Failed to upload message %q into log stream %q in log group %q: %v", message, logStreamName, logGroupName, err)
 	}
@@ -175,14 +173,14 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 	// Terraform is used to set up S3 and SQS and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	cfg.Region = tfConfig.AWSRegion
 
 	// upload log messages for testing
-	svc := cloudwatchlogs.New(cfg)
+	svc := cloudwatchlogs.NewFromConfig(cfg)
 	currentTime := time.Now()
 	timestamp := currentTime.UnixNano() / int64(time.Millisecond)
 
