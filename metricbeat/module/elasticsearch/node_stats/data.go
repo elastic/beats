@@ -20,11 +20,9 @@ package node_stats
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -338,7 +336,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Node Stats API response: %w", err)
 	}
 
 	masterNodeID, err := m.GetMasterNodeID()
@@ -352,7 +350,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		mlockall, err := m.IsMLockAllEnabled(nodeID)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "error determining if mlockall is set on Elasticsearch node"))
+			errs = append(errs, fmt.Errorf("error determining if mlockall is set on Elasticsearch node: %w", err))
 			continue
 		}
 
@@ -375,7 +373,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
+			errs = append(errs, fmt.Errorf("failure to apply node schema: %w", err))
 			continue
 		}
 
