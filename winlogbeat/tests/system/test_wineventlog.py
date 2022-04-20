@@ -82,7 +82,7 @@ class Test(WriteReadTest):
         # remove the output file, otherwise there is a race condition
         # in read_events() below where it reads the results of the previous
         # execution
-        os.unlink(os.path.join(self.working_dir, "output", self.beat_name + "-" + self.today + ".ndjson"))
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name))
 
         self.clear_event_log()
 
@@ -135,7 +135,7 @@ class Test(WriteReadTest):
         # remove the output file, otherwise there is a race condition
         # in read_events() below where it reads the results of the previous
         # execution
-        os.unlink(os.path.join(self.working_dir, "output", self.beat_name + "-" + self.today + ".ndjson"))
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name))
 
         evts = self.read_events(expected_events=1)
         self.assertTrue(len(evts), 1)
