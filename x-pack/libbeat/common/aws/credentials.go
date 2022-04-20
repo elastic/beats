@@ -182,7 +182,7 @@ func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *a
 }
 
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS service clients when endpoint is given in config.
-func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, beatsConfig awssdk.Config) (awssdk.Config, error) {
+func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, beatsConfig awssdk.Config) awssdk.Config {
 	var eurl string
 	if endpoint != "" {
 		parsedEndpoint, _ := url.Parse(endpoint)
@@ -204,7 +204,7 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 				return awssdk.Endpoint{URL: eurl}, nil
 			})
 	}
-	return beatsConfig, nil
+	return beatsConfig
 }
 
 // CreateServiceName based on Service name, Region and FIPS. Returns service name if Fips is not enabled.
