@@ -756,6 +756,35 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			},
 		},
 		{
+			msg: "Empty event hints should return default config. Check for data.kubernetes.container.id instead",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc-k8s",
+					},
+					"pod": common.MapStr{
+						"name": "pod",
+						"uid":  "12345",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+			},
+			path: "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
+			len:  1,
+			result: common.MapStr{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"paths": []interface{}{"/var/lib/docker/containers/abc-k8s/*-json.log"},
+				},
+				"close_timeout": "true",
+			},
+		},
+		{
 			msg: "Hint with processors config must have a processors in the input config",
 			event: bus.Event{
 				"host": "1.2.3.4",
