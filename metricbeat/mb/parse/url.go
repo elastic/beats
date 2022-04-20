@@ -19,6 +19,7 @@ package parse
 
 import (
 	"fmt"
+	"math"
 	"net"
 	"net/url"
 	p "path"
@@ -146,6 +147,15 @@ func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.Ho
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
 func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
+	var err error
+	if scheme == "oracle" {
+		rawHost, user, pass, err = OracleUrlParser(rawHost)
+
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("error extracting username and password: %w", err)
+		}
+	}
+
 	u, transport, err := getURL(rawHost, scheme, user, pass, path, query)
 
 	if err != nil {
@@ -298,4 +308,39 @@ func redactURLCredentials(u *url.URL) *url.URL {
 	redacted := *u
 	redacted.User = nil
 	return &redacted
+}
+
+// OracleUrlParser extracts host, username and password from Oracle Metricbeat module.
+func OracleUrlParser(url string) (host, username, password string, err error) {
+	var separator string
+
+	// If the user has given username and password separately, there wont be any "@" in URL
+	if strings.LastIndex(url, "@") == -1 {
+		url = strings.TrimPrefix(url, "oracle://")
+		return "oracle://" + url, "", "", nil
+	}
+
+	leftPart := url[:strings.LastIndex(url, "@")]
+	rightPart := url[strings.LastIndex(url, "@")+1:]
+	leftPart = strings.TrimPrefix(leftPart, "oracle://")
+
+	// Separate username and password.
+	// User can give username and password separated with ":" or "/".
+	if indexCl := strings.Index(leftPart, ":"); indexCl == -1 { // If there is no colon in url "/" will be separator.
+		separator = "/"
+	} else if indexSl := strings.Index(leftPart, "/"); indexSl == -1 { // If there is no slash in url ":" will be separator.
+		separator = ":"
+	} else { // If both exist in URL than whichever comes first is considered as a separator.
+		index := int(math.Min(float64(indexCl), float64(indexSl)))
+		separator = leftPart[index : index+1]
+	}
+
+	parts := strings.SplitN(leftPart, separator, 2)
+	if len(parts) != 2 {
+		return "", "", "", fmt.Errorf("either username or password is missing")
+	}
+	username = parts[0]
+	password = parts[1]
+
+	return "oracle://" + rightPart, username, password, nil
 }

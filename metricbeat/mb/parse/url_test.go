@@ -22,9 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -177,6 +175,36 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "", h.Password)
 		}
 	})
+
+	t.Run("oracle", func(t *testing.T) {
+		rawURL := "oracle://admin:secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB"
+		hostData, err := ParseURL(rawURL, "oracle", "", "", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "oracle://admin:secret%25~%60%21%40%23$%25%5E&%2A%28%29_+=-%7B%5B%7D%5D%7C%27%3A;%3E.%3C,%3F%2F@127.0.0.1:8080/ORCLCDB", hostData.URI)
+			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.SanitizedURI)
+			assert.Equal(t, "127.0.0.1:8080", hostData.Host)
+			assert.Equal(t, "admin", hostData.User)
+			assert.Equal(t, "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", hostData.Password)
+		}
+		rawURL = "oracle://admin/secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB"
+		hostData, err = ParseURL(rawURL, "oracle", "", "", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "oracle://admin:secret%25~%60%21%40%23$%25%5E&%2A%28%29_+=-%7B%5B%7D%5D%7C%27%3A;%3E.%3C,%3F%2F@127.0.0.1:8080/ORCLCDB", hostData.URI)
+			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.SanitizedURI)
+			assert.Equal(t, "127.0.0.1:8080", hostData.Host)
+			assert.Equal(t, "admin", hostData.User)
+			assert.Equal(t, "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", hostData.Password)
+		}
+		rawURL = "oracle://127.0.0.1:8080/ORCLCDB"
+		hostData, err = ParseURL(rawURL, "oracle", "admin", "password", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.URI)
+			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.SanitizedURI)
+			assert.Equal(t, "127.0.0.1:8080", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
 }
 
 func TestURLHostParserBuilder(t *testing.T) {
@@ -210,5 +238,40 @@ func TestURLHostParserBuilder(t *testing.T) {
 		}
 
 		assert.Equal(t, test.url, hp.URI)
+	}
+}
+
+// TestOracleUrlParser function tests OracleUrlParser function with different urls
+func TestOracleUrlParser(t *testing.T) {
+	tests := []struct {
+		arg          string
+		wantHost     string
+		wantUsername string
+		wantPassword string
+		wantErr      bool
+	}{
+		{"oracle://admin:secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "admin", "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", false},
+		{"oracle://admin/secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "admin", "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", false},
+		{"admin:secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "admin", "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", false},
+		{"admin@127.0.0.1:8080/ORCLCDB", "", "", "", true},
+		{"127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "", "", false},
+	}
+	for _, tt := range tests {
+		t.Run("oracle", func(t *testing.T) {
+			gotHost, gotUsername, gotPassword, err := OracleUrlParser(tt.arg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("OracleUrlParser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotHost != tt.wantHost {
+				t.Errorf("OracleUrlParser() gotHost = %v, want %v", gotHost, tt.wantHost)
+			}
+			if gotUsername != tt.wantUsername {
+				t.Errorf("OracleUrlParser() gotUsername = %v, want %v", gotUsername, tt.wantUsername)
+			}
+			if gotPassword != tt.wantPassword {
+				t.Errorf("OracleUrlParser() gotPassword = %v, want %v", gotPassword, tt.wantPassword)
+			}
+		})
 	}
 }
