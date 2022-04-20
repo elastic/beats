@@ -9,17 +9,16 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"strconv"
 	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/aws/aws-sdk-go-v2/service/costexplorer/costexploreriface"
+	costexplorertypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
-	"github.com/aws/aws-sdk-go-v2/service/organizations/organizationsiface"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -127,15 +126,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
 
 	// get cost metrics from cost explorer
-	awsConfig := m.MetricSet.AwsConfig.Copy()
-	svcCostExplorer := costexplorer.New(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, monitoringServiceName, "", awsConfig))
+	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
+	svcCostExplorer := costexplorer.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(m.Endpoint, monitoringServiceName, "", awsBeatsConfig))
 
-	awsConfig.Region = regionName
-	svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, monitoringServiceName, regionName, awsConfig))
+	awsBeatsConfig.Region = regionName
+	svcCloudwatch := cloudwatch.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(m.Endpoint, monitoringServiceName, regionName, awsBeatsConfig))
 
-	timePeriod := costexplorer.DateInterval{
+	timePeriod := costexplorertypes.DateInterval{
 		Start: awssdk.String(startDate),
 		End:   awssdk.String(endDate),
 	}
@@ -161,7 +158,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func (m *MetricSet) getCloudWatchBillingMetrics(
-	svcCloudwatch cloudwatchiface.ClientAPI,
+	svcCloudwatch *cloudwatch.Client,
 	startTime time.Time,
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
@@ -213,7 +210,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	return events
 }
 
-func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, groupByDimKeys []string, groupByTags []string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
+func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupByDimKeys []string, groupByTags []string, timePeriod costexplorertypes.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
 	// get linked account IDs and names
@@ -227,31 +224,31 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		organizationsServiceName := awscommon.CreateServiceName("organizations", config.AWSConfig.FIPSEnabled, regionName)
 
-		svcOrg := organizations.New(awscommon.EnrichAWSConfigWithEndpoint(
+		svcOrg := organizations.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
 			m.Endpoint, organizationsServiceName, regionName, awsConfig))
 		accounts = m.getAccountName(svcOrg)
 	}
 
 	groupBys := getGroupBys(groupByTags, groupByDimKeys)
 	for _, groupBy := range groupBys {
-		var groupDefs []costexplorer.GroupDefinition
+		var groupDefs []costexplorertypes.GroupDefinition
 
 		if groupBy.dimension != "" {
-			groupDefs = append(groupDefs, costexplorer.GroupDefinition{
+			groupDefs = append(groupDefs, costexplorertypes.GroupDefinition{
 				Key:  awssdk.String(groupBy.dimension),
-				Type: costexplorer.GroupDefinitionTypeDimension,
+				Type: costexplorertypes.GroupDefinitionTypeDimension,
 			})
 		}
 
 		if groupBy.tag != "" {
-			groupDefs = append(groupDefs, costexplorer.GroupDefinition{
+			groupDefs = append(groupDefs, costexplorertypes.GroupDefinition{
 				Key:  awssdk.String(groupBy.tag),
-				Type: costexplorer.GroupDefinitionTypeTag,
+				Type: costexplorertypes.GroupDefinitionTypeTag,
 			})
 		}
 
 		groupByCostInput := costexplorer.GetCostAndUsageInput{
-			Granularity: costexplorer.GranularityDaily,
+			Granularity: costexplorertypes.GranularityDaily,
 			// no permission for "NetAmortizedCost" and "NetUnblendedCost"
 			Metrics: []string{"AmortizedCost", "BlendedCost",
 				"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
@@ -260,8 +257,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 			GroupBy: groupDefs,
 		}
 
-		groupByCostReq := svcCostExplorer.GetCostAndUsageRequest(&groupByCostInput)
-		groupByOutput, err := groupByCostReq.Send(context.Background())
+		groupByOutput, err := svcCostExplorer.GetCostAndUsage(context.Background(), &groupByCostInput)
 		if err != nil {
 			err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
 			m.Logger().Errorf(err.Error())
@@ -309,7 +305,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 	return events
 }
 
-func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, groupDefinition costexplorer.GroupDefinition, startDate string, endDate string) mb.Event {
+func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricValue, groupDefinition costexplorertypes.GroupDefinition, startDate string, endDate string) mb.Event {
 	event := aws.InitEvent("", m.AccountName, m.AccountID, time.Now())
 
 	// add group definition
@@ -339,9 +335,9 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, 
 	return event
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
-	var metricDataQueries []cloudwatch.MetricDataQuery
-	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
+func constructMetricQueries(listMetricsOutput []types.Metric, period time.Duration) []types.MetricDataQuery {
+	var metricDataQueries []types.MetricDataQuery
+	metricDataQueryEmpty := types.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, period)
 		if metricDataQuery == metricDataQueryEmpty {
@@ -352,9 +348,9 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.D
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric types.Metric, index int, period time.Duration) (metricDataQuery types.MetricDataQuery) {
 	statistic := "Maximum"
-	periodInSeconds := int64(period.Seconds())
+	periodInSeconds := int32(period.Seconds())
 	id := metricsetName + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 	metricName := *metric.MetricName
@@ -364,9 +360,9 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
 	}
 
-	metricDataQuery = cloudwatch.MetricDataQuery{
+	metricDataQuery = types.MetricDataQuery{
 		Id: &id,
-		MetricStat: &cloudwatch.MetricStat{
+		MetricStat: &types.MetricStat{
 			Period: &periodInSeconds,
 			Stat:   &statistic,
 			Metric: &metric,
@@ -438,22 +434,22 @@ func generateEventID(eventID string) string {
 	return prefix[:20]
 }
 
-func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]string {
+func (m *MetricSet) getAccountName(svc *organizations.Client) map[string]string {
 	// construct ListAccountsInput
-	ListAccountsInput := &organizations.ListAccountsInput{}
-	req := svc.ListAccountsRequest(ListAccountsInput)
-	p := organizations.NewListAccountsPaginator(req)
+	listAccountsInput := &organizations.ListAccountsInput{}
+	paginator := organizations.NewListAccountsPaginator(svc, listAccountsInput)
 
 	accounts := map[string]string{}
-	for p.Next(context.TODO()) {
-		page := p.CurrentPage()
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.Background())
+		if err != nil {
+			//TODO continue or return with error? Probably is return but...
+			continue
+		}
 		for _, a := range page.Accounts {
 			accounts[*a.Id] = *a.Name
 		}
 	}
 
-	if err := p.Err(); err != nil {
-		m.logger.Warnf("failed ListAccountsRequest", err)
-	}
 	return accounts
 }
