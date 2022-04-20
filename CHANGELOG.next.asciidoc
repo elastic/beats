@@ -125,8 +125,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 - Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
 - Add support in httpjson input for chain calls. {pull}29816[29816]
-- checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
-- Add URL Encode template function for httpjson input. {pull}30962[30962]
 - Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 
 *Auditbeat*
