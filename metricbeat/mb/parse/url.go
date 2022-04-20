@@ -27,9 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
-	"github.com/pkg/errors"
 )
+
+const http = "http"
 
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
@@ -56,7 +56,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			queryMap, ok := query.(map[string]interface{})
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a map", module.Name())
+				return mb.HostData{}, fmt.Errorf("'query' config for module %v is not a map", module.Name())
 			}
 
 			b.QueryParams = mb.QueryParams(queryMap).String()
@@ -67,7 +67,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			user, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module.Name())
+				return mb.HostData{}, fmt.Errorf("'username' config for module %v is not a string", module.Name())
 			}
 		} else {
 			user = b.DefaultUsername
@@ -76,7 +76,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			pass, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module.Name())
+				return mb.HostData{}, fmt.Errorf("'password' config for module %v is not a string", module.Name())
 			}
 		} else {
 			pass = b.DefaultPassword
@@ -85,7 +85,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			path, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
+				return mb.HostData{}, fmt.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
 			}
 		} else {
 			path = b.DefaultPath
@@ -97,7 +97,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			basePath, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
+				return mb.HostData{}, fmt.Errorf("'basepath' config for module %v is not a string", module.Name())
 			}
 		}
 
@@ -119,7 +119,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
 }
 
-// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
+// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjunction of the
 // url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
 func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
@@ -219,12 +219,12 @@ func getURL(
 	case "http+unix":
 		t = dialer.NewUnixDialerBuilder(u.Path)
 		u.Path = ""
-		u.Scheme = "http"
+		u.Scheme = http
 		u.Host = "unix"
 	case "http+npipe":
 		p := u.Path
 		u.Path = ""
-		u.Scheme = "http"
+		u.Scheme = http
 		u.Host = "npipe"
 
 		if p == "" && u.Host != "" {

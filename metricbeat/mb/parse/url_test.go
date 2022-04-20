@@ -26,6 +26,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	rawURL_unix  = "http+unix:///var/lib/docker.sock"
+	rawURL_npipe = "http+npipe://./pipe/custom"
+)
+
 func TestParseURL(t *testing.T) {
 	t.Run("http", func(t *testing.T) {
 		rawURL := "https://admin:secret@127.0.0.1:8080?hello=world"
@@ -60,7 +65,7 @@ func TestParseURL(t *testing.T) {
 	})
 
 	t.Run("http+unix at root", func(t *testing.T) {
-		rawURL := "http+unix:///var/lib/docker.sock"
+		rawURL := rawURL_unix
 		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
@@ -75,7 +80,7 @@ func TestParseURL(t *testing.T) {
 	})
 
 	t.Run("http+unix with path", func(t *testing.T) {
-		rawURL := "http+unix:///var/lib/docker.sock"
+		rawURL := rawURL_unix
 		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
@@ -90,7 +95,7 @@ func TestParseURL(t *testing.T) {
 	})
 
 	t.Run("http+npipe at root", func(t *testing.T) {
-		rawURL := "http+npipe://./pipe/custom"
+		rawURL := rawURL_npipe
 		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
@@ -105,7 +110,7 @@ func TestParseURL(t *testing.T) {
 	})
 
 	t.Run("http+npipe with path", func(t *testing.T) {
-		rawURL := "http+npipe://./pipe/custom"
+		rawURL := rawURL_npipe
 		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
