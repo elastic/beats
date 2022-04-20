@@ -16,7 +16,6 @@ import (
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
