@@ -96,7 +96,8 @@ func DefaultConfig() Config {
 }
 
 // ParseMessage will parse syslog message data formatted as format into fields. loc is used to enrich
-// timestamps that lack a time zone.
+// timestamps that lack a time zone. The error value will indicate any errors encountered during parsing.
+// Even if an error is returned, fields may still contain useful values.
 func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr, time.Time, error) {
 	var m message
 	var err error
