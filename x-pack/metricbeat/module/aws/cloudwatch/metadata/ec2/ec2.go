@@ -11,7 +11,7 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -22,15 +22,14 @@ import (
 const metadataPrefix = "aws.ec2.instance."
 
 // AddMetadata adds metadata for EC2 instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
+func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	ec2ServiceName := awscommon.CreateServiceName("ec2", fips_enabled, regionName)
-	svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+	svcEC2 := ec2.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
 		endpoint, ec2ServiceName, regionName, awsConfig))
 
 	instancesOutputs, err := getInstancesPerRegion(svcEC2)
 	if err != nil {
-		logp.Error(fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err))
-		return events
+		return events, fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err)
 	}
 
 	// collect monitoring state for each instance
@@ -48,10 +47,11 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fi
 		}
 
 		events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
-		if machineType, err := output.InstanceType.MarshalValue(); err == nil {
-			events[instanceID].RootFields.Put("cloud.machine.type", machineType)
+
+		if output.InstanceType != "" {
+			events[instanceID].RootFields.Put("cloud.machine.type", output.InstanceType)
 		} else {
-			logp.Error(fmt.Errorf("InstanceType.MarshalValue failed: %w", err))
+			logp.Error(fmt.Errorf("InstanceType is empty"))
 		}
 
 		placement := output.Placement
@@ -59,17 +59,17 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fi
 			events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
 		}
 
-		if instanceStateName, err := output.State.Name.MarshalValue(); err == nil {
-			events[instanceID].RootFields.Put(metadataPrefix+"state.name", instanceStateName)
+		if output.State.Name != "" {
+			events[instanceID].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
 		} else {
-			logp.Error(fmt.Errorf("instance.State.Name.MarshalValue failed: %w", err))
+			logp.Error(fmt.Errorf("instance.State.Name is empty"))
 		}
 
-		if monitoringState, err := output.Monitoring.State.MarshalValue(); err == nil {
-			monitoringStates[instanceID] = monitoringState
-			events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", monitoringState)
+		if output.Monitoring.State != ""{
+			monitoringStates[instanceID] = string(output.Monitoring.State)
+			events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
 		} else {
-			logp.Error(fmt.Errorf("Monitoring.State.MarshalValue failed: %w", err))
+			logp.Error(fmt.Errorf("Monitoring.State is empty"))
 		}
 
 		cpuOptions := output.CpuOptions
@@ -99,18 +99,17 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fi
 		// add rate metrics
 		calculateRate(events[instanceID], monitoringStates[instanceID])
 	}
-	return events
+	return events, nil
 }
 
-func getInstancesPerRegion(svc ec2iface.ClientAPI) (map[string]*ec2.Instance, error) {
-	instancesOutputs := map[string]*ec2.Instance{}
+func getInstancesPerRegion(svc *ec2.Client) (map[string]*ec2types.Instance, error) {
+	instancesOutputs := map[string]*ec2types.Instance{}
 	output := ec2.DescribeInstancesOutput{NextToken: nil}
 	init := true
 	for init || output.NextToken != nil {
 		init = false
 		describeInstanceInput := &ec2.DescribeInstancesInput{}
-		req := svc.DescribeInstancesRequest(describeInstanceInput)
-		output, err := req.Send(context.Background())
+		output, err := svc.DescribeInstances(context.Background(), describeInstanceInput)
 		if err != nil {
 			err = errors.Wrap(err, "Error DescribeInstances")
 			return nil, err
