@@ -20,6 +20,7 @@ package node_stats
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
