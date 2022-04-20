@@ -15,7 +15,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -102,7 +105,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -189,7 +195,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -276,7 +285,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -363,7 +375,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -450,7 +465,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -537,7 +555,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -624,7 +645,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -711,7 +735,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -798,7 +825,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -885,7 +915,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -972,7 +1005,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1059,7 +1095,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1146,7 +1185,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1233,7 +1275,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1320,7 +1365,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1407,7 +1455,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1494,7 +1545,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1581,7 +1635,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1668,7 +1725,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1755,7 +1815,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1842,7 +1905,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -1929,7 +1995,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -2016,7 +2085,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -2103,7 +2175,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -2190,7 +2265,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -2277,7 +2355,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -2364,7 +2445,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
@@ -2451,7 +2535,10 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_session",
+          "category": [
+            "network",
+            "session"
+          ],
           "kind": "event",
           "type": [
             "connection"
