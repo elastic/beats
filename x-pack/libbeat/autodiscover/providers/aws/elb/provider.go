@@ -7,7 +7,6 @@ package elb
 import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -64,7 +63,7 @@ func AutodiscoverBuilder(
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
 		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsCfg.Region)
-		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+		svcEC2 := ec2.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
 			config.AWSConfig.Endpoint, ec2ServiceName, awsCfg.Region, awsCfg))
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
@@ -75,7 +74,7 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []elasticloadbalancingv2iface.ClientAPI
+	var clients []*elasticloadbalancingv2.Client
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
@@ -88,7 +87,7 @@ func AutodiscoverBuilder(
 		}
 		awsCfg.Region = region
 		elbServiceName := awscommon.CreateServiceName("elasticloadbalancing", config.AWSConfig.FIPSEnabled, region)
-		clients = append(clients, elasticloadbalancingv2.New(awscommon.EnrichAWSConfigWithEndpoint(
+		clients = append(clients, elasticloadbalancingv2.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
 			config.AWSConfig.Endpoint, elbServiceName, region, awsCfg)))
 	}
 
