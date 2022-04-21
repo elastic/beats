@@ -4,947 +4,827 @@
   description: >
     Module for parsing sophosxg syslog.
   fields:
-    - name: Configuration
-      type: float
-      description: >
-        Configuration
-
-    - name: Mode
-      type: keyword
-      description: >
-        Mode
-
-    - name: PHPSESSID
-      type: keyword
-      description: >
-        PHPSESSID
-
-    - name: Reports
-      type: float
-      description: >
-        Reports
-
-    - name: Signature
-      type: float
-      description: >
-        Signature
-
-    - name: SysLog_SERVER_NAME
-      type: keyword
-      description: >
-        SysLog SERVER NAME
-
-    - name: Temp
-      type: float
-      description: >
-        Temp
-
     - name: action
       type: keyword
-      description: >
+      description: |
         Event Action
-
     - name: activityname
       type: keyword
-      description: >
+      description: |
         Web policy activity that matched and caused the policy result.
-
     - name: ap
       type: keyword
-      description: >
-        ap
-
+      description: |
+        Access Point Serial ID or LocalWifi0 or LocalWifi1.
+    - name: app_category
+      type: keyword
+      description: |
+        Name of the category under which application falls
+    - name: app_filter_policy_id
+      type: keyword
+      description: |
+        Application filter policy ID applied on the traffic
     - name: app_is_cloud
       type: keyword
-      description: >
+      description: |
         Application is Cloud
-
+    - name: app_name
+      type: keyword
+      description: |
+        Application name
+    - name: app_resolved_by
+      type: keyword
+      description: |
+        Application is resolved by signature or synchronized application
+    - name: app_risk
+      type: keyword
+      description: |
+        Risk level assigned to the application
+    - name: app_technology
+      type: keyword
+      description: |
+        Technology of the application
     - name: appfilter_policy_id
       type: integer
-      description: >
+      description: |
         Application Filter policy applied on the traffic
-
     - name: application
       type: keyword
-      description: >
+      description: |
         Application name
-
     - name: application_category
       type: keyword
-      description: >
+      description: |
         Application is resolved by signature or synchronized application
-
     - name: application_filter_policy
       type: integer
-      description: >
+      description: |
         Application Filter policy applied on the traffic
-
     - name: application_name
       type: keyword
-      description: >
+      description: |
         Application name
-
     - name: application_risk
       type: keyword
-      description: >
+      description: |
         Risk level assigned to the application
-
     - name: application_technology
       type: keyword
-      description: >
+      description: |
         Technology of the application
-
     - name: appresolvedby
       type: keyword
-      description: >
+      description: |
         Technology of the application
-
     - name: auth_client
       type: keyword
-      description: >
+      description: |
         Auth Client
-
     - name: auth_mechanism
       type: keyword
-      description: >
+      description: |
         Auth mechanism
-
     - name: av_policy_name
       type: keyword
-      description: >
+      description: |
         Malware scanning policy name which is applied on the traffic
-
     - name: backup_mode
       type: keyword
-      description: >
+      description: |
         Backup mode
-
     - name: branch_name
       type: keyword
-      description: >
+      description: |
         Branch Name
-
     - name: category
       type: keyword
-      description: >
+      description: |
         IPS signature category.
-
     - name: category_type
       type: keyword
-      description: >
+      description: |
         Type of category under which website falls
-
     - name: classification
       type: keyword
-      description: >
+      description: |
         Signature classification
-
     - name: client_host_name
       type: keyword
-      description: >
+      description: |
         Client host name
-
     - name: client_physical_address
       type: keyword
-      description: >
+      description: |
         Client physical address
-
     - name: clients_conn_ssid
-      type: keyword
-      description: >
-        clients connection ssid
-
+      type: long
+      description: |
+        Number of client connected to the SSID.
     - name: collisions
       type: long
-      description: >
+      description: |
         collisions
-
+    - name: con_event
+      type: keyword
+      description: |
+        Event Start/Stop
     - name: con_id
       type: integer
-      description: >
+      description: |
         Unique identifier of connection
-
+    - name: configuration
+      type: float
+      description: |
+        Configuration
     - name: conn_id
       type: integer
-      description: >
+      description: |
         Unique identifier of connection
-
     - name: connectionname
       type: keyword
-      description: >
+      description: |
         Connectionname
-
     - name: connectiontype
       type: keyword
-      description: >
+      description: |
         Connectiontype
-
     - name: connevent
       type: keyword
-      description: >
+      description: |
         Event on which this log is generated
-
     - name: connid
       type: keyword
-      description: >
+      description: |
         Connection ID
-
+    - name: content_type
+      type: keyword
+      description: |
+        Type of the content
     - name: contenttype
       type: keyword
-      description: >
+      description: |
         Type of the content
-
     - name: context_match
       type: keyword
-      description: >
+      description: |
         Context Match
-
     - name: context_prefix
       type: keyword
-      description: >
+      description: |
         Content Prefix
-
     - name: context_suffix
       type: keyword
-      description: >
+      description: |
         Context Suffix
-
     - name: cookie
       type: keyword
-      description: >
+      description: |
         cookie
-
     - name: date
       type: date
-      description: >
+      description: |
         Date (yyyy-mm-dd) when the event occurred
-
     - name: destinationip
       type: ip
-      description: >
+      description: |
         Original destination IP address of traffic
-
     - name: device
       type: keyword
-      description: >
+      description: |
         device
-
     - name: device_id
       type: keyword
-      description: >
+      description: |
         Serial number of the device
-
+    - name: device_model
+      type: keyword
+      description: |
+        Model number of the device
     - name: device_name
       type: keyword
-      description: >
+      description: |
         Model number of the device
-
     - name: dictionary_name
       type: keyword
-      description: >
+      description: |
         Dictionary Name
-
     - name: dir_disp
       type: keyword
-      description: >
+      description: |
         TPacket direction. Possible values:“org”, “reply”, “”
-
     - name: direction
       type: keyword
-      description: >
+      description: |
         Direction
-
     - name: domainname
       type: keyword
-      description: >
+      description: |
         Domain from which virus was downloaded
-
     - name: download_file_name
       type: keyword
-      description: >
+      description: |
         Download file name
-
     - name: download_file_type
       type: keyword
-      description: >
+      description: |
         Download file type
-
     - name: dst_country_code
       type: keyword
-      description: >
+      description: |
         Code of the country to which the destination IP belongs
-
     - name: dst_domainname
       type: keyword
-      description: >
+      description: |
         Receiver domain name
-
     - name: dst_ip
       type: ip
-      description: >
+      description: |
         Original destination IP address of traffic
-
     - name: dst_port
       type: integer
-      description: >
+      description: |
         Original destination port of TCP and UDP traffic
-
+    - name: dst_zone_type
+      type: keyword
+      description: |
+        Type of destination zone
     - name: dstdomain
       type: keyword
-      description: >
+      description: |
         Destination Domain
-
-    - name: dstzone
-      type: keyword
-      description: >
-        Name of destination zone
-
-    - name: dstzonetype
-      type: keyword
-      description: >
-        Type of destination zone, e.g., WAN
-
     - name: duration
       type: long
-      description: >
+      description: |
         Durability of traffic (seconds)
-
     - name: email_subject
       type: keyword
-      description: >
+      description: |
         Email Subject
-
     - name: ep_uuid
       type: keyword
-      description: >
+      description: |
         Endpoint UUID
-
     - name: ether_type
       type: keyword
-      description: >
-        The ethernet frame type
-
+      description: |
+        ethernet frame type
     - name: eventid
       type: keyword
-      description: >
+      description: |
         ATP Evenet ID
-
     - name: eventtime
       type: date
-      description: >
+      description: |
         Event time
-
     - name: eventtype
       type: keyword
-      description: >
+      description: |
         ATP event type
-
     - name: exceptions
       type: keyword
-      description: >
+      description: |
         List of the checks excluded by web exceptions.
-
     - name: execution_path
       type: keyword
-      description: >
+      description: |
         ATP execution path
-
     - name: extra
       type: keyword
-      description: >
+      description: |
         extra
-
     - name: file_name
       type: keyword
-      description: >
+      description: |
         Filename
-
     - name: file_path
       type: keyword
-      description: >
+      description: |
         File path
-
     - name: file_size
       type: integer
-      description: >
+      description: |
         File Size
-
     - name: filename
       type: keyword
-      description: >
+      description: |
         File name associated with the event
-
     - name: filepath
       type: keyword
-      description: >
+      description: |
         Path of the file containing virus
-
     - name: filesize
       type: integer
-      description: >
+      description: |
         Size of the file that contained virus
-
     - name: free
       type: integer
-      description: >
+      description: |
         free
-
     - name: from_email_address
       type: keyword
-      description: >
+      description: |
         Sender email address
-
     - name: ftp_direction
       type: keyword
-      description: >
+      description: |
         Direction of FTP transfer: Upload or Download
-
     - name: ftp_url
       type: keyword
-      description: >
+      description: |
         FTP URL from which virus was downloaded
-
     - name: ftpcommand
       type: keyword
-      description: >
+      description: |
         FTP command used when virus was found
-
     - name: fw_rule_id
       type: integer
-      description: >
+      description: |
         Firewall Rule ID which is applied on the traffic
-
+    - name: fw_rule_type
+      type: keyword
+      description: |
+        Firewall rule type which is applied on the traffic
     - name: hb_health
       type: keyword
-      description: >
+      description: |
         Heartbeat status
-
+    - name: hb_status
+      type: keyword
+      description: |
+        Heartbeat status
     - name: host
       type: keyword
-      description: >
+      description: |
         Host
-
+    - name: http_category
+      type: keyword
+      description: |
+        HTTP Category
+    - name: http_category_type
+      type: keyword
+      description: |
+        HTTP Category Type
     - name: httpresponsecode
       type: long
-      description: >
+      description: |
         code of HTTP response
-
     - name: iap
       type: keyword
-      description: >
+      description: |
         Internet Access policy ID applied on the traffic
-
     - name: icmp_code
       type: keyword
-      description: >
+      description: |
         ICMP code of ICMP traffic
-
     - name: icmp_type
       type: keyword
-      description: >
+      description: |
         ICMP type of ICMP traffic
-
     - name: idle_cpu
       type: float
-      description: >
+      description: |
         idle ##
-
     - name: idp_policy_id
       type: integer
-      description: >
+      description: |
         IPS policy ID which is applied on the traffic
-
     - name: idp_policy_name
       type: keyword
-      description: >
+      description: |
         IPS policy name i.e. IPS policy name which is applied on the traffic
-
     - name: in_interface
       type: keyword
-      description: >
+      description: |
         Interface for incoming traffic, e.g., Port A
-
     - name: interface
       type: keyword
-      description: >
+      description: |
         interface
-
     - name: ipaddress
       type: keyword
-      description: >
+      description: |
         Ipaddress
-
     - name: ips_policy_id
       type: integer
-      description: >
+      description: |
         IPS policy ID applied on the traffic
-
+    - name: lease_time
+      type: keyword
+      description: |
+        Lease Time
     - name: localgateway
       type: keyword
-      description: >
+      description: |
         Localgateway
-
     - name: localnetwork
       type: keyword
-      description: >
+      description: |
         Localnetwork
-
     - name: log_component
       type: keyword
-      description: >
+      description: |
         Component responsible for logging e.g. Firewall rule
-
     - name: log_id
       type: keyword
-      description: >
+      description: |
         Unique 12 characters code (0101011)
-
     - name: log_subtype
       type: keyword
-      description: >
+      description: |
         Sub type of event
-
     - name: log_type
       type: keyword
-      description: >
+      description: |
         Type of event e.g. firewall event
-
+    - name: log_version
+      type: keyword
+      description: |
+        Log Version
     - name: login_user
       type: keyword
-      description: >
+      description: |
         ATP login user
-
     - name: mailid
       type: keyword
-      description: >
+      description: |
         mailid
-
     - name: mailsize
       type: integer
-      description: >
+      description: |
         mailsize
-
     - name: message
       type: keyword
-      description: >
+      description: |
         Message
-
-    - name: message_id
+    - name: mode
       type: keyword
-      description: >
-        Message ID
-
+      description: |
+        Mode
+    - name: nat_rule_id
+      type: keyword
+      description: |
+        NAT Rule ID
     - name: newversion
       type: keyword
-      description: >
+      description: |
         Newversion
-
     - name: oldversion
       type: keyword
-      description: >
+      description: |
         Oldversion
-
     - name: out_interface
       type: keyword
-      description: >
+      description: |
         Interface for outgoing traffic, e.g., Port B
-
     - name: override_authorizer
       type: keyword
-      description: >
+      description: |
         Override authorizer
-
     - name: override_name
       type: keyword
-      description: >
+      description: |
         Override name
-
     - name: override_token
       type: keyword
-      description: >
+      description: |
         Override token
-
+    - name: phpsessid
+      type: keyword
+      description: |
+        PHP session ID
     - name: platform
       type: keyword
-      description: >
+      description: |
         Platform of the traffic.
-
     - name: policy_type
       type: keyword
-      description: >
+      description: |
         Policy type applied to the traffic
-
     - name: priority
       type: keyword
-      description: >
+      description: |
         Severity level of traffic
-
     - name: protocol
       type: keyword
-      description: >
+      description: |
         Protocol number of traffic
-
+    - name: qualifier
+      type: keyword
+      description: |
+        Qualifier
     - name: quarantine
       type: keyword
-      description: >
+      description: |
         Path and filename of the file quarantined
-
     - name: quarantine_reason
       type: keyword
-      description: >
+      description: |
         Quarantine reason
-
     - name: querystring
       type: keyword
-      description: >
+      description: |
         querystring
-
     - name: raw_data
       type: keyword
-      description: >
+      description: |
         Raw data
-
-    - name: reason
-      type: keyword
-      description: >
-        Reason why the record was detected as spam/malicious
-
     - name: received_pkts
       type: long
-      description: >
+      description: |
         Total number of packets received
-
     - name: receiveddrops
       type: long
-      description: >
+      description: |
         received drops
-
     - name: receivederrors
       type: keyword
-      description: >
+      description: |
         received errors
-
     - name: receivedkbits
       type: long
-      description: >
+      description: |
         received kbits
-
     - name: recv_bytes
       type: long
-      description: >
+      description: |
         Total number of bytes received
-
     - name: red_id
       type: keyword
-      description: >
+      description: |
         RED ID
-
     - name: referer
       type: keyword
-      description: >
+      description: |
         Referer
-
     - name: remote_ip
       type: ip
-      description: >
+      description: |
         Remote IP
-
     - name: remotenetwork
       type: keyword
-      description: >
+      description: |
         remotenetwork
-
-    - name: responsetime
-      type: long
-      description: >
-        Responsetime
-
+    - name: reported_host
+      type: keyword
+      description: |
+        Reported Host
+    - name: reported_ip
+      type: keyword
+      description: |
+        Reported IP
+    - name: reports
+      type: float
+      description: |
+        Reports
     - name: rule_priority
       type: keyword
-      description: >
+      description: |
         Priority of IPS policy
-
     - name: sent_bytes
       type: long
-      description: >
+      description: |
         Total number of bytes sent
-
     - name: sent_pkts
       type: long
-      description: >
+      description: |
         Total number of packets sent
-
     - name: server
       type: keyword
-      description: >
+      description: |
         Server
-
     - name: sessionid
       type: keyword
-      description: >
+      description: |
         Sessionid
-
     - name: sha1sum
       type: keyword
-      description: >
+      description: |
         SHA1 checksum of the item being analyzed
-
+    - name: signature
+      type: float
+      description: |
+        Signature
     - name: signature_id
       type: keyword
-      description: >
+      description: |
         Signature ID
-
     - name: signature_msg
       type: keyword
-      description: >
+      description: |
         Signature messsage
-
     - name: site_category
       type: keyword
-      description: >
+      description: |
         Site Category
-
     - name: source
       type: keyword
-      description: >
+      description: |
         Source
-
     - name: sourceip
       type: ip
-      description: >
+      description: |
         Original source IP address of traffic
-
     - name: spamaction
       type: keyword
-      description: >
+      description: |
         Spam Action
-
     - name: sqli
       type: keyword
-      description: >
-        The related SQLI caught by the WAF
-
+      description: |
+        related SQLI caught by the WAF
     - name: src_country_code
       type: keyword
-      description: >
+      description: |
         Code of the country to which the source IP belongs
-
     - name: src_domainname
       type: keyword
-      description: >
+      description: |
         Sender domain name
-
     - name: src_ip
       type: ip
-      description: >
+      description: |
         Original source IP address of traffic
-
     - name: src_mac
       type: keyword
-      description: >
+      description: |
         Original source MAC address of traffic
-
     - name: src_port
       type: integer
-      description: >
+      description: |
         Original source port of TCP and UDP traffic
-
-    - name: srczone
+    - name: src_zone_type
       type: keyword
-      description: >
-        Name of source zone
-
-    - name: srczonetype
-      type: keyword
-      description: >
-        Type of source zone, e.g., LAN
-
+      description: |-
+        Type of source zone
     - name: ssid
       type: keyword
-      description: >
-        ssid
-
+      description: |
+        Configured SSID name.
     - name: start_time
       type: date
-      description: >
+      description: |
         Start time
-
     - name: starttime
       type: date
-      description: >
+      description: |
         Starttime
-
     - name: status
       type: keyword
-      description: >
+      description: |
         Ultimate status of traffic – Allowed or Denied
-
     - name: status_code
       type: keyword
-      description: >
+      description: |
         Status code
-
     - name: subject
       type: keyword
-      description: >
+      description: |
         Email subject
-
+    - name: syslog_server_name
+      type: keyword
+      description: |
+        Syslog server name
+    - name: syslog_server_name
+      type: keyword
+      description: |
+        Syslog server name.
     - name: system_cpu
       type: float
-      description: >
+      description: |
         system
-
     - name: target
       type: keyword
-      description: >
+      description: |
         Platform of the traffic.
-
+    - name: temp
+      type: float
+      description: |
+        Temp
     - name: threatname
       type: keyword
-      description: >
+      description: |
         ATP threatname
-
     - name: timestamp
       type: date
-      description: >
+      description: |
         timestamp
-
     - name: timezone
       type: keyword
-      description: >
+      description: |
         Time (hh:mm:ss) when the event occurred
-
     - name: to_email_address
       type: keyword
-      description: >
+      description: |
         Receipeint email address
-
     - name: total_memory
       type: integer
-      description: >
+      description: |
         Total Memory
-
     - name: trans_dst_ip
       type: ip
-      description: >
+      description: |
         Translated destination IP address for outgoing traffic
-
     - name: trans_dst_port
       type: integer
-      description: >
+      description: |
         Translated destination port for outgoing traffic
-
     - name: trans_src_ip
       type: ip
-      description: >
+      description: |
         Translated source IP address for outgoing traffic
-
     - name: trans_src_port
       type: integer
-      description: >
+      description: |
         Translated source port for outgoing traffic
-
     - name: transaction_id
       type: keyword
-      description: >
+      description: |
         Transaction ID
-
     - name: transactionid
       type: keyword
-      description: >
+      description: |
         Transaction ID of the AV scan.
-
     - name: transmitteddrops
       type: long
-      description: >
+      description: |
         transmitted drops
-
     - name: transmittederrors
       type: keyword
-      description: >
+      description: |
         transmitted errors
-
     - name: transmittedkbits
       type: long
-      description: >
+      description: |
         transmitted kbits
-
     - name: unit
       type: keyword
-      description: >
+      description: |
         unit
-
     - name: updatedip
       type: ip
-      description: >
+      description: |
         updatedip
-
     - name: upload_file_name
       type: keyword
-      description: >
+      description: |
         Upload file name
-
     - name: upload_file_type
       type: keyword
-      description: >
+      description: |
         Upload file type
-
     - name: url
       type: keyword
-      description: >
+      description: |
         URL from which virus was downloaded
-
     - name: used
       type: integer
-      description: >
+      description: |
         used
-
+    - name: used_quota
+      type: keyword
+      description: |
+        Used Quota
     - name: user
       type: keyword
-      description: >
+      description: |
         User
-
     - name: user_cpu
       type: float
-      description: >
+      description: |
         system
-
     - name: user_gp
       type: keyword
-      description: >
+      description: |
         Group name to which the user belongs.
-
     - name: user_group
       type: keyword
-      description: >
+      description: |
         Group name to which the user belongs
-
     - name: user_name
       type: keyword
-      description: >
+      description: |
         user_name
-
     - name: users
-      type: keyword
-      description: >
-        users
-
+      type: long
+      description: |
+        Number of users from System Health / Live User events.
     - name: vconn_id
       type: integer
-      description: >
+      description: |
         Connection ID of the master connection
-
     - name: virus
       type: keyword
-      description: >
+      description: |
         virus name
-
+    - name: web_policy_id
+      type: keyword
+      description: |
+        Web policy ID
     - name: website
       type: keyword
-      description: >
+      description: |
         Website
-
     - name: xss
       type: keyword
-      description: >
-        The related XSS caught by the WAF
+      description: |
+        related XSS caught by the WAF
