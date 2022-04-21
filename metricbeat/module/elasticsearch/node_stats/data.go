@@ -258,8 +258,8 @@ var (
 		}),
 		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
 			"memory": c.Dict("memory", s.Schema{
-				"current":        c.Dict("current", current_memory_pressure),
-				"total":          c.Dict("total", total_memory_pressure),
+				"current":        c.Dict("current", currentMemoryPressureSchema),
+				"total":          c.Dict("total", totalMemoryPressureSchema),
 				"limit_in_bytes": c.Int("limit_in_bytes"),
 			}),
 		}),
@@ -280,7 +280,7 @@ var (
 		},
 	}
 
-	current_memory_pressure = s.Schema{
+	currentMemoryPressureSchema = s.Schema{
 		"all": s.Object{
 			"bytes": c.Int("all_in_bytes"),
 		},
@@ -298,7 +298,7 @@ var (
 		},
 	}
 
-	total_memory_pressure = s.Schema{
+	totalMemoryPressureSchema = s.Schema{
 		"primary": s.Object{
 			"rejections": c.Int("primary_rejections"),
 			"bytes":      c.Int("primary_in_bytes"),
