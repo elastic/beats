@@ -13,10 +13,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/stats"
 )
 
 func init() {
 	plugin.Register("browser", create, "synthetic", "synthetics/synthetic")
+	stats.GetBrowserStats()
 }
 
 var showExperimentalOnce = sync.Once{}
@@ -40,7 +42,7 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root!")
 	}
 
-	s, err := NewSuite(cfg)
+	s, err := NewSuite(cfg, stats.GetBrowserStats())
 	if err != nil {
 		return plugin.Plugin{}, err
 	}

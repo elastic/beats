@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/stats"
 
 	"github.com/gofrs/uuid"
 
@@ -22,6 +23,11 @@ type enricher func(event *beat.Event, se *SynthEvent, fields StdSuiteFields) err
 
 type streamEnricher struct {
 	je *journeyEnricher
+	s  *stats.BrowserStats
+}
+
+func newStreamEnricher(s *stats.BrowserStats) streamEnricher {
+	return streamEnricher{s: s}
 }
 
 func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
@@ -29,7 +35,7 @@ func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSui
 		e.je = newJourneyEnricher()
 	}
 
-	return e.je.enrich(event, se, fields)
+	return e.je.enrich(event, se, fields, e.s)
 }
 
 // journeyEnricher holds state across received SynthEvents retaining fields
@@ -62,7 +68,7 @@ func makeUuid() string {
 	return u.String()
 }
 
-func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
+func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields, s *stats.BrowserStats) error {
 	if se == nil {
 		return nil
 	}
@@ -115,10 +121,10 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 			},
 		})
 	}
-	return je.enrichSynthEvent(event, se)
+	return je.enrichSynthEvent(event, se, s)
 }
 
-func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent, s *stats.BrowserStats) error {
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
@@ -134,11 +140,11 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
-			return je.createSummary(event)
+			return je.createSummary(event, s)
 		}
 	case "journey/end":
 		je.journeyComplete = true
-		return je.createSummary(event)
+		return je.createSummary(event, s)
 	case "step/end":
 		je.stepCount++
 	case "step/screenshot":
@@ -170,7 +176,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	return jobErr
 }
 
-func (je *journeyEnricher) createSummary(event *beat.Event) error {
+func (je *journeyEnricher) createSummary(event *beat.Event, s *stats.BrowserStats) error {
 	var up, down int
 	if je.errorCount > 0 {
 		up = 0
@@ -206,6 +212,9 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 			"down": down,
 		},
 	})
+
+	s.RegisterStepCount(je.stepCount)
+	s.RegisterDuration(int64(je.end.Sub(je.start) / time.Microsecond))
 
 	if je.journeyComplete {
 		return je.firstError

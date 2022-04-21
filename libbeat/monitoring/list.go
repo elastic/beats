@@ -70,3 +70,15 @@ func (l *UniqueList) Report(m Mode, V Visitor) {
 	ReportInt(V, "count", count)
 	ReportStringSlice(V, "names", items)
 }
+
+func (l *UniqueList) ReportMap(m Mode, V Visitor) {
+	V.OnRegistryStart()
+	defer V.OnRegistryFinished()
+
+	l.Lock()
+	defer l.Unlock()
+
+	for key, val := range l.list {
+		ReportInt(V, key, int64(val))
+	}
+}

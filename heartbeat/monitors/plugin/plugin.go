@@ -49,7 +49,7 @@ type Plugin struct {
 	Endpoints int
 }
 
-// Close closes the plugin, invoking any DoClose hooks if avialable.
+// Close closes the :lugin, invoking any DoClose hooks if avialable.
 func (p Plugin) Close() error {
 	if p.DoClose != nil {
 		return p.DoClose()

@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/stats"
 )
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
@@ -20,12 +21,14 @@ type JourneyLister func(ctx context.Context, suitePath string, params common.Map
 type Suite struct {
 	rawCfg   *common.Config
 	suiteCfg *Config
+	stats    *stats.BrowserStats
 }
 
-func NewSuite(rawCfg *common.Config) (*Suite, error) {
+func NewSuite(rawCfg *common.Config, bStats *stats.BrowserStats) (*Suite, error) {
 	s := &Suite{
 		rawCfg:   rawCfg,
 		suiteCfg: DefaultConfig(),
+		stats:    bStats,
 	}
 	err := rawCfg.Unpack(s.suiteCfg)
 	if err != nil {
@@ -112,14 +115,14 @@ func (s *Suite) extraArgs() []string {
 func (s *Suite) jobs() []jobs.Job {
 	var j jobs.Job
 	if src, ok := s.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.Fields(), s.extraArgs()...)
+		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.Fields(), s.stats, s.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := s.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.extraArgs()...)
+			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.stats, s.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
