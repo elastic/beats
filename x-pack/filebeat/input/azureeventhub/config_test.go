@@ -20,6 +20,8 @@ func TestStorageContainerValidate(t *testing.T) {
 		{"a", false},
 		{"a-name-that-is-really-too-long-to-be-valid-and-should-never-be-used-no-matter-what", false},
 		{"-not-valid", false},
+		{"not-valid-", false},
+		{"not--valid", false},
 		{"capital-A-not-valid", false},
 		{"no_underscores_either", false},
 	}
@@ -29,4 +31,24 @@ func TestStorageContainerValidate(t *testing.T) {
 			t.Errorf("storageContainerValidate(%s) = %v", test.input, err)
 		}
 	}
+}
+
+func TestValidate(t *testing.T) {
+	t.Run("Check event hub names containing underscores", func(t *testing.T) {
+		config := azureInputConfig{
+			ConnectionString: "sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET",
+			EventHubName:     "eventhub_00",
+			SAName:           "teststorageaccount",
+			SAKey:            "secret",
+			SAContainer:      "filebeat-activitylogs-eventhub_00",
+		}
+
+		if err := config.Validate(); err != nil {
+			t.Fatal(err)
+		}
+
+		if config.SAContainer != "filebeat-activitylogs-eventhub-00" {
+			t.Errorf("underscores (_) not replaced with hyphens (-): %s", config.SAContainer)
+		}
+	})
 }
