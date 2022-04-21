@@ -7,25 +7,15 @@ package aws
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"testing"
-	"time"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
-
-// MockCloudwatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	cloudwatchiface.ClientAPI
-}
-
-// MockResourceGroupsTaggingClient is used for unit tests.
-type MockResourceGroupsTaggingClient struct {
-	resourcegroupstaggingapiiface.ClientAPI
-}
 
 var (
 	metricName = "CPUUtilization"
@@ -50,150 +40,99 @@ var (
 	label4      = instanceID + " " + metricName4
 )
 
-func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
-	dim := cloudwatch.Dimension{
-		Name:  &dimName,
-		Value: &instanceID,
-	}
-	httpReq, _ := http.NewRequest("", "", nil)
-	return cloudwatch.ListMetricsRequest{
-		Input: input,
-		Copy:  m.ListMetricsRequest,
-		Request: &awssdk.Request{
-			Operation: &awssdk.Operation{
-				Name:      "ListMetrics",
-				Paginator: nil,
-			},
-			Data: &cloudwatch.ListMetricsOutput{
-				Metrics: []cloudwatch.Metric{
-					{
-						MetricName: &metricName,
-						Namespace:  &namespace,
-						Dimensions: []cloudwatch.Dimension{dim},
-					},
-				},
-			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
-		},
-	}
-}
+// MockCloudwatchClient struct is used for unit tests.
+type MockCloudWatchClient struct{}
 
-func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient interface
+func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
 	value1 := 0.25
 	value2 := 0.0
 	value3 := 0.0
 	value4 := 0.0
-	httpReq, _ := http.NewRequest("", "", nil)
 
-	return cloudwatch.GetMetricDataRequest{
-		Input: input,
-		Copy:  m.GetMetricDataRequest,
-		Request: &awssdk.Request{
-			Operation: &awssdk.Operation{
-				Name:      "GetMetricData",
-				Paginator: nil,
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:     &id1,
+				Label:  &label1,
+				Values: []float64{value1},
 			},
-			Data: &cloudwatch.GetMetricDataOutput{
-				MetricDataResults: []cloudwatch.MetricDataResult{
-					{
-						Id:     &id1,
-						Label:  &label1,
-						Values: []float64{value1},
-					},
-					{
-						Id:     &id2,
-						Label:  &label2,
-						Values: []float64{value2},
-					},
-					{
-						Id:     &id3,
-						Label:  &label3,
-						Values: []float64{value3},
-					},
-					{
-						Id:     &id4,
-						Label:  &label4,
-						Values: []float64{value4},
-					},
-				},
+			{
+				Id:     &id2,
+				Label:  &label2,
+				Values: []float64{value2},
 			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
+			{
+				Id:     &id3,
+				Label:  &label3,
+				Values: []float64{value3},
+			},
+			{
+				Id:     &id4,
+				Label:  &label4,
+				Values: []float64{value4},
+			},
 		},
-	}
+		NextToken: &emptyString,
+	}, nil
 }
 
-func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	op := &awssdk.Operation{
-		Name:       "GetResources",
-		HTTPMethod: "POST",
-		HTTPPath:   "/",
-		Paginator:  nil,
+func (m *MockCloudWatchClient) ListMetrics(context.Context, *cloudwatch.ListMetricsInput, ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	dim := cloudwatchtypes.Dimension{
+		Name:  &dimName,
+		Value: &instanceID,
 	}
-	firstPageResult := resourcegroupstaggingapi.GetResourcesRequest{
-		Request: &awssdk.Request{
-			Operation: op,
-			Data: &resourcegroupstaggingapi.GetResourcesOutput{
-				PaginationToken: awssdk.String("PaginationToken"),
-				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
+
+	return &cloudwatch.ListMetricsOutput{
+		Metrics: []cloudwatchtypes.Metric{
+			{
+				MetricName: &metricName,
+				Namespace:  &namespace,
+				Dimensions: []cloudwatchtypes.Dimension{dim},
+			},
+		},
+		NextToken: awssdk.String(""),
+	}, nil
+}
+
+// MockResourceGroupsTaggingClient is used for unit tests.
+type MockResourceGroupsTaggingClient struct{}
+
+// GetResources implements resourcegroupstaggingapi.GetResourcesAPIClient.
+func (m *MockResourceGroupsTaggingClient) GetResources(_ context.Context, _ *resourcegroupstaggingapi.GetResourcesInput, _ ...func(*resourcegroupstaggingapi.Options)) (*resourcegroupstaggingapi.GetResourcesOutput, error) {
+	return &resourcegroupstaggingapi.GetResourcesOutput{
+		PaginationToken: awssdk.String(""),
+		ResourceTagMappingList: []resourcegroupstaggingapitypes.ResourceTagMapping{
+			{
+				ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
+				Tags: []resourcegroupstaggingapitypes.Tag{
 					{
-						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
-						Tags: []resourcegroupstaggingapi.Tag{
-							{
-								Key:   awssdk.String("organization"),
-								Value: awssdk.String("engineering"),
-							},
-							{
-								Key:   awssdk.String("owner"),
-								Value: awssdk.String("foo"),
-							},
-						},
+						Key:   awssdk.String("organization"),
+						Value: awssdk.String("engineering"),
 					},
 					{
-						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-2"),
-						Tags: []resourcegroupstaggingapi.Tag{
-							{
-								Key:   awssdk.String("organization"),
-								Value: awssdk.String("finance"),
-							},
-							{
-								Key:   awssdk.String("owner"),
-								Value: awssdk.String("boo"),
-							},
-						},
+						Key:   awssdk.String("owner"),
+						Value: awssdk.String("foo"),
 					},
 				},
 			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
-		},
-		Input: input,
-		Copy:  m.GetResourcesRequest,
-	}
-
-	// aws resourcegroupstaggingapi default pagination size is 50, if resource amount is a
-	// multiple of 50, then last request has an empty result.
-	lastPageWithEmptyResult := resourcegroupstaggingapi.GetResourcesRequest{
-		Request: &awssdk.Request{
-			Data: &resourcegroupstaggingapi.GetResourcesOutput{
-				PaginationToken:        awssdk.String(""),
-				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{},
+			{
+				ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-2"),
+				Tags: []resourcegroupstaggingapitypes.Tag{
+					{
+						Key:   awssdk.String("organization"),
+						Value: awssdk.String("finance"),
+					},
+					{
+						Key:   awssdk.String("owner"),
+						Value: awssdk.String("boo"),
+					},
+				},
 			},
-			HTTPRequest: httpReq,
-			Operation:   op,
-			Retryer:     awssdk.NoOpRetryer{},
 		},
-		Input: input,
-		Copy:  m.GetResourcesRequest,
-	}
-
-	if input.PaginationToken == nil {
-		return firstPageResult
-	} else {
-		return lastPageWithEmptyResult
-	}
+	}, nil
 }
 
 func TestGetListMetricsOutput(t *testing.T) {
@@ -224,7 +163,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	startTime, endTime := GetStartTimeEndTime(10*time.Minute, 0)
 
 	mockSvc := &MockCloudWatchClient{}
-	var metricDataQueries []cloudwatch.MetricDataQuery
+	var metricDataQueries []cloudwatchtypes.MetricDataQuery
 
 	getMetricDataInput := &cloudwatch.GetMetricDataInput{
 		NextToken:         nil,
@@ -233,8 +172,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 		MetricDataQueries: metricDataQueries,
 	}
 
-	reqGetMetricData := mockSvc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataOutput, err := reqGetMetricData.Send(context.TODO())
+	getMetricDataOutput, err := mockSvc.GetMetricData(context.TODO(), getMetricDataInput)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()
@@ -262,12 +200,12 @@ func TestGetMetricDataResults(t *testing.T) {
 	startTime, endTime := GetStartTimeEndTime(10*time.Minute, 0)
 
 	mockSvc := &MockCloudWatchClient{}
-	metricInfo := cloudwatch.Metric{
+	metricInfo := cloudwatchtypes.Metric{
 		MetricName: &metricName,
 		Namespace:  &namespace,
 	}
-	metricStat := cloudwatch.MetricStat{Metric: &metricInfo}
-	metricDataQueries := []cloudwatch.MetricDataQuery{
+	metricStat := cloudwatchtypes.MetricStat{Metric: &metricInfo}
+	metricDataQueries := []cloudwatchtypes.MetricDataQuery{
 		{
 			Id:         &id1,
 			Label:      &label1,
@@ -332,22 +270,22 @@ func TestFindTimestamp(t *testing.T) {
 	timestamp1 := time.Now()
 	timestamp2 := timestamp1.Add(5 * time.Minute)
 	cases := []struct {
-		getMetricDataResults []cloudwatch.MetricDataResult
+		getMetricDataResults []cloudwatchtypes.MetricDataResult
 		expectedTimestamp    time.Time
 	}{
 		{
-			getMetricDataResults: []cloudwatch.MetricDataResult{
+			getMetricDataResults: []cloudwatchtypes.MetricDataResult{
 				{
 					Id:         &id1,
 					Label:      &label1,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 					Timestamps: []time.Time{timestamp1, timestamp2},
 					Values:     []float64{0, 1},
 				},
 				{
 					Id:         &id2,
 					Label:      &label2,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 					Timestamps: []time.Time{timestamp1},
 					Values:     []float64{2, 3},
 				},
@@ -355,40 +293,40 @@ func TestFindTimestamp(t *testing.T) {
 			expectedTimestamp: timestamp1,
 		},
 		{
-			getMetricDataResults: []cloudwatch.MetricDataResult{
+			getMetricDataResults: []cloudwatchtypes.MetricDataResult{
 				{
 					Id:         &id1,
 					Label:      &label1,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 					Timestamps: []time.Time{timestamp1, timestamp2},
 					Values:     []float64{0, 1},
 				},
 				{
 					Id:         &id2,
 					Label:      &label2,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 				},
 			},
 			expectedTimestamp: timestamp1,
 		},
 		{
-			getMetricDataResults: []cloudwatch.MetricDataResult{
+			getMetricDataResults: []cloudwatchtypes.MetricDataResult{
 				{
 					Id:         &id1,
 					Label:      &label1,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 					Timestamps: []time.Time{timestamp1, timestamp2},
 					Values:     []float64{0, 1},
 				},
 				{
 					Id:         &id2,
 					Label:      &label2,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 				},
 				{
 					Id:         &id3,
 					Label:      &label2,
-					StatusCode: cloudwatch.StatusCodeComplete,
+					StatusCode: cloudwatchtypes.StatusCodeComplete,
 					Timestamps: []time.Time{timestamp2},
 					Values:     []float64{2, 3},
 				},
@@ -454,8 +392,8 @@ func TestGetResourcesTags(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 4, len(resourceTagMap))
 
-	expectedResourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
-	expectedResourceTagMap["mysql-db-1"] = []resourcegroupstaggingapi.Tag{
+	expectedResourceTagMap := map[string][]resourcegroupstaggingapitypes.Tag{}
+	expectedResourceTagMap["mysql-db-1"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String("organization"),
 			Value: awssdk.String("engineering"),
@@ -465,7 +403,7 @@ func TestGetResourcesTags(t *testing.T) {
 			Value: awssdk.String("foo"),
 		},
 	}
-	expectedResourceTagMap["mysql-db-2"] = []resourcegroupstaggingapi.Tag{
+	expectedResourceTagMap["mysql-db-2"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String("organization"),
 			Value: awssdk.String("finance"),
@@ -475,7 +413,7 @@ func TestGetResourcesTags(t *testing.T) {
 			Value: awssdk.String("boo"),
 		},
 	}
-	expectedResourceTagMap["db:mysql-db-1"] = []resourcegroupstaggingapi.Tag{
+	expectedResourceTagMap["db:mysql-db-1"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String("organization"),
 			Value: awssdk.String("engineering"),
@@ -485,7 +423,7 @@ func TestGetResourcesTags(t *testing.T) {
 			Value: awssdk.String("foo"),
 		},
 	}
-	expectedResourceTagMap["db:mysql-db-2"] = []resourcegroupstaggingapi.Tag{
+	expectedResourceTagMap["db:mysql-db-2"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String("organization"),
 			Value: awssdk.String("finance"),
