@@ -360,7 +360,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		event.RootFields = common.MapStr{}
 		_, err = event.RootFields.Put("service.name", elasticsearch.ModuleName)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("Unable to put field service.name: %w", err))
+			errs = append(errs, fmt.Errorf("unable to put field service.name: %w", err))
 			continue
 		}
 
@@ -395,12 +395,12 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		}
 		_, err = event.ModuleFields.Put("node.name", nameStr)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("Unable to put field node.name: %w", err))
+			errs = append(errs, fmt.Errorf("unable to put field node.name: %w", err))
 			continue
 		}
 		err = event.MetricSetFields.Delete("name")
 		if err != nil {
-			errs = append(errs, fmt.Errorf("Unable to delete field name: %w", err))
+			errs = append(errs, fmt.Errorf("unable to delete field name: %w", err))
 			continue
 		}
 
