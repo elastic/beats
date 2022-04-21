@@ -2,6 +2,10 @@
 description: Pipeline for parsing Sophos XG firewall logs.
 processors:
 - set:
+    field: event.ingested
+    copy_from: _ingest.timestamp
+
+- set:
     field: ecs.version
     value: '8.0.0'
 
@@ -331,37 +335,37 @@ processors:
 ## Product Specific Pipelines ##
 ###############################
 - pipeline:
-    name: '{{ IngestPipeline "antispam" }}'
+    name: '{< IngestPipeline "antispam" >}'
     if: "ctx.sophos?.xg?.log_type == 'Anti-Spam'"
 - pipeline:
-    name: '{{ IngestPipeline "antivirus" }}'
+    name: '{< IngestPipeline "antivirus" >}'
     if: "ctx.sophos?.xg?.log_type == 'Anti-Virus'"
 - pipeline:
-    name: '{{ IngestPipeline "atp" }}'
+    name: '{< IngestPipeline "atp" >}'
     if: "ctx.sophos?.xg?.log_type == 'ATP'"
 - pipeline:
-    name: '{{ IngestPipeline "cfilter" }}'
+    name: '{< IngestPipeline "cfilter" >}'
     if: "ctx.sophos?.xg?.log_type == 'Content Filtering'"
 - pipeline:
-    name: '{{ IngestPipeline "event" }}'
+    name: '{< IngestPipeline "event" >}'
     if: "ctx.sophos?.xg?.log_type == 'Event'"
 - pipeline:
-    name: '{{ IngestPipeline "firewall" }}'
+    name: '{< IngestPipeline "firewall" >}'
     if: "ctx.sophos?.xg?.log_type == 'Firewall'"
 - pipeline:
-    name: '{{ IngestPipeline "idp" }}'
+    name: '{< IngestPipeline "idp" >}'
     if: "ctx.sophos?.xg?.log_type == 'IDP'"
 - pipeline:
-    name: '{{ IngestPipeline "sandstorm" }}'
+    name: '{< IngestPipeline "sandstorm" >}'
     if: "ctx.sophos?.xg?.log_type == 'Sandbox'"
 - pipeline:
-    name: '{{ IngestPipeline "systemhealth" }}'
+    name: '{< IngestPipeline "systemhealth" >}'
     if: "ctx.sophos?.xg?.log_type == 'System Health'"
 - pipeline:
-    name: '{{ IngestPipeline "waf" }}'
+    name: '{< IngestPipeline "waf" >}'
     if: "ctx.sophos?.xg?.log_type == 'WAF'"
 - pipeline:
-    name: '{{ IngestPipeline "wifi" }}'
+    name: '{< IngestPipeline "wifi" >}'
     if: "ctx.sophos?.xg?.log_type == 'Wireless Protection'"
 
 ##################
