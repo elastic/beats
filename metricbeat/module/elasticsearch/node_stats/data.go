@@ -358,7 +358,11 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+		_, err = event.RootFields.Put("service.name", elasticsearch.ModuleName)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("Unable to put field service.name: %w", err))
+			continue
+		}
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{
@@ -389,8 +393,16 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 			errs = append(errs, fmt.Errorf("name is not a string"))
 			continue
 		}
-		event.ModuleFields.Put("node.name", nameStr)
-		event.MetricSetFields.Delete("name")
+		_, err = event.ModuleFields.Put("node.name", nameStr)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("Unable to put field node.name: %w", err))
+			continue
+		}
+		err = event.MetricSetFields.Delete("name")
+		if err != nil {
+			errs = append(errs, fmt.Errorf("Unable to delete field name: %w", err))
+			continue
+		}
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 		// When using Agent, the index name is overwritten anyways.
