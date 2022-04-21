@@ -634,3 +634,5 @@
           type: keyword
           description: >
             Beat type.
+        - name: elasticsearch.cluster.id
+          type: keyword

@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd/platformcheck"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/cmd"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 )
 
 // Setups and Runs agent.
@@ -20,6 +21,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to initialize: %v\n", err)
 		os.Exit(1)
 	}
+
+	pj, err := proc.CreateJobObject()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to initialize process job object: %v\n", err)
+		os.Exit(1)
+	}
+	defer pj.Close()
 
 	rand.Seed(time.Now().UnixNano())
 	command := cmd.NewCommand()

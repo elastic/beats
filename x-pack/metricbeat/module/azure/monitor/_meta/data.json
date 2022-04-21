@@ -1,29 +1,23 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
+        "dimensions": {
+            "activity_name": "secretlist"
+        },
         "metrics": {
-            "data_usage": {
-                "total": 131072
-            },
-            "document_count": {
-                "total": 2
-            },
-            "document_quota": {
-                "total": 107374182400
+            "availability": {
+                "avg": 100
             }
         },
-        "namespace": "Microsoft.DocumentDb/databaseAccounts",
+        "namespace": "Microsoft.KeyVault/vaults",
         "resource": {
-            "group": "obs-infrastructure",
-            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
-            "name": "obsaccount",
-            "tags": {
-                "defaultExperience": "Core (SQL)"
-            },
-            "type": "Microsoft.DocumentDb/databaseAccounts"
+            "group": "some-rg",
+            "id": "/subscriptions/70f046a0-a299-ab73-9950-88ac8b5ac454/resourceGroups/some-rg/providers/Microsoft.KeyVault/vaults/somekeyvault",
+            "name": "somekeyvault",
+            "type": "Microsoft.KeyVault/vaults"
         },
         "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
-        "timegrain": "PT5M"
+        "timegrain": "PT1M"
     },
     "cloud": {
         "provider": "azure",

@@ -27,7 +27,6 @@ import (
 )
 
 func TestSni(t *testing.T) {
-
 	// Single element
 
 	buf := mkBuf(t, "000d"+ // 13 bytes
@@ -126,7 +125,6 @@ func TestSni(t *testing.T) {
 }
 
 func TestParseMaxFragmentLength(t *testing.T) {
-
 	r := parseMaxFragmentLen(*mkBuf(t, "01", 1))
 	assert.Equal(t, "2^9", r.(string))
 	r = parseMaxFragmentLen(*mkBuf(t, "04", 1))

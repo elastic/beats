@@ -2,481 +2,7 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "3037e577635e9cbcefe1f273e5b06784d36807af76158e4add887e840c42e1ef",
-				"image": {
-					"name": "docker.io/kindest/kindnetd:v20210326-1e038dc5"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-worker2"
-			},
-			"pod": {
-				"name": "kindnet-tg7tl"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"limit": {
-					"cores": 0.1
-				},
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://3037e577635e9cbcefe1f273e5b06784d36807af76158e4add887e840c42e1ef",
-			"memory": {
-				"limit": {
-					"bytes": 52428800
-				},
-				"request": {
-					"bytes": 52428800
-				}
-			},
-			"name": "kindnet-cni",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "a55ee307ef431d293c02a7eb96417963d7b81b298a8ebfac2f77fe4ca58e1461",
-				"image": {
-					"name": "k8s.gcr.io/kube-proxy:v1.16.15"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "kube-proxy-cm525"
-			}
-		},
-		"MetricSetFields": {
-			"id": "containerd://a55ee307ef431d293c02a7eb96417963d7b81b298a8ebfac2f77fe4ca58e1461",
-			"name": "kube-proxy",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "a84953a247df489898d85ecfd0f893c2655ed1915ac902b309ee6e3658c7e258",
-				"image": {
-					"name": "docker.io/library/busybox:latest"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "default"
-			},
-			"node": {
-				"name": "kind-worker"
-			},
-			"pod": {
-				"name": "hello-zf6gh"
-			}
-		},
-		"MetricSetFields": {
-			"id": "containerd://a84953a247df489898d85ecfd0f893c2655ed1915ac902b309ee6e3658c7e258",
-			"name": "hello",
-			"status": {
-				"phase": "terminated",
-				"ready": false,
-				"reason": "Completed",
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "f2926bdf120aa838838aa55640b5511291e7279eb07ee8c17e01bf23a8695c2c",
-				"image": {
-					"name": "k8s.gcr.io/kube-proxy:v1.16.15"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-worker2"
-			},
-			"pod": {
-				"name": "kube-proxy-lf6md"
-			}
-		},
-		"MetricSetFields": {
-			"id": "containerd://f2926bdf120aa838838aa55640b5511291e7279eb07ee8c17e01bf23a8695c2c",
-			"name": "kube-proxy",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "1c1919c3b07bf3369b5e1a4bf187762f2724b3bc7eb113239af3919f12202337",
-				"image": {
-					"name": "k8s.gcr.io/kube-controller-manager:v1.16.15"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "kube-controller-manager-kind-control-plane"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.2
-				}
-			},
-			"id": "containerd://1c1919c3b07bf3369b5e1a4bf187762f2724b3bc7eb113239af3919f12202337",
-			"name": "kube-controller-manager",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "8af6de6644ef1e5bb36b9d1f87d65e9b893096ae2c0f3e57061fad70f094d1be",
-				"image": {
-					"name": "k8s.gcr.io/kube-proxy:v1.16.15"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-worker"
-			},
-			"pod": {
-				"name": "kube-proxy-22znl"
-			}
-		},
-		"MetricSetFields": {
-			"id": "containerd://8af6de6644ef1e5bb36b9d1f87d65e9b893096ae2c0f3e57061fad70f094d1be",
-			"name": "kube-proxy",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "9afadbf7fd5374d1849b008e8ad4287cdbfbbf499bab9740bf0c7a5cd6730ad9",
-				"image": {
-					"name": "docker.io/kindest/kindnetd:v20210326-1e038dc5"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-worker"
-			},
-			"pod": {
-				"name": "kindnet-9fgst"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"limit": {
-					"cores": 0.1
-				},
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://9afadbf7fd5374d1849b008e8ad4287cdbfbbf499bab9740bf0c7a5cd6730ad9",
-			"memory": {
-				"limit": {
-					"bytes": 52428800
-				},
-				"request": {
-					"bytes": 52428800
-				}
-			},
-			"name": "kindnet-cni",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "fae8ef6fa6ea716f5ce0a65a1b2407d1e4839b04452d6013cdb6d5be8db8ada0",
-				"image": {
-					"name": "docker.io/library/redis:5.0.4"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "default"
-			},
-			"node": {
-				"name": "kind-worker2"
-			},
-			"pod": {
-				"name": "redis"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"limit": {
-					"cores": 0.1
-				},
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://fae8ef6fa6ea716f5ce0a65a1b2407d1e4839b04452d6013cdb6d5be8db8ada0",
-			"name": "redis",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 1
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "cd368e1731c278b039642fab2fe90902e2cfa470fd70a7ccfd5c2549a552cea5",
-				"image": {
-					"name": "k8s.gcr.io/kube-scheduler:v1.16.15"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "kube-scheduler-kind-control-plane"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://cd368e1731c278b039642fab2fe90902e2cfa470fd70a7ccfd5c2549a552cea5",
-			"name": "kube-scheduler",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "90560da422742a41de53c281969942c25f24d7b6bf73af6e4f226ee62338f640",
-				"image": {
-					"name": "docker.elastic.co/beats/metricbeat:7.15.0-SNAPSHOT"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-worker"
-			},
-			"pod": {
-				"name": "metricbeat-bvr2v"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://90560da422742a41de53c281969942c25f24d7b6bf73af6e4f226ee62338f640",
-			"memory": {
-				"limit": {
-					"bytes": 209715200
-				},
-				"request": {
-					"bytes": 104857600
-				}
-			},
-			"name": "metricbeat",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 1
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "33315399455b7213d316f6f799155d890659ca407f80d58307075b3ee70e7e07",
+				"id": "3101d1525d6133851881f4b7cd439033663daefeb4849e5322d1428f09620628",
 				"image": {
 					"name": "k8s.gcr.io/coredns:1.6.2"
 				},
@@ -484,14 +10,12 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
 			"node": {
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "coredns-5644d7b6d9-nnwmb"
+				"name": "coredns-5644d7b6d9-zgdsx"
 			}
 		},
 		"MetricSetFields": {
@@ -500,7 +24,7 @@
 					"cores": 0.1
 				}
 			},
-			"id": "containerd://33315399455b7213d316f6f799155d890659ca407f80d58307075b3ee70e7e07",
+			"id": "containerd://3101d1525d6133851881f4b7cd439033663daefeb4849e5322d1428f09620628",
 			"memory": {
 				"limit": {
 					"bytes": 178257920
@@ -511,50 +35,10 @@
 			},
 			"name": "coredns",
 			"status": {
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "3f9250f160ca15f681b8c7da78fdf34cd8be8a86fde3910b682ad413b940a8c5",
-				"image": {
-					"name": "k8s.gcr.io/etcd:3.3.15-0"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "etcd-kind-control-plane"
-			}
-		},
-		"MetricSetFields": {
-			"id": "containerd://3f9250f160ca15f681b8c7da78fdf34cd8be8a86fde3910b682ad413b940a8c5",
-			"name": "etcd",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 0
 			}
 		},
 		"Index": "",
@@ -579,9 +63,7 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
 			"node": {
 				"name": "kind-control-plane"
 			},
@@ -617,41 +99,27 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "3101d1525d6133851881f4b7cd439033663daefeb4849e5322d1428f09620628",
+				"id": "f2926bdf120aa838838aa55640b5511291e7279eb07ee8c17e01bf23a8695c2c",
 				"image": {
-					"name": "k8s.gcr.io/coredns:1.6.2"
+					"name": "k8s.gcr.io/kube-proxy:v1.16.15"
 				},
 				"runtime": "containerd"
 			}
 		},
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
 			"node": {
-				"name": "kind-control-plane"
+				"name": "kind-worker2"
 			},
 			"pod": {
-				"name": "coredns-5644d7b6d9-zgdsx"
+				"name": "kube-proxy-lf6md"
 			}
 		},
 		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://3101d1525d6133851881f4b7cd439033663daefeb4849e5322d1428f09620628",
-			"memory": {
-				"limit": {
-					"bytes": 178257920
-				},
-				"request": {
-					"bytes": 73400320
-				}
-			},
-			"name": "coredns",
+			"id": "containerd://f2926bdf120aa838838aa55640b5511291e7279eb07ee8c17e01bf23a8695c2c",
+			"name": "kube-proxy",
 			"status": {
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -671,139 +139,27 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "d66f649ad0f6c1822039f1c4ea27b6f792f6a86029bf862e77afa2966042a1ce",
+				"id": "8af6de6644ef1e5bb36b9d1f87d65e9b893096ae2c0f3e57061fad70f094d1be",
 				"image": {
-					"name": "docker.elastic.co/beats/metricbeat:7.15.0-SNAPSHOT"
+					"name": "k8s.gcr.io/kube-proxy:v1.16.15"
 				},
 				"runtime": "containerd"
 			}
 		},
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-worker2"
-			},
-			"pod": {
-				"name": "metricbeat-55fp7"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://d66f649ad0f6c1822039f1c4ea27b6f792f6a86029bf862e77afa2966042a1ce",
-			"memory": {
-				"limit": {
-					"bytes": 209715200
-				},
-				"request": {
-					"bytes": 104857600
-				}
-			},
-			"name": "metricbeat",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 1
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "ae513b826459c9382984bea986eb3546aa45fd0e650051cb9591ab7a8efed6ea",
-				"image": {
-					"name": "k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.1.0"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
 			"node": {
 				"name": "kind-worker"
 			},
 			"pod": {
-				"name": "kube-state-metrics-f655d484d-hj69w"
+				"name": "kube-proxy-22znl"
 			}
 		},
 		"MetricSetFields": {
-			"id": "containerd://ae513b826459c9382984bea986eb3546aa45fd0e650051cb9591ab7a8efed6ea",
-			"name": "kube-state-metrics",
+			"id": "containerd://8af6de6644ef1e5bb36b9d1f87d65e9b893096ae2c0f3e57061fad70f094d1be",
+			"name": "kube-proxy",
 			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 2
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "09603a8146bd6aacb32d55a1e52e929143f003ea30c84052f765efca129fd90a",
-				"image": {
-					"name": "docker.io/kindest/kindnetd:v20210326-1e038dc5"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "kindnet-kch2v"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"limit": {
-					"cores": 0.1
-				},
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "containerd://09603a8146bd6aacb32d55a1e52e929143f003ea30c84052f765efca129fd90a",
-			"memory": {
-				"limit": {
-					"bytes": 52428800
-				},
-				"request": {
-					"bytes": 52428800
-				}
-			},
-			"name": "kindnet-cni",
-			"status": {
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -831,9 +187,7 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": {
-				"name": "default"
-			},
+			"namespace": "default",
 			"node": {
 				"name": "kind-worker"
 			},
@@ -845,9 +199,111 @@
 			"id": "containerd://02b0705f60dc6131a6b5d4e9a48e2510463f89a0f77e7e1bafa6b5f45cc595e8",
 			"name": "hello-python",
 			"status": {
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 18
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "09603a8146bd6aacb32d55a1e52e929143f003ea30c84052f765efca129fd90a",
+				"image": {
+					"name": "docker.io/kindest/kindnetd:v20210326-1e038dc5"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "kindnet-kch2v"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"limit": {
+					"cores": 0.1
+				},
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://09603a8146bd6aacb32d55a1e52e929143f003ea30c84052f765efca129fd90a",
+			"memory": {
+				"limit": {
+					"bytes": 52428800
+				},
+				"request": {
+					"bytes": 52428800
+				}
+			},
+			"name": "kindnet-cni",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "cd368e1731c278b039642fab2fe90902e2cfa470fd70a7ccfd5c2549a552cea5",
+				"image": {
+					"name": "k8s.gcr.io/kube-scheduler:v1.16.15"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "kube-scheduler-kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://cd368e1731c278b039642fab2fe90902e2cfa470fd70a7ccfd5c2549a552cea5",
+			"name": "kube-scheduler",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
 			}
 		},
 		"Index": "",
@@ -872,9 +328,7 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": {
-				"name": "local-path-storage"
-			},
+			"namespace": "local-path-storage",
 			"node": {
 				"name": "kind-control-plane"
 			},
@@ -886,9 +340,533 @@
 			"id": "containerd://1a223dbb8b51a7404836789fd049701a9e4df7bb69878fb893ab10419ff4eb29",
 			"name": "local-path-provisioner",
 			"status": {
+				"last_terminated_reason": "Error",
 				"phase": "running",
 				"ready": true,
 				"restarts": 8
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "d66f649ad0f6c1822039f1c4ea27b6f792f6a86029bf862e77afa2966042a1ce",
+				"image": {
+					"name": "docker.elastic.co/beats/metricbeat:7.15.0-SNAPSHOT"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-worker2"
+			},
+			"pod": {
+				"name": "metricbeat-55fp7"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://d66f649ad0f6c1822039f1c4ea27b6f792f6a86029bf862e77afa2966042a1ce",
+			"memory": {
+				"limit": {
+					"bytes": 209715200
+				},
+				"request": {
+					"bytes": 104857600
+				}
+			},
+			"name": "metricbeat",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 1
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "33315399455b7213d316f6f799155d890659ca407f80d58307075b3ee70e7e07",
+				"image": {
+					"name": "k8s.gcr.io/coredns:1.6.2"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "coredns-5644d7b6d9-nnwmb"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://33315399455b7213d316f6f799155d890659ca407f80d58307075b3ee70e7e07",
+			"memory": {
+				"limit": {
+					"bytes": 178257920
+				},
+				"request": {
+					"bytes": 73400320
+				}
+			},
+			"name": "coredns",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "fae8ef6fa6ea716f5ce0a65a1b2407d1e4839b04452d6013cdb6d5be8db8ada0",
+				"image": {
+					"name": "docker.io/library/redis:5.0.4"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "kind-worker2"
+			},
+			"pod": {
+				"name": "redis"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"limit": {
+					"cores": 0.1
+				},
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://fae8ef6fa6ea716f5ce0a65a1b2407d1e4839b04452d6013cdb6d5be8db8ada0",
+			"name": "redis",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 1
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "9afadbf7fd5374d1849b008e8ad4287cdbfbbf499bab9740bf0c7a5cd6730ad9",
+				"image": {
+					"name": "docker.io/kindest/kindnetd:v20210326-1e038dc5"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-worker"
+			},
+			"pod": {
+				"name": "kindnet-9fgst"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"limit": {
+					"cores": 0.1
+				},
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://9afadbf7fd5374d1849b008e8ad4287cdbfbbf499bab9740bf0c7a5cd6730ad9",
+			"memory": {
+				"limit": {
+					"bytes": 52428800
+				},
+				"request": {
+					"bytes": 52428800
+				}
+			},
+			"name": "kindnet-cni",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "ae513b826459c9382984bea986eb3546aa45fd0e650051cb9591ab7a8efed6ea",
+				"image": {
+					"name": "k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.1.0"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-worker"
+			},
+			"pod": {
+				"name": "kube-state-metrics-f655d484d-hj69w"
+			}
+		},
+		"MetricSetFields": {
+			"id": "containerd://ae513b826459c9382984bea986eb3546aa45fd0e650051cb9591ab7a8efed6ea",
+			"name": "kube-state-metrics",
+			"status": {
+				"last_terminated_reason": "Error",
+				"phase": "running",
+				"ready": true,
+				"restarts": 2
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "90560da422742a41de53c281969942c25f24d7b6bf73af6e4f226ee62338f640",
+				"image": {
+					"name": "docker.elastic.co/beats/metricbeat:7.15.0-SNAPSHOT"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-worker"
+			},
+			"pod": {
+				"name": "metricbeat-bvr2v"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://90560da422742a41de53c281969942c25f24d7b6bf73af6e4f226ee62338f640",
+			"memory": {
+				"limit": {
+					"bytes": 209715200
+				},
+				"request": {
+					"bytes": 104857600
+				}
+			},
+			"name": "metricbeat",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 1
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "a84953a247df489898d85ecfd0f893c2655ed1915ac902b309ee6e3658c7e258",
+				"image": {
+					"name": "docker.io/library/busybox:latest"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "kind-worker"
+			},
+			"pod": {
+				"name": "hello-zf6gh"
+			}
+		},
+		"MetricSetFields": {
+			"id": "containerd://a84953a247df489898d85ecfd0f893c2655ed1915ac902b309ee6e3658c7e258",
+			"name": "hello",
+			"status": {
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "a55ee307ef431d293c02a7eb96417963d7b81b298a8ebfac2f77fe4ca58e1461",
+				"image": {
+					"name": "k8s.gcr.io/kube-proxy:v1.16.15"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "kube-proxy-cm525"
+			}
+		},
+		"MetricSetFields": {
+			"id": "containerd://a55ee307ef431d293c02a7eb96417963d7b81b298a8ebfac2f77fe4ca58e1461",
+			"name": "kube-proxy",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "3f9250f160ca15f681b8c7da78fdf34cd8be8a86fde3910b682ad413b940a8c5",
+				"image": {
+					"name": "k8s.gcr.io/etcd:3.3.15-0"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "etcd-kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"id": "containerd://3f9250f160ca15f681b8c7da78fdf34cd8be8a86fde3910b682ad413b940a8c5",
+			"name": "etcd",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "3037e577635e9cbcefe1f273e5b06784d36807af76158e4add887e840c42e1ef",
+				"image": {
+					"name": "docker.io/kindest/kindnetd:v20210326-1e038dc5"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-worker2"
+			},
+			"pod": {
+				"name": "kindnet-tg7tl"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"limit": {
+					"cores": 0.1
+				},
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "containerd://3037e577635e9cbcefe1f273e5b06784d36807af76158e4add887e840c42e1ef",
+			"memory": {
+				"limit": {
+					"bytes": 52428800
+				},
+				"request": {
+					"bytes": 52428800
+				}
+			},
+			"name": "kindnet-cni",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "1c1919c3b07bf3369b5e1a4bf187762f2724b3bc7eb113239af3919f12202337",
+				"image": {
+					"name": "k8s.gcr.io/kube-controller-manager:v1.16.15"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "kube-controller-manager-kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.2
+				}
+			},
+			"id": "containerd://1c1919c3b07bf3369b5e1a4bf187762f2724b3bc7eb113239af3919f12202337",
+			"name": "kube-controller-manager",
+			"status": {
+				"last_terminated_reason": "Unknown",
+				"phase": "running",
+				"ready": true,
+				"restarts": 4
 			}
 		},
 		"Index": "",

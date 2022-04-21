@@ -17,7 +17,7 @@
         discover-pr-forks-strategy: 'merge-current'
         discover-pr-forks-trust: 'permission'
         discover-pr-origin: 'merge-current'
-        head-filter-regex: '(master|6\.[89]|7\.16|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
+        head-filter-regex: '(main|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
         discover-tags: true
         notification-context: "beats-ci"
         repo: 'beats'
@@ -33,16 +33,13 @@
             ignore-target-only-changes: true
         - named-branches:
             - exact-name:
-                name: 'master'
+                name: 'main'
                 case-sensitive: true
             - regex-name:
                 regex: '6\.[89]'
                 case-sensitive: true
             - regex-name:
-                regex: '7\.[x789]'
-                case-sensitive: true
-            - regex-name:
-                regex: '7\.1\d'
+                regex: '7\.1[6789]'
                 case-sensitive: true
             - regex-name:
                 regex: '8\.\d+'

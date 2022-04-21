@@ -6,16 +6,14 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": {
-            "name": "jenkins"
-        },
+        "namespace": "kube-system",
         "node": {
             "name": "minikube"
         },
         "pod": {
             "host_ip": "192.168.99.100",
-            "ip": "172.17.0.7",
-            "name": "wise-lynx-jenkins-1616735317-svn6k",
+            "ip": "172.17.0.2",
+            "name": "tiller-deploy-3067024529-9lpmb",
             "status": {
                 "phase": "running",
                 "ready": "true",

@@ -1,20 +1,36 @@
+queue_rules:
+  - name: default
+    conditions:
+      - check-success=beats-ci/pr-merge
 pull_request_rules:
-  - name: forward-port patches to master branch
+  - name: self-assign PRs
+    conditions:
+      - -merged
+      - -closed
+      - "#assignee=0"
+    actions:
+      assign:
+        add_users:
+          - "{{ author }}"
+  - name: forward-port patches to main branch
     conditions:
       - merged
-      - label=backport-v8.1.0
+      - label=forwardport-main
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "master"
+          - "main"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: ask to resolve conflict
     conditions:
+      - -merged
+      - -closed
       - conflict
+      - -author=apmmachine
     actions:
         comment:
           message: |
@@ -26,6 +42,18 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
+  - name: close automated pull requests with bump updates if any conflict
+    conditions:
+      - -merged
+      - -closed
+      - conflict
+      - author=apmmachine
+      - label=automation
+    actions:
+      close:
+        message: |
+          This pull request has been automatically closed by Mergify.
+          There are some other up-to-date pull requests.
   - name: automatic approval for automated pull requests with bump updates
     conditions:
       - author=apmmachine
@@ -43,9 +71,9 @@ pull_request_rules:
       - files~=^testing/environments/snapshot.*\.yml$
       - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: false
+        name: default
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
       - or:
@@ -87,9 +115,9 @@ pull_request_rules:
       - head~=^add-backport-next.*
       - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: false
+        name: default
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:
@@ -116,7 +144,7 @@ pull_request_rules:
   - name: notify the backport policy
     conditions:
       - -label~=^backport
-      - base=master
+      - base=main
       - -merged
       - -closed
     actions:
@@ -179,6 +207,19 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.17 branch
+    conditions:
+      - merged
+      - label=backport-v7.17.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.17"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.0 branch
     conditions:
       - merged
@@ -189,6 +230,19 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.1 branch
+    conditions:
+      - merged
+      - label=backport-v8.1.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.1"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

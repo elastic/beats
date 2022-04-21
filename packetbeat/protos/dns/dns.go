@@ -59,17 +59,9 @@ type dnsPlugin struct {
 	watcher procs.ProcessesWatcher
 }
 
-var (
-	debugf = logp.MakeDebug("dns")
-)
+var debugf = logp.MakeDebug("dns")
 
 const maxDNSTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
-
-// Constants used to associate the DNS QR flag with a meaningful value.
-const (
-	query    = false
-	response = true
-)
 
 // Transport protocol.
 type transport uint8
@@ -203,13 +195,12 @@ func (dns *dnsPlugin) getTransaction(k hashableDNSTuple) *dnsTransaction {
 }
 
 type dnsTransaction struct {
-	ts           time.Time // Time when the request was received.
-	tuple        dnsTuple  // Key used to track this transaction in the transactionsMap.
-	responseTime int32     // Elapsed time in milliseconds between the request and response.
-	src          common.Endpoint
-	dst          common.Endpoint
-	transport    transport
-	notes        []string
+	ts        time.Time // Time when the request was received.
+	tuple     dnsTuple  // Key used to track this transaction in the transactionsMap.
+	src       common.Endpoint
+	dst       common.Endpoint
+	transport transport
+	notes     []string
 
 	request  *dnsMessage
 	response *dnsMessage

@@ -36,6 +36,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -51,7 +52,7 @@ func init() {
 	system.pagesize = uint64(os.Getpagesize())
 }
 
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 	memData := Memory{}
 	meminfo := C.perfstat_memory_total_t{}
 	_, err := C.perfstat_memory_total(nil, &meminfo, C.sizeof_perfstat_memory_total_t, 1)

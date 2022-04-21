@@ -51,7 +51,7 @@ var (
 
 		Labels: map[string]p.LabelMap{
 			"statefulset": p.KeyLabel("name"),
-			"namespace":   p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+			"namespace":   p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 		},
 	}
 )

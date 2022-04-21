@@ -1,8 +1,8 @@
-# Heartbeat (Experimental)
+# Heartbeat
 
 Welcome to Heartbeat.
 
-This is a new EXPERIMENTAL beat for testing service availability using PING based on ICMP, TCP or higher level protocols.
+This is a beat for testing service availability using PING based on ICMP, TCP or higher level protocols.
 
 Ensure that this folder is at the following location:
 `${GOPATH}/src/github.com/elastic/beats`

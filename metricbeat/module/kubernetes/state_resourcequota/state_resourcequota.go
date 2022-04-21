@@ -63,7 +63,7 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"kube_resourcequota":         p.Metric("quota"),
 			},
 			Labels: map[string]p.LabelMap{
-				"namespace":     p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+				"namespace":     p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 				"resourcequota": p.KeyLabel("name"),
 
 				"resource": p.KeyLabel("resource"),

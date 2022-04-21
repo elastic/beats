@@ -26,6 +26,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 const dockerTestData = "testdata/docker.zip"
@@ -103,7 +105,7 @@ func exists(path string) (bool, error) {
 }
 
 func TestSupportedSubsystems(t *testing.T) {
-	subsystems, err := SupportedSubsystems("testdata/docker")
+	subsystems, err := SupportedSubsystems(resolve.NewTestResolver("testdata/docker"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +128,7 @@ func TestSupportedSubsystems(t *testing.T) {
 }
 
 func TestSupportedSubsystemsErrCgroupsMissing(t *testing.T) {
-	_, err := SupportedSubsystems("testdata/doesnotexist")
+	_, err := SupportedSubsystems(resolve.NewTestResolver("testdata/doesnotexist"))
 	if err != ErrCgroupsMissing {
 		t.Fatalf("expected ErrCgroupsMissing, but got %v", err)
 	}
@@ -144,7 +146,7 @@ func TestSubsystemMountpoints(t *testing.T) {
 	subsystems["memory"] = struct{}{}
 	subsystems["perf_event"] = struct{}{}
 
-	mountpoints, err := SubsystemMountpoints("testdata/docker", subsystems)
+	mountpoints, err := SubsystemMountpoints(resolve.NewTestResolver("testdata/docker"), subsystems)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +163,7 @@ func TestSubsystemMountpoints(t *testing.T) {
 }
 
 func TestProcessCgroupPaths(t *testing.T) {
-	reader, err := NewReader("testdata/docker", false)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false)
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -185,7 +187,7 @@ func TestProcessCgroupPaths(t *testing.T) {
 }
 
 func TestProcessCgroupPathsV2(t *testing.T) {
-	reader, err := NewReader("testdata/docker", false)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false)
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}

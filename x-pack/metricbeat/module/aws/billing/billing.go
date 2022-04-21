@@ -114,6 +114,12 @@ func (c CostExplorerConfig) Validate() error {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	var config aws.Config
+	err := m.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil
+	}
+	monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
@@ -123,11 +129,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// get cost metrics from cost explorer
 	awsConfig := m.MetricSet.AwsConfig.Copy()
 	svcCostExplorer := costexplorer.New(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, "monitoring", "", awsConfig))
+		m.Endpoint, monitoringServiceName, "", awsConfig))
 
 	awsConfig.Region = regionName
 	svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, "monitoring", regionName, awsConfig))
+		m.Endpoint, monitoringServiceName, regionName, awsConfig))
 
 	timePeriod := costexplorer.DateInterval{
 		Start: awssdk.String(startDate),
@@ -212,10 +218,17 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 
 	// get linked account IDs and names
 	accounts := map[string]string{}
+	var config aws.Config
+	err := m.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil
+	}
 	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
+		organizationsServiceName := awscommon.CreateServiceName("organizations", config.AWSConfig.FIPSEnabled, regionName)
+
 		svcOrg := organizations.New(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, "organizations", regionName, awsConfig))
+			m.Endpoint, organizationsServiceName, regionName, awsConfig))
 		accounts = m.getAccountName(svcOrg)
 	}
 

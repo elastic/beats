@@ -16,7 +16,6 @@ import (
 var fieldNameConverter = caseConverter{
 	conversion: map[string]string{
 		// Special handled fields
-
 		// VRFname should be VRFName
 		"VRFname": "vrf_name",
 	},

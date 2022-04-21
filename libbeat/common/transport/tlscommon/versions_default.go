@@ -26,14 +26,13 @@ import (
 
 // Define all the possible TLS version.
 const (
-	TLSVersionSSL30 TLSVersion = tls.VersionSSL30
-	TLSVersion10    TLSVersion = tls.VersionTLS10
-	TLSVersion11    TLSVersion = tls.VersionTLS11
-	TLSVersion12    TLSVersion = tls.VersionTLS12
-	TLSVersion13    TLSVersion = tls.VersionTLS13
+	TLSVersion10 TLSVersion = tls.VersionTLS10
+	TLSVersion11 TLSVersion = tls.VersionTLS11
+	TLSVersion12 TLSVersion = tls.VersionTLS12
+	TLSVersion13 TLSVersion = tls.VersionTLS13
 
 	// TLSVersionMin is the min TLS version supported.
-	TLSVersionMin = TLSVersionSSL30
+	TLSVersionMin = TLSVersion10
 
 	// TLSVersionMax is the max TLS version supported.
 	TLSVersionMax = TLSVersion13
@@ -55,8 +54,6 @@ var TLSDefaultVersions = []TLSVersion{
 }
 
 var tlsProtocolVersions = map[string]TLSVersion{
-	"SSLv3":   TLSVersionSSL30,
-	"SSLv3.0": TLSVersionSSL30,
 	"TLSv1":   TLSVersion10,
 	"TLSv1.0": TLSVersion10,
 	"TLSv1.1": TLSVersion11,
@@ -77,9 +74,8 @@ func (pv TLSVersionDetails) String() string {
 }
 
 var tlsInverseLookup = map[TLSVersion]TLSVersionDetails{
-	TLSVersionSSL30: TLSVersionDetails{Version: "3.0", Protocol: "ssl", Combined: "SSLv3"},
-	TLSVersion10:    TLSVersionDetails{Version: "1.0", Protocol: "tls", Combined: "TLSv1.0"},
-	TLSVersion11:    TLSVersionDetails{Version: "1.1", Protocol: "tls", Combined: "TLSv1.1"},
-	TLSVersion12:    TLSVersionDetails{Version: "1.2", Protocol: "tls", Combined: "TLSv1.2"},
-	TLSVersion13:    TLSVersionDetails{Version: "1.3", Protocol: "tls", Combined: "TLSv1.3"},
+	TLSVersion10: TLSVersionDetails{Version: "1.0", Protocol: "tls", Combined: "TLSv1.0"},
+	TLSVersion11: TLSVersionDetails{Version: "1.1", Protocol: "tls", Combined: "TLSv1.1"},
+	TLSVersion12: TLSVersionDetails{Version: "1.2", Protocol: "tls", Combined: "TLSv1.2"},
+	TLSVersion13: TLSVersionDetails{Version: "1.3", Protocol: "tls", Combined: "TLSv1.3"},
 }

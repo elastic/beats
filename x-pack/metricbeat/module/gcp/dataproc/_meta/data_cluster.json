@@ -1,0 +1,41 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-apm"
+        },
+        "provider": "gcp"
+    },
+    "event": {
+        "dataset": "gcp.dataproc",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "labels": {
+            "metrics": {
+                "storage_class": "MULTI_REGIONAL"
+            },
+            "resource": {
+                "bucket_name": "artifacts.elastic-apm.appspot.com",
+                "location": "us"
+            }
+        },
+        "dataproc": {
+            "cluster": {
+                "hdfs": {
+                    "datanodes": {
+                        "value": 15
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "dataproc",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

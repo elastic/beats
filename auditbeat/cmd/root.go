@@ -54,7 +54,7 @@ var withECSVersion = processing.WithFields(common.MapStr{
 
 // AuditbeatSettings contains the default settings for auditbeat
 func AuditbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
@@ -63,7 +63,7 @@ func AuditbeatSettings() instance.Settings {
 	}
 }
 
-// Initialize initializes the entrypoint commands for journalbeat
+// Initialize initializes the entrypoint commands for auditbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	create := beater.Creator(
 		beater.WithModuleOptions(

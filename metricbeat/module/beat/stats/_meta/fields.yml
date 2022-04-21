@@ -232,6 +232,19 @@
           type: keyword
         - name: version
           type: keyword
+    - name: beat
+      type: group
+      fields:
+        - name: name
+          type: keyword
+        - name: host
+          type: keyword
+        - name: type
+          type: keyword
+        - name: uuid
+          type: keyword
+        - name: version
+          type: keyword
     - name: system
       type: group
       fields:
@@ -378,6 +391,8 @@
             - name: starts
               type: short
             - name: stops
+              type: short
+            - name: reloads
               type: short
         - name: output
           type: group

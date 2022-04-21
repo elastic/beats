@@ -30,38 +30,33 @@ import (
 )
 
 const (
-	pipelinePath  = "%s/module/%s/%s/ingest/pipeline.json"
-	fieldsYmlPath = "%s/module/%s/%s/_meta/fields.yml"
-
 	typeIdx     = 0
 	elementsIdx = 1
 	hintIdx     = 2
 )
 
-var (
-	types = map[string]string{
-		"group":           "group",
-		"DATA":            "text",
-		"GREEDYDATA":      "text",
-		"GREEDYMULTILINE": "text",
-		"HOSTNAME":        "keyword",
-		"IP":              "ip",
-		"IPV4":            "ip",
-		"IPV6":            "ip",
-		"IPHOST":          "keyword",
-		"IPORHOST":        "keyword",
-		"LOGLEVEL":        "keyword",
-		"MULTILINEQUERY":  "text",
-		"NUMBER":          "long",
-		"POSINT":          "long",
-		"SYSLOGHOST":      "keyword",
-		"SYSLOGTIMESTAMP": "text",
-		"LOCALDATETIME":   "text",
-		"TIMESTAMP":       "text",
-		"USERNAME":        "keyword",
-		"WORD":            "keyword",
-	}
-)
+var types = map[string]string{
+	"group":           "group",
+	"DATA":            "text",
+	"GREEDYDATA":      "text",
+	"GREEDYMULTILINE": "text",
+	"HOSTNAME":        "keyword",
+	"IP":              "ip",
+	"IPV4":            "ip",
+	"IPV6":            "ip",
+	"IPHOST":          "keyword",
+	"IPORHOST":        "keyword",
+	"LOGLEVEL":        "keyword",
+	"MULTILINEQUERY":  "text",
+	"NUMBER":          "long",
+	"POSINT":          "long",
+	"SYSLOGHOST":      "keyword",
+	"SYSLOGTIMESTAMP": "text",
+	"LOCALDATETIME":   "text",
+	"TIMESTAMP":       "text",
+	"USERNAME":        "keyword",
+	"WORD":            "keyword",
+}
 
 type pipeline struct {
 	Description string                   `json:"description"`
@@ -121,7 +116,7 @@ func readPipeline(filesetPath string) (*pipeline, error) {
 
 func writeFieldsYml(filesetPath string, fieldsBytes []byte) error {
 	output := filepath.Join(filesetPath, "_meta/fields.yml")
-	return ioutil.WriteFile(output, fieldsBytes, 0644)
+	return ioutil.WriteFile(output, fieldsBytes, 0o644)
 }
 
 func newFieldYml(name, typeName string, noDoc bool) *fieldYml {
@@ -385,8 +380,5 @@ func (p *pipeline) toFieldsYml(noDoc bool) ([]byte, error) {
 	}
 
 	f := generateFields(fs, noDoc)
-	var d []byte
-	d, err = yaml.Marshal(&f)
-
-	return d, nil
+	return yaml.Marshal(&f)
 }

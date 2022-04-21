@@ -28,12 +28,10 @@ type mongodbConfig struct {
 	MaxDocs               int `config:"max_docs"`
 }
 
-var (
-	defaultConfig = mongodbConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		MaxDocLength: 5000,
-		MaxDocs:      10,
-	}
-)
+var defaultConfig = mongodbConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	MaxDocLength: 5000,
+	MaxDocs:      10,
+}

@@ -9,6 +9,7 @@ package tracing
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -17,7 +18,6 @@ import (
 	"unsafe"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/go-perf"
@@ -99,7 +99,8 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 		streams:     make(map[uint64]stream),
 		pid:         perf.AllThreads,
 		attr: perf.Attr{
-			Type: perf.TracepointEvent,
+			Type:    perf.TracepointEvent,
+			ClockID: unix.CLOCK_MONOTONIC,
 			SampleFormat: perf.SampleFormat{
 				Raw:      true,
 				StreamID: true,
@@ -119,7 +120,7 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 	// at runtime (CPU hotplug).
 	channel.cpus, err = NewCPUSetFromFile(OnlineCPUsPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing online CPUs")
+		return nil, fmt.Errorf("error listing online CPUs: %w", err)
 	}
 	if channel.cpus.NumCPU() < 1 {
 		return nil, errors.New("couldn't list online CPUs")
@@ -246,7 +247,7 @@ func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 			fbytes := []byte(format.Probe.Filter + "\x00")
 			_, _, errNo := unix.Syscall(unix.SYS_IOCTL, uintptr(fd), unix.PERF_EVENT_IOC_SET_FILTER, uintptr(unsafe.Pointer(&fbytes[0])))
 			if errNo != 0 {
-				return errors.Wrapf(errNo, "unable to set filter '%s'", format.Probe.Filter)
+				return fmt.Errorf("unable to set filter '%s': %w", format.Probe.Filter, errNo)
 			}
 		}
 		c.streams[cid] = stream{probeID: format.ID, decoder: decoder}
@@ -254,7 +255,7 @@ func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 
 		if !doGroup {
 			if err := ev.MapRingNumPages(c.mappedPages); err != nil {
-				return errors.Wrap(err, "perf channel mapring failed")
+				return fmt.Errorf("perf channel mapring failed: %w", err)
 			}
 		}
 	}
@@ -291,7 +292,7 @@ func (c *PerfChannel) Run() error {
 
 	for _, ev := range c.events {
 		if err := ev.Enable(); err != nil {
-			return errors.Wrap(err, "perf channel enable failed")
+			return fmt.Errorf("perf channel enable failed: %w", err)
 		}
 	}
 	c.wg.Add(1)
@@ -311,10 +312,10 @@ func (c *PerfChannel) Close() error {
 	var errs multierror.Errors
 	for _, ev := range c.events {
 		if err := ev.Disable(); err != nil {
-			errs = append(errs, errors.Wrap(err, "failed to disable event channel"))
+			errs = append(errs, fmt.Errorf("failed to disable event channel: %w", err))
 		}
 		if err := ev.Close(); err != nil {
-			errs = append(errs, errors.Wrap(err, "failed to close event channel"))
+			errs = append(errs, fmt.Errorf("failed to close event channel: %w", err))
 		}
 	}
 	return errs.Err()
@@ -445,7 +446,7 @@ func (m *recordMerger) nextSample(ctx context.Context) (sr *perf.SampleRecord, o
 		// No sample was available. Block until one of the ringbuffers has data.
 		_, closed, err := pollAll(m.evs, m.timeout)
 		if err != nil {
-			m.channel.errC <- errors.Wrap(err, "poll failed")
+			m.channel.errC <- fmt.Errorf("poll failed: %w", err)
 			return nil, false
 		}
 		// Some of the ring buffers closed. Report termination.

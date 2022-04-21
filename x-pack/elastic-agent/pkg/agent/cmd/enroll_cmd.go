@@ -17,8 +17,6 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
@@ -34,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
@@ -77,6 +76,7 @@ type enrollCmd struct {
 type enrollCmdFleetServerOption struct {
 	ConnStr               string
 	ElasticsearchCA       string
+	ElasticsearchCASHA256 string
 	ElasticsearchInsecure bool
 	ServiceToken          string
 	PolicyID              string
@@ -110,6 +110,7 @@ type enrollCmdOption struct {
 	FleetServer          enrollCmdFleetServerOption `yaml:"-"`
 }
 
+// remoteConfig returns the configuration used to connect the agent to a fleet process.
 func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 	cfg, err := remote.NewConfigFromURL(e.URL)
 	if err != nil {
@@ -311,7 +312,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port, c.options.FleetServer.InternalPort,
-		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
+		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA, c.options.FleetServer.ElasticsearchCASHA256,
 		c.options.FleetServer.Headers,
 		c.options.ProxyURL,
 		c.options.ProxyDisabled,
@@ -517,7 +518,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port, c.options.FleetServer.InternalPort,
-			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
+			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA, c.options.FleetServer.ElasticsearchCASHA256,
 			c.options.FleetServer.Headers,
 			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders,
 			c.options.FleetServer.ElasticsearchInsecure,
@@ -853,7 +854,7 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 func createFleetServerBootstrapConfig(
 	connStr, serviceToken, policyID, host string,
 	port uint16, internalPort uint16,
-	cert, key, esCA string,
+	cert, key, esCA, esCASHA256 string,
 	headers map[string]string,
 	proxyURL string,
 	proxyDisabled bool,
@@ -873,6 +874,15 @@ func createFleetServerBootstrapConfig(
 			}
 		} else {
 			es.TLS.CAs = []string{esCA}
+		}
+	}
+	if esCASHA256 != "" {
+		if es.TLS == nil {
+			es.TLS = &tlscommon.Config{
+				CATrustedFingerprint: esCASHA256,
+			}
+		} else {
+			es.TLS.CATrustedFingerprint = esCASHA256
 		}
 	}
 	if host == "" {

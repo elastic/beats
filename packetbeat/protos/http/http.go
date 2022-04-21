@@ -39,8 +39,10 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
-var debugf = logp.MakeDebug("http")
-var detailedf = logp.MakeDebug("httpdetailed")
+var (
+	debugf    = logp.MakeDebug("http")
+	detailedf = logp.MakeDebug("httpdetailed")
+)
 
 type parserState uint8
 
@@ -300,7 +302,6 @@ func (http *httpPlugin) doParse(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *httpConnectionData {
-
 	if isDetailed {
 		detailedf("Payload received: [%s]", pkt.Payload)
 	}
@@ -368,8 +369,8 @@ func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *stream {
 
 // ReceivedFin will be called when TCP transaction is terminating.
 func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	debugf("Received FIN")
 	conn := getHTTPConnection(private)
 	if conn == nil {
@@ -396,8 +397,8 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 // GapInStream is called when a gap of nbytes bytes is found in the stream (due
 // to packet loss).
 func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	defer logp.Recover("GapInStream(http) exception")
 
 	conn := getHTTPConnection(private)
@@ -436,7 +437,6 @@ func (http *httpPlugin) handleHTTP(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
-
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = http.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
@@ -488,7 +488,6 @@ func (http *httpPlugin) flushRequests(conn *httpConnectionData) {
 }
 
 func (http *httpPlugin) correlate(conn *httpConnectionData) {
-
 	// drop responses with missing requests
 	if conn.requests.empty() {
 		http.flushResponses(conn)
@@ -724,8 +723,7 @@ func splitCookiesHeader(headerVal string) map[string]string {
 	for _, cval := range cstring {
 		cookie := strings.SplitN(cval, "=", 2)
 		if len(cookie) == 2 {
-			cookies[strings.ToLower(strings.TrimSpace(cookie[0]))] =
-				parseCookieValue(strings.TrimSpace(cookie[1]))
+			cookies[strings.ToLower(strings.TrimSpace(cookie[0]))] = parseCookieValue(strings.TrimSpace(cookie[1]))
 		}
 	}
 
@@ -926,10 +924,6 @@ func (ml *messageList) pop() *message {
 		ml.tail = nil
 	}
 	return msg
-}
-
-func (ml *messageList) last() *message {
-	return ml.tail
 }
 
 func extractBasicAuthUser(headers map[string]common.NetString) string {

@@ -62,7 +62,7 @@ func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Key
 	namespace := ""
 	if val, ok := event["kubernetes"]; ok {
 		kubernetesMeta := val.(common.MapStr)
-		ns, err := kubernetesMeta.GetValue("namespace.name")
+		ns, err := kubernetesMeta.GetValue("namespace")
 		if err != nil {
 			kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
 			return nil

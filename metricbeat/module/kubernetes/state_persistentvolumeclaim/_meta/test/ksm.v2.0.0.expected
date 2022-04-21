@@ -2,9 +2,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",

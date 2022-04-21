@@ -269,8 +269,7 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 
 func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 	// check if it isn't headers end yet with /r/n/r/n
-	if !(len(pi.data)-pi.parseOffset >= 2 &&
-		bytes.Equal(pi.data[pi.parseOffset:pi.parseOffset+2], constCRLF)) {
+	if len(pi.data)-pi.parseOffset < 2 || !bytes.Equal(pi.data[pi.parseOffset:pi.parseOffset+2], constCRLF) {
 		offset, err := parser.parseHeader(m, pi.data[pi.parseOffset:])
 		if err != nil {
 			return err
