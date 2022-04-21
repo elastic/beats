@@ -81,9 +81,63 @@ type message struct {
 	next *message
 }
 
+type Message struct {
+	Ts               time.Time
+	HasContentLength bool
+	HeaderOffset     int
+	Version          Version
+	Connection       common.NetString
+	ChunkedLength    int
+
+	IsRequest    bool
+	TcpTuple     common.TCPTuple
+	CmdlineTuple *common.ProcessTuple
+	Direction    uint8
+
+	// Request Info
+	RequestURI   common.NetString
+	Method       common.NetString
+	StatusCode   uint16
+	StatusPhrase common.NetString
+	RealIP       common.NetString
+
+	// Http Headers
+	ContentLength int
+	ContentType   common.NetString
+	Host          common.NetString
+	Referer       common.NetString
+	UserAgent     common.NetString
+	Encodings     []string
+	IsChunked     bool
+	Headers       map[string]common.NetString
+	Size          uint64
+	Username      string
+
+	rawHeaders []byte
+
+	// sendBody determines if the body must be sent along with the event
+	// because the content-type is included in the send_body_for setting.
+	sendBody bool
+	// saveBody determines if the body must be saved. It is set when sendBody
+	// is true or when the body type is form-urlencoded.
+	saveBody bool
+	body     []byte
+
+	notes          []string
+	packetLossReq  bool
+	packetLossResp bool
+
+	next *Message
+}
+
 type version struct {
 	major uint8
 	minor uint8
+}
+
+type Version struct {
+	Major uint8
+	Minor uint8
 }
 
 func (v version) String() string {
@@ -91,6 +145,10 @@ func (v version) String() string {
 		return "1.1"
 	}
 	return fmt.Sprintf("%d.%d", v.major, v.minor)
+}
+
+func (v Version) String() string {
+	return fmt.Sprintf("%d.%d", v.Major, v.Minor)
 }
 
 type parser struct {
@@ -104,6 +162,15 @@ type parserConfig struct {
 	headersWhitelist       map[string]bool
 	includeRequestBodyFor  []string
 	includeResponseBodyFor []string
+}
+
+type ParserConfig struct {
+	RealIPHeader           string
+	SendHeaders            bool
+	SendAllHeaders         bool
+	HeadersWhitelist       map[string]bool
+	IncludeRequestBodyFor  []string
+	IncludeResponseBodyFor []string
 }
 
 var (
@@ -125,8 +192,35 @@ var (
 	nameUserAgent        = []byte("user-agent")
 )
 
+func NewParser(config *ParserConfig) *parser {
+	if config == nil {
+		return nil
+	}
+	return newParser(&parserConfig{
+		realIPHeader:           config.RealIPHeader,
+		sendHeaders:            config.SendHeaders,
+		sendAllHeaders:         config.SendAllHeaders,
+		headersWhitelist:       config.HeadersWhitelist,
+		includeRequestBodyFor:  config.IncludeRequestBodyFor,
+		includeResponseBodyFor: config.IncludeResponseBodyFor,
+	})
+}
+
 func newParser(config *parserConfig) *parser {
 	return &parser{config: config}
+}
+
+func (parser *parser) Parse(data []byte) (*Message, bool, bool) {
+	s := &stream{
+		tcptuple:     nil,
+		data:         data,
+		parseOffset:  0,
+		parseState:   stateStart,
+		bodyReceived: 0,
+		message:      &message{},
+	}
+	ok, complete := parser.parse(s, 0)
+	return convertMessage(s.message), ok, complete
 }
 
 func (parser *parser) parse(s *stream, extraMsgSize int) (bool, bool) {
@@ -684,4 +778,66 @@ func toLower(buf, in []byte) []byte {
 
 unbufferedToLower:
 	return bytes.ToLower(in)
+}
+
+func convertConfig(config *ParserConfig) *parserConfig {
+	if config == nil {
+		return nil
+	}
+	return &parserConfig{
+		realIPHeader:           config.RealIPHeader,
+		sendHeaders:            config.SendHeaders,
+		sendAllHeaders:         config.SendAllHeaders,
+		headersWhitelist:       config.HeadersWhitelist,
+		includeRequestBodyFor:  config.IncludeRequestBodyFor,
+		includeResponseBodyFor: config.IncludeResponseBodyFor,
+	}
+}
+
+func convertMessage(message *message) *Message {
+	if message == nil {
+		return nil
+	}
+	return &Message{
+		Ts:               message.ts,
+		HasContentLength: message.hasContentLength,
+		HeaderOffset:     message.headerOffset,
+		Version:          convertVersion(message.version),
+		Connection:       message.connection,
+		ChunkedLength:    message.chunkedLength,
+		IsRequest:        message.isRequest,
+		TcpTuple:         message.tcpTuple,
+		CmdlineTuple:     message.cmdlineTuple,
+		Direction:        message.direction,
+		RequestURI:       message.requestURI,
+		Method:           message.method,
+		StatusCode:       message.statusCode,
+		StatusPhrase:     message.statusPhrase,
+		RealIP:           message.realIP,
+		ContentLength:    message.contentLength,
+		ContentType:      message.contentType,
+		Host:             message.host,
+		Referer:          message.referer,
+		UserAgent:        message.userAgent,
+		Encodings:        message.encodings,
+		IsChunked:        message.isChunked,
+		Headers:          message.headers,
+		Size:             message.size,
+		Username:         message.username,
+		rawHeaders:       message.rawHeaders,
+		sendBody:         message.sendBody,
+		saveBody:         message.saveBody,
+		body:             message.body,
+		notes:            message.notes,
+		packetLossReq:    message.packetLossReq,
+		packetLossResp:   message.packetLossResp,
+		next:             convertMessage(message.next),
+	}
+}
+
+func convertVersion(ver version) Version {
+	return Version{
+		Major: ver.major,
+		Minor: ver.minor,
+	}
 }
