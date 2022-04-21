@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 - Netflow: replace invalid field value. {pull}31295[31295]
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 
 *Heartbeat*
 
