@@ -74,7 +74,7 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []*elasticloadbalancingv2.Client
+	var clients []autodiscoverElbClient
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,

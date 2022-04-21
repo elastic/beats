@@ -11,7 +11,7 @@ import (
 	"github.com/aws/smithy-go/middleware"
 )
 
-func newMockELBClient(numResults int) elasticloadbalancingv2.DescribeLoadBalancersAPIClient {
+func newMockELBClient(numResults int) autodiscoverElbClient {
 	return &mockELBClient{numResults: numResults}
 }
 

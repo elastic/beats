@@ -5,7 +5,6 @@
 package elb
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,6 +12,6 @@ import (
 
 func Test_newAPIFetcher(t *testing.T) {
 	client := newMockELBClient(0)
-	fetcher := newAPIFetcher([]elasticloadbalancingv2.DescribeLoadBalancersAPIClient{client})
+	fetcher := newAPIFetcher([]autodiscoverElbClient{client})
 	require.NotNil(t, fetcher)
 }

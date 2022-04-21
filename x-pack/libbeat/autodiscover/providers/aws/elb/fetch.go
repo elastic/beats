@@ -59,14 +59,19 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client          *elasticloadbalancingv2.Client
+	client autodiscoverElbClient
 }
 
-func newAPIFetcher(clients []*elasticloadbalancingv2.Client) fetcher {
+type autodiscoverElbClient interface {
+	elasticloadbalancingv2.DescribeListenersAPIClient
+	elasticloadbalancingv2.DescribeLoadBalancersAPIClient
+}
+
+func newAPIFetcher(clients []autodiscoverElbClient) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{
-			client:          client,
+			client: client,
 		}
 	}
 	return &apiMultiFetcher{fetchers}
@@ -84,11 +89,11 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 	ir := &fetchRequest{
 		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(f.client,
 			&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize}),
-		client:          f.client,
-		taskPool:        sync.Pool{},
-		context:         ctx,
-		cancel:          cancel,
-		logger:          logp.NewLogger("autodiscover-elb-fetch"),
+		client:   f.client,
+		taskPool: sync.Pool{},
+		context:  ctx,
+		cancel:   cancel,
+		logger:   logp.NewLogger("autodiscover-elb-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -103,16 +108,16 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 // fetchRequest provides a way to get all pages from a
 // elbv2.DescribeLoadBalancersPager and all listeners for the given LoadBalancers.
 type fetchRequest struct {
-	paginator       *elasticloadbalancingv2.DescribeLoadBalancersPaginator
-	client          *elasticloadbalancingv2.Client
-	lbListeners     []*lbListener
-	errs            []error
-	resultsLock     sync.Mutex
-	taskPool        sync.Pool
-	pendingTasks    sync.WaitGroup
-	context         context.Context
-	cancel          func()
-	logger          *logp.Logger
+	paginator    *elasticloadbalancingv2.DescribeLoadBalancersPaginator
+	client       elasticloadbalancingv2.DescribeListenersAPIClient
+	lbListeners  []*lbListener
+	errs         []error
+	resultsLock  sync.Mutex
+	taskPool     sync.Pool
+	pendingTasks sync.WaitGroup
+	context      context.Context
+	cancel       func()
+	logger       *logp.Logger
 }
 
 func (p *fetchRequest) fetch() ([]*lbListener, error) {
