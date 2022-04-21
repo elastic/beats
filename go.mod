@@ -32,17 +32,19 @@ require (
 	github.com/aws/aws-sdk-go v1.38.60
 	github.com/aws/aws-sdk-go-v2 v1.16.2
 	github.com/aws/aws-sdk-go-v2/config v1.15.3
+	github.com/aws/aws-sdk-go-v2/credentials v1.11.2
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.18.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v0.26.0
+	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.18.3
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.34.0
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.18.3
+	github.com/aws/aws-sdk-go-v2/service/iam v1.18.3
+	github.com/aws/aws-sdk-go-v2/service/organizations v1.15.1
+	github.com/aws/aws-sdk-go-v2/service/rds v1.18.4
+	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.13.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.3
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.18.3
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.3
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.17.3
-	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.13.4
-	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.18.3
-	github.com/aws/aws-sdk-go-v2/service/organizations v1.15.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.34.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.18.4
-	github.com/aws/aws-sdk-go-v2/service/iam v1.18.3
 	github.com/awslabs/goformation/v4 v4.1.0
 	github.com/awslabs/kinesis-aggregation/go v0.0.0-20200810181507-d352038274c0
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
@@ -160,9 +162,6 @@ require (
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
-	go.elastic.co/apm v1.11.0
-	go.elastic.co/apm/module/apmelasticsearch v1.7.2
-	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.elastic.co/ecszap v1.0.0
 	go.elastic.co/go-licence-detector v0.4.0
 	go.etcd.io/bbolt v1.3.6
@@ -178,7 +177,7 @@ require (
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
-	golang.org/x/tools v0.1.7
+	golang.org/x/tools v0.1.9
 	google.golang.org/api v0.62.0
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
 	google.golang.org/grpc v1.43.0
@@ -193,7 +192,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
 	gotest.tools/gotestsum v0.6.0
-	howett.net/plist v0.0.0-20181124034731-591f970eefbb
+	howett.net/plist v1.0.0
 	k8s.io/api v0.23.0
 	k8s.io/apimachinery v0.23.0
 	k8s.io/client-go v0.23.0
@@ -201,8 +200,13 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.3
+	github.com/aws/smithy-go v1.11.2
 	github.com/elastic/elastic-agent-libs v0.1.1
 	github.com/shirou/gopsutil/v3 v3.21.12
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
+	go.elastic.co/apm/v2 v2.0.0
 )
 
 require (
@@ -219,6 +223,16 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/apache/thrift v0.13.1-0.20200603211036-eac4d0c79a5f // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.9 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.10 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.3 // indirect
 	github.com/awslabs/smithy-go v0.4.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
@@ -258,6 +272,7 @@ require (
 	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jcchavezs/porto v0.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.0.0 // indirect

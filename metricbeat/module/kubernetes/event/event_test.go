@@ -25,9 +25,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.event")
+
 	labels := map[string]string{
 		"app.kubernetes.io/name":      "mysql",
 		"app.kubernetes.io/version":   "5.7.21",
@@ -155,7 +158,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
+			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig, logger)
 			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
 			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
 			assert.Equal(t, source.Host, mapStrOutput["source"].(common.MapStr)["host"])

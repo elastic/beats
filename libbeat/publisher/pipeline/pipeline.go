@@ -118,9 +118,6 @@ type OutputReloader interface {
 }
 
 type pipelineEventer struct {
-	mutex      sync.Mutex
-	modifyable bool
-
 	observer  queueObserver
 	waitClose *waitCloser
 }
@@ -161,7 +158,6 @@ func New(
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 	p.eventer.observer = p.observer
-	p.eventer.modifyable = true
 
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
 		p.waitCloser = &waitCloser{}
@@ -215,7 +211,7 @@ func (p *Pipeline) Close() error {
 
 	}
 
-	// TODO: close/disconnect still active clients
+	// Note: active clients are not closed / disconnected.
 
 	// close output before shutting down queue
 	p.output.Close()
@@ -253,10 +249,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	p.eventer.mutex.Lock()
-	p.eventer.modifyable = false
-	p.eventer.mutex.Unlock()
 
 	switch cfg.PublishMode {
 	case beat.GuaranteedSend:
@@ -367,18 +359,20 @@ func (p *Pipeline) runSignalPropagation() {
 			}
 
 			// new client -> register client for signal propagation.
-			client := recv.Interface().(*client)
-			channels = append(channels,
-				reflect.SelectCase{
-					Dir:  reflect.SelectRecv,
-					Chan: reflect.ValueOf(client.closeRef.Done()),
-				},
-				reflect.SelectCase{
-					Dir:  reflect.SelectRecv,
-					Chan: reflect.ValueOf(client.done),
-				},
-			)
-			clients = append(clients, client)
+			//nolint: errcheck // The linter doesn't understand that `client != nil` checks the return value of Interface().
+			if client := recv.Interface().(*client); client != nil {
+				channels = append(channels,
+					reflect.SelectCase{
+						Dir:  reflect.SelectRecv,
+						Chan: reflect.ValueOf(client.closeRef.Done()),
+					},
+					reflect.SelectCase{
+						Dir:  reflect.SelectRecv,
+						Chan: reflect.ValueOf(client.done),
+					},
+				)
+				clients = append(clients, client)
+			}
 			continue
 		}
 

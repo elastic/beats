@@ -220,7 +220,16 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 func (loader KibanaLoader) formatDashboardAssets(content []byte) []byte {
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 	content = EncodeJSONObjects(content)
-	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+
+	replacements := loader.config.StringReplacements
+	if replacements == nil {
+		replacements = make(map[string]string)
+	}
+	replacements["CHANGEME_HOSTNAME"] = loader.hostname
+	for needle, replacement := range replacements {
+		content = ReplaceStringInDashboard(needle, replacement, content)
+	}
+
 	return content
 }
 

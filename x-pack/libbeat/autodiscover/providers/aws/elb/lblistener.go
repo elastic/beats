@@ -5,7 +5,7 @@
 package elb
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elasticloadbalancingv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
@@ -13,8 +13,8 @@ import (
 
 // lbListener is a tuple type representing an elasticloadbalancingv2.Listener and its associated elasticloadbalancingv2.LoadBalancer.
 type lbListener struct {
-	lb       *elasticloadbalancingv2.LoadBalancer
-	listener *elasticloadbalancingv2.Listener
+	lb       *elasticloadbalancingv2types.LoadBalancer
+	listener *elasticloadbalancingv2types.Listener
 }
 
 // toMap converts this lbListener into the form consumed as metadata in the autodiscovery process.
