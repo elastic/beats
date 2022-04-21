@@ -60,6 +60,7 @@ func New(r reader.Reader, cfg *Config) *splitterReader {
 		cfg:    cfg,
 		logger: logp.NewLogger("parser_split"),
 		buf:    make(chan reader.Message),
+		ctx:    context.TODO(),
 	}
 }
 

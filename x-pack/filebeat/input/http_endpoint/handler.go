@@ -12,7 +12,7 @@ import (
 	"io"
 	"net/http"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	// v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -42,7 +42,7 @@ type httpHandler struct {
 	includeHeaders        []string
 	preserveOriginalEvent bool
 	parsers               parser.Config
-	context               v2.Context
+	// context               v2.Context
 }
 
 type readertest struct {
@@ -81,15 +81,19 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 			msg: obj,
 		}
 		a := h.parsers.Create(b)
-		for h.context.Cancelation.Err() == nil {
-			message, err := a.Next()
-			if err != nil {
-				h.log.Error("%v", err)
-			}
-			if message.IsEmpty() {
-				continue
-			}
-			h.publishEvent(message.ToEvent(), headers)
+
+		// TODO: Need to figure out how to loop through here!!!!
+		message, err := a.Next()
+		if err != nil {
+			h.log.Error("%v", err)
+			break
+		}
+		// if message.IsEmpty() {
+		// 	continue
+		// }
+		if err = h.publishEvent(message.ToEvent(), headers); err != nil {
+			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			return
 		}
 		// for _, obj := range a {
 		// 	h.publishEvent(obj, headers)
