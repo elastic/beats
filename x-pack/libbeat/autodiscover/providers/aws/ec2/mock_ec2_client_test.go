@@ -5,14 +5,19 @@
 package ec2
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"context"
+	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 )
 
-func newMockEC2Client(numResults int) mockEC2Client {
-	return mockEC2Client{numResults: numResults}
+func newMockEC2Client(numResults int) ec2.DescribeInstancesAPIClient {
+	return &mockEC2Client{numResults: numResults}
 }
 
 type mockEC2Client struct {
-	ec2iface.ClientAPI
 	numResults int
+}
+
+func (m *mockEC2Client)DescribeInstances(context.Context, *ec2.DescribeInstancesInput, ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error){
+	return nil, fmt.Errorf("not implemented")
 }

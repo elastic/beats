@@ -60,10 +60,10 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client *ec2.Client
+	client ec2.DescribeInstancesAPIClient
 }
 
-func newAPIFetcher(clients []*ec2.Client) fetcher {
+func newAPIFetcher(clients []ec2.DescribeInstancesAPIClient) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{client}
@@ -106,7 +106,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 // ec2.DescribeInstancesPaginator and all listeners for the given EC2 instance.
 type fetchRequest struct {
 	paginator    *ec2.DescribeInstancesPaginator
-	client       *ec2.Client
+	client       ec2.DescribeInstancesAPIClient
 	ec2Instances []*ec2Instance
 	errs         []error
 	resultsLock  sync.Mutex

@@ -5,14 +5,14 @@
 package ec2
 
 import (
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_newAPIFetcher(t *testing.T) {
 	client := newMockEC2Client(0)
-	fetcher := newAPIFetcher([]ec2iface.ClientAPI{client})
+	fetcher := newAPIFetcher([]ec2.DescribeInstancesAPIClient{client})
 	require.NotNil(t, fetcher)
 }

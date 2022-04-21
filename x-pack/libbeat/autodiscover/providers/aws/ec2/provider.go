@@ -75,7 +75,7 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []*ec2.Client
+	var clients []ec2.DescribeInstancesAPIClient
 	for _, region := range config.Regions {
 		if err != nil {
 			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
