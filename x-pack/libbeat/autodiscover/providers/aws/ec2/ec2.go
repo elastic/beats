@@ -5,24 +5,18 @@
 package ec2
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/pkg/errors"
-
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type ec2Instance struct {
-	ec2Instance ec2.Instance
+	ec2Instance ec2types.Instance
 }
 
 // toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
 func (i *ec2Instance) toMap() common.MapStr {
-	architecture, err := i.ec2Instance.Architecture.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for architecture: "))
-	}
+	architecture := string(i.ec2Instance.Architecture)
 
 	m := common.MapStr{
 		"image":            i.toImage(),
@@ -54,10 +48,7 @@ func (i *ec2Instance) toImage() common.MapStr {
 }
 
 func (i *ec2Instance) toMonitoringState() common.MapStr {
-	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
-	}
+	monitoringState := i.ec2Instance.Monitoring.State
 
 	m := common.MapStr{}
 	m["state"] = monitoringState
@@ -109,10 +100,7 @@ func (i *ec2Instance) toCloudMap() common.MapStr {
 	instance["id"] = i.instanceID()
 	m["instance"] = instance
 
-	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
-	}
+	instanceType := string(i.ec2Instance.InstanceType)
 	machine := common.MapStr{}
 	machine["type"] = instanceType
 	m["machine"] = machine
@@ -123,10 +111,7 @@ func (i *ec2Instance) toCloudMap() common.MapStr {
 func (i *ec2Instance) stateMap() (stateMap common.MapStr) {
 	state := i.ec2Instance.State
 	stateMap = common.MapStr{}
-	nameString, err := state.Name.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance state name: "))
-	}
+	nameString := string(state.Name)
 
 	stateMap["name"] = nameString
 	stateMap["code"] = state.Code

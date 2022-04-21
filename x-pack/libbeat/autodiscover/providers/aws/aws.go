@@ -6,10 +6,9 @@ package aws
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/pkg/errors"
 )
 
 // SafeString makes handling AWS *string types easier.
@@ -25,16 +24,16 @@ func SafeString(str *string) string {
 }
 
 // GetRegions makes DescribeRegions API call to list all regions from AWS
-func GetRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
-	input := &ec2.DescribeRegionsInput{}
-	req := svc.DescribeRegionsRequest(input)
-	output, err := req.Send(context.TODO())
+func GetRegions(svc *ec2.Client) ([]string, error) {
+	output, err := svc.DescribeRegions(context.TODO(), &ec2.DescribeRegionsInput{})
 	if err != nil {
-		err = errors.Wrap(err, "Failed DescribeRegions")
-		return
+		return nil, fmt.Errorf("Failed DescribeRegions: %w", err)
 	}
+
+	completeRegionsList := make([]string, 0)
 	for _, region := range output.Regions {
 		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
-	return
+
+	return completeRegionsList, nil
 }

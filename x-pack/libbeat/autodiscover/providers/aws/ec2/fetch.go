@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -60,10 +60,10 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client ec2iface.ClientAPI
+	client *ec2.Client
 }
 
-func newAPIFetcher(clients []ec2iface.ClientAPI) fetcher {
+func newAPIFetcher(clients []*ec2.Client) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{client}
@@ -77,14 +77,15 @@ func newAPIFetcher(clients []ec2iface.ClientAPI) fetcher {
 // additional fetch per EC2. We let the goroutine scheduler sort things out, and use
 // a sync.Pool to limit the number of in-flight requests.
 func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
-	var MaxResults int64 = 50
+	var MaxResults int32 = 50
 
 	describeInstanceInput := &ec2.DescribeInstancesInput{MaxResults: &MaxResults}
-	req := f.client.DescribeInstancesRequest(describeInstanceInput)
+
+	svcDescribeInstances := ec2.NewDescribeInstancesPaginator(f.client, describeInstanceInput)
 
 	ctx, cancel := context.WithCancel(ctx)
 	ir := &fetchRequest{
-		paginator: ec2.NewDescribeInstancesPaginator(req),
+		paginator: svcDescribeInstances,
 		client:    f.client,
 		taskPool:  sync.Pool{},
 		context:   ctx,
@@ -104,8 +105,8 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 // fetchRequest provides a way to get all pages from a
 // ec2.DescribeInstancesPaginator and all listeners for the given EC2 instance.
 type fetchRequest struct {
-	paginator    ec2.DescribeInstancesPaginator
-	client       ec2iface.ClientAPI
+	paginator    *ec2.DescribeInstancesPaginator
+	client       *ec2.Client
 	ec2Instances []*ec2Instance
 	errs         []error
 	resultsLock  sync.Mutex
@@ -143,31 +144,30 @@ func (p *fetchRequest) fetchAllPages() {
 			p.logger.Debug("done fetching EC2 instances, context cancelled")
 			return
 		default:
-			if !p.fetchNextPage() {
-				p.logger.Debug("fetched all EC2 instances")
+			if !p.paginator.HasMorePages() {
+				p.logger.Debug("fetched all EC2 pages")
 				return
 			}
-			p.logger.Debug("fetched EC2 instance")
+			p.fetchNextPage()
+			p.logger.Debug("fetched EC2 page")
 		}
 	}
 }
 
-func (p *fetchRequest) fetchNextPage() (more bool) {
-	success := p.paginator.Next(p.context)
+// TODO This is copy-pasted from elb/fetch.go
+func (p *fetchRequest) fetchNextPage() {
+	page, err := p.paginator.NextPage(p.context)
+	if err != nil {
+		p.recordErrResult(err)
+	}
 
-	if success {
-		for _, reservation := range p.paginator.CurrentPage().Reservations {
-			for _, instance := range reservation.Instances {
-				p.dispatch(func() { p.fetchInstances(instance) })
-			}
+	for _, reservation := range page.Reservations {
+		for _, instance := range reservation.Instances {
+			p.dispatch(func() { p.fetchInstances(instance) })
 		}
 	}
 
-	if p.paginator.Err() != nil {
-		p.recordErrResult(p.paginator.Err())
-	}
-
-	return success
+	return
 }
 
 // dispatch runs the given func in a new goroutine, properly throttling requests
@@ -185,25 +185,25 @@ func (p *fetchRequest) dispatch(fn func()) {
 	}()
 }
 
-func (p *fetchRequest) fetchInstances(instance ec2.Instance) {
+func (p *fetchRequest) fetchInstances(instance ec2types.Instance) {
 	describeInstancesInput := &ec2.DescribeInstancesInput{InstanceIds: []string{awsauto.SafeString(instance.InstanceId)}}
-	req := p.client.DescribeInstancesRequest(describeInstancesInput)
-	listen := ec2.NewDescribeInstancesPaginator(req)
+	paginator := ec2.NewDescribeInstancesPaginator(p.client, describeInstancesInput)
 
-	if listen.Err() != nil {
-		p.recordErrResult(listen.Err())
-	}
 
 	for {
 		select {
 		case <-p.context.Done():
 			return
 		default:
-			if !listen.Next(p.context) {
+			if !paginator.HasMorePages() {
 				return
 			}
 
-			for _, reservation := range listen.CurrentPage().Reservations {
+			page, err := paginator.NextPage(p.context)
+			if err != nil {
+				p.recordErrResult(err)
+			}
+			for _, reservation := range page.Reservations {
 				for _, instance := range reservation.Instances {
 					p.recordGoodResult(instance)
 				}
@@ -213,7 +213,7 @@ func (p *fetchRequest) fetchInstances(instance ec2.Instance) {
 	}
 }
 
-func (p *fetchRequest) recordGoodResult(instance ec2.Instance) {
+func (p *fetchRequest) recordGoodResult(instance ec2types.Instance) {
 	p.resultsLock.Lock()
 	defer p.resultsLock.Unlock()
 

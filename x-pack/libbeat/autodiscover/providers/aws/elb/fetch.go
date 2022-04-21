@@ -181,7 +181,8 @@ func (p *fetchRequest) dispatch(fn func()) {
 }
 
 func (p *fetchRequest) fetchListeners(lb types.LoadBalancer) {
-	paginator := elasticloadbalancingv2.NewDescribeListenersPaginator(p.client, &elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
+	describeListenersInput := &elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
+	paginator := elasticloadbalancingv2.NewDescribeListenersPaginator(p.client, describeListenersInput)
 
 	for {
 		select {
