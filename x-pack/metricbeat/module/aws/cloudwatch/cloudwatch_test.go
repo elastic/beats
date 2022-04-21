@@ -1203,9 +1203,7 @@ func TestCheckStatistics(t *testing.T) {
 }
 
 // MockCloudWatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	//*cloudwatch.Client
-}
+type MockCloudWatchClient struct{}
 
 // GetMetricData implements cloudwatch.GetMetricDataAPIClient interface
 func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
@@ -1231,53 +1229,8 @@ func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMet
 	}, nil
 }
 
-//func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-//	httpReq, _ := http.NewRequest("", "", nil)
-//
-//	return cloudwatch.GetMetricDataRequest{
-//		Input: input,
-//		Copy:  m.GetMetricDataRequest,
-//		Request: &awssdk.Request{
-//			Operation: &awssdk.Operation{
-//				Name:      "GetMetricData",
-//				Paginator: nil,
-//			},
-//			Data: &cloudwatch.GetMetricDataOutput{
-
-//			},
-//			HTTPRequest: httpReq,
-//			Retryer:     awssdk.NoOpRetryer{},
-//		},
-//	}
-//}
-
-//func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
-//	dim := cloudwatchtypes.Dimension{
-//		Name:  &dimName,
-//		Value: &instanceID1,
-//	}
-//	httpReq, _ := http.NewRequest("", "", nil)
-//	return cloudwatch.ListMetricsRequest{
-//		Request: &awssdk.Request{
-//			Data: &cloudwatch.ListMetricsOutput{
-//				Metrics: []cloudwatchtypes.Metric{
-//					{
-//						MetricName: &metricName1,
-//						Namespace:  &namespace,
-//						Dimensions: []cloudwatchtypes.Dimension{dim},
-//					},
-//				},
-//			},
-//			HTTPRequest: httpReq,
-//			Retryer:     awssdk.NoOpRetryer{},
-//		},
-//	}
-//}
-
 // MockCloudWatchClientWithoutDim struct is used for unit tests.
-type MockCloudWatchClientWithoutDim struct {
-	//*cloudwatch.Client
-}
+type MockCloudWatchClientWithoutDim struct{}
 
 // GetMetricData implements cloudwatch.GetMetricDataAPIClient.
 func (m *MockCloudWatchClientWithoutDim) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
@@ -1303,61 +1256,8 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricData(context.Context, *cloudwa
 	}, nil
 }
 
-//func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
-//	httpReq, _ := http.NewRequest("", "", nil)
-//	return cloudwatch.ListMetricsRequest{
-//		Request: &awssdk.Request{
-//			Data: &cloudwatch.ListMetricsOutput{
-//				Metrics: []cloudwatchtypes.Metric{
-//					{
-//						MetricName: &metricName1,
-//						Namespace:  &namespace,
-//					},
-//				},
-//			},
-//			HTTPRequest: httpReq,
-//			Retryer:     awssdk.NoOpRetryer{},
-//		},
-//	}
-//}
-
-//func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-//	httpReq, _ := http.NewRequest("", "", nil)
-//
-//	return cloudwatch.GetMetricDataRequest{
-//		Input: input,
-//		Copy:  m.GetMetricDataRequest,
-//		Request: &awssdk.Request{
-//			Operation: &awssdk.Operation{
-//				Name:      "GetMetricData",
-//				Paginator: nil,
-//			},
-//			Data: &cloudwatch.GetMetricDataOutput{
-//				MetricDataResults: []cloudwatchtypes.MetricDataResult{
-//					{
-//						Id:         &id1,
-//						Label:      &label3,
-//						Values:     []float64{value1},
-//						Timestamps: []time.Time{timestamp},
-//					},
-//					{
-//						Id:         &id2,
-//						Label:      &label4,
-//						Values:     []float64{value2},
-//						Timestamps: []time.Time{timestamp},
-//					},
-//				},
-//			},
-//			HTTPRequest: httpReq,
-//			Retryer:     awssdk.NoOpRetryer{},
-//		},
-//	}
-//}
-
 // MockResourceGroupsTaggingClient is used for unit tests.
-type MockResourceGroupsTaggingClient struct {
-	//*resourcegroupstaggingapi.Client
-}
+type MockResourceGroupsTaggingClient struct{}
 
 // GetResources implements resourcegroupstaggingapi.GetResourcesAPIClient.
 func (m *MockResourceGroupsTaggingClient) GetResources(context.Context, *resourcegroupstaggingapi.GetResourcesInput, ...func(*resourcegroupstaggingapi.Options)) (*resourcegroupstaggingapi.GetResourcesOutput, error) {
@@ -1377,38 +1277,6 @@ func (m *MockResourceGroupsTaggingClient) GetResources(context.Context, *resourc
 		ResultMetadata: middleware.Metadata{},
 	}, nil
 }
-
-//func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
-//	httpReq, _ := http.NewRequest("", "", nil)
-//	return resourcegroupstaggingapi.GetResourcesRequest{
-//		Input: input,
-//		Copy:  m.GetResourcesRequest,
-//		Request: &awssdk.Request{
-//			Operation: &awssdk.Operation{
-//				Name:       "GetResources",
-//				HTTPMethod: "POST",
-//				HTTPPath:   "/",
-//				Paginator:  nil,
-//			},
-//			Data: &resourcegroupstaggingapi.GetResourcesOutput{
-//				PaginationToken: awssdk.String(""),
-//				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
-//					{
-//						ResourceARN: awssdk.String("arn:aws:ec2:us-west-1:123456789012:instance:i-1"),
-//						Tags: []resourcegroupstaggingapi.Tag{
-//							{
-//								Key:   awssdk.String("name"),
-//								Value: awssdk.String("test-ec2"),
-//							},
-//						},
-//					},
-//				},
-//			},
-//			HTTPRequest: httpReq,
-//			Retryer:     awssdk.NoOpRetryer{},
-//		},
-//	}
-//}
 
 func TestCreateEventsWithIdentifier(t *testing.T) {
 	m := MetricSet{}
