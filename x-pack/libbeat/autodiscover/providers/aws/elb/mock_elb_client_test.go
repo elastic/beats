@@ -5,14 +5,26 @@
 package elb
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
+	"context"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elasticloadbalancingv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	"github.com/aws/smithy-go/middleware"
 )
 
-func newMockELBClient(numResults int) mockELBClient {
-	return mockELBClient{numResults: numResults}
+func newMockELBClient(numResults int) elasticloadbalancingv2.DescribeLoadBalancersAPIClient {
+	return &mockELBClient{numResults: numResults}
 }
 
 type mockELBClient struct {
-	elasticloadbalancingv2iface.ClientAPI
+	elasticloadbalancingv2.Client
 	numResults int
+}
+
+func (m *mockELBClient) DescribeLoadBalancers(context.Context, *elasticloadbalancingv2.DescribeLoadBalancersInput, ...func(*elasticloadbalancingv2.Options)) (*elasticloadbalancingv2.DescribeLoadBalancersOutput, error) {
+	emptyString := ""
+	return &elasticloadbalancingv2.DescribeLoadBalancersOutput{
+		LoadBalancers:  []elasticloadbalancingv2types.LoadBalancer{},
+		NextMarker:     &emptyString,
+		ResultMetadata: middleware.Metadata{},
+	}, nil
 }
