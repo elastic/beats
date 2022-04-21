@@ -110,6 +110,10 @@ var parseRFC3164Cases = map[string]struct {
 		In:      "<-1>Oct 11 22:14:15 test-host this is the message",
 		WantErr: ErrPriority,
 	},
+	"err-pri-missing-brackets": {
+		In:      "13 Oct 11 22:14:15 test-host this is the message",
+		WantErr: ErrTimestamp, // Priority field is optional, so this will fail on next field, which is the timestamp.
+	},
 	"err-ts-invalid-missing": {
 		In:      "<13> test-host this is the message",
 		WantErr: ErrTimestamp,
