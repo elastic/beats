@@ -3,6 +3,28 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.3]]
+=== Beats version 7.17.3
+https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
+
+*Filebeat*
+
+
+- Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
+- Fixes data duplication on restart when filestream inputs did not have an ID set. {issue}30061[30061]
+- Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
+- Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
+- Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
+- Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
+- checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
+
+
 [[release-notes-7.17.2]]
 === Beats version 7.17.2
 https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]

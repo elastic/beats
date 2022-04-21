@@ -91,11 +91,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		if err != nil {
 			return fmt.Errorf("failed to create new event log: %w", err)
 		}
-<<<<<<< HEAD
-		eb.log.Debugf("Initialized EventLog]", eventLog.Name())
-=======
 		eb.log.Debugf("initialized WinEventLog[%s]", eventLog.Name())
->>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
 
 		logger, err := newEventLogger(b.Info, eventLog, config, eb.log)
 		if err != nil {

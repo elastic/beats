@@ -2457,6 +2457,15 @@ Fields for Azure activity logs.
 
 
 
+*`azure.activitylogs.identity_name`*::
++
+--
+identity name
+
+type: keyword
+
+--
+
 [float]
 === identity
 
@@ -2619,6 +2628,36 @@ type: keyword
 +
 --
 Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.level`*::
++
+--
+Level
+
+
+type: long
+
+--
+
+*`azure.activitylogs.operation_version`*::
++
+--
+Operation version
 
 
 type: keyword
@@ -3550,6 +3589,26 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.device_detail.is_compliant`*::
++
+--
+If the device is compliant
+
+
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.device_detail.is_managed`*::
++
+--
+If the device is managed
+
+
+type: boolean
+
+--
+
 *`azure.signinlogs.properties.applied_conditional_access_policies`*::
 +
 --
@@ -3580,6 +3639,35 @@ type: flattened
 
 --
 
+*`azure.signinlogs.properties.authentication_protocol`*::
++
+--
+Authentication protocol type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.incoming_token_type`*::
++
+--
+Incoming token type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.unique_token_identifier`*::
++
+--
+Unique token identifier for the request.
+
+type: keyword
+
+--
+
 *`azure.signinlogs.properties.authentication_requirement`*::
 +
 --
@@ -3596,7 +3684,7 @@ type: keyword
 Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
 
 
-type: keyword
+type: flattened
 
 --
 

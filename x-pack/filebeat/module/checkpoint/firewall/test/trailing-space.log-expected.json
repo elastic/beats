@@ -1,0 +1,56 @@
+[
+    {
+        "@timestamp": "2020-03-29T13:20:47.000Z",
+        "checkpoint.logid": "0",
+        "checkpoint.match_id": "1",
+        "checkpoint.parent_rule": "0",
+        "checkpoint.rule_action": "Accept",
+        "client.ip": "192.168.1.100",
+        "client.port": 37029,
+        "destination.ip": "192.168.1.1",
+        "destination.port": 53,
+        "event.action": "Accept",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "checkpoint.firewall",
+        "event.id": "{0x5e80a0af,0x3,0xbba3afa,0xd2c10858}",
+        "event.kind": "event",
+        "event.module": "checkpoint",
+        "event.outcome": "success",
+        "event.sequence": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
+        "fileset.name": "firewall",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.application": "domain-udp",
+        "network.direction": "outbound",
+        "network.iana_number": "17",
+        "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
+        "observer.egress.zone": "Internal",
+        "observer.ingress.zone": "Local",
+        "observer.name": "192.168.1.100",
+        "observer.product": "VPN-1 & FireWall-1",
+        "observer.type": "firewall",
+        "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.1",
+            "192.168.1.100"
+        ],
+        "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
+        "server.ip": "192.168.1.1",
+        "server.port": 53,
+        "service.type": "checkpoint",
+        "source.ip": "192.168.1.100",
+        "source.port": 37029,
+        "tags": [
+            "checkpoint-firewall",
+            "forwarded"
+        ]
+    }
+]
