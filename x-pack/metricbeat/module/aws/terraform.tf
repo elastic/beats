@@ -1,5 +1,5 @@
 provider "aws" {
-  version = "~> 2.58"
+  version = "~> 3.33"
   default_tags {
     tags = {
       environment  = var.ENVIRONMENT
