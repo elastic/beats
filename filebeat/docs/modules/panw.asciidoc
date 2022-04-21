@@ -89,8 +89,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Generated Time | `@timestamp` |
 | Source IP | client.ip source.ip |
 | Destination IP | server.ip destination.ip |
-| NAT Source IP |  | panw.panos.source.nat.ip
-| NAT Destination IP |  | panw.panos.destination.nat.ip
+| NAT Source IP | source.nat.ip |
+| NAT Destination IP | destination.nat.ip |
 | Rule Name |  | panw.panos.ruleset
 | Source User | client.user.name source.user.name |
 | Destination User | server.user.name destination.user.name |
@@ -102,8 +102,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Session ID |  | panw.panos.flow_id
 | Source Port | client.port source.port |
 | Destination Port | destination.port server.port |
-| NAT Source Port |  | panw.panos.source.nat.port
-| NAT Destination Port |  | panw.panos.destination.nat.port
+| NAT Source Port | source.nat.port |
+| NAT Destination Port | destination.nat.port |
 | Flags | labels |
 | Protocol | network.transport |
 | Action | event.outcome |
@@ -131,8 +131,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Generated Time | `@timestamp` |
 | Source IP | client.ip source.ip |
 | Destination IP | server.ip destination.ip |
-| NAT Source IP |  | panw.panos.source.nat.ip
-| NAT Destination IP |  | panw.panos.destination.nat.ip
+| NAT Source IP | source.nat.ip |
+| NAT Destination IP | destination.nat.ip |
 | Rule Name |  | panw.panos.ruleset
 | Source User | client.user.name source.user.name |
 | Destination User | server.user.name destination.user.name |
@@ -144,8 +144,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Session ID |  | panw.panos.flow_id
 | Source Port | client.port source.port |
 | Destination Port | destination.port server.port |
-| NAT Source Port |  | panw.panos.source.nat.port
-| NAT Destination Port |  | panw.panos.destination.nat.port
+| NAT Source Port | source.nat.port |
+| NAT Destination Port | destination.nat.port |
 | Flags | labels |
 | Protocol | network.transport |
 | Action | event.outcome |
