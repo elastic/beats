@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 
 *Auditbeat*
 
