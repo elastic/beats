@@ -11,11 +11,11 @@ provider "aws" {
   region = var.aws_region
   default_tags {
     tags = {
-      Environment = "CI"
-      Owner       = "Beats"
-      Branch      = var.BRANCH_NAME
-      Build       = var.BUILD_ID
-      CreatedDate = var.CREATED_DATE
+      environment  = var.ENVIRONMENT
+      repo         = var.REPO
+      branch       = var.BRANCH
+      build        = var.BUILD_ID
+      created_date = var.CREATED_DATE
     }
   }
 }

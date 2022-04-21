@@ -930,9 +930,11 @@ def startCloudTestEnv(Map args = [:]) {
 def terraformApply(String directory) {
   terraformInit(directory)
   dir(directory) {
-    withEnv(["TF_VAR_BUILD_ID=${BUILD_ID}",
-             "TF_VAR_BRANCH_NAME=${BRANCH_NAME}",
-             "TF_VAR_CREATED_DATE=${currentBuild.getRawBuild().getTimestampString2()}"]) {
+    withEnv(["TF_VAR_BRANCH_NAME_LOWER_CASE=${env.BRANCH_NAME.toLowerCase()}",
+             "TF_VAR_BUILD_ID=${BUILD_ID}",
+             "TF_VAR_CREATED_DATE=${new Date().getTime()}",
+             "TF_VAR_ENVIRONMENT=ci",
+             "TF_VAR_REPO=${env.REPO}"]) {
       sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
     }
   }

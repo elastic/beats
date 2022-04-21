@@ -4,9 +4,9 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "BRANCH_NAME" {
-  description = "Branch name for tagging purposes"
-  default = "beats"
+variable "BRANCH" {
+  description = "Branch name or pull request for tagging purposes"
+  default = "unknown-branch"
 }
 
 variable "BUILD_ID" {
@@ -15,6 +15,14 @@ variable "BUILD_ID" {
 }
 
 variable "CREATED_DATE" {
-  description = "Creation date for tagging purposes"
-  default = "unknown-build"
+  description = "Creation date in epoch time for tagging purposes"
+  default = "unknown-date"
+}
+
+variable "ENVIRONMENT" {
+  default = "unknown-environment"
+}
+
+variable "REPO" {
+  default = "unknown-repo-name"
 }
