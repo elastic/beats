@@ -111,6 +111,7 @@ func TestSingleInput(t *testing.T) {
 	assertEventMatches(t, expected, event)
 	input.Stop()
 	atomic.StoreUint64(&called1, 0)
+	atomic.StoreUint64(&called2, 0)
 	atomic.StoreUint64(&clientId, 0)
 }
 
@@ -156,24 +157,14 @@ func TestInputStop_Wait(t *testing.T) {
 
 	cfg := common.MustNewConfigFrom(config)
 
-	bayClient := bay.Client{}
-
-	newBayeuxMockClient := func() bay.Client {
-		b := bay.Bayeux{}
-		bayClient = bay.Client{
-			BayOb: b,
-		}
-		return bayClient
-	}
-
-	input, err := newInput(cfg, connector, newBayeuxMockClient, inputContext)
+	input, err := NewInput(cfg, connector, inputContext)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
-	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	require.Equal(t, 0, bay.GetConnectedCount())
 	input.Run()
 	eventProcessing.Wait()
-	require.Equal(t, 1, bayClient.BayOb.GetConnectedCount())
+	require.Equal(t, 1, bay.GetConnectedCount())
 
 	go func() {
 		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
@@ -182,8 +173,9 @@ func TestInputStop_Wait(t *testing.T) {
 	}()
 
 	input.Wait()
-	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	require.Equal(t, 0, bay.GetConnectedCount())
 	atomic.StoreUint64(&called1, 0)
+	atomic.StoreUint64(&called2, 0)
 	atomic.StoreUint64(&clientId, 0)
 }
 
@@ -214,7 +206,7 @@ func TestMultiInput(t *testing.T) {
 	var expected2 bay.MaybeMsg
 	expected2.Msg.Data.Event.ReplayID = 1234
 	expected2.Msg.Data.Payload = []byte(`{"CountryIso": "US"}`)
-	expected2.Msg.Channel = firstChannel
+	expected2.Msg.Channel = secondChannel
 
 	config1 := map[string]interface{}{
 		"channel_name":              firstChannel,
@@ -244,42 +236,32 @@ func TestMultiInput(t *testing.T) {
 
 	var inputContext finput.Context
 
-	bayClient := bay.Client{}
-
-	newBayeuxMockClient := func() bay.Client {
-		b := bay.Bayeux{}
-		bayClient = bay.Client{
-			BayOb: b,
-		}
-		return bayClient
-	}
-
 	// initialize inputs
-	input1, err := newInput(cfg1, connector, newBayeuxMockClient, inputContext)
+	input1, err := NewInput(cfg1, connector, inputContext)
 	require.NoError(t, err)
 	require.NotNil(t, input1)
 
-	input2, err := newInput(cfg2, connector, newBayeuxMockClient, inputContext)
+	input2, err := NewInput(cfg2, connector, inputContext)
 	require.NoError(t, err)
 	require.NotNil(t, input2)
 
-	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	require.Equal(t, 0, bay.GetConnectedCount())
 	// run input
 	input1.Run()
-
-	go func() {
-		time.Sleep(200 * time.Millisecond) // let input.Stop() be executed.
-		event := <-eventsCh
-		assertEventMatches(t, expected1, event)
-	}()
 
 	// run input
 	input2.Run()
 	eventProcessing.Wait()
-	require.Equal(t, 2, bayClient.BayOb.GetConnectedCount())
+	require.Equal(t, 2, bay.GetConnectedCount())
 
 	go func() {
-		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+		time.Sleep(time.Second) // let input.Stop() be executed.
+		event := <-eventsCh
+		assertEventMatches(t, expected1, event)
+	}()
+
+	go func() {
+		time.Sleep(2 * time.Second) // let input.Stop() be executed.
 		event := <-eventsCh
 		assertEventMatches(t, expected2, event)
 	}()
@@ -287,7 +269,11 @@ func TestMultiInput(t *testing.T) {
 	input1.Wait()
 	input2.Wait()
 
-	require.Equal(t, 0, bayClient.BayOb.GetConnectedCount())
+	require.Equal(t, 0, bay.GetConnectedCount())
+
+	atomic.StoreUint64(&called1, 0)
+	atomic.StoreUint64(&called2, 0)
+	atomic.StoreUint64(&clientId, 0)
 }
 
 func TestStop(t *testing.T) {

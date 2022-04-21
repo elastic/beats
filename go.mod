@@ -186,7 +186,7 @@ require (
 )
 
 require (
-	github.com/elastic/bayeux v1.0.4
+	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-libs v0.1.1
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0

@@ -5807,11 +5807,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/bayeux
-Version: v1.0.4
+Version: v1.0.5
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/bayeux@v1.0.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/bayeux@v1.0.5/LICENSE:
 
 MIT License
 

@@ -35,6 +35,7 @@ func (in *cometdInput) Run() {
 			defer in.log.Info("Input worker has stopped.")
 			defer in.workerWg.Done()
 			defer in.workerCancel()
+			in.b = bay.Bayeux{}
 			in.creds, err = bay.GetSalesforceCredentials(in.authParams)
 			if err != nil {
 				in.log.Error("not able to get access token: ", err)
@@ -88,10 +89,11 @@ func init() {
 	}
 }
 
-func newInput(
+// NewInput creates a new CometD input that consumes events from
+// a topic subscription.
+func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
-	bayeuxClient func() bay.Client,
 	inputContext input.Context,
 ) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
@@ -131,9 +133,6 @@ func newInput(
 		authParams:   authParams,
 	}
 
-	client := bayeuxClient()
-	in.b = client.BayOb
-
 	// Creating a new channel for cometd input.
 	in.msgCh = make(chan bay.MaybeMsg, 1)
 
@@ -144,16 +143,6 @@ func newInput(
 	}
 	in.log.Infof("Initialized %s input.", inputName)
 	return in, nil
-}
-
-// NewInput creates a new CometD input that consumes events from
-// a topic subscription.
-func NewInput(
-	cfg *common.Config,
-	connector channel.Connector,
-	inputContext input.Context,
-) (inp input.Input, err error) {
-	return newInput(cfg, connector, bay.NewClient, inputContext)
 }
 
 // Stop stops the input and waits for it to fully stop.
