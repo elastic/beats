@@ -101,23 +101,31 @@ func (l *directEventLoop) run() {
 	for {
 		select {
 		case <-broker.done:
+			fmt.Printf("broker.done\n")
 			return
 
 		case req := <-l.events: // producer pushing new event
+			fmt.Printf("handleInsert\n")
 			l.handleInsert(&req)
 
 		case req := <-l.pubCancel: // producer cancelling active events
+			fmt.Printf("handleCancel\n")
 			l.handleCancel(&req)
 
 		case req := <-l.get: // consumer asking for next batch
+			fmt.Printf("handleGetRequest\n")
 			l.handleGetRequest(&req)
 
 		case l.schedACKS <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list and queue
+			fmt.Printf("pendingACKs\n")
+
 			l.schedACKS = nil
 			l.pendingACKs = chanList{}
 
 		case count := <-l.acks:
+			fmt.Printf("handleACK\n")
+
 			l.handleACK(count)
 
 		}

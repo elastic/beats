@@ -37,7 +37,9 @@ type ringBuffer struct {
 	entries []queueEntry
 
 	regA, regB region
-	reserved   int // amount of events in region A actively processed/reserved
+
+	// The number of events awaiting ACK at the beginning of region A.
+	reserved int
 }
 
 // region represents a contiguous region in ringBuffer's internal storage (i.e.
