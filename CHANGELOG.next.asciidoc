@@ -10,6 +10,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Update to Go 1.17.9 {issue}31350[31350]
 
 *Auditbeat*
 
