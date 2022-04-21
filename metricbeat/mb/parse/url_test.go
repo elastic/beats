@@ -32,6 +32,23 @@ const (
 	rawURL_npipe = "http+npipe://./pipe/custom"
 )
 
+type expected struct {
+	URI          string
+	SanitizedURI string
+	Host         string
+	User         string
+	Password     string
+}
+
+func assertTest(t *testing.T, hostData mb.HostData, err error, exp *expected) {
+	assert.NoError(t, err)
+	assert.Equal(t, exp.URI, hostData.URI)
+	assert.Equal(t, exp.SanitizedURI, hostData.SanitizedURI)
+	assert.Equal(t, exp.Host, hostData.Host)
+	assert.Equal(t, exp.User, hostData.User)
+	assert.Equal(t, exp.Password, hostData.Password)
+}
+
 func TestParseURL(t *testing.T) {
 	t.Run("http", func(t *testing.T) {
 		rawURL := "https://admin:secret@127.0.0.1:8080?hello=world"
@@ -66,63 +83,71 @@ func TestParseURL(t *testing.T) {
 	})
 
 	t.Run("http+unix at root", func(t *testing.T) {
-		rawURL := rawURL_unix
-		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		hostData, err := ParseURL(rawURL_unix, "http", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
-			assert.Equal(t, "http://unix", hostData.URI)
-			assert.Equal(t, "http://unix", hostData.SanitizedURI)
-			assert.Equal(t, "unix", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
 		}
+		exp := &expected{
+			URI:          "http://unix",
+			SanitizedURI: "http://unix",
+			Host:         "unix",
+			User:         "",
+			Password:     "",
+		}
+		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+unix with path", func(t *testing.T) {
-		rawURL := rawURL_unix
-		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		hostData, err := ParseURL(rawURL_unix, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
-			assert.Equal(t, "http://unix/apath", hostData.URI)
-			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
-			assert.Equal(t, "unix", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
 		}
+		exp := &expected{
+			URI:          "http://unix/apath",
+			SanitizedURI: "http://unix/apath",
+			Host:         "unix",
+			User:         "",
+			Password:     "",
+		}
+		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+npipe at root", func(t *testing.T) {
-		rawURL := rawURL_npipe
-		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		hostData, err := ParseURL(rawURL_npipe, "http", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
-			assert.Equal(t, "http://npipe", hostData.URI)
-			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
-			assert.Equal(t, "npipe", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
 		}
+		exp := &expected{
+			URI:          "http://npipe",
+			SanitizedURI: "http://npipe",
+			Host:         "npipe",
+			User:         "",
+			Password:     "",
+		}
+		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+npipe with path", func(t *testing.T) {
-		rawURL := rawURL_npipe
-		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		hostData, err := ParseURL(rawURL_npipe, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
-			assert.Equal(t, "http://npipe/apath", hostData.URI)
-			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
-			assert.Equal(t, "npipe", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
 		}
+		exp := &expected{
+			URI:          "http://npipe/apath",
+			SanitizedURI: "http://npipe/apath",
+			Host:         "npipe",
+			User:         "",
+			Password:     "",
+		}
+		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+npipe short with", func(t *testing.T) {
