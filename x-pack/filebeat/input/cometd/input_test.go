@@ -66,6 +66,9 @@ func TestMakeEventFailure(t *testing.T) {
 }
 
 func TestSingleInput(t *testing.T) {
+	defer atomic.StoreUint64(&called1, 0)
+	defer atomic.StoreUint64(&called2, 0)
+	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
 
 	outlet := &mockedOutleter{
@@ -110,12 +113,12 @@ func TestSingleInput(t *testing.T) {
 	event := <-eventsCh
 	assertEventMatches(t, expected, event)
 	input.Stop()
-	atomic.StoreUint64(&called1, 0)
-	atomic.StoreUint64(&called2, 0)
-	atomic.StoreUint64(&clientId, 0)
 }
 
 func TestInputStop_Wait(t *testing.T) {
+	defer atomic.StoreUint64(&called1, 0)
+	defer atomic.StoreUint64(&called2, 0)
+	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
 
 	const numMessages = 1
@@ -174,12 +177,12 @@ func TestInputStop_Wait(t *testing.T) {
 
 	input.Wait()
 	require.Equal(t, 0, bay.GetConnectedCount())
-	atomic.StoreUint64(&called1, 0)
-	atomic.StoreUint64(&called2, 0)
-	atomic.StoreUint64(&clientId, 0)
 }
 
 func TestMultiInput(t *testing.T) {
+	defer atomic.StoreUint64(&called1, 0)
+	defer atomic.StoreUint64(&called2, 0)
+	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
 
 	const numMessages = 2
@@ -226,6 +229,7 @@ func TestMultiInput(t *testing.T) {
 	// create Server
 	r := http.HandlerFunc(oauth2Handler)
 	server := httptest.NewServer(r)
+	defer server.Close()
 	serverURL = server.URL
 	config1["auth.oauth2.token_url"] = serverURL + "/token"
 	config2["auth.oauth2.token_url"] = serverURL + "/token"
@@ -255,13 +259,13 @@ func TestMultiInput(t *testing.T) {
 	require.Equal(t, 2, bay.GetConnectedCount())
 
 	go func() {
-		time.Sleep(time.Second) // let input.Stop() be executed.
+		time.Sleep(4 * time.Second)
 		event := <-eventsCh
 		assertEventMatches(t, expected1, event)
 	}()
 
 	go func() {
-		time.Sleep(2 * time.Second) // let input.Stop() be executed.
+		time.Sleep(5 * time.Second)
 		event := <-eventsCh
 		assertEventMatches(t, expected2, event)
 	}()
@@ -270,10 +274,6 @@ func TestMultiInput(t *testing.T) {
 	input2.Wait()
 
 	require.Equal(t, 0, bay.GetConnectedCount())
-
-	atomic.StoreUint64(&called1, 0)
-	atomic.StoreUint64(&called2, 0)
-	atomic.StoreUint64(&clientId, 0)
 }
 
 func TestStop(t *testing.T) {
