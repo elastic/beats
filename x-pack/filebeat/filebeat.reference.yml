@@ -490,6 +490,8 @@ filebeat.modules:
       connection_string: ""
       # the name of the storage account the state/offsets will be stored and updated
       storage_account: ""
+      # the name of the storage account container you would like to store the offset information in.
+      storage_account_container: ""
       # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
 
