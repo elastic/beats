@@ -73,7 +73,7 @@ func (in *cometdInput) run() error {
 			if err != nil {
 				return fmt.Errorf("error while parsing JSON: %w", err)
 			}
-			if ok := in.outlet.OnEvent(makeEvent(event.EventId, string(msg))); !ok {
+			if ok := in.outlet.OnEvent(makeEvent(event.EventId, e.Msg.Channel, string(msg))); !ok {
 				in.log.Debug("OnEvent returned false. Stopping input worker.")
 				return fmt.Errorf("error ingesting data to elasticsearch")
 			}
@@ -178,7 +178,7 @@ type Event struct {
 	EventId string `json:"EventIdentifier"`
 }
 
-func makeEvent(id string, body string) beat.Event {
+func makeEvent(id string, channel string, body string) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
@@ -187,6 +187,9 @@ func makeEvent(id string, body string) beat.Event {
 				"created": time.Now().UTC(),
 			},
 			"message": body,
+			"cometd": common.MapStr{
+				"channel_name": channel,
+			},
 		},
 		Private: body,
 	}

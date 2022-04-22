@@ -59,10 +59,13 @@ func TestMakeEventFailure(t *testing.T) {
 				"created": time.Now().UTC(),
 			},
 			"message": "DEMOBODYFAIL",
+			"cometd": common.MapStr{
+				"channel_name": "DEMOCHANNEL",
+			},
 		},
 		Private: "DEMOBODYFAIL",
 	}
-	assert.NotEqual(t, event, makeEvent("DEMOID", "DEMOBODY"))
+	assert.NotEqual(t, event, makeEvent("DEMOCHANNEL", "DEMOID", "DEMOBODY"))
 }
 
 func TestSingleInput(t *testing.T) {
@@ -70,6 +73,7 @@ func TestSingleInput(t *testing.T) {
 	defer atomic.StoreUint64(&called2, 0)
 	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
 
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
@@ -120,6 +124,7 @@ func TestInputStop_Wait(t *testing.T) {
 	defer atomic.StoreUint64(&called2, 0)
 	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
 
 	const numMessages = 1
 
@@ -184,6 +189,7 @@ func TestMultiInput(t *testing.T) {
 	defer atomic.StoreUint64(&called2, 0)
 	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
 
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
@@ -246,24 +252,22 @@ func TestMultiInput(t *testing.T) {
 	require.Equal(t, 0, bay.GetConnectedCount())
 	// run input
 	input1.Run()
+	defer input1.Stop()
 
 	// run input
 	input2.Run()
+	defer input2.Stop()
 
-	go func() {
-		time.Sleep(4 * time.Second)
-		event := <-eventsCh
-		assertEventMatches(t, expected1, event)
-	}()
+	for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
+		channel, err := event.GetValue("cometd.channel_name")
+		require.NoError(t, err)
 
-	go func() {
-		time.Sleep(5 * time.Second)
-		event := <-eventsCh
-		assertEventMatches(t, expected2, event)
-	}()
-
-	input1.Wait()
-	input2.Wait()
+		if channel == "channel_name1" {
+			assertEventMatches(t, expected1, event)
+		} else {
+			assertEventMatches(t, expected2, event)
+		}
+	}
 }
 
 func TestStop(t *testing.T) {
