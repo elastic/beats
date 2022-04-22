@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Affecting all Beats*
 
 - Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
+- Update to Go 1.17.9 {issue}31350[31350]
 
 *Auditbeat*
 
@@ -53,6 +54,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 - Netflow: replace invalid field value. {pull}31295[31295]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
 
 *Heartbeat*
 
@@ -109,6 +111,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
 - Add URL Encode template function for httpjson input. {pull}30962[30962]
 - Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
+- Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
 
 *Auditbeat*
 
@@ -134,6 +137,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
+- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 
 *Packetbeat*

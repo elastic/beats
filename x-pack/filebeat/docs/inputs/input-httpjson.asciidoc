@@ -529,9 +529,11 @@ filebeat.inputs:
 [float]
 ==== `response.decode_as`
 
-ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`. It is not set by default.
+ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`, `application/zip`. It is not set by default.
 
 NOTE: For `text/csv`, one event for each line will be created, using the header values as the object keys. For this reason is always assumed that a header exists.
+
+NOTE: For `application/zip`, the `zip` file is expected to contain one or more `.json` or `.ndjson` files. The contents of all of them will be merged into a single list of `JSON` objects.
 
 [[response-transforms]]
 [float]
@@ -947,7 +949,7 @@ Contains basic request and response configuration for chained calls.
 [float]
 ==== `chain[].step.request`
 
-Please refer <<request-parameters,request parameters>>. Required. 
+Please refer <<request-parameters,request parameters>>. Required.
 
 Example:
 
