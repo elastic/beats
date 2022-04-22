@@ -185,14 +185,8 @@ func TestMultiInput(t *testing.T) {
 	defer atomic.StoreUint64(&clientId, 0)
 	eventsCh := make(chan beat.Event)
 
-	const numMessages = 2
-
-	var eventProcessing sync.WaitGroup
-	eventProcessing.Add(numMessages)
-
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
-			eventProcessing.Done()
 			eventsCh <- event
 			return true
 		},
@@ -255,8 +249,6 @@ func TestMultiInput(t *testing.T) {
 
 	// run input
 	input2.Run()
-	eventProcessing.Wait()
-	require.Equal(t, 2, bay.GetConnectedCount())
 
 	go func() {
 		time.Sleep(4 * time.Second)
@@ -272,8 +264,6 @@ func TestMultiInput(t *testing.T) {
 
 	input1.Wait()
 	input2.Wait()
-
-	require.Equal(t, 0, bay.GetConnectedCount())
 }
 
 func TestStop(t *testing.T) {
