@@ -81,7 +81,7 @@ Use the `dissect` processor to split each message into three fields, for example
 ----
 processors:
   - dissect:
-      tokenizer: '"%{service.pid|integer} - %{service.name} - %{service.status}"'
+      tokenizer: "%{service.pid|integer} - %{service.name} - %{service.status}"
       field: "message"
       target_prefix: ""
 ----
