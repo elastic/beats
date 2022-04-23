@@ -25,9 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/plugin"
 )
@@ -37,7 +34,7 @@ type PluginFactory struct {
 	Name    string
 	Aliases []string
 	Make    PluginMake
-	Stats   RegistryRecorder
+	Stats   MultiRegistryRecorder
 }
 
 type PluginMake func(string, *common.Config) (p Plugin, err error)
@@ -57,49 +54,23 @@ func (p Plugin) Close() error {
 	return nil
 }
 
-// RunWrapped runs the plug-in with the provided wrappers returning a channel of resultant events.
-func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
-	wj := wrappers.WrapCommon(p.Jobs, fields)
-	results := make(chan *beat.Event)
-
-	var runJob func(j jobs.Job)
-	runJob = func(j jobs.Job) {
-		e := &beat.Event{}
-		conts, err := j(e)
-		// No error handling since WrapCommon handles all errors
-		if err != nil {
-			panic(fmt.Sprintf("unexpected error on wrapped job!: %s", err))
-		}
-		results <- e
-		for _, c := range conts {
-			runJob(c)
-		}
-	}
-
-	go func() {
-		for _, j := range wj {
-			runJob(j)
-		}
-		close(results)
-	}()
-
-	return results
-}
-
 var pluginKey = "heartbeat.monitor"
 
 // stateGlobalRecorder records statistics across all plugin types
 var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.TelemetryRegistry)
 
-func statsForPlugin(pluginName string) RegistryRecorder {
-	return MultiRegistryRecorder{
-		recorders: []RegistryRecorder{
+func statsForPlugin(pluginName string) MultiRegistryRecorder {
+	return MultiRegistry{
+		startStopRecorders: []StartStopRegistryRecorder{
 			// state (telemetry)
 			newPluginGaugeRecorder(pluginName, hbregistry.TelemetryRegistry),
 			// Record global monitors / endpoints count
 			NewPluginCountersRecorder(pluginName, hbregistry.StatsRegistry),
 			// When stats for this plugin are updated, update the global stats as well
 			stateGlobalRecorder,
+		},
+		durationRecorders: []DurationRegistryRecorder{
+			NewDurationRecorder(pluginName, hbregistry.StatsRegistry),
 		},
 	}
 }

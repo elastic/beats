@@ -71,7 +71,7 @@ type Monitor struct {
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
-	stats plugin.RegistryRecorder
+	stats plugin.StartStopRegistryRecorder
 
 	runOnce bool
 }
@@ -180,7 +180,7 @@ func newMonitorUnsafe(
 		}}
 	}
 
-	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
+	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields, pluginFactory.Stats)
 	m.endpoints = p.Endpoints
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)

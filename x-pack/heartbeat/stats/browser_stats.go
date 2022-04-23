@@ -14,8 +14,7 @@ import (
 var globalBrowserRecorder *BrowserStats = nil
 
 type BrowserStats struct {
-	stepsHistogram    *monitoring.UniqueList // histogram with the count for monitors with each number of steps
-	durationHistogram *monitoring.UniqueList // histogram with the count of durations (in ms) for tests
+	stepsHistogram *monitoring.UniqueList // histogram with the count for monitors with each number of steps
 }
 
 func GetBrowserStats() *BrowserStats {
@@ -29,18 +28,11 @@ func GetBrowserStats() *BrowserStats {
 	stepsHistogram := monitoring.NewUniqueList()
 	monitoring.NewFunc(r, "steps_histogram", stepsHistogram.ReportMap, monitoring.Report)
 
-	durationHistogram := monitoring.NewUniqueList()
-	monitoring.NewFunc(r, "duration_histogram", durationHistogram.ReportMap, monitoring.Report)
-
-	s := BrowserStats{stepsHistogram, durationHistogram}
+	s := BrowserStats{stepsHistogram}
 
 	globalBrowserRecorder = &s
 
 	return globalBrowserRecorder
-}
-
-func (b BrowserStats) RegisterDuration(d int64) {
-	b.durationHistogram.Add(strconv.FormatInt(d, 10))
 }
 
 func (b BrowserStats) RegisterStepCount(c int) {

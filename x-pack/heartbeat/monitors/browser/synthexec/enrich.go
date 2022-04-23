@@ -214,7 +214,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event, s *stats.BrowserStat
 	})
 
 	s.RegisterStepCount(je.stepCount)
-	s.RegisterDuration(int64(je.end.Sub(je.start) / time.Microsecond))
 
 	if je.journeyComplete {
 		return je.firstError

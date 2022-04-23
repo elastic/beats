@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -37,16 +38,16 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stats plugin.MultiRegistryRecorder) []jobs.Job {
 	if stdMonFields.Type == "browser" {
-		return WrapBrowser(js, stdMonFields)
+		return WrapBrowser(js, stdMonFields, stats)
 	} else {
-		return WrapLightweight(js, stdMonFields)
+		return WrapLightweight(js, stdMonFields, stats)
 	}
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stats plugin.MultiRegistryRecorder) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
@@ -54,7 +55,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			addServiceName(stdMonFields),
 			addMonitorMeta(stdMonFields, len(js) > 1),
 			addMonitorStatus(false),
-			addMonitorDuration,
+			addLightweightMonitorDuration(stats),
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary(stdMonFields.Type)
@@ -64,12 +65,13 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stats plugin.MultiRegistryRecorder) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorStatus(true),
+		// addBrowserMonitorDuration(stats),
 	)
 }
 
@@ -181,23 +183,48 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 	}
 }
 
-// addMonitorDuration adds duration correctly for all non-browser jobs
-func addMonitorDuration(job jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		start := time.Now()
+// addLightweightMonitorDuration adds duration correctly for all non-browser jobs
+func addLightweightMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobWrapper {
+	return func(job jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			start := time.Now()
+			cont, err := job(event)
+			end := time.Now()
 
-		cont, err := job(event)
+			duration := end.Sub(start)
 
-		if event != nil {
-			eventext.MergeEventFields(event, common.MapStr{
-				"monitor": common.MapStr{
-					"duration": look.RTT(time.Since(start)),
-				},
-			})
-			event.Timestamp = start
+			if event != nil {
+				eventext.MergeEventFields(event, common.MapStr{
+					"monitor": common.MapStr{
+						"duration": look.RTT(duration),
+					},
+				})
+				event.Timestamp = start
+			}
+
+			// stats.RecordDuration(duration.Milliseconds())
+
+			return cont, err
 		}
+	}
+}
 
-		return cont, err
+func addBrowserMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobWrapper {
+	return func(origJob jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, _ := origJob(event)
+
+			hasSummary, _ := event.Fields.HasKey("summary.up")
+			hasDuration, _ := event.Fields.HasKey("monitor.duration.us")
+
+			if hasSummary && hasDuration {
+				durationUs, _ := event.Fields.GetValue("monitor.duration.us")
+				durationMs := (time.Duration(durationUs.(int64)) * time.Microsecond).Milliseconds()
+				stats.RecordDuration(int64(durationMs))
+			}
+
+			return cont, nil
+		}
 	}
 }
 
