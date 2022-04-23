@@ -683,10 +683,6 @@
     - name: syslog_server_name
       type: keyword
       description: |
-        Syslog server name
-    - name: syslog_server_name
-      type: keyword
-      description: |
         Syslog server name.
     - name: system_cpu
       type: float
