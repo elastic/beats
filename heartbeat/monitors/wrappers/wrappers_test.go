@@ -29,8 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -40,6 +40,24 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
+
+type testRegistryRecorder struct {
+	Duration      int64
+	EndpointStart int64
+	EndpointEnd   int64
+}
+
+func (trr *testRegistryRecorder) StartMonitor(endpoints int64) {
+	trr.EndpointStart = endpoints
+}
+
+func (trr *testRegistryRecorder) StopMonitor(endpoints int64) {
+	trr.EndpointEnd = endpoints
+}
+
+func (trr *testRegistryRecorder) RecordDuration(d int64) {
+	trr.Duration = d
+}
 
 type testDef struct {
 	name      string
@@ -64,12 +82,8 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
-	var stats = plugin.NewMultiRegistry(
-		[]plugin.StartStopRegistryRecorder{},
-		[]plugin.DurationRegistryRecorder{},
-	)
-
 	t.Run(tt.name, func(t *testing.T) {
+		stats := &testRegistryRecorder{}
 		wrapped := WrapCommon(tt.jobs, tt.stdFields, stats)
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
@@ -80,6 +94,10 @@ func testCommonWrap(t *testing.T, tt testDef) {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
 				want := tt.want[idx]
 				testslike.Test(t, lookslike.Strict(want), r.Fields)
+
+				durationUs, _ := r.Fields.GetValue("monitor.duration.us")
+				durationMs := durationUs.(time.Duration).Milliseconds()
+				assert.Equal(t, durationMs, stats.Duration)
 
 				if tt.metaWant != nil {
 					metaWant := tt.metaWant[idx]
@@ -423,6 +441,7 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 				"id":          inlineMonitorValues.id,
 				"name":        inlineMonitorValues.name,
 				"check_group": inlineMonitorValues.checkGroup,
+				"duration":    look.RTT(1337 * time.Microsecond),
 			},
 		})
 		return nil, nil
@@ -450,6 +469,7 @@ func TestInlineBrowserJob(t *testing.T) {
 						},
 					}),
 					hbtestllext.MonitorTimespanValidator,
+					hbtestllext.MonitorDurationValidator,
 				),
 			),
 		},
@@ -474,6 +494,7 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 				"id":          suiteMonitorValues.id,
 				"name":        suiteMonitorValues.name,
 				"check_group": suiteMonitorValues.checkGroup,
+				"duration":    look.RTT(1337 * time.Microsecond),
 			},
 		})
 		if summary {
@@ -501,6 +522,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 			"id":          suiteMonitorValues.id,
 			"name":        suiteMonitorValues.name,
 			"check_group": suiteMonitorValues.checkGroup,
+			"duration.us": hbtestllext.IsDuration,
 			"timespan": common.MapStr{
 				"gte": hbtestllext.IsTime,
 				"lt":  hbtestllext.IsTime,

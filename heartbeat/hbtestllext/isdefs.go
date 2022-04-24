@@ -41,3 +41,11 @@ var IsInt64 = isdef.Is("positiveInt64", func(path llpath.Path, v interface{}) *l
 	}
 	return llresult.ValidResult(path)
 })
+
+var IsDuration = isdef.Is("duration", func(path llpath.Path, v interface{}) *llresult.Results {
+	_, ok := v.(time.Duration)
+	if !ok {
+		return llresult.SimpleResult(path, false, "expected a duration")
+	}
+	return llresult.ValidResult(path)
+})
