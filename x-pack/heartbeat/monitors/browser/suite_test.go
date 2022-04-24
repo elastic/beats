@@ -16,7 +16,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/stats"
 )
+
+var browserStats = stats.GetBrowserStats()
 
 func TestValidLocal(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
@@ -39,7 +42,7 @@ func TestValidLocal(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewSuite(cfg)
+	s, e := NewSuite(cfg, browserStats)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	_, ok := s.InlineSource()
@@ -72,7 +75,7 @@ func TestValidInline(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewSuite(cfg)
+	s, e := NewSuite(cfg, browserStats)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	sSrc, ok := s.InlineSource()
@@ -94,7 +97,7 @@ func TestNameRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSuite(cfg)
+	_, e := NewSuite(cfg, browserStats)
 	require.Regexp(t, ErrNameRequired, e)
 }
 
@@ -107,7 +110,7 @@ func TestIDRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSuite(cfg)
+	_, e := NewSuite(cfg, browserStats)
 	require.Regexp(t, ErrIdRequired, e)
 }
 
@@ -115,7 +118,7 @@ func TestEmptySource(t *testing.T) {
 	cfg := common.MustNewConfigFrom(common.MapStr{
 		"source": common.MapStr{},
 	})
-	s, e := NewSuite(cfg)
+	s, e := NewSuite(cfg, browserStats)
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)

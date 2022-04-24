@@ -30,6 +30,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -181,6 +182,11 @@ func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certif
 }
 
 func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string, resolver monitors.Resolver) *beat.Event {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
+
 	config, err := common.NewConfigFrom(common.MapStr{
 		"hosts":   host,
 		"ports":   int64(port),
@@ -193,7 +199,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, stats)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

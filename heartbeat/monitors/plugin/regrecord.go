@@ -31,6 +31,10 @@ type MultiRegistry struct {
 	durationRecorders  []DurationRegistryRecorder
 }
 
+func NewMultiRegistry(startStopRecorders []StartStopRegistryRecorder, durationRecorders []DurationRegistryRecorder) MultiRegistry {
+	return MultiRegistry{startStopRecorders, durationRecorders}
+}
+
 // MultiRegistryRecorder composes multiple statsRecorders.
 type MultiRegistryRecorder interface {
 	StartMonitor(endpoints int64)

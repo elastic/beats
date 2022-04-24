@@ -42,6 +42,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -62,6 +63,11 @@ func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Even
 // sendTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
 func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
+
 	configSrc := map[string]interface{}{
 		"timeout": "1s",
 	}
@@ -85,7 +91,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, stats)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -309,6 +315,11 @@ func TestDownStatuses(t *testing.T) {
 }
 
 func TestLargeResponse(t *testing.T) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
+
 	server := httptest.NewServer(hbtest.SizedResponseHandler(1024 * 1024))
 	defer server.Close()
 
@@ -325,7 +336,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, stats)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -344,6 +355,11 @@ func TestLargeResponse(t *testing.T) {
 }
 
 func TestJsonBody(t *testing.T) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
+
 	type testCase struct {
 		name                string
 		responseBody        string
@@ -441,7 +457,7 @@ func TestJsonBody(t *testing.T) {
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
-			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, stats)[0]
 
 			event := &beat.Event{}
 			_, err = job(event)
@@ -650,6 +666,10 @@ func TestUnreachableJob(t *testing.T) {
 }
 
 func TestRedirect(t *testing.T) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
 	redirectingPaths := map[string]string{
 		"/redirect_one": "/redirect_two",
 		"/redirect_two": "/",
@@ -673,7 +693,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, stats)[0]
 
 	// Run this test multiple times since in the past we had an issue where the redirects
 	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
@@ -705,6 +725,10 @@ func TestRedirect(t *testing.T) {
 }
 
 func TestNoHeaders(t *testing.T) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
 	server := httptest.NewServer(hbtest.HelloWorldHandler(200))
 	defer server.Close()
 
@@ -720,7 +744,7 @@ func TestNoHeaders(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, stats)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -892,6 +916,10 @@ func TestGzipDecodeWithoutRequestHeader(t *testing.T) {
 }
 
 func TestUserAgentInject(t *testing.T) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
 	ua := ""
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ua = r.Header.Get("User-Agent")
@@ -908,7 +936,7 @@ func TestUserAgentInject(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, stats)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

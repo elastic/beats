@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -63,8 +64,13 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
+
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.stdFields)
+		wrapped := WrapCommon(tt.jobs, tt.stdFields, stats)
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)

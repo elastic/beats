@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -62,6 +63,11 @@ func TestICMPFields(t *testing.T) {
 }
 
 func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
+
 	tl := mockLoop{pingRtt: time.Microsecond * 1000, pingRequests: 1}
 	jf, err := newJobFactory(cfg, monitors.NewStdResolver(), tl)
 	require.NoError(t, err)
@@ -70,7 +76,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1})
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, stats)
 	wrapped[0](e)
 	return tl, e
 }

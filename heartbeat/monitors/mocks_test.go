@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -141,7 +140,10 @@ func createMockJob() ([]jobs.Job, error) {
 }
 
 func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
-	reg := monitoring.NewRegistry()
+	var stats = plugin.NewMultiRegistry(
+		[]plugin.StartStopRegistryRecorder{},
+		[]plugin.DurationRegistryRecorder{},
+	)
 
 	built := atomic.NewInt(0)
 	closed := atomic.NewInt(0)
@@ -170,7 +172,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 
 				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, err
 			},
-			Stats: plugin.NewPluginCountersRecorder("test", reg)},
+			Stats: stats},
 		built,
 		closed
 }

@@ -213,6 +213,8 @@ func (je *journeyEnricher) createSummary(event *beat.Event, s *stats.BrowserStat
 		},
 	})
 
+	// In case we want to add the stepcount to the summary document in the future
+	// we can then move this call to the recorder to the job wrapper functions
 	s.RegisterStepCount(je.stepCount)
 
 	if je.journeyComplete {

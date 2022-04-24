@@ -60,8 +60,8 @@ var pluginKey = "heartbeat.monitor"
 var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.TelemetryRegistry)
 
 func statsForPlugin(pluginName string) MultiRegistryRecorder {
-	return MultiRegistry{
-		startStopRecorders: []StartStopRegistryRecorder{
+	return NewMultiRegistry(
+		[]StartStopRegistryRecorder{
 			// state (telemetry)
 			newPluginGaugeRecorder(pluginName, hbregistry.TelemetryRegistry),
 			// Record global monitors / endpoints count
@@ -69,10 +69,10 @@ func statsForPlugin(pluginName string) MultiRegistryRecorder {
 			// When stats for this plugin are updated, update the global stats as well
 			stateGlobalRecorder,
 		},
-		durationRecorders: []DurationRegistryRecorder{
+		[]DurationRegistryRecorder{
 			NewDurationRecorder(pluginName, hbregistry.StatsRegistry),
 		},
-	}
+	)
 }
 
 func init() {
