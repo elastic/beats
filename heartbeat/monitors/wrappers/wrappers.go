@@ -220,8 +220,10 @@ func addBrowserMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobWrapp
 			if hasSummary && hasDuration {
 				durationUs, _ := event.Fields.GetValue("monitor.duration.us")
 
-				durationMs := durationUs.(time.Duration).Milliseconds()
+				durationMs := time.Duration(durationUs.(int64)) * time.Microsecond
 				stats.RecordDuration(int64(durationMs))
+
+				logp.Info("Browser monitor completed in %dms", durationMs)
 			}
 
 			return cont, nil

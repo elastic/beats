@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/stats"
 
@@ -216,6 +217,8 @@ func (je *journeyEnricher) createSummary(event *beat.Event, s stats.BrowserStats
 	// In case we want to add the stepcount to the summary document in the future
 	// we can then move this call to the recorder to the job wrapper functions
 	s.RegisterStepCount(je.stepCount)
+
+	logp.Info("Browser monitor completed with %d steps", je.stepCount)
 
 	if je.journeyComplete {
 		return je.firstError

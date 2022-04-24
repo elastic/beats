@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
-	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -95,9 +94,17 @@ func testCommonWrap(t *testing.T, tt testDef) {
 				want := tt.want[idx]
 				testslike.Test(t, lookslike.Strict(want), r.Fields)
 
-				durationUs, _ := r.Fields.GetValue("monitor.duration.us")
-				durationMs := durationUs.(time.Duration).Milliseconds()
-				assert.Equal(t, durationMs, stats.Duration)
+				monType, _ := r.Fields.GetValue("monitor.type")
+				isBrowserMonitor := monType == "browser"
+				if isBrowserMonitor {
+					durationUs, _ := r.Fields.GetValue("monitor.duration.us")
+					durationMs := time.Duration(durationUs.(int64)) * time.Microsecond
+					assert.Equal(t, int64(durationMs), stats.Duration)
+				} else {
+					durationUs, _ := r.Fields.GetValue("monitor.duration.us")
+					durationMs := durationUs.(time.Duration).Milliseconds()
+					assert.Equal(t, durationMs, stats.Duration)
+				}
 
 				if tt.metaWant != nil {
 					metaWant := tt.metaWant[idx]
@@ -435,15 +442,17 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
 		eventext.MergeEventFields(event, common.MapStr{
-			"url": URLFields(parsed),
+			"url":     URLFields(parsed),
+			"summary": common.MapStr{"up": 1, "down": 0},
 			"monitor": common.MapStr{
 				"type":        "browser",
 				"id":          inlineMonitorValues.id,
 				"name":        inlineMonitorValues.name,
 				"check_group": inlineMonitorValues.checkGroup,
-				"duration":    look.RTT(1337 * time.Microsecond),
+				"duration":    common.MapStr{"us": int64(1337 * time.Microsecond)},
 			},
 		})
+
 		return nil, nil
 	}
 }
@@ -461,7 +470,9 @@ func TestInlineBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, "http://foo.com"),
 					lookslike.MustCompile(map[string]interface{}{
+						"summary": map[string]interface{}{"up": 1, "down": 0},
 						"monitor": map[string]interface{}{
+							"status":      "up",
 							"type":        "browser",
 							"id":          inlineMonitorValues.id,
 							"name":        inlineMonitorValues.name,
@@ -494,7 +505,7 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 				"id":          suiteMonitorValues.id,
 				"name":        suiteMonitorValues.name,
 				"check_group": suiteMonitorValues.checkGroup,
-				"duration":    look.RTT(1337 * time.Microsecond),
+				"duration":    common.MapStr{"us": int64(1337 * time.Microsecond)},
 			},
 		})
 		if summary {
@@ -522,7 +533,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 			"id":          suiteMonitorValues.id,
 			"name":        suiteMonitorValues.name,
 			"check_group": suiteMonitorValues.checkGroup,
-			"duration.us": hbtestllext.IsDuration,
+			"duration.us": hbtestllext.IsInt64,
 			"timespan": common.MapStr{
 				"gte": hbtestllext.IsTime,
 				"lt":  hbtestllext.IsTime,

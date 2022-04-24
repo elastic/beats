@@ -34,7 +34,7 @@ var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
 var MonitorDurationValidator = lookslike.MustCompile(map[string]interface{}{
 	"monitor": map[string]interface{}{
 		"duration": map[string]interface{}{
-			"us": IsDuration,
+			"us": IsInt64,
 		},
 	},
 })
