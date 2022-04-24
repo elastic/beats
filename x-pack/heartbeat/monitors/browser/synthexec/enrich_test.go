@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/stats"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
@@ -35,10 +34,15 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 	}
 }
 
-var browserStats = stats.GetBrowserStats()
+type testBrowserStats struct {
+	stepCount int
+}
+
+func (tbs *testBrowserStats) RegisterStepCount(c int) {
+	tbs.stepCount = c
+}
 
 func TestJourneyEnricher(t *testing.T) {
-
 	var stdFields = StdSuiteFields{
 		Id:       "mysuite",
 		Name:     "mysuite",
@@ -129,7 +133,8 @@ func TestJourneyEnricher(t *testing.T) {
 	check := func(t *testing.T, se *SynthEvent, ssf StdSuiteFields) {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, ssf, browserStats)
+			browserStats := testBrowserStats{}
+			enrichErr := je.enrich(e, se, ssf, &browserStats)
 			if se.Error != nil {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
@@ -229,8 +234,9 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			browserStats := testBrowserStats{}
 			e := &beat.Event{}
-			tt.je.enrichSynthEvent(e, tt.se, browserStats)
+			tt.je.enrichSynthEvent(e, tt.se, &browserStats)
 			tt.check(t, e, tt.je)
 		})
 	}
@@ -348,8 +354,9 @@ func TestEnrichSynthEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			browserStats := testBrowserStats{}
 			e := &beat.Event{}
-			if err := tt.je.enrichSynthEvent(e, tt.se, browserStats); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
+			if err := tt.je.enrichSynthEvent(e, tt.se, &browserStats); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
 				t.Errorf("journeyEnricher.enrichSynthEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			tt.check(t, e, tt.je)
@@ -402,7 +409,8 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		e := &beat.Event{}
 		stdFields := StdSuiteFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields, browserStats)
+			browserStats := testBrowserStats{}
+			enrichErr := je.enrich(e, se, stdFields, &browserStats)
 
 			if se != nil && se.Type == "cmd/status" {
 				t.Run("no summary in cmd/status", func(t *testing.T) {
@@ -464,7 +472,8 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		e := &beat.Event{}
 		stdFields := StdSuiteFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields, browserStats)
+			browserStats := testBrowserStats{}
+			enrichErr := je.enrich(e, se, stdFields, &browserStats)
 
 			if se != nil && se.Type == "cmd/status" {
 				hasCmdStatus = true
@@ -499,6 +508,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			start:           time.Now(),
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: true,
+			stepCount:       1334,
 		},
 		expected: common.MapStr{
 			"monitor.duration.us": int64(10),
@@ -517,6 +527,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			journeyComplete: true,
 			errorCount:      1,
 			firstError:      fmt.Errorf("journey errored"),
+			stepCount:       1335,
 		},
 		expected: common.MapStr{
 			"monitor.duration.us": int64(10),
@@ -533,6 +544,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			start:           time.Now(),
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
+			stepCount:       1336,
 		},
 		expected: common.MapStr{
 			"monitor.duration.us": int64(10),
@@ -548,6 +560,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			journey:         &Journey{},
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
+			stepCount:       1337,
 			errorCount:      1,
 		},
 		expected: common.MapStr{
@@ -561,8 +574,10 @@ func TestCreateSummaryEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			browserStats := testBrowserStats{}
+
 			e := &beat.Event{}
-			err := tt.je.createSummary(e, browserStats)
+			err := tt.je.createSummary(e, &browserStats)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -575,6 +590,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"synthetics.journey": Journey{},
 			}, true)
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
+			require.Equal(t, tt.je.stepCount, browserStats.stepCount)
 		})
 	}
 }

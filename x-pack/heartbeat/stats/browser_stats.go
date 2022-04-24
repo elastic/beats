@@ -17,6 +17,10 @@ type BrowserStats struct {
 	stepsHistogram *monitoring.UniqueList // histogram with the count for monitors with each number of steps
 }
 
+type BrowserStatsRecorder interface {
+	RegisterStepCount(int)
+}
+
 func GetBrowserStats() *BrowserStats {
 	if globalBrowserRecorder != nil {
 		return globalBrowserRecorder

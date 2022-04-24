@@ -40,7 +40,7 @@ type FilterJourneyConfig struct {
 }
 
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, s *stats.BrowserStats, extraArgs ...string) (jobs.Job, error) {
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, s stats.BrowserStatsRecorder, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
 	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
@@ -72,7 +72,7 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StdSuiteFields, s *stats.BrowserStats, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StdSuiteFields, s stats.BrowserStatsRecorder, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
 		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
 	}
@@ -83,7 +83,7 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, s *stats.BrowserStats) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, s stats.BrowserStatsRecorder) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {

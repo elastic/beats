@@ -23,10 +23,10 @@ type enricher func(event *beat.Event, se *SynthEvent, fields StdSuiteFields) err
 
 type streamEnricher struct {
 	je *journeyEnricher
-	s  *stats.BrowserStats
+	s  stats.BrowserStatsRecorder
 }
 
-func newStreamEnricher(s *stats.BrowserStats) streamEnricher {
+func newStreamEnricher(s stats.BrowserStatsRecorder) streamEnricher {
 	return streamEnricher{s: s}
 }
 
@@ -68,7 +68,7 @@ func makeUuid() string {
 	return u.String()
 }
 
-func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields, s *stats.BrowserStats) error {
+func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields, s stats.BrowserStatsRecorder) error {
 	if se == nil {
 		return nil
 	}
@@ -124,7 +124,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 	return je.enrichSynthEvent(event, se, s)
 }
 
-func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent, s *stats.BrowserStats) error {
+func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent, s stats.BrowserStatsRecorder) error {
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
@@ -176,7 +176,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent, s
 	return jobErr
 }
 
-func (je *journeyEnricher) createSummary(event *beat.Event, s *stats.BrowserStats) error {
+func (je *journeyEnricher) createSummary(event *beat.Event, s stats.BrowserStatsRecorder) error {
 	var up, down int
 	if je.errorCount > 0 {
 		up = 0
