@@ -46,7 +46,7 @@ type Plugin struct {
 	Endpoints int
 }
 
-// Close closes the :lugin, invoking any DoClose hooks if avialable.
+// Close closes the :lugin, invoking any DoClose hooks if available.
 func (p Plugin) Close() error {
 	if p.DoClose != nil {
 		return p.DoClose()
@@ -97,7 +97,7 @@ const (
 	PassiveMonitor
 )
 
-// globalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
+// GlobalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
 var GlobalPluginsReg = NewPluginsReg()
 
 type PluginsReg struct {
@@ -156,6 +156,8 @@ func (r *PluginsReg) Get(name string) (PluginFactory, bool) {
 }
 
 func (r *PluginsReg) String() string {
+	//nolint:prealloc // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	var monitors []string
 	for m := range r.monitors {
 		monitors = append(monitors, m)

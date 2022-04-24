@@ -15,7 +15,6 @@ func TestExecMultiplexer(t *testing.T) {
 	em := NewExecMultiplexer()
 
 	// Generate three fake journeys with three fake steps
-	var testJourneys []*Journey
 	var testEvents []*SynthEvent
 	time := float64(0)
 	for jIdx := 0; jIdx < 3; jIdx++ {
@@ -24,7 +23,6 @@ func TestExecMultiplexer(t *testing.T) {
 			Name: fmt.Sprintf("J%d", jIdx),
 			Id:   fmt.Sprintf("j-%d", jIdx),
 		}
-		testJourneys = append(testJourneys, journey)
 		testEvents = append(testEvents, &SynthEvent{
 			Journey:              journey,
 			Type:                 "journey/start",
@@ -62,6 +60,8 @@ func TestExecMultiplexer(t *testing.T) {
 
 	// Wait for all results
 Loop:
+	//nolint:gosimple // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	for {
 		select {
 		case result := <-em.synthEvents:

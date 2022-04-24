@@ -17,7 +17,7 @@ type InlineSource struct {
 var ErrNoInlineScript = fmt.Errorf("no 'script' value specified for inline source")
 
 func (s *InlineSource) Validate() error {
-	if !regexp.MustCompile("\\S").MatchString(s.Script) {
+	if !regexp.MustCompile(`\S`).MatchString(s.Script) {
 		return ErrNoInlineScript
 	}
 

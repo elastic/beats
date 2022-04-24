@@ -22,6 +22,9 @@ import (
 	"sync"
 
 	"github.com/mitchellh/hashstructure"
+
+	//nolint:gomodguard // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -173,7 +176,7 @@ func newMonitorUnsafe(
 	// that it can render.
 	if err != nil {
 		// Note, needed to hoist err to this scope, not just to add a prefix
-		fullErr := fmt.Errorf("job could not be initialized: %s", err)
+		fullErr := fmt.Errorf("job could not be initialized: %w", err)
 		// A placeholder job that always returns an error
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			return nil, fullErr
@@ -211,11 +214,15 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configur
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
 	}
 
+	//nolint:prealloc // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	var mTasks []*configuredJob
 	for _, job := range jobs {
 		t, err := newConfiguredJob(job, mtConf, m)
 		if err != nil {
 			// Failure to compile monitor processors should not crash hb or prevent progress
+			//nolint:errorlint // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			if _, ok := err.(ProcessorsError); ok {
 				logp.Critical("Failed to load monitor processors: %v", err)
 				continue
@@ -244,6 +251,8 @@ func (m *Monitor) Start() {
 			}
 			t.Start(&WrappedClient{
 				Publish: func(event beat.Event) {
+					//nolint:errcheck // There are no new changes to this line but
+					// linter has been activated in the meantime. We'll cleanup separately.
 					client.Publish(event)
 				},
 				Close: client.Close,

@@ -44,7 +44,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 		"ports":   port,
 		"timeout": "1s",
 	}
-	return testTCPConfigCheck(t, config, host, port)
+	return testTCPConfigCheck(t, config)
 }
 
 // TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
@@ -77,7 +77,7 @@ func TestUpEndpointJob(t *testing.T) {
 
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			server, port, err := setupServer(t, func(handler http.Handler) (*httptest.Server, error) {
+			server, port, err := setupServer(func(handler http.Handler) (*httptest.Server, error) {
 				return newHostTestServer(handler, scenario.hostname)
 			})
 			// Some machines don't have ipv6 setup correctly, so we ignore the test
@@ -157,6 +157,8 @@ func TestUnreachableEndpointJob(t *testing.T) {
 func TestCheckUp(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeEcho()
 
 	configMap := common.MapStr{
@@ -167,7 +169,7 @@ func TestCheckUp(t *testing.T) {
 		"check.send":    "echo123",
 	}
 
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -190,6 +192,8 @@ func TestCheckUp(t *testing.T) {
 func TestCheckDown(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeEcho()
 
 	configMap := common.MapStr{
@@ -200,7 +204,7 @@ func TestCheckDown(t *testing.T) {
 		"check.send":    "echo123",
 	}
 
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -262,6 +266,7 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	require.NoError(t, err)
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()

@@ -142,6 +142,8 @@ func (jf *jobFactory) makeEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
 	if jf.config.Socks5.URL != "" && !jf.config.Socks5.LocalResolve {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		jf.makeSocksLookupEndpointJob(endpointURL)
 	}
 
@@ -171,6 +173,8 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 }
 
 // makeSocksLookupEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
+//nolint:unparam // There are no new changes to this line but
+// linter has been activated in the meantime. We'll cleanup separately.
 func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	return wrappers.WithURLField(endpointURL,
 		jobs.MakeSimpleJob(func(event *beat.Event) error {
@@ -228,6 +232,8 @@ func (jf *jobFactory) execDialer(
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
+		//nolint:errorlint // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		if certErr, ok := err.(x509.CertificateInvalidError); ok {
 			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 		}
@@ -246,6 +252,8 @@ func (jf *jobFactory) execDialer(
 
 	validateStart := time.Now()
 	err = jf.dataCheck.Check(conn)
+	//nolint:errorlint // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	if err != nil && err != errRecvMismatch {
 		debugf("check failed with: %v", err)
 		return reason.IOFailed(err)

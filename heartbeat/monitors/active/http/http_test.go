@@ -78,10 +78,8 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 		configSrc["hosts"] = testURL
 	}
 
-	if extraConfig != nil {
-		for k, v := range extraConfig {
-			configSrc[k] = v
-		}
+	for k, v := range extraConfig {
+		configSrc[k] = v
 	}
 
 	config, err := common.NewConfigFrom(configSrc)
@@ -534,6 +532,7 @@ func runHTTPSServerCheck(
 		}
 		for k, v := range missing {
 			if found, err := event.Fields.HasKey(k); !found || err != nil {
+				//nolint:errcheck // HasKey check above
 				event.Fields.Put(k, v)
 			}
 		}
@@ -561,6 +560,9 @@ func TestExpiredHTTPSServer(t *testing.T) {
 	tlsCert, err := tls.LoadX509KeyPair("../fixtures/expired.cert", "../fixtures/expired.key")
 	require.NoError(t, err)
 	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeSrv()
 	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
 
@@ -582,6 +584,7 @@ func TestExpiredHTTPSServer(t *testing.T) {
 }
 
 func TestHTTPSx509Auth(t *testing.T) {
+	//nolint:goconst // windows is a test-scoped value, doesn't make sense to make it a constant.
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}
@@ -816,22 +819,16 @@ func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
+		//nolint:errcheck // test-controlled copy
 		io.Copy(destConn, clientReadWriter)
 		wg.Done()
 	}()
 	go func() {
+		//nolint:errcheck // test-controlled copy
 		io.Copy(clientConn, destConn)
 		wg.Done()
 	}()
 	wg.Wait()
-}
-
-func mustParseURL(t *testing.T, url string) *url.URL {
-	parsed, err := common.ParseURL(url)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return parsed
 }
 
 // helper that compresses some content as gzip

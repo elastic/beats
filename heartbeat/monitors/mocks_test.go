@@ -52,9 +52,7 @@ func (c *MockBeatClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	for _, e := range events {
-		c.publishes = append(c.publishes, e)
-	}
+	c.publishes = append(c.publishes, events...)
 }
 
 func (c *MockBeatClient) Close() error {
@@ -130,13 +128,13 @@ func mockEventCustomFields() map[string]interface{} {
 	return common.MapStr{"foo": "bar"}
 }
 
-func createMockJob() ([]jobs.Job, error) {
+func createMockJob() []jobs.Job {
 	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
 		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
 	})
 
-	return []jobs.Job{j}, nil
+	return []jobs.Job{j}
 }
 
 func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
@@ -168,9 +166,9 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 				if err != nil {
 					return plugin.Plugin{DoClose: closer}, err
 				}
-				j, err := createMockJob()
+				j := createMockJob()
 
-				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, err
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, nil
 			},
 			Stats: stats},
 		built,
@@ -180,6 +178,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
 	reg := plugin.NewPluginsReg()
 	builder, built, closed := mockPluginBuilder()
+	//nolint:errcheck // This is a test-controlled add to the reg
 	reg.Add(builder)
 	return reg, built, closed
 }
@@ -205,7 +204,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
-func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+func mockBadPluginConf(t *testing.T, id string) *common.Config {
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},

@@ -126,6 +126,8 @@ func TestTLSExpiredCert(t *testing.T) {
 	require.NoError(t, err)
 
 	ip, portStr, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeSrv()
 
 	portInt, err := strconv.Atoi(portStr)
@@ -151,7 +153,7 @@ func TestTLSExpiredCert(t *testing.T) {
 
 func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certificate, certFile *os.File, teardown func()) {
 	// Start up a TLS Server
-	server, port, err := setupServer(t, func(handler http.Handler) (*httptest.Server, error) {
+	server, port, err := setupServer(func(handler http.Handler) (*httptest.Server, error) {
 		return httptest.NewTLSServer(handler), nil
 	})
 	require.NoError(t, err)

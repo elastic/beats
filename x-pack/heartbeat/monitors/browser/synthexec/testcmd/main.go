@@ -42,11 +42,18 @@ func main() {
 			os.Stderr.WriteString("Stderr 2\n")
 			time.Sleep(time.Millisecond * 100)
 		}
+
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		pipe.WriteString(scanner.Text())
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		pipe.WriteString("\n")
 		i++
 	}
 	if scanner.Err() != nil {
+		//nolint:forbidigo // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		fmt.Printf("Scanner error %s", scanner.Err())
 		os.Exit(1)
 	}

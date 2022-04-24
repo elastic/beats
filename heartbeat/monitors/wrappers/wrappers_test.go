@@ -75,7 +75,7 @@ var testMonFields = stdfields.StdMonitorFields{
 }
 
 var testBrowserMonFields = stdfields.StdMonitorFields{
-	Type:     "browser",
+	Type:     monitorTypeBrowser,
 	Schedule: schedule.MustParse("@every 1s"),
 	Timeout:  1,
 }
@@ -94,21 +94,24 @@ func testCommonWrap(t *testing.T, tt testDef) {
 				want := tt.want[idx]
 				testslike.Test(t, lookslike.Strict(want), r.Fields)
 
-				monType, _ := r.Fields.GetValue("monitor.type")
-				isBrowserMonitor := monType == "browser"
-				if isBrowserMonitor {
-					durationUs, _ := r.Fields.GetValue("monitor.duration.us")
-					durationMs := time.Duration(durationUs.(int64)) * time.Microsecond
-					assert.Equal(t, int64(durationMs), stats.Duration)
-				} else {
-					durationUs, _ := r.Fields.GetValue("monitor.duration.us")
-					durationMs := durationUs.(time.Duration).Milliseconds()
-					assert.Equal(t, durationMs, stats.Duration)
-				}
+				hasSummary, _ := r.Fields.HasKey("summary.up")
+				if hasSummary {
+					monType, _ := r.Fields.GetValue("monitor.type")
+					isBrowserMonitor := monType == monitorTypeBrowser
+					if isBrowserMonitor {
+						durationUs, _ := r.Fields.GetValue("monitor.duration.us")
+						durationMs := durationUs.(int64) * int64(time.Microsecond)
+						assert.Equal(t, durationMs, stats.Duration)
+					} else {
+						durationUs, _ := r.Fields.GetValue("monitor.duration.us")
+						durationMs := durationUs.(time.Duration).Milliseconds()
+						assert.Equal(t, durationMs, stats.Duration)
+					}
 
-				if tt.metaWant != nil {
-					metaWant := tt.metaWant[idx]
-					testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
+					if tt.metaWant != nil {
+						metaWant := tt.metaWant[idx]
+						testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
+					}
 				}
 			})
 		}
@@ -445,7 +448,7 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 			"url":     URLFields(parsed),
 			"summary": common.MapStr{"up": 1, "down": 0},
 			"monitor": common.MapStr{
-				"type":        "browser",
+				"type":        monitorTypeBrowser,
 				"id":          inlineMonitorValues.id,
 				"name":        inlineMonitorValues.name,
 				"check_group": inlineMonitorValues.checkGroup,
@@ -473,7 +476,7 @@ func TestInlineBrowserJob(t *testing.T) {
 						"summary": map[string]interface{}{"up": 1, "down": 0},
 						"monitor": map[string]interface{}{
 							"status":      "up",
-							"type":        "browser",
+							"type":        monitorTypeBrowser,
 							"id":          inlineMonitorValues.id,
 							"name":        inlineMonitorValues.name,
 							"check_group": inlineMonitorValues.checkGroup,
@@ -501,7 +504,7 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": URLFields(parsed),
 			"monitor": common.MapStr{
-				"type":        "browser",
+				"type":        monitorTypeBrowser,
 				"id":          suiteMonitorValues.id,
 				"name":        suiteMonitorValues.name,
 				"check_group": suiteMonitorValues.checkGroup,
@@ -529,7 +532,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 	urlU, _ := url.Parse(urlStr)
 	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
 		"monitor": map[string]interface{}{
-			"type":        "browser",
+			"type":        monitorTypeBrowser,
 			"id":          suiteMonitorValues.id,
 			"name":        suiteMonitorValues.name,
 			"check_group": suiteMonitorValues.checkGroup,

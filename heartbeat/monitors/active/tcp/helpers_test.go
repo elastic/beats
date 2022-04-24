@@ -23,6 +23,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	//nolint:gomodguard // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
@@ -35,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port uint16) *beat.Event {
+func testTCPConfigCheck(t *testing.T, configMap common.MapStr) *beat.Event {
 	var stats = plugin.NewMultiRegistry(
 		[]plugin.StartStopRegistryRecorder{},
 		[]plugin.DurationRegistryRecorder{},
@@ -59,7 +61,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	return event
 }
 
-func setupServer(t *testing.T, serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
+func setupServer(serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
 	server, err := serverCreator(hbtest.HelloWorldHandler(200))
 	if err != nil {
 		return nil, 0, err

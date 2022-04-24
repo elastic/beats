@@ -50,6 +50,8 @@ func TestStress(t *testing.T) {
 
 		select {
 		case <-failed:
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
 			require.FailNow(t, "Scheduler test iteration timed out, deadlock issue?")
 		case <-succeeded:
@@ -98,6 +100,8 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 
 	var taskResults []int
 Reader:
+	//nolint:gosimple // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	for {
 		select {
 		case res := <-taskResCh:
@@ -124,6 +128,8 @@ func TestQueueRunsTasksAddedAfterStart(t *testing.T) {
 		resCh <- 1
 	})
 
+	//nolint:gosimple // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	select {
 	case r := <-resCh:
 		require.Equal(t, 1, r)

@@ -74,6 +74,8 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 // InlineJourneyJob returns a job that runs the given source as a single journey.
 func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StdSuiteFields, s stats.BrowserStatsRecorder, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
+		//nolint:gosec // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
 	}
 
@@ -137,6 +139,8 @@ func runCmd(
 	}
 
 	// Variant of the command with no params, which could contain sensitive stuff
+	//nolint:gosec // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	loggableCmd := exec.Command(cmd.Path, cmd.Args...)
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
@@ -167,6 +171,8 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
@@ -177,6 +183,8 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
@@ -184,6 +192,8 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
@@ -196,6 +206,8 @@ func runCmd(
 	// Kill the process if the context ends
 	go func() {
 		<-ctx.Done()
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		cmd.Process.Kill()
 	}()
 
@@ -289,7 +301,8 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	if res.Type == "" {
 		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
 	}
-	return
+
+	return res, err
 }
 
 // getNpmRoot gets the closest ancestor path that contains package.json.

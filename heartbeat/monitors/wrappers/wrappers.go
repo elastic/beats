@@ -24,6 +24,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
+
+	//nolint:gomodguard // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -37,9 +40,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+const monitorTypeBrowser = "browser"
+
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stats plugin.MultiRegistryRecorder) []jobs.Job {
-	if stdMonFields.Type == "browser" {
+	if stdMonFields.Type == monitorTypeBrowser {
 		return WrapBrowser(js, stdMonFields, stats)
 	} else {
 		return WrapLightweight(js, stdMonFields, stats)
@@ -58,7 +63,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, sta
 			addLightweightMonitorDuration(stats),
 		),
 		func() jobs.JobWrapper {
-			return makeAddSummary(stdMonFields.Type)
+			return makeAddSummary()
 		})
 }
 
@@ -220,8 +225,8 @@ func addBrowserMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobWrapp
 			if hasSummary && hasDuration {
 				durationUs, _ := event.Fields.GetValue("monitor.duration.us")
 
-				durationMs := time.Duration(durationUs.(int64)) * time.Microsecond
-				stats.RecordDuration(int64(durationMs))
+				durationMs := durationUs.(int64) * int64(time.Microsecond)
+				stats.RecordDuration(durationMs)
 
 				logp.Info("Browser monitor completed in %dms", durationMs)
 			}
@@ -232,7 +237,7 @@ func addBrowserMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobWrapp
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(monitorType string) jobs.JobWrapper {
+func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -279,6 +284,8 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations

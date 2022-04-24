@@ -72,24 +72,21 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	jf, err := newJobFactory(cfg, monitors.NewStdResolver(), tl)
 	require.NoError(t, err)
 	p, err := jf.makePlugin()
+	require.NoError(t, err)
 	require.Len(t, p.Jobs, 1)
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
 	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, stats)
-	wrapped[0](e)
+	_, err = wrapped[0](e)
+	require.NoError(t, err)
 	return tl, e
 }
 
 type mockLoop struct {
-	pingRtt             time.Duration
-	pingRequests        int
-	pingErr             error
-	checkNetworkModeErr error
-}
-
-func (t mockLoop) checkNetworkMode(mode string) error {
-	return t.checkNetworkModeErr
+	pingRtt      time.Duration
+	pingRequests int
+	pingErr      error
 }
 
 func (t mockLoop) ping(addr *net.IPAddr, timeout time.Duration, interval time.Duration) (time.Duration, int, error) {

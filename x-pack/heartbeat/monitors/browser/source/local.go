@@ -41,7 +41,7 @@ func (l *LocalSource) Validate() error {
 		return fmt.Errorf("%s: %w", base, err)
 	}
 	if !s.IsDir() {
-		return fmt.Errorf("%s: path points to a non-directory", base)
+		return fmt.Errorf("%w: path points to a non-directory", base)
 	}
 	// ensure the used synthetics version dep used in suite does not
 	// exceed our supported range
