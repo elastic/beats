@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: mongodb
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/mongodb/_meta/docs.asciidoc
+
 
 [[metricbeat-module-mongodb]]
 == MongoDB module
@@ -89,6 +91,8 @@ db.grantRolesToUser("user", ["clusterMonitor"])
 ----
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -159,3 +163,4 @@ include::mongodb/replstatus.asciidoc[]
 
 include::mongodb/status.asciidoc[]
 
+:edit_url!:

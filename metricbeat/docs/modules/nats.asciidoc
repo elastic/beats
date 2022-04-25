@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: nats
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/nats/_meta/docs.asciidoc
+
 
 [[metricbeat-module-nats]]
 == NATS module
@@ -29,6 +31,8 @@ The Nats module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_nats_dashboard.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -89,3 +93,4 @@ include::nats/stats.asciidoc[]
 
 include::nats/subscriptions.asciidoc[]
 
+:edit_url!:
