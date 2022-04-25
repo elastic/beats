@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: sql
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/sql/_meta/docs.asciidoc
+
 
 [[metricbeat-module-sql]]
 [role="xpack"]
@@ -389,6 +391,8 @@ For example:
 ----
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -418,3 +422,4 @@ The following metricsets are available:
 
 include::sql/query.asciidoc[]
 
+:edit_url!:

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: azure
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/azure/_meta/docs.asciidoc
+
 
 [[metricbeat-module-azure]]
 [role="xpack"]
@@ -162,6 +164,8 @@ Costs: Metric queries are charged based on the number of standard API calls. Mor
 
 Authentication: we are handling authentication on our side (creating/renewing the authentication token), so we advise users to use dedicated credentials for metricbeat only.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -335,3 +339,4 @@ include::azure/monitor.asciidoc[]
 
 include::azure/storage.asciidoc[]
 
+:edit_url!:

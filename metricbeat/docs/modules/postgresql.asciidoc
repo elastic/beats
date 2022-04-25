@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: postgresql
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/postgresql/_meta/docs.asciidoc
+
 
 [[metricbeat-module-postgresql]]
 == PostgreSQL module
@@ -71,6 +73,8 @@ This module was tested with PostgreSQL 9, 10, 11, 12 and 13. It is expected to w
 versions >= 9.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -132,3 +136,4 @@ include::postgresql/database.asciidoc[]
 
 include::postgresql/statement.asciidoc[]
 
+:edit_url!:

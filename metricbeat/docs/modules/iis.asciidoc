@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: iis
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/iis/_meta/docs.asciidoc
+
 
 [[metricbeat-module-iis]]
 [role="xpack"]
@@ -62,6 +64,8 @@ This metricset will collect metrics of specific application pools, users can con
 
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -100,3 +104,4 @@ include::iis/webserver.asciidoc[]
 
 include::iis/website.asciidoc[]
 
+:edit_url!:
