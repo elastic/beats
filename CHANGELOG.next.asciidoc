@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Heartbeat will now send more usage statistics (monitor durations, and browser steps) when monitoring is enabled. {pull}31398[31398]
 
 *Metricbeat*
 
