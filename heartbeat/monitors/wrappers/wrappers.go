@@ -185,16 +185,21 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 func addMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
-
 		cont, err := job(event)
+		duration := time.Since(start)
 
 		if event != nil {
 			eventext.MergeEventFields(event, common.MapStr{
 				"monitor": common.MapStr{
-					"duration": look.RTT(time.Since(start)),
+					"duration": look.RTT(duration),
 				},
 			})
 			event.Timestamp = start
+
+			logp.L().Infow(
+				"Lightweight monitor finished.",
+				logp.Int64("durationMs", duration.Milliseconds()),
+			)
 		}
 
 		return cont, err

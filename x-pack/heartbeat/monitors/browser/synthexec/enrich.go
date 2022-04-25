@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 
 	"github.com/gofrs/uuid"
@@ -180,6 +181,8 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
+	duration := je.end.Sub(je.start)
+
 	// Incase of syntax errors or incorrect runner options, the Synthetics
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
@@ -187,7 +190,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		eventext.MergeEventFields(event, common.MapStr{
 			"monitor": common.MapStr{
 				"duration": common.MapStr{
-					"us": int64(je.end.Sub(je.start) / time.Microsecond),
+					"us": duration.Microseconds(),
 				},
 			},
 		})
@@ -206,6 +209,12 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 			"down": down,
 		},
 	})
+
+	logp.L().Infow(
+		"Browser monitor summary ready",
+		logp.Int("stepCount", je.stepCount),
+		logp.Int64("durationMs", duration.Milliseconds()),
+	)
 
 	if je.journeyComplete {
 		return je.firstError
