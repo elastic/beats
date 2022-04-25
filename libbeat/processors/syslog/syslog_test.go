@@ -113,11 +113,11 @@ var syslogCases = map[string]struct {
 					"procid":   "1024",
 					"msgid":    "ID47",
 					"version":  "1",
-					"structured_data": map[string]map[string]string{
-						"examplePriority@32473": {
+					"structured_data": map[string]interface{}{
+						"examplePriority@32473": map[string]interface{}{
 							"class": "high",
 						},
-						"exampleSDID@32473": {
+						"exampleSDID@32473": map[string]interface{}{
 							"eventID":     "1011",
 							"eventSource": "Application",
 							"iut":         "3",

@@ -255,3 +255,48 @@ func TestAppendStringField(t *testing.T) {
 		})
 	}
 }
+
+func TestJoinStr(t *testing.T) {
+	tests := map[string]struct {
+		InA   string
+		InB   string
+		InSep string
+		Want  string
+	}{
+		"both-empty": {
+			InA:   "",
+			InB:   "",
+			InSep: " ",
+			Want:  "",
+		},
+		"only-a": {
+			InA:   "alpha",
+			InB:   "",
+			InSep: " ",
+			Want:  "alpha",
+		},
+		"only-b": {
+			InA:   "",
+			InB:   "beta",
+			InSep: " ",
+			Want:  "beta",
+		},
+		"both": {
+			InA:   "alpha",
+			InB:   "beta",
+			InSep: " ",
+			Want:  "alpha beta",
+		},
+	}
+
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			got := joinStr(tc.InA, tc.InB, tc.InSep)
+
+			assert.Equal(t, tc.Want, got)
+		})
+	}
+}

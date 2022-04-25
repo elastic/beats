@@ -32,18 +32,47 @@ import (
 //go:generate ragel -Z -G2 -o rfc5424_gen.go parser/parser_rfc5424.rl
 
 var (
-	ErrPriority       = errors.New("message has invalid or missing priority")
-	ErrTimestamp      = errors.New("message has invalid or missing timestamp")
-	ErrHostname       = errors.New("message has invalid or missing hostname")
-	ErrVersion        = errors.New("message has invalid or missing version")
-	ErrAppName        = errors.New("message has invalid or missing app name")
-	ErrProcID         = errors.New("message has invalid or missing proc ID")
-	ErrMsgID          = errors.New("message has invalid or missing msg ID")
-	ErrStructuredData = errors.New("message has invalid or missing structured data")
-	ErrSDID           = errors.New("invalid structured data ID value, expected a value")
-	ErrSDIDDuplicated = errors.New("message contains duplicated structured data ID")
-	ErrSDParam        = errors.New("invalid structured data parameter, expected a value")
+	// ErrPriority indicates a priority value is outside the acceptable range.
+	ErrPriority = errors.New("priority value out of range (expected 0..191)")
+	// ErrEOF indicates the message is truncated and cannot be parsed.
+	ErrEOF = errors.New("message is truncated (unexpected EOF)")
 )
+
+// ErrValidation represents data validation errors.
+type ErrValidation struct {
+	// The underlying error.
+	Err error
+	// The position of the error.
+	Pos int
+}
+
+// Error provides a descriptive error string.
+func (e ErrValidation) Error() string {
+	return fmt.Sprintf("validation error at position %d: %v", e.Pos, e.Err)
+}
+
+// Unwrap provides the underlying error.
+func (e ErrValidation) Unwrap() error {
+	return e.Err
+}
+
+// ErrParsing represents parsing errors.
+type ErrParsing struct {
+	// The underlying error.
+	Err error
+	// The position of the error.
+	Pos int
+}
+
+// Error provides a descriptive error string.
+func (e ErrParsing) Error() string {
+	return fmt.Sprintf("parsing error at position %d: %v", e.Pos, e.Err)
+}
+
+// Unwrap provides the underlying error.
+func (e ErrParsing) Unwrap() error {
+	return e.Err
+}
 
 // Format defines syslog message formats.
 type Format int
@@ -96,7 +125,8 @@ func DefaultConfig() Config {
 }
 
 // ParseMessage will parse syslog message data formatted as format into fields. loc is used to enrich
-// timestamps that lack a time zone.
+// timestamps that lack a time zone. The error value will indicate any errors encountered during parsing.
+// Even if an error is returned, fields may still contain useful values.
 func ParseMessage(data string, format Format, loc *time.Location) (mapstr.M, time.Time, error) {
 	var m message
 	var err error
@@ -113,11 +143,8 @@ func ParseMessage(data string, format Format, loc *time.Location) (mapstr.M, tim
 	case FormatRFC5424:
 		m, err = parseRFC5424(data)
 	}
-	if err != nil {
-		return mapstr.M{}, time.Time{}, err
-	}
 
-	return m.fields(), m.timestamp, nil
+	return m.fields(), m.timestamp, err
 }
 
 // Parser is a syslog parser that implements parser.Parser.
@@ -147,19 +174,19 @@ func (p *Parser) Next() (reader.Message, error) {
 		if p.cfg.AddErrorKey {
 			appendStringField(fields, "error.message", "Error parsing syslog message: "+err.Error())
 		}
-		msg.AddFields(fields)
-		return msg, nil
 	}
 
-	textValue := fields["message"]
-	if textString, _ := textValue.(string); textString != "" {
+	if textString, _ := fields["message"].(string); textString != "" {
 		msg.Content = []byte(textString)
-	} else {
+		msg.Bytes = len(msg.Content)
+	} else if err == nil {
 		msg.Content = nil
+		msg.Bytes = 0
 	}
-	msg.Bytes = len(msg.Content)
 	msg.AddFields(fields)
-	msg.Ts = ts
+	if !ts.IsZero() {
+		msg.Ts = ts
+	}
 
 	return msg, nil
 }

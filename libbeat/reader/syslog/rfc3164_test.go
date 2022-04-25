@@ -24,123 +24,212 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var parseRFC3164Cases = map[string]struct {
-	In      string
-	Want    message
-	WantErr error
-}{
-	"ok": {
-		In: "<13>Oct 11 22:14:15 test-host this is the message",
-		Want: message{
-			timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
-			priority:  13,
-			facility:  1,
-			severity:  5,
-			hostname:  "test-host",
-			msg:       "this is the message",
-		},
-	},
-	"ok-rfc3339": {
-		In: "<13>2003-08-24T05:14:15.000003-07:00 test-host this is the message",
-		Want: message{
-			timestamp: mustParseTime(time.RFC3339Nano, "2003-08-24T05:14:15.000003-07:00", nil),
-			priority:  13,
-			facility:  1,
-			severity:  5,
-			hostname:  "test-host",
-			msg:       "this is the message",
-		},
-	},
-	"ok-process": {
-		In: "<13>Oct 11 22:14:15 test-host su: this is the message",
-		Want: message{
-			timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
-			priority:  13,
-			facility:  1,
-			severity:  5,
-			hostname:  "test-host",
-			process:   "su",
-			msg:       "this is the message",
-		},
-	},
-	"ok-process-pid": {
-		In: "<13>Oct 11 22:14:15 test-host su[1024]: this is the message",
-		Want: message{
-			timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
-			priority:  13,
-			facility:  1,
-			severity:  5,
-			hostname:  "test-host",
-			process:   "su",
-			pid:       "1024",
-			msg:       "this is the message",
-		},
-	},
-	"non-standard-date": {
-		In: "<123>Sep 01 02:03:04 hostname message",
-		Want: message{
-			timestamp: mustParseTime(time.Stamp, "Sep 1 02:03:04", time.Local),
-			priority:  123,
-			facility:  15,
-			severity:  3,
-			hostname:  "hostname",
-			msg:       "message",
-		},
-	},
-	"err-pri-not-a-number": {
-		In:      "<abc>Oct 11 22:14:15 test-host this is the message",
-		WantErr: ErrPriority,
-	},
-	"err-pri-out-of-range": {
-		In:      "<192>Oct 11 22:14:15 test-host this is the message",
-		WantErr: ErrPriority,
-	},
-	"err-pri-negative": {
-		In:      "<-1>Oct 11 22:14:15 test-host this is the message",
-		WantErr: ErrPriority,
-	},
-	"err-pri-missing-brackets": {
-		In:      "13 Oct 11 22:14:15 test-host this is the message",
-		WantErr: ErrPriority,
-	},
-	"err-ts-invalid-missing": {
-		In:      "<13> test-host this is the message",
-		WantErr: ErrTimestamp,
-	},
-	"err-ts-invalid-bsd": {
-		In:      "<13>Foo 11 22:14:15 test-host this is the message",
-		WantErr: ErrTimestamp,
-	},
-	"err-ts-invalid-rfc3339": {
-		In:      "<13>2003-08-24 05:14:15-07:00 test-host this is the message",
-		WantErr: ErrTimestamp,
-	},
-	"err-hostname-too-long": {
-		In:      "<13>Oct 11 22:14:15 abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz12345.abcdefghijklmnopqrstuvwxyz1234567 this is the message",
-		WantErr: ErrHostname,
-	},
-}
-
 func TestParseRFC3164(t *testing.T) {
-	for name, tc := range parseRFC3164Cases {
+	tests := map[string]struct {
+		In      string
+		Want    message
+		WantErr string
+	}{
+		"ok": {
+			In: "<13>Oct 11 22:14:15 test-host this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  13,
+				facility:  1,
+				severity:  5,
+				hostname:  "test-host",
+				msg:       "this is the message",
+			},
+		},
+		"ok-rfc3339": {
+			In: "<13>2003-08-24T05:14:15.000003-07:00 test-host this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.RFC3339Nano, "2003-08-24T05:14:15.000003-07:00", nil),
+				priority:  13,
+				facility:  1,
+				severity:  5,
+				hostname:  "test-host",
+				msg:       "this is the message",
+			},
+		},
+		"ok-process": {
+			In: "<13>Oct 11 22:14:15 test-host su: this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  13,
+				facility:  1,
+				severity:  5,
+				hostname:  "test-host",
+				process:   "su",
+				msg:       "this is the message",
+			},
+		},
+		"ok-process-pid": {
+			In: "<13>Oct 11 22:14:15 test-host su[1024]: this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  13,
+				facility:  1,
+				severity:  5,
+				hostname:  "test-host",
+				process:   "su",
+				pid:       "1024",
+				msg:       "this is the message",
+			},
+		},
+		"non-standard-date": {
+			In: "<123>Sep 01 02:03:04 hostname message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Sep 1 02:03:04", time.Local),
+				priority:  123,
+				facility:  15,
+				severity:  3,
+				hostname:  "hostname",
+				msg:       "message",
+			},
+		},
+		"err-pri-not-a-number": {
+			In: "<abc>Oct 11 22:14:15 test-host this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  -1,
+				hostname:  "test-host",
+				msg:       "this is the message",
+			},
+			WantErr: `validation error at position 2: invalid priority: strconv.Atoi: parsing "abc": invalid syntax`,
+		},
+		"err-pri-out-of-range": {
+			In: "<192>Oct 11 22:14:15 test-host this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  -1,
+				hostname:  "test-host",
+				msg:       "this is the message",
+			},
+			WantErr: ErrPriority.Error(),
+		},
+		"err-pri-negative": {
+			In: "<-1>Oct 11 22:14:15 test-host this is the message",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  -1,
+				hostname:  "test-host",
+				msg:       "this is the message",
+			},
+			WantErr: ErrPriority.Error(),
+		},
+		"err-pri-missing-brackets": {
+			In: "13 Oct 11 22:14:15 test-host this is the message",
+			Want: message{
+				priority: -1,
+				hostname: "Oct",
+				msg:      "11 22:14:15 test-host this is the message",
+			},
+			WantErr: `validation error at position 1: parsing time "13" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "13" as "2006"`,
+		},
+		"err-ts-invalid-missing": {
+			In: "<13> test-host this is the message",
+			Want: message{
+				priority: 13,
+				facility: 1,
+				severity: 5,
+			},
+			WantErr: ErrEOF.Error(),
+		},
+		"err-ts-invalid-bsd": {
+			In: "<13>Foo 11 22:14:15 test-host this is the message",
+			Want: message{
+				priority: 13,
+				facility: 1,
+				severity: 5,
+				hostname: "test-host",
+				msg:      "this is the message",
+			},
+			WantErr: `validation error at position 5: parsing time "Foo 11 22:14:15" as "Jan _2 15:04:05": cannot parse "Foo 11 22:14:15" as "Jan"`,
+		},
+		"err-ts-invalid-rfc3339": {
+			In: "<13>24-08-2003T05:14:15-07:00 test-host this is the message",
+			Want: message{
+				priority: 13,
+				facility: 1,
+				severity: 5,
+				hostname: "test-host",
+				msg:      "this is the message",
+			},
+			WantErr: `validation error at position 5: parsing time "24-08-2003T05:14:15-07:00" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "8-2003T05:14:15-07:00" as "2006"`,
+		},
+		"err-eof": {
+			In: "<13>Oct 11 22:14:15 test-",
+			Want: message{
+				timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+				priority:  13,
+				facility:  1,
+				severity:  5,
+			},
+			WantErr: `parsing error at position 26: message is truncated (unexpected EOF)`,
+		},
+	}
+
+	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
 			got, gotErr := parseRFC3164(tc.In, time.Local)
 
-			if tc.WantErr != nil {
-				assert.Equal(t, tc.WantErr, gotErr)
+			if tc.WantErr != "" {
+				assert.ErrorContains(t, gotErr, tc.WantErr)
 			} else {
-				assert.Nil(t, gotErr)
-				assert.Equal(t, tc.Want, got)
+				assert.NoError(t, gotErr)
 			}
+			assert.Equal(t, tc.Want, got)
 		})
 	}
 }
 
 func BenchmarkParseRFC3164(b *testing.B) {
-	for name, bc := range parseRFC3164Cases {
+	tests := map[string]struct {
+		In string
+	}{
+		"ok": {
+			In: "<13>Oct 11 22:14:15 test-host this is the message",
+		},
+		"ok-rfc3339": {
+			In: "<13>2003-08-24T05:14:15.000003-07:00 test-host this is the message",
+		},
+		"ok-process": {
+			In: "<13>Oct 11 22:14:15 test-host su: this is the message",
+		},
+		"ok-process-pid": {
+			In: "<13>Oct 11 22:14:15 test-host su[1024]: this is the message",
+		},
+		"non-standard-date": {
+			In: "<123>Sep 01 02:03:04 hostname message",
+		},
+		"err-pri-not-a-number": {
+			In: "<abc>Oct 11 22:14:15 test-host this is the message",
+		},
+		"err-pri-out-of-range": {
+			In: "<192>Oct 11 22:14:15 test-host this is the message",
+		},
+		"err-pri-negative": {
+			In: "<-1>Oct 11 22:14:15 test-host this is the message",
+		},
+		"err-pri-missing-brackets": {
+			In: "13 Oct 11 22:14:15 test-host this is the message",
+		},
+		"err-ts-invalid-missing": {
+			In: "<13> test-host this is the message",
+		},
+		"err-ts-invalid-bsd": {
+			In: "<13>Foo 11 22:14:15 test-host this is the message",
+		},
+		"err-ts-invalid-rfc3339": {
+			In: "<13>2003-08-24 05:14:15-07:00 test-host this is the message",
+		},
+	}
+
+	for name, bc := range tests {
 		bc := bc
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
