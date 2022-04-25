@@ -28,6 +28,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
+
+	devtools "github.com/elastic/elastic-agent-libs/dev-tools/mage"
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
 )
 
@@ -41,7 +43,8 @@ var Aliases = map[string]interface{}{
 // Check runs all the checks
 // nolint: deadcode,unparam // it's used as a `mage` target and requires returning an error
 func Check() error {
-	mg.Deps(mage.Deps.CheckModuleTidy, CheckLicenseHeaders)
+	mg.Deps(devtools.Deps.CheckModuleTidy, CheckLicenseHeaders)
+	mg.Deps(devtools.CheckNoChanges)
 	return nil
 }
 
@@ -54,7 +57,7 @@ func Fmt() {
 func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	mg.Deps(mage.InstallGoLicenser)
+	mg.Deps(devtools.InstallGoLicenser)
 
 	licenser := gotool.Licenser
 
@@ -65,7 +68,7 @@ func AddLicenseHeaders() error {
 
 // CheckLicenseHeaders checks ASL2 headers in .go files
 func CheckLicenseHeaders() error {
-	mg.Deps(mage.InstallGoLicenser)
+	mg.Deps(devtools.InstallGoLicenser)
 
 	licenser := gotool.Licenser
 
@@ -77,7 +80,7 @@ func CheckLicenseHeaders() error {
 
 // Notice generates a NOTICE.txt file for the module.
 func Notice() error {
-	return mage.GenerateNotice(
+	return devtools.GenerateNotice(
 		filepath.Join("dev-tools", "templates", "notice", "overrides.json"),
 		filepath.Join("dev-tools", "templates", "notice", "rules.json"),
 		filepath.Join("dev-tools", "templates", "notice", "NOTICE.txt.tmpl"),
