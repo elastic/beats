@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/santa/_meta/docs.asciidoc
+
 [[filebeat-module-santa]]
 :modulename: santa
 :has-dashboards: true
@@ -71,3 +73,4 @@ image::./images/kibana-santa-log-overview.png[]
 For a description of each field in the module, see the
 <<exported-fields-santa,exported fields>> section.
 
+edit_url!:

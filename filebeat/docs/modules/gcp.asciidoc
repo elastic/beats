@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/gcp/_meta/docs.asciidoc
+
 [[filebeat-module-gcp]]
 [role="xpack"]
 
@@ -173,3 +175,4 @@ field. Defaults to `false`, meaning the original message is not saved.
 For a description of each field in the module, see the
 <<exported-fields-gcp,exported fields>> section.
 
+edit_url!:
