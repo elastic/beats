@@ -220,7 +220,10 @@ func (je *journeyEnricher) createSummary(event *beat.Event, s stats.BrowserStats
 	// we can then move this call to the recorder to the job wrapper functions
 	s.RegisterStepCount(je.stepCount)
 
-	logp.Info("Browser monitor completed with %d steps", je.stepCount)
+	logp.L().Infow(
+		"Browser monitor summary ready",
+		logp.Int("stepCount", je.stepCount),
+	)
 
 	if je.journeyComplete {
 		return je.firstError

@@ -209,6 +209,11 @@ func addLightweightMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobW
 
 			// stats.RecordDuration(duration.Milliseconds())
 
+			logp.L().Infow(
+				"Lightweight monitor completed",
+				logp.Int64("durationMs", duration.Milliseconds()),
+			)
+
 			return cont, err
 		}
 	}
@@ -228,7 +233,10 @@ func addBrowserMonitorDuration(stats plugin.MultiRegistryRecorder) jobs.JobWrapp
 				durationMs := durationUs.(int64) * int64(time.Microsecond)
 				stats.RecordDuration(durationMs)
 
-				logp.Info("Browser monitor completed in %dms", durationMs)
+				logp.L().Infow(
+					"Browser monitor completed",
+					logp.Int64("durationMs", durationMs),
+				)
 			}
 
 			return cont, nil
