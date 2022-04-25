@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/iis/_meta/docs.asciidoc
+
 [[filebeat-module-iis]]
 :modulename: iis
 :has-dashboards: true
@@ -87,3 +89,4 @@ image::./images/kibana-iis.png[]
 For a description of each field in the module, see the
 <<exported-fields-iis,exported fields>> section.
 
+edit_url!:
