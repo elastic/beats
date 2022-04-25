@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/iptables/_meta/docs.asciidoc
+
 [[filebeat-module-iptables]]
 [role="xpack"]
 
@@ -98,3 +100,4 @@ image::./images/kibana-iptables-ubiquiti.png[]
 For a description of each field in the module, see the
 <<exported-fields-iptables,exported fields>> section.
 
+edit_url!:

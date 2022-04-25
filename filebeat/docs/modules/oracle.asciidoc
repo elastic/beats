@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/oracle/_meta/docs.asciidoc
+
 [[filebeat-module-oracle]]
 [role="xpack"]
 
@@ -74,3 +76,4 @@ Oracle Database fields are mapped to the current ECS Fields:
 For a description of each field in the module, see the
 <<exported-fields-oracle,exported fields>> section.
 
+edit_url!:

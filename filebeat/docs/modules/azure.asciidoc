@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/azure/_meta/docs.asciidoc
+
 [[filebeat-module-azure]]
 [role="xpack"]
 
@@ -136,3 +138,4 @@ image::./images/filebeat-azure-overview.png[]
 For a description of each field in the module, see the
 <<exported-fields-azure,exported fields>> section.
 
+edit_url!:
