@@ -58,10 +58,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
 - Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
-- Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
-- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
-- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
-- Netflow: replace invalid field value. {pull}31295[31295]
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
 
 *Heartbeat*
