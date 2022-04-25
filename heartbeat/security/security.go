@@ -28,6 +28,8 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/elastic/go-sysinfo"
+
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -39,7 +41,13 @@ func init() {
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
 	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which
 	// does not want to run as root. It's also just generally more secure.
-	if localUserName := os.Getenv("BEAT_SETUID_AS"); localUserName != "" && syscall.Geteuid() == 0 {
+	sysInfo, err := sysinfo.Host()
+	isContainer := false
+	if err == nil && sysInfo.Info().Containerized != nil {
+		isContainer = *sysInfo.Info().Containerized
+	}
+
+	if localUserName := os.Getenv("BEAT_SETUID_AS"); isContainer && localUserName != "" && syscall.Geteuid() == 0 {
 		err := changeUser(localUserName)
 		if err != nil {
 			panic(err)
@@ -52,7 +60,7 @@ func init() {
 	// rather than relying on errors from `setcap`
 	_ = setCapabilities()
 
-	err := setSeccompRules()
+	err = setSeccompRules()
 	if err != nil {
 		panic(err)
 	}
@@ -63,33 +71,33 @@ func changeUser(localUserName string) error {
 	if err != nil {
 		return fmt.Errorf("could not lookup '%s': %w", localUser, err)
 	}
-	localUserUid, err := strconv.Atoi(localUser.Uid)
+	localUserUID, err := strconv.Atoi(localUser.Uid)
 	if err != nil {
 		return fmt.Errorf("could not parse UID '%s' as int: %w", localUser.Uid, err)
 	}
-	localUserGid, err := strconv.Atoi(localUser.Gid)
+	localUserGID, err := strconv.Atoi(localUser.Gid)
 	if err != nil {
 		return fmt.Errorf("could not parse GID '%s' as int: %w", localUser.Uid, err)
 	}
 	// We include the root group because the docker image contains many directories (data,logs)
 	// that are owned by root:root with 0775 perms. The heartbeat user is in both groups
 	// in the container, but we need to repeat that here.
-	err = syscall.Setgroups([]int{localUserGid, 0})
+	err = syscall.Setgroups([]int{localUserGID, 0})
 	if err != nil {
 		return fmt.Errorf("could not set groups: %w", err)
 	}
 
 	// Set the main group as localUserUid so new files created are owned by the user's group
-	err = syscall.Setgid(localUserGid)
+	err = syscall.Setgid(localUserGID)
 	if err != nil {
-		return fmt.Errorf("could not set gid to %d: %w", localUserGid, err)
+		return fmt.Errorf("could not set gid to %d: %w", localUserGID, err)
 	}
 
 	// Note this is not the regular SetUID! Look at the 'cap' package docs for it, it preserves
 	// capabilities post-SetUID, which we use to lock things down immediately
-	err = cap.SetUID(localUserUid)
+	err = cap.SetUID(localUserUID)
 	if err != nil {
-		return fmt.Errorf("could not setuid to %d: %w", localUserUid, err)
+		return fmt.Errorf("could not setuid to %d: %w", localUserUID, err)
 	}
 
 	// This may not be necessary, but is good hygiene, we do some shelling out to node/npm etc.
