@@ -70,6 +70,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 - Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
+- Allow to use metricbeat for named mssql instances. {issue}24076[24076] {pull}30859[30859]
 
 ==== Added
 
