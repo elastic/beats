@@ -24,6 +24,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
+
+	//nolint:gomodguard // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -57,7 +60,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
-			return makeAddSummary(stdMonFields.Type)
+			return makeAddSummary()
 		})
 }
 
@@ -207,7 +210,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(monitorType string) jobs.JobWrapper {
+func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -254,6 +257,8 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations
