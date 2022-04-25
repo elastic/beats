@@ -212,11 +212,15 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		},
 	})
 
-	logp.L().Infow(
-		"Browser monitor summary ready",
-		logp.Int("stepCount", je.stepCount),
-		logp.Int64("durationMs", duration.Milliseconds()),
-	)
+	monitorID, err := event.GetValue("monitor.id")
+	if err == nil {
+		logp.L().Infow(
+			"Browser monitor summary ready",
+			logp.String("monitorId", monitorID.(string)),
+			logp.Int("stepCount", je.stepCount),
+			logp.Int64("durationMs", duration.Milliseconds()),
+		)
+	}
 
 	if je.journeyComplete {
 		return je.firstError

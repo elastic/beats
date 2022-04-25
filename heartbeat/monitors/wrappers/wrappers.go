@@ -199,10 +199,14 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 			})
 			event.Timestamp = start
 
-			logp.L().Infow(
-				"Lightweight monitor finished.",
-				logp.Int64("durationMs", duration.Milliseconds()),
-			)
+			monitorID, err := event.GetValue("monitor.id")
+			if err != nil {
+				logp.L().Infow(
+					"Lightweight monitor finished.",
+					logp.String("monitorId", monitorID.(string)),
+					logp.Int64("durationMs", duration.Milliseconds()),
+				)
+			}
 		}
 
 		return cont, err
