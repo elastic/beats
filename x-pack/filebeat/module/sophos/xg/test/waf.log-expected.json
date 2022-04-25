@@ -1,8 +1,6 @@
 [
     {
         "@timestamp": "2020-05-18T14:38:46.000-02:00",
-        "client.bytes": 1419,
-        "client.ip": "216.160.83.61",
         "destination.bytes": 401,
         "destination.ip": "185.8.209.207",
         "event.action": "denied",
@@ -10,12 +8,13 @@
             "intrusion_detection",
             "network"
         ],
-        "event.code": "075000617071",
+        "event.code": "17071",
         "event.dataset": "sophos.xg",
+        "event.duration": 11199000,
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:46 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=216.160.83.61 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsxYNAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDoAitM4bv3XCA==;MapiSequence=10-GtgsIA==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7PxcrL\" referer=- method=POST httpstatus=401 reason=\"-\" extra=\"-\" contenttype=\"-\" useragent=\"Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)\" host=216.160.83.61 responsetime=11199 bytessent=5669 bytesrcv=1419 fw_rule_id=79",
-        "event.severity": "6",
+        "event.original": "<30>device=\"SFW\" date=2020-05-18 time=14:38:46 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=216.160.83.61 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsxYNAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDoAitM4bv3XCA==;MapiSequence=10-GtgsIA==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7PxcrL\" referer=- method=POST httpstatus=401 reason=\"-\" extra=\"-\" contenttype=\"-\" useragent=\"Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)\" host=216.160.83.61 responsetime=11199 bytessent=5669 bytesrcv=1419 fw_rule_id=79",
+        "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -39,8 +38,6 @@
             "185.8.209.207",
             "216.160.83.61"
         ],
-        "server.bytes": 5669,
-        "server.ip": "185.8.209.207",
         "service.type": "sophos",
         "sophos.xg.cookie": "MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsxYNAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDoAitM4bv3XCA==;MapiSequence=10-GtgsIA==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7PxcrL",
         "sophos.xg.device": "SFW",
@@ -48,11 +45,10 @@
         "sophos.xg.fw_rule_id": "79",
         "sophos.xg.host": "216.160.83.61",
         "sophos.xg.log_component": "Web Application Firewall",
+        "sophos.xg.log_id": "075000617071",
         "sophos.xg.log_type": "WAF",
-        "sophos.xg.message_id": "17071",
         "sophos.xg.priority": "Information",
         "sophos.xg.querystring": "?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com",
-        "sophos.xg.responsetime": "11199",
         "sophos.xg.server": "webmail.elasticuser.com",
         "source.as.number": 209,
         "source.bytes": 1419,
@@ -67,17 +63,14 @@
         "source.ip": "216.160.83.61",
         "tags": [
             "forwarded",
+            "preserve_original_event",
             "sophos-xg"
         ],
         "url.full": "/mapi/nspi/",
-        "url.original": "/mapi/nspi/",
-        "url.path": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
         "@timestamp": "2020-05-18T14:38:47.000-02:00",
-        "client.bytes": 1774,
-        "client.ip": "216.160.83.61",
         "destination.bytes": 200,
         "destination.ip": "185.8.209.207",
         "event.action": "denied",
@@ -85,12 +78,13 @@
             "intrusion_detection",
             "network"
         ],
-        "event.code": "075000617071",
+        "event.code": "17071",
         "event.dataset": "sophos.xg",
+        "event.duration": 14086000,
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:47 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=216.160.83.61 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsw0NAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDpeyft5bv3XCA==;MapiSequence=9-Km2JMg==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7Oxc3M\" referer=- method=POST httpstatus=200 reason=\"-\" extra=\"-\" contenttype=\"application/mapi-http\" useragent=\"Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)\" host=216.160.83.61 responsetime=14086 bytessent=1357 bytesrcv=1774 fw_rule_id=79",
-        "event.severity": "6",
+        "event.original": "<30>device=\"SFW\" date=2020-05-18 time=14:38:47 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=216.160.83.61 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsw0NAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDpeyft5bv3XCA==;MapiSequence=9-Km2JMg==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7Oxc3M\" referer=- method=POST httpstatus=200 reason=\"-\" extra=\"-\" contenttype=\"application/mapi-http\" useragent=\"Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)\" host=216.160.83.61 responsetime=14086 bytessent=1357 bytesrcv=1774 fw_rule_id=79",
+        "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -114,8 +108,6 @@
             "185.8.209.207",
             "216.160.83.61"
         ],
-        "server.bytes": 1357,
-        "server.ip": "185.8.209.207",
         "service.type": "sophos",
         "sophos.xg.contenttype": "application/mapi-http",
         "sophos.xg.cookie": "MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsw0NAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDpeyft5bv3XCA==;MapiSequence=9-Km2JMg==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7Oxc3M",
@@ -124,11 +116,10 @@
         "sophos.xg.fw_rule_id": "79",
         "sophos.xg.host": "216.160.83.61",
         "sophos.xg.log_component": "Web Application Firewall",
+        "sophos.xg.log_id": "075000617071",
         "sophos.xg.log_type": "WAF",
-        "sophos.xg.message_id": "17071",
         "sophos.xg.priority": "Information",
         "sophos.xg.querystring": "?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com",
-        "sophos.xg.responsetime": "14086",
         "sophos.xg.server": "webmail.elasticuser.com",
         "source.as.number": 209,
         "source.bytes": 1774,
@@ -143,17 +134,14 @@
         "source.ip": "216.160.83.61",
         "tags": [
             "forwarded",
+            "preserve_original_event",
             "sophos-xg"
         ],
         "url.full": "/mapi/nspi/",
-        "url.original": "/mapi/nspi/",
-        "url.path": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
         "@timestamp": "2020-05-19T17:20:29.000-02:00",
-        "client.bytes": 510,
-        "client.ip": "10.198.235.254",
         "destination.bytes": 403,
         "destination.ip": "10.198.233.48",
         "event.action": "denied",
@@ -161,13 +149,15 @@
             "intrusion_detection",
             "network"
         ],
-        "event.code": "075000617071",
+        "event.code": "17071",
         "event.dataset": "sophos.xg",
+        "event.duration": 19310000,
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-19 time=17:20:29 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"jsmith\" server=www.iviewtest.com:8989 sourceip=10.198.235.254 localip=10.198.233.48 ws_protocol=\"HTTP/1.1\" url=/ querystring= cookie=\"-\" referer=- method=GET httpstatus=403 reason=\"Static URL Hardening\" extra=\"No signature found\" contenttype=\"text/html\" useragent=\"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0\" host=10.198.235.254 responsetime=19310 bytessent=726 bytesrcv=510 fw_rule_id=3",
+        "event.original": "<30>device=\"SFW\" date=2020-05-19 time=17:20:29 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"jsmith\" server=www.iviewtest.com:8989 sourceip=10.198.235.254 localip=10.198.233.48 ws_protocol=\"HTTP/1.1\" url=/ querystring= cookie=\"-\" referer=- method=GET httpstatus=403 reason=\"Static URL Hardening\" extra=\"No signature found\" contenttype=\"text/html\" useragent=\"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0\" host=10.198.235.254 responsetime=19310 bytessent=726 bytesrcv=510 fw_rule_id=3",
         "event.outcome": "success",
-        "event.severity": "6",
+        "event.reason": "Static URL Hardening",
+        "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -194,8 +184,6 @@
         "related.user": [
             "jsmith"
         ],
-        "server.bytes": 726,
-        "server.ip": "10.198.233.48",
         "service.type": "sophos",
         "sophos.xg.contenttype": "text/html",
         "sophos.xg.device": "SFW",
@@ -204,28 +192,23 @@
         "sophos.xg.fw_rule_id": "3",
         "sophos.xg.host": "10.198.235.254",
         "sophos.xg.log_component": "Web Application Firewall",
+        "sophos.xg.log_id": "075000617071",
         "sophos.xg.log_type": "WAF",
-        "sophos.xg.message_id": "17071",
         "sophos.xg.priority": "Information",
-        "sophos.xg.reason": "Static URL Hardening",
-        "sophos.xg.responsetime": "19310",
         "sophos.xg.server": "www.iviewtest.com:8989",
         "source.bytes": 510,
         "source.ip": "10.198.235.254",
         "source.user.name": "jsmith",
         "tags": [
             "forwarded",
+            "preserve_original_event",
             "sophos-xg"
         ],
         "url.full": "/",
-        "url.original": "/",
-        "url.path": "/",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
         "@timestamp": "2020-05-19T18:03:30.000-02:00",
-        "client.bytes": 715,
-        "client.ip": "10.198.235.254",
         "destination.bytes": 403,
         "destination.ip": "10.198.233.48",
         "event.action": "denied",
@@ -233,13 +216,15 @@
             "malware",
             "network"
         ],
-        "event.code": "075000617071",
+        "event.code": "17071",
         "event.dataset": "sophos.xg",
+        "event.duration": 403214000,
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-19 time=18:03:30 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123456 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"jsmith\" server=www.iviewtest.com:8990 sourceip=10.198.235.254 localip=10.198.233.48 ws_protocol=\"HTTP/1.1\" url=/download/eicarcom2.zip querystring= cookie=\"; PHPSESSID=jetkd9iadd969hsr77jpj4q974; _pk_id.1.fc3a=3a6250e215194a92.1485866024.1.1485866069.1485866024.; _pk_ses.1.fc3a=*\" referer=http://www.iviewtest.com:8990/85-0-Download.html method=GET httpstatus=403 reason=\"Antivirus\" extra=\"EICAR-AV-Test\" contenttype=\"text/html\" useragent=\"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0\" host=10.198.235.254 responsetime=403214 bytessent=739 bytesrcv=715 fw_rule_id=6",
+        "event.original": "<30>device=\"SFW\" date=2020-05-19 time=18:03:30 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123456 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"jsmith\" server=www.iviewtest.com:8990 sourceip=10.198.235.254 localip=10.198.233.48 ws_protocol=\"HTTP/1.1\" url=/download/eicarcom2.zip querystring= cookie=\"; PHPSESSID=jetkd9iadd969hsr77jpj4q974; _pk_id.1.fc3a=3a6250e215194a92.1485866024.1.1485866069.1485866024.; _pk_ses.1.fc3a=*\" referer=http://www.iviewtest.com:8990/85-0-Download.html method=GET httpstatus=403 reason=\"Antivirus\" extra=\"EICAR-AV-Test\" contenttype=\"text/html\" useragent=\"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0\" host=10.198.235.254 responsetime=403214 bytessent=739 bytesrcv=715 fw_rule_id=6",
         "event.outcome": "success",
-        "event.severity": "6",
+        "event.reason": "Antivirus",
+        "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -267,10 +252,7 @@
         "related.user": [
             "jsmith"
         ],
-        "server.bytes": 739,
-        "server.ip": "10.198.233.48",
         "service.type": "sophos",
-        "sophos.xg.PHPSESSID": "jetkd9iadd969hsr77jpj4q974; _pk_id.1.fc3a=3a6250e215194a92.1485866024.1.1485866069.1485866024.; _pk_ses.1.fc3a=*",
         "sophos.xg.contenttype": "text/html",
         "sophos.xg.cookie": ";",
         "sophos.xg.device": "SFW",
@@ -279,29 +261,24 @@
         "sophos.xg.fw_rule_id": "6",
         "sophos.xg.host": "10.198.235.254",
         "sophos.xg.log_component": "Web Application Firewall",
+        "sophos.xg.log_id": "075000617071",
         "sophos.xg.log_type": "WAF",
-        "sophos.xg.message_id": "17071",
+        "sophos.xg.phpsessid": "jetkd9iadd969hsr77jpj4q974; _pk_id.1.fc3a=3a6250e215194a92.1485866024.1.1485866069.1485866024.; _pk_ses.1.fc3a=*",
         "sophos.xg.priority": "Information",
-        "sophos.xg.reason": "Antivirus",
-        "sophos.xg.responsetime": "403214",
         "sophos.xg.server": "www.iviewtest.com:8990",
         "source.bytes": 715,
         "source.ip": "10.198.235.254",
         "source.user.name": "jsmith",
         "tags": [
             "forwarded",
+            "preserve_original_event",
             "sophos-xg"
         ],
-        "url.extension": "zip",
         "url.full": "/download/eicarcom2.zip",
-        "url.original": "/download/eicarcom2.zip",
-        "url.path": "/download/eicarcom2.zip",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
         "@timestamp": "2020-05-20T18:03:31.000-02:00",
-        "client.bytes": 295,
-        "client.ip": "89.160.20.112",
         "destination.bytes": 403,
         "destination.ip": "216.167.51.72",
         "event.action": "denied",
@@ -309,13 +286,15 @@
             "intrusion_detection",
             "network"
         ],
-        "event.code": "075000617071",
+        "event.code": "17071",
         "event.dataset": "sophos.xg",
+        "event.duration": 608000,
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-20 time=18:03:31 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=- sourceip=89.160.20.112 localip=216.167.51.72 ws_protocol=\"HTTP/1.0\" url=/ querystring=\"\" cookie=\"-\" referer=\"-\" method=GET httpstatus=403 reason=\"WAF Anomaly\" extra=\"Inbound Anomaly Score Exceeded (Total Score: 7, SQLi=, XSS=): Last Matched Message: Request Missing a User Agent Header\" contenttype=\"text/html\" useragent=\"-\" host=89.160.20.112 responsetime=608 bytessent=5353 bytesrcv=295 fw_rule_id=3",
+        "event.original": "<30>device=\"SFW\" date=2020-05-20 time=18:03:31 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=- sourceip=89.160.20.112 localip=216.167.51.72 ws_protocol=\"HTTP/1.0\" url=/ querystring=\"\" cookie=\"-\" referer=\"-\" method=GET httpstatus=403 reason=\"WAF Anomaly\" extra=\"Inbound Anomaly Score Exceeded (Total Score: 7, SQLi=, XSS=): Last Matched Message: Request Missing a User Agent Header\" contenttype=\"text/html\" useragent=\"-\" host=89.160.20.112 responsetime=608 bytessent=5353 bytesrcv=295 fw_rule_id=3",
         "event.outcome": "success",
-        "event.severity": "6",
+        "event.reason": "WAF Anomaly",
+        "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -339,8 +318,6 @@
             "216.167.51.72",
             "89.160.20.112"
         ],
-        "server.bytes": 5353,
-        "server.ip": "216.167.51.72",
         "service.type": "sophos",
         "sophos.xg.contenttype": "text/html",
         "sophos.xg.device": "SFW",
@@ -349,11 +326,9 @@
         "sophos.xg.fw_rule_id": "3",
         "sophos.xg.host": "89.160.20.112",
         "sophos.xg.log_component": "Web Application Firewall",
+        "sophos.xg.log_id": "075000617071",
         "sophos.xg.log_type": "WAF",
-        "sophos.xg.message_id": "17071",
         "sophos.xg.priority": "Information",
-        "sophos.xg.reason": "WAF Anomaly",
-        "sophos.xg.responsetime": "608",
         "sophos.xg.sqli": ",",
         "sophos.xg.xss": "): Last Matched Message: Request Missing a User Agent Header",
         "source.as.number": 29518,
@@ -370,10 +345,9 @@
         "source.ip": "89.160.20.112",
         "tags": [
             "forwarded",
+            "preserve_original_event",
             "sophos-xg"
         ],
-        "url.full": "/",
-        "url.original": "/",
-        "url.path": "/"
+        "url.full": "/"
     }
 ]

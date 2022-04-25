@@ -1,4 +1,5 @@
-description: Pipeline for parsing sophos firewall logs (cfilter pipeline)
+---
+description: Pipeline for parsing Sophos XG firewall logs (anti-spam pipeline).
 processors:
 #######################
 ## ECS Event Mapping ##
@@ -17,15 +18,15 @@ processors:
 - set:
     field: event.kind
     value: alert
-    if: '["13001", "13002", "13004", "13005", "13006", "13009", "13012", "13014", "14001", "14002", "15001", "15002"].contains(ctx.sophos?.xg?.message_id)'
+    if: '["13001", "13002", "13004", "13005", "13006", "13009", "13012", "13014", "14001", "14002", "15001", "15002"].contains(ctx.event?.code)'
 - append:
     field: event.category
     value: malware
-    if: '["13001", "13002", "13004", "13005", "13006", "13009", "13014", "14001", "14002", "15001", "15002"].contains(ctx.sophos?.xg?.message_id)'
+    if: '["13001", "13002", "13004", "13005", "13006", "13009", "13014", "14001", "14002", "15001", "15002"].contains(ctx.event?.code)'
 - append:
     field: event.category
     value: intrusion_detection
-    if: "ctx.sophos?.xg?.message_id == '13012'"
+    if: "ctx.event?.code == '13012'"
 - append:
     field: event.category
     value: network
@@ -34,27 +35,24 @@ processors:
     value:
      - allowed
      - connection
-    if: '["13003", "13007", "13008", "13010", "13013", "14003", "15003", "18035"].contains(ctx.sophos?.xg?.message_id)'
+    if: '["13003", "13007", "13008", "13010", "13013", "14003", "15003", "18035"].contains(ctx.event?.code)'
 - append:
     field: event.type
     value:
       - info
       - denied
       - connection
-    if: '["13001", "13002", "13004", "13005", "13006", "13009", "13012", "13014", "14001", "14002", "15001", "15002"].contains(ctx.sophos?.xg?.message_id)'
+    if: '["13001", "13002", "13004", "13005", "13006", "13009", "13012", "13014", "14001", "14002", "15001", "15002"].contains(ctx.event?.code)'
+
 
 ####################################
-## ECS Server/Destination Mapping ##
+## ECS Destination Mapping
 ####################################
 - rename:
     field: sophos.xg.dst_ip
     target_field: destination.ip
     ignore_missing: true
     if: "ctx.sophos?.xg?.dst_ip != null"
-- set:
-    field: server.ip
-    value: '{{destination.ip}}'
-    ignore_empty_value: true
 - convert:
     field: sophos.xg.dst_port
     target_field: destination.port
@@ -62,48 +60,18 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophos?.xg?.dst_port != null"
-- set:
-    field: server.port
-    value: '{{destination.port}}'
-    ignore_empty_value: true
-- convert:
-    field: server.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: sophos.xg.recv_bytes
-    target_field: destination.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.recv_bytes != null"
-- set:
-    field: server.bytes
-    value: '{{destination.bytes}}'
-    ignore_empty_value: true
-- convert:
-    field: server.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.server?.bytes != null"
 - rename:
     field: sophos.xg.to_email_address
     target_field: destination.user.email
     ignore_missing: true
 
 ###############################
-## ECS Client/Source Mapping ##
+## ECS Source Mapping
 ###############################
 - rename:
     field: sophos.xg.src_ip
     target_field: source.ip
     ignore_missing: true
-- set:
-    field: client.ip
-    value: '{{source.ip}}'
-    ignore_empty_value: true
 - convert:
     field: sophos.xg.src_port
     target_field: source.port
@@ -111,32 +79,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophos?.xg?.src_port != null"
-- set:
-    field: client.port
-    value: '{{source.port}}'
-    ignore_empty_value: true
-- convert:
-    field: client.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: sophos.xg.sent_bytes
-    target_field: source.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.sent_bytes != null"
-- set:
-    field: client.bytes
-    value: '{{source.bytes}}'
-    ignore_empty_value: true
-- convert:
-    field: client.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.client?.bytes != null"
 - rename:
     field: sophos.xg.from_email_address
     target_field: source.user.email
@@ -146,82 +88,16 @@ processors:
      target_field: source.domain
      ignore_missing: true
 
-#############################
-## ECS Network/Geo Mapping ##
-#############################
+######################
+## ECS Network Mapping
+######################
 - rename:
     field: sophos.xg.protocol
     target_field: network.transport
     ignore_missing: true
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
-    if: "ctx.source?.geo == null"
-- geoip:
-    field: destination.ip
-    target_field: destination.geo
-    ignore_missing: true
-    if: "ctx.destination?.geo == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: destination.ip
-    target_field: destination.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- geoip:
-    field: source.nat.ip
-    target_field: source.geo
-    ignore_missing: true
-    if: "ctx.source?.geo == null"
-- geoip:
-    field: destination.nat.ip
-    target_field: destination.geo
-    ignore_missing: true
-    if: "ctx.destination?.geo == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.nat.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-    if: "ctx.source?.as == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: destination.nat.ip
-    target_field: destination.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-    if: "ctx.destination?.as == null"
-- rename:
-    field: source.as.asn
-    target_field: source.as.number
-    ignore_missing: true
-- rename:
-    field: source.as.organization_name
-    target_field: source.as.organization.name
-    ignore_missing: true
-- rename:
-    field: destination.as.asn
-    target_field: destination.as.number
-    ignore_missing: true
-- rename:
-    field: destination.as.organization_name
-    target_field: destination.as.organization.name
+- lowercase:
+    field: sophos.xg.log_component
+    target_field: network.protocol
     ignore_missing: true
 
 #############
@@ -230,9 +106,7 @@ processors:
 - remove:
     field:
     - sophos.xg.dst_port
-    - sophos.xg.recv_bytes
     - sophos.xg.src_port
-    - sophos.xg.sent_bytes
     ignore_missing: true
 on_failure:
 - set:
