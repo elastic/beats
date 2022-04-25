@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: kafka
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/kafka/_meta/docs.asciidoc
+
 
 [[metricbeat-module-kafka]]
 == Kafka module
@@ -49,6 +51,8 @@ The Kafka module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_kafka_dashboard.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -142,3 +146,4 @@ include::kafka/partition.asciidoc[]
 
 include::kafka/producer.asciidoc[]
 
+:edit_url!:

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: zookeeper
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/zookeeper/_meta/docs.asciidoc
+
 
 [[metricbeat-module-zookeeper]]
 == ZooKeeper module
@@ -29,6 +31,8 @@ The Zookeeper module comes with a predefined dashboard:
 
 image::./images/metricbeat-zookeeper.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -63,3 +67,4 @@ include::zookeeper/mntr.asciidoc[]
 
 include::zookeeper/server.asciidoc[]
 
+:edit_url!:

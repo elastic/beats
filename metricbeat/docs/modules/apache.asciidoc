@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: apache
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/apache/_meta/docs.asciidoc
+
 
 [[metricbeat-module-apache]]
 == Apache module
@@ -28,6 +30,8 @@ The Apache module comes with a predefined dashboard. For example:
 
 image::./images/apache_httpd_server_status.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -68,3 +72,4 @@ The following metricsets are available:
 
 include::apache/status.asciidoc[]
 
+:edit_url!:

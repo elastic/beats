@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: oracle
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/oracle/_meta/docs.asciidoc
+
 
 [[metricbeat-module-oracle]]
 [role="xpack"]
@@ -46,6 +48,8 @@ The following Metricset is included in the module:
 Includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -86,3 +90,4 @@ include::oracle/performance.asciidoc[]
 
 include::oracle/tablespace.asciidoc[]
 
+:edit_url!:
