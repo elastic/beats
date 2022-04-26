@@ -155,7 +155,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		})
 	}
 
-	c.log.Debugf("all %d events converted to protobuf", len(events))
+	c.log.Debugf("%d events converted to protobuf, %d dropped", len(grpcEvents), dropped)
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
