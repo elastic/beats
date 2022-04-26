@@ -66,6 +66,13 @@ type broker struct {
 	// chanList of all outstanding ACK channels.
 	scheduledACKs chan chanList
 
+	// A listener that should be notified when ACKs are processed.
+	// ackLoop calls this listener's OnACK function when it advances
+	// the consumer ACK position.
+	// Right now this listener always points at the Pipeline associated with
+	// this queue. Pipeline.OnACK then forwards the notification to
+	// Pipeline.observer.queueACKed(), which updates the beats registry
+	// if needed.
 	ackListener queue.ACKListener
 
 	// wait group for worker shutdown
