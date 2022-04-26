@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
 - Update to Go 1.17.9 {issue}31350[31350]
+- This is a test entry
 
 *Auditbeat*
 
