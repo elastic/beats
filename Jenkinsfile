@@ -935,7 +935,7 @@ def startCloudTestEnv(Map args = [:]) {
 def terraformApply(String directory) {
   terraformInit(directory)
   dir(directory) {
-    withEnv(["TF_VAR_BRANCH=${env.BRANCH_NAME.toLowerCase()}",
+    withEnv(["TF_VAR_BRANCH=${env.BRANCH_NAME.toLowerCase().replaceAll('[^a-z0-9-]', '-')}",
              "TF_VAR_BUILD_ID=${BUILD_ID}",
              "TF_VAR_CREATED_DATE=${new Date().getTime()}",
              "TF_VAR_ENVIRONMENT=ci",
