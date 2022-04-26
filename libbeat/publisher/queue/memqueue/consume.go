@@ -38,15 +38,7 @@ type batch struct {
 	consumer *consumer
 	events   []publisher.Event
 	ack      *batchACKer
-	state    ackState
 }
-
-type ackState uint8
-
-const (
-	batchActive ackState = iota
-	batchACK
-)
 
 func newConsumer(b *broker) *consumer {
 	return &consumer{
@@ -79,7 +71,6 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 		consumer: c,
 		events:   events,
 		ack:      resp.ack,
-		state:    batchActive,
 	}, nil
 }
 
@@ -92,19 +83,9 @@ func (c *consumer) Close() error {
 }
 
 func (b *batch) Events() []publisher.Event {
-	if b.state != batchActive {
-		panic("Get Events from inactive batch")
-	}
 	return b.events
 }
 
 func (b *batch) ACK() {
-	switch b.state {
-	case batchActive:
-		b.ack.ch <- batchAckMsg{}
-	case batchACK:
-		panic("Can not acknowledge already acknowledged batch")
-	default:
-		panic("inactive batch")
-	}
+	b.ack.ch <- batchAckMsg{}
 }
