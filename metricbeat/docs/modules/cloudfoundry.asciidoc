@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: cloudfoundry
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/cloudfoundry/_meta/docs.asciidoc
+
 
 [[metricbeat-module-cloudfoundry]]
 [role="xpack"]
@@ -133,6 +135,8 @@ Use `v2` to collect events from the RLP Gateway. Default: "`v1`".
 This specifies SSL/TLS common config. Default: not used.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -175,3 +179,4 @@ include::cloudfoundry/counter.asciidoc[]
 
 include::cloudfoundry/value.asciidoc[]
 
+:edit_url!:

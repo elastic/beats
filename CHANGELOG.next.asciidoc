@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 - Netflow: replace invalid field value. {pull}31295[31295]
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 
 *Heartbeat*
 
@@ -73,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
 - Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 - Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
 
 *Packetbeat*
