@@ -33,7 +33,7 @@ import (
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
-	seccomp_default "github.com/elastic/go-seccomp-bpf"
+	"github.com/elastic/beats/v7/heartbeat/hbseccomp"
 )
 
 func init() {
@@ -247,19 +247,7 @@ func setSeccompRules() error {
 
 	case "arm64", "aarch64":
 		// Register default arm64/aarch64 policy
-		defaultPolicy := &seccomp_default.Policy{
-			DefaultAction: seccomp_default.ActionAllow,
-			Syscalls: []seccomp_default.SyscallGroup{
-				{
-					Action: seccomp_default.ActionErrno,
-					Names: []string{
-						"execveat",
-					},
-				},
-			},
-		}
-		seccomp.MustRegisterPolicy(defaultPolicy)
-
+		seccomp.MustRegisterPolicy(hbseccomp.defaultArmPolicy)
 	}
 
 	return nil
