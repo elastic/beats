@@ -208,11 +208,10 @@ var ackChanPool = sync.Pool{
 	},
 }
 
-func newACKChan(seq uint, start, count int, entries []queueEntry) *ackChan {
+func newACKChan(start, count int, entries []queueEntry) *ackChan {
 	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*ackChan)
 	ch.next = nil
-	//ch.seq = seq
 	ch.start = start
 	ch.count = count
 	ch.entries = entries

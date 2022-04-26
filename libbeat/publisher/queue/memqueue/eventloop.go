@@ -37,11 +37,11 @@ type directEventLoop struct {
 	getChan    chan getRequest
 	cancelChan chan producerCancelRequest
 
-	// ack handling
-	acks        chan int      // ackloop -> eventloop : total number of events ACKed by outputs
+	// ackLoop sends to this channel to notify the event loop
+	// when events
+	ackChan     chan int      // ackloop -> eventloop : total number of events ACKed by outputs
 	schedACKS   chan chanList // eventloop -> ackloop : active list of batches to be acked
 	pendingACKs chanList      // ordered list of active batches to be send to the ackloop
-	ackSeq      uint          // ack batch sequence number to validate ordering
 }
 
 // bufferingEventLoop implements the broker main event loop.
@@ -66,7 +66,6 @@ type bufferingEventLoop struct {
 	acks        chan int      // ackloop -> eventloop : total number of events ACKed by outputs
 	schedACKS   chan chanList // eventloop -> ackloop : active list of batches to be acked
 	pendingACKs chanList      // ordered list of active batches to be send to the ackloop
-	ackSeq      uint          // ack batch sequence number to validate ordering
 
 	// buffer flush timer state
 	timer *time.Timer
@@ -85,7 +84,7 @@ func newDirectEventLoop(b *broker, size int) *directEventLoop {
 		pushChan:   b.events,
 		getChan:    nil,
 		cancelChan: b.pubCancel,
-		acks:       b.acks,
+		ackChan:    b.acks,
 	}
 	l.buf.init(b.logger, size)
 
@@ -110,7 +109,7 @@ func (l *directEventLoop) run() {
 				pushChan = nil
 			}
 
-		case count := <-l.acks:
+		case count := <-l.ackChan:
 			// Give broker/buffer a chance to clean up most recent ACKs
 			// After handling ACKs some buffer has been freed up
 			// -> always reenable producers
@@ -190,9 +189,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 		panic("empty batch returned")
 	}
 
-	// log.Debug("newACKChan: ", b.ackSeq, count)
-	ackCH := newACKChan(l.ackSeq, start, count, l.buf.entries)
-	l.ackSeq++
+	ackCH := newACKChan(start, count, l.buf.entries)
 
 	req.resp <- getResponse{ackCH, buf}
 	l.pendingACKs.append(ackCH)
@@ -425,8 +422,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	}
 
 	entries := buf.entries[:count]
-	ackChan := newACKChan(l.ackSeq, 0, count, entries)
-	l.ackSeq++
+	ackChan := newACKChan(0, count, entries)
 
 	req.resp <- getResponse{ackChan, entries}
 	l.pendingACKs.append(ackChan)

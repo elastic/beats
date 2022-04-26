@@ -23,9 +23,9 @@ package memqueue
 // broker event loop.
 // Producer ACKs are run in the ackLoop go-routine.
 type ackLoop struct {
-	broker *broker
-	sig    chan batchAckMsg
-	lst    chanList
+	broker   *broker
+	sig      chan batchAckMsg
+	ackChans chanList
 
 	totalACK uint64
 
@@ -36,14 +36,14 @@ func (l *ackLoop) run() {
 	var (
 		// log = l.broker.logger
 
-		// Buffer up acked event counter in acked. If acked > 0, acks will be set to
+		// Buffer up event counter in ackCount. If ackCount > 0, acks will be set to
 		// the broker.acks channel for sending the ACKs while potentially receiving
 		// new batches from the broker event loop.
 		// This concurrent bidirectionally communication pattern requiring 'select'
 		// ensures we can not have any deadlock between the event loop and the ack
 		// loop, as the ack loop will not block on any channel
-		acked int
-		acks  chan int
+		ackCount int
+		ackChan  chan int
 	)
 
 	for {
@@ -51,16 +51,16 @@ func (l *ackLoop) run() {
 		case <-l.broker.done:
 			return
 
-		case acks <- acked:
-			acks, acked = nil, 0
+		case ackChan <- ackCount:
+			ackChan, ackCount = nil, 0
 
-		case lst := <-l.broker.scheduledACKs:
-			l.lst.concat(&lst)
+		case chanList := <-l.broker.scheduledACKs:
+			l.ackChans.concat(&chanList)
 
 		case <-l.sig:
-			acked += l.handleBatchSig()
-			if acked > 0 {
-				acks = l.broker.acks
+			ackCount += l.handleBatchSig()
+			if ackCount > 0 {
+				ackChan = l.broker.acks
 			}
 		}
 
@@ -70,7 +70,7 @@ func (l *ackLoop) run() {
 		// log.Debug("ackloop:   total batches scheduled = ", l.batchesSched)
 		// log.Debug("ackloop:   total batches ack = ", l.batchesACKed)
 
-		l.sig = l.lst.channel()
+		l.sig = l.ackChans.channel()
 		// if l.sig == nil {
 		// 	log.Debug("ackloop: no ack scheduled")
 		// } else {
@@ -113,17 +113,17 @@ func (l *ackLoop) handleBatchSig() int {
 func (l *ackLoop) collectAcked() chanList {
 	lst := chanList{}
 
-	acks := l.lst.pop()
+	acks := l.ackChans.pop()
 	//l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 	lst.append(acks)
 
 	done := false
-	for !l.lst.empty() && !done {
-		acks := l.lst.front()
+	for !l.ackChans.empty() && !done {
+		acks := l.ackChans.front()
 		select {
 		case <-acks.ch:
 			//l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
-			lst.append(l.lst.pop())
+			lst.append(l.ackChans.pop())
 
 		default:
 			done = true
