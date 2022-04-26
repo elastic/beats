@@ -311,7 +311,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	}
 
 	for socketType := range socketTypes {
-		if runtime.GOOS == "darwin" && socketType == "datagram" {
+		if runtime.GOOS == "darwin" && socketType == "datagram" { //nolint:goconst // platform checking in test
 			t.Skip("test is only supported on linux. See https://github.com/elastic/beats/issues/22775")
 			return
 		}
@@ -397,7 +397,7 @@ func randomString(l int) string {
 	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
 	message := make([]byte, l)
 	for i := range message {
-		message[i] = charsets[rand.Intn(len(charsets))]
+		message[i] = charsets[rand.Intn(len(charsets))] //nolint:gosec // it generates test string, allowed to be weak
 	}
 	return string(message)
 }

@@ -158,7 +158,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 			}
 		}
 		// If we're here, something isn't set.
-		return errors.New("Cannot crossbuild on AIX. Either run `mage build` or set PLATFORMS='aix/ppc64'")
+		return errors.New("cannot crossbuild on AIX, either run `mage build` or set PLATFORMS='aix/ppc64'")
 	}
 
 	// Docker is required for this target.
@@ -270,7 +270,7 @@ type GolangCrossBuilder struct {
 
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
-	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
+	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform) //nolint:forbidigo // it's ok to fmt.println in mage
 
 	repoInfo, err := GetProjectRepoInfo()
 	if err != nil {
@@ -355,7 +355,7 @@ func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
 	numFixed := 0
 	defer func() {
-		log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+		log.Printf("chown took: %v, changed %d files", time.Since(start), numFixed)
 	}()
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {

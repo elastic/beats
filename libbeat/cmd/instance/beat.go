@@ -186,7 +186,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
 		if u, err := user.Current(); err != nil {
-			if _, ok := err.(user.UnknownUserIdError); ok {
+			if _, ok := err.(user.UnknownUserIdError); ok { //nolint:errorlint // keep legacy behaviour
 				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
 				// if the user set securityContext.runAsUser to an arbitrary value.
 				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
@@ -356,7 +356,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		if b.Manager.Enabled() {
 			logp.Info("Output is configured through Central Management")
 		} else {
-			msg := "No outputs are defined. Please define one under the output section."
+			msg := "no outputs are defined, please define one under the output section"
 			logp.Info(msg)
 			return nil, errors.New(msg)
 		}
@@ -382,7 +382,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("error initializing publisher: %+v", err)
+		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
 	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
