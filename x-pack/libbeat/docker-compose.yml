@@ -35,7 +35,6 @@ services:
       start_period: 60s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=true"
