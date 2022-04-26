@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -199,14 +200,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 			})
 			event.Timestamp = start
 
-			monitorID, err := event.GetValue("monitor.id")
-			if err != nil {
-				logp.L().Infow(
-					"Lightweight monitor finished.",
-					logp.String("monitorId", monitorID.(string)),
-					logp.Int64("durationMs", duration.Milliseconds()),
-				)
-			}
+			logger.LogLightweightRun(event)
 		}
 
 		return cont, err

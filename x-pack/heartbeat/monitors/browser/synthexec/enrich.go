@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -212,14 +212,9 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		},
 	})
 
-	monitorID, err := event.GetValue("monitor.id")
+	_, err := event.GetValue("monitor.id")
 	if err == nil {
-		logp.L().Infow(
-			"Browser monitor summary ready",
-			logp.String("monitorId", monitorID.(string)),
-			logp.Int("stepCount", je.stepCount),
-			logp.Int64("durationMs", duration.Milliseconds()),
-		)
+		logger.LogBrowserRun(event, je.stepCount)
 	}
 
 	if je.journeyComplete {
