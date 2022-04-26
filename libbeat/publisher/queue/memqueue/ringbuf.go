@@ -33,9 +33,10 @@ import (
 type ringBuffer struct {
 	logger *logp.Logger
 
-	//buf eventBuffer
 	entries []queueEntry
 
+	// The underlying array is divided up into two contiguous
+	// regions, A followed by B.
 	regA, regB region
 
 	// The number of events awaiting ACK at the beginning of region A.
@@ -64,7 +65,17 @@ func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	}
 }
 
-func (b *ringBuffer) insert(event interface{}, client clientState) int {
+// Old spec:
+// Returns the number of free entries left in the queue buffer after
+// insertion.
+// Also returns 0 if there is no space left in the queue to insert
+// the given event. However, this is an error state: the first time
+// it returns 0, insertion should be disabled by setting the
+// pushRequest channel in directEventLoop to nil.
+// New spec:
+// Returns true if the ringBuffer is full after handling
+// the given insertion, false otherwise.
+func (b *ringBuffer) insert(event interface{}, client clientState) bool {
 	// log := b.buf.logger
 	// log.Debug("insert:")
 	// log.Debug("  region A:", b.regA)
@@ -84,13 +95,13 @@ func (b *ringBuffer) insert(event interface{}, client clientState) int {
 		idx := b.regB.index + b.regB.size
 		avail := b.regA.index - idx
 		if avail == 0 {
-			return 0
+			return true
 		}
 
 		b.entries[idx] = queueEntry{event, client}
 		b.regB.size++
 
-		return avail - 1
+		return avail <= 1
 	}
 
 	// region B does not exist yet, check if region A is available for use
@@ -98,46 +109,39 @@ func (b *ringBuffer) insert(event interface{}, client clientState) int {
 	// log.Debug("  - index: ", idx)
 	// log.Debug("  - buffer size: ", b.buf.Len())
 	avail := len(b.entries) - idx
-	if avail == 0 { // no more space in region A
-		// log.Debug("  - region A full")
-
+	if b.regA.index+b.regA.size >= len(b.entries) {
+		// region A extends to the end of the buffer
 		if b.regA.index == 0 {
-			// space to create region B, buffer is full
-
-			// log.Debug("  - no space in region B")
-
-			return 0
+			// If region A also extends to the start of the buffer, then
+			// there is no space left.
+			return true
 		}
 
-		// create region B and insert events
-		// log.Debug("  - create region B")
-		b.regB.index = 0
-		b.regB.size = 1
+		// create region B at the start of the buffer; events will now be
+		// appended there until A has been consumed.
+		b.regB = region{index: 0, size: 1}
 		b.entries[0] = queueEntry{event, client}
-		return b.regA.index - 1
+
+		// The buffer is full if region A begins immediately after the first entry.
+		return b.regA.index == 1
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
 	b.entries[idx] = queueEntry{event, client}
 	b.regA.size++
-	return avail - 1
+
+	// This is a strange return value: it checks, not whether there is space
+	// in the ring buffer, but whether the next insertion will be in region B
+	// (i.e. whether we are crossing the end of the internal buffer).
+	// This seems wrong, but I'm leaving it this way for consistency until I
+	// understand the code paths well enough to be sure.
+	return avail == 1
 }
 
 // cancel removes all buffered events matching `st`, not yet reserved by
 // any consumer
 func (b *ringBuffer) cancel(st *produceState) int {
-	// log := b.buf.logger
-	// log.Debug("cancel:")
-	// log.Debug("  region A:", b.regA)
-	// log.Debug("  region B:", b.regB)
-	// log.Debug("  reserved:", b.reserved)
-	// defer func() {
-	// 	log.Debug("  -> region A:", b.regA)
-	// 	log.Debug("  -> region B:", b.regB)
-	// 	log.Debug("  -> reserved:", b.reserved)
-	// }()
-
 	cancelledB := b.cancelRegion(st, b.regB)
 	b.regB.size -= cancelledB
 
@@ -196,10 +200,8 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 	use := b.regA.size - b.reserved
 	// log.Debug("  - avail: ", use)
 
-	if sz > 0 {
-		if use > sz {
-			use = sz
-		}
+	if sz > 0 && use > sz {
+		use = sz
 	}
 
 	start := b.regA.index + b.reserved
@@ -211,17 +213,17 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 }
 
 // ack up to sz events in region A
+// Requires b.reserved <= sz
 func (b *ringBuffer) ack(sz int) {
-	// log := b.buf.logger
-	// log.Debug("ack: ", sz)
-	// log.Debug("  region A:", b.regA)
-	// log.Debug("  region B:", b.regB)
-	// log.Debug("  reserved:", b.reserved)
-	// defer func() {
-	// 	log.Debug("  -> region A:", b.regA)
-	// 	log.Debug("  -> region B:", b.regB)
-	// 	log.Debug("  -> reserved:", b.reserved)
-	// }()
+	/*fmt.Printf("ack(%d)\n", sz)
+	fmt.Printf("  region A: %v\n", b.regA)
+	fmt.Printf("  region B: %v\n", b.regB)
+	fmt.Printf("  reserved: %v\n", b.reserved)
+	defer func() {
+		fmt.Printf("  -> region A: %v\n", b.regA)
+		fmt.Printf("  -> region B: %v\n", b.regB)
+		fmt.Printf("  -> reserved: %v\n", b.reserved)
+	}()*/
 
 	if b.regA.size < sz {
 		panic(fmt.Errorf("commit region to big (commit region=%v, buffer size=%v)",
@@ -246,6 +248,7 @@ func (b *ringBuffer) ack(sz int) {
 	}
 }
 
+// Number of events that consumers can currently request.
 func (b *ringBuffer) Avail() int {
 	return b.regA.size - b.reserved
 }
@@ -255,6 +258,11 @@ func (b *ringBuffer) Full() bool {
 	if b.regB.size > 0 {
 		avail = b.regA.index - b.regB.index - b.regB.size
 	} else {
+		// This doesn't seem right -- this checks how much space
+		// is available after region A in the internal array, but
+		// there might also be free space before region A. In that
+		// case new events must be inserted in region B, but the
+		// queue isn't at capacity.
 		avail = len(b.entries) - b.regA.index - b.regA.size
 	}
 	return avail == 0

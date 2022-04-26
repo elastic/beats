@@ -19,6 +19,7 @@ package memqueue
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -57,18 +58,23 @@ func newConsumer(b *broker) *consumer {
 }
 
 func (c *consumer) Get(sz int) (queue.Batch, error) {
+	fmt.Printf("consumer.Get(%d)\n", sz)
+	defer fmt.Printf("consumer.Get done\n")
 	if c.closed.Load() {
 		return nil, io.EOF
 	}
 
 	select {
 	case c.broker.requests <- getRequest{sz: sz, resp: c.resp}:
+		fmt.Printf("sent request\n")
 	case <-c.done:
+		fmt.Printf("done channel closed\n")
 		return nil, io.EOF
 	}
 
 	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
+	fmt.Printf("received response\n")
 	events := make([]publisher.Event, 0, len(resp.entries))
 	for _, entry := range resp.entries {
 		if event, ok := entry.event.(*publisher.Event); ok {
@@ -84,7 +90,10 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 }
 
 func (c *consumer) Close() error {
+	fmt.Printf("\033[0;32mmemqueue consumer close\033[0m\n")
+
 	if c.closed.Swap(true) {
+		fmt.Printf("\033[0;32malready closed\033[0m\n")
 		return errors.New("already closed")
 	}
 

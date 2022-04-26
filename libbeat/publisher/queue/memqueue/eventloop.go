@@ -101,30 +101,30 @@ func (l *directEventLoop) run() {
 	for {
 		select {
 		case <-broker.done:
-			fmt.Printf("broker.done\n")
+			//fmt.Printf("broker.done\n")
 			return
 
 		case req := <-l.events: // producer pushing new event
-			fmt.Printf("handleInsert\n")
+			//fmt.Printf("handleInsert\n")
 			l.handleInsert(&req)
 
 		case req := <-l.pubCancel: // producer cancelling active events
-			fmt.Printf("handleCancel\n")
+			//fmt.Printf("handleCancel\n")
 			l.handleCancel(&req)
 
 		case req := <-l.get: // consumer asking for next batch
-			fmt.Printf("handleGetRequest\n")
+			//fmt.Printf("handleGetRequest\n")
 			l.handleGetRequest(&req)
 
 		case l.schedACKS <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list and queue
-			fmt.Printf("pendingACKs\n")
+			//fmt.Printf("pendingACKs\n")
 
 			l.schedACKS = nil
 			l.pendingACKs = chanList{}
 
 		case count := <-l.acks:
-			fmt.Printf("handleACK\n")
+			//fmt.Printf("handleACK(%d)\n", count)
 
 			l.handleACK(count)
 
@@ -142,7 +142,7 @@ func (l *directEventLoop) handleInsert(req *pushRequest) {
 	// log := l.broker.logger
 	// log.Debugf("push event: %v\t%v\t%p\n", req.event, req.seq, req.state)
 
-	if avail, ok := l.insert(req); ok && avail == 0 {
+	if full := l.insert(req); full {
 		// log.Debugf("buffer: all regions full")
 
 		// no more space to accept new events -> unset events queue for time being
@@ -150,27 +150,24 @@ func (l *directEventLoop) handleInsert(req *pushRequest) {
 	}
 }
 
-func (l *directEventLoop) insert(req *pushRequest) (int, bool) {
-	var avail int
+// Returns true if the queue is full after handling the insertion request.
+func (l *directEventLoop) insert(req *pushRequest) bool {
 	log := l.broker.logger
 
-	if req.state == nil {
-		avail = l.buf.insert(req.event, clientState{})
-		return avail, true
+	st := req.state
+	if st == nil {
+		return l.buf.insert(req.event, clientState{})
 	}
 
-	st := req.state
 	if st.cancelled {
 		reportCancelledState(log, req)
-		return -1, false
+		return false
 	}
 
-	avail = l.buf.insert(req.event, clientState{
+	return l.buf.insert(req.event, clientState{
 		seq:   req.seq,
 		state: st,
 	})
-
-	return avail, true
 }
 
 func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
@@ -241,7 +238,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 
 	acks := lst.front()
 	start := acks.start
-	entries := acks.entries
+	entries := l.buf.entries
 
 	idx := start + N - 1
 	if idx >= len(entries) {
@@ -318,6 +315,7 @@ func (l *bufferingEventLoop) run() {
 	var (
 		broker = l.broker
 	)
+	fmt.Printf("oops someone is running a bufferingEventLoop\n")
 
 	for {
 		select {
@@ -493,6 +491,7 @@ func (l *bufferingEventLoop) stopFlushTimer() {
 func (l *bufferingEventLoop) advanceFlushList() {
 	l.flushList.pop()
 	if l.flushList.count == 0 {
+		// All buffers are empty, disable consumer get
 		l.get = nil
 
 		if l.buf.flushed {

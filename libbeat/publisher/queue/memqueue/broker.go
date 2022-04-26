@@ -63,9 +63,9 @@ type Settings struct {
 }
 
 type ackChan struct {
-	next         *ackChan
-	ch           chan batchAckMsg
-	seq          uint
+	next *ackChan
+	ch   chan batchAckMsg
+	//seq          uint
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
 }
@@ -212,7 +212,7 @@ func newACKChan(seq uint, start, count int, entries []queueEntry) *ackChan {
 	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*ackChan)
 	ch.next = nil
-	ch.seq = seq
+	//ch.seq = seq
 	ch.start = start
 	ch.count = count
 	ch.entries = entries
