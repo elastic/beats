@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/match"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -56,5 +57,53 @@ func TestDropFieldRun(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, common.MapStr{}, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
+
+	t.Run("supports a regexp field", func(t *testing.T) {
+		event = &beat.Event{
+			Fields: common.MapStr{
+				"field_1": common.MapStr{
+					"subfield_1": "sf_1_value",
+					"subfield_2": common.MapStr{
+						"subfield_2_1": "sf_2_1_value",
+						"subfield_2_2": "sf_2_2_value",
+					},
+					"subfield_3": common.MapStr{
+						"subfield_3_1": "sf_3_1_value",
+						"subfield_3_2": "sf_3_2_value",
+					},
+				},
+				"field_2": "f_2_value",
+			},
+		}
+
+		p := dropFields{
+			RegexpFields: []match.Matcher{match.MustCompile("field_2$"), match.MustCompile("field_1\\.(.*)\\.subfield_2_1"), match.MustCompile("field_1\\.subfield_3(.*)")},
+			Fields:       []string{},
+		}
+
+		newEvent, err := p.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, common.MapStr{
+			"field_1": common.MapStr{
+				"subfield_1": "sf_1_value",
+			},
+		}, newEvent.Fields)
+	})
+}
+
+func TestNewDropFields(t *testing.T) {
+	t.Run("detects regexp fields and assign to RegexpFields property", func(t *testing.T) {
+		c := common.MustNewConfigFrom(map[string]interface{}{
+			"fields": []string{"/field_.*1/", "/second/", "third"},
+		})
+
+		procInt, err := newDropFields(c)
+		processor := procInt.(*dropFields)
+
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"third"}, processor.Fields)
+		assert.Equal(t, "<substring 'second'>", processor.RegexpFields[0].String())
+		assert.Equal(t, "field_(?-s:.)*1", processor.RegexpFields[1].String())
 	})
 }

@@ -852,6 +852,21 @@ func TestFlatten(t *testing.T) {
 	}
 }
 
+func TestFlattenKeys(t *testing.T) {
+	expected := []string{"elastic.search.keys", "elastic.search", "elastic"}
+	input := MapStr{
+		"elastic": MapStr{
+			"search": MapStr{
+				"keys": "value",
+			},
+		},
+	}
+
+	result := input.FlattenKeys()
+
+	assert.Equal(t, &expected, result)
+}
+
 func BenchmarkMapStrFlatten(b *testing.B) {
 	m := MapStr{
 		"test": 15,

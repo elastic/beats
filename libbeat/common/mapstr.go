@@ -270,6 +270,37 @@ func (m MapStr) Flatten() MapStr {
 	return flatten("", m, MapStr{})
 }
 
+// FlattenKeys flattens given MapStr keys and returns a containing array pointer
+//
+// Example:
+//   "hello": MapStr{"world": "test" }
+//
+// This is converted to:
+//   ["hello.world"]
+func (m MapStr) FlattenKeys() *[]string {
+	out := make([]string, 0)
+	flattenKeys("", m, &out)
+
+	return &out
+}
+
+func flattenKeys(prefix string, in MapStr, out *[]string) {
+	for k, v := range in {
+		var fullKey string
+		if prefix == "" {
+			fullKey = k
+		} else {
+			fullKey = prefix + "." + k
+		}
+
+		if m, ok := tryToMapStr(v); ok {
+			flattenKeys(fullKey, m, out)
+		}
+
+		*out = append(*out, fullKey)
+	}
+}
+
 // flatten is a helper for Flatten. See docs for Flatten. For convenience the
 // out parameter is returned.
 func flatten(prefix string, in, out MapStr) MapStr {

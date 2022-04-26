@@ -20,9 +20,10 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
-
+	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,6 +33,7 @@ import (
 
 type dropFields struct {
 	Fields        []string
+	RegexpFields  []match.Matcher
 	IgnoreMissing bool
 }
 
@@ -53,6 +55,7 @@ func newDropFields(c *common.Config) (processors.Processor, error) {
 	}
 
 	/* remove read only fields */
+	// TODO: Is this implementation used? If so, there's a fix needed in removal of exported fields
 	for _, readOnly := range processors.MandatoryExportedFields {
 		for i, field := range config.Fields {
 			if readOnly == field {
@@ -61,23 +64,47 @@ func newDropFields(c *common.Config) (processors.Processor, error) {
 		}
 	}
 
-	f := &dropFields{Fields: config.Fields, IgnoreMissing: config.IgnoreMissing}
+	// Parse regexp containing fields and removes them from initial config
+	regexpFields := make([]match.Matcher, 0)
+	for i := len(config.Fields) - 1; i >= 0; i-- {
+		field := config.Fields[i]
+		if strings.HasPrefix(field, "/") && strings.HasSuffix(field, "/") && len(field) > 2 {
+			config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
+
+			regexpFields = append(regexpFields, match.MustCompile(field[1:len(field)-1]))
+		}
+	}
+
+	f := &dropFields{Fields: config.Fields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields}
 	return f, nil
 }
 
 func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 	var errs []error
 
+	// remove exact match fields
 	for _, field := range f.Fields {
-		if err := event.Delete(field); err != nil {
-			if f.IgnoreMissing && err == common.ErrKeyNotFound {
-				continue
+		f.deleteField(event, field, &errs)
+	}
+
+	// remove fields contained in regexp expressions
+	for _, regex := range f.RegexpFields {
+		for _, field := range *event.Fields.FlattenKeys() {
+			if regex.MatchString(field) {
+				f.deleteField(event, field, &errs)
 			}
-			errs = append(errs, errors.Wrapf(err, "failed to drop field [%v]", field))
 		}
 	}
 
 	return event, multierr.Combine(errs...)
+}
+
+func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {
+	if err := event.Delete(field); err != nil {
+		if !f.IgnoreMissing || err != common.ErrKeyNotFound {
+			*errs = append(*errs, errors.Wrapf(err, "failed to drop field [%v]", field))
+		}
+	}
 }
 
 func (f *dropFields) String() string {
