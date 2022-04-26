@@ -183,7 +183,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	// log := l.broker.logger
 	// log.Debugf("try reserve %v events", req.sz)
 
-	start, buf := l.buf.reserve(req.sz)
+	start, buf := l.buf.reserve(req.entryCount)
 	count := len(buf)
 	if count == 0 {
 		panic("empty batch returned")
@@ -191,7 +191,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 
 	ackCH := newBatchACKer(start, count, l.buf.entries)
 
-	req.resp <- getResponse{ackCH, buf}
+	req.responseChan <- getResponse{ackCH.ch, buf}
 	l.pendingACKs.append(ackCH)
 	l.schedACKS = l.broker.scheduledACKs
 }
@@ -411,7 +411,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 		panic("empty buffer in flush list")
 	}
 
-	if sz := req.sz; sz > 0 {
+	if sz := req.entryCount; sz > 0 {
 		if sz < count {
 			count = sz
 		}
@@ -424,7 +424,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	entries := buf.entries[:count]
 	ackChan := newBatchACKer(0, count, entries)
 
-	req.resp <- getResponse{ackChan, entries}
+	req.responseChan <- getResponse{ackChan.ch, entries}
 	l.pendingACKs.append(ackChan)
 	l.schedACKS = l.broker.scheduledACKs
 

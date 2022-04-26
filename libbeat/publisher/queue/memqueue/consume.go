@@ -37,7 +37,7 @@ type consumer struct {
 type batch struct {
 	consumer *consumer
 	events   []publisher.Event
-	ack      *batchACKer
+	ackChan  chan batchAckMsg
 }
 
 func newConsumer(b *broker) *consumer {
@@ -54,7 +54,7 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 	}
 
 	select {
-	case c.broker.requests <- getRequest{sz: sz, resp: c.resp}:
+	case c.broker.requests <- getRequest{entryCount: sz, responseChan: c.resp}:
 	case <-c.done:
 		return nil, io.EOF
 	}
@@ -70,7 +70,7 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 	return &batch{
 		consumer: c,
 		events:   events,
-		ack:      resp.ack,
+		ackChan:  resp.ackChan,
 	}, nil
 }
 
@@ -87,5 +87,5 @@ func (b *batch) Events() []publisher.Event {
 }
 
 func (b *batch) ACK() {
-	b.ack.ch <- batchAckMsg{}
+	b.ackChan <- batchAckMsg{}
 }

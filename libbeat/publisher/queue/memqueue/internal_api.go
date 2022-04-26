@@ -39,12 +39,12 @@ type producerCancelResponse struct {
 // consumer -> broker API
 
 type getRequest struct {
-	sz   int              // request sz events from the broker
-	resp chan getResponse // channel to send response to
+	entryCount   int              // request sz events from the broker
+	responseChan chan getResponse // channel to send response to
 }
 
 type getResponse struct {
-	ack     *batchACKer
+	ackChan chan batchAckMsg
 	entries []queueEntry
 }
 

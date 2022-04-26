@@ -24,12 +24,12 @@ import (
 )
 
 // Internal event ring buffer.
-// The ring is split into 2 regions.
-// Region A contains active events to be send to consumers, while region B can
-// only be filled by producers, if there is no more space in region A. Splitting
-// the ring buffer into regions enables the broker to send batches of type
-// []publisher.Event to the consumer without having to copy and/or grow/shrink the
-// buffers.
+// The ring is split into 2 contiguous regions.
+// Events are appended to region A until it grows to the end of the internal
+// buffer. Then region B is created at the beginning of the internal buffer,
+// and events are inserted there until region A is emptied. When A becomes empty,
+// we rename region B to region A, and the cycle repeats every time we wrap around
+// the internal array storage.
 type ringBuffer struct {
 	logger *logp.Logger
 
