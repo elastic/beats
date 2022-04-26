@@ -174,14 +174,21 @@ func TestInputStop_Wait(t *testing.T) {
 	eventProcessing.Wait()
 	require.Equal(t, 1, bay.GetConnectedCount())
 
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
-		time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
-		for range eventsCh {
-		}
+		require.Equal(t, 1, bay.GetConnectedCount()) // current open channels count should be 1
+		event := <-eventsCh
+		assertEventMatches(t, expected, event) // wait for single event
+		wg.Done()
+		time.Sleep(100 * time.Millisecond)           // let input.Stop() be executed.
+		require.Equal(t, 0, bay.GetConnectedCount()) // current open channels count should be 0
 	}()
 
+	time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
+
+	wg.Wait()
 	input.Wait()
-	require.Equal(t, 0, bay.GetConnectedCount())
 }
 
 func TestMultiInput(t *testing.T) {
@@ -191,8 +198,14 @@ func TestMultiInput(t *testing.T) {
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
+	const numMessages = 2
+
+	var eventProcessing sync.WaitGroup
+	eventProcessing.Add(numMessages)
+
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
+			eventProcessing.Done()
 			eventsCh <- event
 			return true
 		},
@@ -258,6 +271,8 @@ func TestMultiInput(t *testing.T) {
 	input2.Run()
 	defer input2.Stop()
 
+	eventProcessing.Wait()
+
 	for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
 		channel, err := event.GetValue("cometd.channel_name")
 		require.NoError(t, err)
@@ -290,7 +305,7 @@ func TestStop(t *testing.T) {
 	input.Stop()
 	select {
 	case <-workerCtx.Done():
-	default:
+	case <-time.After(time.Second): // let input.Stop() be executed.
 		require.NoError(t, fmt.Errorf("input is not stopped."))
 	}
 }
