@@ -24,7 +24,6 @@ package memqueue
 // Producer ACKs are run in the ackLoop go-routine.
 type ackLoop struct {
 	broker   *broker
-	sig      chan batchAckMsg
 	ackChans chanList
 
 	totalACK uint64
@@ -44,6 +43,7 @@ func (l *ackLoop) run() {
 		// loop, as the ack loop will not block on any channel
 		ackCount int
 		ackChan  chan int
+		sig      chan batchAckMsg
 	)
 
 	for {
@@ -57,7 +57,7 @@ func (l *ackLoop) run() {
 		case chanList := <-l.broker.scheduledACKs:
 			l.ackChans.concat(&chanList)
 
-		case <-l.sig:
+		case <-sig:
 			ackCount += l.handleBatchSig()
 			if ackCount > 0 {
 				ackChan = l.broker.acks
@@ -70,7 +70,7 @@ func (l *ackLoop) run() {
 		// log.Debug("ackloop:   total batches scheduled = ", l.batchesSched)
 		// log.Debug("ackloop:   total batches ack = ", l.batchesACKed)
 
-		l.sig = l.ackChans.channel()
+		sig = l.ackChans.channel()
 		// if l.sig == nil {
 		// 	log.Debug("ackloop: no ack scheduled")
 		// } else {
