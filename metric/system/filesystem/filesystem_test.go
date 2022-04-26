@@ -54,7 +54,7 @@ func TestFileSystemList(t *testing.T) {
 	}
 	hostfs := resolve.NewTestResolver("/")
 	//Exclude FS types that will give us a permission error
-	fss, err := GetFilesystems(hostfs, BuildFilterWithList([]string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs"}))
+	fss, err := GetFilesystems(hostfs, BuildFilterWithList([]string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}))
 	if err != nil {
 		t.Fatal("GetFileSystemList", err)
 	}
