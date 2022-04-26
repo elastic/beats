@@ -401,7 +401,9 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 }
 
 func (b *Beat) launch(settings Settings, bt beat.Creator) error {
-	defer logp.Sync()
+	defer func() {
+		_ = logp.Sync()
+	}()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	defer func() {
@@ -423,7 +425,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
-	defer bl.unlock()
+	defer func() {
+		_ = bl.unlock()
+	}()
 
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
@@ -443,10 +447,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if b.Config.HTTP.Enabled() {
 		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
-			return errw.Wrap(err, "could not start the HTTP server for the API")
+			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
 		s.Start()
-		defer s.Stop()
+		defer func() {
+			_ = s.Stop()
+		}()
 		if b.Config.HTTPPprof.Enabled() {
 			s.AttachPprof()
 		}
@@ -524,7 +530,7 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 			return err
 		}
 
-		fmt.Println("Config OK")
+		fmt.Println("Config OK") //nolint:forbidigo // required to give feedback to user
 		return beat.GracefulExit
 	}())
 }
@@ -560,7 +566,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		if setup.IndexManagement || setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
 			if outCfg.Name() != "elasticsearch" {
-				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
+				return fmt.Errorf("index management requested but the Elasticsearch output is not configured/enabled")
 			}
 			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
 			if err != nil {
@@ -576,12 +582,12 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
-				fmt.Println(warn)
+				fmt.Println(warn) //nolint:forbidigo // required to give feedback to user
 			}
 			if err = m.Setup(loadTemplate, loadILM); err != nil {
 				return err
 			}
-			fmt.Println("Index setup finished.")
+			fmt.Println("Index setup finished.") //nolint:forbidigo // required to give feedback to user
 		}
 
 		if setup.Dashboard && settings.HasDashboards {
@@ -589,10 +595,9 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			err = b.loadDashboards(context.Background(), true)
 
 			if err != nil {
-				switch err := errw.Cause(err).(type) {
-				case *dashboards.ErrNotFound:
+				if errors.Is(err, dashboards.ErrNotFound) {
 					fmt.Printf("Skipping loading dashboards, %+v\n", err)
-				default:
+				} else {
 					return err
 				}
 			} else {
@@ -648,7 +653,7 @@ func (b *Beat) configure(settings Settings) error {
 	if settings.DisableConfigResolver {
 		common.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else {
-		// TODO: Allow the options to be more flexible for dynamic changes
+		// Must allow the options to be more flexible for dynamic changes
 		common.OverwriteConfigOpts(configOpts(store))
 	}
 
@@ -1111,7 +1116,7 @@ func logSystemInfo(info beat.Info) {
 }
 
 // configOpts returns ucfg config options with a resolver linked to the current keystore.
-// TODO: Refactor to allow insert into the config option array without having to redefine everything
+// Refactor to allow insert into the config option array without having to redefine everything
 func configOpts(store keystore.Keystore) []ucfg.Option {
 	return []ucfg.Option{
 		ucfg.PathSep("."),

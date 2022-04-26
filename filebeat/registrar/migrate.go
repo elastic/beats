@@ -184,7 +184,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 
 	origDataFile := filepath.Join(regHome, "data.json")
 	if !isFile(origDataFile) {
-		return fmt.Errorf("missing original data file at: %v: %w", origDataFile, err)
+		return fmt.Errorf("missing original data file at: %v", origDataFile)
 	}
 
 	// read states from file and ensure file is closed immediately.
