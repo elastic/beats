@@ -303,13 +303,13 @@ def generateStages(Map args = [:]) {
 def cloud(Map args = [:]) {
   withGithubNotify(context: args.context) {
     withNode(labels: args.label, forceWorkspace: true){
-      startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
-    }
-    withCloudTestEnv(args) {
-      try {
-        target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
-      } finally {
-        terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
+      withCloudTestEnv(args) {
+        startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
+        try {
+          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
+        } finally {
+          terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
+        }
       }
     }
   }
@@ -556,11 +556,20 @@ def e2e_with_entrypoint(Map args = [:]) {
 }
 
 /**
+* This method runs in a node
+*/
+def target(Map args = [:]) {
+  withNode(labels: args.label, forceWorkspace: true){
+    targetWithoutNode(args)
+  }
+}
+
+/**
 * This method runs the given command supporting two kind of scenarios:
 *  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
-def target(Map args = [:]) {
+def targetWithoutNode(Map args = [:]) {
   def command = args.command
   def context = args.context
   def directory = args.get('directory', '')
@@ -572,34 +581,32 @@ def target(Map args = [:]) {
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
-  withNode(labels: args.label, forceWorkspace: true){
-    withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
-        dumpVariables()
-        withTools(k8s: installK8s, gcp: withGCP) {
-          // make commands use -C <folder> while mage commands require the dir(folder)
-          // let's support this scenario with the location variable.
-          dir(isMage ? directory : '') {
-            if (enableRetry) {
-              // Retry the same command to bypass any kind of flakiness.
-              // Downside: genuine failures will be repeated.
-              retry(3) {
-                cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
-              }
-            } else {
+  withGithubNotify(context: "${context}") {
+    withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+      dumpVariables()
+      withTools(k8s: installK8s, gcp: withGCP) {
+        // make commands use -C <folder> while mage commands require the dir(folder)
+        // let's support this scenario with the location variable.
+        dir(isMage ? directory : '') {
+          if (enableRetry) {
+            // Retry the same command to bypass any kind of flakiness.
+            // Downside: genuine failures will be repeated.
+            retry(3) {
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
             }
+          } else {
+            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
-        // Publish packages should happen always to easily consume those artifacts if the
-        // e2e were triggered and failed.
-        if (isPackaging) {
-          publishPackages("${directory}")
-          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
-        }
-        if(isE2E) {
-          e2e(args)
-        }
+      }
+      // Publish packages should happen always to easily consume those artifacts if the
+      // e2e were triggered and failed.
+      if (isPackaging) {
+        publishPackages("${directory}")
+        pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
+      }
+      if(isE2E) {
+        e2e(args)
       }
     }
   }
@@ -900,26 +907,24 @@ def startCloudTestEnv(Map args = [:]) {
   String name = normalise(args.name)
   def dirs = args.get('dirs',[])
   stage("${name}-prepare-cloud-env"){
-    withCloudTestEnv(args) {
-      withBeatsEnv(archive: false, withModule: false) {
-        try {
-          dirs?.each { folder ->
-            retryWithSleep(retries: 2, seconds: 5, backoff: true){
-              terraformApply(folder)
-            }
+    withBeatsEnv(archive: false, withModule: false) {
+      try {
+        dirs?.each { folder ->
+          retryWithSleep(retries: 2, seconds: 5, backoff: true){
+            terraformApply(folder)
           }
-        } catch(err) {
-          dirs?.each { folder ->
-            // If it failed then cleanup without failing the build
-            sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
-          }
-          error('startCloudTestEnv: terraform apply failed.')
-        } finally {
-          // Archive terraform states in case manual cleanup is needed.
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
         }
-        stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+      } catch(err) {
+        dirs?.each { folder ->
+          // If it failed then cleanup without failing the build
+          sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
+        }
+        error('startCloudTestEnv: terraform apply failed.')
+      } finally {
+        // Archive terraform states in case manual cleanup is needed.
+        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
     }
   }
 }
@@ -949,12 +954,10 @@ def terraformCleanup(Map args = [:]) {
   String name = normalise(args.name)
   String directory = args.dir
   stage("${name}-tear-down-cloud-env"){
-    withCloudTestEnv(args) {
-      withBeatsEnv(archive: false, withModule: false) {
-        unstash("terraform-${name}")
-        retryWithSleep(retries: 2, seconds: 5, backoff: true) {
-          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
-        }
+    withBeatsEnv(archive: false, withModule: false) {
+      unstash("terraform-${name}")
+      retryWithSleep(retries: 2, seconds: 5, backoff: true) {
+        sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
       }
     }
   }
