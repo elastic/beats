@@ -21,8 +21,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -146,8 +145,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	for _, followerIndex := range data.FollowStats.Indices {
 		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
-			event.RootFields = common.MapStr{}
-			event.ModuleFields = common.MapStr{}
+			event.RootFields = mapstr.M{}
+			event.ModuleFields = mapstr.M{}
 
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 			event.ModuleFields.Put("cluster.name", info.ClusterName)

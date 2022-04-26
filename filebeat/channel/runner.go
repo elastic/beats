@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type onCreateFactory struct {
@@ -155,7 +156,7 @@ func newCommonConfigEditor(
 		setOptional(fields, "service.type", serviceType)
 		setOptional(fields, "input.type", config.Type)
 		if config.Module != "" {
-			event := common.MapStr{"module": config.Module}
+			event := mapstr.M{"module": config.Module}
 			if config.Fileset != "" {
 				event["dataset"] = config.Module + "." + config.Fileset
 			}
@@ -188,7 +189,7 @@ func newCommonConfigEditor(
 	}, nil
 }
 
-func setOptional(to common.MapStr, key string, value string) {
+func setOptional(to mapstr.M, key string, value string) {
 	if value != "" {
 		to.Put(key, value)
 	}

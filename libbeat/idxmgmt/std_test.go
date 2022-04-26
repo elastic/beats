@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type mockClientHandler struct {
@@ -113,7 +114,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		imCfg    map[string]interface{}
 		cfg      map[string]interface{}
 		want     nameFunc
-		meta     common.MapStr
+		meta     mapstr.M
 	}{
 		"without ilm": {
 			ilmCalls: noILM,
@@ -129,7 +130,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test"),
-			meta: common.MapStr{
+			meta: mapstr.M{
 				"index": "test",
 			},
 		},
@@ -137,7 +138,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test"),
-			meta: common.MapStr{
+			meta: mapstr.M{
 				"index": "Test",
 			},
 		},
@@ -155,7 +156,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("event-index"),
-			meta: common.MapStr{
+			meta: mapstr.M{
 				"index": "event-index",
 			},
 		},
@@ -195,9 +196,9 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			meta := test.meta
 			idx, err := sel.Select(&beat.Event{
 				Timestamp: ts,
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"test": "value",
-					"agent": common.MapStr{
+					"agent": mapstr.M{
 						"version": "9.9.9",
 					},
 				},
@@ -252,7 +253,7 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(common.MapStr{
+			cfg, err := common.NewConfigFrom(mapstr.M{
 				"setup.ilm.enabled":      setup.ilmEnabled,
 				"setup.ilm.overwrite":    setup.ilmOverwrite,
 				"setup.template.enabled": setup.tmplEnabled,
@@ -279,10 +280,10 @@ func TestIndexManager_Setup(t *testing.T) {
 		}
 
 		if c.Settings.Index != nil {
-			c.Settings.Index = (map[string]interface{})(common.MapStr(c.Settings.Index).Clone())
+			c.Settings.Index = (map[string]interface{})(mapstr.M(c.Settings.Index).Clone())
 		}
 		if c.Settings.Source != nil {
-			c.Settings.Source = (map[string]interface{})(common.MapStr(c.Settings.Source).Clone())
+			c.Settings.Source = (map[string]interface{})(mapstr.M(c.Settings.Source).Clone())
 		}
 		return c
 	}
@@ -308,7 +309,7 @@ func TestIndexManager_Setup(t *testing.T) {
 	defaultCfg := template.DefaultConfig(info)
 
 	cases := map[string]struct {
-		cfg                   common.MapStr
+		cfg                   mapstr.M
 		loadTemplate, loadILM LoadMode
 
 		err     bool
@@ -325,7 +326,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			policy: "test",
 		},
 		"template default ilm default with policy changed": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.ilm.policy_name": "policy-keep",
 			},
 			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
@@ -337,14 +338,14 @@ func TestIndexManager_Setup(t *testing.T) {
 			policy: "policy-keep",
 		},
 		"template default ilm disabled": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.ilm.enabled": false,
 			},
 			loadTemplate: LoadModeEnabled,
 			tmplCfg:      &defaultCfg,
 		},
 		"template default loadMode Overwrite ilm disabled": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.ilm.enabled": false,
 			},
 			loadTemplate: LoadModeOverwrite,
@@ -355,7 +356,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			}),
 		},
 		"template default loadMode Force ilm disabled": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.ilm.enabled": false,
 				"name":              "test-9.9.9",
 				"pattern":           "test-9.9.9",
@@ -366,26 +367,26 @@ func TestIndexManager_Setup(t *testing.T) {
 			}),
 		},
 		"template loadMode disabled ilm disabled": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.ilm.enabled": false,
 			},
 			loadTemplate: LoadModeDisabled,
 		},
 		"template disabled ilm default": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.template.enabled": false,
 			},
 			policy: "test",
 		},
 		"template disabled ilm disabled, loadMode Overwrite": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.template.enabled": false,
 				"setup.ilm.enabled":      false,
 			},
 			loadILM: LoadModeOverwrite,
 		},
 		"template disabled ilm disabled loadMode Force": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"setup.template.enabled": false,
 				"setup.ilm.enabled":      false,
 			},

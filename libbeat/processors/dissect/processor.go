@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const flagParsingError = "dissect_parsing_error"
@@ -118,7 +119,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, error) {
+func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 	prefix := ""
 	if p.config.TargetPrefix != "" {
 		prefix = p.config.TargetPrefix + "."
@@ -146,16 +147,16 @@ func (p *processor) String() string {
 		",target_prefix=" + p.config.TargetPrefix
 }
 
-func mapToMapStr(m Map) common.MapStr {
-	newMap := make(common.MapStr, len(m))
+func mapToMapStr(m Map) mapstr.M {
+	newMap := make(mapstr.M, len(m))
 	for k, v := range m {
 		newMap[k] = v
 	}
 	return newMap
 }
 
-func mapInterfaceToMapStr(m MapConverted) common.MapStr {
-	newMap := make(common.MapStr, len(m))
+func mapInterfaceToMapStr(m MapConverted) mapstr.M {
+	newMap := make(mapstr.M, len(m))
 	for k, v := range m {
 		newMap[k] = v
 	}

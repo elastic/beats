@@ -20,9 +20,8 @@ package collector
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestSplitTagsFromMetricName(t *testing.T) {
@@ -30,7 +29,7 @@ func TestSplitTagsFromMetricName(t *testing.T) {
 		title string
 		name  string
 		key   string
-		tags  common.MapStr
+		tags  mapstr.M
 	}{
 		{
 			title: "no tags",
@@ -45,12 +44,12 @@ func TestSplitTagsFromMetricName(t *testing.T) {
 			title: "standard tags",
 			name:  "metric{key1=var1, key2=var2}",
 			key:   "metric",
-			tags:  common.MapStr{"key1": "var1", "key2": "var2"},
+			tags:  mapstr.M{"key1": "var1", "key2": "var2"},
 		}, {
 			title: "standard tags (no space)",
 			name:  "metric{key1=var1,key2=var2}",
 			key:   "metric",
-			tags:  common.MapStr{"key1": "var1", "key2": "var2"},
+			tags:  mapstr.M{"key1": "var1", "key2": "var2"},
 		}, {
 			title: "empty parameter",
 			name:  "metric/{}",
@@ -58,22 +57,22 @@ func TestSplitTagsFromMetricName(t *testing.T) {
 			title: "empty key or value",
 			name:  "metric{=var1, key2=}",
 			key:   "metric",
-			tags:  common.MapStr{"": "var1", "key2": ""},
+			tags:  mapstr.M{"": "var1", "key2": ""},
 		}, {
 			title: "empty key and value",
 			name:  "metric{=}",
 			key:   "metric",
-			tags:  common.MapStr{"": ""},
+			tags:  mapstr.M{"": ""},
 		}, {
 			title: "extra comma",
 			name:  "metric{a=b,}",
 			key:   "metric",
-			tags:  common.MapStr{"a": "b"},
+			tags:  mapstr.M{"a": "b"},
 		}, {
 			title: "extra comma and space",
 			name:  "metric{a=b, }",
 			key:   "metric",
-			tags:  common.MapStr{"a": "b"},
+			tags:  mapstr.M{"a": "b"},
 		}, {
 			title: "extra comma and space",
 			name:  "metric{,a=b}",

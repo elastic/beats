@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type decodeJSONFields struct {
@@ -122,7 +123,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
-			event.SetErrorWithOption(common.MapStr{
+			event.SetErrorWithOption(mapstr.M{
 				"message": "parsing input as JSON: " + err.Error(),
 				"data":    text,
 				"field":   field,
@@ -138,10 +139,10 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		var id string
 		if key := f.documentID; key != "" {
 			if dict, ok := output.(map[string]interface{}); ok {
-				if tmp, err := common.MapStr(dict).GetValue(key); err == nil {
+				if tmp, err := mapstr.M(dict).GetValue(key); err == nil {
 					if v, ok := tmp.(string); ok {
 						id = v
-						common.MapStr(dict).Delete(key)
+						mapstr.M(dict).Delete(key)
 					}
 				}
 			}
@@ -166,7 +167,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 
 		if id != "" {
 			if event.Meta == nil {
-				event.Meta = common.MapStr{}
+				event.Meta = mapstr.M{}
 			}
 			event.Meta[events.FieldMetaID] = id
 		}

@@ -12,11 +12,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // TestPromHistogramToES tests that calling PromHistogramToES multiple
@@ -24,7 +23,7 @@ import (
 func TestPromHistogramToES(t *testing.T) {
 	type sample struct {
 		histogram dto.Histogram
-		expected  common.MapStr
+		expected  mapstr.M
 	}
 
 	cases := map[string]struct {
@@ -43,7 +42,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0},
 						"values": []float64{0.495},
 					},
@@ -63,7 +62,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0},
 						"values": []float64{0.495},
 					},
@@ -79,7 +78,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{2},
 						"values": []float64{0.495},
 					},
@@ -99,7 +98,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0},
 						"values": []float64{0.495},
 					},
@@ -120,7 +119,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{2, 0},
 						"values": []float64{0.495, 5.49},
 					},
@@ -140,7 +139,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{1, 1},
 						"values": []float64{0.495, 5.49},
 					},
@@ -160,7 +159,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0, 1},
 						"values": []float64{0.495, 5.49},
 					},
@@ -180,7 +179,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0},
 						"values": []float64{0.495},
 					},
@@ -201,7 +200,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0, 2},
 						"values": []float64{0.045, 0.54},
 					},
@@ -221,7 +220,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{1, 1},
 						"values": []float64{0.045, 0.54},
 					},
@@ -241,7 +240,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{1, 0},
 						"values": []float64{0.045, 0.54},
 					},
@@ -265,7 +264,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0, 0},
 						"values": []float64{0.045, 0.54},
 					},
@@ -290,7 +289,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{1, 0, 1},
 						"values": []float64{0.045, 0.29000000000000004, 0.74},
 					},
@@ -314,7 +313,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{1, 1, 1},
 						"values": []float64{0.045, 0.29000000000000004, 0.74},
 					},
@@ -338,7 +337,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{1, 0, 1},
 						"values": []float64{0.045, 0.29000000000000004, 0.74},
 					},
@@ -362,7 +361,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{0, 0},
 						"values": []float64{0.045, 0.54},
 					},
@@ -382,7 +381,7 @@ func TestPromHistogramToES(t *testing.T) {
 							},
 						},
 					},
-					expected: common.MapStr{
+					expected: mapstr.M{
 						"counts": []uint64{2, 0},
 						"values": []float64{0.045, 0.54},
 					},
@@ -392,7 +391,7 @@ func TestPromHistogramToES(t *testing.T) {
 	}
 
 	metricName := "somemetric"
-	labels := common.MapStr{}
+	labels := mapstr.M{}
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {

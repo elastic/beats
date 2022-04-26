@@ -8,8 +8,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	dto "github.com/prometheus/client_model/go"
 )
 
@@ -27,7 +26,7 @@ import (
 //  - undoing counters accumulation for each bucket (counts)
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/master/histogram.html
-func PromHistogramToES(cc CounterCache, name string, labels common.MapStr, histogram *dto.Histogram) common.MapStr {
+func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram *dto.Histogram) mapstr.M {
 	var values []float64
 	var counts []uint64
 
@@ -71,7 +70,7 @@ func PromHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 		prevCount = bucket.GetCumulativeCount()
 	}
 
-	res := common.MapStr{
+	res := mapstr.M{
 		"values": values,
 		"counts": counts,
 	}

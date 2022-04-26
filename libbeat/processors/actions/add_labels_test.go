@@ -20,7 +20,7 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestAddLabels(t *testing.T) {
@@ -29,30 +29,30 @@ func TestAddLabels(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"add label": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"labels": common.MapStr{"label": "test"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"labels": mapstr.M{"label": "test"},
 			},
 			cfg: single(`{add_labels: {labels: {label: test}}}`),
 		},
 		"add dotted label": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"labels": common.MapStr{"a.b": "test"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"labels": mapstr.M{"a.b": "test"},
 			},
 			cfg: single(`{add_labels: {labels: {a.b: test}}}`),
 		},
 		"add nested labels": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"labels": common.MapStr{"a.b": "test", "a.c": "test2"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"labels": mapstr.M{"a.b": "test", "a.c": "test2"},
 			},
 			cfg: single(`{add_labels: {labels: {a: {b: test, c: test2}}}}`),
 		},
 		"merge labels": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"labels": common.MapStr{"l1": "a", "l2": "b", "lc": "b"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"labels": mapstr.M{"l1": "a", "l2": "b", "lc": "b"},
 			},
 			cfg: multi(
 				`{add_labels.labels: {l1: a, lc: a}}`,
@@ -60,9 +60,9 @@ func TestAddLabels(t *testing.T) {
 			),
 		},
 		"add array": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"labels": common.MapStr{
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"labels": mapstr.M{
 					"array.0":       "foo",
 					"array.1":       "bar",
 					"array.2.hello": "world",

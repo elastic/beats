@@ -28,8 +28,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var latencyCapturer = regexp.MustCompile(`(\d+)/(\d+)/(\d+)`)
@@ -41,7 +41,7 @@ var fieldsCapturer = regexp.MustCompile(`^([a-zA-Z\s]+):\s(\d+)`)
 var versionCapturer = regexp.MustCompile(`:\s(.*),`)
 var dateCapturer = regexp.MustCompile(`built on (.*)`)
 
-func parseSrvr(i io.Reader, logger *logp.Logger) (common.MapStr, string, error) {
+func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 	scanner := bufio.NewScanner(i)
 
 	//Get version
@@ -51,7 +51,7 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (common.MapStr, string, error) 
 		return nil, "", errors.New("no initial successful text scan, aborting")
 	}
 
-	output := common.MapStr{}
+	output := mapstr.M{}
 
 	version := versionCapturer.FindStringSubmatch(scanner.Text())[1]
 	dateString := dateCapturer.FindStringSubmatch(scanner.Text())[1]
@@ -150,8 +150,8 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (common.MapStr, string, error) 
 	return output, version, nil
 }
 
-func parseZxid(line string) (common.MapStr, error) {
-	output := common.MapStr{}
+func parseZxid(line string) (mapstr.M, error) {
+	output := mapstr.M{}
 
 	zxidSplit := strings.Split(line, " ")
 	if len(zxidSplit) < 2 {
@@ -180,8 +180,8 @@ func parseZxid(line string) (common.MapStr, error) {
 	return output, nil
 }
 
-func parseProposalSizes(line string) (common.MapStr, error) {
-	output := common.MapStr{}
+func parseProposalSizes(line string) (mapstr.M, error) {
+	output := mapstr.M{}
 
 	initialSplit := strings.Split(line, " ")
 	if len(initialSplit) < 4 {
@@ -213,8 +213,8 @@ func parseProposalSizes(line string) (common.MapStr, error) {
 	return output, nil
 }
 
-func parseLatencyLine(line string) (common.MapStr, error) {
-	output := common.MapStr{}
+func parseLatencyLine(line string) (mapstr.M, error) {
+	output := mapstr.M{}
 
 	values := latencyCapturer.FindStringSubmatch(line)
 	if len(values) < 4 {

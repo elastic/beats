@@ -232,17 +232,17 @@ func TestHas(t *testing.T) {
 }
 
 func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
-	newMapStrPointer := func(m common.MapStr) *common.MapStrPointer {
+	newMapStrPointer := func(m mapstr.M) *mapstr.MPointer {
 		p := common.NewMapStrPointer(m)
 		return &p
 	}
 
 	cases := map[string]struct {
-		meta *common.MapStrPointer
+		meta *mapstr.MPointer
 	}{
 		"no dynamic metadata": {},
 		"with dynamic fields": {
-			meta: newMapStrPointer(common.MapStr{"test": 1}),
+			meta: newMapStrPointer(mapstr.M{"test": 1}),
 		},
 	}
 

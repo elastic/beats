@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type testParser struct {
@@ -1331,7 +1332,7 @@ func testCreateTCPTuple() *common.TCPTuple {
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
+func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 	if len(e.events) == 0 {
 		t.Error("No transaction")
 		return nil
@@ -1740,12 +1741,12 @@ func TestHttpParser_hostHeader(t *testing.T) {
 	for _, test := range []struct {
 		title, host string
 		port        uint16
-		expected    common.MapStr
+		expected    mapstr.M
 	}{
 		{
 			title: "domain alone",
 			host:  "elasticsearch",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": "elasticsearch",
 				"url.full":           "http://elasticsearch/_cat/shards",
 			},
@@ -1754,7 +1755,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			title: "domain with port",
 			port:  9200,
 			host:  "elasticsearch:9200",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": "elasticsearch",
 				"url.full":           "http://elasticsearch:9200/_cat/shards",
 			},
@@ -1762,7 +1763,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 		{
 			title: "ipv4",
 			host:  "127.0.0.1",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": nil,
 				"url.full":           "http://127.0.0.1/_cat/shards",
 			},
@@ -1771,7 +1772,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			title: "ipv4 with port",
 			port:  9200,
 			host:  "127.0.0.1:9200",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": nil,
 				"url.full":           "http://127.0.0.1:9200/_cat/shards",
 			},
@@ -1779,7 +1780,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 		{
 			title: "ipv6 unboxed",
 			host:  "fd00::42",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": nil,
 				"url.full":           "http://[fd00::42]/_cat/shards",
 			},
@@ -1787,7 +1788,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 		{
 			title: "ipv6 boxed",
 			host:  "[fd00::42]",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": nil,
 				"url.full":           "http://[fd00::42]/_cat/shards",
 			},
@@ -1796,7 +1797,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			title: "ipv6 boxed with port",
 			port:  9200,
 			host:  "[::1]:9200",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": nil,
 				"url.full":           "http://[::1]:9200/_cat/shards",
 			},
@@ -1806,7 +1807,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			// This one is now illegal but it seems at some point the RFC
 			// didn't enforce the brackets when the port was omitted.
 			host: "fd00::1234",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": nil,
 				"url.full":           "http://[fd00::1234]/_cat/shards",
 			},
@@ -1815,7 +1816,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			title: "non-matching port",
 			port:  80,
 			host:  "myhost:9200",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"destination.domain": "myhost",
 				"url.full":           "http://myhost:9200/_cat/shards",
 				"error.message":      []string{"Unmatched request", "Host header port number mismatch"},
@@ -1857,12 +1858,12 @@ func TestHttpParser_Extension(t *testing.T) {
 	http := httpModForTests(&store)
 	for _, test := range []struct {
 		title, path string
-		expected    common.MapStr
+		expected    mapstr.M
 	}{
 		{
 			title: "Zip Extension",
 			path:  "/files.zip",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"url.full":      "http://abc.com/files.zip",
 				"url.extension": "zip",
 			},
@@ -1870,7 +1871,7 @@ func TestHttpParser_Extension(t *testing.T) {
 		{
 			title: "No Extension",
 			path:  "/files",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"url.full":      "http://abc.com/files",
 				"url.extension": nil,
 			},

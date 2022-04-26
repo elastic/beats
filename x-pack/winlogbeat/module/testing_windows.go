@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register javascript modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
@@ -80,7 +81,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Open evtx file.
-	log, err := eventlog.New(common.MustNewConfigFrom(common.MapStr{
+	log, err := eventlog.New(common.MustNewConfigFrom(mapstr.M{
 		"name":           path,
 		"api":            "wineventlog",
 		"no_more_events": "stop",
@@ -95,7 +96,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Load javascript processor.
-	processor, err := javascript.New(common.MustNewConfigFrom(common.MapStr{
+	processor, err := javascript.New(common.MustNewConfigFrom(mapstr.M{
 		"file": pipeline,
 	}))
 	if err != nil {
@@ -103,7 +104,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Read and process events.
-	var events []common.MapStr
+	var events []mapstr.M
 	for stop := false; !stop; {
 		records, err := log.Read()
 		if err == io.EOF {
@@ -182,7 +183,7 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 	return false
 }
 
-func writeGolden(t testing.TB, source string, events []common.MapStr) {
+func writeGolden(t testing.TB, source string, events []mapstr.M) {
 	data, err := json.MarshalIndent(events, "", "  ")
 	if err != nil {
 		t.Fatal(err)
@@ -198,7 +199,7 @@ func writeGolden(t testing.TB, source string, events []common.MapStr) {
 	}
 }
 
-func readGolden(t testing.TB, source string) []common.MapStr {
+func readGolden(t testing.TB, source string) []mapstr.M {
 	inPath := filepath.Join("testdata", filepath.Base(source)+".golden.json")
 
 	data, err := ioutil.ReadFile(inPath)
@@ -206,7 +207,7 @@ func readGolden(t testing.TB, source string) []common.MapStr {
 		t.Fatal(err)
 	}
 
-	var events []common.MapStr
+	var events []mapstr.M
 	if err = json.Unmarshal(data, &events); err != nil {
 		t.Fatal(err)
 	}
@@ -217,13 +218,13 @@ func readGolden(t testing.TB, source string) []common.MapStr {
 	return events
 }
 
-func normalize(t testing.TB, m common.MapStr) common.MapStr {
+func normalize(t testing.TB, m mapstr.M) mapstr.M {
 	data, err := json.Marshal(m)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var out common.MapStr
+	var out mapstr.M
 	if err = json.Unmarshal(data, &out); err != nil {
 		t.Fatal(err)
 	}
@@ -232,7 +233,7 @@ func normalize(t testing.TB, m common.MapStr) common.MapStr {
 	return lowercaseGUIDs(out)
 }
 
-func filterEvent(m common.MapStr, ignores []string) common.MapStr {
+func filterEvent(m mapstr.M, ignores []string) mapstr.M {
 	for _, f := range ignores {
 		m.Delete(f)
 	}
@@ -244,7 +245,7 @@ var uppercaseGUIDRegex = regexp.MustCompile(`^{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{
 // lowercaseGUIDs finds string fields that look like GUIDs and converts the hex
 // from uppercase to lowercase. Prior to Windows 2019, GUIDs used uppercase hex
 // (contrary to RFC 4122).
-func lowercaseGUIDs(m common.MapStr) common.MapStr {
+func lowercaseGUIDs(m mapstr.M) mapstr.M {
 	for k, v := range m.Flatten() {
 		str, ok := v.(string)
 		if !ok {
@@ -264,7 +265,7 @@ var (
 
 // assertFieldsAreDocumented validates that all fields contained in the event
 // are documented in a fields.yml file.
-func assertFieldsAreDocumented(t testing.TB, m common.MapStr) {
+func assertFieldsAreDocumented(t testing.TB, m mapstr.M) {
 	t.Helper()
 
 	loadDocumentedFieldsOnce.Do(func() {

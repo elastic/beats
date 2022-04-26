@@ -156,7 +156,7 @@ func newAnnotateProcessor(name string, fn func(*beat.Event)) *processorFn {
 func (p *processorFn) String() string                         { return p.name }
 func (p *processorFn) Run(e *beat.Event) (*beat.Event, error) { return p.fn(e) }
 
-func clientEventMeta(meta common.MapStr, needsCopy bool) *processorFn {
+func clientEventMeta(meta mapstr.M, needsCopy bool) *processorFn {
 	fn := func(event *beat.Event) { addMeta(event, meta) }
 	if needsCopy {
 		fn = func(event *beat.Event) { addMeta(event, meta.Clone()) }
@@ -164,7 +164,7 @@ func clientEventMeta(meta common.MapStr, needsCopy bool) *processorFn {
 	return newAnnotateProcessor("@metadata", fn)
 }
 
-func addMeta(event *beat.Event, meta common.MapStr) {
+func addMeta(event *beat.Event, meta mapstr.M) {
 	if event.Meta == nil {
 		event.Meta = meta
 	} else {
@@ -175,8 +175,8 @@ func addMeta(event *beat.Event, meta common.MapStr) {
 
 func makeAddDynMetaProcessor(
 	name string,
-	meta *common.MapStrPointer,
-	checkCopy func(m common.MapStr) bool,
+	meta *mapstr.MPointer,
+	checkCopy func(m mapstr.M) bool,
 ) *processorFn {
 	return newAnnotateProcessor(name, func(event *beat.Event) {
 		dynFields := meta.Get()
@@ -211,12 +211,12 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 	})
 }
 
-func hasKey(m common.MapStr, key string) bool {
+func hasKey(m mapstr.M, key string) bool {
 	_, exists := m[key]
 	return exists
 }
 
-func hasKeyAnyOf(m, builtin common.MapStr) bool {
+func hasKeyAnyOf(m, builtin mapstr.M) bool {
 	for k := range builtin {
 		if hasKey(m, k) {
 			return true

@@ -24,8 +24,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
@@ -65,29 +65,29 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "ceph", mon["name"])
 	assert.EqualValues(t, "2017-01-19 11:34:50.700723 +0000 UTC", mon["last_updated"].(Tick).Time.String())
 
-	available := mon["available"].(common.MapStr)
+	available := mon["available"].(mapstr.M)
 	assert.EqualValues(t, 4091244, available["kb"])
 	assert.EqualValues(t, 65, available["pct"])
 
-	total := mon["total"].(common.MapStr)
+	total := mon["total"].(mapstr.M)
 	assert.EqualValues(t, 6281216, total["kb"])
 
-	used := mon["used"].(common.MapStr)
+	used := mon["used"].(mapstr.M)
 	assert.EqualValues(t, 2189972, used["kb"])
 
-	store_stats := mon["store_stats"].(common.MapStr)
+	store_stats := mon["store_stats"].(mapstr.M)
 	assert.EqualValues(t, "0.000000", store_stats["last_updated"])
 
-	misc := store_stats["misc"].(common.MapStr)
+	misc := store_stats["misc"].(mapstr.M)
 	assert.EqualValues(t, 840, misc["bytes"])
 
-	log := store_stats["log"].(common.MapStr)
+	log := store_stats["log"].(mapstr.M)
 	assert.EqualValues(t, 8488103, log["bytes"])
 
-	sst := store_stats["sst"].(common.MapStr)
+	sst := store_stats["sst"].(mapstr.M)
 	assert.EqualValues(t, 0, sst["bytes"])
 
-	total = store_stats["total"].(common.MapStr)
+	total = store_stats["total"].(mapstr.M)
 	assert.EqualValues(t, 8488943, total["bytes"])
 }
 

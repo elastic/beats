@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type metricProcessor struct {
@@ -59,7 +60,7 @@ func (m *metricProcessor) RemovePath(path PathConfig) {
 	m.Unlock()
 }
 
-func (p *metricProcessor) Process(event server.Event) (common.MapStr, error) {
+func (p *metricProcessor) Process(event server.Event) (mapstr.M, error) {
 	urlRaw, ok := event.GetMeta()["path"]
 	if !ok {
 		return nil, errors.New("Malformed HTTP event. Path missing.")
@@ -83,7 +84,7 @@ func (p *metricProcessor) Process(event server.Event) (common.MapStr, error) {
 		return nil, errors.New("Request has no data")
 	}
 
-	out := common.MapStr{}
+	out := mapstr.M{}
 	switch contentType {
 	case "application/json":
 		err := json.Unmarshal(bytes, &out)

@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const responseNamespace = "response"
@@ -40,10 +40,10 @@ func (resp *response) clone() *response {
 		c := make([]interface{}, len(t))
 		copy(c, t)
 		clone.body = c
-	case common.MapStr:
+	case mapstr.M:
 		clone.body = t.Clone()
 	case map[string]interface{}:
-		clone.body = common.MapStr(t).Clone()
+		clone.body = mapstr.M(t).Clone()
 	}
 
 	return clone
@@ -168,7 +168,7 @@ func (resp *response) asTransformables(log *logp.Logger) []transformable {
 		tr := transformable{}
 		tr.setHeader(resp.header.Clone())
 		tr.setURL(resp.url)
-		tr.setBody(common.MapStr(m).Clone())
+		tr.setBody(mapstr.M(m).Clone())
 		ts = append(ts, tr)
 	}
 
@@ -191,14 +191,14 @@ func (resp *response) asTransformables(log *logp.Logger) []transformable {
 	return ts
 }
 
-func (resp *response) templateValues() common.MapStr {
+func (resp *response) templateValues() mapstr.M {
 	if resp == nil {
-		return common.MapStr{}
+		return mapstr.M{}
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"header": resp.header.Clone(),
 		"page":   resp.page,
-		"url": common.MapStr{
+		"url": mapstr.M{
 			"value":  resp.url.String(),
 			"params": resp.url.Query(),
 		},

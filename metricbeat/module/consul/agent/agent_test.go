@@ -23,9 +23,8 @@ package agent
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var jsonExample = `{
@@ -258,7 +257,7 @@ func TestEventMapping(t *testing.T) {
 		runtimeI, ok := event["runtime"]
 		assert.True(t, ok)
 
-		runtime, ok := runtimeI.(common.MapStr)
+		runtime, ok := runtimeI.(mapstr.M)
 		assert.True(t, ok)
 
 		//do not overwrite if heapObjectsFound has already been set to true

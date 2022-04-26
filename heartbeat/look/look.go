@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
 )
@@ -32,12 +33,12 @@ import (
 // TODO: This returns a time.Duration, which isn't quite right. time.Duration
 // represents nanos, whereas this really returns millis. It should probably
 // return a plain int64 type instead.
-func RTT(rtt time.Duration) common.MapStr {
+func RTT(rtt time.Duration) mapstr.M {
 	if rtt < 0 {
 		rtt = 0
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		// cast to int64 since a go duration is a nano, but we want micros
 		// This makes the types less confusing because other wise the duration
 		// we get back has the wrong unit
@@ -46,7 +47,7 @@ func RTT(rtt time.Duration) common.MapStr {
 }
 
 // Reason formats an error into an error event field.
-func Reason(err error) common.MapStr {
+func Reason(err error) mapstr.M {
 	if r, ok := err.(reason.Reason); ok {
 		return reason.Fail(r)
 	}

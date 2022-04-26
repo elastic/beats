@@ -24,8 +24,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -272,8 +272,8 @@ func GetContainersInPod(pod *Pod) []*ContainerInPod {
 }
 
 // PodAnnotations returns the annotations in a pod
-func PodAnnotations(pod *Pod) common.MapStr {
-	annotations := common.MapStr{}
+func PodAnnotations(pod *Pod) mapstr.M {
+	annotations := mapstr.M{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
 	}
@@ -281,7 +281,7 @@ func PodAnnotations(pod *Pod) common.MapStr {
 }
 
 // PodNamespaceAnnotations returns the annotations of the namespace of the pod
-func PodNamespaceAnnotations(pod *Pod, watcher Watcher) common.MapStr {
+func PodNamespaceAnnotations(pod *Pod, watcher Watcher) mapstr.M {
 	if watcher == nil {
 		return nil
 	}
@@ -296,7 +296,7 @@ func PodNamespaceAnnotations(pod *Pod, watcher Watcher) common.MapStr {
 		return nil
 	}
 
-	annotations := common.MapStr{}
+	annotations := mapstr.M{}
 	for k, v := range namespace.GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
 	}

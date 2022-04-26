@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type includeFields struct {
@@ -67,7 +68,7 @@ func newIncludeFields(c *common.Config) (processors.Processor, error) {
 }
 
 func (f *includeFields) Run(event *beat.Event) (*beat.Event, error) {
-	filtered := common.MapStr{}
+	filtered := mapstr.M{}
 	var errs []string
 
 	for _, field := range f.Fields {

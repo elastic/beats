@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // CPU manages the CPU metrics from /proc/stat
@@ -128,7 +129,7 @@ type Metrics struct {
 }
 
 // Format returns the final MapStr data object for the metrics.
-func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
+func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 
 	timeDelta := metric.currentSample.Total() - metric.previousSample.Total()
 	if timeDelta <= 0 {
@@ -139,7 +140,7 @@ func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 		normCPU = 1
 	}
 
-	formattedMetrics := common.MapStr{}
+	formattedMetrics := mapstr.M{}
 
 	reportOptMetric := func(name string, current, previous opt.Uint, norm int) {
 		if !current.IsZero() {
@@ -176,8 +177,8 @@ func createTotal(prev, cur CPU, timeDelta uint64, numCPU int) float64 {
 	return common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
 }
 
-func fillMetric(opts MetricOpts, cur, prev opt.Uint, timeDelta uint64, numCPU int) common.MapStr {
-	event := common.MapStr{}
+func fillMetric(opts MetricOpts, cur, prev opt.Uint, timeDelta uint64, numCPU int) mapstr.M {
+	event := mapstr.M{}
 	if opts.Ticks {
 		event.Put("ticks", cur.ValueOr(0))
 	}

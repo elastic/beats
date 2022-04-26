@@ -20,9 +20,8 @@ package cluster_health
 import (
 	"encoding/json"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Timecheck contains part of the response from a HealthRequest
@@ -44,18 +43,18 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventMapping(content []byte) (common.MapStr, error) {
+func eventMapping(content []byte) (mapstr.M, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting HealthRequest data")
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"overall_status": d.Output.OverallStatus,
-		"timechecks": common.MapStr{
+		"timechecks": mapstr.M{
 			"epoch": d.Output.Timechecks.Epoch,
-			"round": common.MapStr{
+			"round": mapstr.M{
 				"value":  d.Output.Timechecks.Round,
 				"status": d.Output.Timechecks.RoundStatus,
 			},

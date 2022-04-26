@@ -30,8 +30,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -39,7 +39,7 @@ import (
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
-	config := common.MapStr{
+	config := mapstr.M{
 		"hosts":   host,
 		"ports":   port,
 		"timeout": "1s",
@@ -159,7 +159,7 @@ func TestCheckUp(t *testing.T) {
 	require.NoError(t, err)
 	defer closeEcho()
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",
@@ -192,7 +192,7 @@ func TestCheckDown(t *testing.T) {
 	require.NoError(t, err)
 	defer closeEcho()
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",

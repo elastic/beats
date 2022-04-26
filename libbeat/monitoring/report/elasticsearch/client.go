@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
@@ -161,7 +162,7 @@ func (c *publishClient) String() string {
 }
 
 func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, typ string) error {
-	meta := common.MapStr{
+	meta := mapstr.M{
 		"_index":   getMonitoringIndexName(),
 		"_routing": nil,
 	}
@@ -176,13 +177,13 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		opType = events.OpTypeIndex
 	}
 
-	action := common.MapStr{
+	action := mapstr.M{
 		opType.String(): meta,
 	}
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"type": typ,
 		typ:    event.Content.Fields,
 	}

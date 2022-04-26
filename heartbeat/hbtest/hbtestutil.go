@@ -36,7 +36,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -127,7 +127,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
-	expected := common.MapStr{}
+	expected := mapstr.M{}
 	// This function is well tested independently, so we just test that things match up here.
 	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
 		Version:           tls.VersionTLS13,
@@ -150,7 +150,7 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
-	expected := common.MapStr{}
+	expected := mapstr.M{}
 	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
 	return lookslike.MustCompile(expected)
 }

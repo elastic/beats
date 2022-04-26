@@ -24,12 +24,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // AddOptional adds a key and value to the given MapStr if the value is not the
 // zero value for the type of v. It is safe to call the function with a nil
 // MapStr.
-func AddOptional(m common.MapStr, key string, v interface{}) {
+func AddOptional(m mapstr.M, key string, v interface{}) {
 	if m != nil && !isZero(v) {
 		_, _ = m.Put(key, v)
 	}
@@ -41,12 +42,12 @@ func AddOptional(m common.MapStr, key string, v interface{}) {
 //
 // The new dictionary is added to the given MapStr and it is also returned for
 // convenience purposes.
-func AddPairs(m common.MapStr, key string, pairs []KeyValue) common.MapStr {
+func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 	if len(pairs) == 0 {
 		return nil
 	}
 
-	h := make(common.MapStr, len(pairs))
+	h := make(mapstr.M, len(pairs))
 	for i, kv := range pairs {
 		// Ignore empty values.
 		if kv.Value == "" {

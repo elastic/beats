@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -101,7 +102,7 @@ func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMs
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybeMsg) error {
+func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.targetInfo.Name)
 	if err != nil && err != common.ErrKeyNotFound { //nolint:errorlint // common.ErrKeyNotFound is never wrapped by GetValue.
 		return err
@@ -209,7 +210,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 
 // sendMessage sends an array or map split result value, v, on ch after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(ctx *transformContext, root common.MapStr, key string, v interface{}, ch chan<- maybeMsg) error {
+func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, ch chan<- maybeMsg) error {
 	obj, ok := toMapStr(v)
 	if !ok {
 		return errExpectedSplitObj
@@ -247,22 +248,22 @@ func (s *split) sendMessage(ctx *transformContext, root common.MapStr, key strin
 	return nil
 }
 
-func toMapStr(v interface{}) (common.MapStr, bool) {
+func toMapStr(v interface{}) (mapstr.M, bool) {
 	if v == nil {
-		return common.MapStr{}, false
+		return mapstr.M{}, false
 	}
 	switch t := v.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return t, true
 	case map[string]interface{}:
-		return common.MapStr(t), true
+		return mapstr.M(t), true
 	}
-	return common.MapStr{}, false
+	return mapstr.M{}, false
 }
 
 // sendMessage sends a string split result value, v, on ch after performing any
 // necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessageSplitString(ctx *transformContext, root common.MapStr, v string, ch chan<- maybeMsg) error {
+func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, ch chan<- maybeMsg) error {
 	clone := root.Clone()
 	_, _ = clone.Put(s.targetInfo.Name, v)
 

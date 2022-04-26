@@ -33,6 +33,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
@@ -87,7 +88,7 @@ func TestInput(t *testing.T) {
 	}
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   groupID,
@@ -162,7 +163,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":                        getTestKafkaHost(),
 		"topics":                       []string{testTopic},
 		"group_id":                     "filebeat",
@@ -218,14 +219,14 @@ func TestInputWithJsonPayload(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   "filebeat",
 		"wait_close": 0,
-		"parsers": []common.MapStr{
+		"parsers": []mapstr.M{
 			{
-				"ndjson": common.MapStr{
+				"ndjson": mapstr.M{
 					"target": "",
 				},
 			},
@@ -280,15 +281,15 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":                        getTestKafkaHost(),
 		"topics":                       []string{testTopic},
 		"group_id":                     "filebeat",
 		"wait_close":                   0,
 		"expand_event_list_from_field": "records",
-		"parsers": []common.MapStr{
+		"parsers": []mapstr.M{
 			{
-				"ndjson": common.MapStr{
+				"ndjson": mapstr.M{
 					"target": "",
 				},
 			},
@@ -346,7 +347,7 @@ func TestSASLAuthentication(t *testing.T) {
 	}
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":          []string{getTestSASLKafkaHost()},
 		"protocol":       "https",
 		"sasl.mechanism": "SCRAM-SHA-512",
@@ -429,7 +430,7 @@ func TestTest(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":    getTestKafkaHost(),
 		"topics":   []string{testTopic},
 		"group_id": "filebeat",
@@ -474,7 +475,7 @@ func checkMatchingHeaders(
 	if err != nil {
 		t.Fatal(err)
 	}
-	kafkaMap, ok := kafka.(common.MapStr)
+	kafkaMap, ok := kafka.(mapstr.M)
 	if !ok {
 		t.Fatal("event.Fields.kafka isn't MapStr")
 	}

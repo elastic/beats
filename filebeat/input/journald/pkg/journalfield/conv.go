@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // FieldConversion provides the mappings and conversion rules for raw fields of journald entries.
@@ -38,7 +38,7 @@ type Conversion struct {
 }
 
 // Converter applis configured conversion rules to journald entries, producing
-// a new common.MapStr.
+// a new mapstr.M.
 type Converter struct {
 	log         *logp.Logger
 	conversions FieldConversion
@@ -54,18 +54,18 @@ func NewConverter(log *logp.Logger, conversions FieldConversion) *Converter {
 	return &Converter{log: log, conversions: conversions}
 }
 
-// Convert creates a common.MapStr from the raw fields by applying the
+// Convert creates a mapstr.M from the raw fields by applying the
 // configured conversion rules.
 // Field type conversion errors are logged to at debug level and the original
 // value is added to the map.
-func (c *Converter) Convert(entryFields map[string]string) common.MapStr {
-	fields := common.MapStr{}
-	var custom common.MapStr
+func (c *Converter) Convert(entryFields map[string]string) mapstr.M {
+	fields := mapstr.M{}
+	var custom mapstr.M
 
 	for entryKey, v := range entryFields {
 		if fieldConversionInfo, ok := c.conversions[entryKey]; !ok {
 			if custom == nil {
-				custom = common.MapStr{}
+				custom = mapstr.M{}
 			}
 			normalized := strings.ToLower(strings.TrimLeft(entryKey, "_"))
 			custom.Put(normalized, v)
@@ -107,7 +107,7 @@ func convertValue(fc Conversion, value string) (interface{}, error) {
 	return value, nil
 }
 
-func withECSEnrichment(fields common.MapStr) common.MapStr {
+func withECSEnrichment(fields mapstr.M) mapstr.M {
 	// from https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html
 	// we see journald.object fields are populated by systemd on behalf of a different program
 	// so we want them to favor their use in root fields as they are the from the effective program
@@ -119,7 +119,7 @@ func withECSEnrichment(fields common.MapStr) common.MapStr {
 	return fields
 }
 
-func setGidUidFields(prefix string, fields common.MapStr) {
+func setGidUidFields(prefix string, fields mapstr.M) {
 	var auditLoginUid string
 	if found, _ := fields.HasKey(prefix + ".audit.login_uid"); found {
 		auditLoginUid = fmt.Sprint(getIntegerFromFields(prefix+".audit.login_uid", fields))
@@ -143,7 +143,7 @@ func setGidUidFields(prefix string, fields common.MapStr) {
 
 var cmdlineRegexp = regexp.MustCompile(`"(\\"|[^"])*?"|[^\s]+`)
 
-func setProcessFields(prefix string, fields common.MapStr) {
+func setProcessFields(prefix string, fields mapstr.M) {
 	if found, _ := fields.HasKey(prefix + ".pid"); found {
 		pid := getIntegerFromFields(prefix+".pid", fields)
 		fields.Put("process.pid", pid)
@@ -173,19 +173,19 @@ func setProcessFields(prefix string, fields common.MapStr) {
 	}
 }
 
-func getStringFromFields(key string, fields common.MapStr) string {
+func getStringFromFields(key string, fields mapstr.M) string {
 	value, _ := fields.GetValue(key)
 	str, _ := value.(string)
 	return str
 }
 
-func getIntegerFromFields(key string, fields common.MapStr) int64 {
+func getIntegerFromFields(key string, fields mapstr.M) int64 {
 	value, _ := fields.GetValue(key)
 	i, _ := value.(int64)
 	return i
 }
 
-func putStringIfNotEmtpy(k, v string, fields common.MapStr) {
+func putStringIfNotEmtpy(k, v string, fields mapstr.M) {
 	if v == "" {
 		return
 	}

@@ -7,8 +7,7 @@ package azure
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
 )
 
@@ -18,7 +17,7 @@ const (
 )
 
 var (
-	AzureEnvs = common.MapStr{
+	AzureEnvs = mapstr.M{
 		"https://management.azure.com/":         "https://login.microsoftonline.com/",
 		"https://management.usgovcloudapi.net/": "https://login.microsoftonline.us/",
 		"https://management.chinacloudapi.cn/":  "https://login.chinacloudapi.cn/",

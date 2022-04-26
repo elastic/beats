@@ -72,6 +72,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	ucfg "github.com/elastic/go-ucfg"
@@ -1050,10 +1051,10 @@ func logSystemInfo(info beat.Info) {
 	log := logp.NewLogger("beat").With(logp.Namespace("system_info"))
 
 	// Beat
-	beat := common.MapStr{
+	beat := mapstr.M{
 		"type": info.Beat,
 		"uuid": info.ID,
-		"path": common.MapStr{
+		"path": mapstr.M{
 			"config": paths.Resolve(paths.Config, ""),
 			"data":   paths.Resolve(paths.Data, ""),
 			"home":   paths.Resolve(paths.Home, ""),
@@ -1063,7 +1064,7 @@ func logSystemInfo(info beat.Info) {
 	log.Infow("Beat info", "beat", beat)
 
 	// Build
-	build := common.MapStr{
+	build := mapstr.M{
 		"commit":  version.Commit(),
 		"time":    version.BuildTime(),
 		"version": info.Version,
@@ -1081,7 +1082,7 @@ func logSystemInfo(info beat.Info) {
 
 	// Process
 	if self, err := sysinfo.Self(); err == nil {
-		process := common.MapStr{}
+		process := mapstr.M{}
 
 		if info, err := self.Info(); err == nil {
 			process["name"] = info.Name

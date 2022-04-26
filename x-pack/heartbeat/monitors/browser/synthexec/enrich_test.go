@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
@@ -29,7 +30,7 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 		PackageVersion:       "1.0.0",
 		Step:                 &Step{Name: name, Index: index, Status: status},
 		Error:                err,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 		URL:                  urlstr,
 	}
 }
@@ -60,14 +61,14 @@ func TestJourneyEnricher(t *testing.T) {
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	journeyEnd := &SynthEvent{
 		Type:                 "journey/end",
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	url1 := "http://example.net/url1"
 	url2 := "http://example.net/url2"
@@ -85,7 +86,7 @@ func TestJourneyEnricher(t *testing.T) {
 	}
 
 	suiteValidator := func() validator.Validator {
-		return lookslike.MustCompile(common.MapStr{
+		return lookslike.MustCompile(mapstr.M{
 			"suite.id":     stdFields.Id,
 			"suite.name":   stdFields.Name,
 			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
@@ -94,7 +95,7 @@ func TestJourneyEnricher(t *testing.T) {
 		})
 	}
 	inlineValidator := func() validator.Validator {
-		return lookslike.MustCompile(common.MapStr{
+		return lookslike.MustCompile(mapstr.M{
 			"monitor.id":   stdFields.Id,
 			"monitor.name": stdFields.Name,
 			"monitor.type": stdFields.Type,
@@ -112,7 +113,7 @@ func TestJourneyEnricher(t *testing.T) {
 		} else {
 			u, _ := url.Parse(url1)
 			// journey end gets a summary
-			v = append(v, lookslike.MustCompile(common.MapStr{
+			v = append(v, lookslike.MustCompile(mapstr.M{
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -178,15 +179,15 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			&journeyEnricher{},
 			&SynthEvent{
 				Type: "stderr",
-				Payload: common.MapStr{
+				Payload: mapstr.M{
 					"message": "Error from synthetics",
 				},
 				PackageVersion: "1.0.0",
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
-					"synthetics": common.MapStr{
-						"payload": common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
+					"synthetics": mapstr.M{
+						"payload": mapstr.M{
 							"message": "Error from synthetics",
 						},
 						"type":            "stderr",
@@ -202,15 +203,15 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			&journeyEnricher{},
 			&SynthEvent{
 				Type: "stdout",
-				Payload: common.MapStr{
+				Payload: mapstr.M{
 					"message": "debug output",
 				},
 				PackageVersion: "1.0.0",
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
-					"synthetics": common.MapStr{
-						"payload": common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
+					"synthetics": mapstr.M{
+						"payload": mapstr.M{
 							"message": "debug output",
 						},
 						"type":            "stdout",
@@ -249,7 +250,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			},
 			true,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"summary": map[string]int{
 						"up":   0,
 						"down": 1,
@@ -269,7 +270,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			},
 			true,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"summary": map[string]int{
 						"up":   1,
 						"down": 0,
@@ -284,7 +285,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			&SynthEvent{Type: "journey/end"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"summary": map[string]int{
 						"up":   1,
 						"down": 0,
@@ -363,7 +364,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	syntherr := &SynthError{
 		Message: "my-errmsg",
@@ -375,7 +376,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	cmdStatus := &SynthEvent{
 		Type:                 "cmd/status",
@@ -413,7 +414,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 				u, _ := url.Parse(badStepUrl)
 				t.Run("summary in journey/end", func(t *testing.T) {
-					v := lookslike.MustCompile(common.MapStr{
+					v := lookslike.MustCompile(mapstr.M{
 						"synthetics.type":     "heartbeat/summary",
 						"url":                 wrappers.URLFields(u),
 						"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -436,7 +437,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 
 	cmdStatus := &SynthEvent{
@@ -468,7 +469,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 
 				u, _ := url.Parse(url1)
 
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"synthetics.type":     "heartbeat/summary",
 					"url":                 wrappers.URLFields(u),
 					"monitor.duration.us": int64(cmdStatus.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -486,7 +487,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 	tests := []struct {
 		name     string
 		je       *journeyEnricher
-		expected common.MapStr
+		expected mapstr.M
 		wantErr  bool
 	}{{
 		name: "completed without errors",
@@ -496,9 +497,9 @@ func TestCreateSummaryEvent(t *testing.T) {
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: true,
 		},
-		expected: common.MapStr{
+		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
-			"summary": common.MapStr{
+			"summary": mapstr.M{
 				"down": 0,
 				"up":   1,
 			},
@@ -514,9 +515,9 @@ func TestCreateSummaryEvent(t *testing.T) {
 			errorCount:      1,
 			firstError:      fmt.Errorf("journey errored"),
 		},
-		expected: common.MapStr{
+		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
-			"summary": common.MapStr{
+			"summary": mapstr.M{
 				"down": 1,
 				"up":   0,
 			},
@@ -530,9 +531,9 @@ func TestCreateSummaryEvent(t *testing.T) {
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
 		},
-		expected: common.MapStr{
+		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
-			"summary": common.MapStr{
+			"summary": mapstr.M{
 				"down": 0,
 				"up":   1,
 			},
@@ -546,8 +547,8 @@ func TestCreateSummaryEvent(t *testing.T) {
 			journeyComplete: false,
 			errorCount:      1,
 		},
-		expected: common.MapStr{
-			"summary": common.MapStr{
+		expected: mapstr.M{
+			"summary": mapstr.M{
 				"down": 1,
 				"up":   0,
 			},
@@ -564,8 +565,8 @@ func TestCreateSummaryEvent(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			common.MergeFields(tt.expected, common.MapStr{
-				"url":                common.MapStr{},
+			common.MergeFields(tt.expected, mapstr.M{
+				"url":                mapstr.M{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
 				"synthetics.journey": Journey{},

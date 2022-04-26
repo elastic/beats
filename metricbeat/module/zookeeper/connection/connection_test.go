@@ -21,8 +21,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,19 +42,19 @@ func TestParser(t *testing.T) {
 	firstLineClient, ok := firstLine.RootFields["client"]
 	assert.True(t, ok)
 
-	firstLineClientMap, ok := firstLineClient.(common.MapStr)
+	firstLineClientMap, ok := firstLineClient.(mapstr.M)
 	assert.True(t, ok)
 
 	secondLineClient, ok := secondLine.RootFields["client"]
 	assert.True(t, ok)
 
-	secondLineClientMap, ok := secondLineClient.(common.MapStr)
+	secondLineClientMap, ok := secondLineClient.(mapstr.M)
 	assert.True(t, ok)
 
 	thirdLineClient, ok := thirdLine.RootFields["client"]
 	assert.True(t, ok)
 
-	thirdLineClientMap, ok := thirdLineClient.(common.MapStr)
+	thirdLineClientMap, ok := thirdLineClient.(mapstr.M)
 	assert.True(t, ok)
 
 	assert.Equal(t, "172.17.0.1", firstLineClientMap["ip"])

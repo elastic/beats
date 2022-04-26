@@ -22,16 +22,17 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Message represents a reader event with timestamp, content and actual number
 // of bytes read from input before decoding.
 type Message struct {
-	Ts      time.Time     // timestamp the content was read
-	Content []byte        // actual content read
-	Bytes   int           // total number of bytes read to generate the message
-	Fields  common.MapStr // optional fields that can be added by reader
-	Meta    common.MapStr // deprecated
+	Ts      time.Time // timestamp the content was read
+	Content []byte    // actual content read
+	Bytes   int       // total number of bytes read to generate the message
+	Fields  mapstr.M  // optional fields that can be added by reader
+	Meta    mapstr.M  // deprecated
 	Private interface{}
 }
 
@@ -53,13 +54,13 @@ func (m *Message) IsEmpty() bool {
 }
 
 // AddFields adds fields to the message.
-func (m *Message) AddFields(fields common.MapStr) {
+func (m *Message) AddFields(fields mapstr.M) {
 	if fields == nil {
 		return
 	}
 
 	if m.Fields == nil {
-		m.Fields = common.MapStr{}
+		m.Fields = mapstr.M{}
 	}
 	m.Fields.Update(fields)
 }
@@ -72,7 +73,7 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 	}
 
 	if m.Fields == nil {
-		m.Fields = common.MapStr{}
+		m.Fields = mapstr.M{}
 	}
 
 	return common.AddTagsWithKey(m.Fields, key, flags)
@@ -84,7 +85,7 @@ func (m *Message) ToEvent() beat.Event {
 
 	if len(m.Content) > 0 {
 		if m.Fields == nil {
-			m.Fields = common.MapStr{}
+			m.Fields = mapstr.M{}
 		}
 		m.Fields["message"] = string(m.Content)
 	}

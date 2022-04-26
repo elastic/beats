@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -61,7 +61,7 @@ func TestSocks5Job(t *testing.T) {
 			defer closeProxy()
 
 			proxyURL := &url.URL{Scheme: "socks5", Host: net.JoinHostPort(proxyIp, fmt.Sprint(proxyPort))}
-			configMap := common.MapStr{
+			configMap := mapstr.M{
 				"hosts":                    host,
 				"ports":                    port,
 				"timeout":                  "1s",

@@ -20,76 +20,75 @@ package jsontransform
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestExpand(t *testing.T) {
 	type data struct {
-		Event    common.MapStr
-		Expected common.MapStr
+		Event    mapstr.M
+		Expected mapstr.M
 		Err      string
 	}
 	tests := []data{
 		{
-			Event: common.MapStr{
+			Event: mapstr.M{
 				"hello.world": 15,
 			},
-			Expected: common.MapStr{
-				"hello": common.MapStr{
+			Expected: mapstr.M{
+				"hello": mapstr.M{
 					"world": 15,
 				},
 			},
 		},
 		{
-			Event: common.MapStr{
+			Event: mapstr.M{
 				"test": 15,
 			},
-			Expected: common.MapStr{
+			Expected: mapstr.M{
 				"test": 15,
 			},
 		},
 		{
-			Event: common.MapStr{
+			Event: mapstr.M{
 				"test":           15,
 				"hello.there":    1,
 				"hello.world.ok": "test",
 				"elastic.for":    "search",
 			},
-			Expected: common.MapStr{
+			Expected: mapstr.M{
 				"test": 15,
-				"hello": common.MapStr{
+				"hello": mapstr.M{
 					"there": 1,
-					"world": common.MapStr{
+					"world": mapstr.M{
 						"ok": "test",
 					},
 				},
-				"elastic": common.MapStr{
+				"elastic": mapstr.M{
 					"for": "search",
 				},
 			},
 		},
 		{
-			Event: common.MapStr{
-				"root": common.MapStr{
+			Event: mapstr.M{
+				"root": mapstr.M{
 					"ok": 1,
 				},
 				"root.shared":        "yes",
 				"root.one.two.three": 4,
 			},
-			Expected: common.MapStr{
-				"root": common.MapStr{
+			Expected: mapstr.M{
+				"root": mapstr.M{
 					"ok":     1,
 					"shared": "yes",
-					"one":    common.MapStr{"two": common.MapStr{"three": 4}},
+					"one":    mapstr.M{"two": mapstr.M{"three": 4}},
 				},
 			},
 		},
 		{
-			Event: common.MapStr{
-				"root": common.MapStr{
+			Event: mapstr.M{
+				"root": mapstr.M{
 					"seven": 1,
 				},
 				"root.seven.eight": 2,
@@ -97,22 +96,22 @@ func TestExpand(t *testing.T) {
 			Err: `cannot expand .*`,
 		},
 		{
-			Event: common.MapStr{
+			Event: mapstr.M{
 				"a.b": 1,
-				"a": common.MapStr{
+				"a": mapstr.M{
 					"b": 2,
 				},
 			},
 			Err: `cannot expand .*`,
 		},
 		{
-			Event: common.MapStr{
-				"a.b": common.MapStr{
-					"c": common.MapStr{
+			Event: mapstr.M{
+				"a.b": mapstr.M{
+					"c": mapstr.M{
 						"d": 1,
 					},
 				},
-				"a.b.c": common.MapStr{
+				"a.b.c": mapstr.M{
 					"d": 2,
 				},
 			},

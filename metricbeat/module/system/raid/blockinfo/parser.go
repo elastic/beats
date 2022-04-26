@@ -26,8 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var debugf = logp.MakeDebug("system.raid")
@@ -155,7 +155,7 @@ func getDisks(path string) (DiskStates, error) {
 	}
 
 	var disks DiskStates
-	disks.States = common.MapStr{}
+	disks.States = mapstr.M{}
 	//This is meant to provide a 'common status' for disks in the array
 	//see https://www.kernel.org/doc/html/v4.15/admin-guide/md.html#md-devices-in-sysfs
 	for _, disk := range devices {

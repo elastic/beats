@@ -26,13 +26,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Tests for the non-cert fields
@@ -40,14 +40,14 @@ func TestAddTLSMetadata(t *testing.T) {
 	// We always test with this one cert because addCertificateMetadata
 	// is tested in detail elsewhere
 	certs := []*x509.Certificate{parseCert(t, elasticCert)}
-	certMetadata := common.MapStr{}
+	certMetadata := mapstr.M{}
 	AddCertMetadata(certMetadata, certs)
 
 	scenarios := []struct {
 		name      string
 		connState tls.ConnectionState
 		duration  time.Duration
-		expected  common.MapStr
+		expected  mapstr.M
 	}{
 		{
 			"simple TLSv1.1",
@@ -59,9 +59,9 @@ func TestAddTLSMetadata(t *testing.T) {
 				ServerName:        "example.net",
 			},
 			time.Duration(1),
-			common.MapStr{
+			mapstr.M{
 				"established":      true,
-				"rtt":              common.MapStr{"handshake": look.RTT(time.Duration(1))},
+				"rtt":              mapstr.M{"handshake": look.RTT(time.Duration(1))},
 				"version_protocol": "tls",
 				"version":          "1.1",
 				"cipher":           "ECDHE-ECDSA-AES-256-CBC-SHA",
@@ -78,9 +78,9 @@ func TestAddTLSMetadata(t *testing.T) {
 				NegotiatedProtocol: "h2",
 			},
 			time.Duration(1),
-			common.MapStr{
+			mapstr.M{
 				"established":      true,
-				"rtt":              common.MapStr{"handshake": look.RTT(time.Duration(1))},
+				"rtt":              mapstr.M{"handshake": look.RTT(time.Duration(1))},
 				"version_protocol": "tls",
 				"version":          "1.2",
 				"cipher":           "ECDHE-ECDSA-AES-256-CBC-SHA",
@@ -92,12 +92,12 @@ func TestAddTLSMetadata(t *testing.T) {
 	for _, s := range scenarios {
 		t.Run(s.name, func(t *testing.T) {
 			// Nest under the TLS namespace to match actual output
-			expected := common.MapStr{"tls": s.expected}
+			expected := mapstr.M{"tls": s.expected}
 
 			// Always add in the cert metadata since we test that in other test funcs, not here
 			expected.DeepUpdate(certMetadata)
 
-			fields := common.MapStr{}
+			fields := mapstr.M{}
 			AddTLSMetadata(fields, s.connState, s.duration)
 			require.Equal(t, expected, fields)
 		})
@@ -115,17 +115,17 @@ func TestAddCertMetadata(t *testing.T) {
 	expectedFields := lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
 		"certificate_not_valid_after":  certNotAfter,
 		"certificate_not_valid_before": certNotBefore,
-		"server": common.MapStr{
-			"hash": common.MapStr{
+		"server": mapstr.M{
+			"hash": mapstr.M{
 				"sha1":   "b7b4b89ef0d0caf39d223736f0fdbb03c7b426f1",
 				"sha256": "12b00d04db0db8caa302bfde043e88f95baceb91e86ac143e93830b4bbec726d",
 			},
-			"x509": common.MapStr{
-				"issuer": common.MapStr{
+			"x509": mapstr.M{
+				"issuer": mapstr.M{
 					"common_name":        "GlobalSign CloudSSL CA - SHA256 - G3",
 					"distinguished_name": "CN=GlobalSign CloudSSL CA - SHA256 - G3,O=GlobalSign nv-sa,C=BE",
 				},
-				"subject": common.MapStr{
+				"subject": mapstr.M{
 					"common_name":        "r2.shared.global.fastly.net",
 					"distinguished_name": "CN=r2.shared.global.fastly.net,O=Fastly\\, Inc.,L=San Francisco,ST=California,C=US",
 				},
@@ -156,7 +156,7 @@ func TestAddCertMetadata(t *testing.T) {
 
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			fields := common.MapStr{}
+			fields := mapstr.M{}
 			AddCertMetadata(fields, scenario.certs)
 			tls, err := fields.GetValue("tls")
 			require.NoError(t, err)

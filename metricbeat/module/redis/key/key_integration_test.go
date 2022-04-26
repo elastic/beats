@@ -27,9 +27,9 @@ import (
 	rd "github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -100,7 +100,7 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 		}
 		id := event.MetricSetFields["id"].(string)
 		assert.Equal(t, fmt.Sprintf("%d:%s", expectedKeyspace, name), id)
-		keyspace := event.ModuleFields["keyspace"].(common.MapStr)
+		keyspace := event.ModuleFields["keyspace"].(mapstr.M)
 		keyspaceID := keyspace["id"].(string)
 		assert.Equal(t, fmt.Sprintf("db%d", expectedKeyspace), keyspaceID)
 	}

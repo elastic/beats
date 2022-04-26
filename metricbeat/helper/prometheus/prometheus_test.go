@@ -27,9 +27,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -207,7 +207,7 @@ func TestPrometheus(t *testing.T) {
 	tests := []struct {
 		mapping  *MetricsMapping
 		msg      string
-		expected []common.MapStr
+		expected []mapstr.M
 	}{
 		{
 			msg: "Simple field map",
@@ -216,9 +216,9 @@ func TestPrometheus(t *testing.T) {
 					"first_metric": Metric("first.metric"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": 1.0,
 					},
 				},
@@ -235,12 +235,12 @@ func TestPrometheus(t *testing.T) {
 					"label2": Label("labels.label2"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": 1.0,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 						"label2": "value2",
 					},
@@ -258,20 +258,20 @@ func TestPrometheus(t *testing.T) {
 					"label3": KeyLabel("labels.label3"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": 1.0,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label3": "Value3",
 					},
 				},
-				common.MapStr{
-					"second": common.MapStr{
+				mapstr.M{
+					"second": mapstr.M{
 						"metric": 0.0,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label3": "othervalue",
 					},
 				},
@@ -289,15 +289,15 @@ func TestPrometheus(t *testing.T) {
 					"label2": Label("labels.label2"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": 1.0,
 					},
-					"second": common.MapStr{
+					"second": mapstr.M{
 						"metric": 0.0,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 						"label2": "value2",
 					},
@@ -315,12 +315,12 @@ func TestPrometheus(t *testing.T) {
 					"label1": KeyLabel("labels.label1"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": "works",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 					},
 				},
@@ -337,15 +337,15 @@ func TestPrometheus(t *testing.T) {
 					"label1": KeyLabel("labels.label1"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": true,
 					},
-					"second": common.MapStr{
+					"second": mapstr.M{
 						"metric": false,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 					},
 				},
@@ -361,12 +361,12 @@ func TestPrometheus(t *testing.T) {
 					"label1": Label("labels.label1"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": "Value3",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 					},
 				},
@@ -382,12 +382,12 @@ func TestPrometheus(t *testing.T) {
 					"label1": Label("labels.label1"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
 						"metric": "foo",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 					},
 				},
@@ -406,14 +406,14 @@ func TestPrometheus(t *testing.T) {
 					"label1": Label("labels.label1"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"first": common.MapStr{
-						"metric": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
+						"metric": mapstr.M{
 							"foo": "FOO",
 						},
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"label1": "value1",
 					},
 				},
@@ -432,7 +432,7 @@ func TestPrometheus(t *testing.T) {
 					"label1": Label("labels.label1"),
 				},
 			},
-			expected: []common.MapStr{},
+			expected: []mapstr.M{},
 		},
 		{
 			msg: "Summary metric",
@@ -441,13 +441,13 @@ func TestPrometheus(t *testing.T) {
 					"summary_metric": Metric("summary.metric"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"summary": common.MapStr{
-						"metric": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"summary": mapstr.M{
+						"metric": mapstr.M{
 							"sum":   234892394.0,
 							"count": uint64(44000),
-							"percentile": common.MapStr{
+							"percentile": mapstr.M{
 								"50": 29735.0,
 								"90": 47103.0,
 								"99": 50681.0,
@@ -464,12 +464,12 @@ func TestPrometheus(t *testing.T) {
 					"histogram_metric": Metric("histogram.metric"),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"histogram": common.MapStr{
-						"metric": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"histogram": mapstr.M{
+						"metric": mapstr.M{
 							"count": uint64(1),
-							"bucket": common.MapStr{
+							"bucket": mapstr.M{
 								"1000000000": uint64(1),
 								"+Inf":       uint64(1),
 								"1000":       uint64(1),
@@ -491,12 +491,12 @@ func TestPrometheus(t *testing.T) {
 					"histogram_decimal_metric": Metric("histogram.metric", OpMultiplyBuckets(1000)),
 				},
 			},
-			expected: []common.MapStr{
-				common.MapStr{
-					"histogram": common.MapStr{
-						"metric": common.MapStr{
+			expected: []mapstr.M{
+				mapstr.M{
+					"histogram": mapstr.M{
+						"metric": mapstr.M{
 							"count": uint64(5),
-							"bucket": common.MapStr{
+							"bucket": mapstr.M{
 								"1":    uint64(1),
 								"10":   uint64(1),
 								"100":  uint64(2),
@@ -535,7 +535,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 		testName           string
 		prometheusResponse string
 		mapping            *MetricsMapping
-		expectedEvents     []common.MapStr
+		expectedEvents     []mapstr.M
 	}{
 		{
 			testName:           "Test gauge with KeyLabel",
@@ -550,34 +550,34 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"age":     KeyLabel("metrics.one.labels.age"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": 1.0,
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jane",
 								"surname": "foster",
 							},
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": 2.0,
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "john",
 								"surname": "williams",
 							},
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": 3.0,
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jahn",
 								"surname": "baldwin",
 								"age":     "30",
@@ -602,23 +602,23 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"age":     KeyLabel("metrics.one.labels.age"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": 0.0,
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jane",
 								"surname": "foster",
 							},
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": 3.0,
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jahn",
 								"surname": "baldwin",
 								"age":     "30",
@@ -642,34 +642,34 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"age":     KeyLabel("metrics.one.labels.age"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": int64(1),
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jane",
 								"surname": "foster",
 							},
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": int64(2),
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "john",
 								"surname": "williams",
 							},
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": int64(3),
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jahn",
 								"surname": "baldwin",
 								"age":     "30",
@@ -694,23 +694,23 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"age":     KeyLabel("metrics.one.labels.age"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": int64(1),
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jane",
 								"surname": "foster",
 							},
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
 							"count": int64(3),
-							"labels": common.MapStr{
+							"labels": mapstr.M{
 								"name":    "jahn",
 								"surname": "baldwin",
 								"age":     "30",
@@ -733,14 +733,14 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"alive": KeyLabel("metrics.one.midichlorians.alive"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
-							"midichlorians": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
+							"midichlorians": mapstr.M{
 								"count": uint64(86),
 								"sum":   1000001.0,
-								"bucket": common.MapStr{
+								"bucket": mapstr.M{
 									"2000":  uint64(52),
 									"4000":  uint64(70),
 									"8000":  uint64(78),
@@ -755,13 +755,13 @@ func TestPrometheusKeyLabels(t *testing.T) {
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
-							"midichlorians": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
+							"midichlorians": mapstr.M{
 								"count": uint64(28),
 								"sum":   800001.0,
-								"bucket": common.MapStr{
+								"bucket": mapstr.M{
 									"2000":  uint64(16),
 									"4000":  uint64(20),
 									"8000":  uint64(23),
@@ -790,14 +790,14 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"alive": KeyLabel("metrics.one.midichlorians.alive"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"one": common.MapStr{
-							"midichlorians": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"one": mapstr.M{
+							"midichlorians": mapstr.M{
 								"count": uint64(86),
 								"sum":   1000001.0,
-								"bucket": common.MapStr{
+								"bucket": mapstr.M{
 									"16000": uint64(84),
 									"32000": uint64(86),
 									"+Inf":  uint64(86),
@@ -823,22 +823,22 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"kind": KeyLabel("metrics.force.propagation.ms.labels.kind"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"force": common.MapStr{
-							"propagation": common.MapStr{
-								"ms": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"force": mapstr.M{
+							"propagation": mapstr.M{
+								"ms": mapstr.M{
 									"count": uint64(651),
 									"sum":   89.0,
-									"percentile": common.MapStr{
+									"percentile": mapstr.M{
 										"0":   35.0,
 										"25":  22.0,
 										"50":  7.0,
 										"75":  20.0,
 										"100": 30.0,
 									},
-									"labels": common.MapStr{
+									"labels": mapstr.M{
 										"kind": "jedi",
 									},
 								},
@@ -846,21 +846,21 @@ func TestPrometheusKeyLabels(t *testing.T) {
 						},
 					},
 				},
-				common.MapStr{
-					"metrics": common.MapStr{
-						"force": common.MapStr{
-							"propagation": common.MapStr{
-								"ms": common.MapStr{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"force": mapstr.M{
+							"propagation": mapstr.M{
+								"ms": mapstr.M{
 									"count": uint64(711),
 									"sum":   112.0,
-									"percentile": common.MapStr{
+									"percentile": mapstr.M{
 										"0":   30.0,
 										"25":  20.0,
 										"50":  12.0,
 										"75":  21.0,
 										"100": 29.0,
 									},
-									"labels": common.MapStr{
+									"labels": mapstr.M{
 										"kind": "sith",
 									},
 								},
@@ -882,19 +882,19 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"kind": KeyLabel("metrics.force.propagation.ms.labels.kind"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
-						"force": common.MapStr{
-							"propagation": common.MapStr{
-								"ms": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
+						"force": mapstr.M{
+							"propagation": mapstr.M{
+								"ms": mapstr.M{
 									"count": uint64(651),
 									"sum":   50.0,
-									"percentile": common.MapStr{
+									"percentile": mapstr.M{
 										"75":  20.0,
 										"100": 30.0,
 									},
-									"labels": common.MapStr{
+									"labels": mapstr.M{
 										"kind": "jedi",
 									},
 								},
@@ -917,12 +917,12 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"label1": KeyLabel("metrics.label1"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
 						"value":  20.0,
 						"label1": "I am 1",
-						"other_labels": common.MapStr{
+						"other_labels": mapstr.M{
 							"label2": "I am 2",
 							"label3": "I am 3",
 						},
@@ -939,7 +939,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"metrics_that_inform_labels": ExtendedInfoMetric(Configuration{
 						StoreNonMappedLabels:     true,
 						NonMappedLabelsPlacement: "metrics.other_labels",
-						ExtraFields: common.MapStr{
+						ExtraFields: mapstr.M{
 							"metrics.extra.field1": "extra1",
 							"metrics.extra.field2": "extra2",
 						}}),
@@ -949,16 +949,16 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"label1": KeyLabel("metrics.label1"),
 				},
 			},
-			expectedEvents: []common.MapStr{
-				common.MapStr{
-					"metrics": common.MapStr{
+			expectedEvents: []mapstr.M{
+				mapstr.M{
+					"metrics": mapstr.M{
 						"value":  20.0,
 						"label1": "I am 1",
-						"other_labels": common.MapStr{
+						"other_labels": mapstr.M{
 							"label2": "I am 2",
 							"label3": "I am 3",
 						},
-						"extra": common.MapStr{
+						"extra": mapstr.M{
 							"field1": "extra1",
 							"field2": "extra2",
 						},

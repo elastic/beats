@@ -25,8 +25,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,10 +34,10 @@ func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("./_meta/test/input.json")
 	assert.NoError(t, err)
 
-	data := common.MapStr{}
+	data := mapstr.M{}
 	json.Unmarshal(content, &data)
 
 	event, _ := eventMapping("unit.test", data)
 
-	assert.Equal(t, event["total"].(common.MapStr)["count"], float64(1))
+	assert.Equal(t, event["total"].(mapstr.M)["count"], float64(1))
 }

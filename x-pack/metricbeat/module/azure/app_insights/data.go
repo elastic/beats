@@ -13,8 +13,8 @@ import (
 	"github.com/Azure/go-autorest/autorest/date"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -162,7 +162,7 @@ func getValue(metric MetricValue) []MetricValue {
 }
 
 func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, applicationId string, namespace string) mb.Event {
-	metricList := common.MapStr{}
+	metricList := mapstr.M{}
 	for key, metric := range metricValue.Value {
 		metricList.Put(key, metric)
 	}
@@ -179,18 +179,18 @@ func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, appl
 	return event
 }
 
-func createEvent(start *date.Time, end *date.Time, applicationId string, namespace string, metricList common.MapStr) mb.Event {
+func createEvent(start *date.Time, end *date.Time, applicationId string, namespace string, metricList mapstr.M) mb.Event {
 	event := mb.Event{
-		ModuleFields: common.MapStr{
+		ModuleFields: mapstr.M{
 			"application_id": applicationId,
 		},
-		MetricSetFields: common.MapStr{
+		MetricSetFields: mapstr.M{
 			"start_date": start,
 			"end_date":   end,
 		},
 		Timestamp: end.Time,
 	}
-	event.RootFields = common.MapStr{}
+	event.RootFields = mapstr.M{}
 	event.RootFields.Put("cloud.provider", "azure")
 	if namespace == "" {
 		event.ModuleFields.Put("metrics", metricList)
@@ -203,7 +203,7 @@ func createEvent(start *date.Time, end *date.Time, applicationId string, namespa
 }
 
 func createNoSegEvent(values []MetricValue, applicationId string, namespace string) mb.Event {
-	metricList := common.MapStr{}
+	metricList := mapstr.M{}
 	for _, value := range values {
 		for key, metric := range value.Value {
 			metricList.Put(key, metric)

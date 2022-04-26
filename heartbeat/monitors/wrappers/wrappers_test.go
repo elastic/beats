@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -207,14 +207,14 @@ func TestMultiJobConts(t *testing.T) {
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			eventext.MergeEventFields(event, common.MapStr{"cont": "1st"})
+			eventext.MergeEventFields(event, mapstr.M{"cont": "1st"})
 			u, err := url.Parse(u)
 			require.NoError(t, err)
-			eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
+			eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
 			return []jobs.Job{
 				func(event *beat.Event) ([]jobs.Job, error) {
-					eventext.MergeEventFields(event, common.MapStr{"cont": "2nd"})
-					eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
+					eventext.MergeEventFields(event, mapstr.M{"cont": "2nd"})
+					eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
 					return nil, nil
 				},
 			}, nil
@@ -264,15 +264,15 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			eventext.MergeEventFields(event, common.MapStr{"cont": "1st"})
+			eventext.MergeEventFields(event, mapstr.M{"cont": "1st"})
 			eventext.CancelEvent(event)
 			u, err := url.Parse(u)
 			require.NoError(t, err)
-			eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
+			eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
 			return []jobs.Job{
 				func(event *beat.Event) ([]jobs.Job, error) {
-					eventext.MergeEventFields(event, common.MapStr{"cont": "2nd"})
-					eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
+					eventext.MergeEventFields(event, mapstr.M{"cont": "2nd"})
+					eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
 					return nil, nil
 				},
 			}, nil
@@ -320,9 +320,9 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 		},
 		[]validator.Validator{
 			metaCancelledValidator,
-			lookslike.MustCompile(isdef.IsEqual(common.MapStr(nil))),
+			lookslike.MustCompile(isdef.IsEqual(mapstr.M(nil))),
 			metaCancelledValidator,
-			lookslike.MustCompile(isdef.IsEqual(common.MapStr(nil))),
+			lookslike.MustCompile(isdef.IsEqual(mapstr.M(nil))),
 		},
 	})
 }
@@ -331,7 +331,7 @@ func makeURLJob(t *testing.T, u string) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
-		eventext.MergeEventFields(event, common.MapStr{"url": URLFields(parsed)})
+		eventext.MergeEventFields(event, mapstr.M{"url": URLFields(parsed)})
 		return nil, nil
 	}
 }
@@ -366,12 +366,12 @@ func TestTimespan(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want common.MapStr
+		want mapstr.M
 	}{
 		{
 			"interval longer than timeout",
 			args{now, sched10s, time.Second},
-			common.MapStr{
+			mapstr.M{
 				"gte": now,
 				"lt":  now.Add(time.Second * 10),
 			},
@@ -379,7 +379,7 @@ func TestTimespan(t *testing.T) {
 		{
 			"timeout longer than interval",
 			args{now, sched10s, time.Second * 20},
-			common.MapStr{
+			mapstr.M{
 				"gte": now,
 				"lt":  now.Add(time.Second * 20),
 			},
@@ -410,9 +410,9 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
-		eventext.MergeEventFields(event, common.MapStr{
+		eventext.MergeEventFields(event, mapstr.M{
 			"url": URLFields(parsed),
-			"monitor": common.MapStr{
+			"monitor": mapstr.M{
 				"type":        "browser",
 				"id":          inlineMonitorValues.id,
 				"name":        inlineMonitorValues.name,
@@ -461,9 +461,9 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
-		eventext.MergeEventFields(event, common.MapStr{
+		eventext.MergeEventFields(event, mapstr.M{
 			"url": URLFields(parsed),
-			"monitor": common.MapStr{
+			"monitor": mapstr.M{
 				"type":        "browser",
 				"id":          suiteMonitorValues.id,
 				"name":        suiteMonitorValues.name,
@@ -471,13 +471,13 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 			},
 		})
 		if summary {
-			sumFields := common.MapStr{"up": 0, "down": 0}
+			sumFields := mapstr.M{"up": 0, "down": 0}
 			if suiteErr == nil {
 				sumFields["up"] = 1
 			} else {
 				sumFields["down"] = 1
 			}
-			eventext.MergeEventFields(event, common.MapStr{
+			eventext.MergeEventFields(event, mapstr.M{
 				"summary": sumFields,
 			})
 		}
@@ -495,7 +495,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 			"id":          suiteMonitorValues.id,
 			"name":        suiteMonitorValues.name,
 			"check_group": suiteMonitorValues.checkGroup,
-			"timespan": common.MapStr{
+			"timespan": mapstr.M{
 				"gte": hbtestllext.IsTime,
 				"lt":  hbtestllext.IsTime,
 			},

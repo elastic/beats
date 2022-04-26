@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/cloudfoundry/sonde-go/events"
 )
@@ -89,7 +90,7 @@ type Event interface {
 	Index() string
 	IP() string
 	Tags() map[string]string
-	ToFields() common.MapStr
+	ToFields() mapstr.M
 }
 
 // EventWithAppID is the interface all events implement that provide an application ID for the event.
@@ -155,17 +156,17 @@ func (e *EventHttpAccess) StatusCode() int32         { return e.statusCode }
 func (e *EventHttpAccess) ContentLength() int64      { return e.contentLength }
 func (e *EventHttpAccess) InstanceIndex() int32      { return e.instanceIndex }
 func (e *EventHttpAccess) Forwarded() []string       { return e.forwarded }
-func (e *EventHttpAccess) ToFields() common.MapStr {
+func (e *EventHttpAccess) ToFields() mapstr.M {
 	fields := baseMapWithApp(e)
-	fields.DeepUpdate(common.MapStr{
-		"http": common.MapStr{
-			"response": common.MapStr{
+	fields.DeepUpdate(mapstr.M{
+		"http": mapstr.M{
+			"response": mapstr.M{
 				"status_code": e.StatusCode(),
 				"method":      e.Method(),
 				"bytes":       e.ContentLength(),
 			},
 		},
-		"user_agent": common.MapStr{
+		"user_agent": mapstr.M{
 			"original": e.UserAgent(),
 		},
 		"url": urlMap(e.URI()),
@@ -197,12 +198,12 @@ func (e *EventLog) Message() string                  { return e.message }
 func (e *EventLog) MessageType() EventLogMessageType { return e.messageType }
 func (e *EventLog) SourceType() string               { return e.sourceType }
 func (e *EventLog) SourceID() string                 { return e.sourceID }
-func (e *EventLog) ToFields() common.MapStr {
+func (e *EventLog) ToFields() mapstr.M {
 	fields := baseMapWithApp(e)
-	fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			e.String(): common.MapStr{
-				"source": common.MapStr{
+	fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			e.String(): mapstr.M{
+				"source": mapstr.M{
 					"instance": e.SourceID(),
 					"type":     e.SourceType(),
 				},
@@ -235,11 +236,11 @@ func (e *EventCounter) Tags() map[string]string { return e.tags }
 func (e *EventCounter) Name() string            { return e.name }
 func (e *EventCounter) Delta() uint64           { return e.delta }
 func (e *EventCounter) Total() uint64           { return e.total }
-func (e *EventCounter) ToFields() common.MapStr {
+func (e *EventCounter) ToFields() mapstr.M {
 	fields := baseMap(e)
-	fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			e.String(): common.MapStr{
+	fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			e.String(): mapstr.M{
 				"name":  e.Name(),
 				"delta": e.Delta(),
 				"total": e.Total(),
@@ -270,11 +271,11 @@ func (e *EventValueMetric) Tags() map[string]string { return e.tags }
 func (e *EventValueMetric) Name() string            { return e.name }
 func (e *EventValueMetric) Value() float64          { return e.value }
 func (e *EventValueMetric) Unit() string            { return e.unit }
-func (e *EventValueMetric) ToFields() common.MapStr {
+func (e *EventValueMetric) ToFields() mapstr.M {
 	fields := baseMap(e)
-	fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			e.String(): common.MapStr{
+	fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			e.String(): mapstr.M{
 				"name":  e.Name(),
 				"unit":  e.Unit(),
 				"value": e.Value(),
@@ -312,11 +313,11 @@ func (e *EventContainerMetric) MemoryBytes() uint64      { return e.memoryBytes 
 func (e *EventContainerMetric) DiskBytes() uint64        { return e.diskBytes }
 func (e *EventContainerMetric) MemoryBytesQuota() uint64 { return e.memoryBytesQuota }
 func (e *EventContainerMetric) DiskBytesQuota() uint64   { return e.diskBytesQuota }
-func (e *EventContainerMetric) ToFields() common.MapStr {
+func (e *EventContainerMetric) ToFields() mapstr.M {
 	fields := baseMapWithApp(e)
-	fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			e.String(): common.MapStr{
+	fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			e.String(): mapstr.M{
 				"instance_index":     e.InstanceIndex(),
 				"cpu.pct":            e.CPUPercentage(),
 				"memory.bytes":       e.MemoryBytes(),
@@ -350,11 +351,11 @@ func (e *EventError) Tags() map[string]string { return e.tags }
 func (e *EventError) Message() string         { return e.message }
 func (e *EventError) Code() int32             { return e.code }
 func (e *EventError) Source() string          { return e.source }
-func (e *EventError) ToFields() common.MapStr {
+func (e *EventError) ToFields() mapstr.M {
 	fields := baseMap(e)
-	fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			e.String(): common.MapStr{
+	fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			e.String(): mapstr.M{
 				"source": e.Source(),
 			},
 		},
@@ -479,8 +480,8 @@ func EnvelopeToEvent(env *events.Envelope) Event {
 	return nil
 }
 
-func envelopMap(evt Event) common.MapStr {
-	return common.MapStr{
+func envelopMap(evt Event) mapstr.M {
+	return mapstr.M{
 		"origin":     evt.Origin(),
 		"deployment": evt.Deployment(),
 		"ip":         evt.IP(),
@@ -489,16 +490,16 @@ func envelopMap(evt Event) common.MapStr {
 	}
 }
 
-func baseMap(evt Event) common.MapStr {
+func baseMap(evt Event) mapstr.M {
 	tags, meta := tagsToMeta(evt.Tags())
-	cf := common.MapStr{
+	cf := mapstr.M{
 		"type":     evt.String(),
 		"envelope": envelopMap(evt),
 	}
 	if len(tags) > 0 {
 		cf["tags"] = tags
 	}
-	result := common.MapStr{
+	result := mapstr.M{
 		"cloudfoundry": cf,
 	}
 	if len(meta) > 0 {
@@ -507,9 +508,9 @@ func baseMap(evt Event) common.MapStr {
 	return result
 }
 
-func tagsToMeta(eventTags map[string]string) (tags common.MapStr, meta common.MapStr) {
-	tags = common.MapStr{}
-	meta = common.MapStr{}
+func tagsToMeta(eventTags map[string]string) (tags mapstr.M, meta mapstr.M) {
+	tags = mapstr.M{}
+	meta = mapstr.M{}
 	for name, value := range eventTags {
 		switch name {
 		case "app_id":
@@ -531,7 +532,7 @@ func tagsToMeta(eventTags map[string]string) (tags common.MapStr, meta common.Ma
 	return tags, meta
 }
 
-func baseMapWithApp(evt EventWithAppID) common.MapStr {
+func baseMapWithApp(evt EventWithAppID) mapstr.M {
 	base := baseMap(evt)
 	appID := evt.AppGuid()
 	if appID != "" {
@@ -540,14 +541,14 @@ func baseMapWithApp(evt EventWithAppID) common.MapStr {
 	return base
 }
 
-func urlMap(uri string) common.MapStr {
+func urlMap(uri string) mapstr.M {
 	u, err := url.Parse(uri)
 	if err != nil {
-		return common.MapStr{
+		return mapstr.M{
 			"original": uri,
 		}
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"original": uri,
 		"scheme":   u.Scheme,
 		"port":     u.Port(),

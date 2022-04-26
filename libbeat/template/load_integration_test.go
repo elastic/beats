@@ -37,11 +37,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -51,7 +51,7 @@ func init() {
 type testTemplate struct {
 	t      *testing.T
 	client ESClient
-	common.MapStr
+	mapstr.M
 }
 
 type testSetup struct {
@@ -414,8 +414,8 @@ func TestLoadBeatsTemplate_fromFile(t *testing.T) {
 
 func TestTemplateSettings(t *testing.T) {
 	settings := TemplateSettings{
-		Index:  common.MapStr{"number_of_shards": 1},
-		Source: common.MapStr{"enabled": false},
+		Index:  mapstr.M{"number_of_shards": 1},
+		Source: mapstr.M{"enabled": false},
 	}
 	setup := newTestSetup(t, TemplateConfig{Settings: settings, Enabled: true})
 	setup.mustLoadFromFile([]string{"..", "fields.yml"})
@@ -427,15 +427,15 @@ func TestTemplateSettings(t *testing.T) {
 }
 
 var dataTests = []struct {
-	data  common.MapStr
+	data  mapstr.M
 	error bool
 }{
 	{
-		data: common.MapStr{
+		data: mapstr.M{
 			"@timestamp": time.Now(),
 			"keyword":    "test keyword",
 			"array":      [...]int{1, 2, 3},
-			"object": common.MapStr{
+			"object": mapstr.M{
 				"hello": "world",
 			},
 		},
@@ -443,8 +443,8 @@ var dataTests = []struct {
 	},
 	{
 		// Invalid array
-		data: common.MapStr{
-			"array": common.MapStr{
+		data: mapstr.M{
+			"array": mapstr.M{
 				"hello": "world",
 			},
 		},
@@ -452,17 +452,17 @@ var dataTests = []struct {
 	},
 	{
 		// Invalid object
-		data: common.MapStr{
+		data: mapstr.M{
 			"object": [...]int{1, 2, 3},
 		},
 		error: true,
 	},
 	{
 		// tests enabled: false values
-		data: common.MapStr{
+		data: mapstr.M{
 			"@timestamp":     time.Now(),
 			"array_disabled": [...]int{1, 2, 3},
-			"object_disabled": common.MapStr{
+			"object_disabled": mapstr.M{
 				"hello": "world",
 			},
 		},
@@ -492,7 +492,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 	require.NoError(t, err)
 	require.Equal(t, status, 200)
 
-	var response common.MapStr
+	var response mapstr.M
 	err = json.Unmarshal(body, &response)
 	require.NoError(t, err)
 	require.NotNil(t, response)
@@ -504,7 +504,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 	return testTemplate{
 		t:      t,
 		client: client,
-		MapStr: common.MapStr(templateElem["index_template"].(map[string]interface{})),
+		MapStr: mapstr.M(templateElem["index_template"].(map[string]interface{})),
 	}
 }
 

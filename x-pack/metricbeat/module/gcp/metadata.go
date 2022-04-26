@@ -8,9 +8,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // MetadataService must be implemented by GCP services that requires non out-of-the box code that is not fulfil by the Stackdriver
@@ -61,8 +60,8 @@ type MetadataCollectorInputData struct {
 
 // MetadataCollectorData contains the set of ECS and normal labels that we extract from GCP services
 type MetadataCollectorData struct {
-	Labels common.MapStr
-	ECS    common.MapStr
+	Labels mapstr.M
+	ECS    mapstr.M
 }
 
 // Identity must be implemented by GCP services that can add some short of data to group their metrics (like instance

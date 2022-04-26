@@ -21,9 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func mustParseTime(layout string, value string) time.Time {
@@ -463,7 +462,7 @@ func TestMessage_SetData(t *testing.T) {
 func TestMessage_Fields(t *testing.T) {
 	cases := map[string]struct {
 		In   *message
-		Want common.MapStr
+		Want mapstr.M
 	}{
 		"valid": {
 			In: &message{
@@ -483,15 +482,15 @@ func TestMessage_Fields(t *testing.T) {
 					},
 				},
 			},
-			Want: common.MapStr{
-				"log": common.MapStr{
-					"syslog": common.MapStr{
+			Want: mapstr.M{
+				"log": mapstr.M{
+					"syslog": mapstr.M{
 						"priority": 13,
-						"facility": common.MapStr{
+						"facility": mapstr.M{
 							"code": 1,
 							"name": "user-level",
 						},
-						"severity": common.MapStr{
+						"severity": mapstr.M{
 							"code": 5,
 							"name": "Notice",
 						},

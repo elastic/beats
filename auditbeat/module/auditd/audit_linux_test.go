@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/auparse"
 )
@@ -138,7 +139,7 @@ func TestLoginType(t *testing.T) {
 			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32)
 		})
 
-	for idx, expected := range []common.MapStr{
+	for idx, expected := range []mapstr.M{
 		{
 			"event.category":      []string{"authentication"},
 			"event.type":          []string{"start"},

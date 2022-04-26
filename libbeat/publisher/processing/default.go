@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -44,8 +45,8 @@ type builder struct {
 
 	// global pipeline fields and tags configurations
 	modifiers   []modifier
-	builtinMeta common.MapStr
-	fields      common.MapStr
+	builtinMeta mapstr.M
+	fields      mapstr.M
 	tags        []string
 
 	// Time series id will be calculated for Events with the TimeSeries flag if this
@@ -62,14 +63,14 @@ type builder struct {
 
 type modifier interface {
 	// BuiltinFields defines global fields to be added to every event.
-	BuiltinFields(beat.Info) common.MapStr
+	BuiltinFields(beat.Info) mapstr.M
 
 	// ClientFields defines connection local fields to be added to each event
 	// of a pipeline client.
-	ClientFields(beat.Info, beat.ProcessingConfig) common.MapStr
+	ClientFields(beat.Info, beat.ProcessingConfig) mapstr.M
 }
 
-type builtinModifier func(beat.Info) common.MapStr
+type builtinModifier func(beat.Info) mapstr.M
 
 // MakeDefaultBeatSupport creates a new SupportFactory based on NewDefaultSupport.
 // MakeDefaultBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
@@ -116,23 +117,23 @@ func MakeDefaultSupport(
 }
 
 // WithFields creates a modifier with the given default builtin fields.
-func WithFields(fields common.MapStr) modifier {
-	return builtinModifier(func(_ beat.Info) common.MapStr {
+func WithFields(fields mapstr.M) modifier {
+	return builtinModifier(func(_ beat.Info) mapstr.M {
 		return fields
 	})
 }
 
 // WithECS modifier adds `ecs.version` builtin fields to a processing pipeline.
-var WithECS modifier = WithFields(common.MapStr{
-	"ecs": common.MapStr{
+var WithECS modifier = WithFields(mapstr.M{
+	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
 })
 
 // WithHost modifier adds `host.name` builtin fields to a processing pipeline
-var WithHost modifier = builtinModifier(func(info beat.Info) common.MapStr {
-	return common.MapStr{
-		"host": common.MapStr{
+var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
+	return mapstr.M{
+		"host": mapstr.M{
 			"name": info.Name,
 		},
 	}
@@ -141,8 +142,8 @@ var WithHost modifier = builtinModifier(func(info beat.Info) common.MapStr {
 // WithAgentMeta adds agent meta information as builtin fields to a processing
 // pipeline.
 func WithAgentMeta() modifier {
-	return builtinModifier(func(info beat.Info) common.MapStr {
-		metadata := common.MapStr{
+	return builtinModifier(func(info beat.Info) mapstr.M {
+		metadata := mapstr.M{
 			"ephemeral_id": info.EphemeralID.String(),
 			"id":           info.ID.String(),
 			"name":         info.Hostname,
@@ -152,15 +153,15 @@ func WithAgentMeta() modifier {
 		if info.Name != "" {
 			metadata["name"] = info.Name
 		}
-		return common.MapStr{"agent": metadata}
+		return mapstr.M{"agent": metadata}
 	})
 }
 
 // WithObserverMeta adds beat meta information as builtin fields to a processing
 // pipeline.
 func WithObserverMeta() modifier {
-	return builtinModifier(func(info beat.Info) common.MapStr {
-		metadata := common.MapStr{
+	return builtinModifier(func(info beat.Info) mapstr.M {
+		metadata := mapstr.M{
 			"type":         info.Beat,                 // Per ECS this is not a valid type value.
 			"ephemeral_id": info.EphemeralID.String(), // Not in ECS.
 			"hostname":     info.Hostname,
@@ -170,7 +171,7 @@ func WithObserverMeta() modifier {
 		if info.Name != info.Hostname {
 			metadata.Put("name", info.Name)
 		}
-		return common.MapStr{"observer": metadata}
+		return mapstr.M{"observer": metadata}
 	})
 }
 
@@ -200,7 +201,7 @@ func newBuilder(
 		b.processors = tmp
 	}
 
-	builtin := common.MapStr{}
+	builtin := mapstr.M{}
 	for _, mod := range modifiers {
 		m := mod.BuiltinFields(info)
 		if len(m) > 0 {
@@ -212,7 +213,7 @@ func newBuilder(
 	}
 
 	if fields := eventMeta.Fields; len(fields) > 0 {
-		b.fields = common.MapStr{}
+		b.fields = mapstr.M{}
 		common.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
 	}
 
@@ -271,12 +272,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		builtin = tmp
 	}
 
-	var clientFields common.MapStr
+	var clientFields mapstr.M
 	for _, mod := range b.modifiers {
 		m := mod.ClientFields(b.info, cfg)
 		if len(m) > 0 {
 			if clientFields == nil {
-				clientFields = common.MapStr{}
+				clientFields = mapstr.M{}
 			}
 			clientFields.DeepUpdate(m.Clone())
 		}
@@ -322,7 +323,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	if cfg.DynamicFields != nil {
-		checkCopy := func(m common.MapStr) bool {
+		checkCopy := func(m mapstr.M) bool {
 			return needsCopy || hasKeyAnyOf(m, builtin)
 		}
 		processors.add(makeAddDynMetaProcessor("dynamicFields", cfg.DynamicFields, checkCopy))
@@ -381,10 +382,10 @@ func makeClientProcessors(
 	return p
 }
 
-func (b builtinModifier) BuiltinFields(info beat.Info) common.MapStr {
+func (b builtinModifier) BuiltinFields(info beat.Info) mapstr.M {
 	return b(info)
 }
 
-func (b builtinModifier) ClientFields(_ beat.Info, _ beat.ProcessingConfig) common.MapStr {
+func (b builtinModifier) ClientFields(_ beat.Info, _ beat.ProcessingConfig) mapstr.M {
 	return nil
 }

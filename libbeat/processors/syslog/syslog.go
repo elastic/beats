@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -193,7 +194,7 @@ func (p *processor) String() string {
 // value will be converted to a string slice. If the existing field is a string slice or
 // interface slice, then the new value will be appended. If the existing value is some
 // other type, then this function does nothing.
-func appendStringField(m common.MapStr, field, value string) {
+func appendStringField(m mapstr.M, field, value string) {
 	v, _ := m.GetValue(field)
 	switch t := v.(type) {
 	case nil:

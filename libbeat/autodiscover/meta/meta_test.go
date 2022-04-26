@@ -21,25 +21,23 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestStoreNil(t *testing.T) {
 	m := NewMap()
-	assert.Equal(t, common.MapStrPointer{}, m.Store(0, nil))
+	assert.Equal(t, mapstr.MPointer{}, m.Store(0, nil))
 }
 
 func TestStore(t *testing.T) {
 	m := NewMap()
 
 	// Store meta
-	res := m.Store(0, common.MapStr{"foo": "bar"})
-	assert.Equal(t, res.Get(), common.MapStr{"foo": "bar"})
+	res := m.Store(0, mapstr.M{"foo": "bar"})
+	assert.Equal(t, res.Get(), mapstr.M{"foo": "bar"})
 
 	// Update it
-	res = m.Store(0, common.MapStr{"foo": "baz"})
-	assert.Equal(t, res.Get(), common.MapStr{"foo": "baz"})
+	res = m.Store(0, mapstr.M{"foo": "baz"})
+	assert.Equal(t, res.Get(), mapstr.M{"foo": "baz"})
 
 	m.Remove(0)
 	assert.Equal(t, len(m.meta), 0)

@@ -9,13 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestGetStartPosition(t *testing.T) {
@@ -165,18 +164,18 @@ func TestCreateEvent(t *testing.T) {
 		Timestamp:     awssdk.Int64(1600000000000),
 	}
 
-	expectedEventFields := common.MapStr{
+	expectedEventFields := mapstr.M{
 		"message": "test-message-1",
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"id": *logEvent.EventId,
 		},
 		"log.file.path": "logGroup1" + "/" + *logEvent.LogStreamName,
-		"awscloudwatch": common.MapStr{
+		"awscloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
 			"log_stream":     *logEvent.LogStreamName,
 			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
 		},
-		"cloud": common.MapStr{
+		"cloud": mapstr.M{
 			"provider": "aws",
 			"region":   "us-east-1",
 		},

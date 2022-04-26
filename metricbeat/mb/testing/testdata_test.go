@@ -20,8 +20,7 @@ package testing
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,7 +43,7 @@ func TestOmitDocumentedField(t *testing.T) {
 }
 
 func TestDocumentedFieldCheck(t *testing.T) {
-	foundKeys := common.MapStr{
+	foundKeys := mapstr.M{
 		"hello":               "hello",
 		"elasticsearch.stats": "stats1",
 	}
@@ -58,7 +57,7 @@ func TestDocumentedFieldCheck(t *testing.T) {
 	//error should be nil, as `hello` field is ignored and `elasticsearch.stats` field is defined
 	assert.NoError(t, err)
 
-	foundKeys = common.MapStr{
+	foundKeys = mapstr.M{
 		"elasticsearch.stats.cpu":              "stats2",
 		"elasticsearch.metrics.requests.count": "requests2",
 	}
@@ -71,7 +70,7 @@ func TestDocumentedFieldCheck(t *testing.T) {
 	err = documentedFieldCheck(foundKeys, knownKeys, omitfields)
 	assert.NoError(t, err)
 
-	foundKeys = common.MapStr{
+	foundKeys = mapstr.M{
 		"elasticsearch.stats.cpu":              "stats2",
 		"elasticsearch.metrics.requests.count": "requests2",
 	}

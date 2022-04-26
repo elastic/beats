@@ -22,11 +22,11 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -304,16 +304,16 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		event := mb.Event{}
 
-		event.RootFields = common.MapStr{}
+		event.RootFields = mapstr.M{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
-		event.ModuleFields = common.MapStr{
-			"node": common.MapStr{
+		event.ModuleFields = mapstr.M{
+			"node": mapstr.M{
 				"id":       nodeID,
 				"mlockall": mlockall,
 				"master":   isMaster,
 			},
-			"cluster": common.MapStr{
+			"cluster": mapstr.M{
 				"name": info.ClusterName,
 				"id":   info.ClusterID,
 			},

@@ -18,20 +18,19 @@
 package schema
 
 import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/joeshaw/multierror"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // DefaultApplyOptions are the default options for Apply()
 var DefaultApplyOptions = []ApplyOption{AllRequired}
 
 // ApplyOption modifies the result of Apply
-type ApplyOption func(common.MapStr, multierror.Errors) (common.MapStr, multierror.Errors)
+type ApplyOption func(mapstr.M, multierror.Errors) (mapstr.M, multierror.Errors)
 
 // AllRequired considers any missing field as an error, except if explicitly
 // set as optional
-func AllRequired(event common.MapStr, errors multierror.Errors) (common.MapStr, multierror.Errors) {
+func AllRequired(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror.Errors) {
 	k := 0
 	for i, err := range errors {
 		if err, ok := err.(*KeyNotFoundError); ok {
@@ -47,7 +46,7 @@ func AllRequired(event common.MapStr, errors multierror.Errors) (common.MapStr, 
 
 // FailOnRequired considers missing fields as an error only if they are set
 // as required
-func FailOnRequired(event common.MapStr, errors multierror.Errors) (common.MapStr, multierror.Errors) {
+func FailOnRequired(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror.Errors) {
 	k := 0
 	for i, err := range errors {
 		if err, ok := err.(*KeyNotFoundError); ok {
@@ -63,7 +62,7 @@ func FailOnRequired(event common.MapStr, errors multierror.Errors) (common.MapSt
 
 // NotFoundKeys calls a function with the list of missing keys as parameter
 func NotFoundKeys(cb func(keys []string)) ApplyOption {
-	return func(event common.MapStr, errors multierror.Errors) (common.MapStr, multierror.Errors) {
+	return func(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror.Errors) {
 		var keys []string
 		for _, err := range errors {
 			if err, ok := err.(*KeyNotFoundError); ok {

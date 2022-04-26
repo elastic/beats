@@ -8,9 +8,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestTemplateValues(t *testing.T) {
@@ -20,7 +19,7 @@ func TestTemplateValues(t *testing.T) {
 		header: http.Header{
 			"Authorization": []string{"Bearer token"},
 		},
-		body: common.MapStr{
+		body: mapstr.M{
 			"param": "value",
 		},
 	}

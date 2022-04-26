@@ -23,8 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
 )
 
@@ -195,7 +194,7 @@ func (d *Dissector) resolve(s string, p positions) Map {
 }
 
 func (d *Dissector) resolveConvert(s string, p positions) MapConverted {
-	lookup := make(common.MapStr, len(p))
+	lookup := make(mapstr.M, len(p))
 	m := make(Map, len(p))
 	mc := make(MapConverted, len(p))
 	for _, f := range d.parser.fields {

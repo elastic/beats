@@ -198,8 +198,8 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 			flag:       true,
 			"host":     nodeName,
 			"nomad":    allocMeta,
-			"meta": common.MapStr{
-				"nomad": common.MapStrUnion(allocMeta, common.MapStr{
+			"meta": mapstr.M{
+				"nomad": mapstr.MUnion(allocMeta, mapstr.M{
 					"task": task,
 				}),
 			},
@@ -232,20 +232,20 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Beat specific.
 	e := bus.Event{}
 
-	var tags, container common.MapStr
-	var meta, tasks common.MapStr
+	var tags, container mapstr.M
+	var meta, tasks mapstr.M
 
 	rawMeta, ok := event["meta"]
 	if ok {
-		meta = rawMeta.(common.MapStr)
+		meta = rawMeta.(mapstr.M)
 		if nomadMeta, ok := meta["nomad"]; ok {
-			meta = nomadMeta.(common.MapStr)
+			meta = nomadMeta.(mapstr.M)
 		}
 
 		// The builder base config can configure any of the field values of nomad if need be.
 		e["nomad"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
-			tags = rawAnn.(common.MapStr)
+			tags = rawAnn.(mapstr.M)
 
 			e["tags"] = tags
 		}
@@ -258,13 +258,13 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
 	// metadata about the runtime driver.
 	if rawCont, ok := meta["container"]; ok {
-		container = rawCont.(common.MapStr)
+		container = rawCont.(mapstr.M)
 		e["container"] = container
 	}
 
 	// for hints we look at the aggregated task's meta
 	if rawTasks, ok := meta["task"]; ok {
-		tasks, ok = rawTasks.(common.MapStr)
+		tasks, ok = rawTasks.(mapstr.M)
 		if !ok {
 			p.logger.Warnf("Could not get meta for the given task: %s", rawTasks)
 			return e

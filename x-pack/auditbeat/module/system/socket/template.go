@@ -13,12 +13,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // baseTemplateVars contains the substitution variables useful to write KProbes
 // in a portable fashion. During setup it will be populated with arch-dependent
 // variables and guessed offsets.
-var baseTemplateVars = common.MapStr{
+var baseTemplateVars = mapstr.M{
 	// Constants to make KProbes more readable
 	"AF_INET":     2,
 	"AF_INET6":    10,

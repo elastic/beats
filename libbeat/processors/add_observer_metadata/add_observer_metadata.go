@@ -43,8 +43,8 @@ type observerMetadata struct {
 		time.Time
 		sync.Mutex
 	}
-	data    common.MapStrPointer
-	geoData common.MapStr
+	data    mapstr.MPointer
+	geoData mapstr.M
 	config  Config
 	logger  *logp.Logger
 }
@@ -73,7 +73,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 			return nil, err
 		}
 
-		p.geoData = common.MapStr{"observer": common.MapStr{"geo": geoFields}}
+		p.geoData = mapstr.M{"observer": mapstr.M{"geo": geoFields}}
 	}
 
 	return p, nil
@@ -128,8 +128,8 @@ func (p *observerMetadata) loadData() error {
 	}
 
 	hostInfo := h.Info()
-	data := common.MapStr{
-		"observer": common.MapStr{
+	data := mapstr.M{
+		"observer": mapstr.M{
 			"hostname": hostInfo.Hostname,
 		},
 	}

@@ -25,12 +25,12 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -136,12 +136,12 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
-	mapstr := common.MapStr{
+func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
+	mapstr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
-	ecsMapstr := common.MapStr{
+	ecsMapstr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
@@ -373,8 +373,8 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"package"},
 				"type":     []string{action.Type()},

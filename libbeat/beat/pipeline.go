@@ -103,13 +103,13 @@ type ProcessingConfig struct {
 
 	// Meta provides additional meta data to be added to the Meta field in the beat.Event
 	// structure.
-	Meta common.MapStr
+	Meta mapstr.M
 
 	// Fields provides additional 'global' fields to be added to every event
-	Fields common.MapStr
+	Fields mapstr.M
 
 	// DynamicFields provides additional fields to be added to every event, supporting live updates
-	DynamicFields *common.MapStrPointer
+	DynamicFields *mapstr.MPointer
 
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.

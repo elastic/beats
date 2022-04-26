@@ -23,13 +23,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestFetchGroupInfo(t *testing.T) {
-	noEvents := func(events []common.MapStr) {
+	noEvents := func(events []mapstr.M) {
 		assert.Len(t, events, 0)
 	}
 
@@ -39,8 +38,8 @@ func TestFetchGroupInfo(t *testing.T) {
 		groups   []string
 		topics   []string
 		err      error
-		expected []common.MapStr
-		validate func([]common.MapStr)
+		expected []mapstr.M
+		validate func([]mapstr.M)
 	}{
 		{
 			name: "Test all groups",
@@ -65,43 +64,43 @@ func TestFetchGroupInfo(t *testing.T) {
 					},
 				},
 			}),
-			expected: []common.MapStr{
-				testEvent("group1", "topic1", 0, common.MapStr{
+			expected: []mapstr.M{
+				testEvent("group1", "topic1", 0, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(10),
 					"consumer_lag": int64(42) - int64(10),
 				}),
-				testEvent("group1", "topic1", 1, common.MapStr{
+				testEvent("group1", "topic1", 1, mapstr.M{
 					"client":       clientMeta(1),
 					"offset":       int64(11),
 					"consumer_lag": int64(42) - int64(11),
 				}),
-				testEvent("group1", "topic1", 2, common.MapStr{
+				testEvent("group1", "topic1", 2, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(12),
 					"consumer_lag": int64(42) - int64(12),
 				}),
-				testEvent("group1", "topic3", 0, common.MapStr{
+				testEvent("group1", "topic3", 0, mapstr.M{
 					"client":       clientMeta(1),
 					"offset":       int64(6),
 					"consumer_lag": int64(42) - int64(6),
 				}),
-				testEvent("group1", "topic3", 1, common.MapStr{
+				testEvent("group1", "topic3", 1, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(7),
 					"consumer_lag": int64(42) - int64(7),
 				}),
-				testEvent("group2", "topic2", 0, common.MapStr{
+				testEvent("group2", "topic2", 0, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(3),
 					"consumer_lag": int64(42) - int64(3),
 				}),
-				testEvent("group2", "topic3", 0, common.MapStr{
+				testEvent("group2", "topic3", 0, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(9),
 					"consumer_lag": int64(42) - int64(9),
 				}),
-				testEvent("group2", "topic3", 1, common.MapStr{
+				testEvent("group2", "topic3", 1, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(10),
 					"consumer_lag": int64(42) - int64(10),
@@ -133,13 +132,13 @@ func TestFetchGroupInfo(t *testing.T) {
 			}),
 			groups: []string{"group1"},
 			topics: []string{"topic1"},
-			expected: []common.MapStr{
-				testEvent("group1", "topic1", 0, common.MapStr{
+			expected: []mapstr.M{
+				testEvent("group1", "topic1", 0, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(1),
 					"consumer_lag": int64(42) - int64(1),
 				}),
-				testEvent("group1", "topic1", 1, common.MapStr{
+				testEvent("group1", "topic1", 1, mapstr.M{
 					"client":       clientMeta(0),
 					"offset":       int64(2),
 					"consumer_lag": int64(42) - int64(2),
@@ -200,14 +199,14 @@ func TestFetchGroupInfo(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run test (%v): %v", i, test.name)
 
-		var events []common.MapStr
-		collectEvents := func(event common.MapStr) {
+		var events []mapstr.M
+		collectEvents := func(event mapstr.M) {
 			t.Logf("new event: %v", event)
 			events = append(events, event)
 		}
 
-		indexEvents := func(events []common.MapStr) map[string]common.MapStr {
-			index := map[string]common.MapStr{}
+		indexEvents := func(events []mapstr.M) map[string]mapstr.M {
+			index := map[string]mapstr.M{}
 			for _, e := range events {
 				key := fmt.Sprintf("%v::%v::%v",
 					e["id"], e["topic"], e["partition"],
@@ -246,7 +245,7 @@ func TestFetchGroupInfo(t *testing.T) {
 	}
 }
 
-func assertEvent(t *testing.T, expected, event common.MapStr) {
+func assertEvent(t *testing.T, expected, event mapstr.M) {
 	for field, exp := range expected {
 		val, found := event[field]
 		if !found {
@@ -254,8 +253,8 @@ func assertEvent(t *testing.T, expected, event common.MapStr) {
 			continue
 		}
 
-		if sub, ok := exp.(common.MapStr); ok {
-			assertEvent(t, sub, val.(common.MapStr))
+		if sub, ok := exp.(mapstr.M); ok {
+			assertEvent(t, sub, val.(mapstr.M))
 		} else {
 			if !assert.Equal(t, exp, val) {
 				t.Logf("failed in field: %v", field)
@@ -270,9 +269,9 @@ func assertEvent(t *testing.T, expected, event common.MapStr) {
 func testEvent(
 	group, topic string,
 	partition int,
-	fields ...common.MapStr,
-) common.MapStr {
-	event := common.MapStr{
+	fields ...mapstr.M,
+) mapstr.M {
+	event := mapstr.M{
 		"id":        group,
 		"topic":     topic,
 		"partition": int32(partition),
@@ -286,8 +285,8 @@ func testEvent(
 	return event
 }
 
-func clientMeta(id int) common.MapStr {
-	return common.MapStr{
+func clientMeta(id int) mapstr.M {
+	return mapstr.M{
 		"id": fmt.Sprintf("consumer-%v", id),
 	}
 }

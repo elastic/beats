@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
@@ -36,19 +36,19 @@ func TestWrapAll(t *testing.T) {
 	}
 
 	var basicJob Job = func(event *beat.Event) (jobs []Job, err error) {
-		eventext.MergeEventFields(event, common.MapStr{"basic": "job"})
+		eventext.MergeEventFields(event, mapstr.M{"basic": "job"})
 		return nil, nil
 	}
 
 	var contJob Job = func(event *beat.Event) (js []Job, e error) {
-		eventext.MergeEventFields(event, common.MapStr{"cont": "job"})
+		eventext.MergeEventFields(event, mapstr.M{"cont": "job"})
 		return []Job{basicJob}, nil
 	}
 
 	addFoo := func(job Job) Job {
 		return func(event *beat.Event) ([]Job, error) {
 			cont, err := job(event)
-			eventext.MergeEventFields(event, common.MapStr{"foo": "bar"})
+			eventext.MergeEventFields(event, mapstr.M{"foo": "bar"})
 			return cont, err
 		}
 	}
@@ -56,7 +56,7 @@ func TestWrapAll(t *testing.T) {
 	addBaz := func(job Job) Job {
 		return func(event *beat.Event) ([]Job, error) {
 			cont, err := job(event)
-			eventext.MergeEventFields(event, common.MapStr{"baz": "bot"})
+			eventext.MergeEventFields(event, mapstr.M{"baz": "bot"})
 			return cont, err
 		}
 	}

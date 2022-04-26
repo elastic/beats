@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestWhenPriorityIsSet(t *testing.T) {
@@ -40,21 +41,21 @@ func TestWhenPriorityIsSet(t *testing.T) {
 	m := dummyMetadata()
 	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
-	expected := common.MapStr{
-		"log": common.MapStr{
-			"source": common.MapStr{
+	expected := mapstr.M{
+		"log": mapstr.M{
+			"source": mapstr.M{
 				"address": "127.0.0.1",
 			},
 		},
 		"message":  "hello world",
 		"hostname": "wopr",
-		"process": common.MapStr{
+		"process": mapstr.M{
 			"pid": 123,
 		},
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"severity": 5,
 		},
-		"syslog": common.MapStr{
+		"syslog": mapstr.M{
 			"facility":       1,
 			"severity_label": "Notice",
 			"facility_label": "user-level",
@@ -73,19 +74,19 @@ func TestWhenPriorityIsNotSet(t *testing.T) {
 
 	m := dummyMetadata()
 	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
-	expected := common.MapStr{
-		"log": common.MapStr{
-			"source": common.MapStr{
+	expected := mapstr.M{
+		"log": mapstr.M{
+			"source": mapstr.M{
 				"address": "127.0.0.1",
 			},
 		},
 		"message":  "hello world",
 		"hostname": "wopr",
-		"process": common.MapStr{
+		"process": mapstr.M{
 			"pid": 123,
 		},
-		"event":  common.MapStr{},
-		"syslog": common.MapStr{},
+		"event":  mapstr.M{},
+		"syslog": mapstr.M{},
 	}
 
 	assert.Equal(t, expected, event.Fields)
@@ -102,7 +103,7 @@ func TestPid(t *testing.T) {
 		if !assert.NoError(t, err) {
 			return
 		}
-		assert.Equal(t, common.MapStr{"pid": 123}, v)
+		assert.Equal(t, mapstr.M{"pid": 123}, v)
 	})
 
 	t.Run("is not set", func(t *testing.T) {
@@ -154,7 +155,7 @@ func TestProgram(t *testing.T) {
 		if !assert.NoError(t, err) {
 			return
 		}
-		assert.Equal(t, common.MapStr{"program": "sudo"}, v)
+		assert.Equal(t, mapstr.M{"program": "sudo"}, v)
 	})
 
 	t.Run("is not set", func(t *testing.T) {
@@ -197,21 +198,21 @@ func TestSequence(t *testing.T) {
 func TestParseAndCreateEvent3164(t *testing.T) {
 	cases := map[string]struct {
 		data     []byte
-		expected common.MapStr
+		expected mapstr.M
 	}{
 		"valid data": {
 			data: []byte("<34>Oct 11 22:14:15 mymachine su[230]: 'su root' failed for lonvick on /dev/pts/8"),
-			expected: common.MapStr{
-				"event":    common.MapStr{"severity": 2},
+			expected: mapstr.M{
+				"event":    mapstr.M{"severity": 2},
 				"hostname": "mymachine",
-				"log": common.MapStr{
-					"source": common.MapStr{
+				"log": mapstr.M{
+					"source": mapstr.M{
 						"address": "127.0.0.1",
 					},
 				},
 				"message": "'su root' failed for lonvick on /dev/pts/8",
-				"process": common.MapStr{"pid": 230, "program": "su"},
-				"syslog": common.MapStr{
+				"process": mapstr.M{"pid": 230, "program": "su"},
+				"syslog": mapstr.M{
 					"facility":       4,
 					"facility_label": "security/authorization",
 					"priority":       34,
@@ -222,9 +223,9 @@ func TestParseAndCreateEvent3164(t *testing.T) {
 
 		"invalid data": {
 			data: []byte("invalid"),
-			expected: common.MapStr{
-				"log": common.MapStr{
-					"source": common.MapStr{
+			expected: mapstr.M{
+				"log": mapstr.M{
+					"source": mapstr.M{
 						"address": "127.0.0.1",
 					},
 				},
@@ -247,7 +248,7 @@ func TestParseAndCreateEvent3164(t *testing.T) {
 }
 
 func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
+	config := mapstr.M{
 		"protocol.tcp.host": "localhost:9000",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
@@ -263,24 +264,24 @@ func dummyMetadata() inputsource.NetworkMetadata {
 func TestParseAndCreateEvent5424(t *testing.T) {
 	cases := map[string]struct {
 		data     []byte
-		expected common.MapStr
+		expected mapstr.M
 	}{
 		"valid data": {
 			data: []byte(RfcDoc65Example1),
-			expected: common.MapStr{
-				"event":    common.MapStr{"severity": 2},
+			expected: mapstr.M{
+				"event":    mapstr.M{"severity": 2},
 				"hostname": "mymachine.example.com",
-				"log": common.MapStr{
-					"source": common.MapStr{
+				"log": mapstr.M{
+					"source": mapstr.M{
 						"address": "127.0.0.1",
 					},
 				},
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name":      "su",
 					"entity_id": "-",
 				},
 				"message": "'su root' failed for lonvick on /dev/pts/8",
-				"syslog": common.MapStr{
+				"syslog": mapstr.M{
 					"facility":       4,
 					"facility_label": "security/authorization",
 					"priority":       34,
@@ -292,20 +293,20 @@ func TestParseAndCreateEvent5424(t *testing.T) {
 		},
 		"valid data2": {
 			data: []byte(RfcDoc65Example3),
-			expected: common.MapStr{
-				"event":    common.MapStr{"severity": 5},
+			expected: mapstr.M{
+				"event":    mapstr.M{"severity": 5},
 				"hostname": "mymachine.example.com",
-				"log": common.MapStr{
-					"source": common.MapStr{
+				"log": mapstr.M{
+					"source": mapstr.M{
 						"address": "127.0.0.1",
 					},
 				},
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name":      "evntslog",
 					"entity_id": "-",
 				},
 				"message": "An application event log entry...",
-				"syslog": common.MapStr{
+				"syslog": mapstr.M{
 					"facility":       20,
 					"facility_label": "local4",
 					"priority":       165,
@@ -325,9 +326,9 @@ func TestParseAndCreateEvent5424(t *testing.T) {
 
 		"invalid data": {
 			data: []byte("<34>Oct 11 22:14:15 mymachine su[230]: 'su root' failed for lonvick on /dev/pts/8"),
-			expected: common.MapStr{
-				"log": common.MapStr{
-					"source": common.MapStr{
+			expected: mapstr.M{
+				"log": mapstr.M{
+					"source": mapstr.M{
 						"address": "127.0.0.1",
 					},
 				},

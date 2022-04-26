@@ -24,13 +24,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // getTable updates fields with the table data at the given offset.
 // fields must be non_nil on entry.
-func getTable(fields common.MapStr, data []byte, offset uint32) (next uint32, err bool, exists bool) {
+func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
 	length := binary.BigEndian.Uint32(data[offset : offset+4])
 
 	// size declared too big
@@ -39,7 +39,7 @@ func getTable(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 	}
 	if length > 0 {
 		exists = true
-		table := common.MapStr{}
+		table := mapstr.M{}
 		err := fieldUnmarshal(table, data[offset+4:offset+4+length], 0, length, -1)
 		if err {
 			logp.Warn("Error while parsing a field table")
@@ -52,7 +52,7 @@ func getTable(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 
 // getTable updates fields with the array data at the given offset.
 // fields must be non_nil on entry.
-func getArray(fields common.MapStr, data []byte, offset uint32) (next uint32, err bool, exists bool) {
+func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
 	length := binary.BigEndian.Uint32(data[offset : offset+4])
 
 	// size declared too big
@@ -61,7 +61,7 @@ func getArray(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 	}
 	if length > 0 {
 		exists = true
-		array := common.MapStr{}
+		array := mapstr.M{}
 		err := fieldUnmarshal(array, data[offset+4:offset+4+length], 0, length, 0)
 		if err {
 			logp.Warn("Error while parsing a field array")
@@ -74,7 +74,7 @@ func getArray(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 
 // The index parameter, when set at -1, indicates that the entry is a field table.
 // If it's set at 0, it is an array.
-func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint32, index int) (err bool) {
+func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, index int) (err bool) {
 	var name string
 
 	if offset >= length {
@@ -166,7 +166,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		table[name] = s
 		offset = next
 	case fieldArray:
-		newMap := common.MapStr{}
+		newMap := mapstr.M{}
 		next, err, _ := getArray(newMap, data, offset+1)
 		if err {
 			return true
@@ -178,7 +178,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		table[name] = t.Format(amqpTimeLayout)
 		offset += 9
 	case fieldTable:
-		newMap := common.MapStr{}
+		newMap := mapstr.M{}
 		next, err, _ := getTable(newMap, data, offset+1)
 		if err {
 			return true

@@ -23,10 +23,10 @@ package decode_xml_wineventlog
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type winDecoder struct {
@@ -42,7 +42,7 @@ func newDecoder() decoder {
 	}
 }
 
-func (dec *winDecoder) decode(data []byte) (common.MapStr, common.MapStr, error) {
+func (dec *winDecoder) decode(data []byte) (mapstr.M, mapstr.M, error) {
 	evt, err := winevent.UnmarshalXML(data)
 	if err != nil {
 		return nil, nil, err

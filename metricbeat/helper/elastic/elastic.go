@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -118,7 +119,7 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // int, so that it is not serialized in scientific notation in the event. This is because
 // Elasticsearch cannot accepts scientific notation to represent millis-since-epoch values
 // for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
-func FixTimestampField(m common.MapStr, field string) error {
+func FixTimestampField(m mapstr.M, field string) error {
 	v, err := m.GetValue(field)
 	if err == common.ErrKeyNotFound {
 		return nil
@@ -151,7 +152,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 		return base, nil
 	}
 
-	var raw common.MapStr
+	var raw mapstr.M
 	if err := base.UnpackConfig(&raw); err != nil {
 		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}

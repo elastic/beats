@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type (
@@ -88,8 +88,8 @@ func (alertCode alertCode) String() string {
 	return fmt.Sprintf("(unknown:0x%02x)", int(alertCode))
 }
 
-func (alert alert) toMap(source string) common.MapStr {
-	return common.MapStr{
+func (alert alert) toMap(source string) mapstr.M {
+	return mapstr.M{
 		"severity": alert.severity.String(),
 		"code":     int(alert.code),
 		"type":     alert.code.String(),

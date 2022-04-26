@@ -10,12 +10,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type enricher func(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error
@@ -43,7 +43,7 @@ type journeyEnricher struct {
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
-	urlFields common.MapStr
+	urlFields mapstr.M
 	start     time.Time
 	end       time.Time
 }
@@ -94,11 +94,11 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 		id = fmt.Sprintf("%s-%s", id, je.journey.Id)
 		name = fmt.Sprintf("%s - %s", name, je.journey.Name)
 	}
-	eventext.MergeEventFields(event, common.MapStr{
-		"event": common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{
+		"event": mapstr.M{
 			"type": se.Type,
 		},
-		"monitor": common.MapStr{
+		"monitor": mapstr.M{
 			"check_group": je.checkGroup,
 			"id":          id,
 			"name":        name,
@@ -108,8 +108,8 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 
 	// Write suite level fields for suite monitors
 	if !fields.IsInline {
-		eventext.MergeEventFields(event, common.MapStr{
-			"suite": common.MapStr{
+		eventext.MergeEventFields(event, mapstr.M{
+			"suite": mapstr.M{
 				"id":   fields.Id,
 				"name": fields.Name,
 			},
@@ -162,7 +162,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	if je.urlFields == nil {
 		if urlFields, err := event.GetValue("url"); err == nil {
-			if ufMap, ok := urlFields.(common.MapStr); ok {
+			if ufMap, ok := urlFields.(mapstr.M); ok {
 				je.urlFields = ufMap
 			}
 		}
@@ -184,24 +184,24 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
 	if !je.start.IsZero() {
-		eventext.MergeEventFields(event, common.MapStr{
-			"monitor": common.MapStr{
-				"duration": common.MapStr{
+		eventext.MergeEventFields(event, mapstr.M{
+			"monitor": mapstr.M{
+				"duration": mapstr.M{
 					"us": int64(je.end.Sub(je.start) / time.Microsecond),
 				},
 			},
 		})
 	}
-	eventext.MergeEventFields(event, common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{
 		"url": je.urlFields,
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"type": "heartbeat/summary",
 		},
-		"synthetics": common.MapStr{
+		"synthetics": mapstr.M{
 			"type":    "heartbeat/summary",
 			"journey": je.journey,
 		},
-		"summary": common.MapStr{
+		"summary": mapstr.M{
 			"up":   up,
 			"down": down,
 		},

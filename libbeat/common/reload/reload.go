@@ -34,7 +34,7 @@ type ConfigWithMeta struct {
 	Config *common.Config
 
 	// Meta data related to this config
-	Meta *common.MapStrPointer
+	Meta *mapstr.MPointer
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities

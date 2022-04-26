@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -209,7 +210,7 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 		if r := recover(); r != nil {
 			s.log.Errorw("The javascript processor caused an unexpected panic "+
 				"while processing an event. Recovering, but please report this.",
-				"event", common.MapStr{"original": b.Fields.String()},
+				"event", mapstr.M{"original": b.Fields.String()},
 				"panic", r,
 				zap.Stack("stack"))
 			if !s.evt.IsCancelled() {
@@ -261,12 +262,12 @@ func (s *session) Event() Event {
 }
 
 func init() {
-	// Register common.MapStr as being a simple map[string]interface{} for
+	// Register mapstr.M as being a simple map[string]interface{} for
 	// treatment within the JS VM.
 	AddSessionHook("_type_mapstr", func(s Session) {
-		s.Runtime().RegisterSimpleMapType(reflect.TypeOf(common.MapStr(nil)),
+		s.Runtime().RegisterSimpleMapType(reflect.TypeOf(mapstr.M(nil)),
 			func(i interface{}) map[string]interface{} {
-				return map[string]interface{}(i.(common.MapStr))
+				return map[string]interface{}(i.(mapstr.M))
 			},
 		)
 	})

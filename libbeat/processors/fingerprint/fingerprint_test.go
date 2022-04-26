@@ -28,37 +28,38 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestWithConfig(t *testing.T) {
 	cases := map[string]struct {
-		config common.MapStr
-		input  common.MapStr
+		config mapstr.M
+		input  mapstr.M
 		want   string
 	}{
 		"hello world": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"fields": []string{"message"},
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"message": "hello world",
 			},
 			want: "50110bbfc1757f21caacc966b33f5ea2235c4176739447e0b3285dec4e1dd2a4",
 		},
 		"with string escaping": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"fields": []string{"message"},
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"message": `test message "hello world"`,
 			},
 			want: "14a0364b79acbe4c78dd5e77db2c93ae8c750518b32581927d50b3eef407184e",
 		},
 		"with @timestamp": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"fields": []string{"@timestamp", "message"},
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"message": `test message "hello world"`,
 			},
 			want: "081da76e049554943843b83948ac83ab7aa79fd2849331813e02042586021c26",
@@ -83,7 +84,7 @@ func TestWithConfig(t *testing.T) {
 	}
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
-		config := common.MustNewConfigFrom(common.MapStr{
+		config := common.MustNewConfigFrom(mapstr.M{
 			"fields":       []string{"@metadata.message"},
 			"target_field": "@metadata.fingerprint",
 		})
@@ -92,12 +93,12 @@ func TestWithConfig(t *testing.T) {
 
 		testEvent := &beat.Event{
 			Timestamp: time.Unix(1635443183, 0),
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"message": "hello world",
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"message":     "hello world",
 			"fingerprint": "1a3fe8251076ed8de5fd99ce529d2b9971c54851d4d45f5a576bed91d0cc4202",
 		}
@@ -109,7 +110,7 @@ func TestWithConfig(t *testing.T) {
 }
 
 func TestHashMethods(t *testing.T) {
-	testFields := common.MapStr{
+	testFields := mapstr.M{
 		"field1":       "foo",
 		"field2":       "bar",
 		"unused_field": "baz",
@@ -128,7 +129,7 @@ func TestHashMethods(t *testing.T) {
 
 	for method, test := range tests {
 		t.Run(method, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields": []string{"field1", "field2"},
 				"method": method,
 			})
@@ -153,10 +154,10 @@ func TestHashMethods(t *testing.T) {
 }
 
 func TestSourceFields(t *testing.T) {
-	testFields := common.MapStr{
+	testFields := mapstr.M{
 		"field1": "foo",
 		"field2": "bar",
-		"nested": common.MapStr{
+		"nested": mapstr.M{
 			"field": "qux",
 		},
 		"unused_field": "baz",
@@ -173,7 +174,7 @@ func TestSourceFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields": test.fields,
 				"method": "sha256",
 			})
@@ -197,10 +198,10 @@ func TestSourceFields(t *testing.T) {
 }
 
 func TestEncoding(t *testing.T) {
-	testFields := common.MapStr{
+	testFields := mapstr.M{
 		"field1": "foo",
 		"field2": "bar",
-		"nested": common.MapStr{
+		"nested": mapstr.M{
 			"field": "qux",
 		},
 		"unused_field": "baz",
@@ -216,7 +217,7 @@ func TestEncoding(t *testing.T) {
 
 	for encoding, test := range tests {
 		t.Run(encoding, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields":   []string{"field2", "nested.field"},
 				"method":   "md5",
 				"encoding": encoding,
@@ -248,20 +249,20 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 	expectedFingerprint := "4534d56a673c2da41df32db5da87cf47e639e84fe82907f2c015c8dfcac5d4f5"
 
 	tests := map[string]struct {
-		event common.MapStr
+		event mapstr.M
 	}{
 		"UTC": {
-			common.MapStr{
+			mapstr.M{
 				"timestamp": time.Date(2019, 10, 29, 0, 0, 0, 0, tzUTC),
 			},
 		},
 		"PST": {
-			common.MapStr{
+			mapstr.M{
 				"timestamp": time.Date(2019, 10, 28, 16, 0, 0, 0, tzPST),
 			},
 		},
 		"IST": {
-			common.MapStr{
+			mapstr.M{
 				"timestamp": time.Date(2019, 10, 29, 5, 30, 0, 0, tzIST),
 			},
 		},
@@ -269,7 +270,7 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields": []string{"timestamp"},
 			})
 			assert.NoError(t, err)
@@ -291,9 +292,9 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 }
 
 func TestTargetField(t *testing.T) {
-	testFields := common.MapStr{
+	testFields := mapstr.M{
 		"field1": "foo",
-		"nested": common.MapStr{
+		"nested": mapstr.M{
 			"field": "bar",
 		},
 		"unused_field": "baz",
@@ -309,7 +310,7 @@ func TestTargetField(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields":       []string{"field1"},
 				"target_field": test.targetField,
 			})
@@ -336,7 +337,7 @@ func TestTargetField(t *testing.T) {
 }
 
 func TestSourceFieldErrors(t *testing.T) {
-	testFields := common.MapStr{
+	testFields := mapstr.M{
 		"field1": "foo",
 		"field2": "bar",
 		"complex_field": map[string]interface{}{
@@ -358,7 +359,7 @@ func TestSourceFieldErrors(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields": test.fields,
 				"method": "sha256",
 			})
@@ -379,22 +380,22 @@ func TestSourceFieldErrors(t *testing.T) {
 
 func TestInvalidConfig(t *testing.T) {
 	tests := map[string]struct {
-		config common.MapStr
+		config mapstr.M
 	}{
 		"no fields": {
-			common.MapStr{
+			mapstr.M{
 				"fields": []string{},
 				"method": "sha256",
 			},
 		},
 		"invalid fingerprinting method": {
-			common.MapStr{
+			mapstr.M{
 				"fields": []string{"doesnt", "matter"},
 				"method": "non_existent",
 			},
 		},
 		"invalid encoding": {
-			common.MapStr{
+			mapstr.M{
 				"fields":   []string{"doesnt", "matter"},
 				"encoding": "non_existent",
 			},
@@ -413,7 +414,7 @@ func TestInvalidConfig(t *testing.T) {
 }
 
 func TestIgnoreMissing(t *testing.T) {
-	testFields := common.MapStr{
+	testFields := mapstr.M{
 		"field1": "foo",
 	}
 
@@ -433,7 +434,7 @@ func TestIgnoreMissing(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ignoreMissing, _ := strconv.ParseBool(name)
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := common.NewConfigFrom(mapstr.M{
 				"fields":         []string{"field1", "missing_field"},
 				"ignore_missing": ignoreMissing,
 			})
@@ -462,7 +463,7 @@ func BenchmarkHashMethods(b *testing.B) {
 	events := nRandomEvents(100000)
 
 	for method := range hashes {
-		testConfig, _ := common.NewConfigFrom(common.MapStr{
+		testConfig, _ := common.NewConfigFrom(mapstr.M{
 			"fields": []string{"message"},
 			"method": method,
 		})
@@ -496,7 +497,7 @@ func nRandomEvents(num int) []beat.Event {
 			b[j] = charset[prng.Intn(charsetLen)]
 		}
 		events = append(events, beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": string(b),
 			},
 		})

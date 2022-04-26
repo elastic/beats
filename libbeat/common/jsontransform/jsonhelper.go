@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -80,7 +80,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 			switch m := v.(type) {
 			case map[string]string:
 				if event.Meta == nil && len(m) > 0 {
-					event.Meta = common.MapStr{}
+					event.Meta = mapstr.M{}
 				}
 				for meta, value := range m {
 					event.Meta[meta] = value
@@ -88,9 +88,9 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 
 			case map[string]interface{}:
 				if event.Meta == nil {
-					event.Meta = common.MapStr{}
+					event.Meta = mapstr.M{}
 				}
-				event.Meta.DeepUpdate(common.MapStr(m))
+				event.Meta.DeepUpdate(mapstr.M(m))
 
 			default:
 				event.SetErrorWithOption(createJSONError("failed to update @metadata"), addErrKey)
@@ -118,8 +118,8 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 	event.Fields.DeepUpdate(keys)
 }
 
-func createJSONError(message string) common.MapStr {
-	return common.MapStr{"message": message, "type": "json"}
+func createJSONError(message string) mapstr.M {
+	return mapstr.M{"message": message, "type": "json"}
 }
 
 func removeKeys(keys map[string]interface{}, names ...string) {

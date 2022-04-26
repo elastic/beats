@@ -19,14 +19,13 @@ package info
 
 import (
 	"github.com/docker/docker/api/types"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(info *types.Info) common.MapStr {
-	event := common.MapStr{
+func eventMapping(info *types.Info) mapstr.M {
+	event := mapstr.M{
 		"id": info.ID,
-		"containers": common.MapStr{
+		"containers": mapstr.M{
 			"total":   info.Containers,
 			"running": info.ContainersRunning,
 			"paused":  info.ContainersPaused,
