@@ -38,11 +38,12 @@ type directEventLoop struct {
 	cancelChan chan producerCancelRequest
 
 	// When events are ACKed by a consumer, ackLoop sends the number
-	// of ACKed events to this channel to notify the event loop.
-	ackChan chan int // ackloop -> eventloop : total number of events ACKed by outputs
+	// of ACKed events to ackChan to notify the event loop.
+	ackChan chan int
 
-	schedACKS   chan chanList // eventloop -> ackloop : active list of batches to be acked
-	pendingACKs chanList      // ordered list of active batches to be send to the ackloop
+	// pendingACKs aggregates a list of ACK channels for batches that have been sent
+	// to consumers, which is then sent to the broker's scheduledACKs channel.
+	pendingACKs chanList
 }
 
 // bufferingEventLoop implements the broker main event loop.
@@ -63,10 +64,13 @@ type bufferingEventLoop struct {
 	getChan    chan getRequest
 	cancelChan chan producerCancelRequest
 
-	// ack handling
-	acks        chan int      // ackloop -> eventloop : total number of events ACKed by outputs
-	schedACKS   chan chanList // eventloop -> ackloop : active list of batches to be acked
-	pendingACKs chanList      // ordered list of active batches to be send to the ackloop
+	// When events are ACKed by a consumer, ackLoop sends the number
+	// of ACKed events to ackChan to notify the event loop.
+	ackChan chan int // ackloop -> eventloop : total number of events ACKed by outputs
+
+	// pendingACKs aggregates a list of ACK channels for batches that have been sent
+	// to consumers, which is then sent to the broker's scheduledACKs channel.
+	pendingACKs chanList
 
 	// buffer flush timer state
 	timer *time.Timer
@@ -85,7 +89,7 @@ func newDirectEventLoop(b *broker, size int) *directEventLoop {
 		pushChan:   b.pushChan,
 		getChan:    nil,
 		cancelChan: b.cancelChan,
-		ackChan:    b.acks,
+		ackChan:    b.ackChan,
 	}
 	l.buf.init(b.logger, size)
 
@@ -100,6 +104,11 @@ func (l *directEventLoop) run() {
 	)
 
 	for {
+		var schedACKs chan chanList
+		if !l.pendingACKs.empty() {
+			schedACKs = l.broker.scheduledACKs
+		}
+
 		select {
 		case <-broker.done:
 			return
@@ -111,10 +120,9 @@ func (l *directEventLoop) run() {
 			}
 
 		case count := <-l.ackChan:
-			// Give broker/buffer a chance to clean up most recent ACKs
-			// After handling ACKs some buffer has been freed up
-			// -> always reenable producers
-			l.buf.ack(count)
+			// Events have been ACKed, remove them from the internal buffer and
+			// reenable push requests if they were previously disabled.
+			l.buf.removeEntries(count)
 			pushChan = l.pushChan
 
 		case req := <-l.cancelChan: // producer cancelling active events
@@ -127,12 +135,10 @@ func (l *directEventLoop) run() {
 		case req := <-l.getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
-		case l.schedACKS <- l.pendingACKs:
+		case schedACKs <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list and queue
 
-			l.schedACKS = nil
 			l.pendingACKs = chanList{}
-
 		}
 
 		// update get and idle timer after state machine
@@ -194,7 +200,6 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 
 	req.responseChan <- getResponse{ackCH.ackChan, buf}
 	l.pendingACKs.append(ackCH)
-	l.schedACKS = l.broker.scheduledACKs
 }
 
 // processACK is used by the ackLoop to process the list of acked batches
@@ -271,7 +276,7 @@ func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time
 		pushChan:   b.pushChan,
 		getChan:    nil,
 		cancelChan: b.cancelChan,
-		acks:       b.acks,
+		ackChan:    b.ackChan,
 	}
 	l.buf = newBatchBuffer(l.minEvents)
 
@@ -284,11 +289,16 @@ func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time
 }
 
 func (l *bufferingEventLoop) run() {
-	var (
-		broker = l.broker
-	)
+	broker := l.broker
 
 	for {
+		var schedACKs chan chanList
+		if !l.pendingACKs.empty() {
+			// Enable sending to the scheduled ACKs channel if we have
+			// something to send.
+			schedACKs = l.broker.scheduledACKs
+		}
+
 		select {
 		case <-broker.done:
 			return
@@ -302,11 +312,10 @@ func (l *bufferingEventLoop) run() {
 		case req := <-l.getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
-		case l.schedACKS <- l.pendingACKs:
-			l.schedACKS = nil
+		case schedACKs <- l.pendingACKs:
 			l.pendingACKs = chanList{}
 
-		case count := <-l.acks:
+		case count := <-l.ackChan:
 			l.handleACK(count)
 
 		case <-l.idleC:
@@ -427,7 +436,6 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 
 	req.responseChan <- getResponse{ackChan.ackChan, entries}
 	l.pendingACKs.append(ackChan)
-	l.schedACKS = l.broker.scheduledACKs
 
 	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {

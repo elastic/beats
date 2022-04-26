@@ -63,7 +63,7 @@ func (l *ackLoop) run() {
 		case <-sig:
 			ackCount += l.handleBatchSig()
 			if ackCount > 0 {
-				ackChan = l.broker.acks
+				ackChan = l.broker.ackChan
 			}
 		}
 

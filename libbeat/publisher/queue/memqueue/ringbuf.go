@@ -211,9 +211,10 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 	return start, b.entries[start:end]
 }
 
-// ack up to sz events in region A
-// Requires b.reserved <= sz
-func (b *ringBuffer) ack(sz int) {
+// Remove the specified number of previously-reserved buffer entries from the
+// start of region A. Called by the event loop when events are ACKed by
+// consumers.
+func (b *ringBuffer) removeEntries(count int) {
 	/*fmt.Printf("ack(%d)\n", sz)
 	fmt.Printf("  region A: %v\n", b.regA)
 	fmt.Printf("  region B: %v\n", b.regB)
@@ -224,21 +225,21 @@ func (b *ringBuffer) ack(sz int) {
 		fmt.Printf("  -> reserved: %v\n", b.reserved)
 	}()*/
 
-	if b.regA.size < sz {
+	if b.regA.size < count {
 		panic(fmt.Errorf("commit region to big (commit region=%v, buffer size=%v)",
-			sz, b.regA.size,
+			count, b.regA.size,
 		))
 	}
 
 	// clear region, so published events can be collected by the garbage collector:
-	end := b.regA.index + sz
+	end := b.regA.index + count
 	for i := b.regA.index; i < end; i++ {
 		b.entries[i] = queueEntry{}
 	}
 
 	b.regA.index = end
-	b.regA.size -= sz
-	b.reserved -= sz
+	b.regA.size -= count
+	b.reserved -= count
 	if b.regA.size == 0 {
 		// region A is empty, transfer region B into region A
 		b.regA = b.regB

@@ -54,7 +54,10 @@ type broker struct {
 
 	///////////////////////////
 	// internal channels
-	acks          chan int
+
+	// When ackLoop receives ACKs from a consumer, it aggregates them and sends
+	// the number of acked events to ackChan.
+	ackChan       chan int
 	scheduledACKs chan chanList
 
 	ackListener queue.ACKListener
@@ -157,7 +160,7 @@ func NewQueue(
 		cancelChan: make(chan producerCancelRequest, 5),
 
 		// internal broker and ACK handler channels
-		acks:          make(chan int),
+		ackChan:       make(chan int),
 		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,
