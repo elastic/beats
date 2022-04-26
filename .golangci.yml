@@ -89,8 +89,8 @@ linters-settings:
   goconst:
     # minimal length of string constant, 3 by default
     min-len: 3
-    # minimal occurrences count to trigger, 3 by default
-    min-occurrences: 2
+    # minimal occurrences count to trigger
+    min-occurrences: 5
 
   dupl:
     # tokens count to trigger issue, 150 by default
