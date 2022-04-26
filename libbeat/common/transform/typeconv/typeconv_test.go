@@ -21,13 +21,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConversionWithMapStr(t *testing.T) {
-	t.Run("from MapStr", func(t *testing.T) {
+	t.Run("from mapstr.M", func(t *testing.T) {
 		type testStruct struct {
 			A int
 			B int
@@ -38,7 +39,7 @@ func TestConversionWithMapStr(t *testing.T) {
 		assert.Equal(t, testStruct{1, 0}, v)
 	})
 
-	t.Run("to MapStr", func(t *testing.T) {
+	t.Run("to mapstr.M", func(t *testing.T) {
 		var m mapstr.M
 		err := Convert(&m, struct{ A string }{"test"})
 		require.NoError(t, err)
@@ -85,7 +86,7 @@ func TestConversionBetweenGoTypes(t *testing.T) {
 }
 
 func TestTimestamps(t *testing.T) {
-	t.Run("timestamp to MapStr", func(t *testing.T) {
+	t.Run("timestamp to mapstr.M", func(t *testing.T) {
 		var m mapstr.M
 		ts := time.Unix(1234, 5678).UTC()
 
@@ -97,7 +98,7 @@ func TestTimestamps(t *testing.T) {
 		assert.Equal(t, mapstr.M{"timestamp": expected}, m)
 	})
 
-	t.Run("timestamp from encoded MapStr", func(t *testing.T) {
+	t.Run("timestamp from encoded mapstr.M", func(t *testing.T) {
 		type testStruct struct {
 			Timestamp time.Time
 		}
