@@ -33,9 +33,9 @@ type directEventLoop struct {
 	buf ringBuffer
 
 	// active broker API channels
-	events    chan pushRequest
-	get       chan getRequest
-	pubCancel chan producerCancelRequest
+	pushChan   chan pushRequest
+	getChan    chan getRequest
+	cancelChan chan producerCancelRequest
 
 	// ack handling
 	acks        chan int      // ackloop -> eventloop : total number of events ACKed by outputs
@@ -58,9 +58,9 @@ type bufferingEventLoop struct {
 	flushTimeout time.Duration
 
 	// active broker API channels
-	events    chan pushRequest
-	get       chan getRequest
-	pubCancel chan producerCancelRequest
+	pushChan   chan pushRequest
+	getChan    chan getRequest
+	cancelChan chan producerCancelRequest
 
 	// ack handling
 	acks        chan int      // ackloop -> eventloop : total number of events ACKed by outputs
@@ -81,11 +81,11 @@ type flushList struct {
 
 func newDirectEventLoop(b *broker, size int) *directEventLoop {
 	l := &directEventLoop{
-		broker:    b,
-		events:    b.events,
-		get:       nil,
-		pubCancel: b.pubCancel,
-		acks:      b.acks,
+		broker:     b,
+		pushChan:   b.events,
+		getChan:    nil,
+		cancelChan: b.pubCancel,
+		acks:       b.acks,
 	}
 	l.buf.init(b.logger, size)
 
@@ -94,59 +94,52 @@ func newDirectEventLoop(b *broker, size int) *directEventLoop {
 
 func (l *directEventLoop) run() {
 	var (
-		broker = l.broker
-		buf    = &l.buf
+		broker   = l.broker
+		buf      = &l.buf
+		pushChan = l.pushChan
 	)
 
 	for {
 		select {
 		case <-broker.done:
-			//fmt.Printf("broker.done\n")
 			return
 
-		case req := <-l.events: // producer pushing new event
-			//fmt.Printf("handleInsert\n")
-			l.handleInsert(&req)
+		case req := <-pushChan: // producer pushing new event
+			if full := l.insert(&req); full {
+				// no more space to accept new events -> unset events queue for time being
+				pushChan = nil
+			}
 
-		case req := <-l.pubCancel: // producer cancelling active events
-			//fmt.Printf("handleCancel\n")
+		case count := <-l.acks:
+			// Give broker/buffer a chance to clean up most recent ACKs
+			// After handling ACKs some buffer has been freed up
+			// -> always reenable producers
+			l.buf.ack(count)
+			pushChan = l.pushChan
+
+		case req := <-l.cancelChan: // producer cancelling active events
 			l.handleCancel(&req)
+			// re-enable pushRequest if buffer can take new events
+			if !l.buf.Full() {
+				pushChan = l.pushChan
+			}
 
-		case req := <-l.get: // consumer asking for next batch
-			//fmt.Printf("handleGetRequest\n")
+		case req := <-l.getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
 		case l.schedACKS <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list and queue
-			//fmt.Printf("pendingACKs\n")
 
 			l.schedACKS = nil
 			l.pendingACKs = chanList{}
 
-		case count := <-l.acks:
-			//fmt.Printf("handleACK(%d)\n", count)
-
-			l.handleACK(count)
-
 		}
 
 		// update get and idle timer after state machine
-		l.get = nil
+		l.getChan = nil
 		if buf.Avail() > 0 {
-			l.get = broker.requests
+			l.getChan = broker.requests
 		}
-	}
-}
-
-func (l *directEventLoop) handleInsert(req *pushRequest) {
-	// log := l.broker.logger
-	// log.Debugf("push event: %v\t%v\t%p\n", req.event, req.seq, req.state)
-
-	if full := l.insert(req); full {
-		// log.Debugf("buffer: all regions full")
-
-		// no more space to accept new events -> unset events queue for time being
-		l.events = nil
 	}
 }
 
@@ -174,10 +167,7 @@ func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
 	// log := l.broker.logger
 	// log.Debug("handle cancel request")
 
-	var (
-		removed int
-		broker  = l.broker
-	)
+	var removed int
 
 	if st := req.state; st != nil {
 		st.cancelled = true
@@ -187,11 +177,6 @@ func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
 	// signal cancel request being finished
 	if req.resp != nil {
 		req.resp <- producerCancelResponse{removed: removed}
-	}
-
-	// re-enable pushRequest if buffer can take new events
-	if !l.buf.Full() {
-		l.events = broker.events
 	}
 }
 
@@ -212,17 +197,6 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	req.resp <- getResponse{ackCH, buf}
 	l.pendingACKs.append(ackCH)
 	l.schedACKS = l.broker.scheduledACKs
-}
-
-func (l *directEventLoop) handleACK(count int) {
-	// log := l.broker.logger
-	// log.Debug("receive buffer ack:", count)
-
-	// Give broker/buffer a chance to clean up most recent ACKs
-	// After handling ACKs some buffer has been freed up
-	// -> always reenable producers
-	l.buf.ack(count)
-	l.events = l.broker.events
 }
 
 // processACK is used by the ackLoop to process the list of acked batches
@@ -296,10 +270,10 @@ func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time
 		minEvents:    minEvents,
 		flushTimeout: flushTimeout,
 
-		events:    b.events,
-		get:       nil,
-		pubCancel: b.pubCancel,
-		acks:      b.acks,
+		pushChan:   b.events,
+		getChan:    nil,
+		cancelChan: b.pubCancel,
+		acks:       b.acks,
 	}
 	l.buf = newBatchBuffer(l.minEvents)
 
@@ -321,13 +295,13 @@ func (l *bufferingEventLoop) run() {
 		case <-broker.done:
 			return
 
-		case req := <-l.events: // producer pushing new event
+		case req := <-l.pushChan: // producer pushing new event
 			l.handleInsert(&req)
 
-		case req := <-l.pubCancel: // producer cancelling active events
+		case req := <-l.cancelChan: // producer cancelling active events
 			l.handleCancel(&req)
 
-		case req := <-l.get: // consumer asking for next batch
+		case req := <-l.getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
 		case l.schedACKS <- l.pendingACKs:
@@ -351,7 +325,7 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 	if l.insert(req) {
 		l.eventCount++
 		if l.eventCount == l.maxEvents {
-			l.events = nil // stop inserting events if upper limit is reached
+			l.pushChan = nil // stop inserting events if upper limit is reached
 		}
 
 		L := l.buf.length()
@@ -420,12 +394,12 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 	}
 	l.flushList = tmpList
 	if tmpList.empty() {
-		l.get = nil
+		l.getChan = nil
 	}
 
 	l.eventCount -= removed
 	if l.eventCount < l.maxEvents {
-		l.events = l.broker.events
+		l.pushChan = l.broker.events
 	}
 }
 
@@ -467,7 +441,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 func (l *bufferingEventLoop) handleACK(count int) {
 	l.eventCount -= count
 	if l.eventCount < l.maxEvents {
-		l.events = l.broker.events
+		l.pushChan = l.broker.events
 	}
 }
 
@@ -491,7 +465,7 @@ func (l *bufferingEventLoop) advanceFlushList() {
 	l.flushList.pop()
 	if l.flushList.count == 0 {
 		// All buffers are empty, disable consumer get
-		l.get = nil
+		l.getChan = nil
 
 		if l.buf.flushed {
 			l.buf = newBatchBuffer(l.minEvents)
@@ -507,7 +481,7 @@ func (l *bufferingEventLoop) flushBuffer() {
 	}
 
 	l.flushList.add(l.buf)
-	l.get = l.broker.requests
+	l.getChan = l.broker.requests
 }
 
 func (l *bufferingEventLoop) processACK(lst chanList, N int) {
