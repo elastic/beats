@@ -27,8 +27,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	sc "github.com/elastic/elastic-agent-shipper/api"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
