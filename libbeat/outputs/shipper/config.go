@@ -21,38 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-
-	"google.golang.org/grpc/backoff"
 )
-
-type Backoff struct {
-	// BaseDelay is the amount of time to backoff after the first failure.
-	BaseDelay time.Duration `config:"base_delay"`
-	// Multiplier is the factor with which to multiply backoffs after a
-	// failed retry. Should ideally be greater than 1.
-	Multiplier float64 `config:"multiplier"`
-	// Jitter is the factor with which backoffs are randomized.
-	Jitter float64 `config:"jitter"`
-	// MaxDelay is the upper bound of backoff delay.
-	MaxDelay time.Duration `config:"max_delay"`
-}
-
-func (b Backoff) ToGRPCBackOff() backoff.Config {
-	return backoff.Config{
-		BaseDelay:  b.BaseDelay,
-		Multiplier: b.Multiplier,
-		Jitter:     b.Jitter,
-		MaxDelay:   b.MaxDelay,
-	}
-}
-func FromGRPCBackOff(b backoff.Config) Backoff {
-	return Backoff{
-		BaseDelay:  b.BaseDelay,
-		Multiplier: b.Multiplier,
-		Jitter:     b.Jitter,
-		MaxDelay:   b.MaxDelay,
-	}
-}
 
 type Config struct {
 	// Server address in the format of host:port, e.g. `localhost:50051`
@@ -65,8 +34,6 @@ type Config struct {
 	MaxRetries int `config:"max_retries"         validate:"min=-1,nonzero"`
 	// BulkMaxSize max amount of events in a single batch
 	BulkMaxSize int `config:"bulk_max_size"`
-	// Backoff strategy configuration
-	Backoff Backoff `config:"backoff"`
 }
 
 func defaultConfig() Config {
@@ -75,6 +42,5 @@ func defaultConfig() Config {
 		Timeout:     30 * time.Second,
 		MaxRetries:  3,
 		BulkMaxSize: 50,
-		Backoff:     FromGRPCBackOff(backoff.DefaultConfig),
 	}
 }

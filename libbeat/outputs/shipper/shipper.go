@@ -79,7 +79,7 @@ func makeShipper(
 
 	opts := []grpc.DialOption{
 		grpc.WithConnectParams(grpc.ConnectParams{
-			Backoff: backoff.Config(config.Backoff),
+			Backoff: backoff.DefaultConfig,
 		}),
 		grpc.WithTransportCredentials(creds),
 	}
