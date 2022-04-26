@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: gcp
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/gcp/_meta/docs.asciidoc
+
 
 [[metricbeat-module-gcp]]
 [role="xpack"]
@@ -253,6 +255,8 @@ The `storage` metricset comes with a predefined dashboard:
 image::./images/metricbeat-gcp-storage-overview.png[]
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -367,3 +371,4 @@ include::gcp/pubsub.asciidoc[]
 
 include::gcp/storage.asciidoc[]
 
+:edit_url!:

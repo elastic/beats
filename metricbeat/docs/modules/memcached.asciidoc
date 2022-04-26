@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: memcached
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/memcached/_meta/docs.asciidoc
+
 
 [[metricbeat-module-memcached]]
 == Memcached module
@@ -16,6 +18,8 @@ The default metricset is `stats`.
 
 The memcached module is tested with memcached 1.4.35.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -42,3 +46,4 @@ The following metricsets are available:
 
 include::memcached/stats.asciidoc[]
 
+:edit_url!:

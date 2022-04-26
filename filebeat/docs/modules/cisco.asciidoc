@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/cisco/_meta/docs.asciidoc
+
 [[filebeat-module-cisco]]
 [role="xpack"]
 
@@ -544,3 +546,4 @@ image::./images/kibana-cisco-asa.png[]
 For a description of each field in the module, see the
 <<exported-fields-cisco,exported fields>> section.
 
+edit_url!:
