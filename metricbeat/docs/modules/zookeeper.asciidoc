@@ -20,7 +20,7 @@ metricsets are `mntr` and `server`.
 The ZooKeeper metricsets were tested with ZooKeeper 3.4.8, 3.6.0 and 3.7.0. They are expected to work with all versions
 >= 3.4.0. Versions prior to 3.4 do not support the `mntr` command.
 
-Note that from ZooKeeper 3.6.0, `mntr` command must be explicitly enabled at ZooKeeper side using the `4lw.commands.whitelist` configuration parameter.
+Note that from ZooKeeper 3.6.0, `mntr`, `stat`, `ruok`, `conf`, `isro`, `cons` command must be explicitly enabled at ZooKeeper side using the `4lw.commands.whitelist` configuration parameter.
 
 [float]
 === Dashboard
