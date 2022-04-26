@@ -1,5 +1,4 @@
 {"name": "github.com/elastic/elastic-agent-client/v7", "licenceType": "Elastic"}
-{"name": "github.com/elastic/elastic-agent-shipper", "licenceType": "Elastic"}
 {"name": "github.com/gorhill/cronexpr", "licenceType": "Apache-2.0", "licenceFile":"APLv2"}
 {"name": "github.com/hashicorp/cronexpr", "licenceType": "Apache-2.0", "licenceFile":"APLv2"}
 {"name": "github.com/miekg/dns", "licenceType": "BSD"}
