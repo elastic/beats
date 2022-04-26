@@ -29,13 +29,7 @@ import (
 // but tries to forward events as early as possible.
 type directEventLoop struct {
 	broker *broker
-
-	buf ringBuffer
-
-	// active broker API channels
-	pushChan   chan pushRequest
-	getChan    chan getRequest
-	cancelChan chan producerCancelRequest
+	buf    ringBuffer
 
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
 	// to consumers, which is then sent to the broker's scheduledACKs channel.
@@ -80,10 +74,7 @@ type flushList struct {
 
 func newDirectEventLoop(b *broker, size int) *directEventLoop {
 	l := &directEventLoop{
-		broker:     b,
-		pushChan:   b.pushChan,
-		getChan:    nil,
-		cancelChan: b.cancelChan,
+		broker: b,
 	}
 	l.buf.init(b.logger, size)
 
@@ -92,13 +83,27 @@ func newDirectEventLoop(b *broker, size int) *directEventLoop {
 
 func (l *directEventLoop) run() {
 	var (
-		broker   = l.broker
-		buf      = &l.buf
-		pushChan = l.pushChan
+		broker = l.broker
+		buf    = &l.buf
 	)
 
 	for {
+		var pushChan chan pushRequest
+		// Push requests are enabled if the queue isn't yet full.
+		if !l.buf.Full() {
+			pushChan = l.broker.pushChan
+		}
+
+		var getChan chan getRequest
+		// Get requests are enabled if there are events in the queue
+		// that haven't yet been sent to a consumer.
+		if buf.Avail() > 0 {
+			getChan = l.broker.getChan
+		}
+
 		var schedACKs chan chanList
+		// Sending pending ACKs to the broker's scheduled ACKs
+		// channel is enabled if it is nonempty.
 		if !l.pendingACKs.empty() {
 			schedACKs = l.broker.scheduledACKs
 		}
@@ -108,37 +113,22 @@ func (l *directEventLoop) run() {
 			return
 
 		case req := <-pushChan: // producer pushing new event
-			if full := l.insert(&req); full {
-				// no more space to accept new events -> unset events queue for time being
-				pushChan = nil
-			}
+			l.insert(&req)
 
 		case count := <-l.broker.ackChan:
-			// Events have been ACKed, remove them from the internal buffer and
-			// reenable push requests if they were previously disabled.
+			// Events have been ACKed, remove them from the internal buffer.
 			l.buf.removeEntries(count)
-			pushChan = l.pushChan
 
-		case req := <-l.cancelChan: // producer cancelling active events
+		case req := <-l.broker.cancelChan: // producer cancelling active events
 			l.handleCancel(&req)
 			// re-enable pushRequest if buffer can take new events
-			if !l.buf.Full() {
-				pushChan = l.pushChan
-			}
 
-		case req := <-l.getChan: // consumer asking for next batch
+		case req := <-getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
 		case schedACKs <- l.pendingACKs:
-			// on send complete list of pending batches has been forwarded -> clear list and queue
-
+			// on send complete list of pending batches has been forwarded -> clear list
 			l.pendingACKs = chanList{}
-		}
-
-		// update get and idle timer after state machine
-		l.getChan = nil
-		if buf.Avail() > 0 {
-			l.getChan = broker.getChan
 		}
 	}
 }
@@ -196,7 +186,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 	l.pendingACKs.append(ackCH)
 }
 
-// processACK is used by the ackLoop to process the list of acked batches
+// processACK is called by the ackLoop to process the list of acked batches
 func (l *directEventLoop) processACK(lst chanList, N int) {
 	log := l.broker.logger
 	{

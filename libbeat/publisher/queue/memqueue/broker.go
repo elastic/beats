@@ -184,7 +184,7 @@ func NewQueue(
 	}
 
 	b.bufSize = sz
-	ack := &ackLoop{
+	ackLoop := &ackLoop{
 		broker:     b,
 		processACK: eventLoop.processACK}
 
@@ -195,7 +195,7 @@ func NewQueue(
 	}()
 	go func() {
 		defer b.wg.Done()
-		ack.run()
+		ackLoop.run()
 	}()
 
 	return b
