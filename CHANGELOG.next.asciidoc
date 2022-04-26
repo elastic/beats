@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
 - Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 - Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
 
 *Packetbeat*
