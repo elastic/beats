@@ -35,8 +35,7 @@ type ringBuffer struct {
 
 	entries []queueEntry
 
-	// The underlying array is divided up into two contiguous
-	// regions, A followed by B.
+	// The underlying array is divided up into two contiguous regions.
 	regA, regB region
 
 	// The number of events awaiting ACK at the beginning of region A.

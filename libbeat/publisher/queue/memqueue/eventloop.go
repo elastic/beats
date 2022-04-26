@@ -37,9 +37,10 @@ type directEventLoop struct {
 	getChan    chan getRequest
 	cancelChan chan producerCancelRequest
 
-	// ackLoop sends to this channel to notify the event loop
-	// when events are ACKed by
-	ackChan     chan int      // ackloop -> eventloop : total number of events ACKed by outputs
+	// When events are ACKed by a consumer, ackLoop sends the number
+	// of ACKed events to this channel to notify the event loop.
+	ackChan chan int // ackloop -> eventloop : total number of events ACKed by outputs
+
 	schedACKS   chan chanList // eventloop -> ackloop : active list of batches to be acked
 	pendingACKs chanList      // ordered list of active batches to be send to the ackloop
 }
@@ -81,9 +82,9 @@ type flushList struct {
 func newDirectEventLoop(b *broker, size int) *directEventLoop {
 	l := &directEventLoop{
 		broker:     b,
-		pushChan:   b.events,
+		pushChan:   b.pushChan,
 		getChan:    nil,
-		cancelChan: b.pubCancel,
+		cancelChan: b.cancelChan,
 		ackChan:    b.acks,
 	}
 	l.buf.init(b.logger, size)
@@ -137,7 +138,7 @@ func (l *directEventLoop) run() {
 		// update get and idle timer after state machine
 		l.getChan = nil
 		if buf.Avail() > 0 {
-			l.getChan = broker.requests
+			l.getChan = broker.getChan
 		}
 	}
 }
@@ -191,7 +192,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 
 	ackCH := newBatchACKer(start, count, l.buf.entries)
 
-	req.responseChan <- getResponse{ackCH.ch, buf}
+	req.responseChan <- getResponse{ackCH.ackChan, buf}
 	l.pendingACKs.append(ackCH)
 	l.schedACKS = l.broker.scheduledACKs
 }
@@ -267,9 +268,9 @@ func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time
 		minEvents:    minEvents,
 		flushTimeout: flushTimeout,
 
-		pushChan:   b.events,
+		pushChan:   b.pushChan,
 		getChan:    nil,
-		cancelChan: b.pubCancel,
+		cancelChan: b.cancelChan,
 		acks:       b.acks,
 	}
 	l.buf = newBatchBuffer(l.minEvents)
@@ -396,7 +397,7 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 
 	l.eventCount -= removed
 	if l.eventCount < l.maxEvents {
-		l.pushChan = l.broker.events
+		l.pushChan = l.broker.pushChan
 	}
 }
 
@@ -424,7 +425,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	entries := buf.entries[:count]
 	ackChan := newBatchACKer(0, count, entries)
 
-	req.responseChan <- getResponse{ackChan.ch, entries}
+	req.responseChan <- getResponse{ackChan.ackChan, entries}
 	l.pendingACKs.append(ackChan)
 	l.schedACKS = l.broker.scheduledACKs
 
@@ -437,7 +438,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 func (l *bufferingEventLoop) handleACK(count int) {
 	l.eventCount -= count
 	if l.eventCount < l.maxEvents {
-		l.pushChan = l.broker.events
+		l.pushChan = l.broker.pushChan
 	}
 }
 
@@ -477,7 +478,7 @@ func (l *bufferingEventLoop) flushBuffer() {
 	}
 
 	l.flushList.add(l.buf)
-	l.getChan = l.broker.requests
+	l.getChan = l.broker.getChan
 }
 
 func (l *bufferingEventLoop) processACK(lst chanList, N int) {

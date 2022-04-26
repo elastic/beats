@@ -54,7 +54,7 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 	}
 
 	select {
-	case c.broker.requests <- getRequest{entryCount: sz, responseChan: c.resp}:
+	case c.broker.getChan <- getRequest{entryCount: sz, responseChan: c.resp}:
 	case <-c.done:
 		return nil, io.EOF
 	}

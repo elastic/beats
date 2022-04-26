@@ -56,7 +56,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	openState := openState{
 		log:    b.logger,
 		done:   make(chan struct{}),
-		events: b.events,
+		events: b.pushChan,
 	}
 
 	if cb != nil {
@@ -114,7 +114,7 @@ func (p *ackProducer) Cancel() int {
 
 	if p.dropOnCancel {
 		ch := make(chan producerCancelResponse)
-		p.broker.pubCancel <- producerCancelRequest{
+		p.broker.cancelChan <- producerCancelRequest{
 			state: &p.state,
 			resp:  ch,
 		}

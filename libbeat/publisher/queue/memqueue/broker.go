@@ -39,11 +39,20 @@ type broker struct {
 
 	bufSize int
 
+	///////////////////////////
 	// api channels
-	events    chan pushRequest
-	requests  chan getRequest
-	pubCancel chan producerCancelRequest
 
+	// Producers send requests to pushChan to add events to the queue.
+	pushChan chan pushRequest
+
+	// Consumers send getChan to getChan to read events from the queue.
+	getChan chan getRequest
+
+	// Producers send requests to cancelChan to cancel events they've
+	// sent so far that have not yet reached a consumer.
+	cancelChan chan producerCancelRequest
+
+	///////////////////////////
 	// internal channels
 	acks          chan int
 	scheduledACKs chan chanList
@@ -62,9 +71,12 @@ type Settings struct {
 	InputQueueSize int
 }
 
+// batchACKer stores the metadata associated with a batch of events sent to
+// a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
+// ackChan and received by
 type batchACKer struct {
 	next         *batchACKer
-	ch           chan batchAckMsg
+	ackChan      chan batchAckMsg
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
 }
@@ -140,9 +152,9 @@ func NewQueue(
 		logger: logger,
 
 		// broker API channels
-		events:    make(chan pushRequest, chanSize),
-		requests:  make(chan getRequest),
-		pubCancel: make(chan producerCancelRequest, 5),
+		pushChan:   make(chan pushRequest, chanSize),
+		getChan:    make(chan getRequest),
+		cancelChan: make(chan producerCancelRequest, 5),
 
 		// internal broker and ACK handler channels
 		acks:          make(chan int),
@@ -202,7 +214,7 @@ func (b *broker) Consumer() queue.Consumer {
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
 		return &batchACKer{
-			ch: make(chan batchAckMsg, 1),
+			ackChan: make(chan batchAckMsg, 1),
 		}
 	},
 }
@@ -265,7 +277,7 @@ func (l *chanList) channel() chan batchAckMsg {
 	if l.head == nil {
 		return nil
 	}
-	return l.head.ch
+	return l.head.ackChan
 }
 
 func (l *chanList) pop() *batchACKer {
