@@ -6040,11 +6040,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.1.1
+Version: v0.2.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.1.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -12510,11 +12510,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/magefile/mage
-Version: v1.12.1
+Version: v1.13.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/magefile/mage@v1.12.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/magefile/mage@v1.13.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -16198,11 +16198,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.0/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/go-licence-detector
-Version: v0.4.0
+Version: v0.5.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.5.0/LICENSE:
 
 
                                  Apache License
@@ -16440,11 +16440,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/atomic
-Version: v1.8.0
+Version: v1.9.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/atomic@v1.8.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/atomic@v1.9.0/LICENSE.txt:
 
 Copyright (c) 2016 Uber Technologies, Inc.
 
@@ -16469,13 +16469,13 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/multierr
-Version: v1.6.0
+Version: v1.8.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.6.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.8.0/LICENSE.txt:
 
-Copyright (c) 2017 Uber Technologies, Inc.
+Copyright (c) 2017-2021 Uber Technologies, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
