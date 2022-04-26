@@ -37,7 +37,7 @@ type consumer struct {
 type batch struct {
 	consumer *consumer
 	events   []publisher.Event
-	ack      *ackChan
+	ack      *batchACKer
 	state    ackState
 }
 
@@ -99,18 +99,12 @@ func (b *batch) Events() []publisher.Event {
 }
 
 func (b *batch) ACK() {
-	if b.state != batchActive {
-		switch b.state {
-		case batchACK:
-			panic("Can not acknowledge already acknowledged batch")
-		default:
-			panic("inactive batch")
-		}
+	switch b.state {
+	case batchActive:
+		b.ack.ch <- batchAckMsg{}
+	case batchACK:
+		panic("Can not acknowledge already acknowledged batch")
+	default:
+		panic("inactive batch")
 	}
-
-	b.report()
-}
-
-func (b *batch) report() {
-	b.ack.ch <- batchAckMsg{}
 }

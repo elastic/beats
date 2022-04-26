@@ -38,7 +38,7 @@ type directEventLoop struct {
 	cancelChan chan producerCancelRequest
 
 	// ackLoop sends to this channel to notify the event loop
-	// when events
+	// when events are ACKed by
 	ackChan     chan int      // ackloop -> eventloop : total number of events ACKed by outputs
 	schedACKS   chan chanList // eventloop -> ackloop : active list of batches to be acked
 	pendingACKs chanList      // ordered list of active batches to be send to the ackloop
@@ -189,7 +189,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 		panic("empty batch returned")
 	}
 
-	ackCH := newACKChan(start, count, l.buf.entries)
+	ackCH := newBatchACKer(start, count, l.buf.entries)
 
 	req.resp <- getResponse{ackCH, buf}
 	l.pendingACKs.append(ackCH)
@@ -422,7 +422,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	}
 
 	entries := buf.entries[:count]
-	ackChan := newACKChan(0, count, entries)
+	ackChan := newBatchACKer(0, count, entries)
 
 	req.resp <- getResponse{ackChan, entries}
 	l.pendingACKs.append(ackChan)

@@ -62,17 +62,16 @@ type Settings struct {
 	InputQueueSize int
 }
 
-type ackChan struct {
-	next *ackChan
-	ch   chan batchAckMsg
-	//seq          uint
+type batchACKer struct {
+	next         *batchACKer
+	ch           chan batchAckMsg
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
 }
 
 type chanList struct {
-	head *ackChan
-	tail *ackChan
+	head *batchACKer
+	tail *batchACKer
 }
 
 func init() {
@@ -202,15 +201,15 @@ func (b *broker) Consumer() queue.Consumer {
 
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
-		return &ackChan{
+		return &batchACKer{
 			ch: make(chan batchAckMsg, 1),
 		}
 	},
 }
 
-func newACKChan(start, count int, entries []queueEntry) *ackChan {
+func newBatchACKer(start, count int, entries []queueEntry) *batchACKer {
 	//nolint: errcheck // Return value doesn't need to be checked before conversion.
-	ch := ackChanPool.Get().(*ackChan)
+	ch := ackChanPool.Get().(*batchACKer)
 	ch.next = nil
 	ch.start = start
 	ch.count = count
@@ -218,12 +217,12 @@ func newACKChan(start, count int, entries []queueEntry) *ackChan {
 	return ch
 }
 
-func releaseACKChan(c *ackChan) {
+func releaseACKChan(c *batchACKer) {
 	c.next = nil
 	ackChanPool.Put(c)
 }
 
-func (l *chanList) prepend(ch *ackChan) {
+func (l *chanList) prepend(ch *batchACKer) {
 	ch.next = l.head
 	l.head = ch
 	if l.tail == nil {
@@ -245,7 +244,7 @@ func (l *chanList) concat(other *chanList) {
 	l.tail = other.tail
 }
 
-func (l *chanList) append(ch *ackChan) {
+func (l *chanList) append(ch *batchACKer) {
 	if l.head == nil {
 		l.head = ch
 	} else {
@@ -258,7 +257,7 @@ func (l *chanList) empty() bool {
 	return l.head == nil
 }
 
-func (l *chanList) front() *ackChan {
+func (l *chanList) front() *batchACKer {
 	return l.head
 }
 
@@ -269,7 +268,7 @@ func (l *chanList) channel() chan batchAckMsg {
 	return l.head.ch
 }
 
-func (l *chanList) pop() *ackChan {
+func (l *chanList) pop() *batchACKer {
 	ch := l.head
 	if ch != nil {
 		l.head = ch.next
