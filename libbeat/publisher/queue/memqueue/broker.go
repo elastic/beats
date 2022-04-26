@@ -55,9 +55,15 @@ type broker struct {
 	///////////////////////////
 	// internal channels
 
-	// When ackLoop receives ACKs from a consumer, it aggregates them and sends
-	// the number of acked events to ackChan.
-	ackChan       chan int
+	// When ackLoop receives events ACKs from a consumer, it sends the number
+	// of ACKed events to ackChan to notify the event loop that those
+	// events can be removed from the queue.
+	ackChan chan int
+
+	// When events are sent to consumers, the ACK channels for their batches
+	// are collected into chanLists and sent to scheduledACKs.
+	// These are then read by ackLoop and concatenated to its internal
+	// chanList of all outstanding ACK channels.
 	scheduledACKs chan chanList
 
 	ackListener queue.ACKListener
@@ -74,19 +80,19 @@ type Settings struct {
 	InputQueueSize int
 }
 
-// batchACKer stores the metadata associated with a batch of events sent to
+// batchACKState stores the metadata associated with a batch of events sent to
 // a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
 // ackChan and received by
-type batchACKer struct {
-	next         *batchACKer
+type batchACKState struct {
+	next         *batchACKState
 	ackChan      chan batchAckMsg
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
 }
 
 type chanList struct {
-	head *batchACKer
-	tail *batchACKer
+	head *batchACKState
+	tail *batchACKState
 }
 
 func init() {
@@ -216,15 +222,15 @@ func (b *broker) Consumer() queue.Consumer {
 
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
-		return &batchACKer{
+		return &batchACKState{
 			ackChan: make(chan batchAckMsg, 1),
 		}
 	},
 }
 
-func newBatchACKer(start, count int, entries []queueEntry) *batchACKer {
+func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
 	//nolint: errcheck // Return value doesn't need to be checked before conversion.
-	ch := ackChanPool.Get().(*batchACKer)
+	ch := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
 	ch.start = start
 	ch.count = count
@@ -232,12 +238,12 @@ func newBatchACKer(start, count int, entries []queueEntry) *batchACKer {
 	return ch
 }
 
-func releaseACKChan(c *batchACKer) {
+func releaseACKChan(c *batchACKState) {
 	c.next = nil
 	ackChanPool.Put(c)
 }
 
-func (l *chanList) prepend(ch *batchACKer) {
+func (l *chanList) prepend(ch *batchACKState) {
 	ch.next = l.head
 	l.head = ch
 	if l.tail == nil {
@@ -259,7 +265,7 @@ func (l *chanList) concat(other *chanList) {
 	l.tail = other.tail
 }
 
-func (l *chanList) append(ch *batchACKer) {
+func (l *chanList) append(ch *batchACKState) {
 	if l.head == nil {
 		l.head = ch
 	} else {
@@ -272,7 +278,7 @@ func (l *chanList) empty() bool {
 	return l.head == nil
 }
 
-func (l *chanList) front() *batchACKer {
+func (l *chanList) front() *batchACKState {
 	return l.head
 }
 
@@ -283,7 +289,7 @@ func (l *chanList) channel() chan batchAckMsg {
 	return l.head.ackChan
 }
 
-func (l *chanList) pop() *batchACKer {
+func (l *chanList) pop() *batchACKState {
 	ch := l.head
 	if ch != nil {
 		l.head = ch.next

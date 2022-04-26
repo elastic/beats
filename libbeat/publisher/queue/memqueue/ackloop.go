@@ -25,7 +25,7 @@ package memqueue
 type ackLoop struct {
 	broker *broker
 
-	// A list of ACK channels associated with queue consumers,
+	// A list of ACK channels given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.
 	ackChans chanList
 
