@@ -56,7 +56,7 @@ func (in *cometdInput) run() error {
 			return fmt.Errorf("error collecting events: %w", e.Err)
 		}
 		if !e.Msg.Successful {
-			var event Event
+			var event event
 			// To handle the last response where the object received was empty
 			if e.Msg.Data.Payload == nil {
 				return nil
@@ -174,12 +174,12 @@ type cometdInput struct {
 	authParams bay.AuthenticationParameters
 }
 
-type Event struct {
+type event struct {
 	EventId string `json:"EventIdentifier"`
 }
 
 func makeEvent(id string, channel string, body string) beat.Event {
-	event := beat.Event{
+	e := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
 			"event": common.MapStr{
@@ -193,7 +193,7 @@ func makeEvent(id string, channel string, body string) beat.Event {
 		},
 		Private: body,
 	}
-	event.SetID(id)
+	e.SetID(id)
 
-	return event
+	return e
 }
