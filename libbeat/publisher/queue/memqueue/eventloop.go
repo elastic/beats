@@ -315,7 +315,6 @@ func (l *bufferingEventLoop) run() {
 	var (
 		broker = l.broker
 	)
-	fmt.Printf("oops someone is running a bufferingEventLoop\n")
 
 	for {
 		select {

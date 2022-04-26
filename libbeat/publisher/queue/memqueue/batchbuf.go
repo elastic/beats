@@ -27,8 +27,6 @@ type queueEntry struct {
 type batchBuffer struct {
 	next    *batchBuffer
 	flushed bool
-	//events  []publisher.Event
-	//clients []clientState
 	entries []queueEntry
 }
 
@@ -38,7 +36,7 @@ func newBatchBuffer(sz int) *batchBuffer {
 	return b
 }
 
-func (b *batchBuffer) add(event publisher.Event, st clientState) {
+func (b *batchBuffer) add(event *publisher.Event, st clientState) {
 	b.entries = append(b.entries, queueEntry{event, st})
 }
 
