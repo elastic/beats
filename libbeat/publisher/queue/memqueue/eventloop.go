@@ -52,11 +52,6 @@ type bufferingEventLoop struct {
 	maxEvents    int
 	flushTimeout time.Duration
 
-	// active broker API channels
-	pushChan   chan pushRequest
-	getChan    chan getRequest
-	cancelChan chan producerCancelRequest
-
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
 	// to consumers, which is then sent to the broker's scheduledACKs channel.
 	pendingACKs chanList
@@ -256,10 +251,6 @@ func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time
 		maxEvents:    size,
 		minEvents:    minEvents,
 		flushTimeout: flushTimeout,
-
-		pushChan:   b.pushChan,
-		getChan:    nil,
-		cancelChan: b.cancelChan,
 	}
 	l.buf = newBatchBuffer(l.minEvents)
 
@@ -275,10 +266,23 @@ func (l *bufferingEventLoop) run() {
 	broker := l.broker
 
 	for {
+		var pushChan chan pushRequest
+		// Push requests are enabled if the queue isn't yet full.
+		if l.eventCount < l.maxEvents {
+			pushChan = l.broker.pushChan
+		}
+
+		var getChan chan getRequest
+		// Get requests are enabled if the queue has events that
+		// weren't yet sent to consumers.
+		if !l.flushList.empty() {
+			getChan = l.broker.getChan
+		}
+
 		var schedACKs chan chanList
+		// Enable sending to the scheduled ACKs channel if we have
+		// something to send.
 		if !l.pendingACKs.empty() {
-			// Enable sending to the scheduled ACKs channel if we have
-			// something to send.
 			schedACKs = l.broker.scheduledACKs
 		}
 
@@ -286,13 +290,13 @@ func (l *bufferingEventLoop) run() {
 		case <-broker.done:
 			return
 
-		case req := <-l.pushChan: // producer pushing new event
+		case req := <-pushChan: // producer pushing new event
 			l.handleInsert(&req)
 
-		case req := <-l.cancelChan: // producer cancelling active events
+		case req := <-l.broker.cancelChan: // producer cancelling active events
 			l.handleCancel(&req)
 
-		case req := <-l.getChan: // consumer asking for next batch
+		case req := <-getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
 		case schedACKs <- l.pendingACKs:
@@ -314,9 +318,6 @@ func (l *bufferingEventLoop) run() {
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 	if l.insert(req) {
 		l.eventCount++
-		if l.eventCount == l.maxEvents {
-			l.pushChan = nil // stop inserting events if upper limit is reached
-		}
 
 		L := l.buf.length()
 		if !l.buf.flushed {
@@ -383,14 +384,7 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 		}
 	}
 	l.flushList = tmpList
-	if tmpList.empty() {
-		l.getChan = nil
-	}
-
 	l.eventCount -= removed
-	if l.eventCount < l.maxEvents {
-		l.pushChan = l.broker.pushChan
-	}
 }
 
 func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
@@ -428,9 +422,6 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 
 func (l *bufferingEventLoop) handleACK(count int) {
 	l.eventCount -= count
-	if l.eventCount < l.maxEvents {
-		l.pushChan = l.broker.pushChan
-	}
 }
 
 func (l *bufferingEventLoop) startFlushTimer() {
@@ -451,13 +442,8 @@ func (l *bufferingEventLoop) stopFlushTimer() {
 
 func (l *bufferingEventLoop) advanceFlushList() {
 	l.flushList.pop()
-	if l.flushList.count == 0 {
-		// All buffers are empty, disable consumer get
-		l.getChan = nil
-
-		if l.buf.flushed {
-			l.buf = newBatchBuffer(l.minEvents)
-		}
+	if l.flushList.count == 0 && l.buf.flushed {
+		l.buf = newBatchBuffer(l.minEvents)
 	}
 }
 
@@ -469,7 +455,6 @@ func (l *bufferingEventLoop) flushBuffer() {
 	}
 
 	l.flushList.add(l.buf)
-	l.getChan = l.broker.getChan
 }
 
 func (l *bufferingEventLoop) processACK(lst chanList, N int) {
