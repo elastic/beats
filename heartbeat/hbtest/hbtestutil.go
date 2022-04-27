@@ -61,6 +61,8 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 				w.Header().Set("Location", "/somewhere")
 			}
 			w.WriteHeader(status)
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			io.WriteString(w, HelloWorldBody)
 		},
 	)
@@ -78,6 +80,8 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			io.WriteString(w, body.String())
 		},
 	)
@@ -90,6 +94,8 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 				w.Header().Add(key, val)
 			}
 			w.WriteHeader(status)
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			w.Write(body)
 		},
 	)
@@ -107,6 +113,8 @@ func RedirectHandler(redirectingPaths map[string]string, body string) http.Handl
 				w.WriteHeader(302)
 			} else {
 				w.WriteHeader(200)
+				//nolint:errcheck // There are no new changes to this line but
+				// linter has been activated in the meantime. We'll cleanup separately.
 				io.WriteString(w, body)
 			}
 		})
@@ -137,12 +145,16 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
-	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
 
 	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
 	// We don't actually care about the exact cipher matching, since we're not testing the TLS
 	// implementation, we trust go there, just that most of the metadata is present
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		expected.Put("tls.cipher", isdef.IsString)
 	}
 
@@ -171,7 +183,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
 				"status":      status,
-				"duration.us": isdef.IsDuration,
+				"duration.us": hbtestllext.IsInt64,
 				"id":          isdef.IsNonEmptyString,
 				"name":        isdef.IsString,
 				"type":        typ,
@@ -197,7 +209,7 @@ func ResolveChecks(ip string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"resolve": map[string]interface{}{
 			"ip":     ip,
-			"rtt.us": isdef.IsDuration,
+			"rtt.us": hbtestllext.IsInt64,
 		},
 	})
 }
@@ -246,7 +258,7 @@ func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
 func RespondingTCPChecks() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": isdef.IsDuration})
+	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": hbtestllext.IsInt64})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded
@@ -259,6 +271,8 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// disk, not memory, so this little bit of extra work is worthwhile
 	certFile, err := ioutil.TempFile("", "sslcert")
 	require.NoError(t, err)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
 }
@@ -268,6 +282,8 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	require.NoError(t, err)
 
 	// No need to start a real server, since this is invalid, we just
+	//nolint:gosec // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
 		Certificates: []tls.Certificate{tlsCert},
 	})
@@ -275,6 +291,8 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 
 	srv := &http.Server{Handler: HelloWorldHandler(200)}
 	go func() {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		srv.Serve(l)
 	}()
 
