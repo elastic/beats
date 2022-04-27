@@ -38,7 +38,7 @@ func (in *cometdInput) Run() {
 			in.b = bay.Bayeux{}
 			in.creds, err = bay.GetSalesforceCredentials(in.authParams)
 			if err != nil {
-				in.log.Error("not able to get access token: ", err)
+				in.log.Errorw("not able to get access token", "error", err)
 				return
 			}
 			if err := in.run(); err != nil {
@@ -109,7 +109,7 @@ func NewInput(
 	authParams.Password = conf.Auth.OAuth2.Password
 	authParams.TokenURL = conf.Auth.OAuth2.TokenURL
 
-	logger := logp.NewLogger("cometd").With(
+	logger := logp.NewLogger(inputName).With(
 		"pubsub_channel", conf.ChannelName)
 
 	// Wrap input.Context's Done channel with a context.Context. This goroutine
