@@ -37,7 +37,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -547,6 +546,7 @@ type SetupSettings struct {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
+//nolint:forbidigo // required to give feedback to user
 func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {
 		err := b.InitWithSettings(settings)
@@ -565,7 +565,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 
 		if setup.IndexManagement || setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
-			if outCfg.Name() != "elasticsearch" {
+			if isElasticsearchOutput(outCfg.Name()) {
 				return fmt.Errorf("index management requested but the Elasticsearch output is not configured/enabled")
 			}
 			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
@@ -582,12 +582,12 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
-				fmt.Println(warn) //nolint:forbidigo // required to give feedback to user
+				fmt.Println(warn)
 			}
 			if err = m.Setup(loadTemplate, loadILM); err != nil {
 				return err
 			}
-			fmt.Println("Index setup finished.") //nolint:forbidigo // required to give feedback to user
+			fmt.Println("Index setup finished.")
 		}
 
 		if setup.Dashboard && settings.HasDashboards {
@@ -637,7 +637,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
-		return fmt.Errorf("error loading config file: %v", err)
+		return fmt.Errorf("error loading config file: %w", err)
 	}
 
 	if err := initPaths(cfg); err != nil {
@@ -866,7 +866,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
-			return errw.Wrap(err, "Error importing Kibana dashboards")
+			return fmt.Errorf("error importing Kibana dashboards: %w", err)
 		}
 		logp.Info("Kibana dashboards successfully loaded.")
 	}
@@ -878,7 +878,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
-	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
+	if isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
 		return
 	}
 
@@ -909,7 +909,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if b.Config.Output.Name() != "elasticsearch" || !b.IdxSupporter.Enabled() {
+	if isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
@@ -956,7 +956,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 }
 
 func (b *Beat) registerClusterUUIDFetching() error {
-	if b.Config.Output.Name() == "elasticsearch" {
+	if isElasticsearchOutput(b.Config.Output.Name()) {
 		callback, err := b.clusterUUIDFetchingCallback()
 		if err != nil {
 			return err
@@ -979,14 +979,14 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 
 		status, body, err := esClient.Request("GET", "/", "", nil, nil)
 		if err != nil {
-			return errw.Wrap(err, "error querying /")
+			return fmt.Errorf("error querying /: %w", err)
 		}
 		if status > 299 {
-			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
+			return fmt.Errorf("error querying /. Status: %d. Response body: %s", status, body)
 		}
 		err = json.Unmarshal(body, &response)
 		if err != nil {
-			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
+			return fmt.Errorf("error unmarshaling json when querying /. Body: %s", body)
 		}
 
 		clusterUUIDRegVar.Set(response.ClusterUUID)
@@ -1145,7 +1145,7 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 
 func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	var esConfig *common.Config
-	if beatConfig.Output.Name() == "elasticsearch" {
+	if isElasticsearchOutput(beatConfig.Output.Name()) {
 		esConfig = beatConfig.Output.Config()
 	}
 
@@ -1171,6 +1171,10 @@ func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 		}
 	}
 	return kibanaConfig
+}
+
+func isElasticsearchOutput(name string) bool {
+	return name == "elasticsearch"
 }
 
 func initPaths(cfg *common.Config) error {
