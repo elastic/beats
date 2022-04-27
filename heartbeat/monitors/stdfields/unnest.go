@@ -29,7 +29,7 @@ import (
 // config, but we do pull the Id from the root, and merge the root data stream
 // in as well
 type OptionalStream struct {
-	Id         string      `config:"id"`
+	Id         string    `config:"id"`
 	DataStream *conf.C   `config:"data_stream"`
 	Streams    []*conf.C `config:"streams"`
 }

@@ -28,11 +28,11 @@ import (
 // Config defines the structure of heartbeat.yml.
 type Config struct {
 	RunOnce         bool                 `config:"run_once"`
-	Monitors        []*conf.C          `config:"monitors"`
-	ConfigMonitors  *conf.C            `config:"config.monitors"`
+	Monitors        []*conf.C            `config:"monitors"`
+	ConfigMonitors  *conf.C              `config:"config.monitors"`
 	Scheduler       Scheduler            `config:"scheduler"`
 	Autodiscover    *autodiscover.Config `config:"autodiscover"`
-	SyntheticSuites []*conf.C          `config:"synthetic_suites"`
+	SyntheticSuites []*conf.C            `config:"synthetic_suites"`
 	Jobs            map[string]JobLimit  `config:"jobs"`
 }
 
