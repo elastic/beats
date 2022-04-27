@@ -208,7 +208,7 @@ Example configuration:
   message_key: log
 ----
 
-*`target`*:: he name of the new JSON object that should contain the parsed key value pairs. If you
+*`target`*:: The name of the new JSON object that should contain the parsed key value pairs. If you
 leave it empty, the new keys will go under root.
 
 *`overwrite_keys`*:: Values from the decoded JSON object overwrite the fields that {beatname_uc}
