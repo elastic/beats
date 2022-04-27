@@ -504,7 +504,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 	return testTemplate{
 		t:      t,
 		client: client,
-		MapStr: mapstr.M(templateElem["index_template"].(map[string]interface{})),
+		M:      mapstr.M(templateElem["index_template"].(map[string]interface{})),
 	}
 }
 
@@ -519,7 +519,7 @@ func (tt *testTemplate) SourceEnabled() bool {
 
 	val, err := tt.GetValue(key)
 	if !assert.NoError(tt.t, err) {
-		doc, _ := json.MarshalIndent(tt.MapStr, "", "    ")
+		doc, _ := json.MarshalIndent(tt.M, "", "    ")
 		tt.t.Fatal(fmt.Sprintf("failed to read '%v' in %s", key, doc))
 	}
 
