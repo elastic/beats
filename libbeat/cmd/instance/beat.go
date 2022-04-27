@@ -595,7 +595,8 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			err = b.loadDashboards(context.Background(), true)
 
 			if err != nil {
-				if errors.Is(err, dashboards.ErrNotFound) {
+				var notFoundErr *dashboards.ErrNotFound
+				if errors.As(err, &notFoundErr) {
 					fmt.Printf("Skipping loading dashboards, %+v\n", err)
 				} else {
 					return err

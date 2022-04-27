@@ -36,9 +36,9 @@ type registryVersion string
 
 const (
 	noRegistry    registryVersion = ""
-	legacyVersion                 = "<legacy>"
-	version0                      = "0"
-	version1                      = "1"
+	legacyVersion registryVersion = "<legacy>"
+	version0      registryVersion = "0"
+	version1      registryVersion = "1"
 )
 
 const currentVersion = version1
