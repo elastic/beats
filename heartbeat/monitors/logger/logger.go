@@ -30,7 +30,7 @@ var eventLogger *logp.Logger = nil
 const ActionMonitorRun = "monitor.run"
 
 type durationLoggable struct {
-	Ms int64 `json:"ms"`
+	Mills int64 `json:"ms"`
 }
 
 type monitorRunInfo struct {
@@ -44,7 +44,7 @@ func NewMonitorRunInfo(id string, t string, dMs int64) monitorRunInfo {
 	return monitorRunInfo{
 		MonitorID: id,
 		Type:      t,
-		Duration:  durationLoggable{Ms: dMs},
+		Duration:  durationLoggable{Mills: dMs},
 	}
 }
 
@@ -84,29 +84,18 @@ func extractRunInfo(event *beat.Event) (*monitorRunInfo, error) {
 	return &runInfo, nil
 }
 
-func LogBrowserRun(event *beat.Event, stepCount int) {
+func LogRun(event *beat.Event, stepCount *int) {
 	monitor, err := extractRunInfo(event)
 	if err != nil {
 		return
 	}
 
-	monitor.Steps = &stepCount
-
-	getLogger().Infow(
-		"Browser monitor summary ready",
-		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
-		logp.Any("monitor", monitor),
-	)
-}
-
-func LogLightweightRun(event *beat.Event) {
-	monitor, err := extractRunInfo(event)
-	if err != nil {
-		return
+	if stepCount != nil {
+		monitor.Steps = stepCount
 	}
 
 	getLogger().Infow(
-		"Lightweight monitor finished.",
+		"Monitor finished",
 		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
 		logp.Any("monitor", monitor),
 	)

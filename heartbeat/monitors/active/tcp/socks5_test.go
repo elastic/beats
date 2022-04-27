@@ -100,7 +100,6 @@ func TestSocks5Job(t *testing.T) {
 }
 
 func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close func() error, err error) {
-	//nolint:goconst // Test variable.
 	host = "localhost"
 	config := &socks5.Config{}
 	server, err := socks5.New(config)

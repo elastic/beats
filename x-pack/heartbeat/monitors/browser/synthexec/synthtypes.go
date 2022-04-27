@@ -15,6 +15,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+const JourneyStart = "journey/start"
+const JourneyEnd = "journey/end"
+const CmdStatus = "cmd/status"
+
 type SynthEvent struct {
 	Id                   string        `json:"_id"`
 	Type                 string        `json:"type"`
@@ -178,7 +182,3 @@ func (j Journey) ToMap() common.MapStr {
 		"id":   j.Id,
 	}
 }
-
-const JourneyStart = "journey/start"
-const JourneyEnd = "journey/end"
-const CmdStatus = "cmd/status"

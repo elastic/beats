@@ -183,12 +183,11 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
-	duration := je.end.Sub(je.start)
-
 	// Incase of syntax errors or incorrect runner options, the Synthetics
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
 	if !je.start.IsZero() {
+		duration := je.end.Sub(je.start)
 		eventext.MergeEventFields(event, common.MapStr{
 			"monitor": common.MapStr{
 				"duration": common.MapStr{
@@ -214,7 +213,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 
 	_, err := event.GetValue("monitor.id")
 	if err == nil {
-		logger.LogBrowserRun(event, je.stepCount)
+		logger.LogRun(event, &je.stepCount)
 	}
 
 	if je.journeyComplete {

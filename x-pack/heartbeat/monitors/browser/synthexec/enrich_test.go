@@ -61,20 +61,19 @@ func TestJourneyEnricher(t *testing.T) {
 		Stack:   "last\nerr\nstack",
 	}
 	journeyStart := &SynthEvent{
-		Type:                 "journey/start",
+		Type:                 JourneyStart,
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
 	journeyEnd := &SynthEvent{
-		Type:                 "journey/end",
+		Type:                 JourneyEnd,
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
-	//nolint:goconst // Test variable.
 	url1 := "http://example.net/url1"
 	url2 := "http://example.net/url2"
 	url3 := "http://example.net/url3"
@@ -253,7 +252,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - with error",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type:  "cmd/status",
+				Type:  CmdStatus,
 				Error: &SynthError{Name: "cmdexit", Message: "cmd err msg"},
 			},
 			true,
@@ -273,7 +272,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - without error",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type:  "cmd/status",
+				Type:  CmdStatus,
 				Error: nil,
 			},
 			true,
@@ -387,7 +386,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		Payload:              common.MapStr{},
 	}
 	cmdStatus := &SynthEvent{
-		Type:                 "cmd/status",
+		Type:                 CmdStatus,
 		Error:                &SynthError{Name: "cmdexit", Message: "cmd err msg"},
 		TimestampEpochMicros: 3000,
 	}
@@ -409,9 +408,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
-			//nolint:goconst // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			if se != nil && se.Type == "cmd/status" {
+			if se != nil && se.Type == CmdStatus {
 				t.Run("no summary in cmd/status", func(t *testing.T) {
 					require.NotContains(t, e.Fields, "summary")
 				})
@@ -451,7 +448,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	}
 
 	cmdStatus := &SynthEvent{
-		Type:                 "cmd/status",
+		Type:                 CmdStatus,
 		Error:                nil,
 		TimestampEpochMicros: 3000,
 	}
@@ -473,7 +470,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
-			if se != nil && se.Type == "cmd/status" {
+			if se != nil && se.Type == CmdStatus {
 				hasCmdStatus = true
 				require.Error(t, enrichErr, "journey did not finish executing, 1 steps ran")
 
@@ -499,7 +496,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 	defaultLogValidator := func(stepCount int) func(t *testing.T, summary common.MapStr, observed []observer.LoggedEntry) {
 		return func(t *testing.T, summary common.MapStr, observed []observer.LoggedEntry) {
 			require.Len(t, observed, 1)
-			require.Equal(t, "Browser monitor summary ready", observed[0].Message)
+			require.Equal(t, "Monitor finished", observed[0].Message)
 
 			durationMs := baseTime.Add(10 * time.Microsecond).Sub(baseTime).Milliseconds()
 			expectedMonitor := logger.NewMonitorRunInfo("my-monitor", "browser", durationMs)

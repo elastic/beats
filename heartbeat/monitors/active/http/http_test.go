@@ -568,7 +568,6 @@ func TestExpiredHTTPSServer(t *testing.T) {
 }
 
 func TestHTTPSx509Auth(t *testing.T) {
-	//nolint:goconst // Test variable.
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}

@@ -125,7 +125,7 @@ func TestSimpleJob(t *testing.T) {
 		nil,
 		func(t *testing.T, results []*beat.Event, observed []observer.LoggedEntry) {
 			require.Len(t, observed, 1)
-			require.Equal(t, "Lightweight monitor finished.", observed[0].Message)
+			require.Equal(t, "Monitor finished", observed[0].Message)
 
 			durationUs, err := results[0].Fields.GetValue("monitor.duration.us")
 			require.NoError(t, err)

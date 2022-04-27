@@ -200,7 +200,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 			})
 			event.Timestamp = start
 
-			logger.LogLightweightRun(event)
+			logger.LogRun(event, nil)
 		}
 
 		return cont, err

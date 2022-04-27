@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func TestLogBrowserRun(t *testing.T) {
+func TestLogRun(t *testing.T) {
 	core, observed := observer.New(zapcore.InfoLevel)
 	SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
 		return zapcore.NewTee(in, core)
@@ -50,44 +50,14 @@ func TestLogBrowserRun(t *testing.T) {
 
 	event := beat.Event{Fields: fields}
 
-	LogBrowserRun(&event, steps)
+	LogRun(&event, &steps)
 
 	observedEntries := observed.All()
 	require.Len(t, observedEntries, 1)
-	assert.Equal(t, "Browser monitor summary ready", observedEntries[0].Message)
+	assert.Equal(t, "Monitor finished", observedEntries[0].Message)
 
 	expectedMonitor := NewMonitorRunInfo("b0", "browser", durationMs)
 	expectedMonitor.Steps = &steps
-	assert.ElementsMatch(t, []zap.Field{
-		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
-		logp.Any("monitor", &expectedMonitor),
-	}, observedEntries[0].Context)
-}
-
-func TestLogLightweightRun(t *testing.T) {
-	core, observed := observer.New(zapcore.InfoLevel)
-	SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-		return zapcore.NewTee(in, core)
-	})))
-
-	durationUs := int64(5000 * time.Microsecond)
-	durationMs := time.Duration(durationUs * int64(time.Microsecond)).Milliseconds()
-
-	fields := common.MapStr{
-		"monitor.id":          "h0",
-		"monitor.duration.us": durationUs,
-		"monitor.type":        "http",
-	}
-
-	event := beat.Event{Fields: fields}
-
-	LogLightweightRun(&event)
-
-	observedEntries := observed.All()
-	require.Len(t, observedEntries, 1)
-	assert.Equal(t, "Lightweight monitor finished.", observedEntries[0].Message)
-
-	expectedMonitor := NewMonitorRunInfo("h0", "http", durationMs)
 	assert.ElementsMatch(t, []zap.Field{
 		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
 		logp.Any("monitor", &expectedMonitor),
