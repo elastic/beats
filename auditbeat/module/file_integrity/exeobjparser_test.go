@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//nolint:errorlint,goconst,dupl // Bad linters!
+//nolint:errorlint,dupl // Bad linters!
 package file_integrity
 
 import (

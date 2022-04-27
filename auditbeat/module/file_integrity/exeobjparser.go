@@ -69,7 +69,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 
 	typ := strings.ToLower(f.Type())
 	if typ == "mach-o" {
-		typ = "macho" //nolint:goconst // Bad linter! The literal is meaningful.
+		typ = "macho"
 	}
 
 	var details common.MapStr
