@@ -124,7 +124,7 @@ func (g *guessSockaddrIn) Trigger() error {
 }
 
 // Extract takes the dumped sockaddr_in and scans it for the expected values.
-func (g *guessSockaddrIn) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessSockaddrIn) Extract(ev interface{}) (mapstr.M, bool) {
 	arr := ev.([]byte)
 	if len(arr) < 8 {
 		return nil, false
@@ -146,7 +146,7 @@ func (g *guessSockaddrIn) Extract(ev interface{}) (common.MapStr, bool) {
 	if offsetOfAddr == -1 {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"SOCKADDR_IN_AF":   offsetOfFamily,
 		"SOCKADDR_IN_PORT": offsetOfPort,
 		"SOCKADDR_IN_ADDR": offsetOfAddr,

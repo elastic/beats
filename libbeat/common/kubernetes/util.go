@@ -38,8 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-const namespaceFilePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
-
 type HostDiscoveryUtils interface {
 	GetNamespace() (string, error)
 	GetPodName() (string, error)

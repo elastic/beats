@@ -53,7 +53,7 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	evt, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	evt, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +90,7 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	evt, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	evt, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -22,7 +22,7 @@ type Context struct {
 	// Log is a logger so that guesses can log.
 	Log helper.Logger
 	// Vars is the current set of template variables.
-	Vars common.MapStr
+	Vars mapstr.M
 	// Timeout is the maximum time allowed to wait for a guess to complete.
 	Timeout time.Duration
 }
@@ -48,7 +48,7 @@ type Guesser interface {
 	// Extract receives the events generated during trigger.
 	// Done is false when it needs to be called with more events. True when
 	// the guess has completed and results is a map with the discovered values.
-	Extract(event interface{}) (result common.MapStr, done bool)
+	Extract(event interface{}) (result mapstr.M, done bool)
 	// Terminate performs cleanup after the guess is complete.
 	Terminate() error
 }
@@ -60,7 +60,7 @@ type RepeatGuesser interface {
 	// NumRepeats returns how many times the guess is repeated.
 	NumRepeats() int
 	// Reduce takes the output of every repetition and returns the final result.
-	Reduce([]common.MapStr) (common.MapStr, error)
+	Reduce([]mapstr.M) (mapstr.M, error)
 }
 
 // EventualGuesser is a guess that repeats an undetermined amount of times
@@ -87,7 +87,7 @@ type ConditionalGuesser interface {
 // channel and executes the Trigger function. Each record received through the
 // channel is passed to the Extract function. Terminates once Extract succeeds
 // or the timeout expires.
-func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	switch v := guesser.(type) {
 	case RepeatGuesser:
 		result, err = guessMultiple(v, installer, ctx)
@@ -102,8 +102,8 @@ func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (resul
 	return result, nil
 }
 
-func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
-	var results []common.MapStr
+func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
+	var results []mapstr.M
 	for idx := 1; idx <= guess.NumRepeats(); idx++ {
 		r, err := guessOnce(guess, installer, ctx)
 		if err != nil {
@@ -115,7 +115,7 @@ func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Con
 	return guess.Reduce(results)
 }
 
-func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	limit := guess.MaxRepeats()
 	for i := 0; i < limit; i++ {
 		ctx.Log.Debugf(" --- %s run #%d", guess.Name(), i)
@@ -129,7 +129,7 @@ func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx
 	return nil, fmt.Errorf("guess %s didn't succeed after %d tries", guess.Name(), limit)
 }
 
-func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	if err := guesser.Prepare(ctx); err != nil {
 		return nil, fmt.Errorf("prepare failed: %w", err)
 	}
@@ -241,7 +241,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	}
 }
 
-func containsAll(requirements []string, dict common.MapStr) bool {
+func containsAll(requirements []string, dict mapstr.M) bool {
 	for _, req := range requirements {
 		if _, found := dict[req]; !found {
 			return false
@@ -306,7 +306,7 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 	return nil
 }
 
-func isIPv6Enabled(vars common.MapStr) (bool, error) {
+func isIPv6Enabled(vars mapstr.M) (bool, error) {
 	iface, err := vars.GetValue("HAS_IPV6")
 	if err != nil {
 		return false, err

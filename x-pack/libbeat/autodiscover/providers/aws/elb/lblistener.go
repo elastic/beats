@@ -18,9 +18,9 @@ type lbListener struct {
 }
 
 // toMap converts this lbListener into the form consumed as metadata in the autodiscovery process.
-func (l *lbListener) toMap() common.MapStr {
+func (l *lbListener) toMap() mapstr.M {
 	// We fully spell out listener_arn to avoid confusion with the ARN for the whole ELB
-	m := common.MapStr{
+	m := mapstr.M{
 		"listener_arn":       l.listener.ListenerArn,
 		"load_balancer_arn":  awsauto.SafeString(l.lb.LoadBalancerArn),
 		"host":               awsauto.SafeString(l.lb.DNSName),
@@ -43,8 +43,8 @@ func (l *lbListener) toMap() common.MapStr {
 	return m
 }
 
-func (l *lbListener) toCloudMap() common.MapStr {
-	m := common.MapStr{}
+func (l *lbListener) toCloudMap() mapstr.M {
+	m := mapstr.M{}
 
 	var azs []string
 	for _, az := range l.lb.AvailabilityZones {
@@ -76,9 +76,9 @@ func (l *lbListener) azStrings() []string {
 }
 
 // stateMap converts the State part of the lb struct into a friendlier map with 'reason' and 'code' fields.
-func (l *lbListener) stateMap() (stateMap common.MapStr) {
+func (l *lbListener) stateMap() (stateMap mapstr.M) {
 	state := l.lb.State
-	stateMap = common.MapStr{}
+	stateMap = mapstr.M{}
 	if state.Reason != nil {
 		stateMap["reason"] = *state.Reason
 	}

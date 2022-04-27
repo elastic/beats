@@ -32,11 +32,11 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 	for idx, logEvent := range request.LogEvents {
 		events[idx] = beat.Event{
 			Timestamp: time.Unix(0, logEvent.Timestamp*1000000),
-			Fields: common.MapStr{
-				"event": common.MapStr{
+			Fields: mapstr.M{
+				"event": mapstr.M{
 					"kind": "event",
 				},
-				"cloud": common.MapStr{
+				"cloud": mapstr.M{
 					"provider": "aws",
 				},
 				"message":              logEvent.Message,
@@ -57,17 +57,17 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"event": common.MapStr{
+		Fields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     "event",
 				"category": []string{"network"},
 				"type":     []string{"connection", "protocol"},
 			},
-			"cloud": common.MapStr{
+			"cloud": mapstr.M{
 				"provider":   "aws",
 				"account.id": request.RequestContext.AccountID,
 			},
-			"network": common.MapStr{
+			"network": mapstr.M{
 				"transport": "tcp",
 				"protocol":  "http",
 			},
@@ -103,11 +103,11 @@ func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 		for _, deaggRecord := range deaggRecords {
 			events = append(events, beat.Event{
 				Timestamp: time.Now(),
-				Fields: common.MapStr{
-					"event": common.MapStr{
+				Fields: mapstr.M{
+					"event": mapstr.M{
 						"kind": "event",
 					},
-					"cloud": common.MapStr{
+					"cloud": mapstr.M{
 						"provider": "aws",
 						"region":   record.AwsRegion,
 					},
@@ -134,11 +134,11 @@ func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compressed bool) ([]beat.Event, error) {
 	var evts []beat.Event
 	for _, record := range request.Records {
-		envelopeFields := common.MapStr{
-			"event": common.MapStr{
+		envelopeFields := mapstr.M{
+			"event": mapstr.M{
 				"kind": "event",
 			},
-			"cloud": common.MapStr{
+			"cloud": mapstr.M{
 				"provider": "aws",
 				"region":   record.AwsRegion,
 			},
@@ -205,11 +205,11 @@ func SQS(request events.SQSEvent) []beat.Event {
 	for idx, record := range request.Records {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"event": common.MapStr{
+			Fields: mapstr.M{
+				"event": mapstr.M{
 					"kind": "event",
 				},
-				"cloud": common.MapStr{
+				"cloud": mapstr.M{
 					"provider": "aws",
 					"region":   record.AWSRegion,
 				},

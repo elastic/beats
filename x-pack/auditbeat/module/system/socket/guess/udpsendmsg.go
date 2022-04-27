@@ -90,20 +90,20 @@ func (g *guessUDPSendMsg) Terminate() error {
 	return g.cs.Cleanup()
 }
 
-func (g *guessUDPSendMsg) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessUDPSendMsg) Extract(ev interface{}) (mapstr.M, bool) {
 	if g.length == 0 {
 		return nil, false
 	}
 	event := ev.(*udpSendMsgCountGuess)
 	if event.Param3 == g.length {
-		return common.MapStr{
+		return mapstr.M{
 			"UDP_SENDMSG_SOCK": g.ctx.Vars["P1"],
 			"UDP_SENDMSG_MSG":  g.ctx.Vars["P2"],
 			"UDP_SENDMSG_LEN":  g.ctx.Vars["P3"],
 		}, true
 	}
 	if event.Param4 == g.length {
-		return common.MapStr{
+		return mapstr.M{
 			"UDP_SENDMSG_SOCK": g.ctx.Vars["P2"],
 			"UDP_SENDMSG_MSG":  g.ctx.Vars["P3"],
 			"UDP_SENDMSG_LEN":  g.ctx.Vars["P4"],

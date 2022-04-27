@@ -51,7 +51,7 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	_, err = p.Run(&beat.Event{Fields: common.MapStr{"message": "hello world!"}})
+	_, err = p.Run(&beat.Event{Fields: mapstr.M{"message": "hello world!"}})
 	if err != nil {
 		t.Fatal(err)
 	}

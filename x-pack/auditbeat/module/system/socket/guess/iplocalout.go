@@ -148,7 +148,7 @@ func (g *guessIPLocalOut) Trigger() error {
 // Extract first receives and saves the sock* from tcp_sendmsg.
 // Once ip_local_out is called, it analyses the captured arguments to determine
 // their layout.
-func (g *guessIPLocalOut) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessIPLocalOut) Extract(ev interface{}) (mapstr.M, bool) {
 	switch v := ev.(type) {
 	case *sockArgumentGuess:
 		g.sock = v.Sock
@@ -162,13 +162,13 @@ func (g *guessIPLocalOut) Extract(ev interface{}) (common.MapStr, bool) {
 		isIpLocalOut := g.ctx.Vars["IP_LOCAL_OUT"] != "ip_local_out_sk"
 		if v.Arg == g.sock {
 			if isIpLocalOut {
-				return common.MapStr{
+				return mapstr.M{
 					// Second argument to ip_local_out is the struct sock*
 					"IP_LOCAL_OUT_SOCK":    g.ctx.Vars["P2"],
 					"IP_LOCAL_OUT_SK_BUFF": g.ctx.Vars["P3"],
 				}, true
 			}
-			return common.MapStr{
+			return mapstr.M{
 				// Second argument to ip_local_out is the struct sock*
 				"IP_LOCAL_OUT_SOCK":    g.ctx.Vars["P1"],
 				"IP_LOCAL_OUT_SK_BUFF": g.ctx.Vars["P2"],
@@ -176,7 +176,7 @@ func (g *guessIPLocalOut) Extract(ev interface{}) (common.MapStr, bool) {
 		}
 		off := indexAligned(v.Dump[:], ((*[sizeOfPtr]byte)(unsafe.Pointer(&g.sock)))[:], 0, int(sizeOfPtr))
 		if off != -1 {
-			return common.MapStr{
+			return mapstr.M{
 				// struct sock* is a field of struct pointed to by first argument
 				"IP_LOCAL_OUT_SOCK":    fmt.Sprintf("+%d(%s)", off, g.ctx.Vars["P1"]),
 				"IP_LOCAL_OUT_SK_BUFF": g.ctx.Vars["P1"],

@@ -68,7 +68,7 @@ func (c *Converter) Convert(entryFields map[string]string) mapstr.M {
 				custom = mapstr.M{}
 			}
 			normalized := strings.ToLower(strings.TrimLeft(entryKey, "_"))
-			custom.Put(normalized, v)
+			_, _ = custom.Put(normalized, v)
 		} else if !fieldConversionInfo.Dropped {
 			value, err := convertValue(fieldConversionInfo, v)
 			if err != nil {
@@ -76,13 +76,13 @@ func (c *Converter) Convert(entryFields map[string]string) mapstr.M {
 				c.log.Debugf("Journald mapping error: %v", err)
 			}
 			for _, name := range fieldConversionInfo.Names {
-				fields.Put(name, value)
+				_, _ = fields.Put(name, value)
 			}
 		}
 	}
 
 	if len(custom) != 0 {
-		fields.Put("journald.custom", custom)
+		_, _ = fields.Put("journald.custom", custom)
 	}
 
 	return withECSEnrichment(fields)
@@ -99,7 +99,7 @@ func convertValue(fc Conversion, value string) (interface{}, error) {
 			s := strings.Split(value, ",")
 			v, err = strconv.ParseInt(s[0], 10, 64)
 			if err != nil {
-				return value, fmt.Errorf("failed to convert field %s \"%v\" to int: %v", fc.Names[0], value, err)
+				return value, fmt.Errorf("failed to convert field %s \"%v\" to int: %w", fc.Names[0], value, err)
 			}
 		}
 		return v, nil
@@ -123,7 +123,7 @@ func setGidUidFields(prefix string, fields mapstr.M) {
 	var auditLoginUid string
 	if found, _ := fields.HasKey(prefix + ".audit.login_uid"); found {
 		auditLoginUid = fmt.Sprint(getIntegerFromFields(prefix+".audit.login_uid", fields))
-		fields.Put("user.id", auditLoginUid)
+		_, _ = fields.Put("user.id", auditLoginUid)
 	}
 
 	if found, _ := fields.HasKey(prefix + ".uid"); !found {
@@ -146,17 +146,17 @@ var cmdlineRegexp = regexp.MustCompile(`"(\\"|[^"])*?"|[^\s]+`)
 func setProcessFields(prefix string, fields mapstr.M) {
 	if found, _ := fields.HasKey(prefix + ".pid"); found {
 		pid := getIntegerFromFields(prefix+".pid", fields)
-		fields.Put("process.pid", pid)
+		_, _ = fields.Put("process.pid", pid)
 	}
 
 	name := getStringFromFields(prefix+".name", fields)
 	if name != "" {
-		fields.Put("process.name", name)
+		_, _ = fields.Put("process.name", name)
 	}
 
 	executable := getStringFromFields(prefix+".executable", fields)
 	if executable != "" {
-		fields.Put("process.executable", executable)
+		_, _ = fields.Put("process.executable", executable)
 	}
 
 	cmdline := getStringFromFields(prefix+".process.command_line", fields)
@@ -164,12 +164,12 @@ func setProcessFields(prefix string, fields mapstr.M) {
 		return
 	}
 
-	fields.Put("process.command_line", cmdline)
+	_, _ = fields.Put("process.command_line", cmdline)
 
 	args := cmdlineRegexp.FindAllString(cmdline, -1)
 	if len(args) > 0 {
-		fields.Put("process.args", args)
-		fields.Put("process.args_count", len(args))
+		_, _ = fields.Put("process.args", args)
+		_, _ = fields.Put("process.args_count", len(args))
 	}
 }
 
@@ -189,12 +189,10 @@ func putStringIfNotEmtpy(k, v string, fields mapstr.M) {
 	if v == "" {
 		return
 	}
-	fields.Put(k, v)
+	_, _ = fields.Put(k, v)
 }
 
 // helpers for creating a field conversion table.
-
-var ignoredField = Conversion{Dropped: true}
 
 func text(names ...string) Conversion {
 	return Conversion{Names: names, IsInteger: false, Dropped: false}

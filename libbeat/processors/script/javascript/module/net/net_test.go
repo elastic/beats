@@ -61,7 +61,7 @@ function process(evt) {
 		"2001:db8::ff00:42:8329":                  "ipv6",
 		"www.elastic.co":                          nil,
 	} {
-		evt, err := p.Run(&beat.Event{Fields: common.MapStr{"ip": ip}})
+		evt, err := p.Run(&beat.Event{Fields: mapstr.M{"ip": ip}})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -91,7 +91,7 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	_, err = p.Run(&beat.Event{Fields: common.MapStr{}})
+	_, err = p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}

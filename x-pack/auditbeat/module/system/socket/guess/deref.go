@@ -112,7 +112,7 @@ func (g *guessDeref) MaxRepeats() int {
 
 // Extract receives the memory read through a null pointer and checks if it's
 // zero or garbage.
-func (g *guessDeref) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessDeref) Extract(ev interface{}) (mapstr.M, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
 		return nil, false
@@ -128,7 +128,7 @@ func (g *guessDeref) Extract(ev interface{}) (common.MapStr, bool) {
 	if g.tries--; g.tries > 0 {
 		return nil, true
 	}
-	return common.MapStr{
+	return mapstr.M{
 		flagName: !g.garbage,
 	}, true
 }

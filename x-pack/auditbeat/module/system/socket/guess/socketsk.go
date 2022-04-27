@@ -112,7 +112,7 @@ func (g *guessSocketSock) Trigger() error {
 
 // Extract first receives the sock* from sock_init_data, then uses it to
 // scan the dump from inet_release.
-func (g *guessSocketSock) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessSocketSock) Extract(ev interface{}) (mapstr.M, bool) {
 	if v, ok := ev.(*sockEvent); ok {
 		if g.initData != nil {
 			return nil, false
@@ -134,7 +134,7 @@ func (g *guessSocketSock) Extract(ev interface{}) (common.MapStr, bool) {
 		return nil, false
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"SOCKET_SOCK": off,
 	}, true
 }

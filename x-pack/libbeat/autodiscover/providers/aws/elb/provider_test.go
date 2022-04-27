@@ -112,12 +112,12 @@ func Test_internalBuilder(t *testing.T) {
 		"start":    true,
 		"host":     *lbl.lb.DNSName,
 		"port":     *lbl.listener.Port,
-		"aws": common.MapStr{
+		"aws": mapstr.M{
 			"elb": lbl.toMap(),
 		},
 		"cloud": lbl.toCloudMap(),
-		"meta": common.MapStr{
-			"aws": common.MapStr{
+		"meta": mapstr.M{
+			"aws": mapstr.M{
 				"elb": lbl.toMap(),
 			},
 			"cloud": lbl.toCloudMap(),

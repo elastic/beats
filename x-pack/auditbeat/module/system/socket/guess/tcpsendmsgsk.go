@@ -103,7 +103,7 @@ func (g *guessTcpSendmsgSock) Trigger() (err error) {
 
 // Extract checks which of the arguments to tcp_sendmsg contains the expected
 // value (address of destination).
-func (g *guessTcpSendmsgSock) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessTcpSendmsgSock) Extract(ev interface{}) (mapstr.M, bool) {
 	event := ev.(*tcpSendMsgSockGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")
@@ -125,7 +125,7 @@ func (g *guessTcpSendmsgSock) Extract(ev interface{}) (common.MapStr, bool) {
 	default:
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"TCP_SENDMSG_SOCK": param,
 	}, true
 }

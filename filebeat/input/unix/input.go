@@ -63,7 +63,7 @@ func newServer(config config) (*server, error) {
 func (s *server) Name() string { return "unix" }
 
 func (s *server) Test(_ input.TestContext) error {
-	l, err := net.Listen("unix", s.config.Path)
+	l, err := net.Listen("unix", s.config.Config.Path)
 	if err != nil {
 		return err
 	}

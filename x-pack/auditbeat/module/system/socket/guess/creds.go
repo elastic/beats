@@ -108,7 +108,7 @@ func (g *guessStructCreds) Terminate() error {
 }
 
 // Extract receives the struct cred dump and discovers the offsets.
-func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
 		return nil, false
@@ -130,7 +130,7 @@ func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
 		ptr[offset/4+1] != uint32(os.Getgid()) {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"STRUCT_CRED_UID":  offset,
 		"STRUCT_CRED_GID":  offset + 4,
 		"STRUCT_CRED_EUID": offset + 16,
