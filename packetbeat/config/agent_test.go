@@ -20,8 +20,9 @@ package config
 import (
 	"testing"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestAgentInputNormalization(t *testing.T) {

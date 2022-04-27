@@ -28,13 +28,13 @@ import (
 )
 
 type Config struct {
-	Interfaces      InterfacesConfig     `config:"interfaces"`
-	Flows           *Flows               `config:"flows"`
+	Interfaces      InterfacesConfig   `config:"interfaces"`
+	Flows           *Flows             `config:"flows"`
 	Protocols       map[string]*conf.C `config:"protocols"`
 	ProtocolsList   []*conf.C          `config:"protocols"`
-	Procs           procs.ProcsConfig    `config:"procs"`
-	IgnoreOutgoing  bool                 `config:"ignore_outgoing"`
-	ShutdownTimeout time.Duration        `config:"shutdown_timeout"`
+	Procs           procs.ProcsConfig  `config:"procs"`
+	IgnoreOutgoing  bool               `config:"ignore_outgoing"`
+	ShutdownTimeout time.Duration      `config:"shutdown_timeout"`
 }
 
 // FromStatic initializes a configuration given a config.C

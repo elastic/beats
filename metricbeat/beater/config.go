@@ -27,8 +27,8 @@ import (
 // Config is the root of the Metricbeat configuration hierarchy.
 type Config struct {
 	// Modules is a list of module specific configuration data.
-	Modules       []*conf.C          `config:"modules"`
-	ConfigModules *conf.C            `config:"config.modules"`
+	Modules       []*conf.C            `config:"modules"`
+	ConfigModules *conf.C              `config:"config.modules"`
 	MaxStartDelay time.Duration        `config:"max_start_delay"` // Upper bound on the random startup delay for metricsets (use 0 to disable startup delay).
 	Autodiscover  *autodiscover.Config `config:"autodiscover"`
 }

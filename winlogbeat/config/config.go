@@ -22,8 +22,9 @@ import (
 	"fmt"
 	"time"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/joeshaw/multierror"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -38,7 +39,7 @@ var DefaultSettings = WinlogbeatConfig{
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
-	EventLogs          []*conf.C   `config:"event_logs"`
+	EventLogs          []*conf.C     `config:"event_logs"`
 	RegistryFile       string        `config:"registry_file"`
 	RegistryFlush      time.Duration `config:"registry_flush"`
 	ShutdownTimeout    time.Duration `config:"shutdown_timeout"`

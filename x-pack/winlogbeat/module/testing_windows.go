@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/elastic/elastic-agent-libs/config"
 
 	// Register javascript modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"

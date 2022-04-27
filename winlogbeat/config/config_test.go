@@ -23,8 +23,9 @@ package config
 import (
 	"testing"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type validationTestCase struct {
