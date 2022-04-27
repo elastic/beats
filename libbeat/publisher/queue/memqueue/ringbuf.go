@@ -74,7 +74,7 @@ func (b *ringBuffer) init(logger *logp.Logger, size int) {
 // New spec:
 // Returns true if the ringBuffer is full after handling
 // the given insertion, false otherwise.
-func (b *ringBuffer) insert(event interface{}, client clientState) bool {
+func (b *ringBuffer) insert(event interface{}, client clientState) {
 	// always insert into region B, if region B exists.
 	// That is, we have 2 regions and region A is currently processed by consumers
 	if b.regB.size > 0 {
@@ -82,49 +82,30 @@ func (b *ringBuffer) insert(event interface{}, client clientState) bool {
 
 		idx := b.regB.index + b.regB.size
 		avail := b.regA.index - idx
-		if avail == 0 {
-			return true
+		if avail > 0 {
+			b.entries[idx] = queueEntry{event, client}
+			b.regB.size++
 		}
-
-		b.entries[idx] = queueEntry{event, client}
-		b.regB.size++
-
-		return avail <= 1
+		return
 	}
 
 	// region B does not exist yet, check if region A is available for use
 	idx := b.regA.index + b.regA.size
-	// log.Debug("  - index: ", idx)
-	// log.Debug("  - buffer size: ", b.buf.Len())
-	avail := len(b.entries) - idx
 	if b.regA.index+b.regA.size >= len(b.entries) {
 		// region A extends to the end of the buffer
-		if b.regA.index == 0 {
-			// If region A also extends to the start of the buffer, then
-			// there is no space left.
-			return true
+		if b.regA.index > 0 {
+			// If there is space before region AS, create
+			// region B there.
+			b.regB = region{index: 0, size: 1}
+			b.entries[0] = queueEntry{event, client}
 		}
-
-		// create region B at the start of the buffer; events will now be
-		// appended there until A has been consumed.
-		b.regB = region{index: 0, size: 1}
-		b.entries[0] = queueEntry{event, client}
-
-		// The buffer is full if region A begins immediately after the first entry.
-		return b.regA.index == 1
+		return
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
 	b.entries[idx] = queueEntry{event, client}
 	b.regA.size++
-
-	// This is a strange return value: it checks, not whether there is space
-	// in the ring buffer, but whether the next insertion will be in region B
-	// (i.e. whether we are crossing the end of the internal buffer).
-	// This seems wrong, but I'm leaving it this way for consistency until I
-	// understand the code paths well enough to be sure.
-	return avail == 1
 }
 
 // cancel removes all buffered events matching `st`, not yet reserved by

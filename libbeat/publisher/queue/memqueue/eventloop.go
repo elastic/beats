@@ -129,23 +129,20 @@ func (l *directEventLoop) run() {
 }
 
 // Returns true if the queue is full after handling the insertion request.
-func (l *directEventLoop) insert(req *pushRequest) bool {
+func (l *directEventLoop) insert(req *pushRequest) {
 	log := l.broker.logger
 
 	st := req.state
 	if st == nil {
-		return l.buf.insert(req.event, clientState{})
-	}
-
-	if st.cancelled {
+		l.buf.insert(req.event, clientState{})
+	} else if st.cancelled {
 		reportCancelledState(log, req)
-		return false
+	} else {
+		l.buf.insert(req.event, clientState{
+			seq:   req.seq,
+			state: st,
+		})
 	}
-
-	return l.buf.insert(req.event, clientState{
-		seq:   req.seq,
-		state: st,
-	})
 }
 
 func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
