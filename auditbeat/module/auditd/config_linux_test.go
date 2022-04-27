@@ -25,8 +25,9 @@ import (
 	"strings"
 	"testing"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigValidate(t *testing.T) {
