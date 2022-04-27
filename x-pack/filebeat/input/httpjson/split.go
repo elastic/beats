@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -104,7 +103,7 @@ func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMs
 // split recursively executes the split processor chain.
 func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.targetInfo.Name)
-	if err != nil && err != common.ErrKeyNotFound { //nolint:errorlint // common.ErrKeyNotFound is never wrapped by GetValue.
+	if err != nil && err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by GetValue.
 		return err
 	}
 

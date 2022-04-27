@@ -99,7 +99,7 @@ func MakeDefaultSupport(
 ) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *common.Config) (Supporter, error) {
 		cfg := struct {
-			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
+			mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
 			TimeSeries           bool                    `config:"timeseries.enabled"`
 		}{}
@@ -179,7 +179,7 @@ func newBuilder(
 	info beat.Info,
 	log *logp.Logger,
 	processors *processors.Processors,
-	eventMeta common.EventMetadata,
+	eventMeta mapstr.EventMetadata,
 	modifiers []modifier,
 	skipNormalize bool,
 	timeSeries bool,
@@ -214,7 +214,7 @@ func newBuilder(
 
 	if fields := eventMeta.Fields; len(fields) > 0 {
 		b.fields = mapstr.M{}
-		common.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
+		mapstr.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
 	}
 
 	if timeSeries {
@@ -310,7 +310,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	fields := cfg.Fields.Clone()
 	fields.DeepUpdate(b.fields.Clone())
 	if em := cfg.EventMetadata; len(em.Fields) > 0 {
-		common.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+		mapstr.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 	}
 
 	if len(fields) > 0 {

@@ -164,7 +164,7 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		result, err := p.enrich(event, pidField)
 		if err != nil {
 			switch err {
-			case common.ErrKeyNotFound:
+			case mapstr.ErrKeyNotFound:
 				continue
 			case ErrNoProcess:
 				return event, err

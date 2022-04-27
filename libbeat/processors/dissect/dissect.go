@@ -23,8 +23,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Map  represents the keys and their values extracted with the defined tokenizer.

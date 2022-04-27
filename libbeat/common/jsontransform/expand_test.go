@@ -20,9 +20,10 @@ package jsontransform
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestExpand(t *testing.T) {

@@ -26,7 +26,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -218,7 +217,7 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 			}
 			err = errors.Errorf("unexpected panic in javascript processor: %v", r)
 			if s.tagOnException != "" {
-				common.AddTags(b.Fields, []string{s.tagOnException})
+				mapstr.AddTags(b.Fields, []string{s.tagOnException})
 			}
 			appendString(b.Fields, "error.message", err.Error(), false)
 		}
@@ -239,7 +238,7 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 
 	if _, err = s.processFunc(goja.Undefined(), s.evt.JSObject()); err != nil {
 		if s.tagOnException != "" {
-			common.AddTags(b.Fields, []string{s.tagOnException})
+			mapstr.AddTags(b.Fields, []string{s.tagOnException})
 		}
 		appendString(b.Fields, "error.message", err.Error(), false)
 		return b, errors.Wrap(err, "failed in process function")

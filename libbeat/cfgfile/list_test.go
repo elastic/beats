@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type runner struct {
@@ -232,13 +233,13 @@ func TestHas(t *testing.T) {
 }
 
 func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
-	newMapStrPointer := func(m mapstr.M) *mapstr.MPointer {
-		p := common.NewMapStrPointer(m)
+	newMapStrPointer := func(m mapstr.M) *mapstr.Pointer {
+		p := mapstr.NewPointer(m)
 		return &p
 	}
 
 	cases := map[string]struct {
-		meta *mapstr.MPointer
+		meta *mapstr.Pointer
 	}{
 		"no dynamic metadata": {},
 		"with dynamic fields": {

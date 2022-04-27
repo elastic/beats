@@ -24,6 +24,7 @@ import (
 	"sync"
 
 	"github.com/cespare/xxhash/v2"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

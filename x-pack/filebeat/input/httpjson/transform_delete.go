@@ -106,7 +106,7 @@ func (delete *delete) run(ctx *transformContext, tr transformable) (transformabl
 }
 
 func deleteFromCommonMap(m mapstr.M, key string) error {
-	if err := m.Delete(key); err != common.ErrKeyNotFound { //nolint:errorlint // common.ErrKeyNotFound is never wrapped by Delete.
+	if err := m.Delete(key); err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by Delete.
 		return err
 	}
 	return nil

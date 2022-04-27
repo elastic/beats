@@ -97,7 +97,7 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 func (x *decodeXML) run(event *beat.Event) error {
 	data, err := event.GetValue(x.Field)
 	if err != nil {
-		if x.IgnoreMissing && err == common.ErrKeyNotFound {
+		if x.IgnoreMissing && err == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return err

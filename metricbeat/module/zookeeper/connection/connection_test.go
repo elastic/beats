@@ -21,8 +21,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var srvrTestInput = `/172.17.0.1:55218[0](queued=0,recved=1,sent=0)

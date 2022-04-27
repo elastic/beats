@@ -23,8 +23,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // convertUptimeToSeconds converts uptime from formatted string to seconds

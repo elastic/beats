@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // expandFields de-dots the keys in m by expanding them in-place into a

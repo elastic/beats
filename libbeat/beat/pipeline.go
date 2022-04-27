@@ -20,7 +20,7 @@ package beat
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
@@ -99,7 +99,7 @@ type CloseRef interface {
 // pass to the publisher pipeline on Connect.
 type ProcessingConfig struct {
 	// EventMetadata configures additional fields/tags to be added to published events.
-	EventMetadata common.EventMetadata
+	EventMetadata mapstr.EventMetadata
 
 	// Meta provides additional meta data to be added to the Meta field in the beat.Event
 	// structure.
@@ -109,7 +109,7 @@ type ProcessingConfig struct {
 	Fields mapstr.M
 
 	// DynamicFields provides additional fields to be added to every event, supporting live updates
-	DynamicFields *mapstr.MPointer
+	DynamicFields *mapstr.Pointer
 
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.

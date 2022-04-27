@@ -351,7 +351,7 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
-		if err == common.ErrKeyNotFound {
+		if err == mapstr.ErrKeyNotFound {
 			return "", nil
 		}
 		if err != nil {

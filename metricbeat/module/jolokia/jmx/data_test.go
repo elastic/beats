@@ -22,8 +22,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventMapper(t *testing.T) {

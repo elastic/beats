@@ -100,7 +100,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *processor) run(event *beat.Event) error {
 	data, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreMissing && err == common.ErrKeyNotFound {
+		if p.IgnoreMissing && err == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return err

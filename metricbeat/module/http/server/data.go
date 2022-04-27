@@ -24,7 +24,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -98,7 +97,7 @@ func (p *metricProcessor) Process(event server.Event) (mapstr.M, error) {
 	out[mb.NamespaceKey] = pathConf.Namespace
 	if len(pathConf.Fields) != 0 {
 		// Overwrite any keys that are present in the incoming payload
-		common.MergeFields(out, pathConf.Fields, true)
+		mapstr.MergeFields(out, pathConf.Fields, true)
 	}
 	return out, nil
 }

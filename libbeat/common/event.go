@@ -113,7 +113,7 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]mapstr.M, []error) {
 	var errs []error
 
-	out := make([]MapStr, 0, len(maps))
+	out := make([]mapstr.M, 0, len(maps))
 	for i, m := range maps {
 		normalizedMap, err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {

@@ -20,8 +20,9 @@ package osd_df
 import (
 	"encoding/json"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Node represents a node object

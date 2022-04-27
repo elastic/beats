@@ -26,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -113,7 +112,7 @@ func TestPid(t *testing.T) {
 		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
 		_, err := event.GetValue("process")
-		assert.Equal(t, common.ErrKeyNotFound, err)
+		assert.Equal(t, mapstr.ErrKeyNotFound, err)
 	})
 }
 
@@ -165,7 +164,7 @@ func TestProgram(t *testing.T) {
 		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
 		_, err := event.GetValue("process")
-		assert.Equal(t, common.ErrKeyNotFound, err)
+		assert.Equal(t, mapstr.ErrKeyNotFound, err)
 	})
 }
 

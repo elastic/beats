@@ -22,8 +22,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Config defines the configuration options for the DNS processor.

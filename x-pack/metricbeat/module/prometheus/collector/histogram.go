@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	dto "github.com/prometheus/client_model/go"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // PromHistogramToES takes a Prometheus histogram and converts it to an ES histogram:

@@ -39,7 +39,7 @@ type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common
 // for the publisher pipeline.
 type commonInputConfig struct {
 	// event processing
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
 	KeepNull             bool                    `config:"keep_null"`
 

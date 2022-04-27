@@ -137,7 +137,7 @@ func (pkg Package) Hash() uint64 {
 }
 
 func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
-	mapstr := mapstr.M{
+	mapStr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
@@ -147,36 +147,36 @@ func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
 	}
 
 	if pkg.Release != "" {
-		mapstr.Put("release", pkg.Release)
+		mapStr.Put("release", pkg.Release)
 	}
 
 	if pkg.Arch != "" {
-		mapstr.Put("arch", pkg.Arch)
+		mapStr.Put("arch", pkg.Arch)
 		ecsMapstr.Put("architecture", pkg.License)
 	}
 
 	if pkg.License != "" {
-		mapstr.Put("license", pkg.License)
+		mapStr.Put("license", pkg.License)
 		ecsMapstr.Put("license", pkg.License)
 	}
 
 	if !pkg.InstallTime.IsZero() {
-		mapstr.Put("installtime", pkg.InstallTime)
+		mapStr.Put("installtime", pkg.InstallTime)
 		ecsMapstr.Put("installed", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
-		mapstr.Put("size", pkg.Size)
+		mapStr.Put("size", pkg.Size)
 		ecsMapstr.Put("size", pkg.Size)
 	}
 
 	if pkg.Summary != "" {
-		mapstr.Put("summary", pkg.Summary)
+		mapStr.Put("summary", pkg.Summary)
 		ecsMapstr.Put("description", pkg.Summary)
 	}
 
 	if pkg.URL != "" {
-		mapstr.Put("url", pkg.URL)
+		mapStr.Put("url", pkg.URL)
 		ecsMapstr.Put("reference", pkg.URL)
 	}
 
@@ -184,7 +184,7 @@ func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
 		ecsMapstr.Put("type", pkg.Type)
 	}
 
-	return mapstr, ecsMapstr
+	return mapStr, ecsMapstr
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.

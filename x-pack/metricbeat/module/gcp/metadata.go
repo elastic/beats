@@ -8,8 +8,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // MetadataService must be implemented by GCP services that requires non out-of-the box code that is not fulfil by the Stackdriver

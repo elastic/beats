@@ -125,7 +125,7 @@ func createTestTemplate(t *testing.T, beatVersion, esVersion string, config Temp
 func (t *testTemplate) Has(path string) bool {
 	t.t.Helper()
 	has, err := t.data.HasKey(path)
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != mapstr.ErrKeyNotFound {
 		serialized, _ := json.MarshalIndent(t.data, "", "    ")
 		t.t.Fatalf("error accessing '%v': %v\ntemplate: %s", path, err, serialized)
 	}

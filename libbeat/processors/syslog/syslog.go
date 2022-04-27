@@ -151,7 +151,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *processor) run(event *beat.Event) error {
 	value, err := event.GetValue(p.Field)
 	if err != nil {
-		if errors.Is(err, common.ErrKeyNotFound) {
+		if errors.Is(err, mapstr.ErrKeyNotFound) {
 			if p.IgnoreMissing {
 				return nil
 			}

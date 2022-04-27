@@ -9,8 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"

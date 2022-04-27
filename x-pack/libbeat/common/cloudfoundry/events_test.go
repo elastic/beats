@@ -12,8 +12,9 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/sonde-go/events"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventTypeHttpAccess(t *testing.T) {

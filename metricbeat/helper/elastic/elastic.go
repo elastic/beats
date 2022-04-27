@@ -121,7 +121,7 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
 func FixTimestampField(m mapstr.M, field string) error {
 	v, err := m.GetValue(field)
-	if err == common.ErrKeyNotFound {
+	if err == mapstr.ErrKeyNotFound {
 		return nil
 	}
 	if err != nil {

@@ -51,7 +51,7 @@ type RunnerFactory struct {
 
 type publishSettings struct {
 	// Fields and tags to add to monitor.
-	EventMetadata common.EventMetadata    `config:",inline"`
+	EventMetadata mapstr.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
 
 	PublisherPipeline struct {

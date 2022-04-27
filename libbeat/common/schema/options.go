@@ -18,8 +18,9 @@
 package schema
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // DefaultApplyOptions are the default options for Apply()

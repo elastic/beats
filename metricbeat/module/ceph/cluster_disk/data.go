@@ -20,8 +20,9 @@ package cluster_disk
 import (
 	"encoding/json"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type StatsCluster struct {

@@ -23,8 +23,9 @@ package agent
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var jsonExample = `{

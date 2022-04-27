@@ -34,7 +34,6 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -176,7 +175,7 @@ func TestLoginType(t *testing.T) {
 				assert.Equal(t, v, cur, msg)
 			} else {
 				_, err := beatEvent.GetValue(k)
-				assert.Equal(t, common.ErrKeyNotFound, err, msg)
+				assert.Equal(t, mapstr.ErrKeyNotFound, err, msg)
 			}
 		}
 	}

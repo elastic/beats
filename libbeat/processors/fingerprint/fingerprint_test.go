@@ -331,7 +331,7 @@ func TestTargetField(t *testing.T) {
 			assert.Equal(t, expectedFingerprint, v)
 
 			_, err = newEvent.GetValue("fingerprint")
-			assert.EqualError(t, err, common.ErrKeyNotFound.Error())
+			assert.EqualError(t, err, mapstr.ErrKeyNotFound.Error())
 		})
 	}
 }

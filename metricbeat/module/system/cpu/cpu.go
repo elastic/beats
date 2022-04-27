@@ -23,7 +23,6 @@ package cpu
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -105,7 +104,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 // the key does not exist in the source map.
 func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value interface{}) error {
 	v, err := from.GetValue(key)
-	if errors.Is(err, common.ErrKeyNotFound) {
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		_, err = to.Put(newkey, value)
 		return err
 	}

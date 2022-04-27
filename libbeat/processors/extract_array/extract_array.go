@@ -116,7 +116,7 @@ func isEmpty(v reflect.Value) bool {
 func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	iValue, err := event.GetValue(f.config.Field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "could not fetch value for field %s", f.config.Field)

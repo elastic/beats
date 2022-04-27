@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestPreserveOriginalEvent(t *testing.T) {

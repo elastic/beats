@@ -20,8 +20,9 @@ package cluster_status
 import (
 	"encoding/json"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // PgState represents placement group state

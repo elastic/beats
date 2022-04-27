@@ -23,7 +23,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,7 +41,7 @@ func TestGetMetaStringValue(t *testing.T) {
 			},
 			"nonexistent",
 			"",
-			common.ErrKeyNotFound,
+			mapstr.ErrKeyNotFound,
 		},
 		"root": {
 			beat.Event{

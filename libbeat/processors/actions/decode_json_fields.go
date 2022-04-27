@@ -106,7 +106,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, field := range f.fields {
 		data, err := event.GetValue(field)
-		if err != nil && errors.Cause(err) != common.ErrKeyNotFound {
+		if err != nil && errors.Cause(err) != mapstr.ErrKeyNotFound {
 			f.logger.Debugf("Error trying to GetValue for field : %s in event : %v", field, event)
 			errs = append(errs, err.Error())
 			continue

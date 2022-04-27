@@ -195,7 +195,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 	fields.Put("interval_ms", interval)
 
 	clusterUUID, err := event.Content.Meta.GetValue("cluster_uuid")
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != mapstr.ErrKeyNotFound {
 		return errors.Wrap(err, "could not determine cluster_uuid field")
 	}
 	fields.Put("cluster_uuid", clusterUUID)

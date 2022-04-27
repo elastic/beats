@@ -18,8 +18,9 @@
 package host
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/vmware/govmomi/vim25/mo"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventMapping(hs mo.HostSystem) mapstr.M {

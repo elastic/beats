@@ -24,8 +24,9 @@ import (
 	"net"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/insomniacslk/dhcp/dhcpv4"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func optionsToMap(options []dhcpv4.Option) (mapstr.M, error) {

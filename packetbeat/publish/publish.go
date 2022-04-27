@@ -88,7 +88,7 @@ func (p *TransactionPublisher) CreateReporter(
 	// load and register the module it's fields, tags and processors settings
 	meta := struct {
 		Index      string                  `config:"index"`
-		Event      common.EventMetadata    `config:",inline"`
+		Event      mapstr.EventMetadata    `config:",inline"`
 		Processors processors.PluginConfig `config:"processors"`
 		KeepNull   bool                    `config:"keep_null"`
 	}{}

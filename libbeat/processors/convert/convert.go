@@ -118,7 +118,7 @@ func (p *processor) convertFields(event *beat.Event, converted []interface{}) er
 func (p *processor) convertField(event *beat.Event, conversion field) (interface{}, error) {
 	v, err := event.GetValue(conversion.From)
 	if err != nil {
-		if p.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if p.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return ignoredFailure, nil
 		}
 		return nil, newConvertError(conversion, err, p.Tag, "field [%v] is missing", conversion.From)

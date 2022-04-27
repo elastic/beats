@@ -28,8 +28,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"golang.org/x/sys/windows/svc/eventlog"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const gigabyte = 1 << 30

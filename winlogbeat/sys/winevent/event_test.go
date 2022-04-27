@@ -24,8 +24,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const allXML = `

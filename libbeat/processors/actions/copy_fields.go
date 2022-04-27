@@ -99,7 +99,7 @@ func (f *copyFields) copyField(from string, to string, event *beat.Event) error 
 
 	value, err := event.GetValue(from)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)

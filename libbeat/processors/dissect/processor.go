@@ -92,7 +92,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		m, err = p.config.Tokenizer.Dissect(s)
 	}
 	if err != nil {
-		if err := common.AddTagsWithKey(
+		if err := mapstr.AddTagsWithKey(
 			event.Fields,
 			beat.FlagField,
 			[]string{flagParsingError},
@@ -127,7 +127,7 @@ func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 	var prefixKey string
 	for k, v := range m {
 		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound || p.config.OverwriteKeys {
+		if _, err := event.GetValue(prefixKey); err == mapstr.ErrKeyNotFound || p.config.OverwriteKeys {
 			event.PutValue(prefixKey, v)
 		} else {
 			// When the target key exists but is a string instead of a map.

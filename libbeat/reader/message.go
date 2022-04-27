@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -76,7 +75,7 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 		m.Fields = mapstr.M{}
 	}
 
-	return common.AddTagsWithKey(m.Fields, key, flags)
+	return mapstr.AddTagsWithKey(m.Fields, key, flags)
 }
 
 // ToEvent converts a Message to an Event that can be published

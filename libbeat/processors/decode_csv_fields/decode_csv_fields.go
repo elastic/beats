@@ -116,7 +116,7 @@ func (f *decodeCSVFields) Run(event *beat.Event) (*beat.Event, error) {
 func (f *decodeCSVFields) decodeCSVField(src, dest string, event *beat.Event) error {
 	data, err := event.GetValue(src)
 	if err != nil {
-		if f.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return errors.Wrapf(err, "could not fetch value for field %s", src)

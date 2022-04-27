@@ -20,9 +20,10 @@ package schema
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func nop(key string, data map[string]interface{}) (interface{}, error) {

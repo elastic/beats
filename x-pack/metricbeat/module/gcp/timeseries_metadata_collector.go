@@ -9,10 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors

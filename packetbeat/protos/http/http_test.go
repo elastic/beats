@@ -1843,7 +1843,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 				if expected != nil {
 					assert.Nil(t, err, field)
 				} else {
-					assert.Equal(t, common.ErrKeyNotFound, err, field)
+					assert.Equal(t, mapstr.ErrKeyNotFound, err, field)
 				}
 			}
 		})
@@ -1894,7 +1894,7 @@ func TestHttpParser_Extension(t *testing.T) {
 				if expected != nil {
 					assert.Nil(t, err, field)
 				} else {
-					assert.Equal(t, common.ErrKeyNotFound, err, field)
+					assert.Equal(t, mapstr.ErrKeyNotFound, err, field)
 				}
 			}
 		})

@@ -20,9 +20,10 @@ package remote_write
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestGenerateEventsCounter tests counter simple cases

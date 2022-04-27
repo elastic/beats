@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NomadEventKey is the key under which custom metadata is going
@@ -199,7 +200,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 			"host":     nodeName,
 			"nomad":    allocMeta,
 			"meta": mapstr.M{
-				"nomad": mapstr.MUnion(allocMeta, mapstr.M{
+				"nomad": mapstr.Union(allocMeta, mapstr.M{
 					"task": task,
 				}),
 			},

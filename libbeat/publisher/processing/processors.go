@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type group struct {
@@ -175,7 +176,7 @@ func addMeta(event *beat.Event, meta mapstr.M) {
 
 func makeAddDynMetaProcessor(
 	name string,
-	meta *mapstr.MPointer,
+	meta *mapstr.Pointer,
 	checkCopy func(m mapstr.M) bool,
 ) *processorFn {
 	return newAnnotateProcessor(name, func(event *beat.Event) {

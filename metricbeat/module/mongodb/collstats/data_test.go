@@ -25,8 +25,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventMapping(t *testing.T) {

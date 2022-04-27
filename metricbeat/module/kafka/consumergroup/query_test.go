@@ -23,8 +23,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetchGroupInfo(t *testing.T) {

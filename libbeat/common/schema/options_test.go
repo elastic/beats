@@ -20,10 +20,11 @@ package schema
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestApplyOptions(t *testing.T) {

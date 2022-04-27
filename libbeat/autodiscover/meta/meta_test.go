@@ -21,11 +21,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestStoreNil(t *testing.T) {
 	m := NewMap()
-	assert.Equal(t, mapstr.MPointer{}, m.Store(0, nil))
+	assert.Equal(t, mapstr.Pointer{}, m.Store(0, nil))
 }
 
 func TestStore(t *testing.T) {

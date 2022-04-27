@@ -105,7 +105,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		},
 		"user local fields and tags": {
 			local: beat.ProcessingConfig{
-				EventMetadata: common.EventMetadata{
+				EventMetadata: mapstr.EventMetadata{
 					Fields: mapstr.M{"local": "a"},
 					Tags:   []string{"tag"},
 				},
@@ -121,7 +121,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		},
 		"user local fields (under root) and tags": {
 			local: beat.ProcessingConfig{
-				EventMetadata: common.EventMetadata{
+				EventMetadata: mapstr.EventMetadata{
 					Fields:          mapstr.M{"local": "a"},
 					FieldsUnderRoot: true,
 					Tags:            []string{"tag"},
@@ -137,7 +137,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		"user local fields overwrite user global fields": {
 			global: `{fields: {global: a, shared: global}, fields_under_root: true, tags: [global]}`,
 			local: beat.ProcessingConfig{
-				EventMetadata: common.EventMetadata{
+				EventMetadata: mapstr.EventMetadata{
 					Fields: mapstr.M{
 						"local":  "a",
 						"shared": "local",
@@ -359,7 +359,7 @@ func TestDynamicFields(t *testing.T) {
 	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
 	require.NoError(t, err)
 
-	dynFields := common.NewMapStrPointer(mapstr.M{})
+	dynFields := mapstr.NewPointer(mapstr.M{})
 	prog, err := factory.Create(beat.ProcessingConfig{
 		DynamicFields: &dynFields,
 	}, false)

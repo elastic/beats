@@ -12,10 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestPromHistogramToES tests that calling PromHistogramToES multiple

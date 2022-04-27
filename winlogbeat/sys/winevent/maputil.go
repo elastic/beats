@@ -22,7 +22,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -63,7 +62,7 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 
 		// Do not overwrite.
 		_, err := h.GetValue(k)
-		if err == common.ErrKeyNotFound {
+		if err == mapstr.ErrKeyNotFound {
 			_, _ = h.Put(k, sys.RemoveWindowsLineEndings(kv.Value))
 		} else {
 			debugf("Dropping key/value (k=%s, v=%s) pair because key already "+

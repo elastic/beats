@@ -20,8 +20,9 @@ package cluster_health
 import (
 	"encoding/json"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Timecheck contains part of the response from a HealthRequest

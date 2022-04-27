@@ -19,7 +19,6 @@ package publisher
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -77,7 +76,7 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 func (ec *EventCache) GetValue(key string) (interface{}, error) {
 	if ec.m == nil {
 		// uninitialized map
-		return nil, common.ErrKeyNotFound
+		return nil, mapstr.ErrKeyNotFound
 	}
 
 	return ec.m.GetValue(key)

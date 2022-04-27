@@ -26,9 +26,10 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows/registry"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (

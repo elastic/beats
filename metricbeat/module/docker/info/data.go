@@ -19,6 +19,7 @@ package info
 
 import (
 	"github.com/docker/docker/api/types"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
