@@ -75,17 +75,6 @@ func (b *ringBuffer) init(logger *logp.Logger, size int) {
 // Returns true if the ringBuffer is full after handling
 // the given insertion, false otherwise.
 func (b *ringBuffer) insert(event interface{}, client clientState) bool {
-	// log := b.buf.logger
-	// log.Debug("insert:")
-	// log.Debug("  region A:", b.regA)
-	// log.Debug("  region B:", b.regB)
-	// log.Debug("  reserved:", b.reserved)
-	// defer func() {
-	// 	log.Debug("  -> region A:", b.regA)
-	// 	log.Debug("  -> region B:", b.regB)
-	// 	log.Debug("  -> reserved:", b.reserved)
-	// }()
-
 	// always insert into region B, if region B exists.
 	// That is, we have 2 regions and region A is currently processed by consumers
 	if b.regB.size > 0 {
@@ -185,19 +174,7 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 // will only return enqueued and non-reserved events from the buffer.
 // If `sz == -1`, all available events will be reserved.
 func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
-	// log := b.buf.logger
-	// log.Debug("reserve: ", sz)
-	// log.Debug("  region A:", b.regA)
-	// log.Debug("  region B:", b.regB)
-	// log.Debug("  reserved:", b.reserved)
-	// defer func() {
-	// 	log.Debug("  -> region A:", b.regA)
-	// 	log.Debug("  -> region B:", b.regB)
-	// 	log.Debug("  -> reserved:", b.reserved)
-	// }()
-
 	use := b.regA.size - b.reserved
-	// log.Debug("  - avail: ", use)
 
 	if sz > 0 && use > sz {
 		use = sz
@@ -206,8 +183,6 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 	start := b.regA.index + b.reserved
 	end := start + use
 	b.reserved += use
-	// log.Debug("  - start:", start)
-	// log.Debug("  - end:", end)
 	return start, b.entries[start:end]
 }
 
@@ -215,16 +190,6 @@ func (b *ringBuffer) reserve(sz int) (int, []queueEntry) {
 // start of region A. Called by the event loop when events are ACKed by
 // consumers.
 func (b *ringBuffer) removeEntries(count int) {
-	/*fmt.Printf("ack(%d)\n", sz)
-	fmt.Printf("  region A: %v\n", b.regA)
-	fmt.Printf("  region B: %v\n", b.regB)
-	fmt.Printf("  reserved: %v\n", b.reserved)
-	defer func() {
-		fmt.Printf("  -> region A: %v\n", b.regA)
-		fmt.Printf("  -> region B: %v\n", b.regB)
-		fmt.Printf("  -> reserved: %v\n", b.reserved)
-	}()*/
-
 	if b.regA.size < count {
 		panic(fmt.Errorf("commit region to big (commit region=%v, buffer size=%v)",
 			count, b.regA.size,
