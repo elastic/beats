@@ -19,6 +19,11 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -110,6 +115,10 @@ func TestJourneyEnricher(t *testing.T) {
 
 		// We need an expectation for each input plus a final
 		// expectation for the summary which comes on the nil data.
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 		if se.Type != JourneyEnd {
 			// Test that the created event includes the mapped
 			// version of the event
@@ -231,8 +240,14 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &beat.Event{}
+<<<<<<< HEAD
 			err := tt.je.enrichSynthEvent(e, tt.se)
 			require.NoError(t, err)
+=======
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			tt.je.enrichSynthEvent(e, tt.se)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 			tt.check(t, e, tt.je)
 		})
 	}
@@ -491,8 +506,13 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 func TestCreateSummaryEvent(t *testing.T) {
 	baseTime := time.Now()
 
+<<<<<<< HEAD
 	defaultLogValidator := func(stepCount int) func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
 		return func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
+=======
+	defaultLogValidator := func(stepCount int) func(t *testing.T, summary common.MapStr, observed []observer.LoggedEntry) {
+		return func(t *testing.T, summary common.MapStr, observed []observer.LoggedEntry) {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 			require.Len(t, observed, 1)
 			require.Equal(t, "Monitor finished", observed[0].Message)
 
@@ -509,9 +529,15 @@ func TestCreateSummaryEvent(t *testing.T) {
 	tests := []struct {
 		name         string
 		je           *journeyEnricher
+<<<<<<< HEAD
 		expected     mapstr.M
 		wantErr      bool
 		logValidator func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry)
+=======
+		expected     common.MapStr
+		wantErr      bool
+		logValidator func(t *testing.T, summary common.MapStr, observed []observer.LoggedEntry)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	}{{
 		name: "completed without errors",
 		je: &journeyEnricher{
@@ -581,7 +607,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   0,
 			},
 		},
+<<<<<<< HEAD
 		logValidator: func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
+=======
+		logValidator: func(t *testing.T, summary common.MapStr, observed []observer.LoggedEntry) {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 			// We don't log run data without duration
 			require.Len(t, observed, 1)
 			require.Equal(t, "Error gathering information to log event", observed[0].Message)
@@ -596,10 +626,17 @@ func TestCreateSummaryEvent(t *testing.T) {
 				return zapcore.NewTee(in, core)
 			})))
 
+<<<<<<< HEAD
 			monitorField := mapstr.M{"id": "my-monitor", "type": "browser"}
 
 			e := &beat.Event{
 				Fields: mapstr.M{"monitor": monitorField},
+=======
+			monitorField := common.MapStr{"id": "my-monitor", "type": "browser"}
+
+			e := &beat.Event{
+				Fields: common.MapStr{"monitor": monitorField},
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 			}
 			err := tt.je.createSummary(e)
 			if tt.wantErr {
@@ -609,9 +646,15 @@ func TestCreateSummaryEvent(t *testing.T) {
 			}
 			//nolint:errcheck // There are no new changes to this line but
 			// linter has been activated in the meantime. We'll cleanup separately.
+<<<<<<< HEAD
 			mapstr.MergeFields(tt.expected, mapstr.M{
 				"monitor":            monitorField,
 				"url":                mapstr.M{},
+=======
+			common.MergeFields(tt.expected, common.MapStr{
+				"monitor":            monitorField,
+				"url":                common.MapStr{},
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
 				"synthetics.journey": Journey{},

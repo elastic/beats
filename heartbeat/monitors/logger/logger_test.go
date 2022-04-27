@@ -28,8 +28,13 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+=======
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 )
 
 func TestLogRun(t *testing.T) {
@@ -42,7 +47,11 @@ func TestLogRun(t *testing.T) {
 	durationMs := time.Duration(durationUs * int64(time.Microsecond)).Milliseconds()
 	steps := 1337
 
+<<<<<<< HEAD
 	fields := mapstr.M{
+=======
+	fields := common.MapStr{
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 		"monitor.id":          "b0",
 		"monitor.duration.us": durationUs,
 		"monitor.type":        "browser",

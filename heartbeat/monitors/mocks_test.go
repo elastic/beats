@@ -130,7 +130,13 @@ func mockEventCustomFields() map[string]interface{} {
 	return mapstr.M{"foo": "bar"}
 }
 
+<<<<<<< HEAD
 func createMockJob() []jobs.Job {
+=======
+//nolint:unparam // There are no new changes to this line but
+// linter has been activated in the meantime. We'll cleanup separately.
+func createMockJob() ([]jobs.Job, error) {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
 		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
@@ -177,7 +183,13 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
 	reg := plugin.NewPluginsReg()
 	builder, built, closed := mockPluginBuilder()
+<<<<<<< HEAD
 	_ = reg.Add(builder)
+=======
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	reg.Add(builder)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	return reg, built, closed
 }
 
@@ -202,7 +214,13 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
+<<<<<<< HEAD
 func mockBadPluginConf(t *testing.T, id string) *conf.C {
+=======
+//nolint:unparam // There are no new changes to this line but
+// linter has been activated in the meantime. We'll cleanup separately.
+func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},

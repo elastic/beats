@@ -30,7 +30,11 @@ import (
 
 // RTT formats a round-trip-time given as time.Duration into an
 // event field. The duration is stored in `{"us": rtt}`.
+<<<<<<< HEAD
 func RTT(rtt time.Duration) mapstr.M {
+=======
+func RTT(rtt time.Duration) common.MapStr {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	if rtt < 0 {
 		rtt = 0
 	}
@@ -44,7 +48,11 @@ func RTT(rtt time.Duration) mapstr.M {
 }
 
 // Reason formats an error into an error event field.
+<<<<<<< HEAD
 func Reason(err error) mapstr.M {
+=======
+func Reason(err error) common.MapStr {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	//nolint:errorlint // There are no new changes to this line but
 	// linter has been activated in the meantime. We'll cleanup separately.
 	if r, ok := err.(reason.Reason); ok {

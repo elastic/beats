@@ -22,7 +22,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/logp"
+=======
+	"github.com/elastic/beats/v7/libbeat/logp"
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 )
 
 var eventLogger *logp.Logger = nil
@@ -55,7 +59,11 @@ func SetLogger(l *logp.Logger) *logp.Logger {
 
 func getLogger() *logp.Logger {
 	if eventLogger == nil {
+<<<<<<< HEAD
 		return SetLogger(logp.L())
+=======
+		return SetLogger(logp.NewLogger("heartbeat.events"))
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	}
 
 	return eventLogger

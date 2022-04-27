@@ -157,7 +157,13 @@ func TestUnreachableEndpointJob(t *testing.T) {
 func TestCheckUp(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
+<<<<<<< HEAD
 	defer closeEcho() //nolint:errcheck // not needed in test
+=======
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	defer closeEcho()
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 
 	configMap := mapstr.M{
 		"hosts":         host,
@@ -190,7 +196,13 @@ func TestCheckUp(t *testing.T) {
 func TestCheckDown(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
+<<<<<<< HEAD
 	defer closeEcho() //nolint:errcheck // not needed in test
+=======
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	defer closeEcho()
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 
 	configMap := mapstr.M{
 		"hosts":         host,
@@ -263,10 +275,14 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+<<<<<<< HEAD
 	if err != nil {
 		listener.Close()
 		return "", 0, "", nil, err
 	}
+=======
+	require.NoError(t, err)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()

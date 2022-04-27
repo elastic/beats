@@ -24,6 +24,13 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
+<<<<<<< HEAD
+=======
+
+	//nolint:gomodguard // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	"github.com/pkg/errors"
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -193,8 +200,13 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 		duration := time.Since(start)
 
 		if event != nil {
+<<<<<<< HEAD
 			eventext.MergeEventFields(event, mapstr.M{
 				"monitor": mapstr.M{
+=======
+			eventext.MergeEventFields(event, common.MapStr{
+				"monitor": common.MapStr{
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 					"duration": look.RTT(duration),
 				},
 			})
@@ -255,7 +267,13 @@ func makeAddSummary() jobs.JobWrapper {
 				}
 			}
 
+<<<<<<< HEAD
 			_, _ = event.PutValue("monitor.check_group", state.checkGroup)
+=======
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			event.PutValue("monitor.check_group", state.checkGroup)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))

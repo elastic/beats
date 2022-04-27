@@ -25,7 +25,11 @@ type streamEnricher struct {
 	je *journeyEnricher
 }
 
+<<<<<<< HEAD
 func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdProjectFields) error {
+=======
+func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	if e.je == nil || (se != nil && se.Type == JourneyStart) {
 		e.je = newJourneyEnricher()
 	}
@@ -158,7 +162,13 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		event.SetID(se.Id)
 		// This is only relevant for screenshots, which have a specific ID
 		// In that case we always want to issue an update op
+<<<<<<< HEAD
 		_, _ = event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+=======
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
+		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())
@@ -188,9 +198,15 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	// to inform the journey never ran
 	if !je.start.IsZero() {
 		duration := je.end.Sub(je.start)
+<<<<<<< HEAD
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
 				"duration": mapstr.M{
+=======
+		eventext.MergeEventFields(event, common.MapStr{
+			"monitor": common.MapStr{
+				"duration": common.MapStr{
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 					"us": duration.Microseconds(),
 				},
 			},

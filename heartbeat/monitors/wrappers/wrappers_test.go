@@ -37,8 +37,13 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+=======
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -140,6 +145,7 @@ func TestSimpleJob(t *testing.T) {
 	})
 }
 
+<<<<<<< HEAD
 func TestAdditionalStdFields(t *testing.T) {
 	scenarios := []struct {
 		name           string
@@ -201,6 +207,37 @@ func TestAdditionalStdFields(t *testing.T) {
 		})
 	}
 
+=======
+func TestJobWithServiceName(t *testing.T) {
+	fields := testMonFields
+	fields.Service.Name = "testServiceName"
+	testCommonWrap(t, testDef{
+		"simple",
+		fields,
+		[]jobs.Job{makeURLJob(t, "tcp://foo.com:80")},
+		[]validator.Validator{
+			lookslike.Compose(
+				urlValidator(t, "tcp://foo.com:80"),
+				lookslike.MustCompile(map[string]interface{}{
+					"monitor": map[string]interface{}{
+						"duration.us": hbtestllext.IsInt64,
+						"id":          testMonFields.ID,
+						"name":        testMonFields.Name,
+						"type":        testMonFields.Type,
+						"status":      "up",
+						"check_group": isdef.IsString,
+					},
+					"service": map[string]interface{}{
+						"name": fields.Service.Name,
+					},
+				}),
+				hbtestllext.MonitorTimespanValidator,
+				summaryValidator(1, 0),
+			)},
+		nil,
+		nil,
+	})
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 }
 
 func TestErrorJob(t *testing.T) {

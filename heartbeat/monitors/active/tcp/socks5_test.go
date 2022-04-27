@@ -30,7 +30,11 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/mapstr"
+=======
+	"github.com/elastic/beats/v7/libbeat/common"
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
@@ -54,11 +58,23 @@ func TestSocks5Job(t *testing.T) {
 		t.Run(scenario.name, func(t *testing.T) {
 			host, port, ip, closeEcho, err := startEchoServer(t)
 			require.NoError(t, err)
+<<<<<<< HEAD
 			defer closeEcho() //nolint:errcheck // intentional discard
 
 			_, proxyPort, proxyIp, closeProxy, err := startSocks5Server(t)
 			require.NoError(t, err)
 			defer closeProxy() //nolint:errcheck // intentional discard
+=======
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			defer closeEcho()
+
+			_, proxyPort, proxyIp, closeProxy, err := startSocks5Server(t)
+			require.NoError(t, err)
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			defer closeProxy()
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 
 			proxyURL := &url.URL{Scheme: "socks5", Host: net.JoinHostPort(proxyIp, fmt.Sprint(proxyPort))}
 			configMap := mapstr.M{
@@ -108,10 +124,14 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 		return "", 0, "", nil, err
 	}
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+<<<<<<< HEAD
 	if err != nil {
 		listener.Close()
 		return "", 0, "", nil, err
 	}
+=======
+	require.NoError(t, err)
+>>>>>>> d5fe415c84 (Add heartbeat telemetry logs (step count and duration) (#31405))
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	require.NoError(t, err)
 	if err != nil {
