@@ -26,14 +26,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -41,11 +46,12 @@ import (
 )
 
 type testDef struct {
-	name      string
-	stdFields stdfields.StdMonitorFields
-	jobs      []jobs.Job
-	want      []validator.Validator
-	metaWant  []validator.Validator
+	name         string
+	stdFields    stdfields.StdMonitorFields
+	jobs         []jobs.Job
+	want         []validator.Validator
+	metaWant     []validator.Validator
+	logValidator func(t *testing.T, results []*beat.Event, observed []observer.LoggedEntry)
 }
 
 var testMonFields = stdfields.StdMonitorFields{
@@ -66,12 +72,18 @@ func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
 		wrapped := WrapCommon(tt.jobs, tt.stdFields)
 
+		core, observedLogs := observer.New(zapcore.InfoLevel)
+		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+			return zapcore.NewTee(in, core)
+		})))
+
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
 
 		require.Equal(t, len(results), len(tt.want), "Expected test def wants to correspond exactly to number results.")
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
+
 				want := tt.want[idx]
 				testslike.Test(t, lookslike.Strict(want), r.Fields)
 
@@ -79,7 +91,12 @@ func testCommonWrap(t *testing.T, tt testDef) {
 					metaWant := tt.metaWant[idx]
 					testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
 				}
+
 			})
+		}
+
+		if tt.logValidator != nil {
+			tt.logValidator(t, results, observedLogs.All())
 		}
 	})
 }
@@ -94,7 +111,7 @@ func TestSimpleJob(t *testing.T) {
 				urlValidator(t, "tcp://foo.com:80"),
 				lookslike.MustCompile(map[string]interface{}{
 					"monitor": map[string]interface{}{
-						"duration.us": isdef.IsDuration,
+						"duration.us": hbtestllext.IsInt64,
 						"id":          testMonFields.ID,
 						"name":        testMonFields.Name,
 						"type":        testMonFields.Type,
@@ -106,6 +123,20 @@ func TestSimpleJob(t *testing.T) {
 				summaryValidator(1, 0),
 			)},
 		nil,
+		func(t *testing.T, results []*beat.Event, observed []observer.LoggedEntry) {
+			require.Len(t, observed, 1)
+			require.Equal(t, "Monitor finished", observed[0].Message)
+
+			durationUs, err := results[0].Fields.GetValue("monitor.duration.us")
+			require.NoError(t, err)
+
+			durationMs := time.Duration(durationUs.(int64) * int64(time.Microsecond)).Milliseconds()
+			expectedMonitor := logger.NewMonitorRunInfo(testMonFields.ID, testMonFields.Type, durationMs)
+			require.ElementsMatch(t, []zap.Field{
+				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
+				logp.Any("monitor", &expectedMonitor),
+			}, observed[0].Context)
+		},
 	})
 }
 
@@ -121,7 +152,7 @@ func TestJobWithServiceName(t *testing.T) {
 				urlValidator(t, "tcp://foo.com:80"),
 				lookslike.MustCompile(map[string]interface{}{
 					"monitor": map[string]interface{}{
-						"duration.us": isdef.IsDuration,
+						"duration.us": hbtestllext.IsInt64,
 						"id":          testMonFields.ID,
 						"name":        testMonFields.Name,
 						"type":        testMonFields.Type,
@@ -136,6 +167,7 @@ func TestJobWithServiceName(t *testing.T) {
 				summaryValidator(1, 0),
 			)},
 		nil,
+		nil,
 	})
 }
 
@@ -148,7 +180,7 @@ func TestErrorJob(t *testing.T) {
 		lookslike.MustCompile(map[string]interface{}{"error": map[string]interface{}{"message": "myerror", "type": "io"}}),
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
-				"duration.us": isdef.IsDuration,
+				"duration.us": hbtestllext.IsInt64,
 				"id":          testMonFields.ID,
 				"name":        testMonFields.Name,
 				"type":        testMonFields.Type,
@@ -169,6 +201,7 @@ func TestErrorJob(t *testing.T) {
 				summaryValidator(0, 1),
 			)},
 		nil,
+		nil,
 	})
 }
 
@@ -180,7 +213,7 @@ func TestMultiJobNoConts(t *testing.T) {
 			urlValidator(t, u),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": isdef.IsDuration,
+					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo("id"),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -198,6 +231,7 @@ func TestMultiJobNoConts(t *testing.T) {
 		testMonFields,
 		[]jobs.Job{makeURLJob(t, "http://foo.com"), makeURLJob(t, "http://bar.com")},
 		[]validator.Validator{validatorMaker("http://foo.com"), validatorMaker("http://bar.com")},
+		nil,
 		nil,
 	})
 }
@@ -227,7 +261,7 @@ func TestMultiJobConts(t *testing.T) {
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": isdef.IsDuration,
+					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -255,6 +289,7 @@ func TestMultiJobConts(t *testing.T) {
 				summaryValidator(2, 0),
 			),
 		},
+		nil,
 		nil,
 	})
 }
@@ -285,7 +320,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": isdef.IsDuration,
+					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -324,6 +359,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			metaCancelledValidator,
 			lookslike.MustCompile(isdef.IsEqual(common.MapStr(nil))),
 		},
+		nil,
 	})
 }
 
@@ -448,6 +484,7 @@ func TestInlineBrowserJob(t *testing.T) {
 			),
 		},
 		nil,
+		nil,
 	})
 }
 
@@ -513,6 +550,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 					expectedMonFields,
 				))},
 		nil,
+		nil,
 	})
 	testCommonWrap(t, testDef{
 		"with up summary",
@@ -528,6 +566,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 						"summary": map[string]interface{}{"up": 1, "down": 0},
 					}),
 				))},
+		nil,
 		nil,
 	})
 	testCommonWrap(t, testDef{
@@ -548,6 +587,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 						},
 					}),
 				))},
+		nil,
 		nil,
 	})
 }
