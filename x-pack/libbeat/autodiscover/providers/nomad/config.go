@@ -28,9 +28,9 @@ type Config struct {
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
-	Hints     *conf.C               `config:"hints"`
-	Builders  []*conf.C             `config:"builders"`
-	Appenders []*conf.C             `config:"appenders"`
+	Hints     *conf.C                 `config:"hints"`
+	Builders  []*conf.C               `config:"builders"`
+	Appenders []*conf.C               `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
 
 	waitTime   time.Duration
