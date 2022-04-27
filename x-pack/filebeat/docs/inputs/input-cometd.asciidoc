@@ -9,7 +9,7 @@
 <titleabbrev>CometD</titleabbrev>
 ++++
 
-Use the `cometd` input to stream the real-time events from a Salesforce generic subscription Push Topic.
+Use the `https://docs.cometd.org/[cometd]` input to stream the real-time events from a https://resources.docs.salesforce.com/sfdc/pdf/api_streaming.pdf[Salesforce generic subscription Push Topic].
 
 This input can, for example, be used to receive Login and Logout events that are generated when users log in or out of the Salesforce instance.
 
