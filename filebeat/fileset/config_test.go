@@ -20,9 +20,10 @@ package fileset
 import (
 	"testing"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestInputSettings(t *testing.T) {

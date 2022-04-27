@@ -22,6 +22,8 @@ package filestream
 
 import (
 	"fmt"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func newINodeMarkerIdentifier(cfg *conf.C) (fileIdentifier, error) {
