@@ -499,7 +499,7 @@ func TestMessage_Fields(t *testing.T) {
 						"appname":  "su",
 						"procid":   "1024",
 						"msgid":    "msg123",
-						"version":  1,
+						"version":  "1",
 						"structured_data": map[string]map[string]string{
 							"a": {
 								"b": "c",

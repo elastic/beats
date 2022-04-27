@@ -105,7 +105,7 @@ var syslogCases = map[string]struct {
 					"appname":  "evntslog",
 					"procid":   "1024",
 					"msgid":    "ID47",
-					"version":  1,
+					"version":  "1",
 					"structured_data": map[string]map[string]string{
 						"examplePriority@32473": {
 							"class": "high",
