@@ -22,10 +22,8 @@ package file
 
 import (
 	"fmt"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func newINodeMarkerIdentifier(cfg *common.Config) (StateIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *conf.C) (StateIdentifier, error) {
 	return nil, fmt.Errorf("inode_deviceid is not supported on Windows")
 }

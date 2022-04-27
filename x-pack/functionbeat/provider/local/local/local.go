@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const stdinName = "stdin"
@@ -37,7 +38,7 @@ type StdinFunction struct{}
 // NewStdinFunction creates a new StdinFunction
 func NewStdinFunction(
 	provider provider.Provider,
-	functionConfig *common.Config,
+	functionConfig *conf.C,
 ) (provider.Function, error) {
 	return &StdinFunction{}, nil
 }

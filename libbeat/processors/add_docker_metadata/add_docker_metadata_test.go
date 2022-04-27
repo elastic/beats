@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -65,7 +66,7 @@ func init() {
 }
 
 func TestInitializationNoDocker(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 	testConfig.SetString("host", -1, "unix:///var/run42/docker.sock")
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, docker.NewWatcher)
@@ -79,7 +80,7 @@ func TestInitializationNoDocker(t *testing.T) {
 }
 
 func TestInitialization(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
@@ -92,7 +93,7 @@ func TestInitialization(t *testing.T) {
 }
 
 func TestNoMatch(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"foo"},
 	})
 	assert.NoError(t, err)
@@ -110,7 +111,7 @@ func TestNoMatch(t *testing.T) {
 }
 
 func TestMatchNoContainer(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"foo"},
 	})
 	assert.NoError(t, err)
@@ -128,7 +129,7 @@ func TestMatchNoContainer(t *testing.T) {
 }
 
 func TestMatchContainer(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"foo"},
 		"labels.dedot": false,
 	})
@@ -177,7 +178,7 @@ func TestMatchContainer(t *testing.T) {
 }
 
 func TestMatchContainerWithDedot(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"foo"},
 	})
 	assert.NoError(t, err)
@@ -222,7 +223,7 @@ func TestMatchContainerWithDedot(t *testing.T) {
 
 func TestMatchSource(t *testing.T) {
 	// Use defaults
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
@@ -279,7 +280,7 @@ func TestMatchSource(t *testing.T) {
 
 func TestDisableSource(t *testing.T) {
 	// Use defaults
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"match_source": false,
 	})
 	assert.NoError(t, err)
@@ -309,7 +310,7 @@ func TestDisableSource(t *testing.T) {
 }
 
 func TestMatchPIDs(t *testing.T) {
-	p, err := buildDockerMetadataProcessor(logp.L(), common.NewConfig(), MockWatcherFactory(
+	p, err := buildDockerMetadataProcessor(logp.L(), config.NewConfig(), MockWatcherFactory(
 		map[string]*docker.Container{
 			"8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b": {
 				ID:    "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",

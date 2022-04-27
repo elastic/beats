@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // A random container ID that we use for our tests
@@ -174,7 +175,7 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 }
 
 func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult string) {
-	testConfig := common.NewConfig()
+	testConfig := conf.NewConfig()
 	if cfgLogsPath != "" {
 		testConfig.SetString("logs_path", -1, cfgLogsPath)
 	}

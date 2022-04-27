@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
@@ -117,7 +118,7 @@ func TestPipelineSelection(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			selector, err := buildPipelineSelector(common.MustNewConfigFrom(test.cfg))
+			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg))
 
 			client, err := NewClient(
 				ClientSettings{

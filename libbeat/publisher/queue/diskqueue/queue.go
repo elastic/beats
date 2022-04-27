@@ -23,10 +23,10 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // diskQueue is the internal type representing a disk-based implementation
@@ -99,7 +99,7 @@ func init() {
 // queueFactory matches the queue.Factory interface, and is used to add the
 // disk queue to the registry.
 func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, _ int, // input queue size param is unused.
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {

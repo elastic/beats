@@ -80,7 +80,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Open evtx file.
-	log, err := eventlog.New(common.MustNewConfigFrom(common.MapStr{
+	log, err := eventlog.New(config.MustNewConfigFrom(common.MapStr{
 		"name":           path,
 		"api":            "wineventlog",
 		"no_more_events": "stop",
@@ -95,7 +95,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Load javascript processor.
-	processor, err := javascript.New(common.MustNewConfigFrom(common.MapStr{
+	processor, err := javascript.New(config.MustNewConfigFrom(common.MapStr{
 		"file": pipeline,
 	}))
 	if err != nil {

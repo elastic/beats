@@ -41,6 +41,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -173,7 +174,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	connection := esConnect(t, index)
 
 	bulkSize := 0
-	config, _ := common.NewConfigFrom(map[string]interface{}{
+	config, _ := config.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
 		"bulk_max_size":    &bulkSize,
@@ -183,7 +184,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	})
 
 	info := beat.Info{Beat: "libbeat"}
-	im, err := idxmgmt.DefaultSupport(nil, info, common.MustNewConfigFrom(
+	im, err := idxmgmt.DefaultSupport(nil, info, config.MustNewConfigFrom(
 		map[string]interface{}{
 			"setup.ilm.enabled": false,
 		},

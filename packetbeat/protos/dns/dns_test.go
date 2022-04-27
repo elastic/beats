@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Test Constants
@@ -106,7 +107,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		callback = store.publish
 	}
 
-	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
 		"ports":               []int{serverPort},
 		"include_authorities": true,
 		"include_additionals": true,

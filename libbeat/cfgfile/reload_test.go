@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestReloader(t *testing.T) {
@@ -41,14 +42,14 @@ func TestReloader(t *testing.T) {
 	}
 	glob := dir + "/*.yml"
 
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := config.MustNewConfigFrom(common.MapStr{
 		"path": glob,
 		"reload": common.MapStr{
 			"period":  "1s",
 			"enabled": true,
 		},
 	})
-	// common.Config{}
+	// config.C{}
 	reloader := NewReloader(nil, config)
 	retryCount := 10
 

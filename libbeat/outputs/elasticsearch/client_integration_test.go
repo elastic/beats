@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestClientPublishEvent(t *testing.T) {
@@ -399,7 +400,7 @@ func connectTestEsWithoutStats(t *testing.T, cfg interface{}) (outputs.Client, *
 }
 
 func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outputs.Client, *Client) {
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]interface{}{
 		"hosts":            eslegtest.GetEsHost(),
 		"username":         eslegtest.GetUser(),
 		"password":         eslegtest.GetPass(),
@@ -409,7 +410,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	tmp, err := common.NewConfigFrom(cfg)
+	tmp, err := config.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -421,7 +422,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 
 	info := beat.Info{Beat: "libbeat"}
 	// disable ILM if using specified index name
-	im, _ := idxmgmt.DefaultSupport(nil, info, common.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
+	im, _ := idxmgmt.DefaultSupport(nil, info, config.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)

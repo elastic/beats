@@ -38,7 +38,7 @@ func TestInput(t *testing.T) {
 }
 
 func testInput(t *testing.T, version string) {
-	config := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
+	config := conf.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
 	config.SetString("version", -1, version)
 
 	input, err := Plugin().Manager.Create(config)

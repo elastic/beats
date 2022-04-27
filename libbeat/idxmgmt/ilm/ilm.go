@@ -28,10 +28,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // SupportFactory is used to define a policy type to be used.
-type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, *config.C) (Supporter, error)
 
 // Supporter implements ILM support. For loading the policies
 // a manager instance must be generated.
@@ -65,7 +66,7 @@ type Policy struct {
 }
 
 // DefaultSupport configures a new default ILM support implementation.
-func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+func DefaultSupport(log *logp.Logger, info beat.Info, config *config.C) (Supporter, error) {
 	cfg := defaultConfig(info)
 	if config != nil {
 		if err := config.Unpack(&cfg); err != nil {
@@ -81,7 +82,7 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 }
 
 // StdSupport configures a new std ILM support implementation.
-func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+func StdSupport(log *logp.Logger, info beat.Info, config *config.C) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
 	} else {
@@ -123,7 +124,7 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 
 // NoopSupport configures a new noop ILM support implementation,
 // should be used when ILM is disabled
-func NoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+func NoopSupport(_ *logp.Logger, info beat.Info, config *config.C) (Supporter, error) {
 	return NewNoopSupport(info, config)
 }
 

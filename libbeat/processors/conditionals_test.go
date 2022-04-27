@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type countFilter struct {
@@ -83,14 +84,14 @@ func TestWhenProcessor(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run test (%v): %v", i, test.title)
 
-		config, err := common.NewConfigFrom(test.filter)
+		config, err := conf.NewConfigFrom(test.filter)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
 
 		cf := &countFilter{}
-		filter, err := NewConditional(func(_ *common.Config) (Processor, error) {
+		filter, err := NewConditional(func(_ *conf.C) (Processor, error) {
 			return cf, nil
 		})(config)
 		if err != nil {
@@ -115,9 +116,9 @@ func TestWhenProcessor(t *testing.T) {
 
 func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	testErr := errors.New("test")
-	filter, err := NewConditional(func(_ *common.Config) (Processor, error) {
+	filter, err := NewConditional(func(_ *conf.C) (Processor, error) {
 		return nil, testErr
-	})(common.NewConfig())
+	})(conf.NewConfig())
 
 	assert.Equal(t, testErr, err)
 	assert.Nil(t, filter)
@@ -133,7 +134,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c, err := common.NewConfigWithYAML([]byte(test.cfg), "test "+name)
+			c, err := conf.NewConfigWithYAML([]byte(test.cfg), "test "+name)
 			if err != nil {
 				t.Fatal(err)
 			}

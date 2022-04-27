@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type addFields struct {
@@ -47,7 +48,7 @@ func init() {
 }
 
 // CreateAddFields constructs an add_fields processor from config.
-func CreateAddFields(c *common.Config) (processors.Processor, error) {
+func CreateAddFields(c *conf.C) (processors.Processor, error) {
 	config := struct {
 		Fields common.MapStr `config:"fields" validate:"required"`
 		Target *string       `config:"target"`

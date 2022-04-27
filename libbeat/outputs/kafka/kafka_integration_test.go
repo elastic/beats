@@ -42,6 +42,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -399,8 +400,8 @@ func getTestSASLKafkaHost() string {
 	)
 }
 
-func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(in)
+func makeConfig(t *testing.T, in map[string]interface{}) *config.C {
+	cfg, err := config.NewConfigFrom(in)
 	if err != nil {
 		t.Fatal(err)
 	}

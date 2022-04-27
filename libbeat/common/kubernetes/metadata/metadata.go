@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
@@ -88,7 +89,7 @@ func WithMetadata(kind string) FieldOptions {
 // GetPodMetaGen is a wrapper function that creates a metaGen for pod resource and has embeeded
 // nodeMetaGen and namespaceMetaGen
 func GetPodMetaGen(
-	cfg *common.Config,
+	cfg *config.C,
 	podWatcher kubernetes.Watcher,
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
@@ -106,7 +107,7 @@ func GetPodMetaGen(
 }
 
 // GetKubernetesClusterIdentifier returns ClusterInfo for k8s if available
-func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
+func GetKubernetesClusterIdentifier(cfg *config.C, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
 	var config Config
 	config.Unmarshal(cfg)

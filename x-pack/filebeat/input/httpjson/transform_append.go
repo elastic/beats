@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const appendName = "append"
@@ -34,7 +35,7 @@ type appendt struct {
 
 func (appendt) transformName() string { return appendName }
 
-func newAppendRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newAppendRequest(cfg *conf.C, log *logp.Logger) (transform, error) {
 	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
@@ -54,7 +55,7 @@ func newAppendRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
 	return &append, nil
 }
 
-func newAppendResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newAppendResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
 	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
@@ -70,7 +71,7 @@ func newAppendResponse(cfg *common.Config, log *logp.Logger) (transform, error) 
 	return &append, nil
 }
 
-func newAppendPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newAppendPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
 	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
@@ -91,7 +92,7 @@ func newAppendPagination(cfg *common.Config, log *logp.Logger) (transform, error
 }
 
 //nolint:dupl // Bad linter! Claims duplication with newSet. The duplication exists but is not resolvable without parameterised types.
-func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
+func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 	c := &appendConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return appendt{}, fmt.Errorf("fail to unpack the append configuration: %w", err)

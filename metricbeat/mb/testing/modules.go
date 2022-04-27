@@ -63,12 +63,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type TestModule struct {
 	ModName   string
 	ModConfig mb.ModuleConfig
-	RawConfig *common.Config
+	RawConfig *conf.C
 }
 
 func (m *TestModule) Name() string                      { return m.ModName }
@@ -76,7 +77,7 @@ func (m *TestModule) Config() mb.ModuleConfig           { return m.ModConfig }
 func (m *TestModule) UnpackConfig(to interface{}) error { return m.RawConfig.Unpack(to) }
 
 func NewTestModule(t testing.TB, config interface{}) *TestModule {
-	c, err := common.NewConfigFrom(config)
+	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +105,7 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 // NewMetricSets instantiates a list of new MetricSets using the given
 // module configuration.
 func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
-	c, err := common.NewConfigFrom(config)
+	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}

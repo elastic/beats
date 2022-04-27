@@ -23,15 +23,16 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Register holds a registry of reloadable objects
 var Register = NewRegistry()
 
-// ConfigWithMeta holds a pair of common.Config and optional metadata for it
+// ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
 	// Config to store
-	Config *common.Config
+	Config *config.C
 
 	// Meta data related to this config
 	Meta *common.MapStrPointer

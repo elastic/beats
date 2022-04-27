@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	azureConfig = common.MustNewConfigFrom(common.MapStr{
+	azureConfig = conf.MustNewConfigFrom(common.MapStr{
 		"storage_account_key":       lookupEnv("STORAGE_ACCOUNT_NAME"),
 		"storage_account":           lookupEnv("STORAGE_ACCOUNT_KEY"),
 		"storage_account_container": ephContainerName,
@@ -50,7 +50,7 @@ func TestInput(t *testing.T) {
 	o.cond = sync.NewCond(o)
 	defer o.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return o, nil
 	})
 	input, err := NewInput(azureConfig, connector, context)

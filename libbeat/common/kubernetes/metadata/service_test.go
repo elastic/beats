@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestService_Generate(t *testing.T) {
@@ -139,7 +140,7 @@ func TestService_Generate(t *testing.T) {
 		},
 	}
 
-	cfg := common.NewConfig()
+	cfg := config.NewConfig()
 	metagen := NewServiceMetadataGenerator(cfg, nil, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -230,7 +231,7 @@ func TestService_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		cfg := config.NewConfig()
 		services := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		services.Add(test.input)
 		metagen := NewServiceMetadataGenerator(cfg, services, nil, client)
@@ -311,7 +312,7 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		nsConfig, _ := common.NewConfigFrom(map[string]interface{}{
+		nsConfig, _ := config.NewConfigFrom(map[string]interface{}{
 			"include_annotations": []string{"ns.annotation"},
 		})
 		services := cache.NewStore(cache.MetaNamespaceKeyFunc)

@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -86,7 +85,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -106,7 +105,7 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		Backoff:            config.Backoff,
 		MaxBackoff:         config.MaxBackoff,
 		Seek:               config.Seek,
-		CursorSeekFallback: config.CursorSeekFallback,
+		CursorSeekFallback: conf.CursorSeekFallback,
 		Matches:            journalfield.IncludeMatches(config.Matches),
 		Units:              config.Units,
 		Transports:         config.Transports,

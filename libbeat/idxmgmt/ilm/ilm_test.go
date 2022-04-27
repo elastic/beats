@@ -26,13 +26,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestDefaultSupport_Init(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 
 	t.Run("with custom config", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+		tmp, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
 			map[string]interface{}{
 				"enabled":      true,
 				"name":         "test-%{[agent.version]}",
@@ -51,7 +52,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 	})
 
 	t.Run("with custom alias config with fieldref", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+		tmp, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
 			map[string]interface{}{
 				"enabled":      true,
 				"check_exists": false,
@@ -69,7 +70,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 	})
 
 	t.Run("with default alias", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+		tmp, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
 			map[string]interface{}{
 				"enabled":      true,
 				"pattern":      "01",
@@ -88,7 +89,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 	})
 
 	t.Run("load external policy", func(t *testing.T) {
-		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+		s, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
 			common.MapStr{"policy_file": "testfiles/custom.json"},
 		))
 		require.NoError(t, err)
@@ -226,7 +227,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 
 func createManager(t *testing.T, h ClientHandler, cfg map[string]interface{}) Manager {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
-	s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(cfg))
+	s, err := DefaultSupport(nil, info, config.MustNewConfigFrom(cfg))
 	require.NoError(t, err)
 	return s.Manager(h)
 }

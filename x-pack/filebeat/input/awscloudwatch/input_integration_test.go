@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -119,7 +120,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }
 
-func createInput(t *testing.T, cfg *common.Config) *cloudwatchInput {
+func createInput(t *testing.T, cfg *conf.C) *cloudwatchInput {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -128,8 +129,8 @@ func createInput(t *testing.T, cfg *common.Config) *cloudwatchInput {
 	return inputV2.(*cloudwatchInput)
 }
 
-func makeTestConfigWithLogGroupNamePrefix(regionName string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigWithLogGroupNamePrefix(regionName string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 log_group_name_prefix: %s
 region_name: %s
 `, logGroupNamePrefix, regionName))

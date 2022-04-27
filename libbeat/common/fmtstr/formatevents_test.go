@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestEventFormatString(t *testing.T) {
@@ -242,7 +243,7 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run (%v): %v -> %v", i, test.v, test.expected)
 
-		config, err := common.NewConfigFrom(common.MapStr{
+		config, err := config.NewConfigFrom(common.MapStr{
 			"test": test.v,
 		})
 		if err != nil {

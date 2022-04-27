@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestCtxAfterDoRequest(t *testing.T) {
@@ -33,7 +34,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	testServer := httptest.NewServer(dateCursorHandler())
 	t.Cleanup(testServer.Close)
 
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"interval":       1,
 		"request.method": "GET",
 		"request.url":    testServer.URL,

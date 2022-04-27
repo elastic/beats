@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // NomadEventKey is the key under which custom metadata is going
@@ -47,7 +48,7 @@ func AutodiscoverBuilder(
 	name string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *conf.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The nomad autodiscover provider is experimental.")

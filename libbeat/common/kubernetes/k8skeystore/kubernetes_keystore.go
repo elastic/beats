@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // KubernetesKeystoresRegistry implements a Provider for Keystore.
@@ -124,9 +125,9 @@ func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString
 	return keystore.NewSecureString(secretString), nil
 }
 
-// GetConfig returns common.Config representation of the key / secret pair to be merged with other
+// GetConfig returns config.C representation of the key / secret pair to be merged with other
 // loaded configuration.
-func (k *KubernetesSecretsKeystore) GetConfig() (*common.Config, error) {
+func (k *KubernetesSecretsKeystore) GetConfig() (*config.C, error) {
 	return nil, nil
 }
 

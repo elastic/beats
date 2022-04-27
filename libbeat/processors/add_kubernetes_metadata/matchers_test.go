@@ -23,20 +23,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestFieldMatcher(t *testing.T) {
 	testCfg := map[string]interface{}{
 		"lookup_fields": []string{},
 	}
-	fieldCfg, err := common.NewConfigFrom(testCfg)
+	fieldCfg, err := config.NewConfigFrom(testCfg)
 
 	assert.NoError(t, err)
 	matcher, err := NewFieldMatcher(*fieldCfg)
 	assert.Error(t, err)
 
 	testCfg["lookup_fields"] = "foo"
-	fieldCfg, _ = common.NewConfigFrom(testCfg)
+	fieldCfg, _ = config.NewConfigFrom(testCfg)
 
 	matcher, err = NewFieldMatcher(*fieldCfg)
 	assert.NotNil(t, matcher)
@@ -59,14 +60,14 @@ func TestFieldMatcher(t *testing.T) {
 
 func TestFieldFormatMatcher(t *testing.T) {
 	testCfg := map[string]interface{}{}
-	fieldCfg, err := common.NewConfigFrom(testCfg)
+	fieldCfg, err := config.NewConfigFrom(testCfg)
 
 	assert.NoError(t, err)
 	matcher, err := NewFieldFormatMatcher(*fieldCfg)
 	assert.Error(t, err)
 
 	testCfg["format"] = `%{[namespace]}/%{[pod]}`
-	fieldCfg, _ = common.NewConfigFrom(testCfg)
+	fieldCfg, _ = config.NewConfigFrom(testCfg)
 
 	matcher, err = NewFieldFormatMatcher(*fieldCfg)
 	assert.NotNil(t, matcher)
@@ -87,7 +88,7 @@ func TestFieldFormatMatcher(t *testing.T) {
 	assert.Empty(t, out)
 
 	testCfg["format"] = `%{[dimensions.namespace]}/%{[dimensions.pod]}`
-	fieldCfg, _ = common.NewConfigFrom(testCfg)
+	fieldCfg, _ = config.NewConfigFrom(testCfg)
 	matcher, err = NewFieldFormatMatcher(*fieldCfg)
 	assert.NotNil(t, matcher)
 	assert.NoError(t, err)

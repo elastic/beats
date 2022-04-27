@@ -20,13 +20,12 @@ package config
 import (
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestAgentInputNormalization(t *testing.T) {
-	cfg, err := common.NewConfigFrom(`
+	cfg, err := conf.NewConfigFrom(`
 type: packet
 data_stream:
   namespace: default

@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var errNewURLValueNotSet = errors.New("the new url.value was not set")
@@ -38,7 +39,7 @@ type set struct {
 
 func (set) transformName() string { return setName }
 
-func newSetRequestPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newSetRequestPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
 	set, err := newSet(cfg, log)
 	if err != nil {
 		return nil, err
@@ -60,7 +61,7 @@ func newSetRequestPagination(cfg *common.Config, log *logp.Logger) (transform, e
 	return &set, nil
 }
 
-func newSetResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newSetResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
 	set, err := newSet(cfg, log)
 	if err != nil {
 		return nil, err
@@ -77,7 +78,7 @@ func newSetResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
 }
 
 //nolint:dupl // Bad linter! Claims duplication with newAppend. The duplication exists but is not resolvable without parameterised types.
-func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
+func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 	c := &setConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return set{}, fmt.Errorf("fail to unpack the set configuration: %w", err)

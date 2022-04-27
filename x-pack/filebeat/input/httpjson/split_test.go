@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestSplit(t *testing.T) {
@@ -150,7 +151,7 @@ func TestSplit(t *testing.T) {
 					Target: "body.entities",
 					Type:   "map",
 					Transforms: transformsConfig{
-						common.MustNewConfigFrom(map[string]interface{}{
+						conf.MustNewConfigFrom(map[string]interface{}{
 							"set": map[string]interface{}{
 								"target": "body.foo",
 								"value":  "set for each",

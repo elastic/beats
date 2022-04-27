@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Connector configures and establishes a beat.Client for publishing events
@@ -55,7 +56,7 @@ type metricSetRegister interface {
 func NewConnector(
 	beatInfo beat.Info,
 	pipeline beat.PipelineConnector,
-	c *common.Config,
+	c *conf.C,
 ) (*Connector, error) {
 	config := connectorConfig{}
 	if err := c.Unpack(&config); err != nil {

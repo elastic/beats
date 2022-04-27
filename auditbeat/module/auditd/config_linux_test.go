@@ -25,9 +25,8 @@ import (
 	"strings"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -195,7 +194,7 @@ func makeRuleFlags(fileID, ruleID int) string {
 }
 
 func parseConfig(t testing.TB, yaml string) (Config, error) {
-	c, err := common.NewConfigWithYAML([]byte(yaml), "")
+	c, err := conf.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -111,7 +112,7 @@ func TestProcessorsForConfig(t *testing.T) {
 		if test.event.Fields == nil {
 			test.event.Fields = common.MapStr{}
 		}
-		config, err := common.NewConfigFrom(test.configStr)
+		config, err := conf.NewConfigFrom(test.configStr)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
@@ -168,7 +169,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	configStr := `processors:
 - add_fields: {fields: {testField: value}}
 - add_fields: {fields: {testField2: stuff}}`
-	config, err := common.NewConfigFrom(configStr)
+	config, err := conf.NewConfigFrom(configStr)
 	if err != nil {
 		t.Fatal(err)
 	}

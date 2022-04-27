@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type handlerFunc func(http.ResponseWriter, *http.Request)
@@ -34,7 +35,7 @@ type lookupFunc func(string) *monitoring.Namespace
 var handlerFuncMap = make(map[string]handlerFunc)
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *common.Config, ns lookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*Server, error) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", makeRootAPIHandler(makeAPIHandler(ns("info"))))

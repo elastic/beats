@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // LabelsKey is the default target key for the add_labels processor.
@@ -35,7 +36,7 @@ func init() {
 			checks.AllowedFields(LabelsKey, "when")))
 }
 
-func createAddLabels(c *common.Config) (processors.Processor, error) {
+func createAddLabels(c *conf.C) (processors.Processor, error) {
 	config := struct {
 		Labels common.MapStr `config:"labels" validate:"required"`
 	}{}
@@ -70,7 +71,7 @@ func NewAddLabels(labels common.MapStr, shared bool) (processors.Processor, erro
 }
 
 func flattenLabels(labels common.MapStr) (common.MapStr, error) {
-	labelConfig, err := common.NewConfigFrom(labels)
+	labelConfig, err := conf.NewConfigFrom(labels)
 	if err != nil {
 		return nil, err
 	}

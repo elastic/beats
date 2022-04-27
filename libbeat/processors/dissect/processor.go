@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 const flagParsingError = "dissect_parsing_error"
@@ -40,7 +41,7 @@ func init() {
 }
 
 // NewProcessor constructs a new dissect processor.
-func NewProcessor(c *common.Config) (processors.Processor, error) {
+func NewProcessor(c *cfg.C) (processors.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {

@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Processors {
@@ -45,7 +46,7 @@ func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Pro
 
 	var config processors.PluginConfig
 	for _, processor := range yml {
-		processorCfg, err := common.NewConfigFrom(processor)
+		processorCfg, err := conf.NewConfigFrom(processor)
 		if err != nil {
 			t.Fatal(err)
 		}

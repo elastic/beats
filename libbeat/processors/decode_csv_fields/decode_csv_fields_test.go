@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestDecodeCSVField(t *testing.T) {
@@ -320,7 +321,7 @@ func TestDecodeCSVField(t *testing.T) {
 
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			processor, err := NewDecodeCSVField(common.MustNewConfigFrom(tt.config))
+			processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(tt.config))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -359,7 +360,7 @@ func TestDecodeCSVField(t *testing.T) {
 			"message": []string{"17", "192.168.33.1", "8.8.8.8"},
 		}
 
-		processor, err := NewDecodeCSVField(common.MustNewConfigFrom(config))
+		processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(config))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -372,7 +373,7 @@ func TestDecodeCSVField(t *testing.T) {
 }
 
 func TestDecodeCSVField_String(t *testing.T) {
-	p, err := NewDecodeCSVField(common.MustNewConfigFrom(common.MapStr{
+	p, err := NewDecodeCSVField(cfg.MustNewConfigFrom(common.MapStr{
 		"fields": common.MapStr{
 			"a": "csv.a",
 			"b": "csv.b",

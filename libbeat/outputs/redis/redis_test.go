@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type checker func(*testing.T, outputs.Group)
@@ -105,7 +106,7 @@ func TestMakeRedis(t *testing.T) {
 	beatInfo := beat.Info{Beat: "libbeat", Version: "1.2.3"}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(test.config)
+			cfg, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)
 			groups, err := makeRedis(nil, beatInfo, outputs.NewNilObserver(), cfg)
 			assert.Equal(t, err == nil, test.valid)
@@ -163,7 +164,7 @@ func TestKeySelection(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			selector, err := buildKeySelector(common.MustNewConfigFrom(test.cfg))
+			selector, err := buildKeySelector(config.MustNewConfigFrom(test.cfg))
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)
 			}

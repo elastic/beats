@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/format"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -38,7 +39,7 @@ type Matchers struct {
 }
 
 // MatcherConstructor builds a new Matcher from its settings
-type MatcherConstructor func(config common.Config) (Matcher, error)
+type MatcherConstructor func(config conf.C) (Matcher, error)
 
 // NewMatchers builds a Matchers object from its configurations
 func NewMatchers(configs PluginConfig) *Matchers {
@@ -98,7 +99,7 @@ type FieldMatcher struct {
 }
 
 // NewFieldMatcher builds a new list of fields to match from lookup_fields
-func NewFieldMatcher(cfg common.Config) (Matcher, error) {
+func NewFieldMatcher(cfg conf.C) (Matcher, error) {
 	config := struct {
 		LookupFields []string `config:"lookup_fields"`
 	}{}
@@ -136,7 +137,7 @@ type FieldFormatMatcher struct {
 }
 
 // NewFieldFormatMatcher creates a custom FieldFormtMatcher given a configuration (`format` key)
-func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
+func NewFieldFormatMatcher(cfg conf.C) (Matcher, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{}

@@ -24,10 +24,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNewDefaults(t *testing.T) {
-	_, err := New(common.NewConfig())
+	_, err := New(cfg.NewConfig())
 	if err != nil {
 		t.Fatal(err)
 	}

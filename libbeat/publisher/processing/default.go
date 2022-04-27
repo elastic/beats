@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -96,7 +97,7 @@ func MakeDefaultSupport(
 	normalize bool,
 	modifiers ...modifier,
 ) SupportFactory {
-	return func(info beat.Info, log *logp.Logger, beatCfg *common.Config) (Supporter, error) {
+	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
 		cfg := struct {
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`

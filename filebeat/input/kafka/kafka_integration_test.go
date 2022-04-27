@@ -87,7 +87,7 @@ func TestInput(t *testing.T) {
 	}
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   groupID,
@@ -162,7 +162,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":                        getTestKafkaHost(),
 		"topics":                       []string{testTopic},
 		"group_id":                     "filebeat",
@@ -218,7 +218,7 @@ func TestInputWithJsonPayload(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   "filebeat",
@@ -280,7 +280,7 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":                        getTestKafkaHost(),
 		"topics":                       []string{testTopic},
 		"group_id":                     "filebeat",
@@ -346,7 +346,7 @@ func TestSASLAuthentication(t *testing.T) {
 	}
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":          []string{getTestSASLKafkaHost()},
 		"protocol":       "https",
 		"sasl.mechanism": "SCRAM-SHA-512",
@@ -429,7 +429,7 @@ func TestTest(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":    getTestKafkaHost(),
 		"topics":   []string{testTopic},
 		"group_id": "filebeat",
@@ -590,7 +590,7 @@ func writeToKafkaTopic(
 	}
 }
 
-func run(t *testing.T, cfg *common.Config, client *beattest.ChanClient) (*kafkaInput, func()) {
+func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, func()) {
 	inp, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)

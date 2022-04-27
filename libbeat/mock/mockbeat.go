@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 ///*** Mock Beat Setup ***///
@@ -39,7 +40,7 @@ type Mockbeat struct {
 }
 
 // Creates beater
-func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, _ *config.C) (beat.Beater, error) {
 	return &Mockbeat{
 		done:   make(chan struct{}),
 		logger: logp.NewLogger("mock"),

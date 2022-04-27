@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const deleteName = "delete"
@@ -25,7 +26,7 @@ type delete struct {
 
 func (delete) transformName() string { return deleteName }
 
-func newDeleteRequest(cfg *common.Config, _ *logp.Logger) (transform, error) {
+func newDeleteRequest(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -45,7 +46,7 @@ func newDeleteRequest(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	return &delete, nil
 }
 
-func newDeleteResponse(cfg *common.Config, _ *logp.Logger) (transform, error) {
+func newDeleteResponse(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -61,7 +62,7 @@ func newDeleteResponse(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	return &delete, nil
 }
 
-func newDeletePagination(cfg *common.Config, _ *logp.Logger) (transform, error) {
+func newDeletePagination(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -81,7 +82,7 @@ func newDeletePagination(cfg *common.Config, _ *logp.Logger) (transform, error) 
 	return &delete, nil
 }
 
-func newDelete(cfg *common.Config) (delete, error) {
+func newDelete(cfg *conf.C) (delete, error) {
 	c := &deleteConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return delete{}, fmt.Errorf("fail to unpack the delete configuration: %w", err)

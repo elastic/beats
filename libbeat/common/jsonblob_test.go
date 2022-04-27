@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigJSONBlob(t *testing.T) {
@@ -63,7 +65,7 @@ func TestConfigJSONBlob(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := MustNewConfigFrom(tc.config)
+			cfg := config.MustNewConfigFrom(tc.config)
 			conf := struct {
 				JSONBlob JSONBlob `config:"jsonBlob"`
 			}{}

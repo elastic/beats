@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -46,7 +47,7 @@ var (
 )
 
 func TestFetch(t *testing.T) {
-	c, err := common.NewConfigFrom(missingResourcesConfig)
+	c, err := config.NewConfigFrom(missingResourcesConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +59,7 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, len(ms.Client.Config.Resources), 1)
 	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace))
 
-	c, err = common.NewConfigFrom(resourceConfig)
+	c, err = config.NewConfigFrom(resourceConfig)
 	if err != nil {
 		t.Fatal(err)
 	}

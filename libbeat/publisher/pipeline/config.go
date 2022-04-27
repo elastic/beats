@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config object for loading a pipeline instance via Load.
@@ -33,7 +34,7 @@ type Config struct {
 	Processors           processors.PluginConfig `config:"processors"`
 
 	// Event queue
-	Queue common.ConfigNamespace `config:"queue"`
+	Queue config.Namespace `config:"queue"`
 }
 
 // validateClientConfig checks a ClientConfig can be used with (*Pipeline).ConnectWith.

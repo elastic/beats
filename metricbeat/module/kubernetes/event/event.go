@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // init registers the MetricSet with the central registry.
@@ -98,7 +99,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// add ECS orchestrator fields
-	cfg, _ := common.NewConfigFrom(&config)
+	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := getClusterECSMeta(cfg, client, ms.Logger())
 	if err != nil {
 		ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
@@ -110,7 +111,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return ms, nil
 }
 
-func getClusterECSMeta(cfg *common.Config, client k8sclient.Interface, logger *logp.Logger) (common.MapStr, error) {
+func getClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Logger) (common.MapStr, error) {
 	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
 	if err != nil {
 		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)

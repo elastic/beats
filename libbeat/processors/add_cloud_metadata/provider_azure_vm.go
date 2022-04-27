@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Azure VM Metadata Service
@@ -29,7 +30,7 @@ var azureVMMetadataFetcher = provider{
 
 	Local: true,
 
-	Create: func(_ string, config *common.Config) (metadataFetcher, error) {
+	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		azMetadataURI := "/metadata/instance/compute?api-version=2017-04-02"
 		azHeaders := map[string]string{"Metadata": "true"}
 		azSchema := func(m map[string]interface{}) common.MapStr {

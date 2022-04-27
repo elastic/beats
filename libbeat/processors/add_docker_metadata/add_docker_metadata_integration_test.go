@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	dockertest "github.com/elastic/beats/v7/libbeat/tests/docker"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestAddDockerMetadata(t *testing.T) {
@@ -67,7 +68,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	require.NoError(t, err)
 	pid := info.State.Pid
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"cid"},
 	})
 	watcherConstructor := newWatcherWith(client)

@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type pod struct {
@@ -39,7 +40,7 @@ type pod struct {
 
 // NewPodMetadataGenerator creates a metagen for pod resources
 func NewPodMetadataGenerator(
-	cfg *common.Config,
+	cfg *config.C,
 	pods cache.Store,
 	client k8s.Interface,
 	node MetaGen,

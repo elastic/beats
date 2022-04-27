@@ -27,10 +27,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestGenerateHints(t *testing.T) {
-	customCfg := common.MustNewConfigFrom(map[string]interface{}{
+	customCfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"default_config": map[string]interface{}{
 			"type": "docker",
 			"containers": map[string]interface{}{
@@ -42,9 +43,9 @@ func TestGenerateHints(t *testing.T) {
 		},
 	})
 
-	defaultCfg := common.NewConfig()
+	defaultCfg := conf.NewConfig()
 
-	defaultDisabled := common.MustNewConfigFrom(map[string]interface{}{
+	defaultDisabled := conf.MustNewConfigFrom(map[string]interface{}{
 		"default_config": map[string]interface{}{
 			"enabled": "false",
 		},
@@ -52,7 +53,7 @@ func TestGenerateHints(t *testing.T) {
 
 	tests := []struct {
 		msg    string
-		config *common.Config
+		config *conf.C
 		event  bus.Event
 		len    int
 		result []common.MapStr
@@ -914,7 +915,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := common.NewConfigFrom(map[string]interface{}{
+		cfg, _ := conf.NewConfigFrom(map[string]interface{}{
 			"default_config": map[string]interface{}{
 				"type": "docker",
 				"containers": map[string]interface{}{

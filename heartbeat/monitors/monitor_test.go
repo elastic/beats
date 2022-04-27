@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -60,7 +61,7 @@ func TestMonitorCfgError(t *testing.T) {
 	)
 }
 
-func testMonitorConfig(t *testing.T, conf *common.Config, eventValidator validator.Validator) {
+func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Validator) {
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 

@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const pluginName = "kafka"
@@ -57,7 +58,7 @@ func Plugin() input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (input.Input, error) {
+func configure(cfg *conf.C) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type copyFields struct {
@@ -51,7 +52,7 @@ func init() {
 }
 
 // NewCopyFields returns a new copy_fields processor.
-func NewCopyFields(c *common.Config) (processors.Processor, error) {
+func NewCopyFields(c *conf.C) (processors.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

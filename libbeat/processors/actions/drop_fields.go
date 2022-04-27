@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type dropFields struct {
@@ -42,7 +43,7 @@ func init() {
 			checks.AllowedFields("fields", "when", "ignore_missing")))
 }
 
-func newDropFields(c *common.Config) (processors.Processor, error) {
+func newDropFields(c *conf.C) (processors.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`

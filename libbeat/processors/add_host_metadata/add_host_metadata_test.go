@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -41,7 +42,7 @@ func TestConfigDefault(t *testing.T) {
 		Fields:    common.MapStr{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -86,7 +87,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 		Fields:    common.MapStr{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
 		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
@@ -138,7 +139,7 @@ func TestConfigName(t *testing.T) {
 		"name": "my-host",
 	}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -173,7 +174,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		"geo.city_name":        "Yerevan",
 	}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -196,7 +197,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 
 	config := map[string]interface{}{}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -214,7 +215,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	cfg := map[string]interface{}{}
 	cfg["replace_fields"] = false
-	testConfig, err := common.NewConfigFrom(cfg)
+	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -294,7 +295,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	cfg := map[string]interface{}{}
 	cfg["replace_fields"] = true
-	testConfig, err := common.NewConfigFrom(cfg)
+	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)

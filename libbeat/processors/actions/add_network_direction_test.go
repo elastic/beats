@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNetworkDirection(t *testing.T) {
@@ -55,7 +56,7 @@ func TestNetworkDirection(t *testing.T) {
 					"destination": tt.Destination,
 				},
 			}
-			p, err := NewAddNetworkDirection(common.MustNewConfigFrom(map[string]interface{}{
+			p, err := NewAddNetworkDirection(conf.MustNewConfigFrom(map[string]interface{}{
 				"source":            "source",
 				"destination":       "destination",
 				"target":            "direction",
@@ -86,7 +87,7 @@ func TestNetworkDirection(t *testing.T) {
 				"destination": "8.8.8.8",
 			},
 		}
-		p, err := NewAddNetworkDirection(common.MustNewConfigFrom(map[string]interface{}{
+		p, err := NewAddNetworkDirection(conf.MustNewConfigFrom(map[string]interface{}{
 			"source":            "source",
 			"destination":       "destination",
 			"target":            "@metadata.direction",

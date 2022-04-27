@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -33,10 +34,10 @@ import (
 )
 
 var addResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
-var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
+var metagen = metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
 
 func TestPodIndexer(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
 	assert.NoError(t, err)
@@ -89,9 +90,9 @@ func TestPodIndexer(t *testing.T) {
 }
 
 func TestPodUIDIndexer(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
-	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
+	metaGenWithPodUID := metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.NoError(t, err)
@@ -144,7 +145,7 @@ func TestPodUIDIndexer(t *testing.T) {
 }
 
 func TestContainerIndexer(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
 	conIndexer, err := NewContainerIndexer(*testConfig, metagen)
 	assert.NoError(t, err)
@@ -260,7 +261,7 @@ func TestContainerIndexer(t *testing.T) {
 }
 
 func TestFilteredGenMeta(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
 	assert.NoError(t, err)
@@ -296,7 +297,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations, _ := indexers[0].Data.GetValue("kubernetes.annotations")
 	assert.Nil(t, rawAnnotations)
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]interface{}{
 		"include_annotations": []string{"a"},
 		"include_labels":      []string{"foo"},
 	})
@@ -332,9 +333,9 @@ func TestFilteredGenMeta(t *testing.T) {
 }
 
 func TestFilteredGenMetaExclusion(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]interface{}{
 		"exclude_labels": []string{"x"},
 	})
 	assert.NoError(t, err)
@@ -382,7 +383,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 }
 
 func TestIpPortIndexer(t *testing.T) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
 	ipIndexer, err := NewIPPortIndexer(*testConfig, metagen)
 	assert.NoError(t, err)

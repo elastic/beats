@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func newJob(jobID string) *Job {
@@ -69,7 +70,7 @@ func TestAllocationMetadata(t *testing.T) {
 		Namespace: api.DefaultNamespace,
 	}
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"labels.dedot":        false,
 		"annotations.dedot":   false,
 		"include_annotations": []string{"b", "b.key"},
@@ -101,7 +102,7 @@ func TestExcludeMetadata(t *testing.T) {
 		Namespace: "default",
 	}
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"exclude_labels": []string{"key1", "canary_tags"},
 	})
 
@@ -156,7 +157,7 @@ func TestCronJob(t *testing.T) {
 		Namespace: api.DefaultNamespace,
 	}
 
-	config, err := common.NewConfigFrom(map[string]interface{}{})
+	config, err := conf.NewConfigFrom(map[string]interface{}{})
 
 	metaGen, err := NewMetaGenerator(config, nil)
 	if err != nil {

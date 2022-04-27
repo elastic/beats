@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type node struct {
@@ -32,7 +33,7 @@ type node struct {
 }
 
 // NewNodeMetadataGenerator creates a metagen for service resources
-func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store, client k8s.Interface) MetaGen {
+func NewNodeMetadataGenerator(cfg *config.C, nodes cache.Store, client k8s.Interface) MetaGen {
 	return &node{
 		resource: NewResourceMetadataGenerator(cfg, client),
 		store:    nodes,

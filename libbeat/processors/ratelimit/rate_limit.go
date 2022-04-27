@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
@@ -57,7 +58,7 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *common.Config) (processors.Processor, error) {
+func new(cfg *c.C) (processors.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "could not unpack processor configuration")

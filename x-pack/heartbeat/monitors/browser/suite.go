@@ -13,16 +13,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
 
 type Suite struct {
-	rawCfg   *common.Config
+	rawCfg   *config.C
 	suiteCfg *Config
 }
 
-func NewSuite(rawCfg *common.Config) (*Suite, error) {
+func NewSuite(rawCfg *config.C) (*Suite, error) {
 	s := &Suite{
 		rawCfg:   rawCfg,
 		suiteCfg: DefaultConfig(),

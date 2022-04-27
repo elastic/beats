@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/pkg/errors"
 )
@@ -35,7 +36,7 @@ func init() {
 
 // NewInput creates a new container input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	outletFactory channel.Connector,
 	context input.Context,
 ) (input.Input, error) {

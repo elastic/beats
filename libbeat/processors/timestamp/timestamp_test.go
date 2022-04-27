@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var expected = time.Date(2015, 3, 7, 11, 6, 39, 0, time.UTC)
@@ -273,7 +274,7 @@ func TestTimezone(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config := common.MustNewConfigFrom(map[string]interface{}{
+			config := conf.MustNewConfigFrom(map[string]interface{}{
 				"field":    "ts",
 				"timezone": c.Timezone,
 				"layouts":  []string{time.ANSIC},

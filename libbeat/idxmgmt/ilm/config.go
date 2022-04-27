@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
-// Config is used for unpacking a common.Config.
+// Config is used for unpacking a config.C.
 type Config struct {
 	Enabled    bool                     `config:"enabled"`
 	PolicyName fmtstr.EventFormatString `config:"policy_name"`

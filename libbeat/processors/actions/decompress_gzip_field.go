@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type decompressGzipField struct {
@@ -51,7 +52,7 @@ func init() {
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
-func NewDecompressGzipFields(c *common.Config) (processors.Processor, error) {
+func NewDecompressGzipFields(c *conf.C) (processors.Processor, error) {
 	config := decompressGzipFieldConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

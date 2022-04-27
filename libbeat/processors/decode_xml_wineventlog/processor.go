@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -67,7 +68,7 @@ type decoder interface {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *conf.C) (processors.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {

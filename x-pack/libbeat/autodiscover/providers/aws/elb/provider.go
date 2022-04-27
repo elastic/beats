@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -43,7 +44,7 @@ func AutodiscoverBuilder(
 	beatName string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *conf.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_elb autodiscover is experimental")

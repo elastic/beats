@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 type decodeJSONFields struct {
@@ -76,7 +77,7 @@ func init() {
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
-func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
+func NewDecodeJSONFields(c *cfg.C) (processors.Processor, error) {
 	config := defaultConfig
 	logger := logp.NewLogger("truncate_fields")
 

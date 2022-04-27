@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -95,7 +96,7 @@ func TestProcessorsForConfig(t *testing.T) {
 // eventLoggerConfig
 func eventLoggerConfigFromString(s string) (eventLoggerConfig, error) {
 	config := eventLoggerConfig{}
-	cfg, err := common.NewConfigFrom(s)
+	cfg, err := conf.NewConfigFrom(s)
 	if err != nil {
 		return config, err
 	}

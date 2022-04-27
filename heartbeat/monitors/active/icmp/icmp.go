@@ -23,6 +23,7 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -42,7 +43,7 @@ func init() {
 
 func create(
 	name string,
-	commonConfig *common.Config,
+	commonConfig *conf.C,
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {

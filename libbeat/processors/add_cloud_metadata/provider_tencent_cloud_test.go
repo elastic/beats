@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func initQCloudTestServer() *httptest.Server {
@@ -54,7 +55,7 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 	server := initQCloudTestServer()
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"providers": []string{"tencent"},
 		"host":      server.Listener.Addr().String(),
 	})

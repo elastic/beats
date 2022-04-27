@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -62,7 +63,7 @@ type pubsubInput struct {
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
 // a topic subscription.
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (inp input.Input, err error) {

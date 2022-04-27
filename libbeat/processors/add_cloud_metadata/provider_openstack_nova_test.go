@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func openstackNovaMetadataHandler() http.HandlerFunc {
@@ -58,7 +59,7 @@ func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
 	server := httptest.NewServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 
@@ -75,7 +76,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	server := httptest.NewTLSServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host":                  server.Listener.Addr().String(),
 		"ssl.verification_mode": "none",
 	})
@@ -87,7 +88,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	assertOpenstackNova(t, config)
 }
 
-func assertOpenstackNova(t *testing.T, config *common.Config) {
+func assertOpenstackNova(t *testing.T, config *conf.C) {
 	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)

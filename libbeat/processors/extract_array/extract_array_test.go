@@ -24,10 +24,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestExtractArrayProcessor_String(t *testing.T) {
-	p, err := New(common.MustNewConfigFrom(common.MapStr{
+	p, err := New(conf.MustNewConfigFrom(common.MapStr{
 		"field": "csv",
 		"mappings": common.MapStr{
 			"source.ip":         0,
@@ -247,7 +248,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 	}
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tt.config)
+			cfg := conf.MustNewConfigFrom(tt.config)
 			processor, err := New(cfg)
 			if err != nil {
 				t.Fatal(err)
@@ -290,7 +291,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			"second": common.MapStr{"two": 2},
 		}
 
-		cfg := common.MustNewConfigFrom(config)
+		cfg := conf.MustNewConfigFrom(config)
 		processor, err := New(cfg)
 		if err != nil {
 			t.Fatal(err)

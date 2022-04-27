@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type truncateFieldsConfig struct {
@@ -60,7 +61,7 @@ func init() {
 }
 
 // NewTruncateFields returns a new truncate_fields processor.
-func NewTruncateFields(c *common.Config) (processors.Processor, error) {
+func NewTruncateFields(c *conf.C) (processors.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {

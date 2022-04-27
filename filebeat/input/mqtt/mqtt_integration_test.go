@@ -85,7 +85,7 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
 
 	// Setup the input config.
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(common.MapStr{
 		"hosts":  []string{hostPort},
 		"topics": []string{topic},
 	})
@@ -97,7 +97,7 @@ func TestInput(t *testing.T) {
 	captor := newEventCaptor(eventsCh)
 	defer captor.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(captor), nil
 	})
 

@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var config = azureInputConfig{
@@ -157,7 +158,7 @@ func newStubOutlet(stub *stubOutleter) (channel.Outleter, error) {
 	stub.cond = sync.NewCond(stub)
 	defer stub.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return stub, nil
 	})
 	return connector.ConnectWith(nil, beat.ClientConfig{

@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -422,7 +423,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -467,7 +468,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -550,7 +551,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -595,7 +596,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"id":      "foobar",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -640,7 +641,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -719,7 +720,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -762,7 +763,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"id":      "foobar",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -805,7 +806,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -930,7 +931,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"stop":     true,
@@ -971,7 +972,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"id":      "",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1034,7 +1035,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"stop":     true,
@@ -1077,7 +1078,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1156,7 +1157,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"stop":     true,
@@ -1199,7 +1200,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"id":      "foobar",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"stop":     true,
@@ -1242,7 +1243,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1335,7 +1336,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -1380,7 +1381,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -1423,7 +1424,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1492,7 +1493,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -1537,7 +1538,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1608,7 +1609,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				{
 					"start":    true,
@@ -1653,7 +1654,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1755,7 +1756,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							},
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				// Container
 				{
@@ -1801,7 +1802,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				// Init container
 				{
@@ -1847,7 +1848,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 				// Ephemeral container
 				{
@@ -1893,7 +1894,7 @@ func TestPod_EmitEvent(t *testing.T) {
 							"runtime": "docker",
 						},
 					},
-					"config": []*common.Config{},
+					"config": []*config.C{},
 				},
 			},
 		},
@@ -1908,7 +1909,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, addResourceMetadata)
+			metaGen := metadata.NewPodMetadataGenerator(config.NewConfig(), nil, client, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
@@ -2084,7 +2085,7 @@ func (p *publisher) publish(events []bus.Event) {
 		return
 	}
 	for _, event := range events {
-		event["config"] = []*common.Config{}
+		event["config"] = []*config.C{}
 		p.b.Publish(event)
 	}
 }

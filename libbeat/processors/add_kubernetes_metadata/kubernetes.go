@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -98,7 +99,7 @@ func kubernetesMetadataExist(event *beat.Event) bool {
 }
 
 // New constructs a new add_kubernetes_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *config.C) (processors.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err
@@ -118,7 +119,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	return processor, nil
 }
 
-func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorConfig, error) {
+func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig, error) {
 	config := defaultKubernetesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
@@ -139,7 +140,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 	return config, nil
 }
 
-func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
+func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {

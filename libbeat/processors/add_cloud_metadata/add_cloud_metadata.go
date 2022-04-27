@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -59,7 +60,7 @@ type initData struct {
 }
 
 // New constructs a new add_cloud_metadata processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *cfg.C) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")

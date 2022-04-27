@@ -14,11 +14,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const logName = "httpjson.transforms"
 
-type transformsConfig []*common.Config
+type transformsConfig []*conf.C
 
 type transforms []transform
 
@@ -216,7 +217,7 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 			return nil, fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms.String())
 		}
 
-		cfg.PrintDebugf("Configure transform '%v' with:", actionName)
+		common.PrintConfigDebugf(cfg, "Configure transform '%v' with:", actionName)
 		transform, err := constructor(cfg, log)
 		if err != nil {
 			return nil, err

@@ -38,6 +38,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -317,7 +318,7 @@ func getSRedisAddr() string {
 }
 
 func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Client {
-	config, err := common.NewConfigFrom(cfg)
+	config, err := config.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)
 	}

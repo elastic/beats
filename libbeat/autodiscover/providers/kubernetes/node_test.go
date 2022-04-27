@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestGenerateHints_Node(t *testing.T) {
@@ -188,7 +189,7 @@ func TestEmitEvent_Node(t *testing.T) {
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*config.C{},
 			},
 		},
 		{
@@ -239,7 +240,7 @@ func TestEmitEvent_Node(t *testing.T) {
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*config.C{},
 			},
 		},
 		{
@@ -300,7 +301,7 @@ func TestEmitEvent_Node(t *testing.T) {
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*config.C{},
 			},
 		},
 	}
@@ -312,7 +313,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil, client)
+			metaGen := metadata.NewNodeMetadataGenerator(config.NewConfig(), nil, client)
 			config := defaultConfig()
 			p := &Provider{
 				config:    config,

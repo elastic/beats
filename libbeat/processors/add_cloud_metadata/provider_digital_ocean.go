@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // DigitalOcean Metadata Service
@@ -29,7 +30,7 @@ var doMetadataFetcher = provider{
 
 	Local: true,
 
-	Create: func(provider string, config *common.Config) (metadataFetcher, error) {
+	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		doSchema := func(m map[string]interface{}) common.MapStr {
 			m["serviceName"] = "Droplets"
 			out, _ := s.Schema{

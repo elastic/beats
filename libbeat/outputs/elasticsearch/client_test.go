@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 type testIndexSelector struct{}
@@ -528,13 +529,13 @@ func TestBulkEncodeEvents(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.config)
+			cfg := c.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
 				Version:     test.version,
 			}
 
-			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+			im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -594,13 +595,13 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		{"_id": "115", "op_type": e.OpTypeIndex, "message": "test 5", "bulkIndex": 7},
 	}
 
-	cfg := common.MustNewConfigFrom(common.MapStr{})
+	cfg := c.MustNewConfigFrom(common.MapStr{})
 	info := beat.Info{
 		IndexPrefix: "test",
 		Version:     version.GetDefaultVersion(),
 	}
 
-	im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+	im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
 	require.NoError(t, err)
 
 	index, pipeline, err := buildSelectors(im, info, cfg)

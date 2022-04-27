@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type service struct {
@@ -33,7 +34,7 @@ type service struct {
 }
 
 // NewServiceMetadataGenerator creates a metagen for service resources
-func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen, client k8s.Interface) MetaGen {
+func NewServiceMetadataGenerator(cfg *config.C, services cache.Store, namespace MetaGen, client k8s.Interface) MetaGen {
 	return &service{
 		resource:  NewResourceMetadataGenerator(cfg, client),
 		store:     services,

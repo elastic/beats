@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestLightMetricSetRegistration(t *testing.T) {
@@ -125,7 +126,7 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 	c.Module = module
 	c.MetricSets = []string{metricSet}
 	c.Query = QueryParams{"default": "foo"}
-	raw, err := common.NewConfigFrom(c)
+	raw, err := conf.NewConfigFrom(c)
 	require.NoError(t, err)
 	baseModule, err := newBaseModuleFromConfig(raw)
 	require.NoError(t, err)

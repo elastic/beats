@@ -26,11 +26,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNetworkConfigUnpack(t *testing.T) {
 	testYAMLConfig := func(t *testing.T, expected bool, evt *beat.Event, yml string) {
-		c, err := common.NewConfigWithYAML([]byte(yml), "test")
+		c, err := config.NewConfigWithYAML([]byte(yml), "test")
 		if err != nil {
 			t.Fatal(err)
 		}

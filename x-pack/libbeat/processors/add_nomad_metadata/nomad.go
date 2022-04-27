@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -38,7 +39,7 @@ func init() {
 }
 
 // New constructs a new add_nomad_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (processors.Processor, error) {
 	cfgwarn.Experimental("The add_nomad_metadata processor is experimental")
 
 	config := defaultNomadAnnotatorConfig()
@@ -52,7 +53,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	if config.DefaultIndexers.Enabled == true {
 		Indexing.RLock()
 		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
-			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
+			config.Indexers = append(config.Indexers, map[string]conf.C{key: cfg})
 		}
 		Indexing.RUnlock()
 	}
@@ -61,7 +62,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	if config.DefaultMatchers.Enabled == true {
 		Indexing.RLock()
 		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
-			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
+			config.Matchers = append(config.Matchers, map[string]conf.C{key: cfg})
 		}
 		Indexing.RUnlock()
 	}

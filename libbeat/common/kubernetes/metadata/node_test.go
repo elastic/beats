@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNode_Generate(t *testing.T) {
@@ -81,7 +82,7 @@ func TestNode_Generate(t *testing.T) {
 		},
 	}
 
-	cfg, _ := common.NewConfigFrom(Config{
+	cfg, _ := config.NewConfigFrom(Config{
 		IncludeAnnotations: []string{"key2"},
 	})
 	metagen := NewNodeMetadataGenerator(cfg, nil, client)
@@ -139,7 +140,7 @@ func TestNode_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := common.NewConfigFrom(Config{
+		cfg, _ := config.NewConfigFrom(Config{
 			IncludeAnnotations: []string{"key"},
 		})
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)

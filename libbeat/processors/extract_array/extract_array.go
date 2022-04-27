@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
@@ -67,7 +68,7 @@ func init() {
 }
 
 // Unpack unpacks the processor's configuration.
-func (f *extractArrayProcessor) Unpack(from *common.Config) error {
+func (f *extractArrayProcessor) Unpack(from *conf.C) error {
 	tmp := defaultConfig
 	err := from.Unpack(&tmp)
 	if err != nil {
@@ -88,7 +89,7 @@ func (f *extractArrayProcessor) Unpack(from *common.Config) error {
 }
 
 // New builds a new extract_array processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *conf.C) (processors.Processor, error) {
 	p := &extractArrayProcessor{}
 	err := c.Unpack(p)
 	if err != nil {

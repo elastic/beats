@@ -15,13 +15,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const batchSize = 10
@@ -54,7 +54,7 @@ type SQS struct {
 }
 
 // NewSQS creates a new function to receives events from a SQS queue.
-func NewSQS(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
+func NewSQS(provider provider.Provider, cfg *conf.C) (provider.Function, error) {
 	config := &SQSConfig{LambdaConfig: DefaultLambdaConfig}
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err

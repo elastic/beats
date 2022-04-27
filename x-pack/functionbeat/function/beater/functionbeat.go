@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -55,7 +56,7 @@ type Functionbeat struct {
 }
 
 // New creates an instance of functionbeat.
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
@@ -154,11 +155,11 @@ type fnExtraConfig struct {
 	Index fmtstr.EventFormatString `config:"index"`
 }
 
-func makeClientFactory(log *logp.Logger, pipe beat.Pipeline, beatInfo beat.Info) func(*common.Config) (pipeline.ISyncClient, error) {
+func makeClientFactory(log *logp.Logger, pipe beat.Pipeline, beatInfo beat.Info) func(*conf.C) (pipeline.ISyncClient, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
-	return func(cfg *common.Config) (pipeline.ISyncClient, error) {
+	return func(cfg *conf.C) (pipeline.ISyncClient, error) {
 		c := fnExtraConfig{}
 
 		if err := cfg.Unpack(&c); err != nil {

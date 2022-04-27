@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestGenerateAppender(t *testing.T) {
@@ -86,7 +87,7 @@ condition.equals:
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config, err := common.NewConfigWithYAML([]byte(test.config), "")
+			config, err := conf.NewConfigWithYAML([]byte(test.config), "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -95,13 +96,13 @@ condition.equals:
 			assert.NoError(t, err)
 			assert.NotNil(t, appender)
 
-			eveConfig, err := common.NewConfigFrom(&test.eventConfig)
+			eveConfig, err := conf.NewConfigFrom(&test.eventConfig)
 			assert.NoError(t, err)
 
-			test.event["config"] = []*common.Config{eveConfig}
+			test.event["config"] = []*conf.C{eveConfig}
 			appender.Append(test.event)
 
-			cfgs, _ := test.event["config"].([]*common.Config)
+			cfgs, _ := test.event["config"].([]*conf.C)
 			assert.Equal(t, len(cfgs), 1)
 
 			out := common.MapStr{}

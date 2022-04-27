@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestWithConfig(t *testing.T) {
@@ -67,7 +68,7 @@ func TestWithConfig(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			config := common.MustNewConfigFrom(test.config)
+			config := config.MustNewConfigFrom(test.config)
 			p, err := New(config)
 			require.NoError(t, err)
 
@@ -83,7 +84,7 @@ func TestWithConfig(t *testing.T) {
 	}
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
-		config := common.MustNewConfigFrom(common.MapStr{
+		config := config.MustNewConfigFrom(common.MapStr{
 			"fields":       []string{"@metadata.message"},
 			"target_field": "@metadata.fingerprint",
 		})
@@ -128,7 +129,7 @@ func TestHashMethods(t *testing.T) {
 
 	for method, test := range tests {
 		t.Run(method, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields": []string{"field1", "field2"},
 				"method": method,
 			})
@@ -173,7 +174,7 @@ func TestSourceFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields": test.fields,
 				"method": "sha256",
 			})
@@ -216,7 +217,7 @@ func TestEncoding(t *testing.T) {
 
 	for encoding, test := range tests {
 		t.Run(encoding, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields":   []string{"field2", "nested.field"},
 				"method":   "md5",
 				"encoding": encoding,
@@ -269,7 +270,7 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields": []string{"timestamp"},
 			})
 			assert.NoError(t, err)
@@ -309,7 +310,7 @@ func TestTargetField(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields":       []string{"field1"},
 				"target_field": test.targetField,
 			})
@@ -358,7 +359,7 @@ func TestSourceFieldErrors(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields": test.fields,
 				"method": "sha256",
 			})
@@ -403,7 +404,7 @@ func TestInvalidConfig(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			testConfig, err := common.NewConfigFrom(test.config)
+			testConfig, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)
 
 			_, err = New(testConfig)
@@ -433,7 +434,7 @@ func TestIgnoreMissing(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			ignoreMissing, _ := strconv.ParseBool(name)
-			testConfig, err := common.NewConfigFrom(common.MapStr{
+			testConfig, err := config.NewConfigFrom(common.MapStr{
 				"fields":         []string{"field1", "missing_field"},
 				"ignore_missing": ignoreMissing,
 			})
@@ -462,7 +463,7 @@ func BenchmarkHashMethods(b *testing.B) {
 	events := nRandomEvents(100000)
 
 	for method := range hashes {
-		testConfig, _ := common.NewConfigFrom(common.MapStr{
+		testConfig, _ := config.NewConfigFrom(common.MapStr{
 			"fields": []string{"message"},
 			"method": method,
 		})

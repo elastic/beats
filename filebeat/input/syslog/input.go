@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Parser is generated from a ragel state machine using the following command:
@@ -106,7 +107,7 @@ type Input struct {
 
 // NewInput creates a new syslog input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {

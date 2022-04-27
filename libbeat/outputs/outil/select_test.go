@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type node map[string]interface{}
@@ -270,7 +271,7 @@ func TestSelector(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			yaml := strings.Replace(test.config, "\t", "  ", -1)
-			cfg, err := common.NewConfigWithYAML([]byte(yaml), "test")
+			cfg, err := config.NewConfigWithYAML([]byte(yaml), "test")
 			if err != nil {
 				t.Fatalf("YAML parse error: %v\n%v", err, yaml)
 			}
@@ -349,7 +350,7 @@ func TestSelectorInitFail(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := common.NewConfigWithYAML([]byte(test.config), "test")
+			cfg, err := config.NewConfigWithYAML([]byte(test.config), "test")
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestCursorUpdate(t *testing.T) {
@@ -104,7 +105,7 @@ func TestCursorUpdate(t *testing.T) {
 	for _, testCase := range testCases {
 		tc := testCase
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.baseConfig)
+			cfg := conf.MustNewConfigFrom(tc.baseConfig)
 
 			conf := cursorConfig{}
 			require.NoError(t, cfg.Unpack(&conf))

@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestProcessorsForFunction(t *testing.T) {
@@ -136,7 +137,7 @@ func (p *setRawIndex) String() string {
 // fnExtraConfig
 func functionConfigFromString(s string) (fnExtraConfig, error) {
 	config := fnExtraConfig{}
-	cfg, err := common.NewConfigFrom(s)
+	cfg, err := conf.NewConfigFrom(s)
 	if err != nil {
 		return config, err
 	}

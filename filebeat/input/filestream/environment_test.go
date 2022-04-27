@@ -36,7 +36,6 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -79,7 +78,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	manager.Init(&e.grp, v2.ModeRun)
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
 		e.t.Fatalf("failed to create input using manager: %+v", err)
@@ -91,7 +90,7 @@ func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	manager.Init(&e.grp, v2.ModeRun)
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
 		return nil, err

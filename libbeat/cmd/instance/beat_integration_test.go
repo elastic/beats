@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mock"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type mockbeat struct {
@@ -91,7 +92,7 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 
 		// Set the configuration file path flag so the beat can read it
 		flag.Set("c", "testdata/mockbeat.yml")
-		instance.Run(mock.Settings, func(_ *beat.Beat, _ *common.Config) (beat.Beater, error) {
+		instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
 			return &mockBeat, nil
 		})
 	}()

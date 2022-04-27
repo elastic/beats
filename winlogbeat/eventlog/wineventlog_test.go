@@ -33,7 +33,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
@@ -362,7 +361,7 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 }
 
 func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config map[string]interface{}) EventLog {
-	cfg, err := common.NewConfigFrom(config)
+	cfg, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}

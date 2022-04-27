@@ -23,7 +23,7 @@ import (
 
 func TestGetApps(t *testing.T) {
 	var conf Config
-	err := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t)).Unpack(&conf)
+	err := conf.MustNewConfigFrom(cftest.GetConfigFromEnv(t)).Unpack(&conf)
 	require.NoError(t, err)
 
 	log := logp.NewLogger("cloudfoundry")

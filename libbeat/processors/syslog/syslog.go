@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -105,7 +106,7 @@ func defaultConfig() config {
 }
 
 // New creates a new processor from the provided configuration, or an error if the configuration is invalid.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *conf.C) (processors.Processor, error) {
 	cfg := defaultConfig()
 
 	if err := c.Unpack(&cfg); err != nil {
