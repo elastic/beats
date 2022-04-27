@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix docs reference for syslog processor {pull}31087[31087]
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 - Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}xxxx[xxxx]
 
 *Auditbeat*
 
