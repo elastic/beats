@@ -208,7 +208,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
 //nolint:unparam // There are no new changes to this line but
 // linter has been activated in the meantime. We'll cleanup separately.
-func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+func mockBadPluginConf(t *testing.T, id string, schedule string) *conf.C {
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},
