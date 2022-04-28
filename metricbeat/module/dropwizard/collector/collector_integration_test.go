@@ -25,9 +25,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -59,9 +59,9 @@ func TestFetch(t *testing.T) {
 			if err != nil {
 				t.Fatal("write", err)
 			} else {
-				tags, ok := tagsRaw.(common.MapStr)
+				tags, ok := tagsRaw.(mapstr.M)
 				if !ok {
-					t.Fatal("write", "unable to cast tags to common.MapStr")
+					t.Fatal("write", "unable to cast tags to mapstr.M")
 				} else {
 					assert.Equal(t, len(tags), 1)
 					hasTag = true

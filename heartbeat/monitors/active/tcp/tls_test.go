@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/require"
 
@@ -181,10 +182,10 @@ func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certif
 }
 
 func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string, resolver monitors.Resolver) *beat.Event {
-	config, err := common.NewConfigFrom(common.MapStr{
+	config, err := common.NewConfigFrom(mapstr.M{
 		"hosts":   host,
 		"ports":   int64(port),
-		"ssl":     common.MapStr{"certificate_authorities": certFileName},
+		"ssl":     mapstr.M{"certificate_authorities": certFileName},
 		"timeout": "1s",
 	})
 	require.NoError(t, err)

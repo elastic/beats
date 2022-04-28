@@ -18,10 +18,11 @@
 package syslog
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -173,8 +174,8 @@ func (m *message) setDataValue(id, key, value string) {
 }
 
 // fields produces fields from the message.
-func (m message) fields() common.MapStr {
-	f := common.MapStr{}
+func (m message) fields() mapstr.M {
+	f := mapstr.M{}
 
 	// Syslog fields.
 	_, _ = f.Put("log.syslog.priority", m.priority)
@@ -199,7 +200,7 @@ func (m message) fields() common.MapStr {
 		_, _ = f.Put("log.syslog.msgid", m.msgID)
 	}
 	if m.version != 0 {
-		_, _ = f.Put("log.syslog.version", m.version)
+		_, _ = f.Put("log.syslog.version", strconv.Itoa(m.version))
 	}
 	if len(m.structuredData) > 0 {
 		_, _ = f.Put("log.syslog.structured_data", m.structuredData)

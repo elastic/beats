@@ -30,9 +30,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -120,7 +120,7 @@ func sBuf(t *testing.T, hexString string) *streambuf.Buffer {
 	return streambuf.New(bytes)
 }
 
-func mapGet(t *testing.T, m common.MapStr, key string) interface{} {
+func mapGet(t *testing.T, m mapstr.M, key string) interface{} {
 	value, err := m.GetValue(key)
 	assert.NoError(t, err)
 	return value
@@ -370,7 +370,7 @@ func TestRandom(t *testing.T) {
 
 	for i, test := range []struct {
 		msg  string
-		want common.MapStr
+		want mapstr.M
 	}{
 		{
 			msg: "16030100ba010000b603032338f219562c78ca216984f33434bfe952354edf50" +
@@ -379,8 +379,8 @@ func TestRandom(t *testing.T) {
 				"12746573742e6974762e6f72616e67652e6672000b000403000102000a000a00" +
 				"08001700190018001600230000000d0020001e06010602060305010502050304" +
 				"0104020403030103020303020102020203000500050100000000000f000101",
-			want: common.MapStr{
-				"extensions": common.MapStr{
+			want: mapstr.M{
+				"extensions": mapstr.M{
 					"_unparsed_": []string{
 						"15",
 					},
@@ -410,7 +410,7 @@ func TestRandom(t *testing.T) {
 						"(unknown:0x0202)",
 						"ecdsa_sha1",
 					},
-					"status_request": common.MapStr{
+					"status_request": mapstr.M{
 						"type":                     "ocsp",
 						"responder_id_list_length": uint16(0),
 						"request_extensions":       uint16(0),
@@ -476,15 +476,15 @@ func TestRandom(t *testing.T) {
 				"4f6616c21b8fd24e08aadd2c9c43944df5088e2bdbf121649ca1e405e1e95695" +
 				"d52afa1c265b123344a9f5594b661e7d3406b0f6d60c7f776a9723bcec995f4b" +
 				"4da3e6d42dc446b6a33904b7a56f74ba53010006",
-			want: common.MapStr{
-				"extensions": common.MapStr{
+			want: mapstr.M{
+				"extensions": mapstr.M{
 					"_unparsed_": []string{
 						"renegotiation_info",
 					},
 					"ec_points_formats": []string{
 						"uncompressed",
 					},
-					"status_request": common.MapStr{
+					"status_request": mapstr.M{
 						"response": true,
 					},
 				},

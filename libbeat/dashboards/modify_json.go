@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -46,7 +46,7 @@ type JSONObject struct {
 }
 
 // ReplaceIndexInIndexPattern replaces an index in a dashboard content body
-func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error) {
+func ReplaceIndexInIndexPattern(index string, content mapstr.M) (err error) {
 	if index == "" {
 		return nil
 	}
@@ -64,7 +64,7 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error)
 
 func replaceIndexInSearchObject(index string, savedObject string) (string, error) {
 
-	var record common.MapStr
+	var record mapstr.M
 	err := json.Unmarshal([]byte(savedObject), &record)
 	if err != nil {
 		return "", fmt.Errorf("fail to unmarshal searchSourceJSON from search : %v", err)

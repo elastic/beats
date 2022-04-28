@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestInputFileExclude(t *testing.T) {
@@ -144,7 +145,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	assert.NoError(t, err)
 
 	// Setup the input
-	config, _ := common.NewConfigFrom(common.MapStr{
+	config, _ := common.NewConfigFrom(mapstr.M{
 		"paths":     path.Join(tmpdir, "*.log"),
 		"close_eof": true,
 	})
@@ -187,7 +188,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 }
 
 func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
+	config := mapstr.M{
 		"paths": path.Join(os.TempDir(), "logs", "*.log"),
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)

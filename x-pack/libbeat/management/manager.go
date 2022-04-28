@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -181,7 +182,7 @@ func (cm *Manager) updateStatusWithError(err error) {
 func (cm *Manager) OnConfig(s string) {
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
-	var configMap common.MapStr
+	var configMap mapstr.M
 	uconfig, err := common.NewConfigFrom(s)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
@@ -327,7 +328,7 @@ func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {
 	return nil
 }
 
-func (cm *Manager) toConfigBlocks(cfg common.MapStr) (ConfigBlocks, error) {
+func (cm *Manager) toConfigBlocks(cfg mapstr.M) (ConfigBlocks, error) {
 	blocks := map[string][]*ConfigBlock{}
 
 	// Extract all registered values beat can respond to

@@ -11,7 +11,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -47,9 +47,9 @@ func TestEventMapping(t *testing.T) {
 		val2, _ := event.MetricSetFields.GetValue("end_date")
 		assert.Equal(t, val2, &startDate)
 		val3, _ := event.ModuleFields.GetValue("metrics.requests_count")
-		assert.Equal(t, val3, common.MapStr{"sum": 12})
+		assert.Equal(t, val3, mapstr.M{"sum": 12})
 		val5, _ := event.ModuleFields.GetValue("metrics.requests_failed")
-		assert.Equal(t, val5, common.MapStr{"sum": 10})
+		assert.Equal(t, val5, mapstr.M{"sum": 10})
 		val4, _ := event.ModuleFields.GetValue("application_id")
 		assert.Equal(t, val4, applicationId)
 

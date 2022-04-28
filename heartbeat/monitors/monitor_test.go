@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -50,8 +51,8 @@ func TestMonitorCfgError(t *testing.T) {
 		mockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
 		lookslike.Compose(
 			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
-			lookslike.MustCompile(common.MapStr{
-				"error": common.MapStr{
+			lookslike.MustCompile(mapstr.M{
+				"error": mapstr.M{
 					"message": isdef.IsStringContaining("missing required field"),
 					"type":    "io",
 				},

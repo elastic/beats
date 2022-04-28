@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type StatsCluster struct {
@@ -40,21 +40,21 @@ type DfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventMapping(content []byte) (common.MapStr, error) {
+func eventMapping(content []byte) (mapstr.M, error) {
 	var d DfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get DFRequest data")
 	}
 
-	return common.MapStr{
-		"used": common.MapStr{
+	return mapstr.M{
+		"used": mapstr.M{
 			"bytes": d.Output.StatsCluster.TotalUsedBytes,
 		},
-		"total": common.MapStr{
+		"total": mapstr.M{
 			"bytes": d.Output.StatsCluster.TotalBytes,
 		},
-		"available": common.MapStr{
+		"available": mapstr.M{
 			"bytes": d.Output.StatsCluster.TotalAvailBytes,
 		},
 	}, nil

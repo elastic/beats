@@ -13,9 +13,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
+type JourneyLister func(ctx context.Context, suitePath string, params mapstr.M) (journeyNames []string, err error)
 
 type Suite struct {
 	rawCfg   *common.Config

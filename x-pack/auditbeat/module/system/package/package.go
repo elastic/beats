@@ -25,12 +25,12 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -136,47 +136,47 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
-	mapstr := common.MapStr{
+func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
+	mapStr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
-	ecsMapstr := common.MapStr{
+	ecsMapstr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
 
 	if pkg.Release != "" {
-		mapstr.Put("release", pkg.Release)
+		mapStr.Put("release", pkg.Release)
 	}
 
 	if pkg.Arch != "" {
-		mapstr.Put("arch", pkg.Arch)
+		mapStr.Put("arch", pkg.Arch)
 		ecsMapstr.Put("architecture", pkg.License)
 	}
 
 	if pkg.License != "" {
-		mapstr.Put("license", pkg.License)
+		mapStr.Put("license", pkg.License)
 		ecsMapstr.Put("license", pkg.License)
 	}
 
 	if !pkg.InstallTime.IsZero() {
-		mapstr.Put("installtime", pkg.InstallTime)
+		mapStr.Put("installtime", pkg.InstallTime)
 		ecsMapstr.Put("installed", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
-		mapstr.Put("size", pkg.Size)
+		mapStr.Put("size", pkg.Size)
 		ecsMapstr.Put("size", pkg.Size)
 	}
 
 	if pkg.Summary != "" {
-		mapstr.Put("summary", pkg.Summary)
+		mapStr.Put("summary", pkg.Summary)
 		ecsMapstr.Put("description", pkg.Summary)
 	}
 
 	if pkg.URL != "" {
-		mapstr.Put("url", pkg.URL)
+		mapStr.Put("url", pkg.URL)
 		ecsMapstr.Put("reference", pkg.URL)
 	}
 
@@ -184,7 +184,7 @@ func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
 		ecsMapstr.Put("type", pkg.Type)
 	}
 
-	return mapstr, ecsMapstr
+	return mapStr, ecsMapstr
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.
@@ -373,8 +373,8 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"package"},
 				"type":     []string{action.Type()},

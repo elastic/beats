@@ -24,12 +24,12 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -154,8 +154,8 @@ func (user User) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (user User) toMapStr() common.MapStr {
-	evt := common.MapStr{
+func (user User) toMapStr() mapstr.M {
+	evt := mapstr.M{
 		"name":  user.Name,
 		"uid":   user.UID,
 		"gid":   user.GID,
@@ -176,9 +176,9 @@ func (user User) toMapStr() common.MapStr {
 	}
 
 	if len(user.Groups) > 0 {
-		var groupMapStr []common.MapStr
+		var groupMapStr []mapstr.M
 		for _, group := range user.Groups {
-			groupMapStr = append(groupMapStr, common.MapStr{
+			groupMapStr = append(groupMapStr, mapstr.M{
 				"name": group.Name,
 				"gid":  group.Gid,
 				"id":   group.Gid,
@@ -455,18 +455,18 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"iam"},
 				"type":     []string{action.Type()},
 				"action":   action.String(),
 			},
-			"user": common.MapStr{
+			"user": mapstr.M{
 				"id":   user.UID,
 				"name": user.Name,
 			},
-			"related": common.MapStr{
+			"related": mapstr.M{
 				"user": []string{user.Name},
 			},
 			"message": userMessage(user, action),
@@ -480,12 +480,12 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 
 	primaryGroup := user.PrimaryGroup()
 	if primaryGroup != nil {
-		event.RootFields.Put("user.group", common.MapStr{
+		event.RootFields.Put("user.group", mapstr.M{
 			"id":   primaryGroup.Gid,
 			"name": primaryGroup.Name,
 		})
 	} else if user.GID != "" { // fallback to just filling out the GID
-		event.RootFields.Put("user.group", common.MapStr{
+		event.RootFields.Put("user.group", mapstr.M{
 			"id": user.GID,
 		})
 	}

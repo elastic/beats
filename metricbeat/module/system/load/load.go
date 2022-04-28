@@ -23,11 +23,11 @@ package load
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -59,12 +59,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	avgs := load.Averages()
 	normAvgs := load.NormalizedAverages()
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"cores": numcpu.NumCPU(),
 		"1":     avgs.OneMinute,
 		"5":     avgs.FiveMinute,
 		"15":    avgs.FifteenMinute,
-		"norm": common.MapStr{
+		"norm": mapstr.M{
 			"1":  normAvgs.OneMinute,
 			"5":  normAvgs.FiveMinute,
 			"15": normAvgs.FifteenMinute,
