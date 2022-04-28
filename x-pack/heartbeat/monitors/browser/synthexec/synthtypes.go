@@ -15,6 +15,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+const JourneyStart = "journey/start"
+const JourneyEnd = "journey/end"
+const CmdStatus = "cmd/status"
+
 type SynthEvent struct {
 	Id                   string      `json:"_id"`
 	Type                 string      `json:"type"`
@@ -56,21 +60,33 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		},
 	})
 	if len(se.Payload) > 0 {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		m.Put("synthetics.payload", se.Payload)
 	}
 	if se.Blob != "" {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		m.Put("synthetics.blob", se.Blob)
 	}
 	if se.BlobMime != "" {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		m.Put("synthetics.blob_mime", se.BlobMime)
 	}
 	if se.Step != nil {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		m.Put("synthetics.step", se.Step.ToMap())
 	}
 	if se.Journey != nil {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		m.Put("synthetics.journey", se.Journey.ToMap())
 	}
 	if se.Error != nil {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		m.Put("synthetics.error", se.Error.toMap())
 	}
 
@@ -79,6 +95,8 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		if e != nil {
 			logp.Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			m.Put("url", wrappers.URLFields(u))
 		}
 	}

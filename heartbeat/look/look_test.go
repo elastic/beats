@@ -31,18 +31,18 @@ import (
 )
 
 // helper
-func testRTT(t *testing.T, expected time.Duration, provided time.Duration) {
+func testRTT(t *testing.T, expected int64, provided time.Duration) {
 	actual, err := RTT(provided).GetValue("us")
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, expected, actual.(int64))
 }
 
 func TestPositiveRTTIsKept(t *testing.T) {
-	testRTT(t, 5, time.Duration(5*time.Microsecond))
+	testRTT(t, 5, 5*time.Microsecond)
 }
 
 func TestNegativeRTTIsZero(t *testing.T) {
-	testRTT(t, time.Duration(0), time.Duration(-1))
+	testRTT(t, 0, time.Duration(-1))
 }
 
 func TestReason(t *testing.T) {

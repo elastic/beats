@@ -24,11 +24,15 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
+
+	//nolint:gomodguard // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -57,7 +61,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
-			return makeAddSummary(stdMonFields.Type)
+			return makeAddSummary()
 		})
 }
 
@@ -185,16 +189,18 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 func addMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
-
 		cont, err := job(event)
+		duration := time.Since(start)
 
 		if event != nil {
 			eventext.MergeEventFields(event, mapstr.M{
 				"monitor": mapstr.M{
-					"duration": look.RTT(time.Since(start)),
+					"duration": look.RTT(duration),
 				},
 			})
 			event.Timestamp = start
+
+			logger.LogRun(event, nil)
 		}
 
 		return cont, err
@@ -202,7 +208,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(monitorType string) jobs.JobWrapper {
+func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -249,6 +255,8 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations

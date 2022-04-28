@@ -29,11 +29,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -157,6 +157,8 @@ func TestUnreachableEndpointJob(t *testing.T) {
 func TestCheckUp(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeEcho()
 
 	configMap := mapstr.M{
@@ -179,7 +181,7 @@ func TestCheckUp(t *testing.T) {
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
-					"rtt.validate.us": isdef.IsDuration,
+					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 			}),
 		)),
@@ -190,6 +192,8 @@ func TestCheckUp(t *testing.T) {
 func TestCheckDown(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeEcho()
 
 	configMap := mapstr.M{
@@ -212,7 +216,7 @@ func TestCheckDown(t *testing.T) {
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
-					"rtt.validate.us": isdef.IsDuration,
+					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 				"error": map[string]interface{}{
 					"type":    "validate",
@@ -262,6 +266,7 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	require.NoError(t, err)
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()
