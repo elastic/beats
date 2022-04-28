@@ -6,17 +6,13 @@
 
 * @elastic/elastic-agent-data-plane
 
-<<<<<<< HEAD
-
-### Private directories
-# Any changes to the CI system or .github must be reviewed by the data plane team.
-=======
 # List the CHANGELOG files without an owner. This will prevent the data plane team from being added
 # as a reviewer every time a change to files they do not own also adds a changelog entry.
 # https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
 CHANGELOG*
 
->>>>>>> 12b26898dd (List the CHANGELOG files without code owners. (#31425))
+### Private directories
+# Any changes to the CI system or .github must be reviewed by the data plane team.
 /.ci/ @elastic/elastic-agent-data-plane
 /.github/ @elastic/elastic-agent-data-plane
 
