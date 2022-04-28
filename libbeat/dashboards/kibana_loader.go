@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var importAPI = "/api/saved_objects/_import"
@@ -106,7 +107,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
 	}
 
-	var indexContent common.MapStr
+	var indexContent mapstr.M
 	err = json.Unmarshal(reader, &indexContent)
 	if err != nil {
 		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
@@ -116,7 +117,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 }
 
 // ImportIndex imports the passed index pattern to Kibana
-func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
+func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
 		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
 	}
@@ -207,7 +208,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 		loader.loadedAssets[referencePath] = true
 	}
 
-	var res common.MapStr
+	var res mapstr.M
 	err = json.Unmarshal(dashboard, &res)
 	if err != nil {
 		return "", fmt.Errorf("failed to convert asset: %+v", err)

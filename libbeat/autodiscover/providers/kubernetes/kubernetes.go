@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/k8skeystore"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -192,7 +193,7 @@ func (p *Provider) publish(events []bus.Event) {
 	}
 
 	// Since all the events belong to the same event ID pick on and add in all the configs
-	event := bus.Event(common.MapStr(events[0]).Clone())
+	event := bus.Event(mapstr.M(events[0]).Clone())
 	// Remove the port to avoid ambiguity during debugging
 	delete(event, "port")
 	event["config"] = configs

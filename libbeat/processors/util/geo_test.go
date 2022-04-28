@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // parseGeoConfig converts the map into a GeoConfig.
@@ -96,7 +97,7 @@ func TestGeoLocationValidation(t *testing.T) {
 	for _, location := range locations {
 		t.Run(fmt.Sprintf("Location %s validation should be %t", location.str, location.valid), func(t *testing.T) {
 
-			geoConfig := parseConfig(t, common.MapStr{"location": location.str})
+			geoConfig := parseConfig(t, mapstr.M{"location": location.str})
 			geoMap, err := GeoConfigToMap(geoConfig)
 
 			if location.valid {

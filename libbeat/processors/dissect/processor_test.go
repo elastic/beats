@@ -25,25 +25,26 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessor(t *testing.T) {
 	tests := []struct {
 		name   string
 		c      map[string]interface{}
-		fields common.MapStr
+		fields mapstr.M
 		values map[string]string
 	}{
 		{
 			name:   "default field/default target",
 			c:      map[string]interface{}{"tokenizer": "hello %{key}"},
-			fields: common.MapStr{"message": "hello world"},
+			fields: mapstr.M{"message": "hello world"},
 			values: map[string]string{"dissect.key": "world"},
 		},
 		{
 			name:   "default field/target root",
 			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": ""},
-			fields: common.MapStr{"message": "hello world"},
+			fields: mapstr.M{"message": "hello world"},
 			values: map[string]string{"key": "world"},
 		},
 		{
@@ -53,7 +54,7 @@ func TestProcessor(t *testing.T) {
 				"target_prefix": "",
 				"field":         "new_field",
 			},
-			fields: common.MapStr{"new_field": "hello world"},
+			fields: mapstr.M{"new_field": "hello world"},
 			values: map[string]string{"key": "world"},
 		},
 		{
@@ -63,7 +64,7 @@ func TestProcessor(t *testing.T) {
 				"target_prefix": "new_target",
 				"field":         "new_field",
 			},
-			fields: common.MapStr{"new_field": "hello world"},
+			fields: mapstr.M{"new_field": "hello world"},
 			values: map[string]string{"new_target.key": "world"},
 		},
 		{
@@ -73,7 +74,7 @@ func TestProcessor(t *testing.T) {
 				"target_prefix": "extracted",
 				"field":         "message",
 			},
-			fields: common.MapStr{"message": "hello world super", "extracted": common.MapStr{"not": "hello"}},
+			fields: mapstr.M{"message": "hello world super", "extracted": mapstr.M{"not": "hello"}},
 			values: map[string]string{"extracted.key": "world", "extracted.key2": "super", "extracted.not": "hello"},
 		},
 		{
@@ -85,7 +86,7 @@ func TestProcessor(t *testing.T) {
 				"trim_values":   "right",
 				"trim_chars":    " \t",
 			},
-			fields: common.MapStr{"message": "hello world\t super "},
+			fields: mapstr.M{"message": "hello world\t super "},
 			values: map[string]string{"key": "world", "key2": "super"},
 		},
 		{
@@ -95,7 +96,7 @@ func TestProcessor(t *testing.T) {
 				"target_prefix": "",
 				"field":         "message",
 			},
-			fields: common.MapStr{"message": "hello world\t super "},
+			fields: mapstr.M{"message": "hello world\t super "},
 			values: map[string]string{"key": "world\t", "key2": "super "},
 		},
 		{
@@ -107,7 +108,7 @@ func TestProcessor(t *testing.T) {
 				"trim_values":   "left",
 				"trim_chars":    " \t",
 			},
-			fields: common.MapStr{"message": "hello \tworld\t \tsuper "},
+			fields: mapstr.M{"message": "hello \tworld\t \tsuper "},
 			values: map[string]string{"key": "world\t", "key2": "super "},
 		},
 		{
@@ -119,7 +120,7 @@ func TestProcessor(t *testing.T) {
 				"trim_values":   "all",
 				"trim_chars":    " \t",
 			},
-			fields: common.MapStr{"message": "hello \tworld\t \tsuper "},
+			fields: mapstr.M{"message": "hello \tworld\t \tsuper "},
 			values: map[string]string{"key": "world", "key2": "super"},
 		},
 	}
@@ -155,11 +156,11 @@ func TestProcessor(t *testing.T) {
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		e := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"message": "hello world",
 			},
 		}
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"message": "hello world",
 			"key":     "world",
 		}
@@ -193,7 +194,7 @@ func TestFieldDoesntExist(t *testing.T) {
 		return
 	}
 
-	e := beat.Event{Fields: common.MapStr{"hello": "world"}}
+	e := beat.Event{Fields: mapstr.M{"hello": "world"}}
 	_, err = processor.Run(&e)
 	if !assert.Error(t, err) {
 		return
@@ -205,25 +206,25 @@ func TestFieldAlreadyExist(t *testing.T) {
 		name      string
 		tokenizer string
 		prefix    string
-		fields    common.MapStr
+		fields    mapstr.M
 	}{
 		{
 			name:      "no prefix",
 			tokenizer: "hello %{key}",
 			prefix:    "",
-			fields:    common.MapStr{"message": "hello world", "key": "exists"},
+			fields:    mapstr.M{"message": "hello world", "key": "exists"},
 		},
 		{
 			name:      "with prefix",
 			tokenizer: "hello %{key}",
 			prefix:    "extracted",
-			fields:    common.MapStr{"message": "hello world", "extracted": "exists"},
+			fields:    mapstr.M{"message": "hello world", "extracted": "exists"},
 		},
 		{
 			name:      "with conflicting key in prefix",
 			tokenizer: "hello %{key}",
 			prefix:    "extracted",
-			fields:    common.MapStr{"message": "hello world", "extracted": common.MapStr{"key": "exists"}},
+			fields:    mapstr.M{"message": "hello world", "extracted": mapstr.M{"key": "exists"}},
 		},
 	}
 
@@ -267,7 +268,7 @@ func TestErrorFlagging(t *testing.T) {
 			return
 		}
 
-		e := beat.Event{Fields: common.MapStr{"message": "hello world"}}
+		e := beat.Event{Fields: mapstr.M{"message": "hello world"}}
 		event, err := processor.Run(&e)
 
 		if !assert.Error(t, err) {
@@ -296,7 +297,7 @@ func TestErrorFlagging(t *testing.T) {
 			return
 		}
 
-		e := beat.Event{Fields: common.MapStr{"message": "hello world"}}
+		e := beat.Event{Fields: mapstr.M{"message": "hello world"}}
 		event, err := processor.Run(&e)
 
 		if !assert.NoError(t, err) {
@@ -348,7 +349,7 @@ func TestIgnoreFailure(t *testing.T) {
 				return
 			}
 
-			e := beat.Event{Fields: common.MapStr{"message": test.msg}}
+			e := beat.Event{Fields: mapstr.M{"message": test.msg}}
 			event, err := processor.Run(&e)
 			if test.err == nil {
 				if !assert.NoError(t, err) {
@@ -377,29 +378,29 @@ func TestOverwriteKeys(t *testing.T) {
 	tests := []struct {
 		name   string
 		c      map[string]interface{}
-		fields common.MapStr
-		values common.MapStr
+		fields mapstr.M
+		values mapstr.M
 		err    error
 	}{
 		{
 			name:   "fail by default if key exists",
 			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": ""},
-			fields: common.MapStr{"message": "hello world", "key": 42},
-			values: common.MapStr{"message": "hello world", "key": 42},
+			fields: mapstr.M{"message": "hello world", "key": 42},
+			values: mapstr.M{"message": "hello world", "key": 42},
 			err:    errors.New("cannot override existing key with `key`"),
 		},
 		{
 			name:   "fail if key exists and overwrite disabled",
 			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": false},
-			fields: common.MapStr{"message": "hello world", "key": 42},
-			values: common.MapStr{"message": "hello world", "key": 42},
+			fields: mapstr.M{"message": "hello world", "key": 42},
+			values: mapstr.M{"message": "hello world", "key": 42},
 			err:    errors.New("cannot override existing key with `key`"),
 		},
 		{
 			name:   "overwrite existing keys",
 			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": true},
-			fields: common.MapStr{"message": "hello world", "key": 42},
-			values: common.MapStr{"message": "hello world", "key": "world"},
+			fields: mapstr.M{"message": "hello world", "key": 42},
+			values: mapstr.M{"message": "hello world", "key": "world"},
 		},
 	}
 
@@ -443,13 +444,13 @@ func TestProcessorConvert(t *testing.T) {
 	tests := []struct {
 		name   string
 		c      map[string]interface{}
-		fields common.MapStr
+		fields mapstr.M
 		values map[string]interface{}
 	}{
 		{
 			name:   "extract integer",
 			c:      map[string]interface{}{"tokenizer": "userid=%{user_id|integer}"},
-			fields: common.MapStr{"message": "userid=7736"},
+			fields: mapstr.M{"message": "userid=7736"},
 			values: map[string]interface{}{"dissect.user_id": int32(7736)},
 		},
 	}

@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -71,11 +72,11 @@ func TestInitializationNoDocker(t *testing.T) {
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, docker.NewWatcher)
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{}
+	input := mapstr.M{}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.Equal(t, common.MapStr{}, result.Fields)
+	assert.Equal(t, mapstr.M{}, result.Fields)
 }
 
 func TestInitialization(t *testing.T) {
@@ -84,11 +85,11 @@ func TestInitialization(t *testing.T) {
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{}
+	input := mapstr.M{}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.Equal(t, common.MapStr{}, result.Fields)
+	assert.Equal(t, mapstr.M{}, result.Fields)
 }
 
 func TestNoMatch(t *testing.T) {
@@ -100,13 +101,13 @@ func TestNoMatch(t *testing.T) {
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"field": "value",
 	}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.Equal(t, common.MapStr{"field": "value"}, result.Fields)
+	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
 }
 
 func TestMatchNoContainer(t *testing.T) {
@@ -118,13 +119,13 @@ func TestMatchNoContainer(t *testing.T) {
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"foo": "garbage",
 	}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.Equal(t, common.MapStr{"foo": "garbage"}, result.Fields)
+	assert.Equal(t, mapstr.M{"foo": "garbage"}, result.Fields)
 }
 
 func TestMatchContainer(t *testing.T) {
@@ -149,23 +150,23 @@ func TestMatchContainer(t *testing.T) {
 		}))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"foo": "container_id",
 	}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.EqualValues(t, common.MapStr{
-		"container": common.MapStr{
+	assert.EqualValues(t, mapstr.M{
+		"container": mapstr.M{
 			"id": "container_id",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "image",
 			},
-			"labels": common.MapStr{
-				"a": common.MapStr{
+			"labels": mapstr.M{
+				"a": mapstr.M{
 					"x": "1",
 				},
-				"b": common.MapStr{
+				"b": mapstr.M{
 					"value": "2",
 					"foo":   "3",
 				},
@@ -197,19 +198,19 @@ func TestMatchContainerWithDedot(t *testing.T) {
 		}))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"foo": "container_id",
 	}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.EqualValues(t, common.MapStr{
-		"container": common.MapStr{
+	assert.EqualValues(t, mapstr.M{
+		"container": mapstr.M{
 			"id": "container_id",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "image",
 			},
-			"labels": common.MapStr{
+			"labels": mapstr.M{
 				"a_x":   "1",
 				"b":     "2",
 				"b_foo": "3",
@@ -246,9 +247,9 @@ func TestMatchSource(t *testing.T) {
 	default:
 		inputSource = "/var/lib/docker/containers/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b/foo.log"
 	}
-	input := common.MapStr{
-		"log": common.MapStr{
-			"file": common.MapStr{
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
 				"path": inputSource,
 			},
 		},
@@ -257,20 +258,20 @@ func TestMatchSource(t *testing.T) {
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 
-	assert.EqualValues(t, common.MapStr{
-		"container": common.MapStr{
+	assert.EqualValues(t, mapstr.M{
+		"container": mapstr.M{
 			"id": "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "image",
 			},
-			"labels": common.MapStr{
+			"labels": mapstr.M{
 				"a": "1",
 				"b": "2",
 			},
 			"name": "name",
 		},
-		"log": common.MapStr{
-			"file": common.MapStr{
+		"log": mapstr.M{
+			"file": mapstr.M{
 				"path": inputSource,
 			},
 		},
@@ -298,7 +299,7 @@ func TestDisableSource(t *testing.T) {
 		}))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"source": "/var/lib/docker/containers/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b/foo.log",
 	}
 	result, err := p.Run(&beat.Event{Fields: input})
@@ -324,13 +325,13 @@ func TestMatchPIDs(t *testing.T) {
 	))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
-	dockerMetadata := common.MapStr{
-		"container": common.MapStr{
+	dockerMetadata := mapstr.M{
+		"container": mapstr.M{
 			"id": "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "image",
 			},
-			"labels": common.MapStr{
+			"labels": mapstr.M{
 				"a": "1",
 				"b": "2",
 			},
@@ -339,11 +340,11 @@ func TestMatchPIDs(t *testing.T) {
 	}
 
 	t.Run("pid is not containerized", func(t *testing.T) {
-		input := common.MapStr{}
+		input := mapstr.M{}
 		input.Put("process.pid", 2000)
 		input.Put("process.parent.pid", 1000)
 
-		expected := common.MapStr{}
+		expected := mapstr.M{}
 		expected.DeepUpdate(input)
 
 		result, err := p.Run(&beat.Event{Fields: input})
@@ -352,10 +353,10 @@ func TestMatchPIDs(t *testing.T) {
 	})
 
 	t.Run("pid does not exist", func(t *testing.T) {
-		input := common.MapStr{}
+		input := mapstr.M{}
 		input.Put("process.pid", 9999)
 
-		expected := common.MapStr{}
+		expected := mapstr.M{}
 		expected.DeepUpdate(input)
 
 		result, err := p.Run(&beat.Event{Fields: input})
@@ -364,10 +365,10 @@ func TestMatchPIDs(t *testing.T) {
 	})
 
 	t.Run("pid is containerized", func(t *testing.T) {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		fields.Put("process.pid", "1000")
 
-		expected := common.MapStr{}
+		expected := mapstr.M{}
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
@@ -377,11 +378,11 @@ func TestMatchPIDs(t *testing.T) {
 	})
 
 	t.Run("pid exited and ppid is containerized", func(t *testing.T) {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		fields.Put("process.pid", 9999)
 		fields.Put("process.parent.pid", 1000)
 
-		expected := common.MapStr{}
+		expected := mapstr.M{}
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
@@ -391,10 +392,10 @@ func TestMatchPIDs(t *testing.T) {
 	})
 
 	t.Run("cgroup error", func(t *testing.T) {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		fields.Put("process.pid", 3000)
 
-		expected := common.MapStr{}
+		expected := mapstr.M{}
 		expected.DeepUpdate(fields)
 
 		result, err := p.Run(&beat.Event{Fields: fields})

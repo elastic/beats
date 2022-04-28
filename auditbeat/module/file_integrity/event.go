@@ -39,9 +39,9 @@ import (
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Source identifies the source of an event (i.e. what triggered it).
@@ -243,13 +243,13 @@ func getDriveLetter(path string) string {
 }
 
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
-	file := common.MapStr{
+	file := mapstr.M{
 		"path": e.Path,
 	}
 	out := mb.Event{
 		Timestamp: e.Timestamp,
 		Took:      e.rtt,
-		MetricSetFields: common.MapStr{
+		MetricSetFields: mapstr.M{
 			"file": file,
 		},
 	}
@@ -309,7 +309,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	}
 
 	if len(e.Hashes) > 0 {
-		hashes := make(common.MapStr, len(e.Hashes))
+		hashes := make(mapstr.M, len(e.Hashes))
 		for hashType, digest := range e.Hashes {
 			hashes[string(hashType)] = digest
 		}

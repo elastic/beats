@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors
@@ -43,7 +43,7 @@ type StackdriverTimeSeriesMetadataCollector struct {
 // Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
 // object https://www.elastic.co/guide/en/ecs/master/index.html)
 func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (MetadataCollectorData, error) {
-	m := common.MapStr{}
+	m := mapstr.M{}
 
 	var availabilityZone, accountID string
 
@@ -52,9 +52,9 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		accountID = in.Resource.Labels[TimeSeriesResponsePathForECSAccountID]
 	}
 
-	ecs := common.MapStr{
-		ECSCloud: common.MapStr{
-			ECSCloudAccount: common.MapStr{
+	ecs := mapstr.M{
+		ECSCloud: mapstr.M{
+			ECSCloudAccount: mapstr.M{
 				ECSCloudAccountID:   accountID,
 				ECSCloudAccountName: accountID,
 			},
@@ -127,7 +127,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 // ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion
 func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *MetadataCollectorInputData) (string, error) {
-	m := common.MapStr{
+	m := mapstr.M{
 		KeyTimestamp: in.Timestamp.UnixNano(),
 	}
 

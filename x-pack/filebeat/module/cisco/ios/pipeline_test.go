@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -200,9 +200,9 @@ func testInput(t *testing.T, input string, p processors.Processor) {
 			}
 
 			e := &beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": tc.message,
-					"input": common.MapStr{
+					"input": mapstr.M{
 						"type": input,
 					},
 				},
@@ -245,9 +245,9 @@ func BenchmarkPipeline(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		e := beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": testCases[i%len(testCases)].message,
-				"input": common.MapStr{
+				"input": mapstr.M{
 					"type": "syslog",
 				},
 			},

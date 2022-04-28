@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints_Node(t *testing.T) {
@@ -49,15 +50,15 @@ func TestGenerateHints_Node(t *testing.T) {
 		// Only kubernetes payload must return only kubernetes as part of the hint
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"node": common.MapStr{
+				"kubernetes": mapstr.M{
+					"node": mapstr.M{
 						"name": "foobar",
 					},
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"node": common.MapStr{
+				"kubernetes": mapstr.M{
+					"node": mapstr.M{
 						"name": "foobar",
 					},
 				},
@@ -68,30 +69,30 @@ func TestGenerateHints_Node(t *testing.T) {
 		// not.to.include must not be part of hints
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"co.elastic.metrics/period": "10s",
 						"not.to.include":            "true",
 					}),
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "foobar",
 					},
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"not.to.include":            "true",
 						"co.elastic.metrics/period": "10s",
 					}),
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "foobar",
 					},
 				},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 						"period": "10s",
 					},
@@ -171,17 +172,17 @@ func TestEmitEvent_Node(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"node": common.MapStr{
+				"kubernetes": mapstr.M{
+					"node": mapstr.M{
 						"name":     "metricbeat",
 						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
 						"hostname": "node1",
 					},
-					"annotations": common.MapStr{},
+					"annotations": mapstr.M{},
 				},
-				"meta": common.MapStr{
-					"kubernetes": common.MapStr{
-						"node": common.MapStr{
+				"meta": mapstr.M{
+					"kubernetes": mapstr.M{
+						"node": mapstr.M{
 							"name":     "metricbeat",
 							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
 							"hostname": "node1",
@@ -222,17 +223,17 @@ func TestEmitEvent_Node(t *testing.T) {
 				"host":     "node1",
 				"id":       uid,
 				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"node": common.MapStr{
+				"kubernetes": mapstr.M{
+					"node": mapstr.M{
 						"name":     "metricbeat",
 						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
 						"hostname": "node1",
 					},
-					"annotations": common.MapStr{},
+					"annotations": mapstr.M{},
 				},
-				"meta": common.MapStr{
-					"kubernetes": common.MapStr{
-						"node": common.MapStr{
+				"meta": mapstr.M{
+					"kubernetes": mapstr.M{
+						"node": mapstr.M{
 							"name":     "metricbeat",
 							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
 							"hostname": "node1",
@@ -283,17 +284,17 @@ func TestEmitEvent_Node(t *testing.T) {
 				"host":     "node1",
 				"id":       uid,
 				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"node": common.MapStr{
+				"kubernetes": mapstr.M{
+					"node": mapstr.M{
 						"name":     "metricbeat",
 						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
 						"hostname": "node1",
 					},
-					"annotations": common.MapStr{},
+					"annotations": mapstr.M{},
 				},
-				"meta": common.MapStr{
-					"kubernetes": common.MapStr{
-						"node": common.MapStr{
+				"meta": mapstr.M{
+					"kubernetes": mapstr.M{
+						"node": mapstr.M{
 							"name":     "metricbeat",
 							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
 							"hostname": "node1",

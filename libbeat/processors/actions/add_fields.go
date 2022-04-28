@@ -26,10 +26,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type addFields struct {
-	fields    common.MapStr
+	fields    mapstr.M
 	shared    bool
 	overwrite bool
 }
@@ -49,8 +50,8 @@ func init() {
 // CreateAddFields constructs an add_fields processor from config.
 func CreateAddFields(c *common.Config) (processors.Processor, error) {
 	config := struct {
-		Fields common.MapStr `config:"fields" validate:"required"`
-		Target *string       `config:"target"`
+		Fields mapstr.M `config:"fields" validate:"required"`
+		Target *string  `config:"target"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -67,7 +68,7 @@ func CreateAddFields(c *common.Config) (processors.Processor, error) {
 // NewAddFields creates a new processor adding the given fields to events.
 // Set `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
-func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.Processor {
+func NewAddFields(fields mapstr.M, shared bool, overwrite bool) processors.Processor {
 	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
 
@@ -102,9 +103,9 @@ func optTarget(opt *string, def string) string {
 	return *opt
 }
 
-func makeFieldsProcessor(target string, fields common.MapStr, shared bool) processors.Processor {
+func makeFieldsProcessor(target string, fields mapstr.M, shared bool) processors.Processor {
 	if target != "" {
-		fields = common.MapStr{
+		fields = mapstr.M{
 			target: fields,
 		}
 	}

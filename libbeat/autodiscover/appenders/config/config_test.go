@@ -24,24 +24,25 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateAppender(t *testing.T) {
 	tests := []struct {
 		name        string
-		eventConfig common.MapStr
+		eventConfig mapstr.M
 		event       bus.Event
-		result      common.MapStr
+		result      mapstr.M
 		config      string
 	}{
 		{
 			name:  "Appender without a condition should apply the config regardless",
 			event: bus.Event{},
-			result: common.MapStr{
+			result: mapstr.M{
 				"test":  "bar",
 				"test1": "foo",
 			},
-			eventConfig: common.MapStr{
+			eventConfig: mapstr.M{
 				"test": "bar",
 			},
 			config: `
@@ -53,10 +54,10 @@ config:
 			event: bus.Event{
 				"field": "notbar",
 			},
-			result: common.MapStr{
+			result: mapstr.M{
 				"test": "bar",
 			},
-			eventConfig: common.MapStr{
+			eventConfig: mapstr.M{
 				"test": "bar",
 			},
 			config: `
@@ -70,11 +71,11 @@ condition.equals:
 			event: bus.Event{
 				"field": "bar",
 			},
-			result: common.MapStr{
+			result: mapstr.M{
 				"test":  "bar",
 				"test2": "foo",
 			},
-			eventConfig: common.MapStr{
+			eventConfig: mapstr.M{
 				"test": "bar",
 			},
 			config: `
@@ -104,7 +105,7 @@ condition.equals:
 			cfgs, _ := test.event["config"].([]*common.Config)
 			assert.Equal(t, len(cfgs), 1)
 
-			out := common.MapStr{}
+			out := mapstr.M{}
 			cfgs[0].Unpack(&out)
 
 			assert.Equal(t, out, test.result)

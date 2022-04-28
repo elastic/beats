@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCommonPaths(t *testing.T) {
@@ -86,7 +87,7 @@ func TestCommonPaths(t *testing.T) {
 		})
 
 		// Configure input to
-		input := common.MapStr{
+		input := mapstr.M{
 			test.Field: test.Value,
 		}
 
@@ -116,16 +117,16 @@ func TestCommonPaths(t *testing.T) {
 		})
 
 		event := &beat.Event{
-			Meta: common.MapStr{},
-			Fields: common.MapStr{
+			Meta: mapstr.M{},
+			Fields: mapstr.M{
 				"field": "/var/lib/foo/bar",
 			},
 		}
 
-		expectedFields := common.MapStr{
+		expectedFields := mapstr.M{
 			"field": "/var/lib/foo/bar",
 		}
-		expectedMeta := common.MapStr{
+		expectedMeta := mapstr.M{
 			"field": "bar",
 		}
 
@@ -141,7 +142,7 @@ func TestCommonPaths(t *testing.T) {
 	})
 }
 
-func runExtractField(t *testing.T, config *common.Config, input common.MapStr) (*beat.Event, error) {
+func runExtractField(t *testing.T, config *common.Config, input mapstr.M) (*beat.Event, error) {
 	logp.TestingSetup()
 
 	p, err := NewExtractField(config)

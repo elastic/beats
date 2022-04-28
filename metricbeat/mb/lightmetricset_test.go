@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestLightMetricSetRegistration(t *testing.T) {
@@ -75,8 +76,8 @@ func TestLightMetricSetRegistration(t *testing.T) {
 			}
 			ms.Input.Module = c.module
 			ms.Input.MetricSet = c.metricSet
-			ms.Input.Defaults = common.MapStr{
-				"query": common.MapStr{
+			ms.Input.Defaults = mapstr.M{
+				"query": mapstr.M{
 					"extra": "something",
 				},
 			}

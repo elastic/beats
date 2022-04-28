@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -42,7 +43,7 @@ type config struct {
 
 type configAppender struct {
 	condition conditions.Condition
-	config    common.MapStr
+	config    mapstr.M
 }
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
@@ -65,7 +66,7 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	}
 
 	// Unpack the config
-	cf := common.MapStr{}
+	cf := mapstr.M{}
 	err = config.Config.Unpack(&cf)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to unpack config due to error")
@@ -88,10 +89,10 @@ func (c *configAppender) Append(event bus.Event) {
 	if !ok {
 		return
 	}
-	if c.condition == nil || c.condition.Check(common.MapStr(event)) == true {
+	if c.condition == nil || c.condition.Check(mapstr.M(event)) == true {
 		// Merge the template with all the configs
 		for _, cfg := range cfgs {
-			cf := common.MapStr{}
+			cf := mapstr.M{}
 			err := cfg.Unpack(&cf)
 			if err != nil {
 				logp.Debug("config", "unable to unpack config due to error: %v", err)

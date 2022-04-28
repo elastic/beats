@@ -21,12 +21,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -143,7 +143,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, event := range events {
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		containerFields := common.MapStr{}
+		containerFields := mapstr.M{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
@@ -176,11 +176,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		if len(containerFields) > 0 {
 			if e.RootFields != nil {
-				e.RootFields.DeepUpdate(common.MapStr{
+				e.RootFields.DeepUpdate(mapstr.M{
 					"container": containerFields,
 				})
 			} else {
-				e.RootFields = common.MapStr{
+				e.RootFields = mapstr.M{
 					"container": containerFields,
 				}
 			}

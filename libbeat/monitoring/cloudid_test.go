@@ -25,39 +25,40 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestOverrideWithCloudSettings(t *testing.T) {
 	tests := map[string]struct {
-		in               common.MapStr
-		out              common.MapStr
+		in               mapstr.M
+		out              mapstr.M
 		errAssertionFunc assert.ErrorAssertionFunc
 	}{
 		"cloud_id_no_es_hosts": {
-			common.MapStr{
+			mapstr.M{
 				"cloud.id": "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
 			},
-			common.MapStr{
+			mapstr.M{
 				"elasticsearch.hosts": []string{"https://escluster.localhost:443"},
 			},
 			assert.NoError,
 		},
 		"cloud_id_with_es_hosts": {
-			common.MapStr{
+			mapstr.M{
 				"cloud.id":            "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
 				"elasticsearch.hosts": []string{"foo", "bar"},
 			},
-			common.MapStr{
+			mapstr.M{
 				"elasticsearch.hosts": []string{"https://escluster.localhost:443"},
 			},
 			assert.NoError,
 		},
 		"cloud_auth_no_es_auth": {
-			common.MapStr{
+			mapstr.M{
 				"cloud.id":   "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
 				"cloud.auth": "elastic:changeme",
 			},
-			common.MapStr{
+			mapstr.M{
 				"elasticsearch.hosts":    []string{"https://escluster.localhost:443"},
 				"elasticsearch.username": "elastic",
 				"elasticsearch.password": "changeme",
@@ -65,13 +66,13 @@ func TestOverrideWithCloudSettings(t *testing.T) {
 			assert.NoError,
 		},
 		"cloud_auth_with_es_auth": {
-			common.MapStr{
+			mapstr.M{
 				"cloud.id":               "test:bG9jYWxob3N0JGVzY2x1c3RlciRiMGE1N2RhMTkwNzg0MzZmODcwZmQzNTgwZTRhNjE4ZQ==",
 				"cloud.auth":             "elastic:changeme",
 				"elasticsearch.username": "foo",
 				"elasticsearch.password": "bar",
 			},
-			common.MapStr{
+			mapstr.M{
 				"elasticsearch.hosts":    []string{"https://escluster.localhost:443"},
 				"elasticsearch.username": "elastic",
 				"elasticsearch.password": "changeme",
@@ -79,10 +80,10 @@ func TestOverrideWithCloudSettings(t *testing.T) {
 			assert.NoError,
 		},
 		"cloud_auth_no_id": {
-			common.MapStr{
+			mapstr.M{
 				"cloud.auth": "elastic:changeme",
 			},
-			common.MapStr{
+			mapstr.M{
 				"cloud.auth": "elastic:changeme",
 			},
 			func(t assert.TestingT, err error, _ ...interface{}) bool {

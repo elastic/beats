@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -99,7 +100,7 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		}
 
 		switch vv := v.(type) {
-		case map[string]interface{}, []interface{}, common.MapStr:
+		case map[string]interface{}, []interface{}, mapstr.M:
 			return makeErrNonScalarField(k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.

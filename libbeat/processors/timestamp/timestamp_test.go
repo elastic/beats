@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var expected = time.Date(2015, 3, 7, 11, 6, 39, 0, time.UTC)
@@ -45,7 +46,7 @@ func TestParsePatterns(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evt := &beat.Event{Fields: common.MapStr{}}
+	evt := &beat.Event{Fields: mapstr.M{}}
 
 	for name, format := range map[string]string{
 		"ANSIC":       time.ANSIC,
@@ -125,7 +126,7 @@ func TestParseNoYear(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evt := &beat.Event{Fields: common.MapStr{
+	evt := &beat.Event{Fields: mapstr.M{
 		"ts": "Mar  7 11:06:39.002",
 	}}
 
@@ -153,7 +154,7 @@ func TestIgnoreMissing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evt := &beat.Event{Fields: common.MapStr{}}
+	evt := &beat.Event{Fields: mapstr.M{}}
 
 	_, err = p.Run(evt)
 	if assert.Error(t, err) {
@@ -175,7 +176,7 @@ func TestIgnoreFailure(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evt := &beat.Event{Fields: common.MapStr{"ts": expected.Format(time.Kitchen)}}
+	evt := &beat.Event{Fields: mapstr.M{"ts": expected.Format(time.Kitchen)}}
 
 	_, err = p.Run(evt)
 	if assert.Error(t, err) {
@@ -291,7 +292,7 @@ func TestTimezone(t *testing.T) {
 			t.Logf("Timezone: %s", c.Timezone)
 
 			event := &beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"ts": originalTimestamp,
 				},
 			}
@@ -317,7 +318,7 @@ func TestMetadataTarget(t *testing.T) {
 	}
 
 	evt := &beat.Event{
-		Meta: common.MapStr{
+		Meta: mapstr.M{
 			"time": datetime,
 		},
 	}
@@ -328,7 +329,7 @@ func TestMetadataTarget(t *testing.T) {
 	expTs, err := time.Parse(time.RFC3339, datetime)
 	assert.NoError(t, err)
 
-	expMeta := common.MapStr{
+	expMeta := mapstr.M{
 		"time": datetime,
 		"ts":   expTs.UTC(),
 	}

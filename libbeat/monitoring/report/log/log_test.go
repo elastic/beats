@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -112,7 +113,7 @@ func TestReporterLog(t *testing.T) {
 
 func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
 	t.Helper()
-	v, err := common.MapStr(m).GetValue(key)
+	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -252,9 +253,9 @@ func (jf *jobFactory) execDialer(
 	}
 
 	end := time.Now()
-	eventext.MergeEventFields(event, common.MapStr{
-		"tcp": common.MapStr{
-			"rtt": common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{
+		"tcp": mapstr.M{
+			"rtt": mapstr.M{
 				"validate": look.RTT(end.Sub(validateStart)),
 			},
 		},

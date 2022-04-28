@@ -26,11 +26,11 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func optionsToMap(options []dhcpv4.Option) (common.MapStr, error) {
-	opts := common.MapStr{}
+func optionsToMap(options []dhcpv4.Option) (mapstr.M, error) {
+	opts := mapstr.M{}
 
 	for _, opt := range options {
 		if opt.Code() == dhcpv4.OptionEnd {
@@ -82,9 +82,9 @@ func optionsToMap(options []dhcpv4.Option) (common.MapStr, error) {
 			opts.Put("dns_servers", dnsServers)
 
 		case *dhcpv4.OptVIVC:
-			var subOptions []common.MapStr
+			var subOptions []mapstr.M
 			for _, vendorOpt := range v.Identifiers {
-				subOptions = append(subOptions, common.MapStr{
+				subOptions = append(subOptions, mapstr.M{
 					"id":   vendorOpt.EntID,
 					"data": hex.EncodeToString(vendorOpt.Data),
 				})

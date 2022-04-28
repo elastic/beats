@@ -21,12 +21,11 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Schema describes how a map[string]interface{} object can be parsed and converted into
-// an event. The conversions can be described using an (optionally nested) common.MapStr
+// an event. The conversions can be described using an (optionally nested) mapstr.M
 // that contains Conv objects.
 type Schema map[string]Mapper
 
@@ -34,7 +33,7 @@ type Schema map[string]Mapper
 type Mapper interface {
 	// Map applies the Mapper conversion on the data and adds the result
 	// to the event on the key.
-	Map(key string, event common.MapStr, data map[string]interface{}) multierror.Errors
+	Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors
 
 	HasKey(key string) bool
 }
@@ -53,7 +52,7 @@ type Converter func(key string, data map[string]interface{}) (interface{}, error
 
 // Map applies the conversion on the data and adds the result
 // to the event on the key.
-func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{}) multierror.Errors {
+func (conv Conv) Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors {
 	value, err := conv.Func(conv.Key, data)
 	if err != nil {
 		if err, keyNotFound := err.(*KeyNotFoundError); keyNotFound {
@@ -78,8 +77,8 @@ func (conv Conv) HasKey(key string) bool {
 type Object map[string]Mapper
 
 // Map applies the schema for an object
-func (o Object) Map(key string, event common.MapStr, data map[string]interface{}) multierror.Errors {
-	subEvent := common.MapStr{}
+func (o Object) Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors {
+	subEvent := mapstr.M{}
 	errs := applySchemaToEvent(subEvent, data, o)
 	event[key] = subEvent
 	return errs
@@ -91,7 +90,7 @@ func (o Object) HasKey(key string) bool {
 
 // ApplyTo adds the fields extracted from data, converted using the schema, to the
 // event map.
-func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}, opts ...ApplyOption) (common.MapStr, multierror.Errors) {
+func (s Schema) ApplyTo(event mapstr.M, data map[string]interface{}, opts ...ApplyOption) (mapstr.M, multierror.Errors) {
 	if len(opts) == 0 {
 		opts = DefaultApplyOptions
 	}
@@ -103,8 +102,8 @@ func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}, opts .
 }
 
 // Apply converts the fields extracted from data, using the schema, into a new map and reports back the errors.
-func (s Schema) Apply(data map[string]interface{}, opts ...ApplyOption) (common.MapStr, error) {
-	event, errors := s.ApplyTo(common.MapStr{}, data, opts...)
+func (s Schema) Apply(data map[string]interface{}, opts ...ApplyOption) (mapstr.M, error) {
+	event, errors := s.ApplyTo(mapstr.M{}, data, opts...)
 	return event, errors.Err()
 }
 
@@ -122,7 +121,7 @@ func hasKey(key string, mappers map[string]Mapper) bool {
 	return false
 }
 
-func applySchemaToEvent(event common.MapStr, data map[string]interface{}, conversions map[string]Mapper) multierror.Errors {
+func applySchemaToEvent(event mapstr.M, data map[string]interface{}, conversions map[string]Mapper) multierror.Errors {
 	var errs multierror.Errors
 	for key, mapper := range conversions {
 		errors := mapper.Map(key, event, data)

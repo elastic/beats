@@ -24,10 +24,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -86,9 +86,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func fetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
+func fetchLinuxPSIStats(m *MetricSet) ([]mapstr.M, error) {
 	resources := []string{"cpu", "memory", "io"}
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 
 	procfs, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
 	if err != nil {
@@ -101,20 +101,20 @@ func fetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
 			return nil, errors.Wrap(err, "check that /proc/pressure is available, and/or enabled")
 		}
 
-		event := common.MapStr{
-			resource: common.MapStr{
-				"some": common.MapStr{
-					"10": common.MapStr{
+		event := mapstr.M{
+			resource: mapstr.M{
+				"some": mapstr.M{
+					"10": mapstr.M{
 						"pct": psiMetric.Some.Avg10,
 					},
-					"60": common.MapStr{
+					"60": mapstr.M{
 						"pct": psiMetric.Some.Avg60,
 					},
-					"300": common.MapStr{
+					"300": mapstr.M{
 						"pct": psiMetric.Some.Avg300,
 					},
-					"total": common.MapStr{
-						"time": common.MapStr{
+					"total": mapstr.M{
+						"time": mapstr.M{
 							"us": psiMetric.Some.Total,
 						},
 					},

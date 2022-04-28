@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -43,7 +44,7 @@ const (
 
 	// ModuleDataKey is the key used in events created by MetricSets to add data
 	// to an event that is common to the module. The data must be a
-	// common.MapStr and when the final event is built the object will be stored
+	// mapstr.M and when the final event is built the object will be stored
 	// in the event under a key that is the module name.
 	ModuleDataKey string = "_module"
 
@@ -159,9 +160,9 @@ type Closer interface {
 //
 // Deprecated: Use ReporterV2.
 type Reporter interface {
-	Event(event common.MapStr) bool               // Event reports a single successful event.
-	ErrorWith(err error, meta common.MapStr) bool // ErrorWith reports a single error event with the additional metadata.
-	Error(err error) bool                         // Error reports a single error event.
+	Event(event mapstr.M) bool               // Event reports a single successful event.
+	ErrorWith(err error, meta mapstr.M) bool // ErrorWith reports a single error event with the additional metadata.
+	Error(err error) bool                    // Error reports a single error event.
 }
 
 // ReportingMetricSet is a MetricSet that reports events or errors through the

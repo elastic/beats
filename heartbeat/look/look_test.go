@@ -27,6 +27,7 @@ import (
 
 	reason2 "github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // helper
@@ -48,7 +49,7 @@ func TestReason(t *testing.T) {
 	reason := reason2.ValidateFailed(fmt.Errorf("an error"))
 	res := Reason(reason)
 	assert.Equal(t,
-		common.MapStr{
+		mapstr.M{
 			"type":    reason.Type(),
 			"message": reason.Error(),
 		}, res)
@@ -57,7 +58,7 @@ func TestReason(t *testing.T) {
 func TestReasonGenericError(t *testing.T) {
 	msg := "An error"
 	res := Reason(fmt.Errorf(msg))
-	assert.Equal(t, common.MapStr{
+	assert.Equal(t, mapstr.M{
 		"type":    "io",
 		"message": msg,
 	}, res)

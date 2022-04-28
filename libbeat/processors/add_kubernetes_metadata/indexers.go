@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -50,7 +51,7 @@ type Indexer interface {
 // MetadataIndex holds a pair of index -> metadata info
 type MetadataIndex struct {
 	Index string
-	Data  common.MapStr
+	Data  mapstr.M
 }
 
 type Indexers struct {

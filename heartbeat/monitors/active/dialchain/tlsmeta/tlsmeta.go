@@ -29,14 +29,14 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // UnknownTLSHandshakeDuration to be used in AddTLSMetadata when the duration of the TLS handshake can't be determined.
 const UnknownTLSHandshakeDuration = time.Duration(-1)
 
-func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, duration time.Duration) {
+func AddTLSMetadata(fields mapstr.M, connState cryptoTLS.ConnectionState, duration time.Duration) {
 	fields.Put("tls.established", true)
 	if duration != UnknownTLSHandshakeDuration {
 		fields.Put("tls.rtt.handshake", look.RTT(duration))
@@ -57,12 +57,12 @@ func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, d
 	AddCertMetadata(fields, connState.PeerCertificates)
 }
 
-func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
+func AddCertMetadata(fields mapstr.M, certs []*x509.Certificate) {
 	hostCert := certs[0]
 
-	x509Fields := common.MapStr{}
-	serverFields := common.MapStr{"x509": x509Fields}
-	tlsFields := common.MapStr{"server": serverFields}
+	x509Fields := mapstr.M{}
+	serverFields := mapstr.M{"x509": x509Fields}
+	tlsFields := mapstr.M{"server": serverFields}
 
 	serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
 	serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
@@ -98,7 +98,7 @@ func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 		x509Fields.Put("not_after", *chainNotAfter)
 	}
 
-	fields.DeepUpdate(common.MapStr{"tls": tlsFields})
+	fields.DeepUpdate(mapstr.M{"tls": tlsFields})
 }
 
 func calculateCertTimestamps(certs []*x509.Certificate) (chainNotBefore time.Time, chainNotAfter *time.Time) {

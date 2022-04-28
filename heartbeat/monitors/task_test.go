@@ -21,6 +21,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
@@ -31,17 +32,16 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func Test_runPublishJob(t *testing.T) {
-	defineJob := func(fields common.MapStr) func(event *beat.Event) (j []jobs.Job, e error) {
+	defineJob := func(fields mapstr.M) func(event *beat.Event) (j []jobs.Job, e error) {
 		return func(event *beat.Event) (j []jobs.Job, e error) {
 			eventext.MergeEventFields(event, fields)
 			return nil, nil
 		}
 	}
-	simpleJob := defineJob(common.MapStr{"foo": "bar"})
+	simpleJob := defineJob(mapstr.M{"foo": "bar"})
 
 	testCases := []struct {
 		name       string
@@ -71,8 +71,8 @@ func Test_runPublishJob(t *testing.T) {
 			func(event *beat.Event) (j []jobs.Job, e error) {
 				simpleJob(event)
 				return []jobs.Job{
-					defineJob(common.MapStr{"baz": "bot"}),
-					defineJob(common.MapStr{"blah": "blargh"}),
+					defineJob(mapstr.M{"baz": "bot"}),
+					defineJob(mapstr.M{"blah": "blargh"}),
 				}, nil
 			},
 			[]validator.Validator{

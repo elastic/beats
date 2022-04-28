@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -302,12 +302,12 @@ func TestEventMapping(t *testing.T) {
 	for _, test := range []struct {
 		metricName  string
 		metricValue interface{}
-		expected    common.MapStr
+		expected    mapstr.M
 	}{
 		{
 			metricName:  "a_job_name_start",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"job_name": "a_job_name",
 				"started":  countValue,
 			},
@@ -315,7 +315,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "a_job_name_end",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"job_name": "a_job_name",
 				"ended":    countValue,
 			},
@@ -323,7 +323,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "a_job_name_heartbeat_failure",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"job_name":          "a_job_name",
 				"heartbeat_failure": countValue,
 			},
@@ -331,7 +331,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "operator_failures_an_operator_name",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"operator_name": "an_operator_name",
 				"failures":      countValue,
 			},
@@ -339,7 +339,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "operator_successes_an_operator_name",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"operator_name": "an_operator_name",
 				"successes":     countValue,
 			},
@@ -347,112 +347,112 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "ti_failures",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_failures": countValue,
 			},
 		},
 		{
 			metricName:  "ti_successes",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_successes": countValue,
 			},
 		},
 		{
 			metricName:  "previously_succeeded",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"previously_succeeded": countValue,
 			},
 		},
 		{
 			metricName:  "zombies_killed",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"zombies_killed": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler_heartbeat",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"scheduler_heartbeat": countValue,
 			},
 		},
 		{
 			metricName:  "dag_processing.processes",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_processes": countValue,
 			},
 		},
 		{
 			metricName:  "dag_processing.manager_stalls",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_file_processor_manager_stalls": countValue,
 			},
 		},
 		{
 			metricName:  "dag_file_refresh_error",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_file_refresh_error": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.killed_externally",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_killed_externally": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.running",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_running": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.starving",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_starving": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler.orphaned_tasks.cleared",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_orphaned_cleared": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler.orphaned_tasks.adopted",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_orphaned_adopted": countValue,
 			},
 		},
 		{
 			metricName:  "scheduler.critical_section_busy",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"scheduler_critical_section_busy": countValue,
 			},
 		},
 		{
 			metricName:  "sla_email_notification_failure",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"sla_email_notification_failure": countValue,
 			},
 		},
 		{
 			metricName:  "ti.start.a_dagid.a_taskid",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":       "a_dagid",
 				"task_id":      "a_taskid",
 				"task_started": countValue,
@@ -461,7 +461,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "ti.finish.a_dagid.a_taskid.a_status",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":        "a_dagid",
 				"task_id":       "a_taskid",
 				"status":        "a_status",
@@ -471,21 +471,21 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dag.callback_exceptions",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_callback_exceptions": countValue,
 			},
 		},
 		{
 			metricName:  "celery.task_timeout_error",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_celery_timeout_error": countValue,
 			},
 		},
 		{
 			metricName:  "task_removed_from_dag.a_dagid",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":       "a_dagid",
 				"task_removed": countValue,
 			},
@@ -493,7 +493,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "task_restored_to_dag.a_dagid",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":        "a_dagid",
 				"task_restored": countValue,
 			},
@@ -501,7 +501,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "task_instance_created-an_operator_name",
 			metricValue: countValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"operator_name": "an_operator_name",
 				"task_created":  countValue,
 			},
@@ -509,28 +509,28 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dagbag_size",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_bag_size": gaugeValue,
 			},
 		},
 		{
 			metricName:  "dag_processing.import_errors",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_import_errors": gaugeValue,
 			},
 		},
 		{
 			metricName:  "dag_processing.total_parse_time",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_total_parse_time": gaugeValue,
 			},
 		},
 		{
 			metricName:  "dag_processing.last_runtime.a_dag_file",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_file":         "a_dag_file",
 				"dag_last_runtime": gaugeValue,
 			},
@@ -538,7 +538,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dag_processing.last_run.seconds_ago.a_dag_file",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_file":                 "a_dag_file",
 				"dag_last_run_seconds_ago": gaugeValue,
 			},
@@ -546,63 +546,63 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dag_processing.processor_timeouts",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"processor_timeouts": gaugeValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.without_dagrun",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_without_dagrun": gaugeValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.running",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_running": gaugeValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.starving",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_starving": gaugeValue,
 			},
 		},
 		{
 			metricName:  "scheduler.tasks.executable",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"task_executable": gaugeValue,
 			},
 		},
 		{
 			metricName:  "executor.open_slots",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"executor_open_slots": gaugeValue,
 			},
 		},
 		{
 			metricName:  "executor.queued_tasks",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"executor_queued_tasks": gaugeValue,
 			},
 		},
 		{
 			metricName:  "executor.running_tasks",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"executor_running_tasks": gaugeValue,
 			},
 		},
 		{
 			metricName:  "pool.open_slots.a_pool_name",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"pool_name":       "a_pool_name",
 				"pool_open_slots": gaugeValue,
 			},
@@ -610,7 +610,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "pool.queued_slots.a_pool_name",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"pool_name":         "a_pool_name",
 				"pool_queued_slots": gaugeValue,
 			},
@@ -618,7 +618,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "pool.running_slots.a_pool_name",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"pool_name":          "a_pool_name",
 				"pool_running_slots": gaugeValue,
 			},
@@ -626,7 +626,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "pool.starving_tasks.a_pool_name",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"pool_name":           "a_pool_name",
 				"pool_starving_tasks": gaugeValue,
 			},
@@ -634,42 +634,42 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "smart_sensor_operator.poked_tasks",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"smart_sensor_operator_poked_tasks": gaugeValue,
 			},
 		},
 		{
 			metricName:  "smart_sensor_operator.poked_success",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"smart_sensor_operator_poked_success": gaugeValue,
 			},
 		},
 		{
 			metricName:  "smart_sensor_operator.poked_exception",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"smart_sensor_operator_poked_exception": gaugeValue,
 			},
 		},
 		{
 			metricName:  "smart_sensor_operator.exception_failures",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"smart_sensor_operator_exception_failures": gaugeValue,
 			},
 		},
 		{
 			metricName:  "smart_sensor_operator.infra_failures",
 			metricValue: gaugeValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"smart_sensor_operator_infra_failures": gaugeValue,
 			},
 		},
 		{
 			metricName:  "dagrun.dependency-check.a_dag_id",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":               "a_dag_id",
 				"dag_dependency_check": timerValue,
 			},
@@ -677,7 +677,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dag.a_dag_id.a_task_id.duration",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":        "a_dag_id",
 				"task_id":       "a_task_id",
 				"task_duration": timerValue,
@@ -686,7 +686,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dag_processing.last_duration.a_dag_file",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_file":          "a_dag_file",
 				"dag_last_duration": timerValue,
 			},
@@ -694,7 +694,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dagrun.duration.success.a_dag_id",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":               "a_dag_id",
 				"success_dag_duration": timerValue,
 			},
@@ -702,7 +702,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dagrun.duration.failed.a_dag_id",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":              "a_dag_id",
 				"failed_dag_duration": timerValue,
 			},
@@ -710,7 +710,7 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "dagrun.schedule_delay.a_dag_id",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":             "a_dag_id",
 				"dag_schedule_delay": timerValue,
 			},
@@ -718,14 +718,14 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "scheduler.critical_section_duration",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"scheduler_critical_section_duration": timerValue,
 			},
 		},
 		{
 			metricName:  "dagrun.a_dag_id.first_task_scheduling_delay",
 			metricValue: timerValue,
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"dag_id":                          "a_dag_id",
 				"dag_first_task_scheduling_delay": timerValue,
 			},
@@ -733,11 +733,11 @@ func TestEventMapping(t *testing.T) {
 		{
 			metricName:  "not_mapped_metric",
 			metricValue: timerValue,
-			expected:    common.MapStr{},
+			expected:    mapstr.M{},
 		},
 	} {
 		t.Run(test.metricName, func(t *testing.T) {
-			metricSetFields := common.MapStr{}
+			metricSetFields := mapstr.M{}
 			builtMappings, _ := buildMappings(mappings)
 			eventMapping(test.metricName, test.metricValue, metricSetFields, builtMappings)
 
@@ -1017,11 +1017,11 @@ func TestParseMetrics(t *testing.T) {
 }
 
 type testUDPEvent struct {
-	event common.MapStr
+	event mapstr.M
 	meta  server.Meta
 }
 
-func (u *testUDPEvent) GetEvent() common.MapStr {
+func (u *testUDPEvent) GetEvent() mapstr.M {
 	return u.event
 }
 
@@ -1032,7 +1032,7 @@ func (u *testUDPEvent) GetMeta() server.Meta {
 func process(packets []string, ms *MetricSet) error {
 	for _, d := range packets {
 		udpEvent := &testUDPEvent{
-			event: common.MapStr{
+			event: mapstr.M{
 				server.EventDataKey: []byte(d),
 			},
 			meta: server.Meta{
@@ -1062,20 +1062,20 @@ func TestTagsGrouping(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 2)
 
-	actualTags := []common.MapStr{}
+	actualTags := []mapstr.M{}
 	for _, e := range events {
 		actualTags = append(actualTags, e.RootFields)
 	}
 
-	expectedTags := []common.MapStr{
-		common.MapStr{
-			"labels": common.MapStr{
+	expectedTags := []mapstr.M{
+		mapstr.M{
+			"labels": mapstr.M{
 				"k1": "v1",
 				"k2": "v2",
 			},
 		},
-		common.MapStr{
-			"labels": common.MapStr{
+		mapstr.M{
+			"labels": mapstr.M{
 				"k1": "v2",
 				"k2": "v3",
 			},
@@ -1113,7 +1113,7 @@ func TestTagsCleanup(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"value": float64(3)}})
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{"metric1": map[string]interface{}{"value": float64(3)}})
 }
 
 func TestSetReset(t *testing.T) {
@@ -1170,7 +1170,7 @@ func TestGaugeDeltas(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
 		"metric01": map[string]interface{}{"value": -1.0},
 	})
 
@@ -1178,7 +1178,7 @@ func TestGaugeDeltas(t *testing.T) {
 	events = ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
 		"metric01": map[string]interface{}{"value": -1.0},
 	})
 }
@@ -1194,7 +1194,7 @@ func TestCounter(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
 		"metric01": map[string]interface{}{"count": int64(3)},
 	})
 
@@ -1202,7 +1202,7 @@ func TestCounter(t *testing.T) {
 	events = ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
 		"metric01": map[string]interface{}{"count": int64(0)},
 	})
 }
@@ -1219,7 +1219,7 @@ func TestCounterSampled(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
 		"metric01": map[string]interface{}{"count": int64(20)},
 	})
 }
@@ -1279,7 +1279,7 @@ func TestChangeType(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, common.MapStr{
+	assert.Equal(t, mapstr.M{
 		"metric01": map[string]interface{}{"count": int64(2)},
 	}, events[0].MetricSetFields)
 }
@@ -1301,7 +1301,7 @@ func BenchmarkIngest(b *testing.B) {
 	events := make([]*testUDPEvent, len(tests))
 	for i, d := range tests {
 		events[i] = &testUDPEvent{
-			event: common.MapStr{
+			event: mapstr.M{
 				server.EventDataKey: []byte(d),
 			},
 			meta: server.Meta{

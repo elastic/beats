@@ -20,7 +20,7 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestAddTags(t *testing.T) {
@@ -29,39 +29,39 @@ func TestAddTags(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"create tags": {
-			eventFields: common.MapStr{},
-			wantFields:  common.MapStr{"tags": []string{"t1", "t2"}},
+			eventFields: mapstr.M{},
+			wantFields:  mapstr.M{"tags": []string{"t1", "t2"}},
 			cfg:         single(`{add_tags: {tags: [t1, t2]}}`),
 		},
 		"append to tags": {
-			eventFields: common.MapStr{"tags": []string{"t1"}},
-			wantFields:  common.MapStr{"tags": []string{"t1", "t2", "t3"}},
+			eventFields: mapstr.M{"tags": []string{"t1"}},
+			wantFields:  mapstr.M{"tags": []string{"t1", "t2", "t3"}},
 			cfg:         single(`{add_tags: {tags: [t2, t3]}}`),
 		},
 		"combine from 2 processors": {
-			eventFields: common.MapStr{},
-			wantFields:  common.MapStr{"tags": []string{"t1", "t2", "t3", "t4"}},
+			eventFields: mapstr.M{},
+			wantFields:  mapstr.M{"tags": []string{"t1", "t2", "t3", "t4"}},
 			cfg: multi(
 				`{add_tags: {tags: [t1, t2]}}`,
 				`{add_tags: {tags: [t3, t4]}}`,
 			),
 		},
 		"with custom target": {
-			eventFields: common.MapStr{},
-			wantFields:  common.MapStr{"custom": []string{"t1", "t2"}},
+			eventFields: mapstr.M{},
+			wantFields:  mapstr.M{"custom": []string{"t1", "t2"}},
 			cfg:         single(`{add_tags: {tags: [t1, t2], target: custom}}`),
 		},
 		"different targets": {
-			eventFields: common.MapStr{},
-			wantFields:  common.MapStr{"tags1": []string{"t1"}, "tags2": []string{"t2"}},
+			eventFields: mapstr.M{},
+			wantFields:  mapstr.M{"tags1": []string{"t1"}, "tags2": []string{"t2"}},
 			cfg: multi(
 				`{add_tags: {target: tags1, tags: [t1]}}`,
 				`{add_tags: {target: tags2, tags: [t2]}}`,
 			),
 		},
 		"single tag config without array notation": {
-			eventFields: common.MapStr{},
-			wantFields:  common.MapStr{"tags": []string{"t1"}},
+			eventFields: mapstr.M{},
+			wantFields:  mapstr.M{"tags": []string{"t1"}},
 			cfg:         single(`{add_tags: {tags: t1}}`),
 		},
 	})

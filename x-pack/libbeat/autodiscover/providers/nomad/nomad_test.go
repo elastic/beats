@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -34,21 +35,21 @@ func TestGenerateHints(t *testing.T) {
 			result: bus.Event{},
 		},
 		// Scenarios being tested:
-		// - logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// - logs/multiline.pattern must be a nested mapstr.M under hints.logs
 		// - metrics/module must be found in hints.metrics
 		// - not.to.include must not be part of hints
 		{
 			event: bus.Event{
-				"nomad": common.MapStr{
-					"allocation": common.MapStr{
+				"nomad": mapstr.M{
+					"allocation": mapstr.M{
 						"id": "cf7db85d-c93c-873a-cb37-6d2ea071b0eb",
 					},
 					"datacenter": []string{"europe-west4"},
 				},
-				"meta": common.MapStr{
-					"nomad": common.MapStr{
-						"task": getNestedAnnotations(common.MapStr{
-							"allocation": common.MapStr{
+				"meta": mapstr.M{
+					"nomad": mapstr.M{
+						"task": getNestedAnnotations(mapstr.M{
+							"allocation": mapstr.M{
 								"id": "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
 							},
 							"co.elastic.logs/multiline.pattern": "^test",
@@ -60,21 +61,21 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			result: bus.Event{
-				"nomad": common.MapStr{
-					"task": getNestedAnnotations(common.MapStr{
-						"allocation": common.MapStr{
+				"nomad": mapstr.M{
+					"task": getNestedAnnotations(mapstr.M{
+						"allocation": mapstr.M{
 							"id": "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
 						},
 						"not.to.include": "true",
 					}),
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"multiline": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"multiline": mapstr.M{
 							"pattern": "^test",
 						},
 					},
-					"metrics": common.MapStr{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 						"period": "10s",
 					},
@@ -174,33 +175,33 @@ func TestEmitEvent(t *testing.T) {
 				"config":   []*common.Config{},
 				"start":    true,
 				"host":     host,
-				"nomad": common.MapStr{
-					"allocation": common.MapStr{
+				"nomad": mapstr.M{
+					"allocation": mapstr.M{
 						"id":     UUID.String(),
 						"name":   "job.task",
 						"status": "running",
 					},
 					"datacenter": []string{"europe-west4"},
-					"job": common.MapStr{
+					"job": mapstr.M{
 						"name": "my-job",
 						"type": "service",
 					},
 					"namespace": "default",
 					"region":    "global",
 				},
-				"meta": common.MapStr{
-					"nomad": common.MapStr{
+				"meta": mapstr.M{
+					"nomad": mapstr.M{
 						"datacenter": []string{"europe-west4"},
-						"job": common.MapStr{
+						"job": mapstr.M{
 							"name": "my-job",
 							"type": "service",
 						},
-						"task": common.MapStr{
+						"task": mapstr.M{
 							"group-key": "group.value",
 							"job-key":   "job.value",
 							"key1":      "task-value",
 							"name":      "task1",
-							"service": common.MapStr{
+							"service": mapstr.M{
 								"name": []string{"web", "nginx"},
 								"tags": []string{"tag-a", "tag-b", "tag-c", "tag-d"},
 							},
@@ -208,7 +209,7 @@ func TestEmitEvent(t *testing.T) {
 						},
 						"namespace": "default",
 						"region":    "global",
-						"allocation": common.MapStr{
+						"allocation": mapstr.M{
 							"id":     UUID.String(),
 							"name":   "job.task",
 							"status": nomad.AllocClientStatusRunning,
@@ -339,8 +340,8 @@ func TestEmitEvent(t *testing.T) {
 	assert.Equal(t, httpmock.GetCallCountInfo()["GET http://127.0.0.1/v1/node/5456bd7a"], 1)
 }
 
-func getNestedAnnotations(in common.MapStr) common.MapStr {
-	out := common.MapStr{}
+func getNestedAnnotations(in mapstr.M) mapstr.M {
+	out := mapstr.M{}
 
 	for k, v := range in {
 		out.Put(k, v)

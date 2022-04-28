@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -47,7 +48,7 @@ func init() {
 type addCloudMetadata struct {
 	initOnce sync.Once
 	initData *initData
-	metadata common.MapStr
+	metadata mapstr.M
 	logger   *logp.Logger
 }
 
@@ -107,7 +108,7 @@ func (p *addCloudMetadata) init() {
 	})
 }
 
-func (p *addCloudMetadata) getMeta() common.MapStr {
+func (p *addCloudMetadata) getMeta() mapstr.M {
 	p.init()
 	return p.metadata.Clone()
 }
@@ -129,7 +130,7 @@ func (p *addCloudMetadata) String() string {
 	return "add_cloud_metadata=" + p.getMeta().String()
 }
 
-func (p *addCloudMetadata) addMeta(event *beat.Event, meta common.MapStr) error {
+func (p *addCloudMetadata) addMeta(event *beat.Event, meta mapstr.M) error {
 	for key, metaVal := range meta {
 		// If key exists in event already and overwrite flag is set to false, this processor will not overwrite the
 		// meta fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,

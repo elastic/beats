@@ -28,8 +28,8 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestLogRun(t *testing.T) {
@@ -42,7 +42,7 @@ func TestLogRun(t *testing.T) {
 	durationMs := time.Duration(durationUs * int64(time.Microsecond)).Milliseconds()
 	steps := 1337
 
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"monitor.id":          "b0",
 		"monitor.duration.us": durationUs,
 		"monitor.type":        "browser",

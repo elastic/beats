@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const stdinName = "stdin"
@@ -89,7 +90,7 @@ func (s *StdinFunction) Run(ctx context.Context, client pipeline.ISyncClient, _ 
 func (s *StdinFunction) newEvent(line string) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": line,
 		},
 	}

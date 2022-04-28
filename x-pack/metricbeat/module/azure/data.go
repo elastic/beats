@@ -11,8 +11,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -67,7 +67,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 		}
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
 			var event mb.Event
-			var metricList common.MapStr
+			var metricList mapstr.M
 			var vm VmResource
 			// group events by dimension values
 			exists, validDimensions := returnAllDimensions(defaultMetric.Dimensions)
@@ -91,7 +91,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 }
 
 // manageAndReportEvent function will handle event creation and report
-func manageAndReportEvent(client *Client, report mb.ReporterV2, event mb.Event, metricList common.MapStr, vm VmResource, timestamp time.Time, defaultMetric Metric, resource Resource, groupedValues []MetricValue) {
+func manageAndReportEvent(client *Client, report mb.ReporterV2, event mb.Event, metricList mapstr.M, vm VmResource, timestamp time.Time, defaultMetric Metric, resource Resource, groupedValues []MetricValue) {
 	event, metricList = createEvent(timestamp, defaultMetric, resource, groupedValues)
 	if client.Config.AddCloudMetadata {
 		vm = client.GetVMForMetaData(&resource, groupedValues)
@@ -153,23 +153,23 @@ func ReplaceUpperCase(src string) string {
 }
 
 // createEvent will create a new base event
-func createEvent(timestamp time.Time, metric Metric, resource Resource, metricValues []MetricValue) (mb.Event, common.MapStr) {
+func createEvent(timestamp time.Time, metric Metric, resource Resource, metricValues []MetricValue) (mb.Event, mapstr.M) {
 
 	event := mb.Event{
-		ModuleFields: common.MapStr{
+		ModuleFields: mapstr.M{
 			"timegrain": metric.TimeGrain,
 			"namespace": metric.Namespace,
-			"resource": common.MapStr{
+			"resource": mapstr.M{
 				"type":  resource.Type,
 				"group": resource.Group,
 				"name":  resource.Name,
 			},
 			"subscription_id": resource.Subscription,
 		},
-		MetricSetFields: common.MapStr{},
+		MetricSetFields: mapstr.M{},
 		Timestamp:       timestamp,
-		RootFields: common.MapStr{
-			"cloud": common.MapStr{
+		RootFields: mapstr.M{
+			"cloud": mapstr.M{
 				"provider": "azure",
 				"region":   resource.Location,
 			},
@@ -195,7 +195,7 @@ func createEvent(timestamp time.Time, metric Metric, resource Resource, metricVa
 		}
 	}
 
-	metricList := common.MapStr{}
+	metricList := mapstr.M{}
 	for _, value := range metricValues {
 		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
 		if value.min != nil {

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Expvar metric names.
@@ -335,10 +336,10 @@ type reporterV1 struct {
 	module string
 }
 
-func (r reporterV1) Done() <-chan struct{}          { return r.v2.Done() }
-func (r reporterV1) Event(event common.MapStr) bool { return r.ErrorWith(nil, event) }
-func (r reporterV1) Error(err error) bool           { return r.ErrorWith(err, nil) }
-func (r reporterV1) ErrorWith(err error, meta common.MapStr) bool {
+func (r reporterV1) Done() <-chan struct{}     { return r.v2.Done() }
+func (r reporterV1) Event(event mapstr.M) bool { return r.ErrorWith(nil, event) }
+func (r reporterV1) Error(err error) bool      { return r.ErrorWith(err, nil) }
+func (r reporterV1) ErrorWith(err error, meta mapstr.M) bool {
 	// Skip nil events without error
 	if err == nil && meta == nil {
 		return true

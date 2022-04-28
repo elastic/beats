@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/pb"
@@ -297,7 +298,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		fields["status"] = common.OK_STATUS
 	}
 
-	icmpEvent := common.MapStr{
+	icmpEvent := mapstr.M{
 		"version": trans.tuple.icmpVersion,
 	}
 	fields["icmp"] = icmpEvent
@@ -311,7 +312,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		pbf.Event.Start = trans.request.ts
 		pbf.Source.Bytes = int64(trans.request.length)
 
-		request := common.MapStr{
+		request := mapstr.M{
 			"message": humanReadable(&trans.tuple, trans.request),
 			"type":    trans.request.Type,
 			"code":    trans.request.code,
@@ -326,7 +327,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		pbf.Event.End = trans.response.ts
 		pbf.Destination.Bytes = int64(trans.response.length)
 
-		response := common.MapStr{
+		response := mapstr.M{
 			"message": humanReadable(&trans.tuple, trans.response),
 			"type":    trans.response.Type,
 			"code":    trans.response.code,

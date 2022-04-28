@@ -20,11 +20,10 @@ package docker
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
 
 	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDeDotLabels(t *testing.T) {
@@ -36,7 +35,7 @@ func TestDeDotLabels(t *testing.T) {
 
 	t.Run("dedot enabled", func(t *testing.T) {
 		result := helpers.DeDotLabels(labels, true)
-		assert.Equal(t, common.MapStr{
+		assert.Equal(t, mapstr.M{
 			"com_docker_swarm_task":      "",
 			"com_docker_swarm_task_id":   "1",
 			"com_docker_swarm_task_name": "foobar",
@@ -45,11 +44,11 @@ func TestDeDotLabels(t *testing.T) {
 
 	t.Run("dedot disabled", func(t *testing.T) {
 		result := helpers.DeDotLabels(labels, false)
-		assert.Equal(t, common.MapStr{
-			"com": common.MapStr{
-				"docker": common.MapStr{
-					"swarm": common.MapStr{
-						"task": common.MapStr{
+		assert.Equal(t, mapstr.M{
+			"com": mapstr.M{
+				"docker": mapstr.M{
+					"swarm": mapstr.M{
+						"task": mapstr.M{
 							"value": "",
 							"id":    "1",
 							"name":  "foobar",

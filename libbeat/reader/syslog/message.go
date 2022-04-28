@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -173,8 +173,8 @@ func (m *message) setDataValue(id, key, value string) {
 }
 
 // fields produces fields from the message.
-func (m message) fields() common.MapStr {
-	f := common.MapStr{}
+func (m message) fields() mapstr.M {
+	f := mapstr.M{}
 
 	// Syslog fields.
 	_, _ = f.Put("log.syslog.priority", m.priority)

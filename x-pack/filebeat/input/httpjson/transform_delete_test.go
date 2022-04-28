@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewDelete(t *testing.T) {
@@ -141,9 +142,9 @@ func TestDeleteFunctions(t *testing.T) {
 			name:        "deleteBody",
 			tfunc:       deleteBody,
 			paramCtx:    &transformContext{},
-			paramTr:     transformable{"body": common.MapStr{"a_key": "a_value"}},
+			paramTr:     transformable{"body": mapstr.M{"a_key": "a_value"}},
 			paramKey:    "a_key",
-			expectedTr:  transformable{"body": common.MapStr{}},
+			expectedTr:  transformable{"body": mapstr.M{}},
 			expectedErr: nil,
 		},
 		{

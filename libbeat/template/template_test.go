@@ -29,12 +29,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type testTemplate struct {
 	t    *testing.T
 	tmpl *Template
-	data common.MapStr
+	data mapstr.M
 }
 
 func TestNumberOfRoutingShards(t *testing.T) {
@@ -97,14 +98,14 @@ func TestTemplate(t *testing.T) {
 	t.Run("for ES 7.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "7.10.0", DefaultConfig(info))
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion})
-		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("template.mappings._meta", mapstr.M{"beat": "testbeat", "version": currentVersion})
 		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 8.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig(info))
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion})
-		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("template.mappings._meta", mapstr.M{"beat": "testbeat", "version": currentVersion})
 		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
 }
@@ -124,7 +125,7 @@ func createTestTemplate(t *testing.T, beatVersion, esVersion string, config Temp
 func (t *testTemplate) Has(path string) bool {
 	t.t.Helper()
 	has, err := t.data.HasKey(path)
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != mapstr.ErrKeyNotFound {
 		serialized, _ := json.MarshalIndent(t.data, "", "    ")
 		t.t.Fatalf("error accessing '%v': %v\ntemplate: %s", path, err, serialized)
 	}

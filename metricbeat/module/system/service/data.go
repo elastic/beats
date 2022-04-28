@@ -26,8 +26,8 @@ import (
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Properties is a struct representation of the dbus returns from GetAllProperties
@@ -68,14 +68,14 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 	}
 
 	event := mb.Event{
-		RootFields: common.MapStr{},
+		RootFields: mapstr.M{},
 	}
-	msData := common.MapStr{
+	msData := mapstr.M{
 		"name":       unit.Name,
 		"load_state": unit.LoadState,
 		"state":      unit.ActiveState,
 		"sub_state":  unit.SubState,
-		"unit_file": common.MapStr{
+		"unit_file": mapstr.M{
 			"state":         props.UnitFileState,
 			"vendor_preset": props.UnitFilePreset,
 		},
@@ -90,7 +90,7 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 		msData["resources"] = getMetricsFromServivce(props)
 	}
 
-	var childProc = common.MapStr{}
+	var childProc = mapstr.M{}
 	childData := false
 	//anything less than 1 isn't a valid SIGCHLD code
 	if props.ExecMainCode > 0 {
@@ -114,12 +114,12 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 		event.RootFields["process"] = childProc
 	}
 	if props.IPAccounting {
-		event.RootFields["network"] = common.MapStr{
+		event.RootFields["network"] = mapstr.M{
 			"packets": props.IPIngressPackets + props.IPEgressPackets,
 			"bytes":   props.IPIngressBytes + props.IPEgressBytes,
 		}
 	}
-	event.RootFields["systemd"] = common.MapStr{
+	event.RootFields["systemd"] = mapstr.M{
 		"unit":          unit.Name,
 		"fragment_path": props.FragmentPath,
 	}
@@ -130,38 +130,38 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 }
 
 // getMetricsFromServivce checks what accounting we have enabled and uses that to determine what metrics we can send back to the user
-func getMetricsFromServivce(props Properties) common.MapStr {
-	metrics := common.MapStr{}
+func getMetricsFromServivce(props Properties) mapstr.M {
+	metrics := mapstr.M{}
 
 	if props.CPUAccounting {
-		metrics["cpu"] = common.MapStr{
-			"usage": common.MapStr{
+		metrics["cpu"] = mapstr.M{
+			"usage": mapstr.M{
 				"nsec": props.CPUUsageNSec,
 			},
 		}
 	}
 
 	if props.MemoryAccounting {
-		metrics["memory"] = common.MapStr{
-			"usage": common.MapStr{
+		metrics["memory"] = mapstr.M{
+			"usage": mapstr.M{
 				"bytes": props.MemoryCurrent,
 			},
 		}
 	}
 
 	if props.TasksAccounting {
-		metrics["tasks"] = common.MapStr{
+		metrics["tasks"] = mapstr.M{
 			"count": props.TasksCurrent,
 		}
 	}
 
 	if props.IPAccounting {
-		metrics["network"] = common.MapStr{
-			"in": common.MapStr{
+		metrics["network"] = mapstr.M{
+			"in": mapstr.M{
 				"packets": props.IPIngressPackets,
 				"bytes":   props.IPIngressBytes,
 			},
-			"out": common.MapStr{
+			"out": mapstr.M{
 				"packets": props.IPEgressPackets,
 				"bytes":   props.IPEgressBytes,
 			},

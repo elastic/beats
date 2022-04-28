@@ -26,8 +26,8 @@ import (
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 )
@@ -132,11 +132,11 @@ func (h *Harvester) Run() error {
 			log.args = args[2:]
 		}
 
-		slowlogEntry := common.MapStr{
+		slowlogEntry := mapstr.M{
 			"id":  log.id,
 			"cmd": log.cmd,
 			"key": log.key,
-			"duration": common.MapStr{
+			"duration": mapstr.M{
 				"us": log.duration,
 			},
 		}
@@ -147,12 +147,12 @@ func (h *Harvester) Run() error {
 
 		h.forwarder.Send(beat.Event{
 			Timestamp: time.Unix(log.timestamp, 0).UTC(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": strings.Join(args, " "),
-				"redis": common.MapStr{
+				"redis": mapstr.M{
 					"slowlog": slowlogEntry,
 				},
-				"event": common.MapStr{
+				"event": mapstr.M{
 					"created": time.Now(),
 				},
 			},

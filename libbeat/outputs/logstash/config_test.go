@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -55,7 +56,7 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		"config given": {
-			config: common.MustNewConfigFrom(common.MapStr{
+			config: common.MustNewConfigFrom(mapstr.M{
 				"index":         "beat-index",
 				"loadbalance":   true,
 				"bulk_max_size": 1024,
@@ -79,7 +80,7 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		"removed config setting": {
-			config: common.MustNewConfigFrom(common.MapStr{
+			config: common.MustNewConfigFrom(mapstr.M{
 				"port": "8080",
 			}),
 			expectedConfig: nil,

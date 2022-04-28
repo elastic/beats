@@ -18,11 +18,11 @@ import (
 	"google.golang.org/genproto/googleapis/api/metric"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -228,10 +228,10 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 	for _, groupedEvents := range tsGrouped {
 		event := mb.Event{
 			Timestamp: groupedEvents[0].Timestamp,
-			ModuleFields: common.MapStr{
+			ModuleFields: mapstr.M{
 				"labels": groupedEvents[0].Labels,
 			},
-			MetricSetFields: common.MapStr{},
+			MetricSetFields: mapstr.M{},
 		}
 
 		for _, singleEvent := range groupedEvents {
@@ -339,7 +339,7 @@ func (m *MetricSet) getMetadata(out *metric.MetricDescriptor, metricsWithMeta ma
 	return metricsWithMeta
 }
 
-func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
+func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 	hostRootFields := groupedEvents[0].ECS
 	// add host.id and host.name
 	if hostID, err := groupedEvents[0].ECS.GetValue("cloud.instance.id"); err == nil {

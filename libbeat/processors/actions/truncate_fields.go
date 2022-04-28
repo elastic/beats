@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type truncateFieldsConfig struct {
@@ -104,7 +105,7 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 func (f *truncateFields) truncateSingleField(field string, event *beat.Event) (*beat.Event, error) {
 	v, err := event.GetValue(field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "could not fetch value for key: %s", field)
@@ -132,7 +133,7 @@ func (f *truncateFields) addTruncatedString(field, value string, event *beat.Eve
 	}
 
 	if isTruncated {
-		common.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
 	}
 
 	return event, nil
@@ -149,7 +150,7 @@ func (f *truncateFields) addTruncatedByte(field string, value []byte, event *bea
 	}
 
 	if isTruncated {
-		common.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
 	}
 
 	return event, nil

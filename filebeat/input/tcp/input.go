@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -129,10 +130,10 @@ func (p *Input) Wait() {
 func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": string(raw),
-			"log": common.MapStr{
-				"source": common.MapStr{
+			"log": mapstr.M{
+				"source": mapstr.M{
 					"address": metadata.RemoteAddr.String(),
 				},
 			},

@@ -34,8 +34,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 type node struct {
@@ -134,15 +135,15 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var annotations common.MapStr
-	var kubeMeta common.MapStr
+	var annotations mapstr.M
+	var kubeMeta mapstr.M
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(common.MapStr)
+		kubeMeta = rawMeta.(mapstr.M)
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(common.MapStr)
+			annotations = rawAnn.(mapstr.M)
 		}
 	}
 	if host, ok := event["host"]; ok {
@@ -190,10 +191,10 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	meta := n.metagen.Generate(node)
 
 	kubemetaMap, _ := meta.GetValue("kubernetes")
-	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta, _ := kubemetaMap.(mapstr.M)
 	kubemeta = kubemeta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
+	annotations := mapstr.M{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
 	}

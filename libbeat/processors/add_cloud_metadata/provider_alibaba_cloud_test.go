@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func initECSTestServer() *httptest.Server {
@@ -68,20 +69,20 @@ func TestRetrieveAlibabaCloudMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
 			"provider": "ecs",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id": "i-wz9g2hqiikg0aliyun2b",
 			},
 			"region":            "cn-shenzhen",
 			"availability_zone": "cn-shenzhen-a",
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "ECS",
 			},
 		},

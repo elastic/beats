@@ -23,15 +23,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDropFieldRun(t *testing.T) {
 	event := &beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"field": "value",
 		},
-		Meta: common.MapStr{
+		Meta: mapstr.M{
 			"meta_field": "value",
 		},
 	}
@@ -43,7 +43,7 @@ func TestDropFieldRun(t *testing.T) {
 
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
-		assert.Equal(t, common.MapStr{}, newEvent.Fields)
+		assert.Equal(t, mapstr.M{}, newEvent.Fields)
 		assert.Equal(t, event.Meta, newEvent.Meta)
 	})
 
@@ -54,7 +54,7 @@ func TestDropFieldRun(t *testing.T) {
 
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
-		assert.Equal(t, common.MapStr{}, newEvent.Meta)
+		assert.Equal(t, mapstr.M{}, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
 }

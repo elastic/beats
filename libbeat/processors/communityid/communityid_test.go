@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewDefaults(t *testing.T) {
@@ -36,17 +37,17 @@ func TestNewDefaults(t *testing.T) {
 func TestRun(t *testing.T) {
 	// From flowhash package testdata.
 	// 1:LQU9qZlK+B5F3KDmev6m5PMibrg= | 128.232.110.120 66.35.250.204 6 34855 80
-	evt := func() common.MapStr {
-		return common.MapStr{
-			"source": common.MapStr{
+	evt := func() mapstr.M {
+		return mapstr.M{
+			"source": mapstr.M{
 				"ip":   "128.232.110.120",
 				"port": 34855,
 			},
-			"destination": common.MapStr{
+			"destination": mapstr.M{
 				"ip":   "66.35.250.204",
 				"port": 80,
 			},
-			"network": common.MapStr{
+			"network": mapstr.M{
 				"transport": "TCP",
 			},
 		}
@@ -151,7 +152,7 @@ func TestRun(t *testing.T) {
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		event := &beat.Event{
 			Fields: evt(),
-			Meta:   common.MapStr{},
+			Meta:   mapstr.M{},
 		}
 		c := defaultConfig()
 		c.Target = "@metadata.community_id"
@@ -169,7 +170,7 @@ func TestRun(t *testing.T) {
 	})
 }
 
-func testProcessor(t testing.TB, seed uint16, fields common.MapStr, expectedHash interface{}) {
+func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash interface{}) {
 	t.Helper()
 
 	c := defaultConfig()

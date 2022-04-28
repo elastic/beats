@@ -20,11 +20,11 @@ package labelhash
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var testLabels = common.MapStr{
-	"request": common.MapStr{
+var testLabels = mapstr.M{
+	"request": mapstr.M{
 		"component": "apiserver",
 		"resource":  "configmaps",
 		"scope":     "cluster",
@@ -33,7 +33,7 @@ var testLabels = common.MapStr{
 	},
 }
 
-var testLabelsFlat = common.MapStr{
+var testLabelsFlat = mapstr.M{
 	"component": "apiserver",
 	"resource":  "configmaps",
 	"scope":     "cluster",

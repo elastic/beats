@@ -17,9 +17,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -126,7 +126,7 @@ func (g *guessSkBuffLen) Trigger() error {
 
 // Extract scans the sk_buff memory for any values between the expected
 // payload + [0 ... 128).
-func (g *guessSkBuffLen) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessSkBuffLen) Extract(ev interface{}) (mapstr.M, bool) {
 	skbuff := ev.([]byte)
 	if len(skbuff) != skbuffDumpSize || g.written <= 0 {
 		return nil, false
@@ -148,7 +148,7 @@ func (g *guessSkBuffLen) Extract(ev interface{}) (common.MapStr, bool) {
 		}
 	}
 
-	result := make(common.MapStr)
+	result := make(mapstr.M)
 	var overhead []int
 	for i := minHeadersSize; i < maxOverhead; i += ipHeaderSizeChunk {
 		if len(results[i]) > 0 {
@@ -170,14 +170,14 @@ func (g *guessSkBuffLen) NumRepeats() int {
 
 // Reduce takes the output from the multiple runs and returns the offset
 // which consistently returned the expected length plus a fixed constant.
-func (g *guessSkBuffLen) Reduce(results []common.MapStr) (result common.MapStr, err error) {
-	clones := make([]common.MapStr, 0, len(results))
+func (g *guessSkBuffLen) Reduce(results []mapstr.M) (result mapstr.M, err error) {
+	clones := make([]mapstr.M, 0, len(results))
 	for _, res := range results {
 		val, found := res["HEADER_SIZES"]
 		if !found {
 			return nil, errors.New("not all attempts detected offsets")
 		}
-		m := make(common.MapStr, 1)
+		m := make(mapstr.M, 1)
 		m["HEADER_SIZES"] = val
 		clones = append(clones, m)
 	}
@@ -210,7 +210,7 @@ func (g *guessSkBuffLen) Reduce(results []common.MapStr) (result common.MapStr, 
 		return nil, err
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"SK_BUFF_LEN":          list[0],
 		"DETECTED_HEADER_SIZE": headerSize,
 	}, nil
@@ -352,7 +352,7 @@ func (g *guessSkBuffProto) Trigger() error {
 
 // Extract will scan the sk_buff memory to look for all the uint16-sized memory
 // locations that contain the expected protocol value.
-func (g *guessSkBuffProto) Extract(event interface{}) (common.MapStr, bool) {
+func (g *guessSkBuffProto) Extract(event interface{}) (mapstr.M, bool) {
 	raw := event.([]byte)
 	needle := []byte{0x08, 0x00} // ETH_P_IP
 	if g.doIPv6 {
@@ -365,7 +365,7 @@ func (g *guessSkBuffProto) Extract(event interface{}) (common.MapStr, bool) {
 		off = indexAligned(raw, needle, off+2, 2)
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"SK_BUFF_PROTO": hits,
 	}, true
 }
@@ -377,7 +377,7 @@ func (g *guessSkBuffProto) NumRepeats() int {
 
 // Reduce uses the partial results from every repetition to figure out the
 // right offset of the protocol field.
-func (g *guessSkBuffProto) Reduce(results []common.MapStr) (result common.MapStr, err error) {
+func (g *guessSkBuffProto) Reduce(results []mapstr.M) (result mapstr.M, err error) {
 	if result, err = consolidate(results); err != nil {
 		return nil, err
 	}
@@ -621,7 +621,7 @@ func u32At(buf []byte) uintptr {
 // (any), false : Signals that it needs another event in the current iteration.
 // nil, true : Finish the current iteration and perform a new one.
 // (non-nil), true : The guess completed.
-func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
+func (g *guessSkBuffDataPtr) Extract(event interface{}) (mapstr.M, bool) {
 	switch v := event.(type) {
 	case *dataDump:
 		g.data = v
@@ -636,7 +636,7 @@ func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
 	if g.dumpOffset >= skbuffDumpSize {
 		// Scanned more memory than its available from sk_buff. Bail out.
 		// Returns a non-nil map so the guess is not repeated until MaxRepeats()
-		return common.MapStr{"FAILED": true}, true
+		return mapstr.M{"FAILED": true}, true
 	}
 
 	//
@@ -690,7 +690,7 @@ func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
 
 	limit := g.protoOffset + 2
 	protocolValue := binary.BigEndian.Uint16(g.skbuff[g.protoOffset:])
-	scanFields := func(width int, ptrBase uintptr, reader func([]byte) uintptr) common.MapStr {
+	scanFields := func(width int, ptrBase uintptr, reader func([]byte) uintptr) mapstr.M {
 		var off [3]uintptr
 		for base := g.dumpOffset - width*3; base >= limit; base -= width {
 			for i := 0; i < 3; i++ {
@@ -702,7 +702,7 @@ func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
 				off[2] != -ptrBase &&
 				off[2] <= uintptr(ipHdrOff-14) &&
 				binary.BigEndian.Uint16(g.data.Data[off[2]+12:]) == protocolValue {
-				return common.MapStr{
+				return mapstr.M{
 					"SK_BUFF_HEAD":         g.dumpOffset,
 					"SK_BUFF_TRANSPORT":    base,
 					"SK_BUFF_NETWORK":      base + width,

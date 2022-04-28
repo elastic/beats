@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -47,7 +48,7 @@ const (
 	logGroupNamePrefix = "filebeat-log-group-integtest-"
 )
 
-var cloudwatchConfig = common.MapStr{
+var cloudwatchConfig = mapstr.M{
 	"start_position":    "beginning",
 	"scan_frequency":    10 * time.Second,
 	"api_timeout":       120 * time.Second,
@@ -83,7 +84,7 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 	return rtn
 }
 
-func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
+func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{}) {
 	n, _ := snapshot.GetValue(inputID + "." + name)
 	assert.EqualValues(t, value, n, name)
 }
@@ -218,7 +219,7 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
+	snap := mapstr.M(monitoring.CollectStructSnapshot(
 		monitoring.GetNamespace("dataset").GetRegistry(),
 		monitoring.Full,
 		false))

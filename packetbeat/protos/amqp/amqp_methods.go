@@ -22,14 +22,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func connectionStartMethod(m *amqpMessage, args []byte) (bool, bool) {
 	major := args[0]
 	minor := args[1]
-	properties := make(common.MapStr)
+	properties := make(mapstr.M)
 	next, err, exists := getTable(properties, args, 2)
 	if err {
 		// failed to get de peer-properties, size may be wrong, let's quit
@@ -48,7 +48,7 @@ func connectionStartMethod(m *amqpMessage, args []byte) (bool, bool) {
 	}
 	m.method = "connection.start"
 	m.isRequest = true
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"version-major": major,
 		"version-minor": minor,
 		"mechanisms":    mechanisms,
@@ -62,7 +62,7 @@ func connectionStartMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func connectionStartOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	properties := make(common.MapStr)
+	properties := make(mapstr.M)
 	next, err, exists := getTable(properties, args, 0)
 	if err {
 		// failed to get de peer-properties, size may be wrong, let's quit
@@ -85,7 +85,7 @@ func connectionStartOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.isRequest = false
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"mechanism": mechanism,
 		"locale":    locale,
 	}
@@ -105,7 +105,7 @@ func connectionTuneMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func connectionTuneOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"channel-max": binary.BigEndian.Uint16(args[0:2]),
 		"frame-max":   binary.BigEndian.Uint32(args[2:6]),
 		"heartbeat":   binary.BigEndian.Uint16(args[6:8]),
@@ -121,7 +121,7 @@ func connectionOpenMethod(m *amqpMessage, args []byte) (bool, bool) {
 		logp.Warn("Failed to get virtual host from client")
 		return false, false
 	}
-	m.fields = common.MapStr{"virtual-host": host}
+	m.fields = mapstr.M{"virtual-host": host}
 	return true, true
 }
 
@@ -149,7 +149,7 @@ func channelFlowMethod(m *amqpMessage, args []byte) (bool, bool) {
 
 func channelFlowOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[0])
-	m.fields = common.MapStr{"active": params[0]}
+	m.fields = mapstr.M{"active": params[0]}
 	return true, true
 }
 
@@ -172,7 +172,7 @@ func getCloseInfo(args []byte, m *amqpMessage) bool {
 		logp.Warn("Failed to get error reply text")
 		return true
 	}
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"reply-code": code,
 		"reply-text": replyText,
 		"class-id":   binary.BigEndian.Uint16(args[nextOffset : nextOffset+2]),
@@ -191,7 +191,7 @@ func queueDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.method = "queue.declare"
 	params := getBitParams(args[offset])
 	m.request = name
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":       name,
 		"passive":     params[0],
 		"durable":     params[1],
@@ -200,7 +200,7 @@ func queueDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"no-wait":     params[4],
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
-		arguments := make(common.MapStr)
+		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
 			m.fields["arguments"] = arguments
@@ -218,7 +218,7 @@ func queueDeclareOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.method = "queue.declare-ok"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":          name,
 		"consumer-count": binary.BigEndian.Uint32(args[nextOffset+4:]),
 		"message-count":  binary.BigEndian.Uint32(args[nextOffset : nextOffset+4]),
@@ -246,7 +246,7 @@ func queueBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[offset])
 	m.method = "queue.bind"
 	m.request = strings.Join([]string{queue, exchange}, " ")
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":       queue,
 		"routing-key": routingKey,
 		"no-wait":     params[0],
@@ -255,7 +255,7 @@ func queueBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 		m.fields["exchange"] = exchange
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
-		arguments := make(common.MapStr)
+		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
 			m.fields["arguments"] = arguments
@@ -285,7 +285,7 @@ func queueUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.isRequest = true
 	m.method = "queue.unbind"
 	m.request = strings.Join([]string{queue, exchange}, " ")
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":       queue,
 		"routing-key": routingKey,
 	}
@@ -293,7 +293,7 @@ func queueUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
 		m.fields["exchange"] = exchange
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
-		arguments := make(common.MapStr)
+		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
 			m.fields["arguments"] = arguments
@@ -314,7 +314,7 @@ func queuePurgeMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[nextOffset])
 	m.method = "queue.purge"
 	m.request = queue
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":   queue,
 		"no-wait": params[0],
 	}
@@ -323,7 +323,7 @@ func queuePurgeMethod(m *amqpMessage, args []byte) (bool, bool) {
 
 func queuePurgeOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.method = "queue.purge-ok"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"message-count": binary.BigEndian.Uint32(args[0:4]),
 	}
 	return true, true
@@ -339,7 +339,7 @@ func queueDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[nextOffset])
 	m.method = "queue.delete"
 	m.request = queue
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":     queue,
 		"if-unused": params[0],
 		"if-empty":  params[1],
@@ -350,7 +350,7 @@ func queueDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
 
 func queueDeleteOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.method = "queue.delete-ok"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"message-count": binary.BigEndian.Uint32(args[0:4]),
 	}
 	return true, true
@@ -374,7 +374,7 @@ func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 	if exchangeType == "" {
 		exchangeType = "direct"
 	}
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"exchange":      exchange,
 		"exchange-type": exchangeType,
 		"passive":       params[0],
@@ -382,7 +382,7 @@ func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"no-wait":       params[4],
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
-		arguments := make(common.MapStr)
+		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
 			m.fields["arguments"] = arguments
@@ -403,7 +403,7 @@ func exchangeDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.isRequest = true
 	params := getBitParams(args[nextOffset])
 	m.request = exchange
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"exchange":  exchange,
 		"if-unused": params[0],
 		"no-wait":   params[1],
@@ -450,14 +450,14 @@ func exchangeBindUnbindInfo(m *amqpMessage, args []byte) bool {
 	m.isRequest = true
 	params := getBitParams(args[offset])
 	m.request = strings.Join([]string{source, destination}, " ")
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"destination": destination,
 		"source":      source,
 		"routing-key": routingKey,
 		"no-wait":     params[0],
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
-		arguments := make(common.MapStr)
+		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
 			m.fields["arguments"] = arguments
@@ -474,7 +474,7 @@ func basicQosMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[6])
 	m.isRequest = true
 	m.method = "basic.qos"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"prefetch-size":  prefetchSize,
 		"prefetch-count": prefetchCount,
 		"global":         params[0],
@@ -497,7 +497,7 @@ func basicConsumeMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.method = "basic.consume"
 	m.isRequest = true
 	m.request = queue
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":        queue,
 		"consumer-tag": consumerTag,
 		"no-local":     params[0],
@@ -506,7 +506,7 @@ func basicConsumeMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"no-wait":      params[3],
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
-		arguments := make(common.MapStr)
+		arguments := make(mapstr.M)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
 			m.fields["arguments"] = arguments
@@ -524,7 +524,7 @@ func basicConsumeOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.method = "basic.consume-ok"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"consumer-tag": consumerTag,
 	}
 	return true, true
@@ -540,7 +540,7 @@ func basicCancelMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.isRequest = true
 	m.request = consumerTag
 	params := getBitParams(args[offset])
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"consumer-tag": consumerTag,
 		"no-wait":      params[0],
 	}
@@ -554,7 +554,7 @@ func basicCancelOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.method = "basic.cancel-ok"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"consumer-tag": consumerTag,
 	}
 	return true, true
@@ -573,7 +573,7 @@ func basicPublishMethod(m *amqpMessage, args []byte) (bool, bool) {
 	}
 	params := getBitParams(args[nextOffset])
 	m.method = "basic.publish"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"routing-key": routingKey,
 		"mandatory":   params[0],
 		"immediate":   params[1],
@@ -607,7 +607,7 @@ func basicReturnMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.method = "basic.return"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"exchange":    exchange,
 		"routing-key": routingKey,
 		"reply-code":  code,
@@ -636,7 +636,7 @@ func basicDeliverMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.method = "basic.deliver"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"consumer-tag": consumerTag,
 		"delivery-tag": deliveryTag,
 		"redelivered":  params[0],
@@ -659,7 +659,7 @@ func basicGetMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[offset])
 	m.isRequest = true
 	m.request = queue
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"queue":  queue,
 		"no-ack": params[0],
 	}
@@ -679,7 +679,7 @@ func basicGetOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 		return false, false
 	}
 	m.method = "basic.get-ok"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"delivery-tag":  binary.BigEndian.Uint64(args[0:8]),
 		"redelivered":   params[0],
 		"routing-key":   routingKey,
@@ -700,7 +700,7 @@ func basicAckMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[8])
 	m.method = "basic.ack"
 	m.isRequest = true
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"delivery-tag": binary.BigEndian.Uint64(args[0:8]),
 		"multiple":     params[0],
 	}
@@ -712,7 +712,7 @@ func basicNackMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[8])
 	m.method = "basic.nack"
 	m.isRequest = true
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"delivery-tag": binary.BigEndian.Uint64(args[0:8]),
 		"multiple":     params[0],
 		"requeue":      params[1],
@@ -725,7 +725,7 @@ func basicRejectMethod(m *amqpMessage, args []byte) (bool, bool) {
 	tag := binary.BigEndian.Uint64(args[0:8])
 	m.isRequest = true
 	m.method = "basic.reject"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"delivery-tag": tag,
 		"multiple":     params[0],
 	}
@@ -737,7 +737,7 @@ func basicRecoverMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[0])
 	m.isRequest = true
 	m.method = "basic.recover"
-	m.fields = common.MapStr{
+	m.fields = mapstr.M{
 		"requeue": params[0],
 	}
 	return true, true

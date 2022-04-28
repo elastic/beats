@@ -27,10 +27,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewInputDone(t *testing.T) {
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(mapstr.M{
 		"hosts":    "localhost:9092",
 		"topics":   "messages",
 		"group_id": "filebeat",

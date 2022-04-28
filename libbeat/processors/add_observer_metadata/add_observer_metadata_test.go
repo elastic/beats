@@ -26,11 +26,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
@@ -52,7 +53,7 @@ func TestConfigDefault(t *testing.T) {
 
 func TestOverwriteFalse(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{"observer": common.MapStr{"foo": "bar"}},
+		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
@@ -65,12 +66,12 @@ func TestOverwriteFalse(t *testing.T) {
 
 	v, err := newEvent.GetValue("observer")
 	require.NoError(t, err)
-	assert.Equal(t, common.MapStr{"foo": "bar"}, v)
+	assert.Equal(t, mapstr.M{"foo": "bar"}, v)
 }
 
 func TestOverwriteTrue(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{"observer": common.MapStr{"foo": "bar"}},
+		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{"overwrite": true})
@@ -88,7 +89,7 @@ func TestOverwriteTrue(t *testing.T) {
 
 func TestConfigNetInfoDisabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{
@@ -112,7 +113,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 
 func TestConfigGeoEnabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
@@ -144,7 +145,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 
 func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 

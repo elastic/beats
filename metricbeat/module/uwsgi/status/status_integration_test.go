@@ -25,9 +25,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetchTCP(t *testing.T) {
@@ -49,15 +49,15 @@ func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "uwsgi_http")
 
 	f := mbtest.NewFetcher(t, getConfig("http", service.Host()))
-	f.WriteEventsCond(t, "", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "", func(event mapstr.M) bool {
 		isOverall, _ := event.HasKey("uwsgi.status.total")
 		return isOverall
 	})
-	f.WriteEventsCond(t, "_meta/data_core.json", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "_meta/data_core.json", func(event mapstr.M) bool {
 		isCore, _ := event.HasKey("uwsgi.status.core")
 		return isCore
 	})
-	f.WriteEventsCond(t, "_meta/data_worker.json", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "_meta/data_worker.json", func(event mapstr.M) bool {
 		isWorker, _ := event.HasKey("uwsgi.status.worker")
 		return isWorker
 	})

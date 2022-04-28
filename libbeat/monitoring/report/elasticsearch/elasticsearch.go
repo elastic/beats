@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type reporter struct {
@@ -45,7 +46,7 @@ type reporter struct {
 	checkRetry time.Duration
 
 	// event metadata
-	beatMeta common.MapStr
+	beatMeta mapstr.M
 	tags     []string
 
 	// pipeline
@@ -261,7 +262,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			continue
 		}
 
-		fields := common.MapStr{
+		fields := mapstr.M{
 			"beat": r.beatMeta,
 			prefix: snapshot,
 		}
@@ -269,7 +270,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			fields["tags"] = r.tags
 		}
 
-		meta := common.MapStr{
+		meta := mapstr.M{
 			"type":        "beats_" + namespace,
 			"interval_ms": int64(period / time.Millisecond),
 			// Converting to seconds as interval only accepts `s` as unit
@@ -321,8 +322,8 @@ func closing(log *logp.Logger, c io.Closer) {
 	}
 }
 
-func makeMeta(beat beat.Info) common.MapStr {
-	return common.MapStr{
+func makeMeta(beat beat.Info) mapstr.M {
+	return mapstr.M{
 		"type":    beat.Beat,
 		"version": beat.Version,
 		"name":    beat.Name,

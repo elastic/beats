@@ -12,9 +12,9 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func newIncomingFieldExtractor(l *logp.Logger, mc metricsConfig) *incomingFieldExtractor {
@@ -30,8 +30,8 @@ type incomingFieldExtractor struct {
 type KeyValuePoint struct {
 	Key       string
 	Value     interface{}
-	Labels    common.MapStr
-	ECS       common.MapStr
+	Labels    mapstr.M
+	ECS       mapstr.M
 	Timestamp time.Time
 }
 

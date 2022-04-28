@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestExportTimezone(t *testing.T) {
@@ -37,13 +38,13 @@ func TestExportTimezone(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	input := common.MapStr{}
+	input := mapstr.M{}
 
 	zone, _ := time.Now().In(time.Local).Zone()
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"event": map[string]string{
 			"timezone": zone,
 		},
@@ -84,7 +85,7 @@ func TestTimezoneFormat(t *testing.T) {
 	assert.Regexp(t, regexp.MustCompile(`\-[\d]{2}\:[\d]{2}`), negVal)
 }
 
-func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
+func getActualValue(t *testing.T, config *common.Config, input mapstr.M) mapstr.M {
 	log := logp.NewLogger("add_locale_test")
 	p, err := New(config)
 	if err != nil {
@@ -99,7 +100,7 @@ func getActualValue(t *testing.T, config *common.Config, input common.MapStr) co
 func BenchmarkConstruct(b *testing.B) {
 	var testConfig = common.NewConfig()
 
-	input := common.MapStr{}
+	input := mapstr.M{}
 
 	p, err := New(testConfig)
 	if err != nil {

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestParsersConfigSuffix(t *testing.T) {
@@ -348,7 +349,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		"JSON post processer with keys_under_root": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\"}"),
-				Fields:  common.MapStr{},
+				Fields:  mapstr.M{},
 			},
 			config: map[string]interface{}{
 				"parsers": []map[string]interface{}{
@@ -361,7 +362,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 			},
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key": "value",
 				},
 			},
@@ -369,7 +370,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		"JSON post processer with document ID": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
-				Fields:  common.MapStr{},
+				Fields:  mapstr.M{},
 			},
 			config: map[string]interface{}{
 				"parsers": []map[string]interface{}{
@@ -383,10 +384,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 			},
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key": "value",
 				},
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					"_id": "my-id",
 				},
 			},
@@ -394,7 +395,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		"JSON post processer with overwrite keys and under root": {
 			message: reader.Message{
 				Content: []byte("{\"key\": \"value\"}"),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key":       "another-value",
 					"other-key": "other-value",
 				},
@@ -411,7 +412,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 			},
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key":       "value",
 					"other-key": "other-value",
 				},
@@ -459,25 +460,25 @@ func TestContainerParser(t *testing.T) {
 			expectedMessages: []reader.Message{
 				reader.Message{
 					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("Fetching dependencies...\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
@@ -498,7 +499,7 @@ func TestContainerParser(t *testing.T) {
 			expectedMessages: []reader.Message{
 				reader.Message{
 					Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
@@ -519,13 +520,13 @@ func TestContainerParser(t *testing.T) {
 			expectedMessages: []reader.Message{
 				reader.Message{
 					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},

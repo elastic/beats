@@ -25,8 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var _ reader.Reader = &testReader{}
@@ -50,7 +50,7 @@ func (t *testReader) Next() (reader.Message, error) {
 		Ts:      t.referenceTime,
 		Content: t.messages[t.currentLine],
 		Bytes:   len(t.messages[t.currentLine]),
-		Fields:  common.MapStr{},
+		Fields:  mapstr.M{},
 	}
 	t.currentLine++
 
@@ -61,7 +61,7 @@ func TestNewParser(t *testing.T) {
 	type testResult struct {
 		Timestamp time.Time
 		Content   []byte
-		Fields    common.MapStr
+		Fields    mapstr.M
 		WantErr   bool
 	}
 
@@ -82,15 +82,15 @@ func TestNewParser(t *testing.T) {
 				{
 					Timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
 					Content:   []byte("this is the message"),
-					Fields: common.MapStr{
-						"log": common.MapStr{
-							"syslog": common.MapStr{
+					Fields: mapstr.M{
+						"log": mapstr.M{
+							"syslog": mapstr.M{
 								"priority": 165,
-								"facility": common.MapStr{
+								"facility": mapstr.M{
 									"code": 20,
 									"name": "local4",
 								},
-								"severity": common.MapStr{
+								"severity": mapstr.M{
 									"code": 5,
 									"name": "Notice",
 								},
@@ -117,15 +117,15 @@ func TestNewParser(t *testing.T) {
 				{
 					Timestamp: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", time.Local),
 					Content:   []byte("this is the message"),
-					Fields: common.MapStr{
-						"log": common.MapStr{
-							"syslog": common.MapStr{
+					Fields: mapstr.M{
+						"log": mapstr.M{
+							"syslog": mapstr.M{
 								"priority": 13,
-								"facility": common.MapStr{
+								"facility": mapstr.M{
 									"code": 1,
 									"name": "user-level",
 								},
-								"severity": common.MapStr{
+								"severity": mapstr.M{
 									"code": 5,
 									"name": "Notice",
 								},

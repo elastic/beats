@@ -7,9 +7,8 @@ package blkio
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
@@ -106,9 +105,9 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	}
 	for _, event := range events {
 		// setting ECS container.id and module field containerd.namespace
-		containerFields := common.MapStr{}
-		moduleFields := common.MapStr{}
-		rootFields := common.MapStr{}
+		containerFields := mapstr.M{}
+		moduleFields := mapstr.M{}
+		rootFields := mapstr.M{}
 
 		cID := containerd.GetAndDeleteCid(event)
 		namespace := containerd.GetAndDeleteNamespace(event)

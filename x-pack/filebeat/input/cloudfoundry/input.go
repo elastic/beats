@@ -16,13 +16,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 )
 
 type cloudfoundryEvent interface {
 	Timestamp() time.Time
-	ToFields() common.MapStr
+	ToFields() mapstr.M
 }
 
 func Plugin() v2.Plugin {

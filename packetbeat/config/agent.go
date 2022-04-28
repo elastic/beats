@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -36,7 +37,7 @@ type datastream struct {
 type agentInput struct {
 	Type       string                   `config:"type"`
 	Datastream datastream               `config:"data_stream"`
-	Processors []common.MapStr          `config:"processors"`
+	Processors []mapstr.M               `config:"processors"`
 	Streams    []map[string]interface{} `config:"streams"`
 }
 
@@ -63,13 +64,13 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 	if err := cfg.Unpack(&datastreamConfig); err != nil {
 		return nil, err
 	}
-	mergeConfig, err := common.NewConfigFrom(common.MapStr{
+	mergeConfig, err := common.NewConfigFrom(mapstr.M{
 		"index": datastreamConfig.Datastream.Type + "-" + datastreamConfig.Datastream.Dataset + "-" + namespace,
-		"processors": append([]common.MapStr{
+		"processors": append([]mapstr.M{
 			{
-				"add_fields": common.MapStr{
+				"add_fields": mapstr.M{
 					"target": "data_stream",
-					"fields": common.MapStr{
+					"fields": mapstr.M{
 						"type":      datastreamConfig.Datastream.Type,
 						"dataset":   datastreamConfig.Datastream.Dataset,
 						"namespace": namespace,
@@ -77,9 +78,9 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 				},
 			},
 			{
-				"add_fields": common.MapStr{
+				"add_fields": mapstr.M{
 					"target": "event",
-					"fields": common.MapStr{
+					"fields": mapstr.M{
 						"dataset": datastreamConfig.Datastream.Dataset,
 					},
 				},

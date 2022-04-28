@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -138,12 +139,12 @@ func (p *Provider) onWatcherStart(arn string, lbl *lbListener) {
 		"id":       arn,
 		"host":     lblMap["host"],
 		"port":     lblMap["port"],
-		"aws": common.MapStr{
+		"aws": mapstr.M{
 			"elb": lbl.toMap(),
 		},
 		"cloud": lbl.toCloudMap(),
-		"meta": common.MapStr{
-			"aws": common.MapStr{
+		"meta": mapstr.M{
+			"aws": mapstr.M{
 				"elb": lbl.toMap(),
 			},
 			"cloud": lbl.toCloudMap(),

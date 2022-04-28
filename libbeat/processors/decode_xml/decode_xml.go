@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type decodeXML struct {
@@ -96,7 +97,7 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 func (x *decodeXML) run(event *beat.Event) error {
 	data, err := event.GetValue(x.Field)
 	if err != nil {
-		if x.IgnoreMissing && err == common.ErrKeyNotFound {
+		if x.IgnoreMissing && err == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return err
@@ -113,10 +114,10 @@ func (x *decodeXML) run(event *beat.Event) error {
 	}
 
 	var id string
-	if tmp, err := common.MapStr(xmlOutput).GetValue(x.DocumentID); err == nil {
+	if tmp, err := mapstr.M(xmlOutput).GetValue(x.DocumentID); err == nil {
 		if v, ok := tmp.(string); ok {
 			id = v
-			common.MapStr(xmlOutput).Delete(x.DocumentID)
+			mapstr.M(xmlOutput).Delete(x.DocumentID)
 		}
 	}
 
@@ -135,7 +136,7 @@ func (x *decodeXML) run(event *beat.Event) error {
 	return nil
 }
 
-func (x *decodeXML) decode(p []byte) (common.MapStr, error) {
+func (x *decodeXML) decode(p []byte) (mapstr.M, error) {
 	dec := xml.NewDecoder(bytes.NewReader(p))
 	if x.ToLower {
 		dec.LowercaseKeys()
@@ -146,7 +147,7 @@ func (x *decodeXML) decode(p []byte) (common.MapStr, error) {
 		return nil, err
 	}
 
-	return common.MapStr(out), nil
+	return mapstr.M(out), nil
 }
 
 func (x *decodeXML) String() string {

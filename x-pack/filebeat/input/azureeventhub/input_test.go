@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
@@ -113,7 +114,7 @@ func TestParseMultipleMessages(t *testing.T) {
 }
 
 func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
+	config := mapstr.M{
 		"connection_string":   "Endpoint=sb://something",
 		"eventhub":            "insights-operational-logs",
 		"storage_account":     "someaccount",

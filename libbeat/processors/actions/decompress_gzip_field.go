@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type decompressGzipField struct {
@@ -88,7 +89,7 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 	data, err := event.GetValue(f.config.Field.From)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %v", f.config.Field.From, err)

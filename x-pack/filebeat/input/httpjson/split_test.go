@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestSplit(t *testing.T) {
@@ -21,7 +22,7 @@ func TestSplit(t *testing.T) {
 		config           *splitConfig
 		ctx              *transformContext
 		resp             transformable
-		expectedMessages []common.MapStr
+		expectedMessages []mapstr.M
 		expectedErr      error
 	}{
 		{
@@ -38,7 +39,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"this": "is kept",
 					"alerts": []interface{}{
 						map[string]interface{}{
@@ -66,7 +67,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"this":                      "is kept",
 					"alerts.this_is":            "also kept",
@@ -105,7 +106,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"this": "is not kept",
 					"alerts": []interface{}{
 						map[string]interface{}{
@@ -127,7 +128,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"this_is":            "kept",
 					"entities.id":        "id1",
@@ -161,7 +162,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"this": "is not kept",
 					"alerts": []interface{}{
 						map[string]interface{}{
@@ -183,7 +184,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"something": "else",
 					"foo":       "set for each",
@@ -207,7 +208,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -225,19 +226,19 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp": "1606324417",
-						"Attributes": common.MapStr{
+						"Attributes": mapstr.M{
 							"key": "value",
 						},
 					},
 				},
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp": "1606324417",
-						"Attributes": common.MapStr{
+						"Attributes": mapstr.M{
 							"key2": "value2",
 						},
 					},
@@ -257,7 +258,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -267,9 +268,9 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp": "1606324417",
 					},
 				},
@@ -287,11 +288,11 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{},
 				},
 			},
-			expectedMessages: []common.MapStr{},
+			expectedMessages: []mapstr.M{},
 			expectedErr:      errEmptyRootField,
 		},
 		{
@@ -307,19 +308,19 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"@timestamp":    "1234567890",
 					"nextPageToken": "tok",
 					"items": []interface{}{
-						common.MapStr{"foo": "bar"},
-						common.MapStr{
+						mapstr.M{"foo": "bar"},
+						mapstr.M{
 							"baz": "buzz",
-							"splitHere": common.MapStr{
+							"splitHere": mapstr.M{
 								"splitMore": []interface{}{
-									common.MapStr{
+									mapstr.M{
 										"deepest1": "data",
 									},
-									common.MapStr{
+									mapstr.M{
 										"deepest2": "data",
 									},
 								},
@@ -328,10 +329,10 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{"foo": "bar"},
-				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest1": "data"}}},
-				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest2": "data"}}},
+				{"baz": "buzz", "splitHere": mapstr.M{"splitMore": mapstr.M{"deepest1": "data"}}},
+				{"baz": "buzz", "splitHere": mapstr.M{"splitMore": mapstr.M{"deepest2": "data"}}},
 			},
 		},
 		{
@@ -343,12 +344,12 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"@timestamp": "1234567890",
 					"items":      "Line 1\nLine 2\nLine 3",
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{"@timestamp": "1234567890", "items": "Line 1"},
 				{"@timestamp": "1234567890", "items": "Line 2"},
 				{"@timestamp": "1234567890", "items": "Line 3"},
@@ -371,7 +372,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -390,21 +391,21 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp":  "1606324417",
 						"Attributes": []interface{}{},
-						"OtherAttributes": common.MapStr{
+						"OtherAttributes": mapstr.M{
 							"key": "value",
 						},
 					},
 				},
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp":  "1606324417",
 						"Attributes": []interface{}{},
-						"OtherAttributes": common.MapStr{
+						"OtherAttributes": mapstr.M{
 							"key2": "value2",
 						},
 					},
@@ -429,7 +430,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -447,19 +448,19 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp": "1606324417",
-						"OtherAttributes": common.MapStr{
+						"OtherAttributes": mapstr.M{
 							"key": "value",
 						},
 					},
 				},
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp": "1606324417",
-						"OtherAttributes": common.MapStr{
+						"OtherAttributes": mapstr.M{
 							"key2": "value2",
 						},
 					},
@@ -486,7 +487,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -504,12 +505,12 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp":  "1606324417",
-						"Attributes": common.MapStr{},
-						"OtherAttributes": common.MapStr{
+						"Attributes": mapstr.M{},
+						"OtherAttributes": mapstr.M{
 							"key": "value",
 						},
 					},
@@ -536,7 +537,7 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -553,11 +554,11 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
-					"Event": common.MapStr{
+					"Event": mapstr.M{
 						"timestamp": "1606324417",
-						"OtherAttributes": common.MapStr{
+						"OtherAttributes": mapstr.M{
 							"key": "value",
 						},
 					},
@@ -580,13 +581,13 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"@timestamp":  "1234567890",
 					"items":       "",
 					"other_items": "Line 1\nLine 2\nLine 3",
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{"@timestamp": "1234567890", "items": "", "other_items": "Line 1"},
 				{"@timestamp": "1234567890", "items": "", "other_items": "Line 2"},
 				{"@timestamp": "1234567890", "items": "", "other_items": "Line 3"},
@@ -607,12 +608,12 @@ func TestSplit(t *testing.T) {
 			},
 			ctx: emptyTransformContext(),
 			resp: transformable{
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"@timestamp":  "1234567890",
 					"other_items": "Line 1\nLine 2\nLine 3",
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{"@timestamp": "1234567890", "other_items": "Line 1"},
 				{"@timestamp": "1234567890", "other_items": "Line 2"},
 				{"@timestamp": "1234567890", "other_items": "Line 3"},

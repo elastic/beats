@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
@@ -50,7 +51,7 @@ type RunnerFactory struct {
 
 type publishSettings struct {
 	// Fields and tags to add to monitor.
-	EventMetadata common.EventMetadata    `config:",inline"`
+	EventMetadata mapstr.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
 
 	PublisherPipeline struct {
@@ -202,7 +203,7 @@ func preProcessors(info beat.Info, settings publishSettings, monitorType string)
 	}
 
 	// Always set event.dataset
-	procs.AddProcessor(actions.NewAddFields(common.MapStr{"event": common.MapStr{"dataset": dataset}}, true, true))
+	procs.AddProcessor(actions.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
 
 	if settings.DataStream != nil {
 		ds := *settings.DataStream

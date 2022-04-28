@@ -27,10 +27,10 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var binfo = beat.Info{
@@ -100,7 +100,7 @@ func TestPreProcessors(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			e := beat.Event{Meta: common.MapStr{}, Fields: common.MapStr{}}
+			e := beat.Event{Meta: mapstr.M{}, Fields: mapstr.M{}}
 			procs, err := preProcessors(binfo, tt.settings, tt.monitorType)
 			if tt.wantErr == true {
 				require.Error(t, err)

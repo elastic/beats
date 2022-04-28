@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type handlerFunc func(http.ResponseWriter, *http.Request)
@@ -80,7 +81,7 @@ func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
 	}
 }
 
-func prettyPrint(w http.ResponseWriter, data common.MapStr, u *url.URL) {
+func prettyPrint(w http.ResponseWriter, data mapstr.M, u *url.URL) {
 	query := u.Query()
 	if _, ok := query["pretty"]; ok {
 		fmt.Fprintf(w, data.StringToPrint())

@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -112,7 +113,7 @@ func createOnMessageHandler(logger *logp.Logger, outlet channel.Outleter, inflig
 		logger.Debugf("Received message on topic '%s', messageID: %d, size: %d", message.Topic(),
 			message.MessageID(), len(message.Payload()))
 
-		mqttFields := common.MapStr{
+		mqttFields := mapstr.M{
 			"duplicate":  message.Duplicate(),
 			"message_id": message.MessageID(),
 			"qos":        message.Qos(),
@@ -121,7 +122,7 @@ func createOnMessageHandler(logger *logp.Logger, outlet channel.Outleter, inflig
 		}
 		outlet.OnEvent(beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": string(message.Payload()),
 				"mqtt":    mqttFields,
 			},

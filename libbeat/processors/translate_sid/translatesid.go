@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processor.translate_sid"
@@ -75,7 +76,7 @@ func (p *processor) String() string {
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	err := p.translateSID(event)
-	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && common.ErrKeyNotFound == errors.Cause(err)) {
+	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && mapstr.ErrKeyNotFound == errors.Cause(err)) {
 		return event, nil
 	}
 	return event, err

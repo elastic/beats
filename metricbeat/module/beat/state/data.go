@@ -21,8 +21,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 
@@ -69,8 +68,8 @@ var (
 
 func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool) error {
 	event := mb.Event{
-		RootFields:   common.MapStr{},
-		ModuleFields: common.MapStr{},
+		RootFields:   mapstr.M{},
+		ModuleFields: mapstr.M{},
 	}
 
 	var data map[string]interface{}
@@ -99,7 +98,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 
 	if event.MetricSetFields != nil {
 		event.MetricSetFields.Put("cluster.uuid", clusterUUID)
-		event.MetricSetFields.Put("beat", common.MapStr{
+		event.MetricSetFields.Put("beat", mapstr.M{
 			"name":    info.Name,
 			"host":    info.Hostname,
 			"type":    info.Beat,
@@ -111,7 +110,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 	//Extract ECS fields from the host key
 	host, ok := event.MetricSetFields["host"]
 	if ok {
-		hostMap, ok := host.(common.MapStr)
+		hostMap, ok := host.(mapstr.M)
 		if ok {
 			arch, ok := hostMap["architecture"]
 			if ok {
