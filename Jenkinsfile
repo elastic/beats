@@ -564,23 +564,6 @@ def targetWithoutNode(Map args = [:]) {
   def installK8s = args.get('installK8s', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
-<<<<<<< HEAD
-  withNode(labels: args.label, forceWorkspace: true){
-    withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
-        dumpVariables()
-        withTools(k8s: installK8s) {
-          // make commands use -C <folder> while mage commands require the dir(folder)
-          // let's support this scenario with the location variable.
-          dir(isMage ? directory : '') {
-            if (enableRetry) {
-              // Retry the same command to bypass any kind of flakiness.
-              // Downside: genuine failures will be repeated.
-              retry(3) {
-                cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
-              }
-            } else {
-=======
   def withGCP = args.get('withGCP', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -593,7 +576,6 @@ def targetWithoutNode(Map args = [:]) {
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
             retry(3) {
->>>>>>> aa475907dc ([ci][terraform] tags with metadata (#31355))
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
             }
           } else {
