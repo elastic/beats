@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -342,65 +343,65 @@ func TestGetField(t *testing.T) {
 
 func TestFieldValidate(t *testing.T) {
 	tests := map[string]struct {
-		cfg   common.MapStr
+		cfg   mapstr.M
 		field Field
 		err   bool
 	}{
 		"top level object type config": {
-			cfg:   common.MapStr{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 10},
+			cfg:   mapstr.M{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 10},
 			field: Field{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 10},
 			err:   false,
 		},
 		"multiple object type configs": {
-			cfg: common.MapStr{"object_type_params": []common.MapStr{
+			cfg: mapstr.M{"object_type_params": []mapstr.M{
 				{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 100}}},
 			field: Field{ObjectTypeParams: []ObjectTypeCfg{{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 100}}},
 			err:   false,
 		},
 		"invalid config mixing object_type and object_type_params": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"object_type":        "scaled_float",
-				"object_type_params": []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+				"object_type_params": []mapstr.M{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
 		"invalid config mixing object_type_mapping_type and object_type_params": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"object_type_mapping_type": "float",
-				"object_type_params":       []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+				"object_type_params":       []mapstr.M{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
 		"invalid config mixing scaling_factor and object_type_params": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"scaling_factor":     100,
-				"object_type_params": []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+				"object_type_params": []mapstr.M{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
 		"valid unit": {
-			cfg:   common.MapStr{"type": "long", "unit": "nanos"},
+			cfg:   mapstr.M{"type": "long", "unit": "nanos"},
 			err:   false,
 			field: Field{Type: "long", Unit: "nanos"},
 		},
 		"invalid unit": {
-			cfg: common.MapStr{"type": "long", "unit": "celsius"},
+			cfg: mapstr.M{"type": "long", "unit": "celsius"},
 			err: true,
 		},
 		"valid metric type": {
-			cfg:   common.MapStr{"type": "long", "metric_type": "gauge"},
+			cfg:   mapstr.M{"type": "long", "metric_type": "gauge"},
 			err:   false,
 			field: Field{Type: "long", MetricType: "gauge"},
 		},
 		"invalid metric type": {
-			cfg: common.MapStr{"type": "long", "metric_type": "timer"},
+			cfg: mapstr.M{"type": "long", "metric_type": "timer"},
 			err: true,
 		},
 		"invalid config mixing dynamic_template with object_type": {
-			cfg: common.MapStr{"dynamic_template": true, "type": "object", "object_type": "text"},
+			cfg: mapstr.M{"dynamic_template": true, "type": "object", "object_type": "text"},
 			err: true,
 		},
 		"invalid config mixing dynamic_template with object_type_params": {
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"type": "object",
-				"object_type_params": []common.MapStr{{
+				"object_type_params": []mapstr.M{{
 					"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 100,
 				}},
 				"dynamic_template": true,
@@ -408,7 +409,7 @@ func TestFieldValidate(t *testing.T) {
 			err: true,
 		},
 		"allow ip_range": {
-			cfg:   common.MapStr{"type": "ip_range"},
+			cfg:   mapstr.M{"type": "ip_range"},
 			err:   false,
 			field: Field{Type: "ip_range"},
 		},

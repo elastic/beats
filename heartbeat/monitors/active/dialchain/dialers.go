@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TCPDialer creates a new NetDialer with constant event fields and default
@@ -106,9 +106,9 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 			}
 
 			end := time.Now()
-			eventext.MergeEventFields(event, common.MapStr{
-				namespace: common.MapStr{
-					"rtt": common.MapStr{
+			eventext.MergeEventFields(event, mapstr.M{
+				namespace: mapstr.M{
+					"rtt": mapstr.M{
 						"connect": look.RTT(end.Sub(start)),
 					},
 				},

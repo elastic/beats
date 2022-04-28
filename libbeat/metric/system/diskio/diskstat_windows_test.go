@@ -23,11 +23,10 @@ package diskio
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
@@ -45,8 +44,8 @@ func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
 	assert.Empty(t, errs)
 	assert.Equal(t, 1, len(data))
 	assert.Equal(t, data[0].MetricSetFields["name"], "C:")
-	reads := data[0].MetricSetFields["read"].(common.MapStr)
-	writes := data[0].MetricSetFields["write"].(common.MapStr)
+	reads := data[0].MetricSetFields["read"].(mapstr.M)
+	writes := data[0].MetricSetFields["write"].(mapstr.M)
 	// Check values
 	readCount := reads["count"].(uint64)
 	readBytes := reads["bytes"].(uint64)

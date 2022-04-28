@@ -23,9 +23,9 @@ package info
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -47,7 +47,7 @@ func TestFetch(t *testing.T) {
 
 	// Check fields
 	assert.Equal(t, 10, len(event))
-	server := event["server"].(common.MapStr)
+	server := event["server"].(mapstr.M)
 	assert.Equal(t, "standalone", server["mode"])
 }
 

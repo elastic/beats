@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type dnsPlugin struct {
@@ -371,7 +372,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 	fields["type"] = "dns"
 	fields["status"] = common.ERROR_STATUS
 
-	dnsEvent := common.MapStr{}
+	dnsEvent := mapstr.M{}
 	fields["dns"] = dnsEvent
 
 	if t.request != nil && t.response != nil {
@@ -443,11 +444,11 @@ func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {
 }
 
 // Adds the DNS message data to the supplied MapStr.
-func addDNSToMapStr(m common.MapStr, pbf *pb.Fields, dns *mkdns.Msg, authority bool, additional bool) {
+func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, additional bool) {
 	m["id"] = dns.Id
 	m["op_code"] = dnsOpCodeToString(dns.Opcode)
 
-	m["flags"] = common.MapStr{
+	m["flags"] = mapstr.M{
 		"authoritative":       dns.Authoritative,
 		"truncated_response":  dns.Truncated,
 		"recursion_desired":   dns.RecursionDesired,
@@ -484,7 +485,7 @@ func addDNSToMapStr(m common.MapStr, pbf *pb.Fields, dns *mkdns.Msg, authority b
 
 	if len(dns.Question) > 0 {
 		q := dns.Question[0]
-		qMapStr := common.MapStr{
+		qMapStr := mapstr.M{
 			"name":  q.Name,
 			"type":  dnsTypeToString(q.Qtype),
 			"class": dnsClassToString(q.Qclass),
@@ -552,8 +553,8 @@ func addDNSToMapStr(m common.MapStr, pbf *pb.Fields, dns *mkdns.Msg, authority b
 	}
 }
 
-func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {
-	optMapStr := common.MapStr{
+func optToMapStr(rrOPT *mkdns.OPT) mapstr.M {
+	optMapStr := mapstr.M{
 		"do":        rrOPT.Do(), // true if DNSSEC
 		"version":   strconv.FormatUint(uint64(rrOPT.Version()), 10),
 		"udp_size":  rrOPT.UDPSize(),
@@ -588,9 +589,9 @@ func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {
 
 // rrsToMapStr converts an slice of RR's to an slice of MapStr's and optionally
 // returns a list of the IP addresses found in the resource records.
-func rrsToMapStrs(records []mkdns.RR, ipList bool) ([]common.MapStr, []string) {
+func rrsToMapStrs(records []mkdns.RR, ipList bool) ([]mapstr.M, []string) {
 	var allIPs []string
-	mapStrSlice := make([]common.MapStr, 0, len(records))
+	mapStrSlice := make([]mapstr.M, 0, len(records))
 	for _, rr := range records {
 		rrHeader := rr.Header()
 
@@ -654,8 +655,8 @@ func rrToString(rr mkdns.RR) string {
 	return b.String()
 }
 
-func rrToMapStr(rr mkdns.RR, ipList bool) (common.MapStr, []string) {
-	mapStr := common.MapStr{}
+func rrToMapStr(rr mkdns.RR, ipList bool) (mapstr.M, []string) {
+	mapStr := mapstr.M{}
 	rrType := rr.Header().Rrtype
 
 	var ips []string

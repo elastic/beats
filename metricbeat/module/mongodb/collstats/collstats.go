@@ -20,9 +20,9 @@ package collstats
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -62,7 +62,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 	defer mongoSession.Close()
 
-	result := common.MapStr{}
+	result := mapstr.M{}
 
 	err = mongoSession.Run("top", &result)
 	if err != nil {
@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.New("Error accessing collection totals in returned data")
 	}
 
-	totals, ok := result["totals"].(common.MapStr)
+	totals, ok := result["totals"].(mapstr.M)
 	if !ok {
 		return errors.New("Collection totals are not a map")
 	}
@@ -83,7 +83,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		infoMap, ok := info.(common.MapStr)
+		infoMap, ok := info.(mapstr.M)
 		if !ok {
 			err = errors.New("Unexpected data returned by mongodb")
 			reporter.Error(err)

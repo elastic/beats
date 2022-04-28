@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type countFilter struct {
@@ -45,37 +46,37 @@ func TestWhenProcessor(t *testing.T) {
 	tests := []struct {
 		title    string
 		filter   config
-		events   []common.MapStr
+		events   []mapstr.M
 		expected int
 	}{
 		{
 			"condition_matches",
 			config{"when.equals.i": 10},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			1,
 		},
 		{
 			"condition_fails",
 			config{"when.equals.i": 11},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			0,
 		},
 		{
 			"no_condition",
 			config{},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			1,
 		},
 		{
 			"condition_matches",
 			config{"when.has_fields": []string{"i"}},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			1,
 		},
 		{
 			"condition_fails",
 			config{"when.has_fields": []string{"j"}},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			0,
 		},
 	}
@@ -124,8 +125,8 @@ func TestConditionRuleInitErrorPropagates(t *testing.T) {
 }
 
 type testCase struct {
-	event common.MapStr
-	want  common.MapStr
+	event mapstr.M
+	want  mapstr.M
 	cfg   string
 }
 
@@ -199,33 +200,33 @@ func TestIfElseThenProcessor(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"if-then-true": {
-			event: common.MapStr{"uid": 411},
-			want:  common.MapStr{"uid": 411, "uid_type": "reserved"},
+			event: mapstr.M{"uid": 411},
+			want:  mapstr.M{"uid": 411, "uid_type": "reserved"},
 			cfg:   ifThen,
 		},
 		"if-then-false": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500},
 			cfg:   ifThen,
 		},
 		"if-then-else-true": {
-			event: common.MapStr{"uid": 411},
-			want:  common.MapStr{"uid": 411, "uid_type": "reserved"},
+			event: mapstr.M{"uid": 411},
+			want:  mapstr.M{"uid": 411, "uid_type": "reserved"},
 			cfg:   ifThenElse,
 		},
 		"if-then-else-false": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500, "uid_type": "user"},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500, "uid_type": "user"},
 			cfg:   ifThenElse,
 		},
 		"if-then-else-false-single-processor": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500, "uid_type": "user"},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500, "uid_type": "user"},
 			cfg:   ifThenElseSingleProcessor,
 		},
 		"if-then-else-if": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500, "uid_type": "eq_500"},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500, "uid_type": "eq_500"},
 			cfg:   ifThenElseIf,
 		},
 	})

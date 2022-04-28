@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfigsMapping(t *testing.T) {
@@ -110,7 +111,7 @@ func TestConfigsMapping(t *testing.T) {
 			event: bus.Event{
 				"foo":  3,
 				"host": "1.2.3.4",
-				"ports": common.MapStr{
+				"ports": mapstr.M{
 					"web": 8080,
 				},
 			},
