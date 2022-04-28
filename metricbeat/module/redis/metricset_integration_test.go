@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
