@@ -5784,6 +5784,7 @@ https://github.com/elastic/beats/compare/v6.2.3\...v6.3.0[View commits]
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 - Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
+- Add CometD input {pull}30089[30089]
 
 *Heartbeat*
 
