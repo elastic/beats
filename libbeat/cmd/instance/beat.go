@@ -883,7 +883,7 @@ func (b *Beat) checkElasticsearchVersion() {
 		return
 	}
 
-	_ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := common.NewVersion(b.Info.Version)
 		if err != nil {
