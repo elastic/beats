@@ -57,7 +57,7 @@ func makeFileout(
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("bulk_max_size", -1, -1)
+	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
 		log:      logp.NewLogger("file"),

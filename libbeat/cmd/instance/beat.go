@@ -779,7 +779,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 	tempFile := metaPath + ".new"
 	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("Failed to create Beat meta file: %s", err)
+		return fmt.Errorf("failed to create Beat meta file: %w", err)
 	}
 
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
@@ -833,7 +833,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		}
 		err := b.Config.Dashboards.SetBool("enabled", -1, true)
 		if err != nil {
-			return fmt.Errorf("Error setting dashboard.enabled=true: %v", err)
+			return fmt.Errorf("error setting dashboard.enabled=true: %w", err)
 		}
 	}
 
@@ -845,7 +845,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
-			return fmt.Errorf("error connecting to Kibana: %v", err)
+			return fmt.Errorf("error connecting to Kibana: %w", err)
 		}
 		// This fetches the version for Kibana. For the alias feature the version of ES would be needed
 		// but it's assumed that KB and ES have the same minor version.

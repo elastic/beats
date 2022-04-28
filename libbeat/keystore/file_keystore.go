@@ -243,11 +243,11 @@ func (k *FileKeystore) doSave(override bool) error {
 		return fmt.Errorf("cannot open file to save the keystore to '%s', error: %s", k.Path, err)
 	}
 
-	f.Write(version)
+	_, _ = f.Write(version)
 	base64Encoder := base64.NewEncoder(base64.StdEncoding, f)
-	io.Copy(base64Encoder, encrypted)
+	_, _ = io.Copy(base64Encoder, encrypted)
 	base64Encoder.Close()
-	f.Sync()
+	_ = f.Sync()
 	f.Close()
 
 	err = file.SafeFileRotate(k.Path, temporaryPath)

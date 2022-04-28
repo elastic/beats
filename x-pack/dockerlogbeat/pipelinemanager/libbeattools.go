@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
@@ -34,13 +33,13 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 	// Attach CloudID config if needed
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error creating CloudID")
+		return nil, fmt.Errorf("error creating CloudID: %w", err)
 	}
 
 	config := containerConfig{}
 	err = cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("unpacking config failed: %v", err)
+		return nil, fmt.Errorf("unpacking config failed: %w", err)
 	}
 
 	info, err := getBeatInfo(logOptsConfig, hostname)
@@ -50,19 +49,19 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 
 	processing, err := processing.MakeDefaultBeatSupport(true)(info, log, cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "error in MakeDefaultSupport")
+		return nil, fmt.Errorf("error in MakeDefaultSupport: %w", err)
 	}
 
 	pipelineCfg := pipeline.Config{}
 	err = cfg.Unpack(&pipelineCfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpacking pipeline config")
+		return nil, fmt.Errorf("error unpacking pipeline config: %w", err)
 	}
 
 	idxMgr := newIndexSupporter(info)
 
 	settings := pipeline.Settings{
-		WaitClose:     time.Duration(time.Second * 10),
+		WaitClose:     time.Second * 10,
 		WaitCloseMode: pipeline.WaitOnPipelineClose,
 		Processors:    processing,
 	}
@@ -84,7 +83,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 	)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "error in pipeline.Load")
+		return nil, fmt.Errorf("error in pipeline.Load")
 	}
 
 	return &Pipeline{pipeline: pipeline, refCount: 0}, nil
@@ -96,12 +95,12 @@ func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, 
 
 	eid, err := uuid.NewV4()
 	if err != nil {
-		return beat.Info{}, errors.Wrap(err, "error creating ephemeral ID")
+		return beat.Info{}, fmt.Errorf("error creating ephemeral ID: %w", err)
 	}
 
 	id, err := loadMeta("/tmp/meta.json")
 	if err != nil {
-		return beat.Info{}, errors.Wrap(err, "error loading UUID")
+		return beat.Info{}, fmt.Errorf("error loading UUID: %w", err)
 	}
 
 	beatName := "elastic-log-driver"
@@ -128,7 +127,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	// check for an existing file
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
-		return uuid.Nil, errors.Wrapf(err, "beat meta file %s failed to open", metaPath)
+		return uuid.Nil, fmt.Errorf("beat meta file %s failed to open: %w", metaPath, err)
 	}
 
 	//return the UUID if it exists
@@ -148,7 +147,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	// file does not exist or ID is invalid, let's create a new one
 	newID, err := uuid.NewV4()
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "error creating ID")
+		return uuid.Nil, fmt.Errorf("error creating ID: %w", err)
 	}
 	// write temporary file first
 	tempFile := metaPath + ".new"
