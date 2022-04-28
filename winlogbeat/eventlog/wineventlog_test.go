@@ -35,6 +35,7 @@ import (
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
