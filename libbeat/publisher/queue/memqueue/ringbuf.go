@@ -200,18 +200,10 @@ func (b *ringBuffer) Avail() int {
 }
 
 func (b *ringBuffer) Full() bool {
-	var avail int
 	if b.regB.size > 0 {
-		avail = b.regA.index - b.regB.index - b.regB.size
-	} else {
-		// This doesn't seem right -- this checks how much space
-		// is available after region A in the internal array, but
-		// there might also be free space before region A. In that
-		// case new events must be inserted in region B, but the
-		// queue isn't at capacity.
-		avail = len(b.entries) - b.regA.index - b.regA.size
+		return b.regA.index > (b.regB.index + b.regB.size)
 	}
-	return avail == 0
+	return b.regA.size < len(b.entries)
 }
 
 func (b *ringBuffer) Size() int {
