@@ -24,20 +24,20 @@ import (
 	"github.com/prometheus/prometheus/pkg/textparse"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // OpenMetricEvent stores a set of one or more metrics with the same labels
 type OpenMetricEvent struct {
-	Data      common.MapStr
-	Labels    common.MapStr
+	Data      mapstr.M
+	Labels    mapstr.M
 	Help      string
 	Type      textparse.MetricType
 	Unit      string
-	Exemplars common.MapStr
+	Exemplars mapstr.M
 }
 
 // LabelsHash returns a repeatable string that is unique for the set of labels in this event
@@ -45,7 +45,7 @@ func (p *OpenMetricEvent) LabelsHash() string {
 	return labelhash.LabelHash(p.Labels)
 }
 func (p *OpenMetricEvent) MetaDataHash() string {
-	m := common.MapStr{}
+	m := mapstr.M{}
 	m.DeepUpdate(p.Labels)
 	if len(p.Help) > 0 {
 		m["help"] = p.Help
@@ -86,7 +86,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 	}
 
 	for _, metric := range metrics {
-		labels := common.MapStr{}
+		labels := mapstr.M{}
 		mn := metric.GetName()
 
 		if len(metric.Label) != 0 {
@@ -97,9 +97,9 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 			}
 		}
 
-		exemplars := common.MapStr{}
+		exemplars := mapstr.M{}
 		if metric.Exemplar != nil {
-			exemplars = common.MapStr{*mn: metric.Exemplar.Value}
+			exemplars = mapstr.M{*mn: metric.Exemplar.Value}
 			if metric.Exemplar.HasTs {
 				exemplars.Put("timestamp", metric.Exemplar.Ts)
 			}
@@ -117,8 +117,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 					Type: textparse.MetricTypeCounter,
 					Help: help,
 					Unit: unit,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							*mn: counter.GetValue(),
 						},
 					},
@@ -135,8 +135,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 					Type: textparse.MetricTypeGauge,
 					Help: help,
 					Unit: unit,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: gauge.GetValue(),
 						},
 					},
@@ -150,8 +150,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 			if info.HasValidValue() {
 				events = append(events, OpenMetricEvent{
 					Type: textparse.MetricTypeInfo,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: info.GetValue(),
 						},
 					},
@@ -165,8 +165,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 			if stateset.HasValidValue() {
 				events = append(events, OpenMetricEvent{
 					Type: textparse.MetricTypeStateset,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: stateset.GetValue(),
 						},
 					},
@@ -182,8 +182,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 					Type: textparse.MetricTypeSummary,
 					Help: help,
 					Unit: unit,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name + "_sum":   summary.GetSampleSum(),
 							name + "_count": summary.GetSampleCount(),
 						},
@@ -200,8 +200,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 				quantileLabels := labels.Clone()
 				quantileLabels["quantile"] = strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
 				events = append(events, OpenMetricEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: quantile.GetValue(),
 						},
 					},
@@ -226,8 +226,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 					Type: typ,
 					Help: help,
 					Unit: unit,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name + sum:   histogram.GetSampleSum(),
 							name + count: histogram.GetSampleCount(),
 						},
@@ -242,7 +242,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 				}
 
 				if bucket.Exemplar != nil {
-					exemplars = common.MapStr{name: bucket.Exemplar.Value}
+					exemplars = mapstr.M{name: bucket.Exemplar.Value}
 					if bucket.Exemplar.HasTs {
 						exemplars.Put("timestamp", bucket.Exemplar.Ts)
 					}
@@ -257,8 +257,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 				bucketLabels["le"] = strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 
 				events = append(events, OpenMetricEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name + "_bucket": bucket.GetCumulativeCount(),
 						},
 					},
@@ -275,8 +275,8 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 					Type: textparse.MetricTypeUnknown,
 					Help: help,
 					Unit: unit,
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: unknown.GetValue(),
 						},
 					},

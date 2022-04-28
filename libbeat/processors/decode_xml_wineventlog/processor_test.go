@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var testMessage = "<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Security-Auditing' Guid='{54849625-5478-4994-a5ba-3e3b0328c30d}'/>" +
@@ -39,21 +39,21 @@ var testMessage = "<Event xmlns='http://schemas.microsoft.com/win/2004/08/events
 	"SeDebugPrivilege\n\t\t\tSeAuditPrivilege\n\t\t\tSeSystemEnvironmentPrivilege\n\t\t\tSeImpersonatePrivilege\n\t\t\tSeDelegateSessionUserImpersonatePrivilege</Message><Level>Information</Level>" +
 	"<Task>Special Logon</Task><Opcode>Info</Opcode><Channel>Security</Channel><Provider>Microsoft Windows security auditing.</Provider><Keywords><Keyword>Audit Success</Keyword></Keywords></RenderingInfo></Event>"
 
-var testMessageOutput = common.MapStr{
-	"event": common.MapStr{
+var testMessageOutput = mapstr.M{
+	"event": mapstr.M{
 		"action":   "Special Logon",
 		"code":     "4672",
 		"kind":     "event",
 		"outcome":  "success",
 		"provider": "Microsoft-Windows-Security-Auditing",
 	},
-	"host": common.MapStr{
+	"host": mapstr.M{
 		"name": "vagrant",
 	},
-	"log": common.MapStr{
+	"log": mapstr.M{
 		"level": "information",
 	},
-	"winlog": common.MapStr{
+	"winlog": mapstr.M{
 		"channel":       "Security",
 		"outcome":       "success",
 		"activity_id":   "{ffb23523-1f32-0000-c335-b2ff321fd701}",
@@ -68,7 +68,7 @@ var testMessageOutput = common.MapStr{
 		}(),
 		"opcode":        "Info",
 		"provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
-		"event_data": common.MapStr{
+		"event_data": mapstr.M{
 			"SubjectUserSid":    "S-1-5-18",
 			"SubjectUserName":   "SYSTEM",
 			"SubjectDomainName": "NT AUTHORITY",
@@ -80,9 +80,9 @@ var testMessageOutput = common.MapStr{
 			"Audit Success",
 		},
 		"message": "Special privileges assigned to new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\nPrivileges:\t\tSeAssignPrimaryTokenPrivilege\n\t\t\tSeTcbPrivilege\n\t\t\tSeSecurityPrivilege\n\t\t\tSeTakeOwnershipPrivilege\n\t\t\tSeLoadDriverPrivilege\n\t\t\tSeBackupPrivilege\n\t\t\tSeRestorePrivilege\n\t\t\tSeDebugPrivilege\n\t\t\tSeAuditPrivilege\n\t\t\tSeSystemEnvironmentPrivilege\n\t\t\tSeImpersonatePrivilege\n\t\t\tSeDelegateSessionUserImpersonatePrivilege",
-		"process": common.MapStr{
+		"process": mapstr.M{
 			"pid": uint32(652),
-			"thread": common.MapStr{
+			"thread": mapstr.M{
 				"id": uint32(4660),
 			},
 		},
@@ -94,15 +94,15 @@ func TestProcessor(t *testing.T) {
 	var testCases = []struct {
 		description  string
 		config       config
-		Input        common.MapStr
-		Output       common.MapStr
+		Input        mapstr.M
+		Output       mapstr.M
 		error        bool
 		errorMessage string
 	}{
 		{
 			description: "Decodes properly with default config",
 			config:      defaultConfig(),
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": testMessage,
 			},
 			Output: testMessageOutput,
@@ -115,10 +115,10 @@ func TestProcessor(t *testing.T) {
 				MapECSFields:  false,
 				Target:        "winlog",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": testMessage,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"winlog":  testMessageOutput["winlog"],
 				"message": testMessage,
 			},
@@ -159,13 +159,13 @@ func TestProcessor(t *testing.T) {
 		require.NoError(t, err)
 
 		event := &beat.Event{
-			Fields: common.MapStr{},
-			Meta: common.MapStr{
+			Fields: mapstr.M{},
+			Meta: mapstr.M{
 				"message": testMessage,
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"message": testMessage,
 			"target":  testMessageOutput["winlog"],
 		}

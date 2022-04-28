@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -281,7 +282,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 }
 
 // GetClusterState returns cluster state information.
-func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (common.MapStr, error) {
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (mapstr.M, error) {
 	clusterStateURI := "_cluster/state"
 	if metrics != nil && len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
@@ -298,12 +299,12 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (comm
 }
 
 // GetClusterSettingsWithDefaults returns cluster settings.
-func GetClusterSettingsWithDefaults(http *helper.HTTP, resetURI string, filterPaths []string) (common.MapStr, error) {
+func GetClusterSettingsWithDefaults(http *helper.HTTP, resetURI string, filterPaths []string) (mapstr.M, error) {
 	return GetClusterSettings(http, resetURI, true, filterPaths)
 }
 
 // GetClusterSettings returns cluster settings
-func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool, filterPaths []string) (common.MapStr, error) {
+func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool, filterPaths []string) (mapstr.M, error) {
 	clusterSettingsURI := "_cluster/settings"
 	var queryParams []string
 	if includeDefaults {
@@ -460,7 +461,7 @@ func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
 
 // PassThruField copies the field at the given path from the given source data object into
 // the same path in the given target data object.
-func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
+func PassThruField(fieldPath string, sourceData, targetData mapstr.M) error {
 	fieldValue, err := sourceData.GetValue(fieldPath)
 	if err != nil {
 		return elastic.MakeErrorForMissingField(fieldPath, elastic.Elasticsearch)
@@ -471,7 +472,7 @@ func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error
 }
 
 // MergeClusterSettings merges cluster settings in the correct precedence order
-func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) {
+func MergeClusterSettings(clusterSettings mapstr.M) (mapstr.M, error) {
 	transientSettings, err := getSettingGroup(clusterSettings, "transient")
 	if err != nil {
 		return nil, err
@@ -564,12 +565,12 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 	return false
 }
 
-// ToMapStr converts the license to a common.MapStr. This is necessary
+// ToMapStr converts the license to a mapstr.M. This is necessary
 // for proper marshaling of the data before it's sent over the wire. In
 // particular it ensures that ms-since-epoch values are marshaled as longs
 // and not floats in scientific notation as Elasticsearch does not like that.
-func (l *License) ToMapStr() common.MapStr {
-	m := common.MapStr{
+func (l *License) ToMapStr() mapstr.M {
+	m := mapstr.M{
 		"status":               l.Status,
 		"uid":                  l.ID,
 		"type":                 l.Type,
@@ -600,7 +601,7 @@ func (l *License) ToMapStr() common.MapStr {
 	return m
 }
 
-func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {
+func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 	hasSettingGroup, err := allSettings.HasKey(groupKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "failure to determine if "+groupKey+" settings exist")
@@ -620,5 +621,5 @@ func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr,
 		return nil, errors.Wrap(err, groupKey+" settings are not a map")
 	}
 
-	return common.MapStr(v), nil
+	return mapstr.M(v), nil
 }

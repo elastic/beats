@@ -20,6 +20,7 @@ package template
 import (
 	"fmt"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 
@@ -75,11 +76,11 @@ func NewConfigMapper(
 }
 
 // Event adapts MapStr to processors.ValuesMap interface
-type Event common.MapStr
+type Event mapstr.M
 
 // GetValue extracts given key from an Event
 func (e Event) GetValue(key string) (interface{}, error) {
-	val, err := common.MapStr(e).GetValue(key)
+	val, err := mapstr.M(e).GetValue(key)
 	if err != nil {
 		return nil, err
 	}

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
@@ -192,10 +193,10 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		}
 
 		event := mb.Event{
-			RootFields: common.MapStr{
-				"service": common.MapStr{"name": logstash.ModuleName},
+			RootFields: mapstr.M{
+				"service": mapstr.M{"name": logstash.ModuleName},
 			},
-			ModuleFields: common.MapStr{},
+			ModuleFields: mapstr.M{},
 		}
 
 		event.ModuleFields.Put("node.stats", logstashStats)

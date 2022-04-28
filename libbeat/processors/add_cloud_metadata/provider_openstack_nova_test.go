@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func openstackNovaMetadataHandler() http.HandlerFunc {
@@ -93,23 +94,23 @@ func assertOpenstackNova(t *testing.T, config *common.Config) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
 			"provider": "openstack",
-			"instance": common.MapStr{"" +
+			"instance": mapstr.M{"" +
 				"id": "i-0000ffac",
 				"name": "testvm01.stack.cloud",
 			},
-			"machine": common.MapStr{
+			"machine": mapstr.M{
 				"type": "m1.xlarge",
 			},
 			"availability_zone": "az-test-2",
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "Nova",
 			},
 		},

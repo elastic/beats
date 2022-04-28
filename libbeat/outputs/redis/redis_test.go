@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type checker func(*testing.T, outputs.Group)
@@ -148,14 +149,14 @@ func TestKeySelection(t *testing.T) {
 		"use event field": {
 			cfg: map[string]interface{}{"key": "test-%{[field]}"},
 			event: beat.Event{
-				Fields: common.MapStr{"field": "from-event"},
+				Fields: mapstr.M{"field": "from-event"},
 			},
 			want: "test-from-event",
 		},
 		"use event field must keep case": {
 			cfg: map[string]interface{}{"key": "Test-%{[field]}"},
 			event: beat.Event{
-				Fields: common.MapStr{"field": "From-Event"},
+				Fields: mapstr.M{"field": "From-Event"},
 			},
 			want: "Test-From-Event",
 		},

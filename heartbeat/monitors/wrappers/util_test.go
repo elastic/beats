@@ -23,22 +23,21 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestURLFields(t *testing.T) {
 	tests := []struct {
 		name string
 		u    string
-		want common.MapStr
+		want mapstr.M
 	}{
 		{
 			"simple-http",
 			"http://elastic.co",
-			common.MapStr{
+			mapstr.M{
 				"full":   "http://elastic.co",
 				"scheme": "http",
 				"domain": "elastic.co",
@@ -48,7 +47,7 @@ func TestURLFields(t *testing.T) {
 		{
 			"simple-https",
 			"https://elastic.co",
-			common.MapStr{
+			mapstr.M{
 				"full":   "https://elastic.co",
 				"scheme": "https",
 				"domain": "elastic.co",
@@ -58,7 +57,7 @@ func TestURLFields(t *testing.T) {
 		{
 			"fancy-proto",
 			"tcp+ssl://elastic.co:1234",
-			common.MapStr{
+			mapstr.M{
 				"full":   "tcp+ssl://elastic.co:1234",
 				"scheme": "tcp+ssl",
 				"domain": "elastic.co",
@@ -68,7 +67,7 @@ func TestURLFields(t *testing.T) {
 		{
 			"complex",
 			"tcp+ssl://myuser:mypass@elastic.co:65500/foo/bar?q=dosomething&x=y",
-			common.MapStr{
+			mapstr.M{
 				"full":     "tcp+ssl://myuser:%3Chidden%3E@elastic.co:65500/foo/bar?q=dosomething&x=y",
 				"scheme":   "tcp+ssl",
 				"domain":   "elastic.co",

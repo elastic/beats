@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -73,7 +73,7 @@ func decodeLine(line []byte) []byte {
 		return line
 	}
 
-	o := common.MapStr{}
+	o := mapstr.M{}
 	err := json.Unmarshal(line, &o)
 	if err != nil {
 		return line
@@ -84,7 +84,7 @@ func decodeLine(line []byte) []byte {
 	return []byte(o.String())
 }
 
-func decodeObject(o common.MapStr) common.MapStr {
+func decodeObject(o mapstr.M) mapstr.M {
 	for _, key := range responseToDecode {
 		// All fields are optional, so errors are not caught
 		err := decodeValue(o, key)
@@ -98,7 +98,7 @@ func decodeObject(o common.MapStr) common.MapStr {
 	return o
 }
 
-func decodeEmbeddableConfig(o common.MapStr) common.MapStr {
+func decodeEmbeddableConfig(o mapstr.M) mapstr.M {
 	p, err := o.GetValue("attributes.panelsJSON")
 	if err != nil {
 		return o
@@ -107,13 +107,13 @@ func decodeEmbeddableConfig(o common.MapStr) common.MapStr {
 	if panels, ok := p.([]interface{}); ok {
 		for i, pan := range panels {
 			if panel, ok := pan.(map[string]interface{}); ok {
-				panelObj := common.MapStr(panel)
+				panelObj := mapstr.M(panel)
 				embedded, err := panelObj.GetValue("embeddableConfig")
 				if err != nil {
 					continue
 				}
 				if embeddedConfig, ok := embedded.(map[string]interface{}); ok {
-					embeddedConfigObj := common.MapStr(embeddedConfig)
+					embeddedConfigObj := mapstr.M(embeddedConfig)
 					panelObj.Put("embeddableConfig", decodeObject(embeddedConfigObj))
 					panels[i] = panelObj
 				}
@@ -125,7 +125,7 @@ func decodeEmbeddableConfig(o common.MapStr) common.MapStr {
 	return o
 }
 
-func decodeValue(data common.MapStr, key string) error {
+func decodeValue(data mapstr.M, key string) error {
 	v, err := data.GetValue(key)
 	if err != nil {
 		return err

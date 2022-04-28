@@ -24,12 +24,12 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -37,7 +37,7 @@ import (
 )
 
 func TestGetPromEventsFromMetricFamily(t *testing.T) {
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"handler": "query",
 	}
 	tests := []struct {
@@ -65,8 +65,8 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
@@ -89,12 +89,12 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 			},
 		},
@@ -120,21 +120,21 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_count": uint64(10),
 							"http_request_duration_microseconds_sum":   float64(10),
 						},
 					},
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
-					Labels: common.MapStr{
+					Labels: mapstr.M{
 						"quantile": "0.99",
 					},
 				},
@@ -162,21 +162,21 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_count": uint64(10),
 							"http_request_duration_microseconds_sum":   float64(10),
 						},
 					},
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_bucket": uint64(10),
 						},
 					},
-					Labels: common.MapStr{"le": "0.99"},
+					Labels: mapstr.M{"le": "0.99"},
 				},
 			},
 		},
@@ -201,8 +201,8 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},

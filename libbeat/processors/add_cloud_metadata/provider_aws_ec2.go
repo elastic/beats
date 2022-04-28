@@ -25,6 +25,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -113,7 +114,7 @@ var ec2MetadataFetcher = provider{
 	Local: true,
 
 	Create: func(_ string, config *common.Config) (metadataFetcher, error) {
-		ec2Schema := func(m map[string]interface{}) common.MapStr {
+		ec2Schema := func(m map[string]interface{}) mapstr.M {
 			m["serviceName"] = "EC2"
 			out, _ := s.Schema{
 				"instance":          s.Object{"id": c.Str("instanceId")},
@@ -126,7 +127,7 @@ var ec2MetadataFetcher = provider{
 				"account": s.Object{"id": c.Str("accountId")},
 				"image":   s.Object{"id": c.Str("imageId")},
 			}.Apply(m)
-			return common.MapStr{"cloud": out}
+			return mapstr.M{"cloud": out}
 		}
 
 		headers := make(map[string]string, 1)

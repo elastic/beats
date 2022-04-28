@@ -29,7 +29,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -73,16 +73,16 @@ func NewReader() (*Reader, error) {
 	return r, nil
 }
 
-func (reader *Reader) Read() ([]common.MapStr, error) {
+func (reader *Reader) Read() ([]mapstr.M, error) {
 	services, err := GetServiceStates(reader.handle, reader.state, reader.protectedServices)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]common.MapStr, 0, len(services))
+	result := make([]mapstr.M, 0, len(services))
 
 	for _, service := range services {
-		ev := common.MapStr{
+		ev := mapstr.M{
 			"id":           reader.getServiceID(service.ServiceName),
 			"display_name": service.DisplayName,
 			"name":         service.ServiceName,

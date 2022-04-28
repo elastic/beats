@@ -23,11 +23,11 @@ package cpu
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error creating host fields")
 	}
-	hostFields := common.MapStr{}
+	hostFields := mapstr.M{}
 	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
 	if err != nil {
 		return errors.Wrap(err, "error fetching normalized CPU percent")
@@ -102,9 +102,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 // copyFieldsOrDefault copies the field specified by key to the given map. It will
 // overwrite the key if it exists. It will update the map with a default value if
 // the key does not exist in the source map.
-func copyFieldsOrDefault(from, to common.MapStr, key, newkey string, value interface{}) error {
+func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value interface{}) error {
 	v, err := from.GetValue(key)
-	if errors.Is(err, common.ErrKeyNotFound) {
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		_, err = to.Put(newkey, value)
 		return err
 	}
