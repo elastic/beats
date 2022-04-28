@@ -1,0 +1,153 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "3bc85366-bc3d-4ef1-b4cb-a94bad79ae77": {
+                            "columnOrder": [
+                                "b74e6a34-ee9b-42a4-9ac1-3d2a58181ff4",
+                                "c66648f4-1b68-4e81-8652-fa179dc55e8f"
+                            ],
+                            "columns": {
+                                "b74e6a34-ee9b-42a4-9ac1-3d2a58181ff4": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "c66648f4-1b68-4e81-8652-fa179dc55e8f": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Last value of oracle.sysmetric.metrics.value",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "9e138975-4fc9-42d9-919d-880d617d88b1",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "Network Traffic Volume Per Sec"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "Network Traffic Volume Per Sec"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "1dac6339-2b34-403f-a01c-8734e8cc781a",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "Linear",
+                "layers": [
+                    {
+                        "accessors": [
+                            "c66648f4-1b68-4e81-8652-fa179dc55e8f"
+                        ],
+                        "layerId": "3bc85366-bc3d-4ef1-b4cb-a94bad79ae77",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "b74e6a34-ee9b-42a4-9ac1-3d2a58181ff4"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "title": "Empty XY chart",
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "Network Traffic Volume per second"
+            }
+        },
+        "title": "Network Traffic Volume per second",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "7defed90-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-3bc85366-bc3d-4ef1-b4cb-a94bad79ae77",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "9e138975-4fc9-42d9-919d-880d617d88b1",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "1dac6339-2b34-403f-a01c-8734e8cc781a",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:04:45.842Z",
+    "version": "WzkwMzYsMV0="
+}

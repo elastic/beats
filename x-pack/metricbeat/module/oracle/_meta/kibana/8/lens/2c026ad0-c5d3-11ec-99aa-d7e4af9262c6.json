@@ -1,0 +1,153 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "2cab3c50-fe47-4f39-a047-33a75bd88d51": {
+                            "columnOrder": [
+                                "1bb5a317-f9bb-49ec-aeea-351d7a8d330d",
+                                "3088c7f4-8a79-4daf-a85d-ff279e652d74"
+                            ],
+                            "columns": {
+                                "1bb5a317-f9bb-49ec-aeea-351d7a8d330d": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "3088c7f4-8a79-4daf-a85d-ff279e652d74": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Last value of oracle.sysmetric.metrics.value",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "5148828a-61e3-4e91-93f1-0d8ef3f0f077",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "CPU Usage Per Sec"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "CPU Usage Per Sec"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "3f1cd9de-2d3c-47c5-9344-d155223fa0a3",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "Linear",
+                "layers": [
+                    {
+                        "accessors": [
+                            "3088c7f4-8a79-4daf-a85d-ff279e652d74"
+                        ],
+                        "layerId": "2cab3c50-fe47-4f39-a047-33a75bd88d51",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "1bb5a317-f9bb-49ec-aeea-351d7a8d330d"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "title": "Empty XY chart",
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "CPU Usage per second"
+            }
+        },
+        "title": "CPU Usage per second",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "2c026ad0-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-2cab3c50-fe47-4f39-a047-33a75bd88d51",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "5148828a-61e3-4e91-93f1-0d8ef3f0f077",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "3f1cd9de-2d3c-47c5-9344-d155223fa0a3",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:03:17.678Z",
+    "version": "Wzg5MzcsMV0="
+}

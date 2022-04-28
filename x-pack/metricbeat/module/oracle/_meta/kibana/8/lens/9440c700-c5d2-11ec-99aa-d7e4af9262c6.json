@@ -1,0 +1,208 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "4ba6140e-163b-461d-8576-354b4b5c5ee7": {
+                            "columnOrder": [
+                                "97f7256e-b653-419d-a6a4-0c63b1d7bb85",
+                                "4c41c9ef-e387-415d-88f7-877a4f2ccc87",
+                                "c5030c60-e0fd-4a98-9177-5e26c08adf8d"
+                            ],
+                            "columns": {
+                                "4c41c9ef-e387-415d-88f7-877a4f2ccc87": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "oracle.sysmetric.metrics.name : \"Physical Writes Per Sec\" "
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Physical Writes per second",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                },
+                                "97f7256e-b653-419d-a6a4-0c63b1d7bb85": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "c5030c60-e0fd-4a98-9177-5e26c08adf8d": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "oracle.sysmetric.metrics.name : \"Physical Reads Per Sec\" "
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Physical Reads per second",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "712c842f-b5cf-42e3-b4a1-f43f89ae8a0d",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": [
+                            "Physical Reads Per Sec",
+                            "Physical Writes Per Sec"
+                        ],
+                        "type": "phrases"
+                    },
+                    "query": {
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "oracle.sysmetric.metrics.name": "Physical Reads Per Sec"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "oracle.sysmetric.metrics.name": "Physical Writes Per Sec"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "46935d2b-559c-466d-bdce-e28233183912",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "Linear",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "labelsOrientation": {
+                    "x": 0,
+                    "yLeft": 0,
+                    "yRight": 0
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "4c41c9ef-e387-415d-88f7-877a4f2ccc87",
+                            "c5030c60-e0fd-4a98-9177-5e26c08adf8d"
+                        ],
+                        "layerId": "4ba6140e-163b-461d-8576-354b4b5c5ee7",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "97f7256e-b653-419d-a6a4-0c63b1d7bb85",
+                        "yConfig": [
+                            {
+                                "color": "#c06060",
+                                "forAccessor": "c5030c60-e0fd-4a98-9177-5e26c08adf8d"
+                            }
+                        ]
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "Physical Writes per second"
+            }
+        },
+        "title": "Physical Writes per second",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "9440c700-c5d2-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-4ba6140e-163b-461d-8576-354b4b5c5ee7",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "712c842f-b5cf-42e3-b4a1-f43f89ae8a0d",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "46935d2b-559c-466d-bdce-e28233183912",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:01:46.765Z",
+    "version": "Wzg4MTQsMV0="
+}

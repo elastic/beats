@@ -1,0 +1,117 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "3d121daf-1e90-49e6-bae1-6a640a3e6e95": {
+                            "columnOrder": [
+                                "393c2b53-89ce-4c67-b38b-e18291f9358c"
+                            ],
+                            "columns": {
+                                "393c2b53-89ce-4c67-b38b-e18291f9358c": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Current Session Count",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "e4b10d32-f810-4a07-9be8-9b5c2bdf6fc6",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "Session Count"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "Session Count"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "014ee419-6c4a-47be-97a1-0501c43708b7",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "393c2b53-89ce-4c67-b38b-e18291f9358c",
+                "layerId": "3d121daf-1e90-49e6-bae1-6a640a3e6e95",
+                "layerType": "data"
+            }
+        },
+        "title": "Session Count",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "b213aa40-c5d2-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-3d121daf-1e90-49e6-bae1-6a640a3e6e95",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "e4b10d32-f810-4a07-9be8-9b5c2bdf6fc6",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "014ee419-6c4a-47be-97a1-0501c43708b7",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:25:16.899Z",
+    "version": "Wzk4NTgsMV0="
+}

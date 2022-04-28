@@ -1,0 +1,45 @@
+- name: sysmetric
+  type: group
+  release: beta
+  description: >
+    Sysmetric related metrics.
+  fields:
+    - name: metrics
+      type: group 
+      fields:
+        - name: begin_time
+          type: date
+          description: >
+            Begin time of the interval.
+        - name: container_id
+          type: long
+          description: >
+            Container ID.
+        - name: end_time
+          type: date
+          description: >
+            End time of the interval.
+        - name: group_id
+          type: long
+          description: >
+            Metric group ID.
+        - name: interval_size_csec
+          type: long
+          description: >
+            Interval size (in hundredths of a second).
+        - name: metric_id
+          type: long
+          description: >
+            Metric ID.
+        - name: metric_unit
+          type: keyword
+          description: >
+            Description of metric unit.
+        - name: name
+          type: keyword
+          description: >
+            Metric name.
+        - name: value
+          type: double
+          description: >
+            Metric value.

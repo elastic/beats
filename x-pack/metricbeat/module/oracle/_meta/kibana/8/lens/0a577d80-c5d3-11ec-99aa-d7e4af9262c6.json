@@ -1,0 +1,114 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "c1f602d4-54b5-444b-a7fe-10566aeb2eb4": {
+                            "columnOrder": [
+                                "892a4633-782b-4e15-a95d-dd096ed64334"
+                            ],
+                            "columns": {
+                                "892a4633-782b-4e15-a95d-dd096ed64334": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Active Session Count",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "f83e507a-6193-46a9-82ec-3bebe0dfa7a5",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "Average Active Sessions"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "Average Active Sessions"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "2f982629-6010-47a5-9757-5c937e696ac1",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "892a4633-782b-4e15-a95d-dd096ed64334",
+                "layerId": "c1f602d4-54b5-444b-a7fe-10566aeb2eb4",
+                "layerType": "data"
+            }
+        },
+        "title": "Average Active Sessions",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "0a577d80-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-c1f602d4-54b5-444b-a7fe-10566aeb2eb4",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "f83e507a-6193-46a9-82ec-3bebe0dfa7a5",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "2f982629-6010-47a5-9757-5c937e696ac1",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:26:17.579Z",
+    "version": "Wzk5MDUsMV0="
+}

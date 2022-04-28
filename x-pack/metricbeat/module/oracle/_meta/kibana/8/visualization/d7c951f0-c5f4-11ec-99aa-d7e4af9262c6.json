@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Oracle Host Control",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "service.address",
+                        "id": "1651041401253",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Host Address",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "Oracle Host Control",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "d7c951f0-c5f4-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "visualization": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-04-27T12:19:24.728Z",
+    "version": "WzExNzExLDFd"
+}

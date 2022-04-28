@@ -1,0 +1,167 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "dc96c418-75b4-4d07-a6cb-6ec47f99844d": {
+                            "columnOrder": [
+                                "2e9e2748-d13e-4046-ac91-bfa410c8ce8f",
+                                "84ac2000-aeba-4235-adc2-e8b40a94b97b"
+                            ],
+                            "columns": {
+                                "2e9e2748-d13e-4046-ac91-bfa410c8ce8f": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "84ac2000-aeba-4235-adc2-e8b40a94b97b": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Average of oracle.sysmetric.metrics.value",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "48483084-8b8f-4c54-a048-fd9d0b5eae93",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "User Rollbacks Per Sec"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "User Rollbacks Per Sec"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "570be755-ff85-4a21-9911-1b9d078e7b30",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "Linear",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "labelsOrientation": {
+                    "x": 0,
+                    "yLeft": 0,
+                    "yRight": 0
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "84ac2000-aeba-4235-adc2-e8b40a94b97b"
+                        ],
+                        "layerId": "dc96c418-75b4-4d07-a6cb-6ec47f99844d",
+                        "layerType": "data",
+                        "seriesType": "line",
+                        "xAccessor": "2e9e2748-d13e-4046-ac91-bfa410c8ce8f"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "User Rollbacks per second"
+            }
+        },
+        "title": "User Rollbacks per second",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "16804880-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-dc96c418-75b4-4d07-a6cb-6ec47f99844d",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "48483084-8b8f-4c54-a048-fd9d0b5eae93",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "570be755-ff85-4a21-9911-1b9d078e7b30",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:08:59.311Z",
+    "version": "WzkyNjEsMV0="
+}

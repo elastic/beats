@@ -1,0 +1,169 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "5ba0273f-f939-40fd-87e0-7a78a35a3530": {
+                            "columnOrder": [
+                                "c7b837fe-9347-421c-b658-77fd907e0c69",
+                                "6719c397-b40f-47e0-9800-52bd5191cd6b"
+                            ],
+                            "columns": {
+                                "6719c397-b40f-47e0-9800-52bd5191cd6b": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Median of oracle.sysmetric.metrics.value",
+                                    "operationType": "median",
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                },
+                                "c7b837fe-9347-421c-b658-77fd907e0c69": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "4b04c914-05e9-4b91-8ae3-6af46c29fc83",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "Total Index Scans Per Txn"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "Total Index Scans Per Txn"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "33ac7310-9dbd-4203-9637-f042eaf9a7cd",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "Linear",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "labelsOrientation": {
+                    "x": 0,
+                    "yLeft": 0,
+                    "yRight": 0
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "6719c397-b40f-47e0-9800-52bd5191cd6b"
+                        ],
+                        "layerId": "5ba0273f-f939-40fd-87e0-7a78a35a3530",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "c7b837fe-9347-421c-b658-77fd907e0c69"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "Total Index Scans per transaction"
+            }
+        },
+        "title": "Total Index Scans per transaction",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "93f21550-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-5ba0273f-f939-40fd-87e0-7a78a35a3530",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "4b04c914-05e9-4b91-8ae3-6af46c29fc83",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "33ac7310-9dbd-4203-9637-f042eaf9a7cd",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:04:18.384Z",
+    "version": "WzkwMTMsMV0="
+}

@@ -1,0 +1,114 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "a23dcf70-49ca-4282-906e-99056952456b": {
+                            "columnOrder": [
+                                "4eede62c-2ada-4f8d-98d9-354085236f6a"
+                            ],
+                            "columns": {
+                                "4eede62c-2ada-4f8d-98d9-354085236f6a": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Average time spent in DB operations per transaction",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "d27129b6-4034-41be-b668-bf6341ef2f87",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "Response Time Per Txn"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "Response Time Per Txn"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "9fe979e4-b959-4a4c-8522-66d3a46f2b0d",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "4eede62c-2ada-4f8d-98d9-354085236f6a",
+                "layerId": "a23dcf70-49ca-4282-906e-99056952456b",
+                "layerType": "data"
+            }
+        },
+        "title": "Response Time per transaction",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "ac82a590-c5d2-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-a23dcf70-49ca-4282-906e-99056952456b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "d27129b6-4034-41be-b668-bf6341ef2f87",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "9fe979e4-b959-4a4c-8522-66d3a46f2b0d",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:01:20.885Z",
+    "version": "Wzg3OTIsMV0="
+}

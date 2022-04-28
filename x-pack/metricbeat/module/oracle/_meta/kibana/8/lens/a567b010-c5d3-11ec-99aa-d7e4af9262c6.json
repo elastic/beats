@@ -1,0 +1,153 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "06cbba1a-ef8b-408d-ae62-9c3e28482e2b": {
+                            "columnOrder": [
+                                "1abbbc8e-6e47-4e89-a268-594549bf3131",
+                                "de18801a-bebc-4780-8faf-20596b84dbe1"
+                            ],
+                            "columns": {
+                                "1abbbc8e-6e47-4e89-a268-594549bf3131": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "de18801a-bebc-4780-8faf-20596b84dbe1": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Last value of oracle.sysmetric.metrics.value",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "44c42dcc-8608-405e-96bc-d0bd41113a08",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "Physical Read Total Bytes Per Sec"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "Physical Read Total Bytes Per Sec"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "7b78e018-8656-4c8c-86e7-62d41ee394e5",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "Linear",
+                "layers": [
+                    {
+                        "accessors": [
+                            "de18801a-bebc-4780-8faf-20596b84dbe1"
+                        ],
+                        "layerId": "06cbba1a-ef8b-408d-ae62-9c3e28482e2b",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "1abbbc8e-6e47-4e89-a268-594549bf3131"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "title": "Empty XY chart",
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "Physical Read Total Bytes per second"
+            }
+        },
+        "title": "Physical Read Total Bytes per second",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "a567b010-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-06cbba1a-ef8b-408d-ae62-9c3e28482e2b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "44c42dcc-8608-405e-96bc-d0bd41113a08",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "7b78e018-8656-4c8c-86e7-62d41ee394e5",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:02:14.880Z",
+    "version": "Wzg4NjMsMV0="
+}

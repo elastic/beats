@@ -1,0 +1,155 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "f2a38165-b6d7-4c66-86d2-957c711e2f73": {
+                            "columnOrder": [
+                                "cedb4d79-393b-4d5c-8499-3a56c31bb5de",
+                                "09dcc328-c940-4d76-83d8-d0c79b415da5"
+                            ],
+                            "columns": {
+                                "09dcc328-c940-4d76-83d8-d0c79b415da5": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Last value of oracle.sysmetric.metrics.value",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "oracle.sysmetric.metrics.value"
+                                },
+                                "cedb4d79-393b-4d5c-8499-3a56c31bb5de": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "2m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "28b0214a-5fd3-476d-b66f-3e530b9f81cd",
+                        "key": "oracle.sysmetric.metrics.name",
+                        "negate": false,
+                        "params": {
+                            "query": "User Transaction Per Sec"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "oracle.sysmetric.metrics.name": "User Transaction Per Sec"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "490f3c73-45fe-435c-b26a-7404947fe8d0",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "oracle.sysmetric"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "oracle.sysmetric"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "curveType": "LINEAR",
+                "fittingFunction": "Linear",
+                "layers": [
+                    {
+                        "accessors": [
+                            "09dcc328-c940-4d76-83d8-d0c79b415da5"
+                        ],
+                        "layerId": "f2a38165-b6d7-4c66-86d2-957c711e2f73",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "cedb4d79-393b-4d5c-8499-3a56c31bb5de"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right",
+                    "showSingleSeries": false
+                },
+                "preferredSeriesType": "line",
+                "title": "Empty XY chart",
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                },
+                "yTitle": "User Transactions per second"
+            }
+        },
+        "title": "User Transactions per second",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "0f6dace0-c5d3-11ec-99aa-d7e4af9262c6",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "indexpattern-datasource-layer-f2a38165-b6d7-4c66-86d2-957c711e2f73",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "28b0214a-5fd3-476d-b66f-3e530b9f81cd",
+            "type": "index-pattern"
+        },
+        {
+            "id": "11fafbd0-c541-11ec-99aa-d7e4af9262c6",
+            "name": "490f3c73-45fe-435c-b26a-7404947fe8d0",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-04-27T09:05:38.385Z",
+    "version": "WzkxMTAsMV0="
+}

@@ -6,13 +6,12 @@ package oracle
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/godror/godror"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
-	"github.com/pkg/errors"
 )
 
 // ConnectionDetails contains all possible data that can be used to create a connection with
@@ -21,6 +20,7 @@ type ConnectionDetails struct {
 	Username string   `config:"username"`
 	Password string   `config:"password"`
 	Hosts    []string `config:"hosts"    validate:"required"`
+	Patterns []string `config:"patterns"`
 }
 
 // HostParser parsers the host value as a URL
@@ -37,10 +37,18 @@ func init() {
 
 // NewConnection returns a connection already established with Oracle
 func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
-	params, err := godror.ParseConnString(c.Hosts[0])
+	host, username, password, err := parse.OracleUrlParser(c.Hosts[0])
 	if err != nil {
-		return nil, errors.Wrap(err, "error trying to parse connection string in field 'hosts'")
+		return nil, fmt.Errorf("error trying to parse URL in field 'hosts': %w", err)
 	}
+
+	params, err := godror.ParseConnString(host)
+	if err != nil {
+		return nil, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
+	}
+
+	params.Username = username
+	params.Password = password
 
 	if params.Username == "" {
 		params.Username = c.Username
@@ -52,13 +60,13 @@ func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
 
 	db, err := sql.Open("godror", params.StringWithPassword())
 	if err != nil {
-		return nil, errors.Wrap(err, "could not open database")
+		return nil, fmt.Errorf("could not open database: %w", err)
 	}
 
 	// Check the connection before executing all queries to reduce the number
 	// of connection errors that we might encounter.
 	if err = db.Ping(); err != nil {
-		err = errors.Wrap(err, "error doing ping to database")
+		err = fmt.Errorf("error doing ping to database: %w", err)
 	}
 
 	return db, err
@@ -70,7 +78,7 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := ConnectionDetails{}
 	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error parsing config module")
+		return nil, fmt.Errorf("error parsing config module: %w", err)
 	}
 
 	return &base, nil
