@@ -201,9 +201,9 @@ func (b *ringBuffer) Avail() int {
 
 func (b *ringBuffer) Full() bool {
 	if b.regB.size > 0 {
-		return b.regA.index > (b.regB.index + b.regB.size)
+		return b.regA.index == (b.regB.index + b.regB.size)
 	}
-	return b.regA.size < len(b.entries)
+	return b.regA.size == len(b.entries)
 }
 
 func (b *ringBuffer) Size() int {
