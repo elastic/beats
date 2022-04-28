@@ -24,11 +24,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // KubernetesKeystoresRegistry implements a Provider for Keystore.
@@ -62,7 +62,7 @@ func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) k
 func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Keystore {
 	namespace := ""
 	if val, ok := event["kubernetes"]; ok {
-		kubernetesMeta := val.(common.MapStr)
+		kubernetesMeta := val.(mapstr.M)
 		ns, err := kubernetesMeta.GetValue("namespace")
 		if err != nil {
 			kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)

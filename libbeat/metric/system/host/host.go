@@ -18,19 +18,19 @@
 package host
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 // MapHostInfo converts the HostInfo to a MapStr based on ECS.
-func MapHostInfo(info types.HostInfo) common.MapStr {
-	data := common.MapStr{
-		"host": common.MapStr{
+func MapHostInfo(info types.HostInfo) mapstr.M {
+	data := mapstr.M{
+		"host": mapstr.M{
 			"hostname":     info.Hostname,
 			"architecture": info.Architecture,
-			"os": common.MapStr{
+			"os": mapstr.M{
 				"platform": info.OS.Platform,
 				"version":  info.OS.Version,
 				"family":   info.OS.Family,

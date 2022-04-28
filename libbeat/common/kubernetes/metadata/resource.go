@@ -25,8 +25,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 // Resource generates metadata for any kubernetes resource
@@ -58,9 +59,9 @@ func NewResourceMetadataGenerator(cfg *config.C, client k8s.Interface) *Resource
 // }
 // This method should be called in top level and not as part of other metadata generators.
 // For retrieving metadata without kubernetes. prefix one should call GenerateK8s instead.
-func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) mapstr.M {
 	ecsFields := r.GenerateECS(obj)
-	meta := common.MapStr{
+	meta := mapstr.M{
 		"kubernetes": r.GenerateK8s(kind, obj, opts...),
 	}
 	meta.DeepUpdate(ecsFields)
@@ -68,8 +69,8 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldO
 }
 
 // GenerateECS generates ECS metadata from a resource object
-func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
-	ecsMeta := common.MapStr{}
+func (r *Resource) GenerateECS(obj kubernetes.Resource) mapstr.M {
+	ecsMeta := mapstr.M{}
 	if r.clusterInfo.Url != "" {
 		ecsMeta.Put("orchestrator.cluster.url", r.clusterInfo.Url)
 	}
@@ -80,13 +81,13 @@ func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
 }
 
 // GenerateK8s takes a kind and an object and creates metadata for the same
-func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
+func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...FieldOptions) mapstr.M {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return nil
 	}
 
-	var labelMap common.MapStr
+	var labelMap mapstr.M
 	if len(r.config.IncludeLabels) == 0 {
 		labelMap = GenerateMap(accessor.GetLabels(), r.config.LabelsDedot)
 	} else {
@@ -100,8 +101,8 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 
 	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.AnnotationsDedot)
 
-	meta := common.MapStr{
-		strings.ToLower(kind): common.MapStr{
+	meta := mapstr.M{
+		strings.ToLower(kind): mapstr.M{
 			"name": accessor.GetName(),
 			"uid":  string(accessor.GetUID()),
 		},
@@ -142,8 +143,8 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	return meta
 }
 
-func generateMapSubset(input map[string]string, keys []string, dedot bool) common.MapStr {
-	output := common.MapStr{}
+func generateMapSubset(input map[string]string, keys []string, dedot bool) mapstr.M {
+	output := mapstr.M{}
 	if input == nil {
 		return output
 	}
@@ -163,8 +164,8 @@ func generateMapSubset(input map[string]string, keys []string, dedot bool) commo
 	return output
 }
 
-func GenerateMap(input map[string]string, dedot bool) common.MapStr {
-	output := common.MapStr{}
+func GenerateMap(input map[string]string, dedot bool) mapstr.M {
+	output := mapstr.M{}
 	if input == nil {
 		return output
 	}

@@ -23,6 +23,7 @@ import (
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -34,7 +35,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
@@ -226,7 +226,7 @@ func TestInputRunSQS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
+	snap := mapstr.M(monitoring.CollectStructSnapshot(
 		monitoring.GetNamespace("dataset").GetRegistry(),
 		monitoring.Full,
 		false))
@@ -289,7 +289,7 @@ func TestInputRunS3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
+	snap := mapstr.M(monitoring.CollectStructSnapshot(
 		monitoring.GetNamespace("dataset").GetRegistry(),
 		monitoring.Full,
 		false))
@@ -303,7 +303,7 @@ func TestInputRunS3(t *testing.T) {
 	assertMetric(t, snap, "s3_events_created_total", 12)
 }
 
-func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
+func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{}) {
 	n, _ := snapshot.GetValue(inputID + "." + name)
 	assert.EqualValues(t, value, n, name)
 }
@@ -494,7 +494,7 @@ func TestInputRunSNS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
+	snap := mapstr.M(monitoring.CollectStructSnapshot(
 		monitoring.GetNamespace("dataset").GetRegistry(),
 		monitoring.Full,
 		false))

@@ -7,9 +7,9 @@ package httpjson
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const appendName = "append"
@@ -136,7 +136,7 @@ func (append *appendt) run(ctx *transformContext, tr transformable) (transformab
 	return tr, nil
 }
 
-func appendToCommonMap(m common.MapStr, key string, val interface{}) error {
+func appendToCommonMap(m mapstr.M, key string, val interface{}) error {
 	var value interface{}
 	strVal, isString := val.(string)
 	if found, _ := m.HasKey(key); found {

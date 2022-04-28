@@ -21,10 +21,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Config struct {
@@ -95,7 +95,7 @@ type Flows struct {
 	Enabled       *bool                   `config:"enabled"`
 	Timeout       string                  `config:"timeout"`
 	Period        string                  `config:"period"`
-	EventMetadata common.EventMetadata    `config:",inline"`
+	EventMetadata mapstr.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published

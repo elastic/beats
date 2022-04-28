@@ -11,13 +11,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	missingResourcesConfig = common.MapStr{
+	missingResourcesConfig = mapstr.M{
 		"module":          "azure",
 		"period":          "60s",
 		"metricsets":      []string{"storage"},
@@ -27,7 +27,7 @@ var (
 		"tenant_id":       "unique identifier",
 	}
 
-	resourceConfig = common.MapStr{
+	resourceConfig = mapstr.M{
 		"module":          "azure",
 		"period":          "60s",
 		"metricsets":      []string{"storage"},
@@ -35,7 +35,7 @@ var (
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
 		"tenant_id":       "unique identifier",
-		"resources": []common.MapStr{
+		"resources": []mapstr.M{
 			{
 				"resource_id": "test",
 				"metrics": []map[string]interface{}{

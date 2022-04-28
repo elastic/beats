@@ -28,11 +28,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestAddProcessMetadata(t *testing.T) {
@@ -121,66 +121,66 @@ func TestAddProcessMetadata(t *testing.T) {
 
 	for _, test := range []struct {
 		description             string
-		config, event, expected common.MapStr
+		config, event, expected mapstr.M
 		err, initErr            error
 	}{
 		{
 			description: "default fields",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"system.process.ppid"},
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name":       "systemd",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
-					"parent": common.MapStr{
+					"parent": mapstr.M{
 						"pid": 0,
 					},
 					"start_time": startTime,
-					"owner": common.MapStr{
+					"owner": mapstr.M{
 						"name": "root",
 						"id":   "0",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "single field",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"system.process.ppid"},
 				"target":         "system.process.parent",
 				"include_fields": []string{"process.name"},
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
-						"parent": common.MapStr{
+						"parent": mapstr.M{
 							"name": "systemd",
 						},
 					},
@@ -189,26 +189,26 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "multiple fields",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"system.other.pid", "system.process.ppid"},
 				"target":         "extra",
 				"include_fields": []string{"process.title", "process.start_time"},
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"extra": common.MapStr{
-					"process": common.MapStr{
+				"extra": mapstr.M{
+					"process": mapstr.M{
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"start_time": startTime,
 					},
@@ -217,32 +217,32 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "complete process info",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"ppid"},
 				"target":     "parent",
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "1",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": "1",
-				"parent": common.MapStr{
-					"process": common.MapStr{
+				"parent": mapstr.M{
+					"process": mapstr.M{
 						"name":       "systemd",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
-						"parent": common.MapStr{
+						"parent": mapstr.M{
 							"pid": 0,
 						},
 						"start_time": startTime,
-						"owner": common.MapStr{
+						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
 						},
 					},
-					"container": common.MapStr{
+					"container": mapstr.M{
 						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 					},
 				},
@@ -250,24 +250,24 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "complete process info (restricted fields)",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":        []string{"ppid"},
 				"restricted_fields": true,
 				"target":            "parent",
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "1",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": "1",
-				"parent": common.MapStr{
-					"process": common.MapStr{
+				"parent": mapstr.M{
+					"process": mapstr.M{
 						"name":       "systemd",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
-						"parent": common.MapStr{
+						"parent": mapstr.M{
 							"pid": 0,
 						},
 						"start_time": startTime,
@@ -277,12 +277,12 @@ func TestAddProcessMetadata(t *testing.T) {
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
 						},
-						"owner": common.MapStr{
+						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
 						},
 					},
-					"container": common.MapStr{
+					"container": mapstr.M{
 						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 					},
 				},
@@ -290,25 +290,25 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "complete process info (restricted fields - alt)",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":        []string{"ppid"},
 				"restricted_fields": true,
 				"target":            "parent",
 				"include_fields":    []string{"process"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "1",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": "1",
-				"parent": common.MapStr{
-					"process": common.MapStr{
+				"parent": mapstr.M{
+					"process": mapstr.M{
 						"name":       "systemd",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
-						"parent": common.MapStr{
+						"parent": mapstr.M{
 							"pid": 0,
 						},
 						"start_time": startTime,
@@ -318,7 +318,7 @@ func TestAddProcessMetadata(t *testing.T) {
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
 						},
-						"owner": common.MapStr{
+						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
 						},
@@ -328,18 +328,18 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "env field (restricted_fields: true)",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":        []string{"ppid"},
 				"restricted_fields": true,
 				"target":            "parent",
 				"include_fields":    []string{"process.env"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "1",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": "1",
-				"parent": common.MapStr{
+				"parent": mapstr.M{
 					"env": map[string]string{
 						"HOME":       "/",
 						"TERM":       "linux",
@@ -351,12 +351,12 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "env field (restricted_fields: false)",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"ppid"},
 				"target":         "parent",
 				"include_fields": []string{"process.env"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "1",
 			},
 			expected: nil,
@@ -364,65 +364,65 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "fields not found (ignored)",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"ppid"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"other": "field",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"other": "field",
 			},
 		},
 		{
 			description: "fields not found (reported)",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"ppid"},
 				"ignore_missing": false,
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"other": "field",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"other": "field",
 			},
 			err: ErrNoMatch,
 		},
 		{
 			description: "overwrite keys",
-			config: common.MapStr{
+			config: mapstr.M{
 				"overwrite_keys": true,
 				"match_pids":     []string{"ppid"},
 				"include_fields": []string{"process.name"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": 1,
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name": "other",
 				},
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": 1,
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name": "systemd",
 				},
 			},
 		},
 		{
 			description: "overwrite keys error",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"ppid"},
 				"include_fields": []string{"process.name"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": 1,
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name": "other",
 				},
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": 1,
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name": "other",
 				},
 			},
@@ -430,53 +430,53 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "bad PID field cast",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"ppid"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "a",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": "a",
 			},
 			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': error converting string to integer: strconv.Atoi: parsing \"a\": invalid syntax"),
 		},
 		{
 			description: "bad PID field type",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"ppid"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": false,
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": false,
 			},
 			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': not an integer or string, but bool"),
 		},
 		{
 			description: "process not found",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"ppid"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": 42,
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": 42,
 			},
 			err: ErrNoProcess,
 		},
 		{
 			description: "lookup first PID",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"nil", "ppid"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"nil":  0,
 				"ppid": 1,
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"nil":  0,
 				"ppid": 1,
 			},
@@ -484,158 +484,158 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "env field",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"system.process.ppid"},
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name":       "systemd",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
-					"parent": common.MapStr{
+					"parent": mapstr.M{
 						"pid": 0,
 					},
 					"start_time": startTime,
-					"owner": common.MapStr{
+					"owner": mapstr.M{
 						"name": "root",
 						"id":   "0",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "env field (IncludeContainer id), process not found",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids": []string{"ppid"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": 42,
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": 42,
 			},
 			err: ErrNoProcess,
 		},
 		{
 			description: "container.id only",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"system.process.ppid"},
 				"include_fields": []string{"container.id"},
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "container.id based on regex in config",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"system.process.ppid"},
 				"include_fields": []string{"container.id"},
 				"cgroup_regex":   "\\/.+\\/.+\\/.+\\/([0-9a-f]{64}).*",
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "no process metadata available",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":   []string{"system.process.ppid"},
 				"cgroup_regex": "\\/.+\\/.+\\/.+\\/([0-9a-f]{64}).*",
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "2",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "2",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "no container id available",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":   []string{"system.process.ppid"},
 				"cgroup_regex": "\\/.+\\/.+\\/.+\\/([0-9a-f]{64}).*",
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "3",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "3",
 					},
 				},
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"name":       "systemd",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
-					"parent": common.MapStr{
+					"parent": mapstr.M{
 						"pid": 0,
 					},
 					"start_time": startTime,
-					"owner": common.MapStr{
+					"owner": mapstr.M{
 						"name": "user",
 						"id":   "1001",
 					},
@@ -644,68 +644,68 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 		{
 			description: "without cgroup cache",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":               []string{"system.process.ppid"},
 				"include_fields":           []string{"container.id"},
 				"cgroup_cache_expire_time": 0,
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "custom cache expire time",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":               []string{"system.process.ppid"},
 				"include_fields":           []string{"container.id"},
 				"cgroup_cache_expire_time": 10 * time.Second,
 			},
-			event: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
 			},
-			expected: common.MapStr{
-				"system": common.MapStr{
-					"process": common.MapStr{
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
 						"ppid": "1",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
 		{
 			description: "only user",
-			config: common.MapStr{
+			config: mapstr.M{
 				"match_pids":     []string{"ppid"},
 				"target":         "",
 				"include_fields": []string{"process.owner"},
 			},
-			event: common.MapStr{
+			event: mapstr.M{
 				"ppid": "1",
 			},
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"ppid": "1",
-				"process": common.MapStr{
-					"owner": common.MapStr{
+				"process": mapstr.M{
+					"owner": mapstr.M{
 						"id":   "0",
 						"name": "root",
 					},
@@ -749,7 +749,7 @@ func TestAddProcessMetadata(t *testing.T) {
 	}
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
-		c := common.MapStr{
+		c := mapstr.M{
 			"match_pids":     []string{"@metadata.system.ppid"},
 			"target":         "@metadata",
 			"include_fields": []string{"process.name"},
@@ -762,18 +762,18 @@ func TestAddProcessMetadata(t *testing.T) {
 		assert.NoError(t, err)
 
 		event := &beat.Event{
-			Meta: common.MapStr{
-				"system": common.MapStr{
+			Meta: mapstr.M{
+				"system": mapstr.M{
 					"ppid": "1",
 				},
 			},
-			Fields: common.MapStr{},
+			Fields: mapstr.M{},
 		}
-		expMeta := common.MapStr{
-			"system": common.MapStr{
+		expMeta := mapstr.M{
+			"system": mapstr.M{
 				"ppid": "1",
 			},
-			"process": common.MapStr{
+			"process": mapstr.M{
 				"name": "systemd",
 			},
 		}
@@ -818,7 +818,7 @@ func TestUsingCache(t *testing.T) {
 		return testMap[pid], nil
 	}
 
-	config, err := conf.NewConfigFrom(common.MapStr{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids":     []string{"system.process.ppid"},
 		"include_fields": []string{"container.id"},
 		"target":         "meta",
@@ -832,9 +832,9 @@ func TestUsingCache(t *testing.T) {
 	}
 
 	ev := beat.Event{
-		Fields: common.MapStr{
-			"system": common.MapStr{
-				"process": common.MapStr{
+		Fields: mapstr.M{
+			"system": mapstr.M{
+				"process": mapstr.M{
 					"ppid": selfPID,
 				},
 			},
@@ -854,9 +854,9 @@ func TestUsingCache(t *testing.T) {
 	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
 
 	ev = beat.Event{
-		Fields: common.MapStr{
-			"system": common.MapStr{
-				"process": common.MapStr{
+		Fields: mapstr.M{
+			"system": mapstr.M{
+				"process": mapstr.M{
 					"ppid": selfPID,
 				},
 			},
@@ -878,7 +878,7 @@ func TestUsingCache(t *testing.T) {
 
 func TestSelf(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
-	config, err := conf.NewConfigFrom(common.MapStr{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
 	})
@@ -891,7 +891,7 @@ func TestSelf(t *testing.T) {
 	}
 	selfPID := os.Getpid()
 	ev := beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"self_pid": selfPID,
 		},
 	}
@@ -911,7 +911,7 @@ func TestSelf(t *testing.T) {
 
 func TestBadProcess(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
-	config, err := conf.NewConfigFrom(common.MapStr{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
 	})
@@ -923,7 +923,7 @@ func TestBadProcess(t *testing.T) {
 		t.Fatal(err)
 	}
 	ev := beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"self_pid": 0,
 		},
 	}

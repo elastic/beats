@@ -11,9 +11,9 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ConfigBlacklist takes a ConfigBlocks object and filter it based on the given
@@ -36,7 +36,7 @@ func (f *ConfigBlacklistSettings) Unpack(from interface{}) error {
 	}
 
 	f.Patterns = map[string]string{}
-	for k, v := range common.MapStr(m).Flatten() {
+	for k, v := range mapstr.M(m).Flatten() {
 		f.Patterns[k] = fmt.Sprintf("%s", v)
 	}
 

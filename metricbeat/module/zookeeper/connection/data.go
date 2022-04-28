@@ -25,8 +25,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var capturer = regexp.MustCompile(`/(?P<ip>.*):(?P<port>\d+)\[(?P<interest_ops>\d*)]\(queued=(?P<queued>\d*),recved=(?P<received>\d*),sent=(?P<sent>\d*)\)`)
@@ -37,8 +36,8 @@ func (m *MetricSet) parseCons(i io.Reader) []mb.Event {
 	result := make([]mb.Event, 0)
 
 	for scanner.Scan() {
-		metricsetFields := common.MapStr{}
-		rootFields := common.MapStr{}
+		metricsetFields := mapstr.M{}
+		rootFields := mapstr.M{}
 		line := scanner.Text()
 
 		oneParsingIsCorrect := false
@@ -89,7 +88,7 @@ func lineToMap(line string) (map[string]string, error) {
 	return keyMap, nil
 }
 
-func (m *MetricSet) checkRegexAndSetInt(output common.MapStr, capturedData string, key string, correct *bool) {
+func (m *MetricSet) checkRegexAndSetInt(output mapstr.M, capturedData string, key string, correct *bool) {
 	if capturedData != "" {
 		n, err := strconv.ParseInt(capturedData, 10, 64)
 		if err != nil {

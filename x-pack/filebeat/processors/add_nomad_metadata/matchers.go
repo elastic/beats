@@ -10,10 +10,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/processors/add_nomad_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // LogPathMatcherName is the name of LogPathMatcher
@@ -71,7 +71,7 @@ func newLogsPathMatcher(cfg conf.C) (add_nomad_metadata.Matcher, error) {
 
 // MetadataIndex returns the index key to be used for enriching the event with the proper metadata
 // which is the allocation id from the event `log.file.path` field
-func (m *LogPathMatcher) MetadataIndex(event common.MapStr) string {
+func (m *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 	value, err := event.GetValue("log.file.path")
 
 	if err == nil {

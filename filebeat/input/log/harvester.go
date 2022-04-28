@@ -44,6 +44,7 @@ import (
 	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -429,10 +430,10 @@ func (h *Harvester) onMessage(
 		return err == nil
 	}
 
-	fields := common.MapStr{
-		"log": common.MapStr{
+	fields := mapstr.M{
+		"log": mapstr.M{
 			"offset": messageOffset, // Offset here is the offset before the starting char.
-			"file": common.MapStr{
+			"file": mapstr.M{
 				"path": state.Source,
 			},
 		},
@@ -440,12 +441,12 @@ func (h *Harvester) onMessage(
 	fields.DeepUpdate(message.Fields)
 
 	// Check if json fields exist
-	var jsonFields common.MapStr
+	var jsonFields mapstr.M
 	if f, ok := fields["json"]; ok {
-		jsonFields = f.(common.MapStr)
+		jsonFields = f.(mapstr.M)
 	}
 
-	var meta common.MapStr
+	var meta mapstr.M
 	timestamp := message.Ts
 	if h.config.JSON != nil && len(jsonFields) > 0 {
 		id, ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
@@ -456,13 +457,13 @@ func (h *Harvester) onMessage(
 		}
 
 		if id != "" {
-			meta = common.MapStr{
+			meta = mapstr.M{
 				"_id": id,
 			}
 		}
 	} else if &text != nil {
 		if fields == nil {
-			fields = common.MapStr{}
+			fields = mapstr.M{}
 		}
 		fields["message"] = text
 	}

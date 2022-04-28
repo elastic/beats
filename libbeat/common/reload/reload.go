@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Register holds a registry of reloadable objects
@@ -35,7 +35,7 @@ type ConfigWithMeta struct {
 	Config *config.C
 
 	// Meta data related to this config
-	Meta *common.MapStrPointer
+	Meta *mapstr.Pointer
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities

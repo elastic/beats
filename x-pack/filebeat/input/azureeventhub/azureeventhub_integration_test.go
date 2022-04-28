@@ -20,11 +20,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	azureConfig = conf.MustNewConfigFrom(common.MapStr{
+	azureConfig = conf.MustNewConfigFrom(mapstr.M{
 		"storage_account_key":       lookupEnv("STORAGE_ACCOUNT_NAME"),
 		"storage_account":           lookupEnv("STORAGE_ACCOUNT_KEY"),
 		"storage_account_container": ephContainerName,

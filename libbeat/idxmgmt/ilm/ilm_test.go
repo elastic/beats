@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDefaultSupport_Init(t *testing.T) {
@@ -48,7 +48,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
 		assert.Equal(true, s.Enabled())
-		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(DefaultPolicy, mapstr.M(s.Policy().Body))
 	})
 
 	t.Run("with custom alias config with fieldref", func(t *testing.T) {
@@ -66,7 +66,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
 		assert.Equal(true, s.Enabled())
-		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(DefaultPolicy, mapstr.M(s.Policy().Body))
 	})
 
 	t.Run("with default alias", func(t *testing.T) {
@@ -85,15 +85,15 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
 		assert.Equal(true, s.Enabled())
-		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(DefaultPolicy, mapstr.M(s.Policy().Body))
 	})
 
 	t.Run("load external policy", func(t *testing.T) {
 		s, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
-			common.MapStr{"policy_file": "testfiles/custom.json"},
+			mapstr.M{"policy_file": "testfiles/custom.json"},
 		))
 		require.NoError(t, err)
-		assert.Equal(t, common.MapStr{"hello": "world"}, s.Policy().Body)
+		assert.Equal(t, mapstr.M{"hello": "world"}, s.Policy().Body)
 	})
 }
 

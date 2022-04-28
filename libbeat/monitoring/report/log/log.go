@@ -23,11 +23,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // List of metrics that are gauges. This is used to identify metrics that should
@@ -245,7 +245,7 @@ func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []interface{} {
 	args := []interface{}{logp.Namespace("monitoring")}
 
 	for name, snap := range snaps {
-		data := make(common.MapStr, snapshotLen(snap))
+		data := make(mapstr.M, snapshotLen(snap))
 		for k, v := range snap.Bools {
 			data.Put(k, v)
 		}

@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -654,7 +655,7 @@ func (http *httpPlugin) publishTransaction(event beat.Event) {
 	http.results(event)
 }
 
-func (http *httpPlugin) collectHeaders(m *message) common.MapStr {
+func (http *httpPlugin) collectHeaders(m *message) mapstr.M {
 	hdrs := map[string]interface{}{}
 
 	hdrs["content-length"] = m.contentLength

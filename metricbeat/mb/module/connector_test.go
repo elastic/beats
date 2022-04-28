@@ -26,9 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -55,7 +55,7 @@ func TestProcessorsForConfig(t *testing.T) {
 	}
 	for description, test := range testCases {
 		if test.event.Fields == nil {
-			test.event.Fields = common.MapStr{}
+			test.event.Fields = mapstr.M{}
 		}
 		config, err := connectorConfigFromString(test.configStr)
 		if err != nil {

@@ -24,9 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func mustParseTime(layout string, value string) time.Time {
@@ -52,27 +52,27 @@ func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time
 
 var syslogCases = map[string]struct {
 	Cfg      *conf.C
-	In       common.MapStr
-	Want     common.MapStr
+	In       mapstr.M
+	Want     mapstr.M
 	WantTime time.Time
 	WantErr  bool
 }{
 	"rfc-3164": {
-		Cfg: conf.MustNewConfigFrom(common.MapStr{
+		Cfg: conf.MustNewConfigFrom(mapstr.M{
 			"timezone": "America/Chicago",
 		}),
-		In: common.MapStr{
+		In: mapstr.M{
 			"message": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
 		},
-		Want: common.MapStr{
-			"log": common.MapStr{
-				"syslog": common.MapStr{
+		Want: mapstr.M{
+			"log": mapstr.M{
+				"syslog": mapstr.M{
 					"priority": 13,
-					"facility": common.MapStr{
+					"facility": mapstr.M{
 						"code": 1,
 						"name": "user-level",
 					},
-					"severity": common.MapStr{
+					"severity": mapstr.M{
 						"code": 5,
 						"name": "Notice",
 					},
@@ -86,19 +86,19 @@ var syslogCases = map[string]struct {
 		WantTime: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
 	},
 	"rfc-5424": {
-		Cfg: conf.MustNewConfigFrom(common.MapStr{}),
-		In: common.MapStr{
+		Cfg: conf.MustNewConfigFrom(mapstr.M{}),
+		In: mapstr.M{
 			"message": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
 		},
-		Want: common.MapStr{
-			"log": common.MapStr{
-				"syslog": common.MapStr{
+		Want: mapstr.M{
+			"log": mapstr.M{
+				"syslog": mapstr.M{
 					"priority": 165,
-					"facility": common.MapStr{
+					"facility": mapstr.M{
 						"code": 20,
 						"name": "local4",
 					},
-					"severity": common.MapStr{
+					"severity": mapstr.M{
 						"code": 5,
 						"name": "Notice",
 					},
@@ -171,46 +171,46 @@ func BenchmarkSyslog(b *testing.B) {
 
 func TestAppendStringField(t *testing.T) {
 	tests := map[string]struct {
-		InMap   common.MapStr
+		InMap   mapstr.M
 		InField string
 		InValue string
-		Want    common.MapStr
+		Want    mapstr.M
 	}{
 		"nil": {
-			InMap:   common.MapStr{},
+			InMap:   mapstr.M{},
 			InField: "error",
 			InValue: "foo",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": "foo",
 			},
 		},
 		"string": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": "foo",
 			},
 			InField: "error",
 			InValue: "bar",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 		},
 		"string-slice": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 			InField: "error",
 			InValue: "some value",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []string{"foo", "bar", "some value"},
 			},
 		},
 		"interface-slice": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": []interface{}{"foo", "bar"},
 			},
 			InField: "error",
 			InValue: "some value",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []interface{}{"foo", "bar", "some value"},
 			},
 		},

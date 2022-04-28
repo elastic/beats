@@ -18,11 +18,11 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func makeSnapshot(R *monitoring.Registry) common.MapStr {
+func makeSnapshot(R *monitoring.Registry) mapstr.M {
 	mode := monitoring.Full
-	return common.MapStr(monitoring.CollectStructSnapshot(R, mode, false))
+	return mapstr.M(monitoring.CollectStructSnapshot(R, mode, false))
 }

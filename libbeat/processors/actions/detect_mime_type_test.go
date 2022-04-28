@@ -23,13 +23,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMimeTypeFromTo(t *testing.T) {
 	evt := beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"foo.bar.baz": "hello world!",
 		},
 	}
@@ -47,12 +47,12 @@ func TestMimeTypeFromTo(t *testing.T) {
 
 func TestMimeTypeFromToMetadata(t *testing.T) {
 	evt := beat.Event{
-		Meta: common.MapStr{},
-		Fields: common.MapStr{
+		Meta: mapstr.M{},
+		Fields: mapstr.M{
 			"foo.bar.baz": "hello world!",
 		},
 	}
-	expectedMeta := common.MapStr{
+	expectedMeta := mapstr.M{
 		"field": "text/plain; charset=utf-8",
 	}
 	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
@@ -69,7 +69,7 @@ func TestMimeTypeFromToMetadata(t *testing.T) {
 
 func TestMimeTypeTestNoMatch(t *testing.T) {
 	evt := beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"foo.bar.baz": string([]byte{0, 0}),
 		},
 	}

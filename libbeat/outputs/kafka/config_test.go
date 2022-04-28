@@ -24,25 +24,25 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
-	tests := map[string]common.MapStr{
-		"default config is valid": common.MapStr{},
-		"lz4 with 0.11": common.MapStr{
+	tests := map[string]mapstr.M{
+		"default config is valid": mapstr.M{},
+		"lz4 with 0.11": mapstr.M{
 			"compression": "lz4",
 			"version":     "0.11",
 		},
-		"lz4 with 1.0": common.MapStr{
+		"lz4 with 1.0": mapstr.M{
 			"compression": "lz4",
 			"version":     "1.0.0",
 		},
-		"Kerberos with keytab": common.MapStr{
-			"kerberos": common.MapStr{
+		"Kerberos with keytab": mapstr.M{
+			"kerberos": mapstr.M{
 				"auth_type":    "keytab",
 				"username":     "elastic",
 				"keytab":       "/etc/krb5kcd/kafka.keytab",
@@ -51,8 +51,8 @@ func TestConfigAcceptValid(t *testing.T) {
 				"realm":        "ELASTIC",
 			},
 		},
-		"Kerberos with user and password pair": common.MapStr{
-			"kerberos": common.MapStr{
+		"Kerberos with user and password pair": mapstr.M{
+			"kerberos": mapstr.M{
 				"auth_type":    "password",
 				"username":     "elastic",
 				"password":     "changeme",
@@ -80,9 +80,9 @@ func TestConfigAcceptValid(t *testing.T) {
 }
 
 func TestConfigInvalid(t *testing.T) {
-	tests := map[string]common.MapStr{
-		"Kerberos with invalid auth_type": common.MapStr{
-			"kerberos": common.MapStr{
+	tests := map[string]mapstr.M{
+		"Kerberos with invalid auth_type": mapstr.M{
+			"kerberos": mapstr.M{
 				"auth_type":    "invalid_auth_type",
 				"config_path":  "/etc/path/config",
 				"service_name": "HTTP/elastic@ELASTIC",
@@ -163,14 +163,14 @@ func TestTopicSelection(t *testing.T) {
 		"use event field": {
 			cfg: map[string]interface{}{"topic": "test-%{[field]}"},
 			event: beat.Event{
-				Fields: common.MapStr{"field": "from-event"},
+				Fields: mapstr.M{"field": "from-event"},
 			},
 			want: "test-from-event",
 		},
 		"use event field must keep case": {
 			cfg: map[string]interface{}{"topic": "Test-%{[field]}"},
 			event: beat.Event{
-				Fields: common.MapStr{"field": "From-Event"},
+				Fields: mapstr.M{"field": "From-Event"},
 			},
 			want: "Test-From-Event",
 		},

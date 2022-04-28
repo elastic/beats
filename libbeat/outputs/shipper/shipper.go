@@ -23,13 +23,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -190,7 +190,7 @@ func (c *shipper) String() string {
 	return "shipper"
 }
 
-func convertMapStr(m common.MapStr) (*structpb.Value, error) {
+func convertMapStr(m mapstr.M) (*structpb.Value, error) {
 	if m == nil {
 		return structpb.NewNullValue(), nil
 	}
@@ -203,7 +203,7 @@ func convertMapStr(m common.MapStr) (*structpb.Value, error) {
 			err        error
 		)
 		switch v := value.(type) {
-		case common.MapStr:
+		case mapstr.M:
 			protoValue, err = convertMapStr(v)
 		default:
 			protoValue, err = structpb.NewValue(v)

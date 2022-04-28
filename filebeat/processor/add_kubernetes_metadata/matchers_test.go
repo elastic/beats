@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // A random container ID that we use for our tests
@@ -187,9 +187,9 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 	logMatcher, err := newLogsPathMatcher(*testConfig)
 	assert.NoError(t, err)
 
-	input := common.MapStr{
-		"log": common.MapStr{
-			"file": common.MapStr{
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
 				"path": source,
 			},
 		},

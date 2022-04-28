@@ -33,11 +33,11 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -367,7 +367,7 @@ func TestManager_InputsRun(t *testing.T) {
 					}
 
 					for i := 0; i < config.Max; i++ {
-						event := beat.Event{Fields: common.MapStr{"n": state.N}}
+						event := beat.Event{Fields: mapstr.M{"n": state.N}}
 						state.N++
 						pub.Publish(event, state)
 					}
@@ -415,7 +415,7 @@ func TestManager_InputsRun(t *testing.T) {
 		manager := constInput(t, sourceList("key"), &fakeTestInput{
 			OnRun: func(ctx input.Context, _ Source, _ Cursor, pub Publisher) error {
 				defer wgSend.Done()
-				fields := common.MapStr{"hello": "world"}
+				fields := mapstr.M{"hello": "world"}
 				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state1")
 				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state2")
 				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state3")

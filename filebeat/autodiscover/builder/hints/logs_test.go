@@ -24,10 +24,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -56,26 +56,26 @@ func TestGenerateHints(t *testing.T) {
 		config *conf.C
 		event  bus.Event
 		len    int
-		result []common.MapStr
+		result []mapstr.M
 	}{
 		{
 			msg:    "Default config is correct",
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
 					"type":  "container",
@@ -87,44 +87,44 @@ func TestGenerateHints(t *testing.T) {
 			config: defaultDisabled,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			msg:    "Hint to enable when disabled by default works",
 			config: defaultDisabled,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"enabled":       "true",
 						"exclude_lines": "^test2, ^test3",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type":          "container",
 					"paths":         []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
@@ -136,46 +136,46 @@ func TestGenerateHints(t *testing.T) {
 			msg:    "Hints without host should return nothing",
 			config: customCfg,
 			event: bus.Event{
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 					},
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			msg:    "Hints with logs.disable should return nothing",
 			config: customCfg,
 			event: bus.Event{
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"disable": "true",
 					},
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			msg:    "Empty event hints should return default config",
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type": "docker",
 					"containers": map[string]interface{}{
@@ -190,25 +190,25 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"include_lines": "^test, ^test1",
 						"exclude_lines": "^test2, ^test3",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type": "docker",
 					"containers": map[string]interface{}{
@@ -225,29 +225,29 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"1": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"1": mapstr.M{
 							"exclude_lines": "^test1, ^test2",
 						},
-						"2": common.MapStr{
+						"2": mapstr.M{
 							"include_lines": "^test1, ^test2",
 						},
 					},
 				},
 			},
 			len: 2,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type": "docker",
 					"containers": map[string]interface{}{
@@ -271,19 +271,19 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"multiline": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"multiline": mapstr.M{
 							"pattern": "^test",
 							"negate":  "true",
 						},
@@ -291,7 +291,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type": "docker",
 					"containers": map[string]interface{}{
@@ -310,24 +310,24 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"raw": "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type": "docker",
 					"containers": map[string]interface{}{
@@ -345,31 +345,31 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"processors": common.MapStr{
-							"1": common.MapStr{
-								"dissect": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"processors": mapstr.M{
+							"1": mapstr.M{
+								"dissect": mapstr.M{
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
-							"drop_event": common.MapStr{},
+							"drop_event": mapstr.M{},
 						},
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"type": "docker",
 					"containers": map[string]interface{}{
@@ -394,24 +394,24 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module": "apache",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module": "apache",
 					"error": map[string]interface{}{
@@ -444,25 +444,25 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module":  "apache",
 						"fileset": "access",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module": "apache",
 					"access": map[string]interface{}{
@@ -495,18 +495,18 @@ func TestGenerateHints(t *testing.T) {
 			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module":         "apache",
 						"fileset.stdout": "access",
 						"fileset.stderr": "error",
@@ -514,7 +514,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module": "apache",
 					"access": map[string]interface{}{
@@ -547,24 +547,24 @@ func TestGenerateHints(t *testing.T) {
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module": "apache",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module": "apache",
 					"error": map[string]interface{}{
@@ -595,25 +595,25 @@ func TestGenerateHints(t *testing.T) {
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module":  "apache",
 						"fileset": "access",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module": "apache",
 					"access": map[string]interface{}{
@@ -644,18 +644,18 @@ func TestGenerateHints(t *testing.T) {
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module":         "apache",
 						"fileset.stdout": "access",
 						"fileset.stderr": "error",
@@ -663,7 +663,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module": "apache",
 					"access": map[string]interface{}{
@@ -705,9 +705,9 @@ func TestGenerateHints(t *testing.T) {
 
 		cfgs := l.CreateConfig(test.event)
 		assert.Equal(t, test.len, len(cfgs), test.msg)
-		configs := make([]common.MapStr, 0)
+		configs := make([]mapstr.M, 0)
 		for _, cfg := range cfgs {
-			config := common.MapStr{}
+			config := mapstr.M{}
 			err := cfg.Unpack(&config)
 			ok := assert.Nil(t, err, test.msg)
 			if !ok {
@@ -725,30 +725,30 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		event  bus.Event
 		path   string
 		len    int
-		result common.MapStr
+		result mapstr.M
 	}{
 		{
 			msg: "Empty event hints should return default config",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
-					"pod": common.MapStr{
+					"pod": mapstr.M{
 						"name": "pod",
 						"uid":  "12345",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
 			},
 			path: "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
 			len:  1,
-			result: common.MapStr{
+			result: mapstr.M{
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
@@ -760,36 +760,36 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			msg: "Hint with processors config must have a processors in the input config",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
-					"pod": common.MapStr{
+					"pod": mapstr.M{
 						"name": "pod",
 						"uid":  "12345",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"processors": common.MapStr{
-							"1": common.MapStr{
-								"dissect": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"processors": mapstr.M{
+							"1": mapstr.M{
+								"dissect": mapstr.M{
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
-							"drop_event": common.MapStr{},
+							"drop_event": mapstr.M{},
 						},
 					},
 				},
 			},
 			len:  1,
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
-			result: common.MapStr{
+			result: mapstr.M{
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
@@ -811,29 +811,29 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			msg: "Hint with module should attach input to its filesets",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
-					"pod": common.MapStr{
+					"pod": mapstr.M{
 						"name": "pod",
 						"uid":  "12345",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module": "apache",
 					},
 				},
 			},
 			len:  1,
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
-			result: common.MapStr{
+			result: mapstr.M{
 				"module": "apache",
 				"error": map[string]interface{}{
 					"enabled": true,
@@ -863,22 +863,22 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			msg: "Hint with module should honor defined filesets",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
-					"pod": common.MapStr{
+					"pod": mapstr.M{
 						"name": "pod",
 						"uid":  "12345",
 					},
 				},
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"name": "foobar",
 					"id":   "abc",
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"module":  "apache",
 						"fileset": "access",
 					},
@@ -886,7 +886,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			},
 			len:  1,
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
-			result: common.MapStr{
+			result: mapstr.M{
 				"module": "apache",
 				"access": map[string]interface{}{
 					"enabled": true,
@@ -941,7 +941,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		cfgs := l.CreateConfig(test.event)
 		require.Equal(t, test.len, len(cfgs), test.msg)
 		if test.len != 0 {
-			config := common.MapStr{}
+			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.msg)
 

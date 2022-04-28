@@ -25,9 +25,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func initHuaweiCloudTestServer() *httptest.Server {
@@ -76,20 +76,20 @@ func TestRetrieveHuaweiCloudMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
 			"provider": "huawei",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id": "37da9890-8289-4c58-ba34-a8271c4a8216",
 			},
 			"region":            "cn-east-2",
 			"availability_zone": "cn-east-2b",
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "ECS",
 			},
 		},

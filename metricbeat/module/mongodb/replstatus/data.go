@@ -17,29 +17,27 @@
 
 package replstatus
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common"
-)
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
-func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr {
-	var result common.MapStr = make(common.MapStr)
+func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
+	var result mapstr.M = make(mapstr.M)
 
-	result["oplog"] = common.MapStr{
-		"size": common.MapStr{
+	result["oplog"] = mapstr.M{
+		"size": mapstr.M{
 			"allocated": oplogInfo.allocated,
 			"used":      oplogInfo.used,
 		},
-		"first": common.MapStr{
+		"first": mapstr.M{
 			"timestamp": oplogInfo.firstTs,
 		},
-		"last": common.MapStr{
+		"last": mapstr.M{
 			"timestamp": oplogInfo.lastTs,
 		},
 		"window": oplogInfo.diff,
 	}
 	result["set_name"] = replStatus.Set
 	result["server_date"] = replStatus.Date
-	result["optimes"] = common.MapStr{
+	result["optimes"] = mapstr.M{
 		"last_committed": replStatus.OpTimes.LastCommitted.getTimeStamp(),
 		"applied":        replStatus.OpTimes.Applied.getTimeStamp(),
 		"durable":        replStatus.OpTimes.Durable.getTimeStamp(),
@@ -48,22 +46,22 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 	// find lag and headroom
 	minLag, maxLag, lagIsOk := findLag(replStatus.Members)
 	if lagIsOk {
-		result["lag"] = common.MapStr{
+		result["lag"] = mapstr.M{
 			"max": maxLag,
 			"min": minLag,
 		}
 
-		result["headroom"] = common.MapStr{
+		result["headroom"] = mapstr.M{
 			"max": oplogInfo.diff - minLag,
 			"min": oplogInfo.diff - maxLag,
 		}
 	} else {
-		result["lag"] = common.MapStr{
+		result["lag"] = mapstr.M{
 			"max": nil,
 			"min": nil,
 		}
 
-		result["headroom"] = common.MapStr{
+		result["headroom"] = mapstr.M{
 			"max": nil,
 			"min": nil,
 		}
@@ -80,41 +78,41 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 		unhealthyHosts  = findUnhealthyHosts(replStatus.Members)
 	)
 
-	result["members"] = common.MapStr{
-		"primary": common.MapStr{
+	result["members"] = mapstr.M{
+		"primary": mapstr.M{
 			"host":   findHostsByState(replStatus.Members, PRIMARY)[0],
 			"optime": findOptimesByState(replStatus.Members, PRIMARY)[0],
 		},
-		"secondary": common.MapStr{
+		"secondary": mapstr.M{
 			"hosts":   secondaryHosts,
 			"count":   len(secondaryHosts),
 			"optimes": findOptimesByState(replStatus.Members, SECONDARY),
 		},
-		"recovering": common.MapStr{
+		"recovering": mapstr.M{
 			"hosts": recoveringHosts,
 			"count": len(recoveringHosts),
 		},
-		"unknown": common.MapStr{
+		"unknown": mapstr.M{
 			"hosts": unknownHosts,
 			"count": len(unknownHosts),
 		},
-		"startup2": common.MapStr{
+		"startup2": mapstr.M{
 			"hosts": startup2Hosts,
 			"count": len(startup2Hosts),
 		},
-		"arbiter": common.MapStr{
+		"arbiter": mapstr.M{
 			"hosts": arbiterHosts,
 			"count": len(arbiterHosts),
 		},
-		"down": common.MapStr{
+		"down": mapstr.M{
 			"hosts": downHosts,
 			"count": len(downHosts),
 		},
-		"rollback": common.MapStr{
+		"rollback": mapstr.M{
 			"hosts": rollbackHosts,
 			"count": len(rollbackHosts),
 		},
-		"unhealthy": common.MapStr{
+		"unhealthy": mapstr.M{
 			"hosts": unhealthyHosts,
 			"count": len(unhealthyHosts),
 		},

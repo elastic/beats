@@ -33,9 +33,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -86,7 +86,7 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
 
 	// Setup the input config.
-	config := conf.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":  []string{hostPort},
 		"topics": []string{topic},
 	})

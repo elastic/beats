@@ -13,10 +13,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessorsForFunction(t *testing.T) {
@@ -49,7 +49,7 @@ func TestProcessorsForFunction(t *testing.T) {
 	}
 	for description, test := range testCases {
 		if test.event.Fields == nil {
-			test.event.Fields = common.MapStr{}
+			test.event.Fields = mapstr.M{}
 		}
 		config, err := functionConfigFromString(test.configStr)
 		if err != nil {
@@ -123,7 +123,7 @@ type setRawIndex struct {
 
 func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Meta == nil {
-		event.Meta = common.MapStr{}
+		event.Meta = mapstr.M{}
 	}
 	event.Meta[events.FieldMetaRawIndex] = p.indexStr
 	return event, nil

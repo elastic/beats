@@ -27,9 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mock"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type mockbeat struct {
@@ -52,7 +52,7 @@ func (mb mockbeat) Run(b *beat.Beat) error {
 			case <-ticker.C:
 				client.Publish(beat.Event{
 					Timestamp: time.Now(),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"type":    "mock",
 						"message": "Mockbeat is alive!",
 					},

@@ -24,12 +24,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Processors {
@@ -100,13 +100,13 @@ func TestIncludeFields(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -115,7 +115,7 @@ func TestIncludeFields(t *testing.T) {
 				},
 				"name":    "test-1",
 				"cmdline": "/sbin/launchd",
-				"mem": common.MapStr{
+				"mem": mapstr.M{
 					"rss":   11194368,
 					"rss_p": 0,
 					"share": 0,
@@ -131,12 +131,12 @@ func TestIncludeFields(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedEvent := common.MapStr{
-		"proc": common.MapStr{
-			"cpu": common.MapStr{
+	expectedEvent := mapstr.M{
+		"proc": mapstr.M{
+			"cpu": mapstr.M{
 				"total_p": 0,
 			},
-			"mem": common.MapStr{
+			"mem": mapstr.M{
 				"rss":   11194368,
 				"rss_p": 0,
 				"share": 0,
@@ -169,14 +169,14 @@ func TestIncludeFields1(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
 
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -184,7 +184,7 @@ func TestIncludeFields1(t *testing.T) {
 					"user":       53363,
 				},
 				"cmdline": "/sbin/launchd",
-				"mem": common.MapStr{
+				"mem": mapstr.M{
 					"rss":   11194368,
 					"rss_p": 0,
 					"share": 0,
@@ -197,7 +197,7 @@ func TestIncludeFields1(t *testing.T) {
 
 	processedEvent, _ := processors.Run(event)
 
-	expectedEvent := common.MapStr{
+	expectedEvent := mapstr.M{
 		"type": "process",
 	}
 
@@ -222,14 +222,14 @@ func TestDropFields(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
 
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -238,7 +238,7 @@ func TestDropFields(t *testing.T) {
 				},
 				"cmdline": "/sbin/launchd",
 			},
-			"mem": common.MapStr{
+			"mem": mapstr.M{
 				"rss":   11194368,
 				"rss_p": 0,
 				"share": 0,
@@ -250,9 +250,9 @@ func TestDropFields(t *testing.T) {
 
 	processedEvent, _ := processors.Run(event)
 
-	expectedEvent := common.MapStr{
-		"proc": common.MapStr{
-			"cpu": common.MapStr{
+	expectedEvent := mapstr.M{
+		"proc": mapstr.M{
+			"cpu": mapstr.M{
 				"system":  26027,
 				"total":   79390,
 				"total_p": 0,
@@ -290,15 +290,15 @@ func TestMultipleIncludeFields(t *testing.T) {
 
 	event1 := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"@timestamp": "2016-01-24T18:35:19.308Z",
-			"beat": common.MapStr{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
 
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -307,7 +307,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 				},
 				"cmdline": "/sbin/launchd",
 			},
-			"mem": common.MapStr{
+			"mem": mapstr.M{
 				"rss":   11194368,
 				"rss_p": 0,
 				"share": 0,
@@ -319,12 +319,12 @@ func TestMultipleIncludeFields(t *testing.T) {
 
 	event2 := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
-			"fs": common.MapStr{
+			"fs": mapstr.M{
 				"device_name": "devfs",
 				"total":       198656,
 				"used":        198656,
@@ -339,9 +339,9 @@ func TestMultipleIncludeFields(t *testing.T) {
 		},
 	}
 
-	expected1 := common.MapStr{
-		"proc": common.MapStr{
-			"cpu": common.MapStr{
+	expected1 := mapstr.M{
+		"proc": mapstr.M{
+			"cpu": mapstr.M{
 				"start_time": "Jan14",
 				"total_p":    0,
 			},
@@ -351,7 +351,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 		"type": "process",
 	}
 
-	expected2 := common.MapStr{
+	expected2 := mapstr.M{
 		"type": "process",
 	}
 
@@ -383,13 +383,13 @@ func TestDropEvent(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -398,7 +398,7 @@ func TestDropEvent(t *testing.T) {
 				},
 				"name":    "test-1",
 				"cmdline": "/sbin/launchd",
-				"mem": common.MapStr{
+				"mem": mapstr.M{
 					"rss":   11194368,
 					"rss_p": 0,
 					"share": 0,
@@ -427,13 +427,13 @@ func TestEmptyCondition(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -442,7 +442,7 @@ func TestEmptyCondition(t *testing.T) {
 				},
 				"name":    "test-1",
 				"cmdline": "/sbin/launchd",
-				"mem": common.MapStr{
+				"mem": mapstr.M{
 					"rss":   11194368,
 					"rss_p": 0,
 					"share": 0,
@@ -529,14 +529,14 @@ func TestDropMissingFields(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"beat": common.MapStr{
+		Fields: mapstr.M{
+			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
 			},
 
-			"proc": common.MapStr{
-				"cpu": common.MapStr{
+			"proc": mapstr.M{
+				"cpu": mapstr.M{
 					"start_time": "Jan14",
 					"system":     26027,
 					"total":      79390,
@@ -545,7 +545,7 @@ func TestDropMissingFields(t *testing.T) {
 				},
 				"cmdline": "/sbin/launchd",
 			},
-			"mem": common.MapStr{
+			"mem": mapstr.M{
 				"rss":   11194368,
 				"rss_p": 0,
 				"share": 0,
@@ -557,8 +557,8 @@ func TestDropMissingFields(t *testing.T) {
 
 	processedEvent, _ := processors.Run(event)
 
-	expectedEvent := common.MapStr{
-		"proc": common.MapStr{
+	expectedEvent := mapstr.M{
+		"proc": mapstr.M{
 			"cmdline": "/sbin/launchd",
 		},
 		"type": "process",

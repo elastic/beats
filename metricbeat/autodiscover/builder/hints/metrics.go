@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -90,7 +91,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		noPort = true
 	}
 
-	hints, ok := event["hints"].(common.MapStr)
+	hints, ok := event["hints"].(mapstr.M)
 	if !ok {
 		return configs
 	}
@@ -132,7 +133,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		username := m.getUsername(hint)
 		password := m.getPassword(hint)
 
-		moduleConfig := common.MapStr{
+		moduleConfig := mapstr.M{
 			"module":     mod,
 			"metricsets": msets,
 			"timeout":    tout,
@@ -191,7 +192,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	return template.ApplyConfigTemplate(event, configs, options...)
 }
 
-func (m *metricHints) generateConfig(mod common.MapStr) *conf.C {
+func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
 	cfg, err := conf.NewConfigFrom(mod)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
@@ -200,11 +201,11 @@ func (m *metricHints) generateConfig(mod common.MapStr) *conf.C {
 	return cfg
 }
 
-func (m *metricHints) getModule(hints common.MapStr) string {
+func (m *metricHints) getModule(hints mapstr.M) string {
 	return builder.GetHintString(hints, m.Key, module)
 }
 
-func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string {
+func (m *metricHints) getMetricSets(hints mapstr.M, module string) []string {
 	var msets []string
 	var err error
 	msets = builder.GetHintAsList(hints, m.Key, metricsets)
@@ -221,7 +222,7 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort bool) ([]string, bool) {
+func (m *metricHints) getHostsWithPort(hints mapstr.M, port int, noPort bool) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
@@ -271,23 +272,23 @@ func (m *metricHints) checkHostPort(h string, p int) bool {
 	return h[end] < '0' || h[end] > '9'
 }
 
-func (m *metricHints) getNamespace(hints common.MapStr) string {
+func (m *metricHints) getNamespace(hints mapstr.M) string {
 	return builder.GetHintString(hints, m.Key, namespace)
 }
 
-func (m *metricHints) getMetricPath(hints common.MapStr) string {
+func (m *metricHints) getMetricPath(hints mapstr.M) string {
 	return builder.GetHintString(hints, m.Key, metricspath)
 }
 
-func (m *metricHints) getUsername(hints common.MapStr) string {
+func (m *metricHints) getUsername(hints mapstr.M) string {
 	return builder.GetHintString(hints, m.Key, username)
 }
 
-func (m *metricHints) getPassword(hints common.MapStr) string {
+func (m *metricHints) getPassword(hints mapstr.M) string {
 	return builder.GetHintString(hints, m.Key, password)
 }
 
-func (m *metricHints) getPeriod(hints common.MapStr) string {
+func (m *metricHints) getPeriod(hints mapstr.M) string {
 	if ival := builder.GetHintString(hints, m.Key, period); ival != "" {
 		return ival
 	}
@@ -295,40 +296,40 @@ func (m *metricHints) getPeriod(hints common.MapStr) string {
 	return defaultPeriod
 }
 
-func (m *metricHints) getTimeout(hints common.MapStr) string {
+func (m *metricHints) getTimeout(hints mapstr.M) string {
 	if tout := builder.GetHintString(hints, m.Key, timeout); tout != "" {
 		return tout
 	}
 	return defaultTimeout
 }
 
-func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
+func (m *metricHints) getSSLConfig(hints mapstr.M) mapstr.M {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
 }
 
-func (m *metricHints) getMetricsFilters(hints common.MapStr) common.MapStr {
-	mf := common.MapStr{}
+func (m *metricHints) getMetricsFilters(hints mapstr.M) mapstr.M {
+	mf := mapstr.M{}
 	for k := range builder.GetHintMapStr(hints, m.Key, metricsfilters) {
 		mf[k] = builder.GetHintAsList(hints, m.Key, metricsfilters+"."+k)
 	}
 	return mf
 }
 
-func (m *metricHints) getModuleConfigs(hints common.MapStr) []common.MapStr {
+func (m *metricHints) getModuleConfigs(hints mapstr.M) []mapstr.M {
 	return builder.GetHintAsConfigs(hints, m.Key)
 }
 
-func (m *metricHints) getProcessors(hints common.MapStr) []common.MapStr {
+func (m *metricHints) getProcessors(hints mapstr.M) []mapstr.M {
 	return builder.GetProcessors(hints, m.Key)
 
 }
 
-func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+func (m *metricHints) getModules(hints mapstr.M) []mapstr.M {
 	modules := builder.GetHintsAsList(hints, m.Key)
-	var output []common.MapStr
+	var output []mapstr.M
 
 	for _, mod := range modules {
-		output = append(output, common.MapStr{
+		output = append(output, mapstr.M{
 			m.Key: mod,
 		})
 	}

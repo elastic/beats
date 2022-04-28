@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type node map[string]interface{}
@@ -38,80 +38,80 @@ func TestSelector(t *testing.T) {
 
 	tests := map[string]struct {
 		config   string
-		event    common.MapStr
+		event    mapstr.M
 		want     string
 		settings func(Settings) Settings
 	}{
 		"constant key": {
 			config: `key: value`,
-			event:  common.MapStr{},
+			event:  mapstr.M{},
 			want:   "value",
 		},
 		"lowercase constant key": {
 			config:   `key: VaLuE`,
-			event:    common.MapStr{},
+			event:    mapstr.M{},
 			want:     "value",
 			settings: useLowerCase,
 		},
 		"do not lowercase constant key by default": {
 			config: `key: VaLuE`,
-			event:  common.MapStr{},
+			event:  mapstr.M{},
 			want:   "VaLuE",
 		},
 		"format string key": {
 			config: `key: '%{[key]}'`,
-			event:  common.MapStr{"key": "value"},
+			event:  mapstr.M{"key": "value"},
 			want:   "value",
 		},
 		"lowercase format string key": {
 			config:   `key: '%{[key]}'`,
-			event:    common.MapStr{"key": "VaLuE"},
+			event:    mapstr.M{"key": "VaLuE"},
 			want:     "value",
 			settings: useLowerCase,
 		},
 		"do not lowercase format string by default": {
 			config: `key: '%{[key]}'`,
-			event:  common.MapStr{"key": "VaLuE"},
+			event:  mapstr.M{"key": "VaLuE"},
 			want:   "VaLuE",
 		},
 		"key with empty keys": {
 			config: `{key: value, keys: }`,
-			event:  common.MapStr{},
+			event:  mapstr.M{},
 			want:   "value",
 		},
 		"lowercase key with empty keys": {
 			config:   `{key: vAlUe, keys: }`,
-			event:    common.MapStr{},
+			event:    mapstr.M{},
 			want:     "value",
 			settings: useLowerCase,
 		},
 		"do not lowercase key with empty keys by default": {
 			config: `{key: vAlUe, keys: }`,
-			event:  common.MapStr{},
+			event:  mapstr.M{},
 			want:   "vAlUe",
 		},
 		"constant in multi key": {
 			config: `keys: [key: 'value']`,
-			event:  common.MapStr{},
+			event:  mapstr.M{},
 			want:   "value",
 		},
 		"format string in multi key": {
 			config: `keys: [key: '%{[key]}']`,
-			event:  common.MapStr{"key": "value"},
+			event:  mapstr.M{"key": "value"},
 			want:   "value",
 		},
 		"missing format string key with default in rule": {
 			config: `keys:
 			        - key: '%{[key]}'
 			          default: value`,
-			event: common.MapStr{},
+			event: mapstr.M{},
 			want:  "value",
 		},
 		"lowercase missing format string key with default in rule": {
 			config: `keys:
 			        - key: '%{[key]}'
 			          default: vAlUe`,
-			event:    common.MapStr{},
+			event:    mapstr.M{},
 			want:     "value",
 			settings: useLowerCase,
 		},
@@ -119,21 +119,21 @@ func TestSelector(t *testing.T) {
 			config: `keys:
 			        - key: '%{[key]}'
 			          default: vAlUe`,
-			event: common.MapStr{},
+			event: mapstr.M{},
 			want:  "vAlUe",
 		},
 		"empty format string key with default in rule": {
 			config: `keys:
 						        - key: '%{[key]}'
 						          default: value`,
-			event: common.MapStr{"key": ""},
+			event: mapstr.M{"key": ""},
 			want:  "value",
 		},
 		"lowercase empty format string key with default in rule": {
 			config: `keys:
 						        - key: '%{[key]}'
 						          default: vAluE`,
-			event:    common.MapStr{"key": ""},
+			event:    mapstr.M{"key": ""},
 			want:     "value",
 			settings: useLowerCase,
 		},
@@ -141,19 +141,19 @@ func TestSelector(t *testing.T) {
 			config: `keys:
 						        - key: '%{[key]}'
 						          default: vAluE`,
-			event: common.MapStr{"key": ""},
+			event: mapstr.M{"key": ""},
 			want:  "vAluE",
 		},
 		"missing format string key with constant in next rule": {
 			config: `keys:
 						        - key: '%{[key]}'
 						        - key: value`,
-			event: common.MapStr{},
+			event: mapstr.M{},
 			want:  "value",
 		},
 		"missing format string key with constant in top-level rule": {
 			config: `{ key: value, keys: [key: '%{[key]}']}`,
-			event:  common.MapStr{},
+			event:  mapstr.M{},
 			want:   "value",
 		},
 		"apply mapping": {
@@ -161,7 +161,7 @@ func TestSelector(t *testing.T) {
 						       - key: '%{[key]}'
 						         mappings:
 						           v: value`,
-			event: common.MapStr{"key": "v"},
+			event: mapstr.M{"key": "v"},
 			want:  "value",
 		},
 		"lowercase applied mapping": {
@@ -169,7 +169,7 @@ func TestSelector(t *testing.T) {
 						       - key: '%{[key]}'
 						         mappings:
 						           v: vAlUe`,
-			event:    common.MapStr{"key": "v"},
+			event:    mapstr.M{"key": "v"},
 			want:     "value",
 			settings: useLowerCase,
 		},
@@ -178,7 +178,7 @@ func TestSelector(t *testing.T) {
 						       - key: '%{[key]}'
 						         mappings:
 						           v: vAlUe`,
-			event: common.MapStr{"key": "v"},
+			event: mapstr.M{"key": "v"},
 			want:  "vAlUe",
 		},
 		"apply mapping with default on empty key": {
@@ -187,7 +187,7 @@ func TestSelector(t *testing.T) {
 						         default: value
 						         mappings:
 						           v: 'v'`,
-			event: common.MapStr{"key": ""},
+			event: mapstr.M{"key": ""},
 			want:  "value",
 		},
 		"lowercase apply mapping with default on empty key": {
@@ -196,7 +196,7 @@ func TestSelector(t *testing.T) {
 						         default: vAluE
 						         mappings:
 						           v: 'v'`,
-			event:    common.MapStr{"key": ""},
+			event:    mapstr.M{"key": ""},
 			want:     "value",
 			settings: useLowerCase,
 		},
@@ -206,7 +206,7 @@ func TestSelector(t *testing.T) {
 						         default: vAluE
 						         mappings:
 						           v: 'v'`,
-			event: common.MapStr{"key": ""},
+			event: mapstr.M{"key": ""},
 			want:  "vAluE",
 		},
 		"apply mapping with default on empty lookup": {
@@ -215,7 +215,7 @@ func TestSelector(t *testing.T) {
 			         default: value
 			         mappings:
 			           v: ''`,
-			event: common.MapStr{"key": "v"},
+			event: mapstr.M{"key": "v"},
 			want:  "value",
 		},
 		"apply mapping without match": {
@@ -224,7 +224,7 @@ func TestSelector(t *testing.T) {
 						         mappings:
 						           v: ''
 						       - key: value`,
-			event: common.MapStr{"key": "x"},
+			event: mapstr.M{"key": "x"},
 			want:  "value",
 		},
 		"mapping with constant key": {
@@ -232,7 +232,7 @@ func TestSelector(t *testing.T) {
 						       - key: k
 						         mappings:
 						           k: value`,
-			event: common.MapStr{},
+			event: mapstr.M{},
 			want:  "value",
 		},
 		"mapping with missing constant key": {
@@ -240,7 +240,7 @@ func TestSelector(t *testing.T) {
 						       - key: unknown
 						         mappings: {k: wrong}
 						       - key: value`,
-			event: common.MapStr{},
+			event: mapstr.M{},
 			want:  "value",
 		},
 		"mapping with missing constant key, but default": {
@@ -248,14 +248,14 @@ func TestSelector(t *testing.T) {
 						       - key: unknown
 						         default: value
 						         mappings: {k: wrong}`,
-			event: common.MapStr{},
+			event: mapstr.M{},
 			want:  "value",
 		},
 		"matching condition": {
 			config: `keys:
 						       - key: value
 						         when.equals.test: test`,
-			event: common.MapStr{"test": "test"},
+			event: mapstr.M{"test": "test"},
 			want:  "value",
 		},
 		"failing condition": {
@@ -263,7 +263,7 @@ func TestSelector(t *testing.T) {
 						       - key: wrong
 						         when.equals.test: test
 						       - key: value`,
-			event: common.MapStr{"test": "x"},
+			event: mapstr.M{"test": "x"},
 			want:  "value",
 		},
 	}

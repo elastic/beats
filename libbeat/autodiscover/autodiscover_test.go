@@ -29,11 +29,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type mockRunner struct {
@@ -67,7 +67,7 @@ func (m *mockRunner) String() string {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	out := common.MapStr{}
+	out := mapstr.M{}
 	m.config.Unpack(&out)
 	return fmt.Sprintf("config: %v, started=%v, stopped=%v", out.String(), m.started, m.stopped)
 }
@@ -192,7 +192,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -209,7 +209,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -225,7 +225,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -233,7 +233,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -251,7 +251,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -314,7 +314,7 @@ func TestAutodiscoverHash(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -379,7 +379,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 			"id":       "foo",
 			"provider": "mock",
 			"start":    true,
-			"meta": common.MapStr{
+			"meta": mapstr.M{
 				"foo": "bar",
 			},
 		})
@@ -438,7 +438,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -494,7 +494,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 		"config": []*conf.C{
@@ -518,7 +518,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 		"config": []*conf.C{
@@ -552,7 +552,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 		"config": []*conf.C{
@@ -597,7 +597,7 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 	}
 
 	// Fail the test case if the check fails
-	out := common.MapStr{}
+	out := mapstr.M{}
 	expected.Unpack(&out)
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }

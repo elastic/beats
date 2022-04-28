@@ -27,8 +27,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -39,7 +39,7 @@ var (
 
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
@@ -84,7 +84,7 @@ func TestConfigDefault(t *testing.T) {
 
 func TestConfigNetInfoDisabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
@@ -131,7 +131,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 
 func TestConfigName(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
@@ -159,7 +159,7 @@ func TestConfigName(t *testing.T) {
 
 func TestConfigGeoEnabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
@@ -191,7 +191,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 
 func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
@@ -237,8 +237,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		{
 			"replace_fields=false with only host.name",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 					},
 				},
@@ -250,8 +250,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		{
 			"replace_fields=false with only host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"id": hostID,
 					},
 				},
@@ -263,8 +263,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		{
 			"replace_fields=false with host.name and host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 						"id":   hostID,
 					},
@@ -283,10 +283,10 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(common.MapStr)))
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M)))
 			}
 		})
 	}
@@ -316,8 +316,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		{
 			"replace_fields=true with host.name",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 					},
 				},
@@ -328,8 +328,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		{
 			"replace_fields=true with host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"id": hostID,
 					},
 				},
@@ -340,8 +340,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		{
 			"replace_fields=true with host.name and host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 						"id":   hostID,
 					},
@@ -359,8 +359,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
 		})
 	}
 }
@@ -384,8 +384,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event only with host.name",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 					},
 				},
@@ -395,8 +395,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event only with host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"id": hostID,
 					},
 				},
@@ -406,8 +406,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with host.name and host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 						"id":   hostID,
 					},
@@ -418,14 +418,14 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event without host field",
 			beat.Event{
-				Fields: common.MapStr{},
+				Fields: mapstr.M{},
 			},
 			false,
 		},
 		{
 			"event with field type map[string]string hostID",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": hostIDMap,
 				},
 			},
@@ -434,7 +434,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with field type map[string]string host name",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": hostNameMap,
 				},
 			},
@@ -443,7 +443,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with field type map[string]string host ID and name",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": hostIDNameMap,
 				},
 			},
@@ -452,7 +452,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with field type string",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": "string",
 				},
 			},

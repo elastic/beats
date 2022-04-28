@@ -13,10 +13,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCtxAfterDoRequest(t *testing.T) {
@@ -76,17 +76,17 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	assert.EqualValues(
 		t,
-		common.MapStr{"timestamp": "2002-10-02T15:00:00Z"},
+		mapstr.M{"timestamp": "2002-10-02T15:00:00Z"},
 		trCtx.cursorMap(),
 	)
 	assert.EqualValues(
 		t,
-		&common.MapStr{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.firstEventClone(),
 	)
 	assert.EqualValues(
 		t,
-		&common.MapStr{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		trCtx.lastEventClone(),
 	)
 	lastResp := trCtx.lastResponseClone()
@@ -97,7 +97,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 		&response{
 			page: 1,
 			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z"))),
-			body: common.MapStr{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			body: mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		},
 		lastResp,
 	)
@@ -107,19 +107,19 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	assert.EqualValues(
 		t,
-		common.MapStr{"timestamp": "2002-10-02T15:00:01Z"},
+		mapstr.M{"timestamp": "2002-10-02T15:00:01Z"},
 		trCtx.cursorMap(),
 	)
 
 	assert.EqualValues(
 		t,
-		&common.MapStr{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.firstEventClone(),
 	)
 
 	assert.EqualValues(
 		t,
-		&common.MapStr{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.lastEventClone(),
 	)
 
@@ -129,7 +129,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 		&response{
 			page: 1,
 			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"))),
-			body: common.MapStr{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			body: mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		},
 		lastResp,
 	)

@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -63,7 +63,7 @@ func newServer(config config) (*server, error) {
 func (s *server) Name() string { return "unix" }
 
 func (s *server) Test(_ input.TestContext) error {
-	l, err := net.Listen("unix", s.config.Path)
+	l, err := net.Listen("unix", s.config.Config.Path)
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": string(raw),
 		},
 	}

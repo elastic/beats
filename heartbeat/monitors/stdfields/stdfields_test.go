@@ -23,15 +23,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestLegacyServiceNameConfig(t *testing.T) {
 	srvName := "myService"
 
-	configBase := func() common.MapStr {
-		return common.MapStr{
+	configBase := func() mapstr.M {
+		return mapstr.M{
 			"type":     "http",
 			"id":       "myId",
 			"schedule": "@every 1s",
@@ -42,13 +42,13 @@ func TestLegacyServiceNameConfig(t *testing.T) {
 	legacyOnly["service_name"] = srvName
 
 	newOnly := configBase()
-	newOnly["service"] = common.MapStr{"name": srvName}
+	newOnly["service"] = mapstr.M{"name": srvName}
 
 	mix := configBase()
-	mix["service"] = common.MapStr{"name": srvName}
+	mix["service"] = mapstr.M{"name": srvName}
 	mix["service_name"] = "ignoreMe"
 
-	confMaps := []common.MapStr{
+	confMaps := []mapstr.M{
 		legacyOnly,
 		newOnly,
 		mix,

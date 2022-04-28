@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNetworkConfigUnpack(t *testing.T) {
@@ -36,12 +36,12 @@ func TestNetworkConfigUnpack(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		var config Config
-		if err = c.Unpack(&config); err != nil {
+		var cfg Config
+		if err = c.Unpack(&cfg); err != nil {
 			t.Fatal(err)
 		}
 
-		testConfig(t, expected, evt, &config)
+		testConfig(t, expected, evt, &cfg)
 	}
 
 	t.Run("string values", func(t *testing.T) {
@@ -70,8 +70,8 @@ network:
     server: [loopback]
 `
 
-		evt := &beat.Event{Fields: common.MapStr{
-			"ip": common.MapStr{
+		evt := &beat.Event{Fields: mapstr.M{
+			"ip": mapstr.M{
 				"client": "127.0.0.1",
 				"server": "127.0.0.1",
 			},
@@ -256,7 +256,7 @@ func BenchmarkNetworkCondition(b *testing.B) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"@timestamp": "2015-06-11T09:51:23.642Z",
 			"ip":         "192.168.0.92",
 		},

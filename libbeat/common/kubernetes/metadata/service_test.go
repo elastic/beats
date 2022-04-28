@@ -30,9 +30,9 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestService_Generate(t *testing.T) {
@@ -43,7 +43,7 @@ func TestService_Generate(t *testing.T) {
 	boolean := true
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -69,16 +69,16 @@ func TestService_Generate(t *testing.T) {
 					},
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"selectors": common.MapStr{
+					"selectors": mapstr.M{
 						"app":   "istiod",
 						"istio": "pilot",
 					},
@@ -118,21 +118,21 @@ func TestService_Generate(t *testing.T) {
 					},
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"selectors": common.MapStr{
+					"selectors": mapstr.M{
 						"app":   "istiod",
 						"istio": "pilot",
 					},
 					"namespace": "default",
-					"deployment": common.MapStr{
+					"deployment": mapstr.M{
 						"name": "owner",
 					},
 				},
@@ -157,7 +157,7 @@ func TestService_GenerateFromName(t *testing.T) {
 	boolean := true
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -177,12 +177,12 @@ func TestService_GenerateFromName(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"service": common.MapStr{
+			output: mapstr.M{
+				"service": mapstr.M{
 					"name": "obj",
 					"uid":  uid,
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
 				"namespace": "default",
@@ -214,16 +214,16 @@ func TestService_GenerateFromName(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"service": common.MapStr{
+			output: mapstr.M{
+				"service": mapstr.M{
 					"name": "obj",
 					"uid":  uid,
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
 				"namespace": "default",
-				"deployment": common.MapStr{
+				"deployment": mapstr.M{
 					"name": "owner",
 				},
 			},
@@ -253,7 +253,7 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 	tests := []struct {
 		input     kubernetes.Resource
 		namespace kubernetes.Resource
-		output    common.MapStr
+		output    mapstr.M
 		name      string
 	}{
 		{
@@ -289,21 +289,21 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
 					"namespace":     "default",
 					"namespace_uid": uid,
-					"namespace_labels": common.MapStr{
+					"namespace_labels": mapstr.M{
 						"nskey": "nsvalue",
 					},
-					"namespace_annotations": common.MapStr{
+					"namespace_annotations": mapstr.M{
 						"ns_annotation": "value",
 					},
 				},

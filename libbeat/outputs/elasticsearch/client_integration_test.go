@@ -37,7 +37,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -45,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestClientPublishEvent(t *testing.T) {
@@ -90,7 +90,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 
 	batch := outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":    "libbeat",
 			"message": "Test message from libbeat",
 		},
@@ -179,7 +179,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 
 	publish(beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":      "libbeat",
 			"message":   "Test message 1",
 			"pipeline":  pipeline,
@@ -187,7 +187,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		}})
 	publish(beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":      "libbeat",
 			"message":   "Test message 2",
 			"testfield": 0,
@@ -223,7 +223,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 
 	err := output.Publish(context.Background(), outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":      "libbeat",
 			"message":   "Test message 1",
 			"testfield": 0,
@@ -235,7 +235,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 
 	batch := outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":      "libbeat",
 			"message":   "Test message 2",
 			"testfield": "foo0",
@@ -325,7 +325,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	publish(
 		beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"type":      "libbeat",
 				"message":   "Test message 1",
 				"pipeline":  pipeline,
@@ -333,7 +333,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 			}},
 		beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"type":      "libbeat",
 				"message":   "Test message 2",
 				"testfield": 0,
@@ -359,7 +359,7 @@ func TestClientPublishTracer(t *testing.T) {
 
 	batch := outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": "Hello world",
 		},
 	})

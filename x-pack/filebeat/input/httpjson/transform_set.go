@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var errNewURLValueNotSet = errors.New("the new url.value was not set")
@@ -122,7 +122,7 @@ func (set *set) run(ctx *transformContext, tr transformable) (transformable, err
 	return tr, nil
 }
 
-func setToCommonMap(m common.MapStr, key string, val interface{}) error {
+func setToCommonMap(m mapstr.M, key string, val interface{}) error {
 	if _, err := m.Put(key, val); err != nil {
 		return err
 	}

@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type partTestScenario func(*testing.T, bool, sarama.Partitioner) error
@@ -230,7 +231,7 @@ func partTestSimple(N int, makeKey bool) partTestScenario {
 		for i := 0; i <= N; i++ {
 			ts := time.Now()
 
-			event := common.MapStr{
+			event := mapstr.M{
 				"@timestamp": common.Time(ts),
 				"message":    randString(20),
 			}
@@ -282,7 +283,7 @@ func partTestHashInvariant(N int) partTestScenario {
 		for i := 0; i <= N; i++ {
 			ts := time.Now()
 
-			event := common.MapStr{
+			event := mapstr.M{
 				"@timestamp": common.Time(ts),
 				"message":    randString(20),
 			}

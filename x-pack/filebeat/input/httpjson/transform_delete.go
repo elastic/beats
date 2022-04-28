@@ -7,9 +7,9 @@ package httpjson
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const deleteName = "delete"
@@ -105,8 +105,8 @@ func (delete *delete) run(ctx *transformContext, tr transformable) (transformabl
 	return tr, nil
 }
 
-func deleteFromCommonMap(m common.MapStr, key string) error {
-	if err := m.Delete(key); err != common.ErrKeyNotFound { //nolint:errorlint // common.ErrKeyNotFound is never wrapped by Delete.
+func deleteFromCommonMap(m mapstr.M, key string) error {
+	if err := m.Delete(key); err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by Delete.
 		return err
 	}
 	return nil

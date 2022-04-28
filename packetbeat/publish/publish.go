@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type TransactionPublisher struct {
@@ -88,7 +89,7 @@ func (p *TransactionPublisher) CreateReporter(
 	// load and register the module it's fields, tags and processors settings
 	meta := struct {
 		Index      string                  `config:"index"`
-		Event      common.EventMetadata    `config:",inline"`
+		Event      mapstr.EventMetadata    `config:",inline"`
 		Processors processors.PluginConfig `config:"processors"`
 		KeepNull   bool                    `config:"keep_null"`
 	}{}
@@ -112,7 +113,7 @@ func (p *TransactionPublisher) CreateReporter(
 		clientConfig.PublishMode = beat.DropIfFull
 	}
 	if meta.Index != "" {
-		clientConfig.Processing.Meta = common.MapStr{"raw_index": meta.Index}
+		clientConfig.Processing.Meta = mapstr.M{"raw_index": meta.Index}
 	}
 
 	client, err := p.pipeline.ConnectWith(clientConfig)

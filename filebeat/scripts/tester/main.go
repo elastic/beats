@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type logReaderConfig struct {
@@ -272,19 +273,19 @@ func readPipeline(path string) (map[string]interface{}, error) {
 }
 
 func runSimulate(url string, pipeline map[string]interface{}, logs []string, verbose bool) (*http.Response, error) {
-	var sources []common.MapStr
+	var sources []mapstr.M
 	now := time.Now().UTC()
 	for _, l := range logs {
-		s := common.MapStr{
+		s := mapstr.M{
 			"@timestamp": common.Time(now),
 			"message":    l,
 		}
 		sources = append(sources, s)
 	}
 
-	var docs []common.MapStr
+	var docs []mapstr.M
 	for _, s := range sources {
-		d := common.MapStr{
+		d := mapstr.M{
 			"_index":  "index",
 			"_type":   "_doc",
 			"_id":     "id",
@@ -293,7 +294,7 @@ func runSimulate(url string, pipeline map[string]interface{}, logs []string, ver
 		docs = append(docs, d)
 	}
 
-	p := common.MapStr{
+	p := mapstr.M{
 		"pipeline": pipeline,
 		"docs":     docs,
 	}
@@ -316,7 +317,7 @@ func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
 
 	b := new(bytes.Buffer)
 	b.ReadFrom(resp.Body)
-	var r common.MapStr
+	var r mapstr.M
 	err := json.Unmarshal(b.Bytes(), &r)
 	if err != nil {
 		return err
@@ -337,7 +338,7 @@ func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
 	return nil
 }
 
-func getDocErrors(r common.MapStr, simulateVerbose bool) ([]common.MapStr, error) {
+func getDocErrors(r mapstr.M, simulateVerbose bool) ([]mapstr.M, error) {
 	d, err := r.GetValue("docs")
 	if err != nil {
 		return nil, err
@@ -351,11 +352,11 @@ func getDocErrors(r common.MapStr, simulateVerbose bool) ([]common.MapStr, error
 	return getRegularErrors(docs)
 }
 
-func getRegularErrors(docs []interface{}) ([]common.MapStr, error) {
-	var errors []common.MapStr
+func getRegularErrors(docs []interface{}) ([]mapstr.M, error) {
+	var errors []mapstr.M
 	for _, d := range docs {
 		dd := d.(map[string]interface{})
-		doc := common.MapStr(dd)
+		doc := mapstr.M(dd)
 		hasError, err := doc.HasKey("doc._source.error")
 		if err != nil {
 			return nil, err
@@ -368,11 +369,11 @@ func getRegularErrors(docs []interface{}) ([]common.MapStr, error) {
 	return errors, nil
 }
 
-func getErrorsSimulateVerbose(docs []interface{}) ([]common.MapStr, error) {
-	var errors []common.MapStr
+func getErrorsSimulateVerbose(docs []interface{}) ([]mapstr.M, error) {
+	var errors []mapstr.M
 	for _, d := range docs {
 		pr := d.(map[string]interface{})
-		p := common.MapStr(pr)
+		p := mapstr.M(pr)
 
 		rr, err := p.GetValue("processor_results")
 		if err != nil {
@@ -382,7 +383,7 @@ func getErrorsSimulateVerbose(docs []interface{}) ([]common.MapStr, error) {
 		hasError := false
 		for _, r := range res {
 			rres := r.(map[string]interface{})
-			result := common.MapStr(rres)
+			result := mapstr.M(rres)
 			hasError, _ = result.HasKey("error")
 			if hasError {
 				errors = append(errors, p)

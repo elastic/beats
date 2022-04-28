@@ -25,9 +25,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -44,10 +44,10 @@ func TestFetch(t *testing.T) {
 		events[0].BeatEvent("zookeeper", "mntr").Fields.StringToPrint())
 
 	e, _ := events[0].BeatEvent("zookeeper", "mntr").Fields.GetValue("zookeeper.mntr")
-	event := e.(common.MapStr)
+	event := e.(mapstr.M)
 	// Check values
-	avgLatency := event["latency"].(common.MapStr)["avg"].(float64)
-	maxLatency := event["latency"].(common.MapStr)["max"].(float64)
+	avgLatency := event["latency"].(mapstr.M)["avg"].(float64)
+	maxLatency := event["latency"].(mapstr.M)["max"].(float64)
 	numAliveConnections := event["num_alive_connections"].(int64)
 
 	assert.True(t, avgLatency >= 0)

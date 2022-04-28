@@ -20,8 +20,8 @@ package stdfields
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // OptionalStream represents a config that has a stream set, which in practice
@@ -69,6 +69,6 @@ func UnnestStream(config *conf.C) (res *conf.C, err error) {
 		return nil, fmt.Errorf("could not determine base stream for config: %s", id)
 	}
 
-	err = res.Merge(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
+	err = res.Merge(mapstr.M{"id": optS.Id, "data_stream": optS.DataStream})
 	return
 }

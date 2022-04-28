@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const allocID = "43205e0e-3d55-f561-83cb-bed15e23b862"
@@ -50,9 +50,9 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 	logMatcher, err := newLogsPathMatcher(*cfg)
 	assert.Nil(t, err)
 
-	input := common.MapStr{
-		"log": common.MapStr{
-			"file": common.MapStr{
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
 				"path": source,
 			},
 		},

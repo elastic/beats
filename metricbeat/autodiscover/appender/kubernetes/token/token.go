@@ -22,12 +22,12 @@ import (
 	"io/ioutil"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -81,7 +81,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 	}
 
 	// Check if the condition is met. Attempt to append only if that is the case.
-	if t.Condition == nil || t.Condition.Check(common.MapStr(event)) == true {
+	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) == true {
 		tok := t.getAuthHeaderFromToken()
 		// If token is empty then just return
 		if tok == "" {
@@ -90,20 +90,20 @@ func (t *tokenAppender) Append(event bus.Event) {
 		for i := 0; i < len(cfgs); i++ {
 			// Unpack the config
 			cfg := cfgs[i]
-			c := common.MapStr{}
+			c := mapstr.M{}
 			err := cfg.Unpack(&c)
 			if err != nil {
 				logp.Debug("kubernetes.config", "unable to unpack config due to error: %v", err)
 				continue
 			}
-			var headers common.MapStr
+			var headers mapstr.M
 			if hRaw, ok := c["headers"]; ok {
 				// If headers is not a map then continue to next config
-				if headers, ok = hRaw.(common.MapStr); !ok {
+				if headers, ok = hRaw.(mapstr.M); !ok {
 					continue
 				}
 			} else {
-				headers = common.MapStr{}
+				headers = mapstr.M{}
 			}
 
 			// Assign authorization header and add it back to the config

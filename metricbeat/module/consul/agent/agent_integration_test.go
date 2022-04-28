@@ -23,9 +23,9 @@ package agent
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/module/consul"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 
@@ -54,7 +54,7 @@ func TestFetch(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 
 		// Check runtime value
-		runtime, ok := metricsetFields["runtime"].(common.MapStr)
+		runtime, ok := metricsetFields["runtime"].(mapstr.M)
 		assert.True(t, ok)
 
 		//Check heapObjects

@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var srvrTestInput = `Zookeeper version: 3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653, built on 05/03/2019 12:07 GMT
@@ -49,7 +49,7 @@ func TestParser(t *testing.T) {
 	assert.Equal(t, "2019-05-03T12:07:00Z", mapStr["version_date"])
 	assert.Equal(t, "3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653", versionID)
 
-	latency := mapStr["latency"].(common.MapStr)
+	latency := mapStr["latency"].(mapstr.M)
 	assert.Equal(t, int64(1), latency["min"])
 	assert.Equal(t, int64(2), latency["avg"])
 	assert.Equal(t, int64(3), latency["max"])
@@ -61,7 +61,7 @@ func TestParser(t *testing.T) {
 	assert.Equal(t, "standalone", mapStr["mode"])
 	assert.Equal(t, int64(4), mapStr["node_count"])
 
-	proposalSizes := mapStr["proposal_sizes"].(common.MapStr)
+	proposalSizes := mapStr["proposal_sizes"].(mapstr.M)
 	assert.Equal(t, int64(-3), proposalSizes["last"])
 	assert.Equal(t, int64(-999), proposalSizes["min"])
 	assert.Equal(t, int64(-1), proposalSizes["max"])

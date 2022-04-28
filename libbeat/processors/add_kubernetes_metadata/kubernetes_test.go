@@ -25,9 +25,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test Annotator is skipped if kubernetes metadata already exist
@@ -50,10 +50,10 @@ func TestAnnotatorSkipped(t *testing.T) {
 	}
 
 	processor.cache.set("foo",
-		common.MapStr{
-			"kubernetes": common.MapStr{
-				"pod": common.MapStr{
-					"labels": common.MapStr{
+		mapstr.M{
+			"kubernetes": mapstr.M{
+				"pod": mapstr.M{
+					"labels": mapstr.M{
 						"added": "should not",
 					},
 				},
@@ -61,12 +61,12 @@ func TestAnnotatorSkipped(t *testing.T) {
 		})
 
 	event, err := processor.Run(&beat.Event{
-		Fields: common.MapStr{
-			"kubernetes": common.MapStr{
-				"pod": common.MapStr{
+		Fields: mapstr.M{
+			"kubernetes": mapstr.M{
+				"pod": mapstr.M{
 					"name": "foo",
 					"id":   "pod_id",
-					"metrics": common.MapStr{
+					"metrics": mapstr.M{
 						"a": 1,
 						"b": 2,
 					},
@@ -76,12 +76,12 @@ func TestAnnotatorSkipped(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	assert.Equal(t, common.MapStr{
-		"kubernetes": common.MapStr{
-			"pod": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{
 				"name": "foo",
 				"id":   "pod_id",
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"a": 1,
 					"b": 2,
 				},
@@ -108,12 +108,12 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 		kubernetesAvailable: false,
 	}
 
-	intialEventMap := common.MapStr{
-		"kubernetes": common.MapStr{
-			"pod": common.MapStr{
+	intialEventMap := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{
 				"name": "foo",
 				"id":   "pod_id",
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"a": 1,
 					"b": 2,
 				},

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -62,10 +63,10 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 
 // Create config based on input hints in the bus event
 func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
-	var hints common.MapStr
+	var hints mapstr.M
 	hIface, ok := event["hints"]
 	if ok {
-		hints, _ = hIface.(common.MapStr)
+		hints, _ = hIface.(mapstr.M)
 	}
 
 	monitorConfig := hb.getRawConfigs(hints)
@@ -95,7 +96,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		return template.ApplyConfigTemplate(event, configs)
 	}
 
-	tempCfg := common.MapStr{}
+	tempCfg := mapstr.M{}
 	monitors := builder.GetHintsAsList(hints, hb.config.Key)
 
 	var configs []*conf.C
@@ -125,23 +126,23 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	return template.ApplyConfigTemplate(event, configs)
 }
 
-func (hb *heartbeatHints) getType(hints common.MapStr) common.MapStr {
+func (hb *heartbeatHints) getType(hints mapstr.M) mapstr.M {
 	return builder.GetHintMapStr(hints, hb.config.Key, montype)
 }
 
-func (hb *heartbeatHints) getSchedule(hints common.MapStr) []string {
+func (hb *heartbeatHints) getSchedule(hints mapstr.M) []string {
 	return builder.GetHintAsList(hints, hb.config.Key, schedule)
 }
 
-func (hb *heartbeatHints) getRawConfigs(hints common.MapStr) []common.MapStr {
+func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {
 	return builder.GetHintAsConfigs(hints, hb.config.Key)
 }
 
-func (hb *heartbeatHints) getProcessors(hints common.MapStr) []common.MapStr {
+func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {
 	return builder.GetConfigs(hints, "", "processors")
 }
 
-func (hb *heartbeatHints) getHostsWithPort(hints common.MapStr, port int) []string {
+func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int) []string {
 	var result []string
 	thosts := builder.GetHintAsList(hints, "", hosts)
 	// Only pick hosts that have ${data.port} or the port on current event. This will make

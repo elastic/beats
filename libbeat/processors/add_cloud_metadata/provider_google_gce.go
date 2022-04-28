@@ -22,10 +22,10 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type KubeConfig struct {
@@ -49,13 +49,13 @@ var gceMetadataFetcher = provider{
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-		gceSchema := func(m map[string]interface{}) common.MapStr {
-			cloud := common.MapStr{
-				"service": common.MapStr{
+		gceSchema := func(m map[string]interface{}) mapstr.M {
+			cloud := mapstr.M{
+				"service": mapstr.M{
 					"name": "GCE",
 				},
 			}
-			meta := common.MapStr{}
+			meta := mapstr.M{}
 
 			trimLeadingPath := func(key string) {
 				v, err := cloud.GetValue(key)
@@ -125,7 +125,7 @@ var gceMetadataFetcher = provider{
 				}.ApplyTo(cloud, project)
 			}
 
-			meta.DeepUpdate(common.MapStr{"cloud": cloud})
+			meta.DeepUpdate(mapstr.M{"cloud": cloud})
 			return meta
 		}
 

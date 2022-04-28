@@ -27,9 +27,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -67,13 +67,13 @@ func NewInput(
 	callback := func(data []byte, metadata inputsource.NetworkMetadata) {
 		forwarder.Send(beat.Event{
 			Timestamp: time.Now(),
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"truncated": metadata.Truncated,
 			},
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": string(data),
-				"log": common.MapStr{
-					"source": common.MapStr{
+				"log": mapstr.M{
+					"source": mapstr.M{
 						"address": metadata.RemoteAddr.String(),
 					},
 				},

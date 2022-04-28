@@ -27,9 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func createEC2MockAPI(responseMap map[string]string) *httptest.Server {
@@ -97,25 +97,25 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 		testName           string
 		ec2ResponseMap     map[string]string
 		processorOverwrite bool
-		previousEvent      common.MapStr
+		previousEvent      mapstr.M
 
-		expectedEvent common.MapStr
+		expectedEvent mapstr.M
 	}{
 		{
 			testName:           "all fields from processor",
 			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
 			processorOverwrite: false,
-			previousEvent:      common.MapStr{},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
+			previousEvent:      mapstr.M{},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "EC2",
 					},
 				},
@@ -126,14 +126,14 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			testName:           "instanceId pre-informed, no overwrite",
 			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
 			processorOverwrite: false,
-			previousEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"instance": common.MapStr{"id": instanceIDDoc2},
+			previousEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
 				},
 			},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"instance": common.MapStr{"id": instanceIDDoc2},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
 				},
 			},
 		},
@@ -145,20 +145,20 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			testName:           "only cloud.provider pre-informed, no overwrite",
 			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
 			processorOverwrite: false,
-			previousEvent: common.MapStr{
+			previousEvent: mapstr.M{
 				"cloud.provider": "aws",
 			},
-			expectedEvent: common.MapStr{
+			expectedEvent: mapstr.M{
 				"cloud.provider": "aws",
-				"cloud": common.MapStr{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "EC2",
 					},
 				},
@@ -169,17 +169,17 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			testName:           "all fields from processor, overwrite",
 			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
 			processorOverwrite: true,
-			previousEvent:      common.MapStr{},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
+			previousEvent:      mapstr.M{},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "EC2",
 					},
 				},
@@ -190,21 +190,21 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			testName:           "instanceId pre-informed, overwrite",
 			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
 			processorOverwrite: true,
-			previousEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"instance": common.MapStr{"id": instanceIDDoc2},
+			previousEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
 				},
 			},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "EC2",
 					},
 				},
@@ -215,20 +215,20 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			testName:           "only cloud.provider pre-informed, overwrite",
 			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
 			processorOverwrite: false,
-			previousEvent: common.MapStr{
+			previousEvent: mapstr.M{
 				"cloud.provider": "aws",
 			},
-			expectedEvent: common.MapStr{
+			expectedEvent: mapstr.M{
 				"cloud.provider": "aws",
-				"cloud": common.MapStr{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "EC2",
 					},
 				},

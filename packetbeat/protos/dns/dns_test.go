@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test Constants
@@ -132,7 +133,7 @@ func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
-func expectResult(t testing.TB, e *eventStore) common.MapStr {
+func expectResult(t testing.TB, e *eventStore) mapstr.M {
 	if len(e.events) == 0 {
 		t.Error("No transaction")
 		return nil
@@ -144,13 +145,13 @@ func expectResult(t testing.TB, e *eventStore) common.MapStr {
 }
 
 // Retrieves a map value. The key should be the full dotted path to the element.
-func mapValue(t testing.TB, m common.MapStr, key string) interface{} {
+func mapValue(t testing.TB, m mapstr.M, key string) interface{} {
 	t.Helper()
 	return mapValueHelper(t, m, strings.Split(key, "."))
 }
 
 // Retrieves nested MapStr values.
-func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
+func mapValueHelper(t testing.TB, m mapstr.M, keys []string) interface{} {
 	t.Helper()
 
 	key := keys[0]
@@ -167,9 +168,9 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 		switch typ := value.(type) {
 		default:
 			t.Fatalf("Expected %s to return a MapStr but got %v.", key, value)
-		case common.MapStr:
+		case mapstr.M:
 			return mapValueHelper(t, typ, keys[1:])
-		case []common.MapStr:
+		case []mapstr.M:
 			var values []interface{}
 			for _, m := range typ {
 				values = append(values, mapValueHelper(t, m, keys[1:]))
@@ -204,7 +205,7 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 //     dns.authorities
 //     dns.additionals_count
 //     dns.additionals
-func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
+func assertMapStrData(t testing.TB, m mapstr.M, q dnsTestMessage) {
 	t.Helper()
 
 	assertRequest(t, m, q)
@@ -258,7 +259,7 @@ func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	}
 }
 
-func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
+func assertRequest(t testing.TB, m mapstr.M, q dnsTestMessage) {
 	t.Helper()
 
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
@@ -281,7 +282,7 @@ func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
 }
 
 // Assert that the specified flags are set.
-func assertFlags(t testing.TB, m common.MapStr, flags []string) {
+func assertFlags(t testing.TB, m mapstr.M, flags []string) {
 	for _, expected := range flags {
 		var key string
 		switch expected {

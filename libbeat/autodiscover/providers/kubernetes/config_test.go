@@ -23,21 +23,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 func TestConfigWithCustomBuilders(t *testing.T) {
 	autodiscover.Registry.AddBuilder("mock", newMockBuilder)
 
-	cfg := common.MapStr{
+	cfg := mapstr.M{
 		"hints.enabled": false,
-		"builders": []common.MapStr{
+		"builders": []mapstr.M{
 			{
-				"mock": common.MapStr{},
+				"mock": mapstr.M{},
 			},
 		},
 	}
@@ -47,7 +47,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	err := config.Unpack(&c)
 	assert.NoError(t, err)
 
-	cfg1 := common.MapStr{
+	cfg1 := mapstr.M{
 		"hints.enabled": false,
 	}
 	config, err = conf.NewConfigFrom(&cfg1)
@@ -57,7 +57,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 }
 
 func TestConfigWithIncorrectScope(t *testing.T) {
-	cfg := common.MapStr{
+	cfg := mapstr.M{
 		"scope":         "node",
 		"resource":      "service",
 		"hints.enabled": true,

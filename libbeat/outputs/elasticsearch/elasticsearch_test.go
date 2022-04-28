@@ -24,9 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
@@ -95,11 +95,11 @@ func TestPipelineSelection(t *testing.T) {
 			want: "test",
 		},
 		"pipeline via event meta": {
-			event: beat.Event{Meta: common.MapStr{"pipeline": "test"}},
+			event: beat.Event{Meta: mapstr.M{"pipeline": "test"}},
 			want:  "test",
 		},
 		"pipeline via event meta must be lowercase": {
-			event: beat.Event{Meta: common.MapStr{"pipeline": "Test"}},
+			event: beat.Event{Meta: mapstr.M{"pipeline": "Test"}},
 			want:  "test",
 		},
 		"pipelines setting": {

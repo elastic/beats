@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -34,7 +34,7 @@ type Indexer interface {
 // MetadataIndex holds a pair of index to metadata
 type MetadataIndex struct {
 	Index string
-	Data  common.MapStr
+	Data  mapstr.M
 }
 
 // Indexers holds a collections of Indexer objects and the associated lock

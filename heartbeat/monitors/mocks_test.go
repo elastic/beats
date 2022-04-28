@@ -31,10 +31,10 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -127,7 +127,7 @@ func mockEventMonitorValidator(id string, name string) validator.Validator {
 }
 
 func mockEventCustomFields() map[string]interface{} {
-	return common.MapStr{"foo": "bar"}
+	return mapstr.M{"foo": "bar"}
 }
 
 //nolint:unparam // There are no new changes to this line but

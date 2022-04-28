@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -149,7 +150,7 @@ type fnExtraConfig struct {
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`
 
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"` // Fields and tags to add to events.
 
 	// ES output index pattern
 	Index fmtstr.EventFormatString `config:"index"`

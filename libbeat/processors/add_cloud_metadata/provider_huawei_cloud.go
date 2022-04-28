@@ -20,8 +20,8 @@ package add_cloud_metadata
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type hwMeta struct {
@@ -49,11 +49,11 @@ var huaweiMetadataFetcher = provider{
 		metadataHost := "169.254.169.254"
 		huaweiCloudMetadataJSONURI := "/openstack/latest/meta_data.json"
 
-		huaweiCloudSchema := func(m map[string]interface{}) common.MapStr {
-			m["service"] = common.MapStr{
+		huaweiCloudSchema := func(m map[string]interface{}) mapstr.M {
+			m["service"] = mapstr.M{
 				"name": "ECS",
 			}
-			return common.MapStr{"cloud": m}
+			return mapstr.M{"cloud": m}
 		}
 
 		urls, err := getMetadataURLs(c, metadataHost, []string{

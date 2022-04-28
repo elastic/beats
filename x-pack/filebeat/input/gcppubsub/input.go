@@ -20,12 +20,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -202,8 +202,8 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 
 	event := beat.Event{
 		Timestamp: msg.PublishTime.UTC(),
-		Fields: common.MapStr{
-			"event": common.MapStr{
+		Fields: mapstr.M{
+			"event": mapstr.M{
 				"id":      id,
 				"created": time.Now().UTC(),
 			},

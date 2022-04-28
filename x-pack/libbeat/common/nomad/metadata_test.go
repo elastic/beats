@@ -11,8 +11,8 @@ import (
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func newJob(jobID string) *Job {
@@ -84,7 +84,7 @@ func TestAllocationMetadata(t *testing.T) {
 	meta := metaGen.ResourceMetadata(alloc)
 	tasks := metaGen.GroupMeta(alloc.Job)
 
-	assert.EqualValues(t, common.MapStr{
+	assert.EqualValues(t, mapstr.M{
 		"name": "my-job",
 		"type": "service",
 	}, meta["job"])
@@ -167,12 +167,12 @@ func TestCronJob(t *testing.T) {
 	meta := metaGen.ResourceMetadata(alloc)
 	tasks := metaGen.GroupMeta(alloc.Job)
 
-	assert.EqualValues(t, common.MapStr{
+	assert.EqualValues(t, mapstr.M{
 		"name":   alloc.Name,
 		"id":     allocID,
 		"status": "",
 	}, meta["allocation"])
-	assert.EqualValues(t, common.MapStr{
+	assert.EqualValues(t, mapstr.M{
 		"name": *cron.Name,
 		"type": JobTypeBatch,
 	}, meta["job"])

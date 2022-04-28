@@ -26,12 +26,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -281,14 +281,14 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	return updated
 }
 
-func (a *Autodiscover) getMeta(event bus.Event) common.MapStr {
+func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
 	m := event["meta"]
 	if m == nil {
 		return nil
 	}
 
 	a.logger.Debugf("Got a meta field in the event")
-	meta, ok := m.(common.MapStr)
+	meta, ok := m.(mapstr.M)
 	if !ok {
 		a.logger.Errorf("Got a wrong meta field for event %v", event)
 		return nil

@@ -26,9 +26,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type httpMetadataFetcher struct {
@@ -42,7 +42,7 @@ type httpMetadataFetcher struct {
 // to the result according the HTTP response.
 type responseHandler func(all []byte, res *result) error
 
-type schemaConv func(m map[string]interface{}) common.MapStr
+type schemaConv func(m map[string]interface{}) mapstr.M
 
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
@@ -66,7 +66,7 @@ func newMetadataFetcher(
 // Some providers require multiple HTTP requests to gather the whole metadata,
 // len(f.responseHandlers)  > 1 indicates that multiple requests are needed.
 func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
-	res := result{provider: f.provider, metadata: common.MapStr{}}
+	res := result{provider: f.provider, metadata: mapstr.M{}}
 	for url, responseHandler := range f.responseHandlers {
 		f.fetchRaw(ctx, client, url, responseHandler, &res)
 		if res.err != nil {

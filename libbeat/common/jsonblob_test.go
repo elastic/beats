@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfigJSONBlob(t *testing.T) {
@@ -47,9 +48,9 @@ func TestConfigJSONBlob(t *testing.T) {
 			expectedOut: []byte(`{"key":"value"}`),
 		},
 		{
-			name: "successfully unpacks MapStr",
+			name: "successfully unpacks mapstr.M",
 			config: map[string]interface{}{
-				"jsonBlob": MapStr{"key": "value"},
+				"jsonBlob": mapstr.M{"key": "value"},
 			},
 			expectedOut: []byte(`{"key":"value"}`),
 		},

@@ -25,8 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type provider struct {
@@ -46,9 +46,9 @@ type metadataFetcher interface {
 
 // result is the result of a query for a specific hosting provider's metadata.
 type result struct {
-	provider string        // Hosting provider type.
-	err      error         // Error that occurred while fetching (if any).
-	metadata common.MapStr // A specific subset of the metadata received from the hosting provider.
+	provider string   // Hosting provider type.
+	err      error    // Error that occurred while fetching (if any).
+	metadata mapstr.M // A specific subset of the metadata received from the hosting provider.
 }
 
 var cloudMetaProviders = map[string]provider{

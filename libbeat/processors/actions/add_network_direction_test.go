@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNetworkDirection(t *testing.T) {
@@ -51,7 +51,7 @@ func TestNetworkDirection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%v -> %v : %v", tt.Source, tt.Destination, tt.Direction), func(t *testing.T) {
 			evt := beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"source":      tt.Source,
 					"destination": tt.Destination,
 				},
@@ -81,8 +81,8 @@ func TestNetworkDirection(t *testing.T) {
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		evt := beat.Event{
-			Meta: common.MapStr{},
-			Fields: common.MapStr{
+			Meta: mapstr.M{},
+			Fields: mapstr.M{
 				"source":      "1.1.1.1",
 				"destination": "8.8.8.8",
 			},
@@ -95,7 +95,7 @@ func TestNetworkDirection(t *testing.T) {
 		}))
 		require.NoError(t, err)
 
-		expectedMeta := common.MapStr{
+		expectedMeta := mapstr.M{
 			"direction": "external",
 		}
 

@@ -24,10 +24,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type TcpServer struct {
@@ -40,10 +40,10 @@ type TcpServer struct {
 }
 
 type TcpEvent struct {
-	event common.MapStr
+	event mapstr.M
 }
 
-func (m *TcpEvent) GetEvent() common.MapStr {
+func (m *TcpEvent) GetEvent() mapstr.M {
 	return m.event
 }
 
@@ -131,7 +131,7 @@ func (g *TcpServer) handle(conn net.Conn) {
 		// Drop the delimiter and send the data
 		if len(bytes) > 0 {
 			g.eventQueue <- &TcpEvent{
-				event: common.MapStr{
+				event: mapstr.M{
 					server.EventDataKey: bytes[:len(bytes)-1],
 				},
 			}

@@ -20,11 +20,11 @@ package template
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/keystore"
@@ -44,13 +44,13 @@ type Mapper struct {
 // ConditionMap maps a condition to the configs to use when it's triggered
 type ConditionMap struct {
 	Condition conditions.Condition
-	Configs   []*config.C
+	Configs   []*conf.C
 }
 
 // MapperSettings holds user settings to build Mapper
 type MapperSettings []*struct {
 	ConditionConfig *conditions.Config `config:"condition"`
-	Configs         []*config.C        `config:"config"`
+	Configs         []*conf.C          `config:"config"`
 }
 
 // NewConfigMapper builds a template Mapper from given settings
@@ -76,11 +76,11 @@ func NewConfigMapper(
 }
 
 // Event adapts MapStr to processors.ValuesMap interface
-type Event common.MapStr
+type Event mapstr.M
 
 // GetValue extracts given key from an Event
 func (e Event) GetValue(key string) (interface{}, error) {
-	val, err := common.MapStr(e).GetValue(key)
+	val, err := mapstr.M(e).GetValue(key)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +88,8 @@ func (e Event) GetValue(key string) (interface{}, error) {
 }
 
 // GetConfig returns a matching Config if any, nil otherwise
-func (c Mapper) GetConfig(event bus.Event) []*config.C {
-	var result []*config.C
+func (c Mapper) GetConfig(event bus.Event) []*conf.C {
+	var result []*conf.C
 	opts := []ucfg.Option{}
 	// add k8s keystore in options list with higher priority
 	if c.keystoreProvider != nil {
@@ -118,8 +118,8 @@ func (c Mapper) GetConfig(event bus.Event) []*config.C {
 }
 
 // ApplyConfigTemplate takes a set of templated configs and applys information in an event map
-func ApplyConfigTemplate(event bus.Event, configs []*config.C, options ...ucfg.Option) []*config.C {
-	var result []*config.C
+func ApplyConfigTemplate(event bus.Event, configs []*conf.C, options ...ucfg.Option) []*conf.C {
+	var result []*conf.C
 	// unpack input
 	vars, err := ucfg.NewFrom(map[string]interface{}{
 		"data": event,
@@ -158,7 +158,7 @@ func ApplyConfigTemplate(event bus.Event, configs []*config.C, options ...ucfg.O
 			continue
 		}
 		// Repack again:
-		res, err := config.NewConfigFrom(unpacked)
+		res, err := conf.NewConfigFrom(unpacked)
 		if err != nil {
 			logp.Err("Error creating config from unpack: %v", err)
 			continue

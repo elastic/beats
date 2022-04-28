@@ -19,8 +19,8 @@ package ilm
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Config is used for unpacking a config.C.
@@ -42,12 +42,12 @@ type Config struct {
 // configured.
 // By default the policy contains not warm, cold, or delete phase.
 // The index is configured to rollover every 50GB or after 30d.
-var DefaultPolicy = common.MapStr{
-	"policy": common.MapStr{
-		"phases": common.MapStr{
-			"hot": common.MapStr{
-				"actions": common.MapStr{
-					"rollover": common.MapStr{
+var DefaultPolicy = mapstr.M{
+	"policy": mapstr.M{
+		"phases": mapstr.M{
+			"hot": mapstr.M{
+				"actions": mapstr.M{
+					"rollover": mapstr.M{
 						"max_size": "50gb",
 						"max_age":  "30d",
 					},

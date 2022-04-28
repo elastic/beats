@@ -30,15 +30,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type config struct {
-	Field         string        `config:"field"`
-	Mappings      common.MapStr `config:"mappings"`
-	IgnoreMissing bool          `config:"ignore_missing"`
-	OmitEmpty     bool          `config:"omit_empty"`
-	OverwriteKeys bool          `config:"overwrite_keys"`
-	FailOnError   bool          `config:"fail_on_error"`
+	Field         string   `config:"field"`
+	Mappings      mapstr.M `config:"mappings"`
+	IgnoreMissing bool     `config:"ignore_missing"`
+	OmitEmpty     bool     `config:"omit_empty"`
+	OverwriteKeys bool     `config:"overwrite_keys"`
+	FailOnError   bool     `config:"fail_on_error"`
 }
 
 type fieldMapping struct {
@@ -116,7 +117,7 @@ func isEmpty(v reflect.Value) bool {
 func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	iValue, err := event.GetValue(f.config.Field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "could not fetch value for field %s", f.config.Field)
@@ -176,10 +177,10 @@ func clone(value interface{}) interface{} {
 	// TODO: This is dangerous but done by most processors.
 	//       Otherwise need to reflect value and deep copy lists / map types.
 	switch v := value.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return v.Clone()
 	case map[string]interface{}:
-		return common.MapStr(v).Clone()
+		return mapstr.M(v).Clone()
 	case []interface{}:
 		len := len(v)
 		newArr := make([]interface{}, len)

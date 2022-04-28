@@ -22,10 +22,10 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type addTags struct {
@@ -59,7 +59,7 @@ func createAddTags(c *conf.C) (processors.Processor, error) {
 // appended to the existing list of tags.
 func NewAddTags(target string, tags []string) processors.Processor {
 	if target == "" {
-		target = common.TagsKey
+		target = mapstr.TagsKey
 	}
 
 	// make sure capacity == length such that different processors adding more tags
@@ -74,7 +74,7 @@ func NewAddTags(target string, tags []string) processors.Processor {
 }
 
 func (at *addTags) Run(event *beat.Event) (*beat.Event, error) {
-	common.AddTagsWithKey(event.Fields, at.target, at.tags)
+	mapstr.AddTagsWithKey(event.Fields, at.target, at.tags)
 	return event, nil
 }
 

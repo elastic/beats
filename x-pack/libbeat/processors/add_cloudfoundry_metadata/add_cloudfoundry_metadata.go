@@ -12,11 +12,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -82,16 +82,16 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		d.log.Debugf("failed to get application info for GUID(%s): %v", val, err)
 		return event, nil
 	}
-	event.Fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			"app": common.MapStr{
+	event.Fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			"app": mapstr.M{
 				"name": app.Name,
 			},
-			"space": common.MapStr{
+			"space": mapstr.M{
 				"id":   app.SpaceGuid,
 				"name": app.SpaceName,
 			},
-			"org": common.MapStr{
+			"org": mapstr.M{
 				"id":   app.OrgGuid,
 				"name": app.OrgName,
 			},

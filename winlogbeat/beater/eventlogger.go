@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -30,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
@@ -37,14 +37,14 @@ import (
 
 type eventLogger struct {
 	source     eventlog.EventLog
-	eventMeta  common.EventMetadata
+	eventMeta  mapstr.EventMetadata
 	processors beat.ProcessorList
 	keepNull   bool
 	log        *logp.Logger
 }
 
 type eventLoggerConfig struct {
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"` // Fields and tags to add to events.
 
 	Processors processors.PluginConfig  `config:"processors"`
 	Index      fmtstr.EventFormatString `config:"index"`

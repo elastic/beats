@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventFormatString(t *testing.T) {
@@ -53,56 +53,56 @@ func TestEventFormatString(t *testing.T) {
 		{
 			"expand event field",
 			"%{[key]}",
-			beat.Event{Fields: common.MapStr{"key": "value"}},
+			beat.Event{Fields: mapstr.M{"key": "value"}},
 			"value",
 			[]string{"key"},
 		},
 		{
 			"expand with default",
 			"%{[key]:default}",
-			beat.Event{Fields: common.MapStr{}},
+			beat.Event{Fields: mapstr.M{}},
 			"default",
 			nil,
 		},
 		{
 			"expand nested event field",
 			"%{[nested.key]}",
-			beat.Event{Fields: common.MapStr{"nested": common.MapStr{"key": "value"}}},
+			beat.Event{Fields: mapstr.M{"nested": mapstr.M{"key": "value"}}},
 			"value",
 			[]string{"nested.key"},
 		},
 		{
 			"expand nested event field (alt. syntax)",
 			"%{[nested][key]}",
-			beat.Event{Fields: common.MapStr{"nested": common.MapStr{"key": "value"}}},
+			beat.Event{Fields: mapstr.M{"nested": mapstr.M{"key": "value"}}},
 			"value",
 			[]string{"nested.key"},
 		},
 		{
 			"multiple event fields",
 			"%{[key1]} - %{[key2]}",
-			beat.Event{Fields: common.MapStr{"key1": "v1", "key2": "v2"}},
+			beat.Event{Fields: mapstr.M{"key1": "v1", "key2": "v2"}},
 			"v1 - v2",
 			[]string{"key1", "key2"},
 		},
 		{
 			"same fields",
 			"%{[key]} - %{[key]}",
-			beat.Event{Fields: common.MapStr{"key": "value"}},
+			beat.Event{Fields: mapstr.M{"key": "value"}},
 			"value - value",
 			[]string{"key"},
 		},
 		{
 			"same fields with default (first)",
 			"%{[key]:default} - %{[key]}",
-			beat.Event{Fields: common.MapStr{"key": "value"}},
+			beat.Event{Fields: mapstr.M{"key": "value"}},
 			"value - value",
 			[]string{"key"},
 		},
 		{
 			"same fields with default (second)",
 			"%{[key]} - %{[key]:default}",
-			beat.Event{Fields: common.MapStr{"key": "value"}},
+			beat.Event{Fields: mapstr.M{"key": "value"}},
 			"value - value",
 			[]string{"key"},
 		},
@@ -111,7 +111,7 @@ func TestEventFormatString(t *testing.T) {
 			"%{[key]}: %{+YYYY.MM.dd}",
 			beat.Event{
 				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key": "timestamp",
 				},
 			},
@@ -123,7 +123,7 @@ func TestEventFormatString(t *testing.T) {
 			"%{[@timestamp]}: %{+YYYY.MM.dd}",
 			beat.Event{
 				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key": "timestamp",
 				},
 			},
@@ -190,7 +190,7 @@ func TestEventFormatStringErrors(t *testing.T) {
 			"missing required field",
 			"%{[key]}",
 			true,
-			beat.Event{Fields: common.MapStr{}},
+			beat.Event{Fields: mapstr.M{}},
 		},
 	}
 
@@ -220,22 +220,22 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 	}{
 		{
 			"plain string",
-			beat.Event{Fields: common.MapStr{}},
+			beat.Event{Fields: mapstr.M{}},
 			"plain string",
 		},
 		{
 			100,
-			beat.Event{Fields: common.MapStr{}},
+			beat.Event{Fields: mapstr.M{}},
 			"100",
 		},
 		{
 			true,
-			beat.Event{Fields: common.MapStr{}},
+			beat.Event{Fields: mapstr.M{}},
 			"true",
 		},
 		{
 			"%{[key]}",
-			beat.Event{Fields: common.MapStr{"key": "value"}},
+			beat.Event{Fields: mapstr.M{"key": "value"}},
 			"value",
 		},
 	}
@@ -243,7 +243,7 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run (%v): %v -> %v", i, test.v, test.expected)
 
-		config, err := config.NewConfigFrom(common.MapStr{
+		cfg, err := config.NewConfigFrom(mapstr.M{
 			"test": test.v,
 		})
 		if err != nil {
@@ -254,7 +254,7 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 		testConfig := struct {
 			Test *EventFormatString `config:"test"`
 		}{}
-		err = config.Unpack(&testConfig)
+		err = cfg.Unpack(&testConfig)
 		if err != nil {
 			t.Error(err)
 			continue

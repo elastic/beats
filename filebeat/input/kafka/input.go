@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
@@ -432,9 +433,9 @@ func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
 	return messages
 }
 
-func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, common.MapStr) {
+func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, mapstr.M) {
 	timestamp := time.Now()
-	kafkaFields := common.MapStr{
+	kafkaFields := mapstr.M{
 		"topic":     claim.Topic(),
 		"partition": claim.Partition(),
 		"offset":    msg.Offset,
@@ -454,11 +455,11 @@ func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler
 	return timestamp, kafkaFields
 }
 
-func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapStr, ackHandler func()) reader.Message {
+func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, ackHandler func()) reader.Message {
 	return reader.Message{
 		Ts:      timestamp,
 		Content: content,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"kafka":   kafkaFields,
 			"message": string(content),
 		},

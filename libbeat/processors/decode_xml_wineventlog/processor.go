@@ -23,7 +23,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -32,6 +31,7 @@ import (
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -64,7 +64,7 @@ type processor struct {
 }
 
 type decoder interface {
-	decode(data []byte) (win, ecs common.MapStr, err error)
+	decode(data []byte) (win, ecs mapstr.M, err error)
 }
 
 // New constructs a new decode_xml processor.
@@ -100,7 +100,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *processor) run(event *beat.Event) error {
 	data, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreMissing && err == common.ErrKeyNotFound {
+		if p.IgnoreMissing && err == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return err
@@ -136,10 +136,10 @@ func (p *processor) String() string {
 	return procName + "=" + string(json)
 }
 
-func fields(evt winevent.Event) (common.MapStr, common.MapStr) {
+func fields(evt winevent.Event) (mapstr.M, mapstr.M) {
 	win := evt.Fields()
 
-	ecs := common.MapStr{}
+	ecs := mapstr.M{}
 
 	eventCode, _ := win.GetValue("event_id")
 	ecs.Put("event.code", eventCode)
@@ -156,7 +156,7 @@ func fields(evt winevent.Event) (common.MapStr, common.MapStr) {
 	return win, ecs
 }
 
-func getValue(m common.MapStr, key string) interface{} {
+func getValue(m mapstr.M, key string) interface{} {
 	v, _ := m.GetValue(key)
 	return v
 }

@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
@@ -149,7 +150,7 @@ func testConnectionType(
 }
 
 func testEvent() beat.Event {
-	return beat.Event{Fields: common.MapStr{
+	return beat.Event{Fields: mapstr.M{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "log",
 		"extra":      10,

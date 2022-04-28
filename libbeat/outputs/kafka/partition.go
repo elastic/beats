@@ -28,9 +28,9 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type partitionBuilder func(*logp.Logger, *config.C) (func() partitioner, error)
@@ -277,7 +277,7 @@ func hash2Partition(hash uint32, numPartitions int32) (int32, error) {
 	return p % numPartitions, nil
 }
 
-func hashFieldValue(h hash.Hash32, event common.MapStr, field string) error {
+func hashFieldValue(h hash.Hash32, event mapstr.M, field string) error {
 	type stringer interface {
 		String() string
 	}

@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConvert(t *testing.T) {
@@ -38,7 +38,7 @@ func TestConvert(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		evt := &beat.Event{Fields: common.MapStr{}}
+		evt := &beat.Event{Fields: mapstr.M{}}
 
 		// Defaults.
 		p.IgnoreMissing = false
@@ -79,7 +79,7 @@ func TestConvert(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		evt := &beat.Event{Fields: common.MapStr{"source": common.MapStr{"address": "host.local"}}}
+		evt := &beat.Event{Fields: mapstr.M{"source": mapstr.M{"address": "host.local"}}}
 
 		_, err = p.Run(evt)
 		if assert.Error(t, err) {
@@ -103,7 +103,7 @@ func TestConvert(t *testing.T) {
 		}
 
 		const loopback = "127.0.0.1"
-		fields := common.MapStr{"source": common.MapStr{"address": loopback}}
+		fields := mapstr.M{"source": mapstr.M{"address": loopback}}
 
 		t.Run("copy", func(t *testing.T) {
 			evt := &beat.Event{Fields: fields.Clone()}
@@ -154,11 +154,11 @@ func TestConvert(t *testing.T) {
 		c.Fields = append(c.Fields, field{From: "@metadata.source", To: "@metadata.dest", Type: Integer})
 
 		evt := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"source": "1",
 			},
 		}
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"source": "1",
 			"dest":   int32(1),
 		}
@@ -175,64 +175,64 @@ func TestConvert(t *testing.T) {
 
 func TestConvertRun(t *testing.T) {
 	tests := map[string]struct {
-		config      common.MapStr
+		config      mapstr.M
 		input       beat.Event
 		expected    beat.Event
 		fail        bool
 		errContains string
 	}{
 		"missing field": {
-			config: common.MapStr{
-				"fields": []common.MapStr{
+			config: mapstr.M{
+				"fields": []mapstr.M{
 					{"from": "port", "type": "integer"},
 					{"from": "address", "to": "ip", "type": "ip"},
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"port": "80",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"port": "80",
 				},
 			},
 			fail: true,
 		},
 		"put error no clone": {
-			config: common.MapStr{
-				"fields": []common.MapStr{
+			config: mapstr.M{
+				"fields": []mapstr.M{
 					{"from": "port", "to": "port.number", "type": "integer"},
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"port": "80",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"port": "80",
 				},
 			},
 			fail: true,
 		},
 		"put error with clone": {
-			config: common.MapStr{
-				"fields": []common.MapStr{
+			config: mapstr.M{
+				"fields": []mapstr.M{
 					{"from": "id", "to": "event.id", "type": "integer"},
 					{"from": "port", "to": "port.number", "type": "integer"},
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"id":   "32",
 					"port": "80",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"id":   "32",
 					"port": "80",
 				},
@@ -240,18 +240,18 @@ func TestConvertRun(t *testing.T) {
 			fail: true,
 		},
 		"invalid conversion": {
-			config: common.MapStr{
-				"fields": []common.MapStr{
+			config: mapstr.M{
+				"fields": []mapstr.M{
 					{"from": "address", "to": "ip", "type": "ip"},
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"address": "-",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"address": "-",
 				},
 			},
@@ -436,7 +436,7 @@ func TestDataTypes(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			event, err := p.Run(&beat.Event{Fields: common.MapStr{key: tc.In}})
+			event, err := p.Run(&beat.Event{Fields: mapstr.M{key: tc.In}})
 			if tc.Err {
 				assert.Error(t, err)
 				return
@@ -475,11 +475,11 @@ func BenchmarkTestConvertRun(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			event := &beat.Event{
-				Fields: common.MapStr{
-					"source": common.MapStr{
+				Fields: mapstr.M{
+					"source": mapstr.M{
 						"address": "192.51.100.1",
 					},
-					"destination": common.MapStr{
+					"destination": mapstr.M{
 						"address": "192.0.2.51",
 					},
 				},

@@ -30,9 +30,9 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNamespace_Generate(t *testing.T) {
@@ -41,7 +41,7 @@ func TestNamespace_Generate(t *testing.T) {
 	name := "obj"
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -64,13 +64,13 @@ func TestNamespace_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
+			output: mapstr.M{"kubernetes": mapstr.M{
 				"namespace":     name,
 				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
+				"namespace_labels": mapstr.M{
 					"foo": "bar",
 				},
-				"namespace_annotations": common.MapStr{
+				"namespace_annotations": mapstr.M{
 					"spam": "baz",
 				},
 			}},
@@ -99,7 +99,7 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 	name := "obj"
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -120,13 +120,13 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"namespace":     name,
 				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
+				"namespace_labels": mapstr.M{
 					"foo": "bar",
 				},
-				"namespace_annotations": common.MapStr{
+				"namespace_annotations": mapstr.M{
 					"spam": "baz",
 				},
 			},

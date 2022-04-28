@@ -29,12 +29,12 @@ import (
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -288,7 +288,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	cmeta, err := metaClone.Clone().GetValue("kubernetes.container")
 	if err == nil {
-		event.Fields.DeepUpdate(common.MapStr{
+		event.Fields.DeepUpdate(mapstr.M{
 			"container": cmeta,
 		})
 	}

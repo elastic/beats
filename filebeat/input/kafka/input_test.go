@@ -25,13 +25,13 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewInputDone(t *testing.T) {
-	config := conf.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":    "localhost:9092",
 		"topics":   "messages",
 		"group_id": "filebeat",

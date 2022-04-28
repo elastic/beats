@@ -13,10 +13,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestValidLocal(t *testing.T) {
@@ -26,7 +26,7 @@ func TestValidLocal(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cfg := conf.MustNewConfigFrom(common.MapStr{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
@@ -34,8 +34,8 @@ func TestValidLocal(t *testing.T) {
 			Tags:  []string{"*"},
 			Match: "*",
 		},
-		"source": common.MapStr{
-			"local": common.MapStr{
+		"source": mapstr.M{
+			"local": mapstr.M{
 				"path": path,
 			},
 		},
@@ -63,12 +63,12 @@ func TestValidInline(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cfg := conf.MustNewConfigFrom(common.MapStr{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
-		"source": common.MapStr{
-			"inline": common.MapStr{
+		"source": mapstr.M{
+			"inline": mapstr.M{
 				"script": script,
 			},
 		},
@@ -87,10 +87,10 @@ func TestValidInline(t *testing.T) {
 }
 
 func TestNameRequired(t *testing.T) {
-	cfg := conf.MustNewConfigFrom(common.MapStr{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"id": "myId",
-		"source": common.MapStr{
-			"inline": common.MapStr{
+		"source": mapstr.M{
+			"inline": mapstr.M{
 				"script": "a script",
 			},
 		},
@@ -100,10 +100,10 @@ func TestNameRequired(t *testing.T) {
 }
 
 func TestIDRequired(t *testing.T) {
-	cfg := conf.MustNewConfigFrom(common.MapStr{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name": "My Name",
-		"source": common.MapStr{
-			"inline": common.MapStr{
+		"source": mapstr.M{
+			"inline": mapstr.M{
 				"script": "a script",
 			},
 		},
@@ -113,8 +113,8 @@ func TestIDRequired(t *testing.T) {
 }
 
 func TestEmptySource(t *testing.T) {
-	cfg := conf.MustNewConfigFrom(common.MapStr{
-		"source": common.MapStr{},
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"source": mapstr.M{},
 	})
 	s, e := NewSuite(cfg)
 

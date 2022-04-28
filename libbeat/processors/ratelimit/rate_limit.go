@@ -27,12 +27,12 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	c "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
@@ -132,7 +132,7 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			if err != common.ErrKeyNotFound {
+			if err != mapstr.ErrKeyNotFound {
 				return 0, errors.Wrapf(err, "error getting value of field: %v", field)
 			}
 

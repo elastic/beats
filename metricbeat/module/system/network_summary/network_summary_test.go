@@ -22,10 +22,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -45,7 +45,7 @@ func TestMapping(t *testing.T) {
 		},
 	}
 
-	exampleOut := common.MapStr{
+	exampleOut := mapstr.M{
 		"icmp":     map[string]interface{}{"InAddrMaskReps": uint64(5), "InType3": uint64(835)},
 		"ip":       map[string]interface{}{"DefaultTTL": uint64(64), "InBcastOctets": uint64(431773621), "InBcastPkts": uint64(1686995), "InCEPkts": uint64(0)},
 		"tcp":      map[string]interface{}{"DelayedACKLocked": uint64(111), "DelayedACKLost": uint64(1587), "DelayedACKs": uint64(516004), "MaxConn": int64(-1)},

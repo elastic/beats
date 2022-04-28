@@ -8,8 +8,9 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 var (
@@ -19,14 +20,14 @@ var (
 // MetaGenerator builds metadata objects for allocations
 type MetaGenerator interface {
 	// ResourceMetadata generates metadata for the given allocation
-	ResourceMetadata(obj Resource) common.MapStr
+	ResourceMetadata(obj Resource) mapstr.M
 
 	// AllocationNodeName returns the name of the node where the Task is allocated
 	AllocationNodeName(id string) (string, error)
 
 	// GroupMeta returns per-task metadata merged with the group metadata, task
 	// metadata takes will overwrite metadata from the group with the same key
-	GroupMeta(job *Job) []common.MapStr
+	GroupMeta(job *Job) []mapstr.M
 }
 
 // MetaGeneratorConfig settings
@@ -60,15 +61,15 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 }
 
 // ResourceMetadata generates metadata for the given Nomad allocation*
-func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
+func (g *metaGenerator) ResourceMetadata(obj Resource) mapstr.M {
 	// default labels that we expose / filter with `IncludeLabels`
-	meta := common.MapStr{
-		"allocation": common.MapStr{
+	meta := mapstr.M{
+		"allocation": mapstr.M{
 			"name":   obj.Name,
 			"id":     obj.ID,
 			"status": obj.ClientStatus,
 		},
-		"job": common.MapStr{
+		"job": mapstr.M{
 			"name": *obj.Job.Name,
 			"type": *obj.Job.Type,
 		},
@@ -82,8 +83,8 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 
 // Returns an array of per-task metadata aggregating the group metadata into the
 // task metadata
-func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
-	var tasksMeta []common.MapStr
+func (g *metaGenerator) GroupMeta(job *Job) []mapstr.M {
+	var tasksMeta []mapstr.M
 
 	for _, group := range job.TaskGroups {
 		meta := make(map[string]string, len(job.Meta))
@@ -104,7 +105,7 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 	}
 
 	for idx, task := range tasksMeta {
-		labelMap := common.MapStr{}
+		labelMap := mapstr.M{}
 
 		if len(g.IncludeLabels) == 0 {
 			for k, v := range task {
@@ -131,8 +132,8 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 }
 
 // Returns per-task metadata
-func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
-	var tasks []common.MapStr
+func (g *metaGenerator) tasksMeta(group *TaskGroup) []mapstr.M {
+	var tasks []mapstr.M
 
 	for _, task := range group.Tasks {
 		var svcNames, svcTags, svcCanaryTags []string
@@ -142,7 +143,7 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 			svcCanaryTags = append(svcCanaryTags, service.CanaryTags...)
 		}
 
-		svcMeta := common.MapStr{}
+		svcMeta := mapstr.M{}
 		if len(svcNames) > 0 {
 			svcMeta["name"] = svcNames
 		}
@@ -163,7 +164,7 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 			joinMeta[k] = v
 		}
 
-		meta := common.MapStr{
+		meta := mapstr.M{
 			"name": task.Name,
 		}
 		if len(svcMeta) > 0 {
@@ -180,8 +181,8 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 	return tasks
 }
 
-func generateMapSubset(input common.MapStr, keys []string, dedot bool) common.MapStr {
-	output := common.MapStr{}
+func generateMapSubset(input mapstr.M, keys []string, dedot bool) mapstr.M {
+	output := mapstr.M{}
 	if input == nil {
 		return output
 	}

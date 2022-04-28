@@ -25,10 +25,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var fields = [1]string{"msg"}
@@ -61,13 +61,13 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 }
 
 func TestMissingKey(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"pipeline": "us1",
 	}
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"pipeline": "us1",
 	}
 
@@ -75,14 +75,14 @@ func TestMissingKey(t *testing.T) {
 }
 
 func TestFieldNotString(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      123,
 		"pipeline": "us1",
 	}
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"msg":      123,
 		"pipeline": "us1",
 	}
@@ -91,14 +91,14 @@ func TestFieldNotString(t *testing.T) {
 }
 
 func TestInvalidJSON(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3",
 		"pipeline": "us1",
 	}
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3",
 		"pipeline": "us1",
 	}
@@ -106,14 +106,14 @@ func TestInvalidJSON(t *testing.T) {
 }
 
 func TestInvalidJSONMultiple(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      "11:38:04,323 |-INFO testing",
 		"pipeline": "us1",
 	}
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"msg":      "11:38:04,323 |-INFO testing",
 		"pipeline": "us1",
 	}
@@ -123,7 +123,7 @@ func TestInvalidJSONMultiple(t *testing.T) {
 func TestDocumentID(t *testing.T) {
 	log := logp.NewLogger("decode_json_fields_test")
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg": `{"log": "message", "myid": "myDocumentID"}`,
 	}
 
@@ -141,10 +141,10 @@ func TestDocumentID(t *testing.T) {
 	actual, err := p.Run(&beat.Event{Fields: input})
 	require.NoError(t, err)
 
-	wantFields := common.MapStr{
+	wantFields := mapstr.M{
 		"msg": map[string]interface{}{"log": "message"},
 	}
-	wantMeta := common.MapStr{
+	wantMeta := mapstr.M{
 		"_id": "myDocumentID",
 	}
 
@@ -153,14 +153,14 @@ func TestDocumentID(t *testing.T) {
 }
 
 func TestValidJSONDepthOne(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"msg": map[string]interface{}{
 			"log":    "{\"level\":\"info\"}",
 			"stream": "stderr",
@@ -173,7 +173,7 @@ func TestValidJSONDepthOne(t *testing.T) {
 }
 
 func TestValidJSONDepthTwo(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
@@ -186,7 +186,7 @@ func TestValidJSONDepthTwo(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"msg": map[string]interface{}{
 			"log": map[string]interface{}{
 				"level": "info",
@@ -201,7 +201,7 @@ func TestValidJSONDepthTwo(t *testing.T) {
 }
 
 func TestTargetOption(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
@@ -215,7 +215,7 @@ func TestTargetOption(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"doc": map[string]interface{}{
 			"log": map[string]interface{}{
 				"level": "info",
@@ -231,7 +231,7 @@ func TestTargetOption(t *testing.T) {
 }
 
 func TestTargetRootOption(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 		"pipeline": "us1",
 	}
@@ -245,7 +245,7 @@ func TestTargetRootOption(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"log": map[string]interface{}{
 			"level": "info",
 		},
@@ -260,11 +260,11 @@ func TestTargetRootOption(t *testing.T) {
 
 func TestTargetMetadata(t *testing.T) {
 	event := &beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
 			"pipeline": "us1",
 		},
-		Meta: common.MapStr{},
+		Meta: mapstr.M{},
 	}
 
 	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
@@ -284,7 +284,7 @@ func TestTargetMetadata(t *testing.T) {
 
 	actual, _ := p.Run(event)
 
-	expectedMeta := common.MapStr{
+	expectedMeta := mapstr.M{
 		"json": map[string]interface{}{
 			"log": map[string]interface{}{
 				"level": "info",
@@ -301,12 +301,12 @@ func TestTargetMetadata(t *testing.T) {
 func TestNotJsonObjectOrArray(t *testing.T) {
 	var cases = []struct {
 		MaxDepth int
-		Expected common.MapStr
+		Expected mapstr.M
 	}{
 		{
 			MaxDepth: 1,
-			Expected: common.MapStr{
-				"msg": common.MapStr{
+			Expected: mapstr.M{
+				"msg": mapstr.M{
 					"someDate":           "2016-09-28T01:40:26.760+0000",
 					"someNumber":         1475026826760,
 					"someNumberAsString": "1475026826760",
@@ -319,14 +319,14 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 		},
 		{
 			MaxDepth: 10,
-			Expected: common.MapStr{
-				"msg": common.MapStr{
+			Expected: mapstr.M{
+				"msg": mapstr.M{
 					"someDate":           "2016-09-28T01:40:26.760+0000",
 					"someNumber":         1475026826760,
 					"someNumberAsString": "1475026826760",
 					"someString":         "foobar",
 					"someString2":        "2017 is awesome",
-					"someMap":            common.MapStr{"a": "b"},
+					"someMap":            mapstr.M{"a": "b"},
 					"someArray":          []int{1, 2, 3},
 				},
 			},
@@ -335,7 +335,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 
 	for _, testCase := range cases {
 		t.Run(fmt.Sprintf("TestNotJsonObjectOrArrayDepth-%v", testCase.MaxDepth), func(t *testing.T) {
-			input := common.MapStr{
+			input := mapstr.M{
 				"msg": `{
 					"someDate": "2016-09-28T01:40:26.760+0000",
 					"someNumberAsString": "1475026826760",
@@ -360,7 +360,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 }
 
 func TestArrayWithArraysDisabled(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg": `{
 			"arrayOfMap": "[{\"a\":\"b\"}]"
 		  }`,
@@ -374,8 +374,8 @@ func TestArrayWithArraysDisabled(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
-		"msg": common.MapStr{
+	expected := mapstr.M{
+		"msg": mapstr.M{
 			"arrayOfMap": "[{\"a\":\"b\"}]",
 		},
 	}
@@ -384,7 +384,7 @@ func TestArrayWithArraysDisabled(t *testing.T) {
 }
 
 func TestArrayWithArraysEnabled(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg": `{
 			"arrayOfMap": "[{\"a\":\"b\"}]"
 		  }`,
@@ -398,9 +398,9 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
-		"msg": common.MapStr{
-			"arrayOfMap": []common.MapStr{common.MapStr{"a": "b"}},
+	expected := mapstr.M{
+		"msg": mapstr.M{
+			"arrayOfMap": []mapstr.M{mapstr.M{"a": "b"}},
 		},
 	}
 
@@ -408,7 +408,7 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 }
 
 func TestArrayWithInvalidArray(t *testing.T) {
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg": `{
 			"arrayOfMap": "[]]"
 		  }`,
@@ -422,8 +422,8 @@ func TestArrayWithInvalidArray(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 
-	expected := common.MapStr{
-		"msg": common.MapStr{
+	expected := mapstr.M{
+		"msg": mapstr.M{
 			"arrayOfMap": "[]]",
 		},
 	}
@@ -435,19 +435,19 @@ func TestAddErrKeyOption(t *testing.T) {
 	tests := []struct {
 		name           string
 		addErrOption   bool
-		expectedOutput common.MapStr
+		expectedOutput mapstr.M
 	}{
-		{name: "With add_error_key option", addErrOption: true, expectedOutput: common.MapStr{
-			"error": common.MapStr{"message": "@timestamp not overwritten (parse error on {})", "type": "json"},
+		{name: "With add_error_key option", addErrOption: true, expectedOutput: mapstr.M{
+			"error": mapstr.M{"message": "@timestamp not overwritten (parse error on {})", "type": "json"},
 			"msg":   "{\"@timestamp\":\"{}\"}",
 		}},
-		{name: "Without add_error_key option", addErrOption: false, expectedOutput: common.MapStr{
+		{name: "Without add_error_key option", addErrOption: false, expectedOutput: mapstr.M{
 			"msg": "{\"@timestamp\":\"{}\"}",
 		}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			input := common.MapStr{
+			input := mapstr.M{
 				"msg": "{\"@timestamp\":\"{}\"}",
 			}
 
@@ -471,10 +471,10 @@ func TestExpandKeys(t *testing.T) {
 		"expand_keys": true,
 		"target":      "",
 	})
-	input := common.MapStr{"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`}
-	expected := common.MapStr{
+	input := mapstr.M{"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`}
+	expected := mapstr.M{
 		"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`,
-		"a": common.MapStr{
+		"a": mapstr.M{
 			"b": map[string]interface{}{
 				"c": "c",
 				"d": "d",
@@ -492,10 +492,10 @@ func TestExpandKeysError(t *testing.T) {
 		"add_error_key": true,
 		"target":        "",
 	})
-	input := common.MapStr{"msg": `{"a.b": "c", "a.b.c": "d"}`}
-	expected := common.MapStr{
+	input := mapstr.M{"msg": `{"a.b": "c", "a.b.c": "d"}`}
+	expected := mapstr.M{
 		"msg": `{"a.b": "c", "a.b.c": "d"}`,
-		"error": common.MapStr{
+		"error": mapstr.M{
 			"message": "cannot expand ...",
 			"type":    "json",
 		},
@@ -503,7 +503,7 @@ func TestExpandKeysError(t *testing.T) {
 
 	actual := getActualValue(t, testConfig, input)
 	assert.Contains(t, actual, "error")
-	errorField := actual["error"].(common.MapStr)
+	errorField := actual["error"].(mapstr.M)
 	assert.Contains(t, errorField, "message")
 
 	// The order in which keys are processed is not defined, so the error
@@ -520,11 +520,11 @@ func TestOverwriteMetadata(t *testing.T) {
 		"overwrite_keys": true,
 	})
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"msg": "{\"@metadata\":{\"beat\":\"libbeat\"},\"msg\":\"overwrite metadata test\"}",
 	}
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"msg": "overwrite metadata test",
 	}
 	actual := getActualValue(t, testConfig, input)
@@ -538,13 +538,13 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 		"add_error_key": true,
 	})
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"message": "Broken JSON [[",
 	}
 
 	actual := getActualValue(t, testConfig, input)
 
-	errObj, ok := actual["error"].(common.MapStr)
+	errObj, ok := actual["error"].(mapstr.M)
 	require.True(t, ok, "'error' field not present or of invalid type")
 	require.NotNil(t, actual["error"])
 
@@ -553,7 +553,7 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 	assert.NotNil(t, errObj["message"])
 }
 
-func getActualValue(t *testing.T, config *conf.C, input common.MapStr) common.MapStr {
+func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
 	log := logp.NewLogger("decode_json_fields_test")
 
 	p, err := NewDecodeJSONFields(config)

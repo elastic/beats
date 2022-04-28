@@ -29,10 +29,10 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type fakeStatelessInput struct {
@@ -98,7 +98,7 @@ func TestStateless_Run(t *testing.T) {
 				for ctx.Cancelation.Err() == nil {
 					started.Store(true)
 					publisher.Publish(beat.Event{
-						Fields: common.MapStr{
+						Fields: mapstr.M{
 							"hello": "world",
 						},
 					})

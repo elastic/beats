@@ -25,10 +25,10 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type dropFields struct {
@@ -71,7 +71,7 @@ func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, field := range f.Fields {
 		if err := event.Delete(field); err != nil {
-			if f.IgnoreMissing && err == common.ErrKeyNotFound {
+			if f.IgnoreMissing && err == mapstr.ErrKeyNotFound {
 				continue
 			}
 			errs = append(errs, errors.Wrapf(err, "failed to drop field [%v]", field))
