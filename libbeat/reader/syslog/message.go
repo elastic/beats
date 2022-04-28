@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -199,7 +200,7 @@ func (m message) fields() common.MapStr {
 		_, _ = f.Put("log.syslog.msgid", m.msgID)
 	}
 	if m.version != 0 {
-		_, _ = f.Put("log.syslog.version", m.version)
+		_, _ = f.Put("log.syslog.version", strconv.Itoa(m.version))
 	}
 	if len(m.structuredData) > 0 {
 		_, _ = f.Put("log.syslog.structured_data", m.structuredData)
