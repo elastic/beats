@@ -214,7 +214,7 @@ func (k *FileKeystore) IsPersisted() bool {
 
 // doSave lock/unlocking of the resource need to be done by the caller.
 func (k *FileKeystore) doSave(override bool) error {
-	if k.dirty == false {
+	if !k.dirty {
 		return nil
 	}
 

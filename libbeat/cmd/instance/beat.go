@@ -331,10 +331,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
-	err = b.registerClusterUUIDFetching()
-	if err != nil {
-		return nil, err
-	}
+	b.registerClusterUUIDFetching()
 
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
@@ -751,7 +748,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("Beat meta file failed to open: %s", err)
+		return fmt.Errorf("meta file failed to open: %w", err)
 	}
 
 	if err == nil {
@@ -788,16 +785,16 @@ func (b *Beat) loadMeta(metaPath string) error {
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
 	err = f.Sync()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", err)
+		return fmt.Errorf("Beat meta file failed to write: %w", err)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", err)
+		return fmt.Errorf("Beat meta file failed to write: %w", err)
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", encodeErr)
+		return fmt.Errorf("Beat meta file failed to write: %w", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -956,19 +953,15 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
 }
 
-func (b *Beat) registerClusterUUIDFetching() error {
+func (b *Beat) registerClusterUUIDFetching() {
 	if isElasticsearchOutput(b.Config.Output.Name()) {
-		callback, err := b.clusterUUIDFetchingCallback()
-		if err != nil {
-			return err
-		}
+		callback := b.clusterUUIDFetchingCallback()
 		_, _ = elasticsearch.RegisterConnectCallback(callback)
 	}
-	return nil
 }
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
-func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
+func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
 	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
 	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
@@ -994,7 +987,7 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 		return nil
 	}
 
-	return callback, nil
+	return callback
 }
 
 func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {

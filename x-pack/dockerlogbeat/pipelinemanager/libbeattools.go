@@ -5,17 +5,14 @@
 package pipelinemanager
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
@@ -26,26 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/file"
 )
-
-// makeConfigHash is the helper function that turns a user config into a hash
-func makeConfigHash(cfg map[string]string) string {
-	var hashString string
-	var orderedVal []string
-
-	for _, val := range cfg {
-		orderedVal = append(orderedVal, val)
-	}
-
-	sort.Strings(orderedVal)
-
-	for _, val := range orderedVal {
-		hashString = hashString + val
-	}
-
-	sum := sha1.Sum([]byte(hashString))
-
-	return string(sum[:])
-}
 
 // load pipeline starts up a new pipeline with the given config
 func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *logp.Logger) (*Pipeline, error) {
@@ -113,21 +90,6 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 	return &Pipeline{pipeline: pipeline, refCount: 0}, nil
 }
 
-// parseCfgKeys helpfully parses the values in the map, so users can specify yml structures.
-func parseCfgKeys(cfg map[string]string) (map[string]interface{}, error) {
-	outMap := make(map[string]interface{})
-
-	for cfgKey, strVal := range cfg {
-		var parsed interface{}
-		if err := yaml.Unmarshal([]byte(strVal), &parsed); err != nil {
-			return nil, err
-		}
-		outMap[cfgKey] = parsed
-	}
-
-	return outMap, nil
-}
-
 // getBeatInfo returns the beat.Info type needed to start the pipeline
 func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, error) {
 	vers := version.GetDefaultVersion()
@@ -174,7 +136,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
-			return uuid.Nil, errors.Wrapf(err, "Error reading %s", metaPath)
+			return uuid.Nil, fmt.Errorf("error reading %s: %w", metaPath, err)
 		}
 
 		f.Close()
@@ -192,28 +154,28 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	tempFile := metaPath + ".new"
 	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return uuid.Nil, errors.Wrapf(err, "failed to create Beat meta file at %s", tempFile)
+		return uuid.Nil, fmt.Errorf("failed to create Beat meta file at %s: %w", tempFile, err)
 	}
 
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: newID})
 	err = f.Sync()
 	if err != nil {
-		return uuid.Nil, errors.Wrapf(err, "beat meta file at %s failed to write", tempFile)
+		return uuid.Nil, fmt.Errorf("beat meta file at %s failed to write: %w", tempFile, err)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return uuid.Nil, errors.Wrapf(err, "beat meta file at %s failed to close", tempFile)
+		return uuid.Nil, fmt.Errorf("beat meta file at %s failed to close: %w", tempFile, err)
 	}
 
 	if encodeErr != nil {
-		return uuid.Nil, errors.Wrapf(err, "beat meta file at %s failed to write", tempFile)
+		return uuid.Nil, fmt.Errorf("beat meta file at %s failed to write: %w", tempFile, err)
 	}
 
 	// move temporary file into final location
 	err = file.SafeFileRotate(metaPath, tempFile)
 	if err != nil {
-		return uuid.Nil, errors.Wrapf(err, "error rotating file to %s", metaPath)
+		return uuid.Nil, fmt.Errorf("error rotating file to %s: %w", metaPath, err)
 	}
 	return newID, nil
 }
