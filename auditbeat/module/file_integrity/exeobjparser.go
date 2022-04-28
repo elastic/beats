@@ -25,7 +25,7 @@ import (
 
 	"github.com/kortschak/toutoumomoma"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // exeObjParser performs a number of analyses on executable objects
@@ -53,7 +53,7 @@ import (
 //    go_stripped
 type exeObjParser map[string]bool
 
-func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
+func (fields exeObjParser) Parse(dst mapstr.M, path string) error {
 	if dst == nil {
 		return errors.New("cannot use nil dst for file parser")
 	}
@@ -72,17 +72,17 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		typ = "macho"
 	}
 
-	var details common.MapStr
+	var details mapstr.M
 	d, err := dst.GetValue(typ)
 	if err != nil {
-		if err != common.ErrKeyNotFound {
+		if err != mapstr.ErrKeyNotFound {
 			panic(err)
 		}
-		details = make(common.MapStr)
+		details = make(mapstr.M)
 		dst[typ] = details
 	} else {
 		switch d := d.(type) {
-		case common.MapStr:
+		case mapstr.M:
 			details = d
 		default:
 			return fmt.Errorf("cannot write %s details to %T", typ, d)
@@ -114,7 +114,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 			wantVariance = wantFields(fields, "file."+typ+".sections.var_entropy")
 		}
 		if len(sections) != 0 {
-			// TODO: Replace this []section with a []common.MapStr if additional
+			// TODO: Replace this []section with a []mapstr.M if additional
 			// section attributes are added from another parser.
 			stats := make([]objSection, len(sections))
 			for i, s := range sections {

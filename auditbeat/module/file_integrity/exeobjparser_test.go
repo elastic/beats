@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestExeObjParser(t *testing.T) {
@@ -40,7 +40,7 @@ func TestExeObjParser(t *testing.T) {
 
 			key := fmt.Sprintf("%s_%s", builder, format)
 			t.Run(fmt.Sprintf("executableObject_%s_%s", format, builder), func(t *testing.T) {
-				got := make(common.MapStr)
+				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)
 				if err != nil {
 					t.Errorf("unexpected error calling exeObjParser.Parse: %v", err)
@@ -188,9 +188,9 @@ func (o objSection) String() string {
 	return fmt.Sprintf("{Name: %q, Size: %s, Entropy: %s, VarEntropy: %s}", name, size, entropy, varEntropy)
 }
 
-var want = map[string]common.MapStr{
+var want = map[string]mapstr.M{
 	"go_pe": {
-		"pe": common.MapStr{
+		"pe": mapstr.M{
 			"imphash":                      "c7269d59926fa4252270f407e4dab043",
 			"go_import_hash":               "10bddcb4cee42080f76c88d9ff964491",
 			"go_imports_names_entropy":     4.156563879566413,
@@ -263,7 +263,7 @@ var want = map[string]common.MapStr{
 		},
 	},
 	"garble_pe": {
-		"pe": common.MapStr{
+		"pe": mapstr.M{
 			"import_hash": "c7269d59926fa4252270f407e4dab043",
 			"imphash":     "c7269d59926fa4252270f407e4dab043",
 			"imports": []string{
@@ -323,7 +323,7 @@ var want = map[string]common.MapStr{
 		},
 	},
 	"go_elf": {
-		"elf": common.MapStr{
+		"elf": mapstr.M{
 			"go_imports_names_entropy":     4.156563879566413,
 			"go_imports_names_var_entropy": 0.0073028693197579415,
 			"go_stripped":                  false,
@@ -361,7 +361,7 @@ var want = map[string]common.MapStr{
 		},
 	},
 	"garble_elf": {
-		"elf": common.MapStr{
+		"elf": mapstr.M{
 			"import_hash":    "d41d8cd98f00b204e9800998ecf8427e",
 			"go_import_hash": "d41d8cd98f00b204e9800998ecf8427e",
 			"go_stripped":    true,
@@ -383,7 +383,7 @@ var want = map[string]common.MapStr{
 		},
 	},
 	"go_macho": {
-		"macho": common.MapStr{
+		"macho": mapstr.M{
 			"symhash": "d3ccf195b62a9279c3c19af1080497ec",
 			"imports": []string{
 				"___error",
@@ -466,7 +466,7 @@ var want = map[string]common.MapStr{
 		},
 	},
 	"garble_macho": {
-		"macho": common.MapStr{
+		"macho": mapstr.M{
 			"sections": []objSection{
 				{Name: strPtr("__text"), Size: uint64Ptr(0x80e52), Entropy: float64Ptr(6.17), VarEntropy: float64Ptr(0.0001)},
 				{Name: strPtr("__symbol_stub1"), Size: uint64Ptr(0x102), Entropy: float64Ptr(3.62), VarEntropy: float64Ptr(0.0001)},

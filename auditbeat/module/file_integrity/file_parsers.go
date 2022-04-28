@@ -20,12 +20,12 @@ package file_integrity
 import (
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // FileParser is a file analyser the provides enrichment for file.* fields.
 type FileParser interface {
-	Parse(dst common.MapStr, path string) error
+	Parse(dst mapstr.M, path string) error
 }
 
 // FileParsers returns the set of file parsers required to satisfy the config.

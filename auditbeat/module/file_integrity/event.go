@@ -118,7 +118,7 @@ type Event struct {
 	Source        Source              `json:"source"`                // Source of the event.
 	Action        Action              `json:"action"`                // Action (like created, updated).
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
-	ParserResults common.MapStr       `json:"file,omitempty"`        // Results from runnimg file parsers.
+	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from runnimg file parsers.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
@@ -200,7 +200,7 @@ func NewEventFromFileInfo(
 			}
 
 			if len(fileParsers) != 0 && event.ParserResults == nil {
-				event.ParserResults = make(common.MapStr)
+				event.ParserResults = make(mapstr.M)
 			}
 			for _, p := range fileParsers {
 				err = p.Parse(event.ParserResults, path)
