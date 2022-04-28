@@ -333,29 +333,45 @@ def k8sTest(Map args = [:]) {
 */
 def withTools(Map args = [:], Closure body) {
   if (args.get('k8s', false)) {
-    withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
-      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
-      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
-      try {
-        // Add some environmental resilience when setup does not work the very first time.
-        def i = 0
-        retryWithSleep(retries: 3, seconds: 5, backoff: true){
-          try {
-            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
-          } catch(err) {
-            i++
-            sh(label: 'Delete cluster', script: 'kind delete cluster')
-            if (i > 2) {
-              error("Setup kind failed with error '${err.toString()}'")
-            }
-          }
-        }
-        body()
-      } finally {
-        sh(label: 'Delete cluster', script: 'kind delete cluster')
-      }
+    withK8s() {
+      body()
+    }
+  } else if (args.get('gcp', false)) {
+    withGCP() {
+      body()
     }
   } else {
+    body()
+  }
+}
+
+def withK8s(Closure body) {
+  withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
+    try {
+      // Add some environmental resilience when setup does not work the very first time.
+      def i = 0
+      retryWithSleep(retries: 3, seconds: 5, backoff: true){
+        try {
+          sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+        } catch(err) {
+          i++
+          sh(label: 'Delete cluster', script: 'kind delete cluster')
+          if (i > 2) {
+            error("Setup kind failed with error '${err.toString()}'")
+          }
+        }
+      }
+      body()
+    } finally {
+      sh(label: 'Delete cluster', script: 'kind delete cluster')
+    }
+  }
+}
+
+def withGCP(Closure body) {
+  withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
     body()
   }
 }
@@ -557,23 +573,6 @@ def targetWithoutNode(Map args = [:]) {
   def installK8s = args.get('installK8s', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
-<<<<<<< HEAD
-  withNode(labels: args.label, forceWorkspace: true){
-    withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
-        dumpVariables()
-        withTools(k8s: installK8s) {
-          // make commands use -C <folder> while mage commands require the dir(folder)
-          // let's support this scenario with the location variable.
-          dir(isMage ? directory : '') {
-            if (enableRetry) {
-              // Retry the same command to bypass any kind of flakiness.
-              // Downside: genuine failures will be repeated.
-              retry(3) {
-                cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
-              }
-            } else {
-=======
   def withGCP = args.get('withGCP', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -586,7 +585,6 @@ def targetWithoutNode(Map args = [:]) {
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
             retry(3) {
->>>>>>> aa475907dc ([ci][terraform] tags with metadata (#31355))
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
             }
           } else {
@@ -1072,6 +1070,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       def withModule = args.content.get('withModule', false)
       def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
+      def withGCP = args.content.get('withGCP', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1101,6 +1100,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      installK8s: installK8s,
                      withModule: withModule,
                      isMage: true,
+                     withGCP: withGCP,
                      id: args.id,
                      enableRetry: enableRetry)
       }
