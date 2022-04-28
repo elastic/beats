@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 - cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+- Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 
 *Heartbeat*
 
