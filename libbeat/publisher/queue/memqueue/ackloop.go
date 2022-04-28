@@ -117,7 +117,6 @@ func (l *ackLoop) collectAcked() chanList {
 	lst := chanList{}
 
 	acks := l.ackChans.pop()
-	//l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 	lst.append(acks)
 
 	done := false
@@ -125,7 +124,6 @@ func (l *ackLoop) collectAcked() chanList {
 		acks := l.ackChans.front()
 		select {
 		case <-acks.ackChan:
-			//l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 			lst.append(l.ackChans.pop())
 
 		default:

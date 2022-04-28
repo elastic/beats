@@ -94,7 +94,7 @@ func (b *ringBuffer) insert(event interface{}, client clientState) {
 	if b.regA.index+b.regA.size >= len(b.entries) {
 		// region A extends to the end of the buffer
 		if b.regA.index > 0 {
-			// If there is space before region AS, create
+			// If there is space before region A, create
 			// region B there.
 			b.regB = region{index: 0, size: 1}
 			b.entries[0] = queueEntry{event, client}

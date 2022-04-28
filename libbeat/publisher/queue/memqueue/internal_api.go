@@ -39,7 +39,7 @@ type producerCancelResponse struct {
 // consumer -> broker API
 
 type getRequest struct {
-	entryCount   int              // request sz events from the broker
+	entryCount   int              // request entryCount events from the broker
 	responseChan chan getResponse // channel to send response to
 }
 

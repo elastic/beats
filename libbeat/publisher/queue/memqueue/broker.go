@@ -45,7 +45,7 @@ type broker struct {
 	// Producers send requests to pushChan to add events to the queue.
 	pushChan chan pushRequest
 
-	// Consumers send getChan to getChan to read events from the queue.
+	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest
 
 	// Producers send requests to cancelChan to cancel events they've
