@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -80,7 +81,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
 
-func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
+func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 	value, err := event.GetValue("log.file.path")
 	if err != nil {
 		f.logger.Debugf("Error extracting log.file.path from the event: %s.", event)

@@ -25,7 +25,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestInputParsers ensures journald input support parsers,
@@ -35,12 +35,12 @@ func TestInputParsers(t *testing.T) {
 	inputParsersExpected := []string{"1st line\n2nd line\n3rd line", "4th line\n5th line\n6th line"}
 	env := newInputTestingEnvironment(t)
 
-	inp := env.mustCreateInput(common.MapStr{
+	inp := env.mustCreateInput(mapstr.M{
 		"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
 		"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
-		"parsers": []common.MapStr{
+		"parsers": []mapstr.M{
 			{
-				"multiline": common.MapStr{
+				"multiline": mapstr.M{
 					"type":        "count",
 					"count_lines": 3,
 				},

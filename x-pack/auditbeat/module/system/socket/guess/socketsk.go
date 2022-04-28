@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Guess the offset of (struct socket*)->sk (type struct sock*)
@@ -112,7 +112,7 @@ func (g *guessSocketSock) Trigger() error {
 
 // Extract first receives the sock* from sock_init_data, then uses it to
 // scan the dump from inet_release.
-func (g *guessSocketSock) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessSocketSock) Extract(ev interface{}) (mapstr.M, bool) {
 	if v, ok := ev.(*sockEvent); ok {
 		if g.initData != nil {
 			return nil, false
@@ -134,7 +134,7 @@ func (g *guessSocketSock) Extract(ev interface{}) (common.MapStr, bool) {
 		return nil, false
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"SOCKET_SOCK": off,
 	}, true
 }

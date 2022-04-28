@@ -31,15 +31,15 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
-	config := common.MapStr{
+	config := mapstr.M{
 		"hosts":   host,
 		"ports":   port,
 		"timeout": "1s",
@@ -161,7 +161,7 @@ func TestCheckUp(t *testing.T) {
 	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeEcho()
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",
@@ -196,7 +196,7 @@ func TestCheckDown(t *testing.T) {
 	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeEcho()
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",

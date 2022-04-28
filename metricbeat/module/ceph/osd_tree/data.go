@@ -22,8 +22,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Node represents a node object
@@ -54,7 +54,7 @@ type OsdTreeRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d OsdTreeRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
@@ -84,9 +84,9 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	}
 
 	//osd node list
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 	for _, node := range nodeList {
-		nodeInfo := common.MapStr{}
+		nodeInfo := mapstr.M{}
 		if node.ID < 0 {
 			//bucket node
 			nodeInfo["children"] = strings.Split(childrenMap[node.Name], ",")

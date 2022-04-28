@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 )
@@ -45,7 +46,7 @@ func NewInput(
 		return nil, errors.Wrap(err, "reading container input config")
 	}
 
-	err := cfg.Merge(common.MapStr{
+	err := cfg.Merge(mapstr.M{
 		"docker-json.partial":   true,
 		"docker-json.cri_flags": true,
 

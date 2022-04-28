@@ -21,15 +21,15 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) {
-	events := []common.MapStr{}
+func eventMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
+	events := []mapstr.M{}
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
@@ -40,29 +40,29 @@ func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) 
 	node := summary.Node
 
 	for _, syscontainer := range node.SystemContainers {
-		containerEvent := common.MapStr{
-			mb.ModuleDataKey: common.MapStr{
-				"node": common.MapStr{
+		containerEvent := mapstr.M{
+			mb.ModuleDataKey: mapstr.M{
+				"node": mapstr.M{
 					"name": node.NodeName,
 				},
 			},
 			"container": syscontainer.Name,
-			"cpu": common.MapStr{
-				"usage": common.MapStr{
+			"cpu": mapstr.M{
+				"usage": mapstr.M{
 					"nanocores": syscontainer.CPU.UsageNanoCores,
-					"core": common.MapStr{
+					"core": mapstr.M{
 						"ns": syscontainer.CPU.UsageCoreNanoSeconds,
 					},
 				},
 			},
-			"memory": common.MapStr{
-				"usage": common.MapStr{
+			"memory": mapstr.M{
+				"usage": mapstr.M{
 					"bytes": syscontainer.Memory.UsageBytes,
 				},
-				"workingset": common.MapStr{
+				"workingset": mapstr.M{
 					"bytes": syscontainer.Memory.WorkingSetBytes,
 				},
-				"rss": common.MapStr{
+				"rss": mapstr.M{
 					"bytes": syscontainer.Memory.RssBytes,
 				},
 				"pagefaults":      syscontainer.Memory.PageFaults,

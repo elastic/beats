@@ -17,12 +17,12 @@ import (
 
 	"github.com/cloudfoundry/sonde-go/events"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -60,7 +60,7 @@ func TestMetricSet(t *testing.T) {
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
 	require.NotEmpty(t, events)
 
-	expectedFields := common.MapStr{
+	expectedFields := mapstr.M{
 		"cloudfoundry.app.id":                       "1234",
 		"cloudfoundry.container.cpu.pct":            float64(0.1234),
 		"cloudfoundry.container.disk.bytes":         uint64(0),

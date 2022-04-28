@@ -24,8 +24,8 @@ package memcache
 // init function.
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -456,7 +456,7 @@ func makeSerializeBinary(
 ) eventFn {
 	command := code.String()
 	eventType := typ.String()
-	return func(msg *message, event common.MapStr) error {
+	return func(msg *message, event mapstr.M) error {
 		event["command"] = command
 		event["type"] = eventType
 		event["opcode"] = msg.opcode.String()

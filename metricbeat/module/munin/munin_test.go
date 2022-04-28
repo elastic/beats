@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func dummyNode(response string) *Node {
@@ -75,12 +75,12 @@ func TestFetch(t *testing.T) {
 	cases := []struct {
 		title    string
 		response string
-		expected common.MapStr
+		expected mapstr.M
 	}{
 		{
 			"normal case",
 			responseCPU,
-			common.MapStr{
+			mapstr.M{
 				"user":    float64(4679836),
 				"nice":    float64(59278),
 				"system":  float64(1979168),
@@ -95,14 +95,14 @@ func TestFetch(t *testing.T) {
 		{
 			"unknown values",
 			responseUnknown,
-			common.MapStr{
+			mapstr.M{
 				"other": float64(42),
 			},
 		},
 		{
 			"wrong field names",
 			responseWithWrongFields,
-			common.MapStr{
+			mapstr.M{
 				"user":   float64(4679836),
 				"nice":   float64(59278),
 				"system": float64(1979168),

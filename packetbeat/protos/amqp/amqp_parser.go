@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool) {
@@ -223,7 +224,7 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, headersProp) {
-		headers := common.MapStr{}
+		headers := mapstr.M{}
 		next, err, exists := getTable(headers, data, offset)
 		if !err && exists {
 			m.fields["headers"] = headers

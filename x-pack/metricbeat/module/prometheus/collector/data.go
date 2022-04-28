@@ -8,11 +8,11 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	dto "github.com/prometheus/client_model/go"
 )
@@ -67,7 +67,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 	name := *mf.Name
 	metrics := mf.Metric
 	for _, metric := range metrics {
-		labels := common.MapStr{}
+		labels := mapstr.M{}
 
 		if len(metric.Label) != 0 {
 			for _, label := range metric.Label {
@@ -81,7 +81,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 		if counter != nil {
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, collector.PromEvent{
-					Data: common.MapStr{
+					Data: mapstr.M{
 						name: g.rateCounterFloat64(name, labels, counter.GetValue()),
 					},
 					Labels: labels,
@@ -93,8 +93,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 		if gauge != nil {
 			if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 0) {
 				events = append(events, collector.PromEvent{
-					Data: common.MapStr{
-						name: common.MapStr{
+					Data: mapstr.M{
+						name: mapstr.M{
 							"value": gauge.GetValue(),
 						},
 					},
@@ -107,7 +107,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 		if summary != nil {
 			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, collector.PromEvent{
-					Data: common.MapStr{
+					Data: mapstr.M{
 						name + "_sum":   g.rateCounterFloat64(name, labels, summary.GetSampleSum()),
 						name + "_count": g.rateCounterUint64(name, labels, summary.GetSampleCount()),
 					},
@@ -123,8 +123,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 				quantileLabels := labels.Clone()
 				quantileLabels["quantile"] = strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
 				events = append(events, collector.PromEvent{
-					Data: common.MapStr{
-						name: common.MapStr{
+					Data: mapstr.M{
+						name: mapstr.M{
 							"value": quantile.GetValue(),
 						},
 					},
@@ -136,8 +136,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 		histogram := metric.GetHistogram()
 		if histogram != nil {
 			events = append(events, collector.PromEvent{
-				Data: common.MapStr{
-					name: common.MapStr{
+				Data: mapstr.M{
+					name: mapstr.M{
 						"histogram": PromHistogramToES(g.counterCache, name, labels, histogram),
 					},
 				},
@@ -153,8 +153,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 		if untyped != nil {
 			if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
 				events = append(events, collector.PromEvent{
-					Data: common.MapStr{
-						name: common.MapStr{
+					Data: mapstr.M{
+						name: mapstr.M{
 							"value": untyped.GetValue(),
 						},
 					},
@@ -167,8 +167,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 }
 
 // rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
-	d := common.MapStr{
+func (g *typedGenerator) rateCounterUint64(name string, labels mapstr.M, value uint64) mapstr.M {
+	d := mapstr.M{
 		"counter": value,
 	}
 
@@ -180,8 +180,8 @@ func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, va
 }
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
-	d := common.MapStr{
+func (g *typedGenerator) rateCounterFloat64(name string, labels mapstr.M, value float64) mapstr.M {
+	d := mapstr.M{
 		"counter": value,
 	}
 

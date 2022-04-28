@@ -23,7 +23,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestGenerateEventsCounter tests counter simple cases
@@ -32,7 +32,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 
 	timestamp := model.Time(424242)
 	timestamp1 := model.Time(424243)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
 
@@ -57,14 +57,14 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"metrics": common.MapStr{
+	expected := mapstr.M{
+		"metrics": mapstr.M{
 			"net_conntrack_listener_conn_closed_total": float64(42),
 		},
 		"labels": labels,
 	}
-	expected1 := common.MapStr{
-		"metrics": common.MapStr{
+	expected1 := mapstr.M{
+		"metrics": mapstr.M{
 			"net_conntrack_listener_conn_closed_total": float64(43),
 		},
 		"labels": labels,

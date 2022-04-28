@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -136,9 +137,9 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func toCEFObject(cefEvent *cef.Event) common.MapStr {
+func toCEFObject(cefEvent *cef.Event) mapstr.M {
 	// Add CEF header fields.
-	cefObject := common.MapStr{"version": strconv.Itoa(cefEvent.Version)}
+	cefObject := mapstr.M{"version": strconv.Itoa(cefEvent.Version)}
 	if cefEvent.DeviceVendor != "" {
 		cefObject.Put("device.vendor", cefEvent.DeviceVendor)
 	}
@@ -160,7 +161,7 @@ func toCEFObject(cefEvent *cef.Event) common.MapStr {
 
 	// Add CEF extensions (key-value pairs).
 	if len(cefEvent.Extensions) > 0 {
-		extensions := make(common.MapStr, len(cefEvent.Extensions))
+		extensions := make(mapstr.M, len(cefEvent.Extensions))
 		cefObject.Put("extensions", extensions)
 		for k, field := range cefEvent.Extensions {
 			if field.Interface != nil {
@@ -198,7 +199,7 @@ func writeCEFHeaderToECS(cefEvent *cef.Event, event *beat.Event) {
 	}
 }
 
-func appendErrorMessage(m common.MapStr, msg string) error {
+func appendErrorMessage(m mapstr.M, msg string) error {
 	const field = "error.message"
 	list, _ := m.GetValue(field)
 

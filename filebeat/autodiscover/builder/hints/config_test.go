@@ -23,11 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestUnpackCopiesDefault(t *testing.T) {
-	userCfg := common.MustNewConfigFrom(common.MapStr{
-		"default_config": common.MapStr{
+	userCfg := common.MustNewConfigFrom(mapstr.M{
+		"default_config": mapstr.M{
 			"type": "container",
 			"paths": []string{
 				"/var/log/containers/*${data.kubernetes.container.id}.log",

@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processor.convert"
@@ -117,7 +118,7 @@ func (p *processor) convertFields(event *beat.Event, converted []interface{}) er
 func (p *processor) convertField(event *beat.Event, conversion field) (interface{}, error) {
 	v, err := event.GetValue(conversion.From)
 	if err != nil {
-		if p.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if p.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return ignoredFailure, nil
 		}
 		return nil, newConvertError(conversion, err, p.Tag, "field [%v] is missing", conversion.From)
@@ -380,10 +381,10 @@ func newConvertError(conversion field, cause error, tag string, message string, 
 // maps without doing any type conversions.
 func cloneValue(value interface{}) interface{} {
 	switch v := value.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return v.Clone()
 	case map[string]interface{}:
-		return common.MapStr(v).Clone()
+		return mapstr.M(v).Clone()
 	case []interface{}:
 		len := len(v)
 		newArr := make([]interface{}, len)

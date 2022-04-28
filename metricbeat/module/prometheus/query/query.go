@@ -22,10 +22,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) getURL(path string, queryMap common.MapStr) string {
+func (m *MetricSet) getURL(path string, queryMap mapstr.M) string {
 	queryStr := mb.QueryParams(queryMap).String()
 	return m.baseURL + path + "?" + queryStr
 }

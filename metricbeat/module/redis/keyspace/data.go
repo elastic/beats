@@ -20,11 +20,11 @@ package keyspace
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/redis"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Map data to MapStr
@@ -38,7 +38,7 @@ func eventsMapping(r mb.ReporterV2, info map[string]string) {
 	}
 }
 
-func getKeyspaceStats(info map[string]string) map[string]common.MapStr {
+func getKeyspaceStats(info map[string]string) map[string]mapstr.M {
 	keyspaceMap := findKeyspaceStats(info)
 	return parseKeyspaceStats(keyspaceMap)
 }
@@ -62,8 +62,8 @@ var schema = s.Schema{
 }
 
 // parseKeyspaceStats resolves the overloaded value string that Redis returns for keyspace
-func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr {
-	keyspace := map[string]common.MapStr{}
+func parseKeyspaceStats(keyspaceMap map[string]string) map[string]mapstr.M {
+	keyspace := map[string]mapstr.M{}
 	for k, v := range keyspaceMap {
 
 		// Extract out the overloaded values for db keyspace

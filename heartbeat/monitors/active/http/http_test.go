@@ -50,6 +50,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -347,7 +348,7 @@ func TestJsonBody(t *testing.T) {
 		name                string
 		responseBody        string
 		expression          string
-		condition           common.MapStr
+		condition           mapstr.M
 		expectedErrMsg      string
 		expectedContentType string
 	}
@@ -373,8 +374,8 @@ func TestJsonBody(t *testing.T) {
 			"simple condition match",
 			"{\"foo\": \"bar\"}",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"foo": "bar"},
+			mapstr.M{
+				"equals": mapstr.M{"foo": "bar"},
 			},
 			"",
 			"application/json",
@@ -383,8 +384,8 @@ func TestJsonBody(t *testing.T) {
 			"condition mismatch",
 			"{\"foo\": \"bar\"}",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"baz": "bot"},
+			mapstr.M{
+				"equals": mapstr.M{"baz": "bot"},
 			},
 			"JSON body did not match",
 			"application/json",
@@ -393,8 +394,8 @@ func TestJsonBody(t *testing.T) {
 			"condition invalid json",
 			"notjson",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"foo": "bar"},
+			mapstr.M{
+				"equals": mapstr.M{"foo": "bar"},
 			},
 			"could not parse JSON",
 			"text/plain; charset=utf-8",
@@ -403,8 +404,8 @@ func TestJsonBody(t *testing.T) {
 			"condition complex type match json",
 			"{\"number\": 3, \"bool\": true}",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"number": 3, "bool": true},
+			mapstr.M{
+				"equals": mapstr.M{"number": 3, "bool": true},
 			},
 			"",
 			"application/json",
@@ -416,7 +417,7 @@ func TestJsonBody(t *testing.T) {
 			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, nil))
 			defer server.Close()
 
-			jsonCheck := common.MapStr{"description": tc.name}
+			jsonCheck := mapstr.M{"description": tc.name}
 			if tc.expression != "" {
 				jsonCheck["expression"] = tc.expression
 			}
@@ -428,7 +429,7 @@ func TestJsonBody(t *testing.T) {
 				"hosts":                 server.URL,
 				"timeout":               "1s",
 				"response.include_body": "never",
-				"check.response.json": []common.MapStr{
+				"check.response.json": []mapstr.M{
 					jsonCheck,
 				},
 			}
