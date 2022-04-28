@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -56,7 +57,7 @@ func makeShipper(
 	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (outputs.Group, error) {
 
 	config := defaultConfig()
