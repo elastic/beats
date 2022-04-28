@@ -216,7 +216,6 @@ func buildMage() error {
 		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
 
-//nolint:goconst // unnecessary consts
 func CrossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
@@ -270,7 +269,7 @@ type GolangCrossBuilder struct {
 
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
-	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform) //nolint:forbidigo // it's ok to fmt.println in mage
+	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
 
 	repoInfo, err := GetProjectRepoInfo()
 	if err != nil {

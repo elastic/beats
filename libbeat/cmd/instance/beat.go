@@ -649,13 +649,13 @@ func (b *Beat) configure(settings Settings) error {
 	// options.
 	store, err := LoadKeystore(cfg, b.Info.Beat)
 	if err != nil {
-		return fmt.Errorf("could not initialize the keystore: %v", err)
+		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
 
 	if settings.DisableConfigResolver {
 		common.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else {
-		// Must allow the options to be more flexible for dynamic changes
+		// TODO: Allow the options to be more flexible for dynamic changes
 		common.OverwriteConfigOpts(configOpts(store))
 	}
 
@@ -675,7 +675,7 @@ func (b *Beat) configure(settings Settings) error {
 	b.RawConfig = cfg
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
-		return fmt.Errorf("error unpacking config data: %v", err)
+		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -685,7 +685,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
-		return fmt.Errorf("error initializing logging: %v", err)
+		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
 	// log paths values to help with troubleshooting
@@ -756,7 +756,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
 			f.Close()
 			return fmt.Errorf("Beat meta file reading error: %v", err)
 		}
@@ -883,7 +883,7 @@ func (b *Beat) checkElasticsearchVersion() {
 		return
 	}
 
-	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+	_ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := common.NewVersion(b.Info.Version)
 		if err != nil {
@@ -901,7 +901,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 		AllowOlder bool `config:"allow_older_versions"`
 	}{false}
 
-	b.Config.Output.Config().Unpack(&config)
+	_ = b.Config.Output.Config().Unpack(&config)
 
 	return config.AllowOlder
 }
