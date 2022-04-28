@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processor.dns"
@@ -83,7 +84,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	for field, target := range p.reverseFlat {
 		if err := p.processField(field, target, p.Action, event); err != nil {
 			p.log.Debugf("DNS processor failed: %v", err)
-			tagOnce.Do(func() { common.AddTags(event.Fields, p.TagOnFailure) })
+			tagOnce.Do(func() { mapstr.AddTags(event.Fields, p.TagOnFailure) })
 		}
 	}
 	return event, nil

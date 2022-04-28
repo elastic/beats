@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -164,7 +164,7 @@ func TestSessionTimeout(t *testing.T) {
 	}
 
 	evt := &beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"stop": false,
 		},
 	}
@@ -211,8 +211,8 @@ func TestSessionParallel(t *testing.T) {
 			defer wg.Done()
 			for ctx.Err() == nil {
 				evt := &beat.Event{
-					Fields: common.MapStr{
-						"host": common.MapStr{"name": "computer"},
+					Fields: mapstr.M{
+						"host": mapstr.M{"name": "computer"},
 					},
 				}
 				_, err := p.Run(evt)

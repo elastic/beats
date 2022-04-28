@@ -26,8 +26,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -43,7 +43,7 @@ func TestEventMapping(t *testing.T) {
 
 	assert.Len(t, event, 7, "got wrong number of event")
 
-	clusterManager := event["cluster_manager"].(common.MapStr)
+	clusterManager := event["cluster_manager"].(mapstr.M)
 	assert.Equal(t, int64(1), clusterManager["active_clusters"])
 	assert.Equal(t, int64(1), clusterManager["cluster_added"])
 	assert.Equal(t, int64(0), clusterManager["cluster_modified"])
@@ -54,7 +54,7 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(0), clusterManager["update_merge_cancelled"])
 	assert.Equal(t, int64(0), clusterManager["update_out_of_merge_window"])
 
-	fileSystem := event["filesystem"].(common.MapStr)
+	fileSystem := event["filesystem"].(mapstr.M)
 	assert.Equal(t, int64(389), fileSystem["flushed_by_timer"])
 	assert.Equal(t, int64(0), fileSystem["reopen_failed"])
 	assert.Equal(t, int64(44), fileSystem["write_buffered"])
@@ -63,7 +63,7 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(0), fileSystem["write_total_buffered"])
 	assert.Equal(t, int64(0), fileSystem["write_failed"])
 
-	listenerManager := event["listener_manager"].(common.MapStr)
+	listenerManager := event["listener_manager"].(mapstr.M)
 	assert.Equal(t, int64(1), listenerManager["listener_added"])
 	assert.Equal(t, int64(0), listenerManager["listener_create_failure"])
 	assert.Equal(t, int64(4), listenerManager["listener_create_success"])
@@ -74,7 +74,7 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(0), listenerManager["total_listeners_warming"])
 	assert.Equal(t, int64(0), listenerManager["listener_stopped"])
 
-	runtime := event["runtime"].(common.MapStr)
+	runtime := event["runtime"].(mapstr.M)
 	assert.Equal(t, int64(0), runtime["admin_overrides_active"])
 	assert.Equal(t, int64(0), runtime["load_error"])
 	assert.Equal(t, int64(0), runtime["load_success"])
@@ -84,7 +84,7 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(0), runtime["deprecated_feature_use"])
 	assert.Equal(t, int64(2), runtime["num_layers"])
 
-	server := event["server"].(common.MapStr)
+	server := event["server"].(mapstr.M)
 	assert.Equal(t, int64(2147483647), server["days_until_first_cert_expiring"])
 	assert.Equal(t, int64(1), server["live"])
 	assert.Equal(t, int64(3120760), server["memory_allocated"])
@@ -103,10 +103,10 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(0), server["static_unknown_fields"])
 	assert.Equal(t, int64(0), server["stats_recent_lookups"])
 
-	stats := event["stats"].(common.MapStr)
+	stats := event["stats"].(mapstr.M)
 	assert.Equal(t, int64(0), stats["overflow"])
 
-	http2 := event["http2"].(common.MapStr)
+	http2 := event["http2"].(mapstr.M)
 	assert.Equal(t, int64(0), http2["header_overflow"])
 	assert.Equal(t, int64(0), http2["headers_cb_no_stream"])
 	assert.Equal(t, int64(0), http2["rx_reset"])
@@ -145,7 +145,7 @@ func TestFetchEventContent(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func testValue(t *testing.T, event common.MapStr, field string, value interface{}) {
+func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)

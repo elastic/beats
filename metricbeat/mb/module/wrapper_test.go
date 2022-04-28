@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -53,7 +54,7 @@ type fakeReportingFetcher struct {
 
 func (ms *fakeReportingFetcher) Fetch(r mb.Reporter) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	r.Event(common.MapStr{"@timestamp": common.Time(t), "metric": 1})
+	r.Event(mapstr.M{"@timestamp": common.Time(t), "metric": 1})
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -69,7 +70,7 @@ type fakePushMetricSet struct {
 
 func (ms *fakePushMetricSet) Run(r mb.PushReporter) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	event := common.MapStr{"@timestamp": common.Time(t), "metric": 1}
+	event := mapstr.M{"@timestamp": common.Time(t), "metric": 1}
 	r.Event(event)
 	<-r.Done()
 }

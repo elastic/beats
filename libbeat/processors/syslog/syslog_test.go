@@ -26,24 +26,31 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func mustParseTime(layout string, value string) time.Time {
-	t, err := time.Parse(layout, value)
+// mustParseTime will parse value into a time.Time using the provided layout. If value
+// cannot be parsed, this function will panic. If layout does not specify a time zone,
+// then a time.Location should be provided by loc. If layout does specify a time zone,
+// then loc should be nil. Layouts that do not specify a year will be enriched with
+// the current year relative to the location specified for the parsed timestamp.
+func mustParseTime(layout, value string, loc *time.Location) time.Time {
+	var t time.Time
+	var err error
+
+	if loc != nil {
+		t, err = time.ParseInLocation(layout, value, loc)
+	} else {
+		t, err = time.Parse(layout, value)
+	}
 	if err != nil {
 		panic(err)
 	}
 
-	return t
-}
-
-func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time {
-	t, err := time.ParseInLocation(layout, value, loc)
-	if err != nil {
-		panic(err)
-	}
-	if layout == time.Stamp {
-		t = t.AddDate(time.Now().In(loc).Year(), 0, 0)
+	// Timestamps that do not include a year will be enriched using the
+	// current year relative to the location specified for the timestamp.
+	if t.Year() == 0 {
+		t = t.AddDate(time.Now().In(t.Location()).Year(), 0, 0)
 	}
 
 	return t
@@ -51,27 +58,27 @@ func mustParseTimeLoc(layout string, value string, loc *time.Location) time.Time
 
 var syslogCases = map[string]struct {
 	Cfg      *common.Config
-	In       common.MapStr
-	Want     common.MapStr
+	In       mapstr.M
+	Want     mapstr.M
 	WantTime time.Time
 	WantErr  bool
 }{
 	"rfc-3164": {
-		Cfg: common.MustNewConfigFrom(common.MapStr{
+		Cfg: common.MustNewConfigFrom(mapstr.M{
 			"timezone": "America/Chicago",
 		}),
-		In: common.MapStr{
+		In: mapstr.M{
 			"message": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
 		},
-		Want: common.MapStr{
-			"log": common.MapStr{
-				"syslog": common.MapStr{
+		Want: mapstr.M{
+			"log": mapstr.M{
+				"syslog": mapstr.M{
 					"priority": 13,
-					"facility": common.MapStr{
+					"facility": mapstr.M{
 						"code": 1,
 						"name": "user-level",
 					},
-					"severity": common.MapStr{
+					"severity": mapstr.M{
 						"code": 5,
 						"name": "Notice",
 					},
@@ -82,22 +89,22 @@ var syslogCases = map[string]struct {
 			},
 			"message": "this is the message",
 		},
-		WantTime: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
+		WantTime: mustParseTime(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
 	},
 	"rfc-5424": {
-		Cfg: common.MustNewConfigFrom(common.MapStr{}),
-		In: common.MapStr{
+		Cfg: common.MustNewConfigFrom(mapstr.M{}),
+		In: mapstr.M{
 			"message": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
 		},
-		Want: common.MapStr{
-			"log": common.MapStr{
-				"syslog": common.MapStr{
+		Want: mapstr.M{
+			"log": mapstr.M{
+				"syslog": mapstr.M{
 					"priority": 165,
-					"facility": common.MapStr{
+					"facility": mapstr.M{
 						"code": 20,
 						"name": "local4",
 					},
-					"severity": common.MapStr{
+					"severity": mapstr.M{
 						"code": 5,
 						"name": "Notice",
 					},
@@ -105,7 +112,7 @@ var syslogCases = map[string]struct {
 					"appname":  "evntslog",
 					"procid":   "1024",
 					"msgid":    "ID47",
-					"version":  1,
+					"version":  "1",
 					"structured_data": map[string]map[string]string{
 						"examplePriority@32473": {
 							"class": "high",
@@ -120,7 +127,7 @@ var syslogCases = map[string]struct {
 			},
 			"message": "this is the message",
 		},
-		WantTime: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
+		WantTime: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
 	},
 }
 
@@ -170,46 +177,46 @@ func BenchmarkSyslog(b *testing.B) {
 
 func TestAppendStringField(t *testing.T) {
 	tests := map[string]struct {
-		InMap   common.MapStr
+		InMap   mapstr.M
 		InField string
 		InValue string
-		Want    common.MapStr
+		Want    mapstr.M
 	}{
 		"nil": {
-			InMap:   common.MapStr{},
+			InMap:   mapstr.M{},
 			InField: "error",
 			InValue: "foo",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": "foo",
 			},
 		},
 		"string": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": "foo",
 			},
 			InField: "error",
 			InValue: "bar",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 		},
 		"string-slice": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 			InField: "error",
 			InValue: "some value",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []string{"foo", "bar", "some value"},
 			},
 		},
 		"interface-slice": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": []interface{}{"foo", "bar"},
 			},
 			InField: "error",
 			InValue: "some value",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []interface{}{"foo", "bar", "some value"},
 			},
 		},

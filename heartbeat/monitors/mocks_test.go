@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -53,9 +54,7 @@ func (c *MockBeatClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	for _, e := range events {
-		c.publishes = append(c.publishes, e)
-	}
+	c.publishes = append(c.publishes, events...)
 }
 
 func (c *MockBeatClient) Close() error {
@@ -111,7 +110,7 @@ func baseMockEventMonitorValidator(id string, name string, status string) valida
 			"id":          idMatcher,
 			"name":        name,
 			"type":        "test",
-			"duration.us": isdef.IsDuration,
+			"duration.us": hbtestllext.IsInt64,
 			"status":      status,
 			"check_group": isdef.IsString,
 		},
@@ -128,9 +127,11 @@ func mockEventMonitorValidator(id string, name string) validator.Validator {
 }
 
 func mockEventCustomFields() map[string]interface{} {
-	return common.MapStr{"foo": "bar"}
+	return mapstr.M{"foo": "bar"}
 }
 
+//nolint:unparam // There are no new changes to this line but
+// linter has been activated in the meantime. We'll cleanup separately.
 func createMockJob() ([]jobs.Job, error) {
 	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
 		eventext.MergeEventFields(event, mockEventCustomFields())
@@ -178,6 +179,8 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
 	reg := plugin.NewPluginsReg()
 	builder, built, closed := mockPluginBuilder()
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	reg.Add(builder)
 	return reg, built, closed
 }
@@ -203,6 +206,8 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
+//nolint:unparam // There are no new changes to this line but
+// linter has been activated in the meantime. We'll cleanup separately.
 func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
 	confMap := map[string]interface{}{
 		"type":        "test",

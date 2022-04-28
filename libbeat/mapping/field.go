@@ -24,7 +24,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -132,15 +132,15 @@ type Analyzer struct {
 }
 
 func (a *Analyzer) Unpack(v interface{}) error {
-	var m common.MapStr
+	var m mapstr.M
 	switch v := v.(type) {
 	case string:
 		a.Name = v
 		return nil
-	case common.MapStr:
+	case mapstr.M:
 		m = v
 	case map[string]interface{}:
-		m = common.MapStr(v)
+		m = mapstr.M(v)
 	default:
 		return fmt.Errorf("'%v' is invalid analyzer setting", v)
 	}

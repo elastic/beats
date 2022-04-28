@@ -17,10 +17,10 @@ import (
 	"github.com/cespare/xxhash/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
@@ -34,7 +34,13 @@ func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Even
 	}
 }
 
-func toBeatEventCommon(flow record.Record) (event beat.Event) {
+func toBeatEventCommon(flow record.Record) beat.Event {
+	const (
+		flowType    = "netflow_flow"
+		optionsType = "netflow_options"
+		unknownType = "netflow_unknown"
+	)
+
 	// replace net.HardwareAddress with its String() representation
 	fixMacAddresses(flow.Fields)
 	// Nest Exporter into netflow fields
@@ -43,36 +49,37 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	// Nest Type into netflow fields
 	switch flow.Type {
 	case record.Flow:
-		flow.Fields["type"] = "netflow_flow"
+		flow.Fields["type"] = flowType
 	case record.Options:
-		flow.Fields["type"] = "netflow_options"
+		flow.Fields["type"] = optionsType
 	default:
-		flow.Fields["type"] = "netflow_unknown"
+		flow.Fields["type"] = unknownType
 	}
 
 	// ECS Fields -- event
-	ecsEvent := common.MapStr{
+	ecsEvent := mapstr.M{
 		"created":  time.Now().UTC(),
 		"kind":     "event",
 		"category": []string{"network_traffic", "network"},
 		"action":   flow.Fields["type"],
 	}
-	if ecsEvent["action"] == "netflow_flow" {
+	if ecsEvent["action"] == flowType {
 		ecsEvent["type"] = []string{"connection"}
 	}
 	// ECS Fields -- device
-	ecsDevice := common.MapStr{}
+	ecsDevice := mapstr.M{}
 	if exporter, ok := getKeyString(flow.Exporter, "address"); ok {
 		ecsDevice["ip"] = extractIPFromIPPort(exporter)
 	}
 
-	event.Timestamp = flow.Timestamp
-	event.Fields = common.MapStr{
-		"netflow":  fieldNameConverter.ToSnakeCase(flow.Fields),
-		"event":    ecsEvent,
-		"observer": ecsDevice,
+	return beat.Event{
+		Timestamp: flow.Timestamp,
+		Fields: mapstr.M{
+			"netflow":  fieldNameConverter.ToSnakeCase(flow.Fields),
+			"event":    ecsEvent,
+			"observer": ecsDevice,
+		},
 	}
-	return
 }
 
 func extractIPFromIPPort(address string) string {
@@ -101,12 +108,12 @@ func optionsToBeatEvent(flow record.Record) beat.Event {
 	return toBeatEventCommon(flow)
 }
 
-func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
-	event = toBeatEventCommon(flow)
+func flowToBeatEvent(flow record.Record, internalNetworks []string) beat.Event {
+	event := toBeatEventCommon(flow)
 
-	ecsEvent, ok := event.Fields["event"].(common.MapStr)
+	ecsEvent, ok := event.Fields["event"].(mapstr.M)
 	if !ok {
-		ecsEvent = common.MapStr{}
+		ecsEvent = mapstr.M{}
 		event.Fields["event"] = ecsEvent
 	}
 	sysUptime, hasSysUptime := getKeyUint64(flow.Exporter, "uptimeMillis")
@@ -122,10 +129,10 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 		hasStartUptime = hasStartUptime && startUptime <= sysUptime
 		hasEndUptime = hasEndUptime && endUptime <= sysUptime
 		if hasStartUptime {
-			ecsEvent["start"] = flow.Timestamp.Add((time.Duration(startUptime) - time.Duration(sysUptime)) * time.Millisecond)
+			ecsEvent["start"] = flow.Timestamp.Add(time.Duration(startUptime-sysUptime) * time.Millisecond)
 		}
 		if hasEndUptime {
-			ecsEvent["end"] = flow.Timestamp.Add((time.Duration(endUptime) - time.Duration(sysUptime)) * time.Millisecond)
+			ecsEvent["end"] = flow.Timestamp.Add(time.Duration(endUptime-sysUptime) * time.Millisecond)
 		}
 		if hasStartUptime && hasEndUptime {
 			ecsEvent["duration"] = ecsEvent["end"].(time.Time).Sub(ecsEvent["start"].(time.Time)).Nanoseconds()
@@ -147,8 +154,8 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 
 	flowDirection, hasFlowDirection := getKeyUint64(flow.Fields, "flowDirection")
 	// ECS Fields -- source, destination & related.ip
-	ecsSource := common.MapStr{}
-	ecsDest := common.MapStr{}
+	ecsSource := mapstr.M{}
+	ecsDest := mapstr.M{}
 	var relatedIP []net.IP
 
 	// Populate first with WLAN fields
@@ -213,7 +220,7 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 	}
 
 	// ECS Fields -- Flow
-	ecsFlow := common.MapStr{}
+	ecsFlow := mapstr.M{}
 	var srcIP, dstIP net.IP
 	var srcPort, dstPort uint16
 	var protocol IPProtocol
@@ -242,7 +249,7 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 	ecsFlow["locality"] = getIPLocality(internalNetworks, srcIP, dstIP).String()
 
 	// ECS Fields -- network
-	ecsNetwork := common.MapStr{}
+	ecsNetwork := mapstr.M{}
 	if proto, found := getKeyUint64(flow.Fields, "protocolIdentifier"); found {
 		ecsNetwork["transport"] = IPProtocol(proto).String()
 		ecsNetwork["iana_number"] = proto
@@ -280,7 +287,7 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 		if biflowDir == 2 {
 			ecsDest, ecsSource = ecsSource, ecsDest
 		}
-		ecsEvent["category"] = "network_session"
+		ecsEvent["category"] = []string{"network", "session"}
 
 		// Assume source is the client in biflows.
 		event.Fields["client"] = ecsSource
@@ -316,9 +323,9 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 		event.Fields["network"] = ecsNetwork
 	}
 	if len(relatedIP) > 0 {
-		event.Fields["related"] = common.MapStr{"ip": uniqueIPs(relatedIP)}
+		event.Fields["related"] = mapstr.M{"ip": uniqueIPs(relatedIP)}
 	}
-	return
+	return event
 }
 
 // unique returns ips lexically sorted and with repeated elements
@@ -344,10 +351,10 @@ func uniqueIPs(ips []net.IP) []net.IP {
 func getKeyUint64(dict record.Map, key string) (value uint64, found bool) {
 	iface, found := dict[key]
 	if !found {
-		return
+		return value, found
 	}
 	value, found = iface.(uint64)
-	return
+	return value, found
 }
 
 func getKeyUint64Alternatives(dict record.Map, keys ...string) (value uint64, found bool) {
@@ -355,29 +362,29 @@ func getKeyUint64Alternatives(dict record.Map, keys ...string) (value uint64, fo
 	for _, key := range keys {
 		if iface, found = dict[key]; found {
 			if value, found = iface.(uint64); found {
-				return
+				return value, found
 			}
 		}
 	}
-	return
+	return value, found
 }
 
 func getKeyString(dict record.Map, key string) (value string, found bool) {
 	iface, found := dict[key]
 	if !found {
-		return
+		return value, found
 	}
 	value, found = iface.(string)
-	return
+	return value, found
 }
 
 func getKeyIP(dict record.Map, key string) (value net.IP, found bool) {
 	iface, found := dict[key]
 	if !found {
-		return
+		return value, found
 	}
 	value, found = iface.(net.IP)
-	return
+	return value, found
 }
 
 // Replaces each net.HardwareAddr in the dictionary with its string representation
@@ -437,6 +444,7 @@ func getIPLocality(internalNetworks []string, ips ...net.IP) Locality {
 	return LocalityInternal
 }
 
+//nolint:godox // Bad linter!
 // TODO: create table from https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
 // They have a CSV file available for conversion.
 
@@ -467,6 +475,7 @@ func (p IPProtocol) String() string {
 func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
 	h := xxhash.New()
 	// Both flows will have the same ID.
+	//nolint:errcheck // Hash writes never fail.
 	if srcPort >= dstPort {
 		h.Write(srcIP)
 		binary.Write(h, binary.BigEndian, srcPort)
@@ -478,6 +487,7 @@ func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
 		h.Write(srcIP)
 		binary.Write(h, binary.BigEndian, srcPort)
 	}
+	//nolint:errcheck // Hash writes never fail.
 	binary.Write(h, binary.BigEndian, proto)
 
 	return base64.RawURLEncoding.EncodeToString(h.Sum(nil))

@@ -2,6 +2,12 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+{{- if .Mod.IsXpack}}
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/{{.Mod.Base}}/{{.Metricset.Title}}/_meta/docs.asciidoc
+{{ else }}
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/{{.Mod.Base}}/{{.Metricset.Title}}/_meta/docs.asciidoc
+{{end}}
+
 [[{{getBeatName}}-metricset-{{.Mod.Base}}-{{.Metricset.Title}}]]
 {{- if .Mod.IsXpack}}
 [role="xpack"]{{end}}
@@ -15,6 +21,8 @@ include::../../../{{.Mod.Path | basePath}}/{{.Mod.Base}}/{{.Metricset.Title}}/_m
 {{if .Metricset.IsDefault}}
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.{{end}}
 
+:edit_url:
+
 ==== Fields
 
 For a description of each field in the metricset, see the
@@ -27,3 +35,5 @@ For a description of each field in the metricset, see the
 include::../../../{{.Mod.Path | basePath}}/{{.Mod.Base}}/{{.Metricset.Title}}/_meta/data.json[]
 ----
 {{end -}}
+
+:edit_url!:

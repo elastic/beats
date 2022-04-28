@@ -26,20 +26,21 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestTokenAppender(t *testing.T) {
 	tests := []struct {
 		eventConfig string
 		event       bus.Event
-		result      common.MapStr
+		result      mapstr.M
 		config      string
 	}{
 		// Appender without a condition should apply the config regardless
 		// Empty event config should return a config with only the headers
 		{
 			event: bus.Event{},
-			result: common.MapStr{
+			result: mapstr.M{
 				"headers": map[string]interface{}{
 					"Authorization": "Bearer foo bar",
 				},
@@ -52,7 +53,7 @@ token_path: "test"
 		// Metricbeat module config should return a config that has headers section
 		{
 			event: bus.Event{},
-			result: common.MapStr{
+			result: mapstr.M{
 				"module": "prometheus",
 				"hosts":  []interface{}{"1.2.3.4:8080"},
 				"headers": map[string]interface{}{
@@ -91,7 +92,7 @@ token_path: "test"
 		cfgs, _ := test.event["config"].([]*common.Config)
 		assert.Equal(t, len(cfgs), 1)
 
-		out := common.MapStr{}
+		out := mapstr.M{}
 		cfgs[0].Unpack(&out)
 
 		assert.Equal(t, out, test.result)

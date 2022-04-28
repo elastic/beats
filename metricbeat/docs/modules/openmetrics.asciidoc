@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: openmetrics
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/openmetrics/_meta/docs.asciidoc
+
 
 [[metricbeat-module-openmetrics]]
 == Openmetrics module
@@ -31,6 +33,8 @@ In order to filter out/in metrics one can make use of `metrics_filters.include` 
 The configuration above will include only metrics that match `node_filesystem_*` pattern and do not match `node_filesystem_device_*`
 and are not `node_filesystem_readonly` metric.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -66,3 +70,4 @@ The following metricsets are available:
 
 include::openmetrics/collector.asciidoc[]
 
+:edit_url!:

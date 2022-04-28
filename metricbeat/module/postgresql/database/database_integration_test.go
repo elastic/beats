@@ -23,10 +23,10 @@ package database
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -52,7 +52,7 @@ func TestFetch(t *testing.T) {
 	_, ok := event["name"].(string)
 	assert.True(t, ok)
 
-	rows := event["rows"].(common.MapStr)
+	rows := event["rows"].(mapstr.M)
 	assert.Contains(t, rows, "returned")
 	assert.Contains(t, rows, "fetched")
 	assert.Contains(t, rows, "inserted")
@@ -63,7 +63,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "postgresql")
 
-	getOid := func(event common.MapStr) int {
+	getOid := func(event mapstr.M) int {
 		oid, err := event.GetValue("postgresql.database.oid")
 		require.NoError(t, err)
 
@@ -79,10 +79,10 @@ func TestData(t *testing.T) {
 	}
 
 	f := mbtest.NewFetcher(t, getConfig(service.Host()))
-	f.WriteEventsCond(t, "", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "", func(event mapstr.M) bool {
 		return getOid(event) != 0
 	})
-	f.WriteEventsCond(t, "./_meta/data_shared.json", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "./_meta/data_shared.json", func(event mapstr.M) bool {
 		return getOid(event) == 0
 	})
 }

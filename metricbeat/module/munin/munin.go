@@ -28,8 +28,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -85,13 +85,13 @@ func (n *Node) List() ([]string, error) {
 }
 
 // Fetch metrics from munin node
-func (n *Node) Fetch(plugin string, sanitize bool) (common.MapStr, error) {
+func (n *Node) Fetch(plugin string, sanitize bool) (mapstr.M, error) {
 	_, err := io.WriteString(n.writer, "fetch "+plugin+"\n")
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to fetch metrics for plugin '%s'", plugin)
 	}
 
-	event := common.MapStr{}
+	event := mapstr.M{}
 	scanner := bufio.NewScanner(n.reader)
 	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {

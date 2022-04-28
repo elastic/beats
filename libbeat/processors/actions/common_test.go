@@ -25,13 +25,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type testCase struct {
-	eventFields common.MapStr
-	eventMeta   common.MapStr
-	wantFields  common.MapStr
-	wantMeta    common.MapStr
+	eventFields mapstr.M
+	eventMeta   mapstr.M
+	wantFields  mapstr.M
+	wantMeta    mapstr.M
 	cfg         []string
 }
 

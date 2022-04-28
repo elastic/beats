@@ -10,12 +10,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type enricher func(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error
@@ -25,7 +26,7 @@ type streamEnricher struct {
 }
 
 func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
-	if e.je == nil || (se != nil && se.Type == "journey/start") {
+	if e.je == nil || (se != nil && se.Type == JourneyStart) {
 		e.je = newJourneyEnricher()
 	}
 
@@ -43,7 +44,7 @@ type journeyEnricher struct {
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
-	urlFields common.MapStr
+	urlFields mapstr.M
 	start     time.Time
 	end       time.Time
 }
@@ -71,12 +72,12 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 		event.Timestamp = se.Timestamp()
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
-		case "journey/start":
+		case JourneyStart:
 			je.firstError = nil
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
-		case "journey/end", "cmd/status":
+		case JourneyEnd, CmdStatus:
 			je.end = event.Timestamp
 		}
 	} else {
@@ -94,11 +95,11 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 		id = fmt.Sprintf("%s-%s", id, je.journey.Id)
 		name = fmt.Sprintf("%s - %s", name, je.journey.Name)
 	}
-	eventext.MergeEventFields(event, common.MapStr{
-		"event": common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{
+		"event": mapstr.M{
 			"type": se.Type,
 		},
-		"monitor": common.MapStr{
+		"monitor": mapstr.M{
 			"check_group": je.checkGroup,
 			"id":          id,
 			"name":        name,
@@ -108,8 +109,8 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 
 	// Write suite level fields for suite monitors
 	if !fields.IsInline {
-		eventext.MergeEventFields(event, common.MapStr{
-			"suite": common.MapStr{
+		eventext.MergeEventFields(event, mapstr.M{
+			"suite": mapstr.M{
 				"id":   fields.Id,
 				"name": fields.Name,
 			},
@@ -129,14 +130,14 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	}
 
 	switch se.Type {
-	case "cmd/status":
+	case CmdStatus:
 		// If a command failed _after_ the journey was complete, as it happens
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
 			return je.createSummary(event)
 		}
-	case "journey/end":
+	case JourneyEnd:
 		je.journeyComplete = true
 		return je.createSummary(event)
 	case "step/end":
@@ -155,6 +156,8 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		event.SetID(se.Id)
 		// This is only relevant for screenshots, which have a specific ID
 		// In that case we always want to issue an update op
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
 	}
 
@@ -162,7 +165,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	if je.urlFields == nil {
 		if urlFields, err := event.GetValue("url"); err == nil {
-			if ufMap, ok := urlFields.(common.MapStr); ok {
+			if ufMap, ok := urlFields.(mapstr.M); ok {
 				je.urlFields = ufMap
 			}
 		}
@@ -184,28 +187,34 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
 	if !je.start.IsZero() {
-		eventext.MergeEventFields(event, common.MapStr{
-			"monitor": common.MapStr{
-				"duration": common.MapStr{
-					"us": int64(je.end.Sub(je.start) / time.Microsecond),
+		duration := je.end.Sub(je.start)
+		eventext.MergeEventFields(event, mapstr.M{
+			"monitor": mapstr.M{
+				"duration": mapstr.M{
+					"us": duration.Microseconds(),
 				},
 			},
 		})
 	}
-	eventext.MergeEventFields(event, common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{
 		"url": je.urlFields,
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"type": "heartbeat/summary",
 		},
-		"synthetics": common.MapStr{
+		"synthetics": mapstr.M{
 			"type":    "heartbeat/summary",
 			"journey": je.journey,
 		},
-		"summary": common.MapStr{
+		"summary": mapstr.M{
 			"up":   up,
 			"down": down,
 		},
 	})
+
+	_, err := event.GetValue("monitor.id")
+	if err == nil {
+		logger.LogRun(event, &je.stepCount)
+	}
 
 	if je.journeyComplete {
 		return je.firstError

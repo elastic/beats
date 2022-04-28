@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // SupportFactory is used to define a policy type to be used.
@@ -61,7 +62,7 @@ type Manager interface {
 // See: [Policy phases and actions documentation](https://www.elastic.co/guide/en/elasticsearch/reference/master/ilm-policy-definition.html).
 type Policy struct {
 	Name string
-	Body common.MapStr
+	Body mapstr.M
 }
 
 // DefaultSupport configures a new default ILM support implementation.

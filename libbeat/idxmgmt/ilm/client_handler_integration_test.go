@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -203,12 +204,12 @@ func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
 	c := newMockClient("")
 	h := ilm.NewFileClientHandler(c)
 	name := "test-policy"
-	body := common.MapStr{"foo": "bar"}
+	body := mapstr.M{"foo": "bar"}
 	h.CreateILMPolicy(ilm.Policy{Name: name, Body: body})
 
 	assert.Equal(t, name, c.name)
 	assert.Equal(t, "policy", c.component)
-	var out common.MapStr
+	var out mapstr.M
 	json.Unmarshal([]byte(c.body), &out)
 	assert.Equal(t, body, out)
 }

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: aws
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/aws/_meta/docs.asciidoc
+
 
 [[metricbeat-module-aws]]
 [role="xpack"]
@@ -322,6 +324,8 @@ to the IRSA:
 In this case there's no need to add `role_arn` to modules config.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -459,3 +463,4 @@ include::aws/usage.asciidoc[]
 
 include::aws/vpn.asciidoc[]
 
+:edit_url!:

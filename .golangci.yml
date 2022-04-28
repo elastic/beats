@@ -21,6 +21,9 @@ issues:
     - linters:
         - stylecheck
       text: "ST1003:"
+    # From mage we are priting to the console to ourselves
+    - path: (.*magefile.go|.*dev-tools/mage/.*)
+      linters: forbidigo
 
 output:
   sort-results: true
@@ -68,7 +71,6 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - godox # tool for detection of FIXME, TODO and other comment keywords
     - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
@@ -89,8 +91,8 @@ linters-settings:
   goconst:
     # minimal length of string constant, 3 by default
     min-len: 3
-    # minimal occurrences count to trigger, 3 by default
-    min-occurrences: 2
+    # minimal occurrences count to trigger
+    min-occurrences: 5
 
   dupl:
     # tokens count to trigger issue, 150 by default
@@ -120,7 +122,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.8"
+    go: "1.17.9"
 
   misspell:
     # Correct spellings using locale preferences for US or UK.
@@ -155,12 +157,12 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.8"
+    go: "1.17.9"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.8"
+    go: "1.17.9"
     checks: ["all"]
 
   unparam:
@@ -172,4 +174,4 @@ linters-settings:
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.8"
+    go: "1.17.9"

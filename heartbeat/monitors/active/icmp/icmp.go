@@ -23,6 +23,7 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -119,10 +120,10 @@ func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {
 			return err
 		}
 
-		icmpFields := common.MapStr{"requests": n}
+		icmpFields := mapstr.M{"requests": n}
 		if err == nil {
 			icmpFields["rtt"] = look.RTT(rtt)
-			eventext.MergeEventFields(event, common.MapStr{"icmp": icmpFields})
+			eventext.MergeEventFields(event, mapstr.M{"icmp": icmpFields})
 		}
 
 		return nil

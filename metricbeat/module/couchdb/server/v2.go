@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type V2 struct{}
@@ -35,15 +35,15 @@ func (v *V2) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 		return mb.Event{}, errors.Wrap(err, "error parsing v2 server JSON")
 	}
 
-	event := common.MapStr{
-		"httpd": common.MapStr{
+	event := mapstr.M{
+		"httpd": mapstr.M{
 			"view_reads":                 data.Couchdb.Httpd.ViewReads.Value,
 			"bulk_requests":              data.Couchdb.Httpd.BulkRequests.Value,
 			"clients_requesting_changes": data.Couchdb.Httpd.ClientsRequestingChanges.Value,
 			"temporary_view_reads":       data.Couchdb.Httpd.TemporaryViewReads.Value,
 			"requests":                   data.Couchdb.Httpd.Requests.Value,
 		},
-		"httpd_request_methods": common.MapStr{
+		"httpd_request_methods": mapstr.M{
 			"COPY":   data.Couchdb.HttpdRequestMethods.COPY.Value,
 			"HEAD":   data.Couchdb.HttpdRequestMethods.HEAD.Value,
 			"POST":   data.Couchdb.HttpdRequestMethods.POST.Value,
@@ -51,7 +51,7 @@ func (v *V2) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 			"GET":    data.Couchdb.HttpdRequestMethods.GET.Value,
 			"PUT":    data.Couchdb.HttpdRequestMethods.PUT.Value,
 		},
-		"httpd_status_codes": common.MapStr{
+		"httpd_status_codes": mapstr.M{
 			"200": data.Couchdb.HttpdStatusCodes.Num200.Value,
 			"201": data.Couchdb.HttpdStatusCodes.Num201.Value,
 			"202": data.Couchdb.HttpdStatusCodes.Num202.Value,
@@ -66,7 +66,7 @@ func (v *V2) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 			"412": data.Couchdb.HttpdStatusCodes.Num412.Value,
 			"500": data.Couchdb.HttpdStatusCodes.Num500.Value,
 		},
-		"couchdb": common.MapStr{
+		"couchdb": mapstr.M{
 			"database_writes":   data.Couchdb.DatabaseWrites.Value,
 			"open_databases":    data.Couchdb.OpenDatabases.Value,
 			"auth_cache_misses": data.Couchdb.AuthCacheMisses.Value,
@@ -77,7 +77,7 @@ func (v *V2) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 		},
 	}
 
-	ecs := common.MapStr{}
+	ecs := mapstr.M{}
 	ecs.Put("service.id", info.UUID)
 	ecs.Put("service.version", info.Version)
 

@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
@@ -145,7 +145,7 @@ func generate(
 	for cs.Active() {
 		event := beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"id":    id,
 				"hello": "world",
 				"count": count,
