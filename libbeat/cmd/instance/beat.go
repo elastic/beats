@@ -758,7 +758,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
 			f.Close()
-			return fmt.Errorf("Beat meta file reading error: %v", err)
+			return fmt.Errorf("Beat meta file reading error: %w", err)
 		}
 
 		f.Close()
@@ -962,7 +962,7 @@ func (b *Beat) registerClusterUUIDFetching() error {
 		if err != nil {
 			return err
 		}
-		elasticsearch.RegisterConnectCallback(callback)
+		_, _ = elasticsearch.RegisterConnectCallback(callback)
 	}
 	return nil
 }
@@ -1037,7 +1037,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 // error. If the err is nil or is a GracefulExit error then the method will
 // return nil without logging anything.
 func handleError(err error) error {
-	if err == nil || err == beat.GracefulExit {
+	if err == nil || err == beat.GracefulExit { //nolint:errorlint // keep old behaviour
 		return nil
 	}
 
@@ -1162,13 +1162,13 @@ func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 		api_key, _ := esConfig.String("api_key", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
-			kibanaConfig.SetString("username", -1, username)
+			_ = kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
-			kibanaConfig.SetString("password", -1, password)
+			_ = kibanaConfig.SetString("password", -1, password)
 		}
 		if !kibanaConfig.HasField("api_key") && api_key != "" {
-			kibanaConfig.SetString("api_key", -1, api_key)
+			_ = kibanaConfig.SetString("api_key", -1, api_key)
 		}
 	}
 	return kibanaConfig
