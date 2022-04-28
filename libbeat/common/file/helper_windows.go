@@ -31,22 +31,35 @@ func SafeFileRotate(path, tempfile string) error {
 	// not with using the os.Rename function that Golang offers.
 	// This tries to move the existing file into an old file first and only do the
 	// move after that.
-	if e = os.Remove(old); e != nil {
-		// ignore error in case old doesn't exit yet
-	}
-	if e = os.Rename(path, old); e != nil {
-		// ignore error in case path doesn't exist
-	}
+
+	// ignore error in case old doesn't exit yet
+	_ = os.Remove(old)
+	// ignore error in case path doesn't exist
+	_ = os.Rename(path, old)
 
 	if e = os.Rename(tempfile, path); e != nil {
 		return e
 	}
 
+	// .old file will still exist if path file is already there, it should be removed
+	_ = os.Remove(old)
+
 	// sync all files
+	return SyncParent(path)
+}
+
+// SyncParent fsyncs parent directory
+func SyncParent(path string) error {
 	parent := filepath.Dir(path)
 	if f, err := os.OpenFile(parent, os.O_SYNC|os.O_RDWR, 0755); err == nil {
-		f.Sync()
-		f.Close()
+		err := f.Sync()
+		if err != nil {
+			return err
+		}
+		err = f.Close()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
