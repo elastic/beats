@@ -13,31 +13,7 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 
 - Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -55,20 +31,10 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 - Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
 - Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
 - Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -76,9 +42,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 
 - Add support for port mapping in docker hints. {pull}31243[31243]
 - Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -89,13 +52,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 *Auditbeat*
 
 - Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
 
 *Metricbeat*
 
@@ -108,42 +64,9 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
 
-*Packetbeat*
-
-
-*Functionbeat*
-
-
 *Winlogbeat*
 
 - Improve the error message when the registry file content is invalid. {pull}30543[30543]
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
 
 [[release-notes-8.1.3]]
 === Beats version 8.1.3
