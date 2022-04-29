@@ -17,7 +17,7 @@ func (m *MetricSet) extract(ctx context.Context, extractor sysmetricExtractMetho
 	if out.sysmetricMetrics, err = extractor.sysmetricMetric(ctx); err != nil {
 		return nil, fmt.Errorf("error getting system metrics %w", err)
 	}
-	return
+	return out, nil
 }
 
 // extractAndTransform just composes the ET operations from a ETL. It's called by the Fetch method, which is the one
