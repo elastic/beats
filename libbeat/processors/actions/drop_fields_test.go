@@ -18,9 +18,10 @@
 package actions
 
 import (
+	"testing"
+
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	config2 "github.com/elastic/elastic-agent-libs/config"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 

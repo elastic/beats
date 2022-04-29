@@ -20,10 +20,12 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common/match"
+	"strings"
+
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
-	"strings"
+
+	"github.com/elastic/beats/v7/libbeat/common/match"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
