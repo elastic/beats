@@ -35,9 +35,8 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/elastic-agent-libs/config"
 	c "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/file"
 )
 
 const (
@@ -175,7 +174,7 @@ func (k *FileKeystore) List() ([]string, error) {
 
 // GetConfig returns config.C representation of the key / secret pair to be merged with other
 // loaded configuration.
-func (k *FileKeystore) GetConfig() (*config.C, error) {
+func (k *FileKeystore) GetConfig() (*c.C, error) {
 	k.RLock()
 	defer k.RUnlock()
 
@@ -184,7 +183,7 @@ func (k *FileKeystore) GetConfig() (*config.C, error) {
 		configHash[key] = string(secret.Value)
 	}
 
-	return config.NewConfigFrom(configHash)
+	return c.NewConfigFrom(configHash)
 }
 
 // Create create an empty keystore, if the store already exist we will return an error.
@@ -216,7 +215,7 @@ func (k *FileKeystore) IsPersisted() bool {
 
 // doSave lock/unlocking of the resource need to be done by the caller.
 func (k *FileKeystore) doSave(override bool) error {
-	if k.dirty == false {
+	if !k.dirty {
 		return nil
 	}
 
@@ -245,11 +244,15 @@ func (k *FileKeystore) doSave(override bool) error {
 		return fmt.Errorf("cannot open file to save the keystore to '%s', error: %s", k.Path, err)
 	}
 
-	f.Write(version)
+	// Writing files can and allowed to go wrong here.
+	// Where it is important to write to disk we use SafeFileRotate or safeWriteFile.
+	// As this function only makes a checkpoint, the keystore is going to be in a consistent
+	// state eventually.
+	_, _ = f.Write(version)
 	base64Encoder := base64.NewEncoder(base64.StdEncoding, f)
-	io.Copy(base64Encoder, encrypted)
+	_, _ = io.Copy(base64Encoder, encrypted)
 	base64Encoder.Close()
-	f.Sync()
+	_ = f.Sync()
 	f.Close()
 
 	err = file.SafeFileRotate(k.Path, temporaryPath)
