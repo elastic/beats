@@ -37,16 +37,8 @@ type consumer struct {
 type batch struct {
 	consumer *consumer
 	events   []publisher.Event
-	ack      *ackChan
-	state    ackState
+	ackChan  chan batchAckMsg
 }
-
-type ackState uint8
-
-const (
-	batchActive ackState = iota
-	batchACK
-)
 
 func newConsumer(b *broker) *consumer {
 	return &consumer{
@@ -62,18 +54,23 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 	}
 
 	select {
-	case c.broker.requests <- getRequest{sz: sz, resp: c.resp}:
+	case c.broker.getChan <- getRequest{entryCount: sz, responseChan: c.resp}:
 	case <-c.done:
 		return nil, io.EOF
 	}
 
 	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
+	events := make([]publisher.Event, 0, len(resp.entries))
+	for _, entry := range resp.entries {
+		if event, ok := entry.event.(*publisher.Event); ok {
+			events = append(events, *event)
+		}
+	}
 	return &batch{
 		consumer: c,
-		events:   resp.buf,
-		ack:      resp.ack,
-		state:    batchActive,
+		events:   events,
+		ackChan:  resp.ackChan,
 	}, nil
 }
 
@@ -81,31 +78,14 @@ func (c *consumer) Close() error {
 	if c.closed.Swap(true) {
 		return errors.New("already closed")
 	}
-
 	close(c.done)
 	return nil
 }
 
 func (b *batch) Events() []publisher.Event {
-	if b.state != batchActive {
-		panic("Get Events from inactive batch")
-	}
 	return b.events
 }
 
 func (b *batch) ACK() {
-	if b.state != batchActive {
-		switch b.state {
-		case batchACK:
-			panic("Can not acknowledge already acknowledged batch")
-		default:
-			panic("inactive batch")
-		}
-	}
-
-	b.report()
-}
-
-func (b *batch) report() {
-	b.ack.ch <- batchAckMsg{}
+	b.ackChan <- batchAckMsg{}
 }
