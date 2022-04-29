@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -103,7 +103,7 @@ func TestNewTransformsFromConfig(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.paramCfg)
+			cfg := conf.MustNewConfigFrom(tc.paramCfg)
 			gotTransforms, gotErr := newTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
@@ -123,7 +123,7 @@ type fakeTransform struct{}
 func (fakeTransform) transformName() string { return "fake" }
 
 func TestNewBasicTransformsFromConfig(t *testing.T) {
-	fakeConstr := func(*common.Config, *logp.Logger) (transform, error) {
+	fakeConstr := func(*conf.C, *logp.Logger) (transform, error) {
 		return fakeTransform{}, nil
 	}
 
@@ -159,7 +159,7 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.paramCfg)
+			cfg := conf.MustNewConfigFrom(tc.paramCfg)
 			_, gotErr := newBasicTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)

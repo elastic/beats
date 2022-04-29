@@ -20,8 +20,8 @@ package mb
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // LightMetricSet contains the definition of a non-registered metric set
@@ -103,7 +103,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 // taking into account the light metric set default configurations
 func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	// Initialize config using input defaults as raw config
-	rawConfig, err := common.NewConfigFrom(m.Input.Defaults)
+	rawConfig, err := conf.NewConfigFrom(m.Input.Defaults)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid input defaults")
 	}

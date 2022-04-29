@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -262,7 +262,7 @@ func TestConvertRun(t *testing.T) {
 
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			processor, err := New(common.MustNewConfigFrom(tt.config))
+			processor, err := New(conf.MustNewConfigFrom(tt.config))
 			if err != nil {
 				t.Fatal(err)
 			}

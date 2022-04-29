@@ -19,11 +19,11 @@ package channel
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // ConnectorFunc is an adapter for using ordinary functions as Connector.
-type ConnectorFunc func(*common.Config, beat.ClientConfig) (Outleter, error)
+type ConnectorFunc func(*conf.C, beat.ClientConfig) (Outleter, error)
 
 type pipelineConnector struct {
 	parent   *OutletFactory
@@ -31,20 +31,20 @@ type pipelineConnector struct {
 }
 
 // Connect passes the cfg and the zero value of beat.ClientConfig to the underlying function.
-func (fn ConnectorFunc) Connect(cfg *common.Config) (Outleter, error) {
+func (fn ConnectorFunc) Connect(cfg *conf.C) (Outleter, error) {
 	return fn(cfg, beat.ClientConfig{})
 }
 
 // ConnectWith passes the configuration and the pipeline connection setting to the underlying function.
-func (fn ConnectorFunc) ConnectWith(cfg *common.Config, clientCfg beat.ClientConfig) (Outleter, error) {
+func (fn ConnectorFunc) ConnectWith(cfg *conf.C, clientCfg beat.ClientConfig) (Outleter, error) {
 	return fn(cfg, clientCfg)
 }
 
-func (c *pipelineConnector) Connect(cfg *common.Config) (Outleter, error) {
+func (c *pipelineConnector) Connect(cfg *conf.C) (Outleter, error) {
 	return c.ConnectWith(cfg, beat.ClientConfig{})
 }
 
-func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.ClientConfig) (Outleter, error) {
+func (c *pipelineConnector) ConnectWith(cfg *conf.C, clientCfg beat.ClientConfig) (Outleter, error) {
 	// connect with updated configuration
 	client, err := c.pipeline.ConnectWith(clientCfg)
 	if err != nil {

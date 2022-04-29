@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -56,7 +56,7 @@ func TestLegacyServiceNameConfig(t *testing.T) {
 
 	for _, cm := range confMaps {
 		t.Run(fmt.Sprintf("given config map %#v", cm), func(t *testing.T) {
-			c, err := common.NewConfigFrom(cm)
+			c, err := conf.NewConfigFrom(cm)
 			require.NoError(t, err)
 			f, err := ConfigToStdMonitorFields(c)
 			require.Equal(t, srvName, f.Service.Name)

@@ -23,8 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,12 +42,12 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 		t.Run(name, func(t *testing.T) {
 			ps := make([]*processors.Processors, len(test.cfg))
 			for i := range test.cfg {
-				config, err := common.NewConfigWithYAML([]byte(test.cfg[i]), "test")
+				config, err := conf.NewConfigWithYAML([]byte(test.cfg[i]), "test")
 				if err != nil {
 					t.Fatalf("Failed to create config(%v): %+v", i, err)
 				}
 
-				ps[i], err = processors.New([]*common.Config{config})
+				ps[i], err = processors.New([]*conf.C{config})
 				if err != nil {
 					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
 				}

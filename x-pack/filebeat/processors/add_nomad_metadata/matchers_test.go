@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,7 +42,7 @@ func TestLogsPathMatcherWithAllocation(t *testing.T) {
 }
 
 func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult string) {
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 	if cfgLogsPath != "" {
 		cfg.SetString("logs_path", -1, cfgLogsPath)
 	}

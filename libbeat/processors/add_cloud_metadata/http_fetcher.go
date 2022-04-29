@@ -26,8 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,7 +46,7 @@ type schemaConv func(m map[string]interface{}) mapstr.M
 
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
-	c *common.Config,
+	c *cfg.C,
 	provider string,
 	headers map[string]string,
 	host string,
@@ -128,12 +128,12 @@ func (f *httpMetadataFetcher) fetchRaw(
 }
 
 // getMetadataURLs loads config and generates the metadata URLs.
-func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
+func getMetadataURLs(c *cfg.C, defaultHost string, metadataURIs []string) ([]string, error) {
 	return getMetadataURLsWithScheme(c, "http", defaultHost, metadataURIs)
 }
 
 // getMetadataURLsWithScheme loads config and generates the metadata URLs.
-func getMetadataURLsWithScheme(c *common.Config, scheme string, defaultHost string, metadataURIs []string) ([]string, error) {
+func getMetadataURLsWithScheme(c *cfg.C, scheme string, defaultHost string, metadataURIs []string) ([]string, error) {
 	var urls []string
 	config := struct {
 		MetadataHostAndPort string            `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).

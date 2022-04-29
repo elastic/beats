@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
@@ -129,7 +129,7 @@ func TestUnnestStream(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			src, err := common.NewConfigFrom(test.cfg)
+			src, err := conf.NewConfigFrom(test.cfg)
 			require.NoError(t, err)
 
 			unnested, err := UnnestStream(src)

@@ -21,11 +21,11 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/format"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,7 +46,7 @@ type Matchers struct {
 	matchers []Matcher
 }
 
-type MatcherConstructor func(config common.Config) (Matcher, error)
+type MatcherConstructor func(config config.C) (Matcher, error)
 
 func NewMatchers(configs PluginConfig) *Matchers {
 	matchers := []Matcher{}
@@ -98,7 +98,7 @@ type FieldMatcher struct {
 	MatchFields []string
 }
 
-func NewFieldMatcher(cfg common.Config) (Matcher, error) {
+func NewFieldMatcher(cfg config.C) (Matcher, error) {
 	config := struct {
 		LookupFields []string `config:"lookup_fields"`
 	}{}
@@ -133,7 +133,7 @@ type FieldFormatMatcher struct {
 	Codec codec.Codec
 }
 
-func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
+func NewFieldFormatMatcher(cfg config.C) (Matcher, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{}

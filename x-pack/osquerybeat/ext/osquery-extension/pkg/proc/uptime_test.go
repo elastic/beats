@@ -8,9 +8,10 @@
 package proc
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"testing/fstest"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var uptime = "179118.54 1008710.15"

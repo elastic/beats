@@ -28,9 +28,9 @@ import (
 	"go.elastic.co/apm/v2"
 	apmtransport "go.elastic.co/apm/v2/transport"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Instrumentation is an interface that can return an APM tracer a net.listener
@@ -134,7 +134,7 @@ type HeapProfiling struct {
 }
 
 // New configures and returns an instrumentation object for tracing
-func New(cfg *common.Config, beatName, beatVersion string) (Instrumentation, error) {
+func New(cfg *config.C, beatName, beatVersion string) (Instrumentation, error) {
 	if !cfg.HasField("instrumentation") {
 		return &instrumentation{}, nil
 	}
@@ -144,18 +144,18 @@ func New(cfg *common.Config, beatName, beatVersion string) (Instrumentation, err
 		return &instrumentation{}, nil
 	}
 
-	config := Config{}
+	c := Config{}
 
 	if instrConfig == nil {
-		instrConfig = common.NewConfig()
+		instrConfig = config.NewConfig()
 	}
-	err = instrConfig.Unpack(&config)
+	err = instrConfig.Unpack(&c)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create tracer, err: %v", err)
 	}
 
-	return initTracer(config, beatName, beatVersion)
+	return initTracer(c, beatName, beatVersion)
 }
 
 func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, error) {

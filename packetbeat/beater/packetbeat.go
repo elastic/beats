@@ -22,11 +22,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/service"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -79,12 +79,12 @@ func initialConfig() config.Config {
 
 // Beater object. Contains all objects needed to run the beat
 type packetbeat struct {
-	config  *common.Config
+	config  *conf.C
 	factory *processorFactory
 	done    chan struct{}
 }
 
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	configurator := config.NewAgentConfig
 	if !b.Manager.Enabled() {
 		configurator = initialConfig().FromStatic

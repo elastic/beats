@@ -21,8 +21,8 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,7 +34,7 @@ type namespace struct {
 }
 
 // NewNamespaceMetadataGenerator creates a metagen for namespace resources
-func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store, client k8s.Interface) MetaGen {
+func NewNamespaceMetadataGenerator(cfg *config.C, namespaces cache.Store, client k8s.Interface) MetaGen {
 	return &namespace{
 		resource: NewResourceMetadataGenerator(cfg, client),
 		store:    namespaces,

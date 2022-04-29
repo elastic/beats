@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -46,6 +45,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 
 	_ "github.com/elastic/beats/v7/filebeat/include"
@@ -83,12 +83,12 @@ type StateStore interface {
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
-	return func(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+	return func(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return newBeater(b, plugins, rawConfig)
 	}
 }
 
-func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (beat.Beater, error) {
+func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
@@ -168,7 +168,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	}
 
 	overwritePipelines := true
-	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
@@ -429,7 +429,7 @@ func (fb *Filebeat) Stop() {
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {

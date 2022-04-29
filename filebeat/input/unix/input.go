@@ -26,8 +26,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -47,7 +47,7 @@ func Plugin() input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (stateless.Input, error) {
+func configure(cfg *conf.C) (stateless.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

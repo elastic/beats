@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -92,17 +93,17 @@ func init() {
 }
 
 // New constructs a new add_process_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (processors.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, false)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
-func NewWithCache(cfg *common.Config) (processors.Processor, error) {
+func NewWithCache(cfg *conf.C) (processors.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider, withCache bool) (proc processors.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetadataProvider, withCache bool) (proc processors.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())

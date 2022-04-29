@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -34,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -82,7 +82,7 @@ func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.Pl
 }
 
 // Create makes a new Runner for a new monitor with the given Config.
-func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runner, error) {
+func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
@@ -136,11 +136,11 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
-func (f *RunnerFactory) CheckConfig(config *common.Config) error {
+func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
-func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.ConfigEditor, error) {
+func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor, error) {
 	var settings publishSettings
 	if err := cfg.Unpack(&settings); err != nil {
 		return nil, err
