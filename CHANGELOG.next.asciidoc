@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
 - Netflow: replace invalid field value. {pull}31295[31295]
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 
 *Heartbeat*
 

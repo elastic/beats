@@ -22,7 +22,7 @@ processors:
       - source.user.name
       - cisco.umbrella.identities
       - source.address
-      - destination.address
+      - source.nat.ip
       - cisco.umbrella.action
       - dns.question.type
       - dns.response_code
@@ -192,16 +192,38 @@ processors:
     if: ctx?.cisco?.umbrella?.action != null
 
 # Converting address fields to either ip or domain
-- grok:
+- convert:
     field: source.address
-    patterns:
-      - "(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})"
-    ignore_failure: true
-- grok:
+    target_field: source.ip
+    type: ip
+    ignore_missing: true
+    on_failure:
+      - set:
+          copy_from: source.address
+          field: source.domain
+          override: true
+
+- convert:
     field: destination.address
-    patterns:
-      - "(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})"
-    ignore_failure: true
+    target_field: destination.ip
+    type: ip
+    ignore_missing: true
+    on_failure:
+      - set:
+          field: destination.domain
+          copy_from: destination.address
+          override: true
+
+# For nat, there's no address or domain subfield.
+# If the value is not a valid IP, it must be removed
+# or ingestion will fail. Probably just an empty value.
+- convert:
+    field: source.nat.ip
+    type: ip
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: source.nat.ip
 
 - community_id:
     ignore_missing: true
