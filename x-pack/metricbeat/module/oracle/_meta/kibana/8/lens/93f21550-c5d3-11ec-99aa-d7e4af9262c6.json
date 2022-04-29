@@ -133,7 +133,7 @@
                 "yTitle": "Total Index Scans per transaction"
             }
         },
-        "title": "Total Index Scans per transaction",
+        "title": "Total Index Scans per transaction [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

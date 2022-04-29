@@ -117,7 +117,7 @@
                 "yTitle": "Network Traffic Volume per second"
             }
         },
-        "title": "Network Traffic Volume per second",
+        "title": "Network Traffic Volume per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

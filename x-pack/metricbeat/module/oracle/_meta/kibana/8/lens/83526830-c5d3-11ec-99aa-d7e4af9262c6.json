@@ -134,7 +134,7 @@
                 "yTitle": "Total Table Scans per transaction"
             }
         },
-        "title": "Total Table Scans per transaction",
+        "title": "Total Table Scans per transaction [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

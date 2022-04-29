@@ -172,7 +172,7 @@
                 "yTitle": "Physical Writes per second"
             }
         },
-        "title": "Physical Writes per second",
+        "title": "Physical Writes per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

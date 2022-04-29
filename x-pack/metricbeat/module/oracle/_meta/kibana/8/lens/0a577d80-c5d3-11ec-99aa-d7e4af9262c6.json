@@ -78,7 +78,7 @@
                 "layerType": "data"
             }
         },
-        "title": "Average Active Sessions",
+        "title": "Average Active Sessions [Metricbeat Oracle]",
         "visualizationType": "lnsMetric"
     },
     "coreMigrationVersion": "8.1.0",

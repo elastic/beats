@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package sysmetric
 
 import (
@@ -10,14 +14,14 @@ type sysmetricExtractMethod interface {
 	sysmetricMetric(context.Context) ([]sysmetricMetric, error)
 }
 
-// extractedData contains the necessary system metric information. 
+// extractedData contains the necessary system metric information.
 type extractedData struct {
-	sysmetricMetrics        []sysmetricMetric
+	sysmetricMetrics []sysmetricMetric
 }
 
 // sysmetricExtractor is the implementor of sysmetricExtractMethod. It's implementation are on different Go files
 // which refers to the origin of the data for organization purposes.
 type sysmetricExtractor struct {
-	db *sql.DB
+	db       *sql.DB
 	patterns []string
 }

@@ -78,7 +78,7 @@
                 "layerType": "data"
             }
         },
-        "title": "Response Time per transaction",
+        "title": "Response Time per transaction [Metricbeat Oracle]",
         "visualizationType": "lnsMetric"
     },
     "coreMigrationVersion": "8.1.0",

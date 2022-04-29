@@ -133,7 +133,7 @@
                 "yTitle": "DB Block Changes per second"
             }
         },
-        "title": "DB Block Changes per second",
+        "title": "DB Block Changes per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

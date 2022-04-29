@@ -94,7 +94,7 @@
                 "yTitle": "Physical Reads per second"
             }
         },
-        "title": "Physical Reads per second",
+        "title": "Physical Reads per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

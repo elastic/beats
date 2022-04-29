@@ -131,7 +131,7 @@
                 "yTitle": "User Rollbacks per second"
             }
         },
-        "title": "User Rollbacks per second",
+        "title": "User Rollbacks per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

@@ -11,7 +11,7 @@
   enabled: true
   hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
 - module: oracle
-  period: 10m
+  period: 60s
   metricsets:
     - sysmetric
   enabled: true

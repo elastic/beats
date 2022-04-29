@@ -81,7 +81,7 @@
                 "layerType": "data"
             }
         },
-        "title": "Session Count",
+        "title": "Session Count [Metricbeat Oracle]",
         "visualizationType": "lnsMetric"
     },
     "coreMigrationVersion": "8.1.0",

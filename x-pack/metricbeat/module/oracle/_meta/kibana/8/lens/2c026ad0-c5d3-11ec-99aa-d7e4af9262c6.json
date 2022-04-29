@@ -117,7 +117,7 @@
                 "yTitle": "CPU Usage per second"
             }
         },
-        "title": "CPU Usage per second",
+        "title": "CPU Usage per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

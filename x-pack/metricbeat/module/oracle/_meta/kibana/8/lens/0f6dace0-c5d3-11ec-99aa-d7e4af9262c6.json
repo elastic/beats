@@ -119,7 +119,7 @@
                 "yTitle": "User Transactions per second"
             }
         },
-        "title": "User Transactions per second",
+        "title": "User Transactions per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

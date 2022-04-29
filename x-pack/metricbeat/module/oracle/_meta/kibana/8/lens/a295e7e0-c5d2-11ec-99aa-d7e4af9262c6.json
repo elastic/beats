@@ -114,7 +114,7 @@
                 "yTitle": "Host CPU Utilization (%)"
             }
         },
-        "title": "Host CPU Utilization (%)",
+        "title": "Host CPU Utilization (%) [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",

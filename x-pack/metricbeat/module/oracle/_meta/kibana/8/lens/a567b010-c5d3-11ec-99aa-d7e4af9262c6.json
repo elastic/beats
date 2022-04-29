@@ -117,7 +117,7 @@
                 "yTitle": "Physical Read Total Bytes per second"
             }
         },
-        "title": "Physical Read Total Bytes per second",
+        "title": "Physical Read Total Bytes per second [Metricbeat Oracle]",
         "visualizationType": "lnsXY"
     },
     "coreMigrationVersion": "8.1.0",
