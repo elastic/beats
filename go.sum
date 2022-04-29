@@ -569,8 +569,6 @@ github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 h1:lnDkqiRFKm0rxdljqr
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3/go.mod h1:aPqzac6AYkipvp4hufTyMj5PDIphF3+At8zr7r51xjY=
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6 h1:nFvXHBjYK3e9+xF0WKDeAKK4aOO51uC28s+L9rBmilo=
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6/go.mod h1:uh/Gj9a0XEbYoM4NYz4LvaBVARz3QXLmlNjsrKY9fTc=
-github.com/elastic/elastic-agent-libs v0.1.1 h1:13Y268vfgkZK99Ql1X2WdT8jjpd01stln2wLvlewkbo=
-github.com/elastic/elastic-agent-libs v0.1.1/go.mod h1:h8K/f7RcdxM2f19VahcS1jeco170ItqV9N7HyYsn9Ss=
 github.com/elastic/elastic-agent-libs v0.2.3 h1:GY8M0fxOs/GBY2nIB+JOB91aoD72S87iEcm2qVGFUqI=
 github.com/elastic/elastic-agent-libs v0.2.3/go.mod h1:1xDLBhIqBIjhJ7lr2s+xRFFkQHpitSp8q2zzv1Dqg+s=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
