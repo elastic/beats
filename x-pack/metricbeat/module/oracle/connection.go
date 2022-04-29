@@ -37,18 +37,10 @@ func init() {
 
 // NewConnection returns a connection already established with Oracle
 func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
-	host, username, password, err := parse.OracleUrlParser(c.Hosts[0])
-	if err != nil {
-		return nil, fmt.Errorf("error trying to parse URL in field 'hosts': %w", err)
-	}
-
-	params, err := godror.ParseConnString(host)
+	params, err := godror.ParseConnString(c.Hosts[0])
 	if err != nil {
 		return nil, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}
-
-	params.Username = username
-	params.Password = password
 
 	if params.Username == "" {
 		params.Username = c.Username

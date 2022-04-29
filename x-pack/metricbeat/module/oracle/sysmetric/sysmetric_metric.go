@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type sysmetricMetric struct {
@@ -29,25 +29,22 @@ type sysmetricMetric struct {
 /*
  * The following function executes a query that produces the following result
  *
- * BEGIN_TIM END_TIME  INTSIZE_CSEC   GROUP_ID  METRIC_ID
- * METRIC_NAME                                                           VALUE
- * METRIC_UNIT                                                          CON_ID
- * 19-APR-22 19-APR-22         6042          2       2146
- * I/O Requests per Second                                          2.99569679
- * Requests per Second                                                       0
+ * BEGIN_TIM END_TIME  INTSIZE_CSEC GROUP_ID  METRIC_ID METRIC_NAME				VALUE	   METRIC_UNIT		   CON_ID
+ * 19-APR-22 19-APR-22         6042        2       2146 I/O Requests per Second 2.99569679 Requests per Second 0                                                      0
  *
  * Which is parsed into sysmetricMetric instances
  */
-
 func (e *sysmetricExtractor) calQuery() string {
 	if len(e.patterns) == 0 {
 		e.patterns = []string{"%"}
 	}
+
 	query := "SELECT * FROM V$SYSMETRIC WHERE (" + "METRIC_NAME LIKE '" + e.patterns[0] + "'"
-	for i := 1; i < len(e.patterns); i++ {
-		query = query + " OR " + "METRIC_NAME LIKE '" + e.patterns[i] + "'"
+	for _, pattern := range e.patterns {
+		query = query + " OR " + "METRIC_NAME LIKE '" + pattern + "'"
 	}
 	query = query + ")"
+
 	return query
 }
 
@@ -71,13 +68,12 @@ func (e *sysmetricExtractor) sysmetricMetric(ctx context.Context) ([]sysmetricMe
 	return results, nil
 }
 
-func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) map[string]common.MapStr {
-	out := make(map[string]common.MapStr)
-
+func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) map[string]mapstr.M {
+	out := make(map[string]mapstr.M)
 	for _, sysmetricMetric := range bs {
 		key := strconv.Itoa(int(sysmetricMetric.metricId.Int64)) + strconv.Itoa(int(sysmetricMetric.groupId.Int64))
 
-		out[key] = common.MapStr{}
+		out[key] = mapstr.M{}
 
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.begin_time", &oracle.StringValue{NullString: sysmetricMetric.beginTime})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.end_time", &oracle.StringValue{NullString: sysmetricMetric.endTime})

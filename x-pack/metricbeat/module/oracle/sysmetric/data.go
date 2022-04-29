@@ -17,7 +17,6 @@ func (m *MetricSet) extract(ctx context.Context, extractor sysmetricExtractMetho
 	if out.sysmetricMetrics, err = extractor.sysmetricMetric(ctx); err != nil {
 		return nil, fmt.Errorf("error getting system metrics %w", err)
 	}
-
 	return
 }
 
@@ -28,19 +27,17 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 	if err != nil {
 		return nil, fmt.Errorf("error extracting data %w", err)
 	}
-
 	return m.transform(extractedMetricsData), nil
 }
 
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
 // to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
-// was necessary. More than one different event is generated. Refer to the _meta folder too see ones.
+// was necessary. Data is organized by sysmetric entity that contains metrics details.
 func (m *MetricSet) transform(in *extractedData) []mb.Event {
 	sysMetric := m.addSysmetricData(in.sysmetricMetrics)
 	events := make([]mb.Event, 0)
 	for _, v := range sysMetric {
 		events = append(events, mb.Event{MetricSetFields: v})
 	}
-
 	return events
 }

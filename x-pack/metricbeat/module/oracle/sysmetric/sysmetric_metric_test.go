@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func Test_sysmetricExtractor_calQuery(t *testing.T) {
+func TestSysmetricExtractorCalQuery(t *testing.T) {
 	type fields struct {
 		patterns []string
 	}
@@ -16,8 +16,16 @@ func Test_sysmetricExtractor_calQuery(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		{fields{patterns: []string{"foo%", "%bar", "%foobar%"}}, "SELECT * FROM V$SYSMETRIC WHERE (METRIC_NAME LIKE 'foo%' OR METRIC_NAME LIKE '%bar' OR METRIC_NAME LIKE '%foobar%')"},
-		{fields{}, "SELECT * FROM V$SYSMETRIC WHERE (METRIC_NAME LIKE '%')"},
+		{
+			fields{
+				patterns: []string{"foo%", "%bar", "%foobar%"},
+			},
+			"SELECT * FROM V$SYSMETRIC WHERE (METRIC_NAME LIKE 'foo%' OR METRIC_NAME LIKE '%bar' OR METRIC_NAME LIKE '%foobar%')",
+		},
+		{
+			fields{},
+			"SELECT * FROM V$SYSMETRIC WHERE (METRIC_NAME LIKE '%')",
+		},
 	}
 	for _, tt := range tests {
 		t.Run("test func CalQuery()", func(t *testing.T) {
