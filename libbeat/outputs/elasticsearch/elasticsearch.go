@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -36,7 +37,7 @@ func makeES(
 	im outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *config.C,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	if !cfg.HasField("bulk_max_size") {
@@ -124,7 +125,7 @@ func makeES(
 func buildSelectors(
 	im outputs.IndexManager,
 	beat beat.Info,
-	cfg *common.Config,
+	cfg *config.C,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	index, err = im.BuildSelector(cfg)
 	if err != nil {
@@ -143,7 +144,7 @@ func buildSelectors(
 	return index, pipeline, err
 }
 
-func buildPipelineSelector(cfg *common.Config) (outil.Selector, error) {
+func buildPipelineSelector(cfg *config.C) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "pipeline",
 		MultiKey:         "pipelines",

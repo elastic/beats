@@ -24,14 +24,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // parseGeoConfig converts the map into a GeoConfig.
 // Going through go-ucfg we test the config to struct transform / validation.
 func parseConfig(t *testing.T, configMap map[string]interface{}) GeoConfig {
-	config, err := common.NewConfigFrom(configMap)
+	config, err := config.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
 	geoConfig := GeoConfig{}

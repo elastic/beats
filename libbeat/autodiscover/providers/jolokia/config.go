@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -35,8 +35,8 @@ type Config struct {
 	// List of network interfaces to use for discovery probes
 	Interfaces []InterfaceConfig `config:"interfaces,replace" validate:"nonzero"`
 
-	Builders  []*common.Config        `config:"builders"`
-	Appenders []*common.Config        `config:"appenders"`
+	Builders  []*config.C             `config:"builders"`
+	Appenders []*config.C             `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
 }
 
@@ -56,7 +56,7 @@ type InterfaceConfig struct {
 }
 
 // Unpack implements the config unpacker for interface configs
-func (c *InterfaceConfig) Unpack(from *common.Config) error {
+func (c *InterfaceConfig) Unpack(from *config.C) error {
 	// Overriding Unpack just to set defaults
 	// See https://github.com/elastic/go-ucfg/issues/104
 	type tmpConfig InterfaceConfig

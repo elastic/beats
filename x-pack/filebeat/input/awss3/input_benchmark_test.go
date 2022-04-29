@@ -22,13 +22,13 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -141,7 +141,7 @@ func (c constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
 }
 
 func makeBenchmarkConfig(t testing.TB) config {
-	cfg := common.MustNewConfigFrom(`---
+	cfg := conf.MustNewConfigFrom(`---
 queue_url: foo
 file_selectors:
 -

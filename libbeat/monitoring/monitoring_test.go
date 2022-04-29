@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestIsBufferEnabled(t *testing.T) {
@@ -56,7 +56,7 @@ func TestIsBufferEnabled(t *testing.T) {
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(tt.input)
+			cfg, err := config.NewConfigFrom(tt.input)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expect, IsBufferEnabled(cfg))
 		})

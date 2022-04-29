@@ -21,24 +21,24 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Config struct {
-	Interfaces      InterfacesConfig          `config:"interfaces"`
-	Flows           *Flows                    `config:"flows"`
-	Protocols       map[string]*common.Config `config:"protocols"`
-	ProtocolsList   []*common.Config          `config:"protocols"`
-	Procs           procs.ProcsConfig         `config:"procs"`
-	IgnoreOutgoing  bool                      `config:"ignore_outgoing"`
-	ShutdownTimeout time.Duration             `config:"shutdown_timeout"`
+	Interfaces      InterfacesConfig   `config:"interfaces"`
+	Flows           *Flows             `config:"flows"`
+	Protocols       map[string]*conf.C `config:"protocols"`
+	ProtocolsList   []*conf.C          `config:"protocols"`
+	Procs           procs.ProcsConfig  `config:"procs"`
+	IgnoreOutgoing  bool               `config:"ignore_outgoing"`
+	ShutdownTimeout time.Duration      `config:"shutdown_timeout"`
 }
 
-// FromStatic initializes a configuration given a common.Config
-func (c Config) FromStatic(cfg *common.Config) (Config, error) {
+// FromStatic initializes a configuration given a config.C
+func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
 		return c, err
@@ -47,8 +47,8 @@ func (c Config) FromStatic(cfg *common.Config) (Config, error) {
 }
 
 // ICMP returns the ICMP configuration
-func (c Config) ICMP() (*common.Config, error) {
-	var icmp *common.Config
+func (c Config) ICMP() (*conf.C, error) {
+	var icmp *conf.C
 	if c.Protocols["icmp"].Enabled() {
 		icmp = c.Protocols["icmp"]
 	}

@@ -13,9 +13,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -26,7 +26,7 @@ func TestValidLocal(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
@@ -63,7 +63,7 @@ func TestValidInline(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
@@ -87,7 +87,7 @@ func TestValidInline(t *testing.T) {
 }
 
 func TestNameRequired(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"id": "myId",
 		"source": mapstr.M{
 			"inline": mapstr.M{
@@ -100,7 +100,7 @@ func TestNameRequired(t *testing.T) {
 }
 
 func TestIDRequired(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name": "My Name",
 		"source": mapstr.M{
 			"inline": mapstr.M{
@@ -113,7 +113,7 @@ func TestIDRequired(t *testing.T) {
 }
 
 func TestEmptySource(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
 	s, e := NewSuite(cfg)

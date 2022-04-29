@@ -25,15 +25,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestConfigIncludeMatches(t *testing.T) {
 	verify := func(t *testing.T, yml string) {
 		t.Helper()
 
-		c, err := common.NewConfigWithYAML([]byte(yml), "source")
+		c, err := conf.NewConfigWithYAML([]byte(yml), "source")
 		require.NoError(t, err)
 
 		conf := defaultConfig()

@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -50,7 +50,7 @@ func TestNew(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			config := common.MustNewConfigFrom(test.config)
+			config := conf.MustNewConfigFrom(test.config)
 			_, err := new(config)
 			if test.err == "" {
 				require.NoError(t, err)
@@ -152,7 +152,7 @@ func TestRateLimit(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			p, err := new(common.MustNewConfigFrom(test.config))
+			p, err := new(conf.MustNewConfigFrom(test.config))
 			require.NoError(t, err)
 
 			fakeClock := clockwork.NewFakeClock()

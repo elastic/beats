@@ -23,26 +23,26 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	Paths          []string                `config:"paths"`
-	Close          closerConfig            `config:"close"`
-	FileWatcher    *common.ConfigNamespace `config:"prospector"`
-	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
-	CleanInactive  time.Duration           `config:"clean_inactive" validate:"min=0"`
-	CleanRemoved   bool                    `config:"clean_removed"`
-	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
-	IgnoreOlder    time.Duration           `config:"ignore_older"`
-	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
-	Rotation       *common.ConfigNamespace `config:"rotation"`
+	Paths          []string           `config:"paths"`
+	Close          closerConfig       `config:"close"`
+	FileWatcher    *conf.Namespace    `config:"prospector"`
+	FileIdentity   *conf.Namespace    `config:"file_identity"`
+	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool               `config:"clean_removed"`
+	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
+	IgnoreOlder    time.Duration      `config:"ignore_older"`
+	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
+	Rotation       *conf.Namespace    `config:"rotation"`
 }
 
 type closerConfig struct {
@@ -81,7 +81,7 @@ type backoffConfig struct {
 }
 
 type rotationConfig struct {
-	Strategy *common.ConfigNamespace `config:"strategy" validate:"required"`
+	Strategy *conf.Namespace `config:"strategy" validate:"required"`
 }
 
 type commonRotationConfig struct {

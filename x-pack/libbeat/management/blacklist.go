@@ -11,8 +11,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -102,7 +102,7 @@ func (c *ConfigBlacklist) isBlacklisted(blockType string, block *ConfigBlock) bo
 	return false
 }
 
-func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []string, current *common.Config) bool {
+func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []string, current *conf.C) bool {
 	if current.IsDict() {
 		switch len(segments) {
 		case 0:

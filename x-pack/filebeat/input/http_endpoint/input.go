@@ -12,10 +12,10 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -38,7 +38,7 @@ func Plugin() v2.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (stateless.Input, error) {
+func configure(cfg *conf.C) (stateless.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err

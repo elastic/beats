@@ -32,7 +32,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -41,6 +40,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -174,7 +174,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	connection := esConnect(t, index)
 
 	bulkSize := 0
-	config, _ := common.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
 		"bulk_max_size":    &bulkSize,
@@ -184,7 +184,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	})
 
 	info := beat.Info{Beat: "libbeat"}
-	im, err := idxmgmt.DefaultSupport(nil, info, common.MustNewConfigFrom(
+	im, err := idxmgmt.DefaultSupport(nil, info, conf.MustNewConfigFrom(
 		map[string]interface{}{
 			"setup.ilm.enabled": false,
 		},

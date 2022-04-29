@@ -5,8 +5,8 @@
 package management
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config for central management
@@ -39,9 +39,9 @@ func defaultConfig() *Config {
 	}
 }
 
-// Config returns a common.Config object holding the config from this block
-func (c *ConfigBlock) Config() (*common.Config, error) {
-	return common.NewConfigFrom(c.Raw)
+// Config returns a config.C object holding the config from this block
+func (c *ConfigBlock) Config() (*conf.C, error) {
+	return conf.NewConfigFrom(c.Raw)
 }
 
 // ConfigWithMeta returns a reload.ConfigWithMeta object holding the config from this block, meta will be nil

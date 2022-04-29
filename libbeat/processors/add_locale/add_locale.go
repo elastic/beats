@@ -25,9 +25,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type addLocale struct {
@@ -58,7 +58,7 @@ func init() {
 }
 
 // New constructs a new add_locale processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *config.C) (processors.Processor, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{

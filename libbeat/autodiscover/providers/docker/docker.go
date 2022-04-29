@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
@@ -66,7 +67,7 @@ func AutodiscoverBuilder(
 	beatName string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *config.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
@@ -332,7 +333,7 @@ func (d *Provider) publish(events []bus.Event) {
 		return
 	}
 
-	configs := make([]*common.Config, 0)
+	configs := make([]*config.C, 0)
 	for _, event := range events {
 		// Try to match a config
 		if config := d.templates.GetConfig(event); config != nil {
