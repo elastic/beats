@@ -20,8 +20,6 @@ package node_rules
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -70,10 +68,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	}
 
 	if err = m.fetchMetrics(r); err != nil {
-		return errors.Wrap(err, "error trying to get node rule data from Kibana")
+		return fmt.Errorf("error trying to get node rule data from Kibana: %w", err)
 	}
 
-	return
+	return nil
 }
 
 func (m *MetricSet) init() error {

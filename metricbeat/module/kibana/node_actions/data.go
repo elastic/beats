@@ -19,8 +19,7 @@ package node_actions
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
@@ -61,7 +60,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Node Actions API response")
+		return fmt.Errorf("failure parsing Kibana Node Actions API response: %w", err)
 	}
 
 	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
@@ -101,7 +100,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 	actionsFields, err := actionsSchema.Apply(data.Actions)
 	if err != nil {
-		return errors.Wrap(err, "failure to apply node actions specific schema")
+		return fmt.Errorf("failure to apply node actions specific schema: %w", err)
 	}
 	event.MetricSetFields = actionsFields
 

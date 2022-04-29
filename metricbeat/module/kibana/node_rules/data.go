@@ -19,8 +19,7 @@ package node_rules
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
@@ -61,7 +60,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Node Rules API response")
+		return fmt.Errorf("failure parsing Kibana Node Rules API response: %w", err)
 	}
 
 	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
@@ -101,7 +100,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 	rulesFields, err := rulesSchema.Apply(data.Rules)
 	if err != nil {
-		return errors.Wrap(err, "failure to apply node_rules specific schema")
+		return fmt.Errorf("failure to apply node_rules specific schema: %w", err)
 	}
 	event.MetricSetFields = rulesFields
 
