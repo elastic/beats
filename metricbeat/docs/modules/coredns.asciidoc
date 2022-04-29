@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: coredns
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/coredns/_meta/docs.asciidoc
+
 
 [[metricbeat-module-coredns]]
 [role="xpack"]
@@ -26,6 +28,8 @@ The CoreDNS module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat_coredns_dashboard.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -51,3 +55,4 @@ The following metricsets are available:
 
 include::coredns/stats.asciidoc[]
 
+:edit_url!:

@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -67,7 +69,7 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &amqpPlugin{}
 	config := defaultConfig
@@ -289,7 +291,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	if msg.fields != nil {
 		trans.amqp = msg.fields
 	} else {
-		trans.amqp = common.MapStr{}
+		trans.amqp = mapstr.M{}
 	}
 
 	// if error or exception, publish it now. sometimes client or server never send
@@ -556,7 +558,7 @@ func isCloseError(t *amqpTransaction) bool {
 		getReplyCode(t.amqp) >= 300
 }
 
-func getReplyCode(m common.MapStr) uint16 {
+func getReplyCode(m mapstr.M) uint16 {
 	code, _ := m["reply-code"].(uint16)
 	return code
 }

@@ -29,12 +29,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	dockertest "github.com/elastic/beats/v7/libbeat/tests/docker"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestAddDockerMetadata(t *testing.T) {
@@ -67,7 +68,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	require.NoError(t, err)
 	pid := info.State.Pid
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := config.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"cid"},
 	})
 	watcherConstructor := newWatcherWith(client)
@@ -75,20 +76,20 @@ func TestAddDockerMetadata(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("match container by container id", func(t *testing.T) {
-		input := &beat.Event{Fields: common.MapStr{
+		input := &beat.Event{Fields: mapstr.M{
 			"cid": id,
 		}}
 		result, err := processor.Run(input)
 		require.NoError(t, err)
 
 		resultLabels, _ := result.Fields.GetValue("container.labels")
-		expectedLabels := common.MapStr{"label": "foo"}
+		expectedLabels := mapstr.M{"label": "foo"}
 		assert.Equal(t, expectedLabels, resultLabels)
 		assert.Equal(t, id, result.Fields["cid"])
 	})
 
 	t.Run("match container by process id", func(t *testing.T) {
-		input := &beat.Event{Fields: common.MapStr{
+		input := &beat.Event{Fields: mapstr.M{
 			"cid":         id,
 			"process.pid": pid,
 		}}
@@ -96,13 +97,13 @@ func TestAddDockerMetadata(t *testing.T) {
 		require.NoError(t, err)
 
 		resultLabels, _ := result.Fields.GetValue("container.labels")
-		expectedLabels := common.MapStr{"label": "foo"}
+		expectedLabels := mapstr.M{"label": "foo"}
 		assert.Equal(t, expectedLabels, resultLabels)
 		assert.Equal(t, id, result.Fields["cid"])
 	})
 
 	t.Run("don't enrich non existing container", func(t *testing.T) {
-		input := &beat.Event{Fields: common.MapStr{
+		input := &beat.Event{Fields: mapstr.M{
 			"cid": "notexists",
 		}}
 		result, err := processor.Run(input)

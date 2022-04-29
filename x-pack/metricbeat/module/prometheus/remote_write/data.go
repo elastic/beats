@@ -16,13 +16,13 @@ import (
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/model"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -34,7 +34,7 @@ const (
 type histogram struct {
 	timestamp  time.Time
 	buckets    []*dto.Bucket
-	labels     common.MapStr
+	labels     mapstr.M
 	metricName string
 }
 
@@ -98,12 +98,12 @@ func (g *remoteWriteTypedGenerator) Stop() {
 // 3. if metrics of histogram type then it is converted to ES histogram
 // 4. metrics with the same set of labels are grouped into same events
 func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
-	var data common.MapStr
+	var data mapstr.M
 	histograms := map[string]histogram{}
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
-		labels := common.MapStr{}
+		labels := mapstr.M{}
 
 		if metric == nil {
 			continue
@@ -131,7 +131,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				ModuleFields: common.MapStr{},
+				ModuleFields: mapstr.M{},
 				Timestamp:    metric.Timestamp.Time(),
 			}
 
@@ -148,12 +148,12 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		e := eventList[labelsHash]
 		switch promType {
 		case counterType:
-			data = common.MapStr{
+			data = mapstr.M{
 				name: g.rateCounterFloat64(name, labels, val),
 			}
 		case otherType:
-			data = common.MapStr{
-				name: common.MapStr{
+			data = mapstr.M{
+				name: mapstr.M{
 					"value": val,
 				},
 			}
@@ -193,8 +193,8 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 }
 
 // rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
-	d := common.MapStr{
+func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels mapstr.M, value uint64) mapstr.M {
+	d := mapstr.M{
 		"counter": value,
 	}
 
@@ -206,8 +206,8 @@ func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels common
 }
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
-	d := common.MapStr{
+func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels mapstr.M, value float64) mapstr.M {
+	d := mapstr.M{
 		"counter": value,
 	}
 	if g.rateCounters {
@@ -223,7 +223,7 @@ func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 		labelsHash := histogram.labels.String() + histogram.timestamp.String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				ModuleFields: common.MapStr{},
+				ModuleFields: mapstr.M{},
 				Timestamp:    histogram.timestamp,
 			}
 
@@ -239,8 +239,8 @@ func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 			Bucket: histogram.buckets,
 		}
 		name := strings.TrimSuffix(histogram.metricName, "_bucket")
-		data := common.MapStr{
-			name: common.MapStr{
+		data := mapstr.M{
+			name: mapstr.M{
 				"histogram": collector.PromHistogramToES(g.counterCache, histogram.metricName, histogram.labels, &hist),
 			},
 		}
@@ -249,7 +249,7 @@ func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 }
 
 // findMetricType evaluates the type of the metric by check the metricname format in order to handle it properly
-func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels common.MapStr) string {
+func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels mapstr.M) string {
 	leLabel := false
 	if _, ok := labels["le"]; ok {
 		leLabel = true

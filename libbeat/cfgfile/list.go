@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -154,8 +155,8 @@ func (r *RunnerList) Has(hash uint64) bool {
 	return ok
 }
 
-// HashConfig hashes a given common.Config
-func HashConfig(c *common.Config) (uint64, error) {
+// HashConfig hashes a given config.C
+func HashConfig(c *config.C) (uint64, error) {
 	var config map[string]interface{}
 	if err := c.Unpack(&config); err != nil {
 		return 0, err
@@ -171,9 +172,9 @@ func (r *RunnerList) copyRunnerList() map[uint64]Runner {
 	return list
 }
 
-func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, config *reload.ConfigWithMeta) (Runner, error) {
+func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *reload.ConfigWithMeta) (Runner, error) {
 	// Pass a copy of the config to the factory, this way if the factory modifies it,
 	// that doesn't affect the hash of the original one.
-	c, _ := common.NewConfigFrom(config.Config)
-	return factory.Create(pipetool.WithDynamicFields(pipeline, config.Meta), c)
+	c, _ := config.NewConfigFrom(cfg.Config)
+	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
 }

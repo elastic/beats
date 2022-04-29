@@ -29,9 +29,10 @@ import (
 
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
@@ -43,17 +44,17 @@ type MetaGen interface {
 	//    "some.ecs.field": "asdf, // populated by GenerateECS()
 	// }
 	// This method is called in top level and returns the complete map of metadata.
-	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
+	Generate(kubernetes.Resource, ...FieldOptions) mapstr.M
 	// GenerateFromName generates metadata for a given resource based on it's name
-	GenerateFromName(string, ...FieldOptions) common.MapStr
+	GenerateFromName(string, ...FieldOptions) mapstr.M
 	// GenerateK8s generates kubernetes metadata for a given resource
-	GenerateK8s(kubernetes.Resource, ...FieldOptions) common.MapStr
+	GenerateK8s(kubernetes.Resource, ...FieldOptions) mapstr.M
 	// GenerateECS generates ECS metadata for a given resource
-	GenerateECS(kubernetes.Resource) common.MapStr
+	GenerateECS(kubernetes.Resource) mapstr.M
 }
 
 // FieldOptions allows additional enrichment to be done on top of existing metadata
-type FieldOptions func(common.MapStr)
+type FieldOptions func(mapstr.M)
 
 type ClusterInfo struct {
 	Url  string
@@ -67,7 +68,7 @@ type ClusterConfiguration struct {
 
 // WithFields FieldOption allows adding specific fields into the generated metadata
 func WithFields(key string, value interface{}) FieldOptions {
-	return func(meta common.MapStr) {
+	return func(meta mapstr.M) {
 		safemapstr.Put(meta, key, value)
 	}
 }
@@ -75,7 +76,7 @@ func WithFields(key string, value interface{}) FieldOptions {
 // WithMetadata FieldOption allows adding labels and annotations under sub-resource(kind)
 // example if kind=namespace namespace.labels key will be added
 func WithMetadata(kind string) FieldOptions {
-	return func(meta common.MapStr) {
+	return func(meta mapstr.M) {
 		if meta["labels"] != nil {
 			safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
 		}
@@ -88,7 +89,7 @@ func WithMetadata(kind string) FieldOptions {
 // GetPodMetaGen is a wrapper function that creates a metaGen for pod resource and has embeeded
 // nodeMetaGen and namespaceMetaGen
 func GetPodMetaGen(
-	cfg *common.Config,
+	cfg *config.C,
 	podWatcher kubernetes.Watcher,
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
@@ -106,11 +107,11 @@ func GetPodMetaGen(
 }
 
 // GetKubernetesClusterIdentifier returns ClusterInfo for k8s if available
-func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
+func GetKubernetesClusterIdentifier(cfg *config.C, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
-	var config Config
-	config.Unmarshal(cfg)
-	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
+	var c Config
+	c.Unmarshal(cfg)
+	clusterInfo, err := getClusterInfoFromKubeConfigFile(c.KubeConfig)
 	if err == nil {
 		return clusterInfo, nil
 	}

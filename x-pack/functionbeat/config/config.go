@@ -12,7 +12,7 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 
 	functionPattern = "^[A-Za-z][A-Za-z0-9\\-]{0,30}$"
 	functionRE      = regexp.MustCompile(functionPattern)
-	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
+	configOverrides = conf.MustNewConfigFrom(map[string]interface{}{
 		"path.data":              "/tmp",
 		"path.logs":              "/tmp/logs",
 		"keystore.path":          "/tmp/functionbeat.keystore",
@@ -35,11 +35,11 @@ var (
 			"flush.timeout":    "0.01s",
 		},
 	})
-	functionLoggingOverrides = common.MustNewConfigFrom(map[string]interface{}{
+	functionLoggingOverrides = conf.MustNewConfigFrom(map[string]interface{}{
 		"logging.to_stderr": true,
 		"logging.to_files":  false,
 	})
-	logstashOverrides = common.MustNewConfigFrom(map[string]interface{}{
+	logstashOverrides = conf.MustNewConfigFrom(map[string]interface{}{
 		"output.logstash.pipelining": 0,
 	})
 
@@ -66,12 +66,12 @@ var (
 
 // Config default configuration for Functionbeat.
 type Config struct {
-	Provider *common.Config `config:"provider" validate:"required"`
+	Provider *conf.C `config:"provider" validate:"required"`
 }
 
 // ProviderConfig is a generic configured used by providers.
 type ProviderConfig struct {
-	Functions []*common.Config `config:"functions"`
+	Functions []*conf.C `config:"functions"`
 }
 
 // FunctionConfig minimal configuration from each function.
@@ -89,15 +89,15 @@ var DefaultFunctionConfig = FunctionConfig{
 	Enabled: true,
 }
 
-var always = func(_ *common.Config) bool {
+var always = func(_ *conf.C) bool {
 	return true
 }
 
-var isLogstash = func(cfg *common.Config) bool {
+var isLogstash = func(cfg *conf.C) bool {
 	return isOutput(cfg, "logstash")
 }
 
-func isOutput(cfg *common.Config, name string) bool {
+func isOutput(cfg *conf.C, name string) bool {
 	outputCfg, err := cfg.Child("output", -1)
 	if err != nil {
 		return false

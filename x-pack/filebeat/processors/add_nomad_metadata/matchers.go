@@ -10,9 +10,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/processors/add_nomad_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // LogPathMatcherName is the name of LogPathMatcher
@@ -27,7 +28,7 @@ const (
 
 func init() {
 	add_nomad_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 
 	// Add a container indexer config by default.
 	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.AllocationNameIndexerName, *cfg)
@@ -43,7 +44,7 @@ type LogPathMatcher struct {
 	allocIDRegex *regexp.Regexp
 }
 
-func newLogsPathMatcher(cfg common.Config) (add_nomad_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C) (add_nomad_metadata.Matcher, error) {
 	config := struct {
 		LogsPath string `config:"logs_path"`
 	}{
@@ -70,7 +71,7 @@ func newLogsPathMatcher(cfg common.Config) (add_nomad_metadata.Matcher, error) {
 
 // MetadataIndex returns the index key to be used for enriching the event with the proper metadata
 // which is the allocation id from the event `log.file.path` field
-func (m *LogPathMatcher) MetadataIndex(event common.MapStr) string {
+func (m *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 	value, err := event.GetValue("log.file.path")
 
 	if err == nil {

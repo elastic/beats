@@ -24,14 +24,15 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -44,7 +45,7 @@ type Enricher interface {
 	Stop()
 
 	// Enrich the given list of events
-	Enrich([]common.MapStr)
+	Enrich([]mapstr.M)
 }
 
 type kubernetesConfig struct {
@@ -62,8 +63,8 @@ type kubernetesConfig struct {
 
 type enricher struct {
 	sync.RWMutex
-	metadata            map[string]common.MapStr
-	index               func(common.MapStr) string
+	metadata            map[string]mapstr.M
+	index               func(mapstr.M) string
 	watcher             kubernetes.Watcher
 	watchersStarted     bool
 	watchersStartedLock sync.Mutex
@@ -98,7 +99,7 @@ func NewResourceMetadataEnricher(
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
-	cfg, _ := common.NewConfigFrom(&commonMetaConfig)
+	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
 	metaGen := metadata.NewResourceMetadataGenerator(cfg, watcher.Client())
 	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
@@ -107,7 +108,7 @@ func NewResourceMetadataEnricher(
 	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, watcher.Client())
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
-		func(m map[string]common.MapStr, r kubernetes.Resource) {
+		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
 			id := join(accessor.GetNamespace(), accessor.GetName())
 
@@ -150,13 +151,13 @@ func NewResourceMetadataEnricher(
 			}
 		},
 		// delete
-		func(m map[string]common.MapStr, r kubernetes.Resource) {
+		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
 			id := join(accessor.GetNamespace(), accessor.GetName())
 			delete(m, id)
 		},
 		// index
-		func(e common.MapStr) string {
+		func(e mapstr.M) string {
 			return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
 		},
 	)
@@ -191,13 +192,13 @@ func NewContainerMetadataEnricher(
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
-	cfg, _ := common.NewConfigFrom(&commonMetaConfig)
+	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
 	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
 
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
-		func(m map[string]common.MapStr, r kubernetes.Resource) {
+		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			pod, ok := r.(*kubernetes.Pod)
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
@@ -242,7 +243,7 @@ func NewContainerMetadataEnricher(
 			}
 		},
 		// delete
-		func(m map[string]common.MapStr, r kubernetes.Resource) {
+		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			pod, ok := r.(*kubernetes.Pod)
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
@@ -253,7 +254,7 @@ func NewContainerMetadataEnricher(
 			}
 		},
 		// index
-		func(e common.MapStr) string {
+		func(e mapstr.M) string {
 			return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 		},
 	)
@@ -338,7 +339,7 @@ func validatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
 	return &config
 }
 
-func getString(m common.MapStr, key string) string {
+func getString(m mapstr.M, key string) string {
 	val, err := m.GetValue(key)
 	if err != nil {
 		return ""
@@ -356,12 +357,12 @@ func buildMetadataEnricher(
 	watcher kubernetes.Watcher,
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
-	update func(map[string]common.MapStr, kubernetes.Resource),
-	delete func(map[string]common.MapStr, kubernetes.Resource),
-	index func(e common.MapStr) string) *enricher {
+	update func(map[string]mapstr.M, kubernetes.Resource),
+	delete func(map[string]mapstr.M, kubernetes.Resource),
+	index func(e mapstr.M) string) *enricher {
 
 	enricher := enricher{
-		metadata:         map[string]common.MapStr{},
+		metadata:         map[string]mapstr.M{},
 		index:            index,
 		watcher:          watcher,
 		nodeWatcher:      nodeWatcher,
@@ -431,7 +432,7 @@ func (m *enricher) Stop() {
 	}
 }
 
-func (m *enricher) Enrich(events []common.MapStr) {
+func (m *enricher) Enrich(events []mapstr.M) {
 	m.RLock()
 	defer m.RUnlock()
 	for _, event := range events {
@@ -440,14 +441,14 @@ func (m *enricher) Enrich(events []common.MapStr) {
 			if err != nil {
 				continue
 			}
-			k8sMeta, ok := k8s.(common.MapStr)
+			k8sMeta, ok := k8s.(mapstr.M)
 			if !ok {
 				continue
 			}
 
 			if m.isPod {
 				// apply pod meta at metricset level
-				if podMeta, ok := k8sMeta["pod"].(common.MapStr); ok {
+				if podMeta, ok := k8sMeta["pod"].(mapstr.M); ok {
 					event.DeepUpdate(podMeta)
 				}
 
@@ -461,7 +462,7 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
 			}
 
-			event.DeepUpdate(common.MapStr{
+			event.DeepUpdate(mapstr.M{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
 			})
@@ -471,18 +472,18 @@ func (m *enricher) Enrich(events []common.MapStr) {
 
 type nilEnricher struct{}
 
-func (*nilEnricher) Start()                 {}
-func (*nilEnricher) Stop()                  {}
-func (*nilEnricher) Enrich([]common.MapStr) {}
+func (*nilEnricher) Start()            {}
+func (*nilEnricher) Stop()             {}
+func (*nilEnricher) Enrich([]mapstr.M) {}
 
-func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
-	var moduleFieldsMapStr common.MapStr
+func CreateEvent(event mapstr.M, namespace string) (mb.Event, error) {
+	var moduleFieldsMapStr mapstr.M
 	moduleFields, ok := event[mb.ModuleDataKey]
 	var err error
 	if ok {
-		moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+		moduleFieldsMapStr, ok = moduleFields.(mapstr.M)
 		if !ok {
-			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+			err = fmt.Errorf("error trying to convert '%s' from event to mapstr.M", mb.ModuleDataKey)
 		}
 	}
 	delete(event, mb.ModuleDataKey)
@@ -494,12 +495,12 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 	}
 
 	// add root-level fields like ECS fields
-	var metaFieldsMapStr common.MapStr
+	var metaFieldsMapStr mapstr.M
 	metaFields, ok := event["meta"]
 	if ok {
-		metaFieldsMapStr, ok = metaFields.(common.MapStr)
+		metaFieldsMapStr, ok = metaFields.(mapstr.M)
 		if !ok {
-			err = fmt.Errorf("error trying to convert '%s' from event to common.MapStr", "meta")
+			err = fmt.Errorf("error trying to convert '%s' from event to mapstr.M", "meta")
 		}
 		delete(event, "meta")
 		if len(metaFieldsMapStr) > 0 {
@@ -509,14 +510,14 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 	return e, err
 }
 
-func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
 		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
 	}
 }
 
-func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
 	err := event.Delete(field)
 	if err != nil {
 		logger.Debugf("Failed to delete field '%s': %s", field, err)

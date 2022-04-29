@@ -23,9 +23,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
@@ -49,7 +49,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 			// Use empty config to use default configs if not set
 			if b.Config.Kibana == nil {
-				b.Config.Kibana = common.NewConfig()
+				b.Config.Kibana = config.NewConfig()
 			}
 
 			// Initialize kibana config. If username and password is set in

@@ -25,13 +25,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type redisOut struct {
@@ -54,7 +54,7 @@ func makeRedis(
 	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *config.C,
 ) (outputs.Group, error) {
 
 	if !cfg.HasField("index") {
@@ -170,7 +170,7 @@ func makeRedis(
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
 }
 
-func buildKeySelector(cfg *common.Config) (outil.Selector, error) {
+func buildKeySelector(cfg *config.C) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "key",
 		MultiKey:         "keys",

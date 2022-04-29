@@ -24,24 +24,25 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventsMapping(imagesList []types.ImageSummary, dedot bool) []common.MapStr {
-	events := []common.MapStr{}
+func eventsMapping(imagesList []types.ImageSummary, dedot bool) []mapstr.M {
+	events := []mapstr.M{}
 	for _, image := range imagesList {
 		events = append(events, eventMapping(&image, dedot))
 	}
 	return events
 }
 
-func eventMapping(image *types.ImageSummary, dedot bool) common.MapStr {
-	event := common.MapStr{
-		"id": common.MapStr{
+func eventMapping(image *types.ImageSummary, dedot bool) mapstr.M {
+	event := mapstr.M{
+		"id": mapstr.M{
 			"current": image.ID,
 			"parent":  image.ParentID,
 		},
 		"created": common.Time(time.Unix(image.Created, 0)),
-		"size": common.MapStr{
+		"size": mapstr.M{
 			"regular": image.Size,
 			"virtual": image.VirtualSize,
 		},

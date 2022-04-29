@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessorRun(t *testing.T) {
@@ -59,7 +59,7 @@ func TestProcessorRun(t *testing.T) {
 
 	for _, tc := range testCases {
 		evt := &beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"domain": tc.Domain,
 			},
 		}
@@ -103,11 +103,11 @@ func TestProcessorRun(t *testing.T) {
 		p, err := newRegisteredDomain(c)
 
 		evt := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"domain": "www.google.com",
 			},
 		}
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"domain":            "www.google.com",
 			"registered_domain": "google.com",
 			"subdomain":         "www",

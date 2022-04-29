@@ -25,8 +25,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func openstackNovaMetadataHandler() http.HandlerFunc {
@@ -58,7 +59,7 @@ func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
 	server := httptest.NewServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 
@@ -75,7 +76,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	server := httptest.NewTLSServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host":                  server.Listener.Addr().String(),
 		"ssl.verification_mode": "none",
 	})
@@ -87,29 +88,29 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	assertOpenstackNova(t, config)
 }
 
-func assertOpenstackNova(t *testing.T, config *common.Config) {
+func assertOpenstackNova(t *testing.T, config *conf.C) {
 	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
 			"provider": "openstack",
-			"instance": common.MapStr{"" +
+			"instance": mapstr.M{"" +
 				"id": "i-0000ffac",
 				"name": "testvm01.stack.cloud",
 			},
-			"machine": common.MapStr{
+			"machine": mapstr.M{
 				"type": "m1.xlarge",
 			},
 			"availability_zone": "az-test-2",
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "Nova",
 			},
 		},

@@ -22,17 +22,17 @@ package config
 
 import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config defines the structure of heartbeat.yml.
 type Config struct {
 	RunOnce         bool                 `config:"run_once"`
-	Monitors        []*common.Config     `config:"monitors"`
-	ConfigMonitors  *common.Config       `config:"config.monitors"`
+	Monitors        []*conf.C            `config:"monitors"`
+	ConfigMonitors  *conf.C              `config:"config.monitors"`
 	Scheduler       Scheduler            `config:"scheduler"`
 	Autodiscover    *autodiscover.Config `config:"autodiscover"`
-	SyntheticSuites []*common.Config     `config:"synthetic_suites"`
+	SyntheticSuites []*conf.C            `config:"synthetic_suites"`
 	Jobs            map[string]JobLimit  `config:"jobs"`
 }
 

@@ -20,9 +20,9 @@ package queue
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -41,7 +41,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 
 	ee, _ := e.Fields.GetValue("rabbitmq.queue")
-	event := ee.(common.MapStr)
+	event := ee.(mapstr.M)
 
 	assert.EqualValues(t, "queuenamehere", event["name"])
 	assert.EqualValues(t, true, event["durable"])
@@ -49,39 +49,39 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, false, event["exclusive"])
 	assert.EqualValues(t, "running", event["state"])
 
-	arguments := event["arguments"].(common.MapStr)
+	arguments := event["arguments"].(mapstr.M)
 	assert.EqualValues(t, 9, arguments["max_priority"])
 
-	consumers := event["consumers"].(common.MapStr)
-	utilisation := consumers["utilisation"].(common.MapStr)
+	consumers := event["consumers"].(mapstr.M)
+	utilisation := consumers["utilisation"].(mapstr.M)
 	assert.EqualValues(t, 3, consumers["count"])
 	assert.EqualValues(t, 0.7, utilisation["pct"])
 
-	memory := event["memory"].(common.MapStr)
+	memory := event["memory"].(mapstr.M)
 	assert.EqualValues(t, 232720, memory["bytes"])
 
-	messages := event["messages"].(common.MapStr)
-	total := messages["total"].(common.MapStr)
-	ready := messages["ready"].(common.MapStr)
-	unacknowledged := messages["unacknowledged"].(common.MapStr)
-	persistent := messages["persistent"].(common.MapStr)
+	messages := event["messages"].(mapstr.M)
+	total := messages["total"].(mapstr.M)
+	ready := messages["ready"].(mapstr.M)
+	unacknowledged := messages["unacknowledged"].(mapstr.M)
+	persistent := messages["persistent"].(mapstr.M)
 	assert.EqualValues(t, 74, total["count"])
 	assert.EqualValues(t, 71, ready["count"])
 	assert.EqualValues(t, 3, unacknowledged["count"])
 	assert.EqualValues(t, 73, persistent["count"])
 
-	totalDetails := total["details"].(common.MapStr)
+	totalDetails := total["details"].(mapstr.M)
 	assert.EqualValues(t, 2.2, totalDetails["rate"])
 
-	readyDetails := ready["details"].(common.MapStr)
+	readyDetails := ready["details"].(mapstr.M)
 	assert.EqualValues(t, 0, readyDetails["rate"])
 
-	unacknowledgedDetails := unacknowledged["details"].(common.MapStr)
+	unacknowledgedDetails := unacknowledged["details"].(mapstr.M)
 	assert.EqualValues(t, 0.5, unacknowledgedDetails["rate"])
 
-	disk := event["disk"].(common.MapStr)
-	reads := disk["reads"].(common.MapStr)
-	writes := disk["writes"].(common.MapStr)
+	disk := event["disk"].(mapstr.M)
+	reads := disk["reads"].(mapstr.M)
+	writes := disk["writes"].(mapstr.M)
 	assert.EqualValues(t, 212, reads["count"])
 	assert.EqualValues(t, 121, writes["count"])
 }
@@ -91,7 +91,7 @@ func TestData(t *testing.T) {
 	defer server.Close()
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2ErrorCond(ms, t, "", func(e common.MapStr) bool {
+	err := mbtest.WriteEventsReporterV2ErrorCond(ms, t, "", func(e mapstr.M) bool {
 		hasTotal, _ := e.HasKey("rabbitmq.queue.messages.total")
 		return hasTotal
 	})

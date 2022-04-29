@@ -32,12 +32,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 const (
@@ -70,11 +72,11 @@ type addDockerMetadata struct {
 const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (processors.Processor, error) {
 	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -97,7 +99,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherC
 	// Use extract_field processor to get container ID from source file path.
 	var sourceProcessor processors.Processor
 	if config.MatchSource {
-		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
+		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",
 			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
@@ -188,10 +190,10 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	container := d.watcher.Container(cid)
 	if container != nil {
-		meta := common.MapStr{}
+		meta := mapstr.M{}
 
 		if len(container.Labels) > 0 {
-			labels := common.MapStr{}
+			labels := mapstr.M{}
 			for k, v := range container.Labels {
 				if d.dedot {
 					label := common.DeDot(k)

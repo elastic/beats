@@ -32,7 +32,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -41,6 +40,8 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -119,8 +120,8 @@ func esConnect(t *testing.T, index string) *esConnection {
 	// try to drop old index if left over from failed test
 	_, _, _ = client.Delete(index, "", "", nil) // ignore error
 
-	_, _, err = client.CreateIndex(index, common.MapStr{
-		"settings": common.MapStr{
+	_, _, err = client.CreateIndex(index, mapstr.M{
+		"settings": mapstr.M{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
 		},
@@ -173,7 +174,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	connection := esConnect(t, index)
 
 	bulkSize := 0
-	config, _ := common.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
 		"bulk_max_size":    &bulkSize,
@@ -183,7 +184,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	})
 
 	info := beat.Info{Beat: "libbeat"}
-	im, err := idxmgmt.DefaultSupport(nil, info, common.MustNewConfigFrom(
+	im, err := idxmgmt.DefaultSupport(nil, info, conf.MustNewConfigFrom(
 		map[string]interface{}{
 			"setup.ilm.enabled": false,
 		},
@@ -300,7 +301,7 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 	batch := outest.NewBatch(
 		beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"host":    "test-host",
 				"message": "hello world",
 			},
@@ -335,7 +336,7 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	for i := 0; i < 10; i++ {
 		event := beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"host":    "test-host",
 				"type":    "log",
 				"message": fmt.Sprintf("hello world - %v", i),
@@ -398,7 +399,7 @@ func testSendMultipleBatchesViaLogstash(
 		for j := 0; j < batchSize; j++ {
 			event := beat.Event{
 				Timestamp: time.Now(),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host":    "test-host",
 					"type":    "log",
 					"message": fmt.Sprintf("batch hello world - %v", i*batchSize+j),
@@ -448,7 +449,7 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	ts := time.Now()
 	event := beat.Event{
 		Timestamp: ts,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"host":    "test-host",
 			"type":    "log",
 			"message": "hello world",
@@ -505,7 +506,7 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	events := []beat.Event{
 		{
 			Timestamp: ts,
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"host":    "test-host",
 				"type":    "log",
 				"message": "hello world",

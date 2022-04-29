@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: nginx
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/nginx/_meta/docs.asciidoc
+
 
 [[metricbeat-module-nginx]]
 == Nginx module
@@ -29,6 +31,8 @@ The nginx module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-nginx.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -63,3 +67,4 @@ The following metricsets are available:
 
 include::nginx/stubstatus.asciidoc[]
 
+:edit_url!:

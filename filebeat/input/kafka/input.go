@@ -27,13 +27,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const pluginName = "kafka"
@@ -57,7 +58,7 @@ func Plugin() input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (input.Input, error) {
+func configure(cfg *conf.C) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -431,9 +432,9 @@ func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
 	return messages
 }
 
-func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, common.MapStr) {
+func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, mapstr.M) {
 	timestamp := time.Now()
-	kafkaFields := common.MapStr{
+	kafkaFields := mapstr.M{
 		"topic":     claim.Topic(),
 		"partition": claim.Partition(),
 		"offset":    msg.Offset,
@@ -453,11 +454,11 @@ func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler
 	return timestamp, kafkaFields
 }
 
-func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapStr, ackHandler func()) reader.Message {
+func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, ackHandler func()) reader.Message {
 	return reader.Message{
 		Ts:      timestamp,
 		Content: content,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"kafka":   kafkaFields,
 			"message": string(content),
 		},

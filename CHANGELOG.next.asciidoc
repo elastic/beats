@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Affecting all Beats*
 
 - Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
+- Update to Go 1.17.9 {issue}31350[31350]
 
 *Auditbeat*
 
@@ -18,7 +19,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Filebeat*
 
 *Heartbeat*
-
+- Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
 
@@ -45,6 +46,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add ecs container fields {pull}31020[31020]
 - Fix docs reference for syslog processor {pull}31087[31087]
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
 
 *Auditbeat*
 
@@ -53,17 +56,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
-- Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
-- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
-- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
-- Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
-- Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
-- Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
-- checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
 - m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
+- Netflow: replace invalid field value. {pull}31295[31295]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+- Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 
 *Heartbeat*
 
@@ -76,8 +76,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
-- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
 - Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 - Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
 
 *Packetbeat*
@@ -85,10 +85,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
 - Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
-- Fix missing annotation of event.module. {issue}31330[31330] {pull}[]
-
+- Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
 
 *Functionbeat*
 
@@ -101,13 +99,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add support for kafka message headers. {pull}29940[29940]
-- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
-- Add syslog parser and processor. {issue}30139[30139] {pull}30541[30541]
-- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
-- Add cronjob metadata by default {pull}30637[30637]
-- New option `setup.template.json.data_stream` is added to indicate if the JSON index template is a data stream. {pull}31048[31048]
 - Add support for port mapping in docker hints. {pull}31243[31243]
 - Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
 
@@ -129,6 +120,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support in httpjson input for chain calls. {pull}29816[29816]
 - checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
 - Add URL Encode template function for httpjson input. {pull}30962[30962]
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
+- Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
+- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 
 *Auditbeat*
 
@@ -154,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
+- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 
 *Packetbeat*
 
@@ -164,7 +159,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Winlogbeat*
 
 - Improve the error message when the registry file content is invalid. {pull}30543[30543]
-- Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
 - Add parent process ID to new process creation events. {issue}29237[29237] {pull}31102[31102]
 
 
@@ -191,4 +185,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 

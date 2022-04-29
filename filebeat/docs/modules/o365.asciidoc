@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/o365/_meta/docs.asciidoc
+
 [[filebeat-module-o365]]
 [role="xpack"]
 
@@ -229,3 +231,4 @@ image::./images/filebeat-o365-audit.png[]
 For a description of each field in the module, see the
 <<exported-fields-o365,exported fields>> section.
 
+edit_url!:

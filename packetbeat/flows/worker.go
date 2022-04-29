@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type flowsProcessor struct {
@@ -211,7 +212,7 @@ func createEvent(
 ) beat.Event {
 	timestamp := ts
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"start":    common.Time(f.createTS),
 		"end":      common.Time(f.ts),
 		"duration": f.ts.Sub(f.createTS),
@@ -226,18 +227,18 @@ func createEvent(
 	}
 	event["type"] = eventType
 
-	flow := common.MapStr{
+	flow := mapstr.M{
 		"id":    common.NetString(f.id.Serialize()),
 		"final": isOver,
 	}
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"event": event,
 		"flow":  flow,
 		"type":  "flow",
 	}
-	network := common.MapStr{}
-	source := common.MapStr{}
-	dest := common.MapStr{}
+	network := mapstr.M{}
+	source := mapstr.M{}
+	dest := mapstr.M{}
 	tuple := common.IPPortTuple{}
 	var communityID flowhash.Flow
 	var proto applayer.Transport
@@ -398,7 +399,7 @@ func createEvent(
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
 		if proc := watcher.FindProcessesTuple(&tuple, proto); proc != nil {
 			if proc.Src.PID > 0 {
-				p := common.MapStr{
+				p := mapstr.M{
 					"pid":               proc.Src.PID,
 					"name":              proc.Src.Name,
 					"args":              proc.Src.Args,
@@ -414,7 +415,7 @@ func createEvent(
 				fields["process"] = p
 			}
 			if proc.Dst.PID > 0 {
-				p := common.MapStr{
+				p := mapstr.M{
 					"pid":               proc.Dst.PID,
 					"name":              proc.Dst.Name,
 					"args":              proc.Dst.Args,
@@ -480,7 +481,7 @@ func encodeStats(
 	return report
 }
 
-func putOrAppendString(m common.MapStr, key, value string) {
+func putOrAppendString(m mapstr.M, key, value string) {
 	old, found := m[key]
 	if !found {
 		m[key] = value
@@ -497,7 +498,7 @@ func putOrAppendString(m common.MapStr, key, value string) {
 	}
 }
 
-func putOrAppendUint64(m common.MapStr, key string, value uint64) {
+func putOrAppendUint64(m mapstr.M, key string, value uint64) {
 	old, found := m[key]
 	if !found {
 		m[key] = value

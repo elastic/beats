@@ -20,8 +20,8 @@ package docker
 import (
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Container is a struct representation of a container
@@ -29,16 +29,16 @@ type Container struct {
 	ID     string
 	Name   string
 	Image  string
-	Labels common.MapStr
+	Labels mapstr.M
 }
 
 // ToMapStr converts a container struct to a MapStrs
-func (c *Container) ToMapStr() common.MapStr {
-	m := common.MapStr{
-		"container": common.MapStr{
+func (c *Container) ToMapStr() mapstr.M {
+	m := mapstr.M{
+		"container": mapstr.M{
 			"id":   c.ID,
 			"name": c.Name,
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": c.Image,
 			},
 			"runtime": "docker",

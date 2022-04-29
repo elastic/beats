@@ -29,15 +29,16 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type mockRunner struct {
 	mutex            sync.Mutex
-	config           *common.Config
+	config           *conf.C
 	started, stopped bool
 }
 
@@ -66,29 +67,29 @@ func (m *mockRunner) String() string {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	out := common.MapStr{}
+	out := mapstr.M{}
 	m.config.Unpack(&out)
 	return fmt.Sprintf("config: %v, started=%v, stopped=%v", out.String(), m.started, m.stopped)
 }
 
 type mockAdapter struct {
 	mutex   sync.Mutex
-	configs []*common.Config
+	configs []*conf.C
 	runners []*mockRunner
 
 	CheckConfigCallCount int
 }
 
 // CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
-func (m *mockAdapter) CreateConfig(event bus.Event) ([]*common.Config, error) {
+func (m *mockAdapter) CreateConfig(event bus.Event) ([]*conf.C, error) {
 	if cfgs, ok := event["config"]; ok {
-		return cfgs.([]*common.Config), nil
+		return cfgs.([]*conf.C), nil
 	}
 	return m.configs, nil
 }
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
-func (m *mockAdapter) CheckConfig(c *common.Config) error {
+func (m *mockAdapter) CheckConfig(c *conf.C) error {
 	m.CheckConfigCallCount++
 
 	config := struct {
@@ -103,7 +104,7 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	return nil
 }
 
-func (m *mockAdapter) Create(_ beat.PipelineConnector, config *common.Config) (cfgfile.Runner, error) {
+func (m *mockAdapter) Create(_ beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
 	}
@@ -152,7 +153,7 @@ func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -160,19 +161,19 @@ func TestAutodiscover(t *testing.T) {
 	})
 
 	// Create a mock adapter
-	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "1",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig},
+		configs: []*conf.C{runnerConfig},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -191,7 +192,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -208,7 +209,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -224,7 +225,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -232,7 +233,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -250,7 +251,7 @@ func TestAutodiscover(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
@@ -271,7 +272,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -279,22 +280,22 @@ func TestAutodiscoverHash(t *testing.T) {
 	})
 
 	// Create a mock adapter
-	runnerConfig1, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig1, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "1",
 	})
-	runnerConfig2, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig2, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "2",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig1, runnerConfig2},
+		configs: []*conf.C{runnerConfig1, runnerConfig2},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -313,7 +314,7 @@ func TestAutodiscoverHash(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -336,7 +337,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -344,19 +345,19 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	})
 
 	// Create a mock adapter that returns a duplicated config
-	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"id": "foo",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig, runnerConfig},
+		configs: []*conf.C{runnerConfig, runnerConfig},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -378,7 +379,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 			"id":       "foo",
 			"provider": "mock",
 			"start":    true,
-			"meta": common.MapStr{
+			"meta": mapstr.M{
 				"foo": "bar",
 			},
 		})
@@ -395,7 +396,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -403,22 +404,22 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	})
 
 	// Create a mock adapter
-	runnerConfig1, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig1, _ := conf.NewConfigFrom(map[string]string{
 		"broken": "true",
 	})
-	runnerConfig2, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig2, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "2",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig1, runnerConfig2},
+		configs: []*conf.C{runnerConfig1, runnerConfig2},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -437,7 +438,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -454,7 +455,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -462,19 +463,19 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	})
 
 	// Create a mock adapter
-	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "1",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig},
+		configs: []*conf.C{runnerConfig},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -493,14 +494,14 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
-		"config": []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		"config": []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"a": "b",
 			}),
-			common.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"x": "y",
 			}),
 		},
@@ -510,21 +511,21 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 	// Test start event with changed configurations
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
-		"config": []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		"config": []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"a": "b",
 			}),
-			common.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"x": "c",
 			}),
 		},
@@ -535,30 +536,30 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	fmt.Println(runners)
 	assert.Equal(t, len(runners), 3)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 
 	// Ensure that the runner for the stale config is stopped
 	wait(t, func() bool {
-		check(t, adapter.Runners(), common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+		check(t, adapter.Runners(), conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
 		return true
 	})
 
 	// Ensure that the new runner is started
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
 
 	// Stop all the configs
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
-		"config": []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		"config": []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"a": "b",
 			}),
-			common.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"x": "c",
 			}),
 		},
@@ -566,7 +567,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 
 	wait(t, func() bool { return adapter.Runners()[2].stopped == true })
 	runners = adapter.Runners()
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
 }
 
 func wait(t *testing.T, test func() bool) {
@@ -583,7 +584,7 @@ func wait(t *testing.T, test func() bool) {
 	}
 }
 
-func check(t *testing.T, runners []*mockRunner, expected *common.Config, started, stopped bool) {
+func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopped bool) {
 	for _, r := range runners {
 		if reflect.DeepEqual(expected, r.config) {
 			ok1 := assert.Equal(t, started, r.started)
@@ -596,7 +597,7 @@ func check(t *testing.T, runners []*mockRunner, expected *common.Config, started
 	}
 
 	// Fail the test case if the check fails
-	out := common.MapStr{}
+	out := mapstr.M{}
 	expected.Unpack(&out)
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }

@@ -19,7 +19,7 @@ package publisher
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Batch is used to pass a batch of events to the outputs and asynchronously listening
@@ -59,14 +59,14 @@ type EventFlags uint8
 // EventCache provides a space for outputs to define per-event metadata
 // that's intended to be used only within the scope of an output
 type EventCache struct {
-	m common.MapStr
+	m mapstr.M
 }
 
 // Put lets outputs put key-value pairs into the event cache
 func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 	if ec.m == nil {
 		// uninitialized map
-		ec.m = common.MapStr{}
+		ec.m = mapstr.M{}
 	}
 
 	return ec.m.Put(key, value)
@@ -76,7 +76,7 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 func (ec *EventCache) GetValue(key string) (interface{}, error) {
 	if ec.m == nil {
 		// uninitialized map
-		return nil, common.ErrKeyNotFound
+		return nil, mapstr.ErrKeyNotFound
 	}
 
 	return ec.m.GetValue(key)

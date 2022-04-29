@@ -26,9 +26,9 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDNSProcessorRun(t *testing.T) {
@@ -44,7 +44,7 @@ func TestDNSProcessorRun(t *testing.T) {
 
 	t.Run("default", func(t *testing.T) {
 		event, err := p.Run(&beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"source.ip": gatewayIP,
 			},
 		})
@@ -61,7 +61,7 @@ func TestDNSProcessorRun(t *testing.T) {
 		p.Config.Action = ActionAppend
 
 		event, err := p.Run(&beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"source.ip":     gatewayIP,
 				"source.domain": forwardDomain,
 			},
@@ -80,7 +80,7 @@ func TestDNSProcessorRun(t *testing.T) {
 		p.Config.Action = ActionReplace
 
 		event, err := p.Run(&beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"source.ip":     gatewayIP,
 				"source.domain": forwardDomain,
 			},
@@ -106,12 +106,12 @@ func TestDNSProcessorRun(t *testing.T) {
 		}
 
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"ip": gatewayIP,
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"ip":     gatewayIP,
 			"domain": gatewayName,
 		}
@@ -138,7 +138,7 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 	t.Log(p.String())
 
 	event, err := p.Run(&beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"source.ip":      "192.0.2.1",
 			"destination.ip": "192.0.2.2",
 		},
@@ -177,7 +177,7 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 			// Execute processor.
 			for i := 0; i < numEvents; i++ {
 				_, err := p.Run(&beat.Event{
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"source.ip": "192.168.0." + strconv.Itoa(i%256),
 					},
 				})

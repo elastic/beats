@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type inodeMarkerIdentifier struct {
@@ -40,7 +40,7 @@ type inodeMarkerIdentifier struct {
 	markerTxt                 string
 }
 
-func newINodeMarkerIdentifier(cfg *common.Config) (StateIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *conf.C) (StateIdentifier, error) {
 	var config struct {
 		MarkerPath string `config:"path" validate:"required"`
 	}

@@ -23,9 +23,9 @@ import (
 	as "github.com/aerospike/aerospike-client-go"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/aerospike"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 			data, _ := schema.Apply(aerospike.ParseInfo(info["namespace/"+namespace]))
 			data["name"] = namespace
-			data["node"] = common.MapStr{
+			data["node"] = mapstr.M{
 				"host": node.GetHost().String(),
 				"name": node.GetName(),
 			}

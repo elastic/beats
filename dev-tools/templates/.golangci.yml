@@ -18,6 +18,9 @@ issues:
     - text: "ST1003:"
       linters:
         - stylecheck
+    # From mage we are priting to the console to ourselves
+    - path: (.*magefile.go|.*dev-tools/mage/.*)
+      linters: forbidigo
 
 output:
   sort-results: true
@@ -65,7 +68,6 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - godox # tool for detection of FIXME, TODO and other comment keywords
     - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
@@ -86,8 +88,8 @@ linters-settings:
   goconst:
     # minimal length of string constant, 3 by default
     min-len: 3
-    # minimal occurrences count to trigger, 3 by default
-    min-occurrences: 2
+    # minimal occurrences count to trigger
+    min-occurrences: 5
 
   dupl:
     # tokens count to trigger issue, 150 by default

@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type fakeAppender struct{}
@@ -32,7 +32,7 @@ func (f *fakeAppender) Append(event bus.Event) {
 	event["foo"] = "bar"
 }
 
-func newFakeAppender(_ *common.Config) (Appender, error) {
+func newFakeAppender(_ *conf.C) (Appender, error) {
 	return &fakeAppender{}, nil
 }
 
@@ -50,7 +50,7 @@ func TestAppenderRegistry(t *testing.T) {
 		Type: "fake",
 	}
 
-	cfg, err := common.NewConfigFrom(&config)
+	cfg, err := conf.NewConfigFrom(&config)
 
 	// Make sure that config building doesn't fail
 	assert.NoError(t, err)
@@ -60,7 +60,7 @@ func TestAppenderRegistry(t *testing.T) {
 
 	// Attempt to build using an array of configs
 	Registry.AddAppender("fake", newFakeAppender)
-	cfgs := []*common.Config{cfg}
+	cfgs := []*conf.C{cfg}
 	appenders, err := NewAppenders(cfgs)
 	assert.NoError(t, err)
 	assert.Equal(t, len(appenders), 1)
@@ -69,7 +69,7 @@ func TestAppenderRegistry(t *testing.T) {
 	incorrectConfig := AppenderConfig{
 		Type: "wrong",
 	}
-	icfg, err := common.NewConfigFrom(&incorrectConfig)
+	icfg, err := conf.NewConfigFrom(&incorrectConfig)
 	assert.NoError(t, err)
 	cfgs = append(cfgs, icfg)
 	appenders, err = NewAppenders(cfgs)

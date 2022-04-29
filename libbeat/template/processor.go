@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // DefaultField controls the default value for the default_field flag.
@@ -45,9 +46,9 @@ type Processor struct {
 	ElasticLicensed bool
 
 	// dynamicTemplatesMap records which dynamic templates have been added, to prevent duplicates.
-	dynamicTemplatesMap map[dynamicTemplateKey]common.MapStr
+	dynamicTemplatesMap map[dynamicTemplateKey]mapstr.M
 	// dynamicTemplates records the dynamic templates in the order they were added.
-	dynamicTemplates []common.MapStr
+	dynamicTemplates []mapstr.M
 }
 
 var (
@@ -63,7 +64,7 @@ type fieldState struct {
 }
 
 // Process recursively processes the given fields and writes the template in the given output
-func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, analyzers common.MapStr) error {
+func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, analyzers mapstr.M) error {
 	if state == nil {
 		// Set the defaults.
 		state = &fieldState{DefaultField: DefaultField}
@@ -79,7 +80,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, an
 			field.DefaultField = &state.DefaultField
 		}
 		var (
-			indexMapping             common.MapStr
+			indexMapping             mapstr.M
 			analyzer, searchAnalyzer mapping.Analyzer
 		)
 
@@ -184,7 +185,7 @@ func addToDefaultFields(f *mapping.Field) {
 	}
 }
 
-func (p *Processor) other(f *mapping.Field) common.MapStr {
+func (p *Processor) other(f *mapping.Field) mapstr.M {
 	property := p.getDefaultProperties(f)
 	if f.Type != "" {
 		property["type"] = f.Type
@@ -193,13 +194,13 @@ func (p *Processor) other(f *mapping.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) integer(f *mapping.Field) common.MapStr {
+func (p *Processor) integer(f *mapping.Field) mapstr.M {
 	property := p.getDefaultProperties(f)
 	property["type"] = "long"
 	return property
 }
 
-func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) common.MapStr {
+func (p *Processor) scaledFloat(f *mapping.Field, params ...mapstr.M) mapstr.M {
 	property := p.getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
@@ -219,7 +220,7 @@ func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) commo
 	return property
 }
 
-func (p *Processor) nested(f *mapping.Field, output, analyzers common.MapStr) (common.MapStr, error) {
+func (p *Processor) nested(f *mapping.Field, output, analyzers mapstr.M) (mapstr.M, error) {
 	mapping, err := p.group(f, output, analyzers)
 	if err != nil {
 		return nil, err
@@ -228,19 +229,19 @@ func (p *Processor) nested(f *mapping.Field, output, analyzers common.MapStr) (c
 	return mapping, nil
 }
 
-func (p *Processor) group(f *mapping.Field, output, analyzers common.MapStr) (common.MapStr, error) {
-	indexMapping := common.MapStr{}
+func (p *Processor) group(f *mapping.Field, output, analyzers mapstr.M) (mapstr.M, error) {
+	indexMapping := mapstr.M{}
 	if f.Dynamic.Value != nil {
 		indexMapping["dynamic"] = f.Dynamic.Value
 	}
 
 	// Combine properties with previous field definitions (if any)
-	properties := common.MapStr{}
+	properties := mapstr.M{}
 	key := mapping.GenerateKey(f.Name) + ".properties"
 	currentProperties, err := output.GetValue(key)
 	if err == nil {
 		var ok bool
-		properties, ok = currentProperties.(common.MapStr)
+		properties, ok = currentProperties.(mapstr.M)
 		if !ok {
 			// This should never happen
 			return nil, errors.New(key + " is expected to be a MapStr")
@@ -260,14 +261,14 @@ func (p *Processor) group(f *mapping.Field, output, analyzers common.MapStr) (co
 	return indexMapping, nil
 }
 
-func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
+func (p *Processor) halfFloat(f *mapping.Field) mapstr.M {
 	property := p.getDefaultProperties(f)
 	property["type"] = "half_float"
 
 	return property
 }
 
-func (p *Processor) ip(f *mapping.Field) common.MapStr {
+func (p *Processor) ip(f *mapping.Field) mapstr.M {
 	property := p.getDefaultProperties(f)
 	property["type"] = "ip"
 	return property
@@ -290,7 +291,7 @@ func stateFromField(f *mapping.Field) *fieldState {
 	return st
 }
 
-func (p *Processor) keyword(f *mapping.Field, analyzers common.MapStr) common.MapStr {
+func (p *Processor) keyword(f *mapping.Field, analyzers mapstr.M) mapstr.M {
 	property := p.getDefaultProperties(f)
 
 	property["type"] = "keyword"
@@ -304,7 +305,7 @@ func (p *Processor) keyword(f *mapping.Field, analyzers common.MapStr) common.Ma
 	}
 
 	if len(f.MultiFields) > 0 {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		p.Process(f.MultiFields, stateFromField(f), fields, analyzers)
 		property["fields"] = fields
 	}
@@ -312,7 +313,7 @@ func (p *Processor) keyword(f *mapping.Field, analyzers common.MapStr) common.Ma
 	return property
 }
 
-func (p *Processor) wildcard(f *mapping.Field, analyzers common.MapStr) common.MapStr {
+func (p *Processor) wildcard(f *mapping.Field, analyzers mapstr.M) mapstr.M {
 	property := p.getDefaultProperties(f)
 
 	property["type"] = "wildcard"
@@ -326,7 +327,7 @@ func (p *Processor) wildcard(f *mapping.Field, analyzers common.MapStr) common.M
 	}
 
 	if len(f.MultiFields) > 0 {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		p.Process(f.MultiFields, stateFromField(f), fields, analyzers)
 		property["fields"] = fields
 	}
@@ -334,7 +335,7 @@ func (p *Processor) wildcard(f *mapping.Field, analyzers common.MapStr) common.M
 	return property
 }
 
-func (p *Processor) text(f *mapping.Field, analyzers common.MapStr) (properties common.MapStr, analyzer, searchAnalyzer mapping.Analyzer) {
+func (p *Processor) text(f *mapping.Field, analyzers mapstr.M) (properties mapstr.M, analyzer, searchAnalyzer mapping.Analyzer) {
 	properties = p.getDefaultProperties(f)
 
 	properties["type"] = "text"
@@ -354,7 +355,7 @@ func (p *Processor) text(f *mapping.Field, analyzers common.MapStr) (properties 
 	}
 
 	if len(f.MultiFields) > 0 {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		p.Process(f.MultiFields, stateFromField(f), fields, analyzers)
 		properties["fields"] = fields
 	}
@@ -362,7 +363,7 @@ func (p *Processor) text(f *mapping.Field, analyzers common.MapStr) (properties 
 	return properties, analyzer, searchAnalyzer
 }
 
-func (p *Processor) matchOnlyText(f *mapping.Field, analyzers common.MapStr) (properties common.MapStr, analyzer, searchAnalyzer mapping.Analyzer) {
+func (p *Processor) matchOnlyText(f *mapping.Field, analyzers mapstr.M) (properties mapstr.M, analyzer, searchAnalyzer mapping.Analyzer) {
 	properties = p.getDefaultProperties(f)
 
 	properties["type"] = "match_only_text"
@@ -378,7 +379,7 @@ func (p *Processor) matchOnlyText(f *mapping.Field, analyzers common.MapStr) (pr
 	}
 
 	if len(f.MultiFields) > 0 {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		p.Process(f.MultiFields, nil, fields, analyzers)
 		properties["fields"] = fields
 	}
@@ -386,7 +387,7 @@ func (p *Processor) matchOnlyText(f *mapping.Field, analyzers common.MapStr) (pr
 	return properties, analyzer, searchAnalyzer
 }
 
-func (p *Processor) array(f *mapping.Field) common.MapStr {
+func (p *Processor) array(f *mapping.Field) mapstr.M {
 	properties := p.getDefaultProperties(f)
 	if f.ObjectType != "" {
 		properties["type"] = f.ObjectType
@@ -394,7 +395,7 @@ func (p *Processor) array(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func (p *Processor) alias(f *mapping.Field) common.MapStr {
+func (p *Processor) alias(f *mapping.Field) mapstr.M {
 	// In case migration is disabled and it's a migration alias, field is not created
 	if !p.Migration && f.MigrationAlias {
 		return nil
@@ -406,7 +407,7 @@ func (p *Processor) alias(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func (p *Processor) histogram(f *mapping.Field) common.MapStr {
+func (p *Processor) histogram(f *mapping.Field) mapstr.M {
 	// Histograms were introduced in Elasticsearch 7.6, ignore if unsupported
 	if p.EsVersion.LessThan(minVersionHistogram) {
 		return nil
@@ -418,7 +419,7 @@ func (p *Processor) histogram(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func (p *Processor) object(f *mapping.Field) common.MapStr {
+func (p *Processor) object(f *mapping.Field) mapstr.M {
 	matchType := func(onlyType string, mt string) string {
 		if mt != "" {
 			return mt
@@ -443,7 +444,7 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 
 		switch otp.ObjectType {
 		case "scaled_float":
-			dynProperties = p.scaledFloat(f, common.MapStr{scalingFactorKey: otp.ScalingFactor})
+			dynProperties = p.scaledFloat(f, mapstr.M{scalingFactorKey: otp.ScalingFactor})
 			matchingType = matchType("*", otp.ObjectTypeMappingType)
 		case "text":
 			dynProperties["type"] = "text"
@@ -500,21 +501,21 @@ type dynamicTemplateKey struct {
 	matchType string
 }
 
-func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, properties common.MapStr) {
+func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, properties mapstr.M) {
 	key := dynamicTemplateKey{
 		name:      name,
 		pathMatch: pathMatch,
 		matchType: matchType,
 	}
 	if p.dynamicTemplatesMap == nil {
-		p.dynamicTemplatesMap = make(map[dynamicTemplateKey]common.MapStr)
+		p.dynamicTemplatesMap = make(map[dynamicTemplateKey]mapstr.M)
 	} else {
 		if _, ok := p.dynamicTemplatesMap[key]; ok {
 			// Dynamic template already added.
 			return
 		}
 	}
-	dynamicTemplateProperties := common.MapStr{
+	dynamicTemplateProperties := mapstr.M{
 		"mapping": properties,
 	}
 	if matchType != "" {
@@ -523,16 +524,16 @@ func (p *Processor) addDynamicTemplate(name, pathMatch, matchType string, proper
 	if pathMatch != "" {
 		dynamicTemplateProperties["path_match"] = pathMatch
 	}
-	dynamicTemplate := common.MapStr{
+	dynamicTemplate := mapstr.M{
 		name: dynamicTemplateProperties,
 	}
 	p.dynamicTemplatesMap[key] = dynamicTemplate
 	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
 }
 
-func (p *Processor) getDefaultProperties(f *mapping.Field) common.MapStr {
+func (p *Processor) getDefaultProperties(f *mapping.Field) mapstr.M {
 	// Currently no defaults exist
-	properties := common.MapStr{}
+	properties := mapstr.M{}
 
 	if f.Index != nil {
 		properties["index"] = *f.Index
@@ -548,7 +549,7 @@ func (p *Processor) getDefaultProperties(f *mapping.Field) common.MapStr {
 
 	if !p.EsVersion.LessThan(minVersionFieldMeta) {
 		if f.MetricType != "" || f.Unit != "" {
-			meta := common.MapStr{}
+			meta := mapstr.M{}
 			if f.MetricType != "" {
 				meta["metric_type"] = f.MetricType
 			}
