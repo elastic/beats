@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 *Filebeat*
 
 *Heartbeat*
-- Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
 
@@ -37,9 +36,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 
 *Affecting all Beats*
 
-- Fix group write permissions on runtime directories. {pull}30869[30869]
-- Store syslog version as string. {pull}31446[31446]
-
 *Auditbeat*
 
 
@@ -47,9 +43,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 
 - m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
-- Netflow: replace invalid field value. {pull}31295[31295]
-- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
-- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 
 *Heartbeat*
 
@@ -92,7 +85,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 - Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
 - Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
 - Add support in httpjson input for chain calls. {pull}29816[29816]
-- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 
 *Auditbeat*
 
@@ -150,10 +142,6 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 *Functionbeat*
 
 ==== Known Issue
-
-
-
-
 
 
 

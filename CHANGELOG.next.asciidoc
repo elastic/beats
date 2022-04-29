@@ -18,6 +18,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Restrict setuid to containerized environments. {pull}30869[30869]
+
 *Metricbeat*
 
 
@@ -34,12 +36,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Netflow: replace invalid field value. {pull}31295[31295]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 
 *Heartbeat*
 
@@ -70,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 
 *Auditbeat*
 
