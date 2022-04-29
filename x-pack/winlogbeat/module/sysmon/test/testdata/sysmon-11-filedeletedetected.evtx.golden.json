@@ -1,23 +1,10 @@
 [
   {
-    "@timestamp": "2022-01-24T05:12:34.328Z",
+    "@timestamp": "2022-01-24T05:12:34.3299803Z",
     "event": {
-      "category": [
-        "file"
-      ],
       "code": "26",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "deletion"
-      ]
-    },
-    "file": {
-      "directory": "C:\\Windows\\ServiceState\\EventLog\\Data",
-      "extension": "dat",
-      "name": "lastalive1.dat",
-      "path": "C:\\Windows\\ServiceState\\EventLog\\Data\\lastalive1.dat"
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
@@ -25,36 +12,21 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "entity_id": "{63a74932-a2b4-61ee-1b00-000000000700}",
-      "executable": "C:\\Windows\\System32\\svchost.exe",
-      "hash": {
-        "sha256": "a94808e7c66973b122f66ec6611019c745a9602f8e944f53635cab58aef35a79"
-      },
-      "name": "svchost.exe",
-      "pid": 1264
-    },
-    "related": {
-      "hash": "a94808e7c66973b122f66ec6611019c745a9602f8e944f53635cab58aef35a79",
-      "user": "LOCAL SERVICE"
-    },
-    "rule": {
-      "name": "-"
-    },
-    "sysmon": {
-      "file": {
-        "is_executable": false
-      }
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "LOCAL SERVICE"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "Hashes": "SHA256=A94808E7C66973B122F66EC6611019C745A9602F8E944F53635CAB58AEF35A79",
+        "Image": "C:\\Windows\\System32\\svchost.exe",
+        "IsExecutable": "false",
+        "ProcessGuid": "{63a74932-a2b4-61ee-1b00-000000000700}",
+        "ProcessId": "1264",
+        "RuleName": "-",
+        "TargetFilename": "C:\\Windows\\ServiceState\\EventLog\\Data\\lastalive1.dat",
+        "User": "NT AUTHORITY\\LOCAL SERVICE",
+        "UtcTime": "2022-01-24 05:12:34.328"
+      },
       "event_id": "26",
       "process": {
         "pid": 2764,
@@ -72,24 +44,11 @@
     }
   },
   {
-    "@timestamp": "2022-01-24T05:12:51.031Z",
+    "@timestamp": "2022-01-24T05:12:51.04227Z",
     "event": {
-      "category": [
-        "file"
-      ],
       "code": "26",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "deletion"
-      ]
-    },
-    "file": {
-      "directory": "C:\\ProgramData\\Microsoft\\Windows\\DeviceMetadataCache",
-      "extension": "000",
-      "name": "OLDCACHE.000",
-      "path": "C:\\ProgramData\\Microsoft\\Windows\\DeviceMetadataCache\\OLDCACHE.000"
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
@@ -97,36 +56,21 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "entity_id": "{63a74932-3523-61ee-af00-000000000700}",
-      "executable": "C:\\Windows\\system32\\svchost.exe",
-      "hash": {
-        "sha256": "d78fbf654d84ddf2cb4fe221f7d8b61e0decdee48a4687915e6e4a2296e2418b"
-      },
-      "name": "svchost.exe",
-      "pid": 1364
-    },
-    "related": {
-      "hash": "d78fbf654d84ddf2cb4fe221f7d8b61e0decdee48a4687915e6e4a2296e2418b",
-      "user": "SYSTEM"
-    },
-    "rule": {
-      "name": "-"
-    },
-    "sysmon": {
-      "file": {
-        "is_executable": false
-      }
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "Hashes": "SHA256=D78FBF654D84DDF2CB4FE221F7D8B61E0DECDEE48A4687915E6E4A2296E2418B",
+        "Image": "C:\\Windows\\system32\\svchost.exe",
+        "IsExecutable": "false",
+        "ProcessGuid": "{63a74932-3523-61ee-af00-000000000700}",
+        "ProcessId": "1364",
+        "RuleName": "-",
+        "TargetFilename": "C:\\ProgramData\\Microsoft\\Windows\\DeviceMetadataCache\\OLDCACHE.000",
+        "User": "NT AUTHORITY\\SYSTEM",
+        "UtcTime": "2022-01-24 05:12:51.031"
+      },
       "event_id": "26",
       "process": {
         "pid": 2764,
