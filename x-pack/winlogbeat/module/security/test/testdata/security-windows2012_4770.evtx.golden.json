@@ -2,18 +2,11 @@
   {
     "@timestamp": "2020-04-01T07:32:55.0104462Z",
     "event": {
-      "action": "kerberos-service-ticket-renewed",
-      "category": [
-        "authentication"
-      ],
+      "action": "Kerberos Service Ticket Operations",
       "code": "4770",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -21,34 +14,19 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "ip": "::1",
-      "user": "DC_TEST2K12$"
-    },
-    "source": {
-      "ip": "::1",
-      "port": 0
-    },
-    "user": {
-      "domain": "TEST.SAAS",
-      "name": "DC_TEST2K12$"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
+        "IpAddress": "::1",
+        "IpPort": "0",
         "ServiceName": "krbtgt",
         "ServiceSid": "S-1-5-21-1717121054-434620538-60925301-502",
         "TargetDomainName": "TEST.SAAS",
         "TargetUserName": "DC_TEST2K12$@TEST.SAAS",
         "TicketEncryptionType": "0x12",
-        "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
-        "TicketOptions": "0x10002",
-        "TicketOptionsDescription": [
-          "Renew",
-          "Name-canonicalize"
-        ]
+        "TicketOptions": "0x10002"
       },
       "event_id": "4770",
       "keywords": [

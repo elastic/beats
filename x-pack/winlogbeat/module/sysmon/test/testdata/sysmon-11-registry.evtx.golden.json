@@ -1,42 +1,16 @@
 [
   {
-    "@timestamp": "2020-05-05T14:57:40.589Z",
+    "@timestamp": "2020-05-05T14:57:40.5995672Z",
     "event": {
-      "category": [
-        "configuration",
-        "registry"
-      ],
       "code": "13",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
-      "executable": "C:\\Windows\\regedit.exe",
-      "name": "regedit.exe",
-      "pid": 6072
-    },
-    "registry": {
-      "data": {
-        "strings": [
-          "4"
-        ],
-        "type": "SZ_DWORD"
-      },
-      "hive": "HKU",
-      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1",
-      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1",
-      "value": "Key 1"
     },
     "winlog": {
       "api": "wineventlog",
@@ -45,7 +19,12 @@
       "event_data": {
         "Details": "DWORD (0x00000004)",
         "EventType": "SetValue",
-        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1"
+        "Image": "C:\\Windows\\regedit.exe",
+        "ProcessGuid": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+        "ProcessId": "6072",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1",
+        "UtcTime": "2020-05-05 14:57:40.589"
       },
       "event_id": "13",
       "process": {
@@ -64,37 +43,17 @@
     }
   },
   {
-    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "@timestamp": "2020-05-05T14:57:44.7232485Z",
     "event": {
-      "category": [
-        "configuration",
-        "registry"
-      ],
       "code": "13",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
-      "executable": "C:\\Windows\\Explorer.EXE",
-      "name": "Explorer.EXE",
-      "pid": 4320
-    },
-    "registry": {
-      "hive": "HKU",
-      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
-      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
-      "value": "HRZR_PGYFRFFVBA"
     },
     "winlog": {
       "api": "wineventlog",
@@ -103,7 +62,12 @@
       "event_data": {
         "Details": "Binary Data",
         "EventType": "SetValue",
-        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA"
+        "Image": "C:\\Windows\\Explorer.EXE",
+        "ProcessGuid": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+        "ProcessId": "4320",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+        "UtcTime": "2020-05-05 14:57:44.714"
       },
       "event_id": "13",
       "process": {
@@ -122,43 +86,17 @@
     }
   },
   {
-    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "@timestamp": "2020-05-05T14:57:44.7260099Z",
     "event": {
-      "category": [
-        "configuration",
-        "registry"
-      ],
       "code": "13",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
-      "executable": "C:\\Windows\\regedit.exe",
-      "name": "regedit.exe",
-      "pid": 6072
-    },
-    "registry": {
-      "data": {
-        "strings": [
-          "5"
-        ],
-        "type": "SZ_QWORD"
-      },
-      "hive": "HKU",
-      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2",
-      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2",
-      "value": "Key 2"
     },
     "winlog": {
       "api": "wineventlog",
@@ -167,7 +105,12 @@
       "event_data": {
         "Details": "QWORD (0x00000000-0x00000005)",
         "EventType": "SetValue",
-        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2"
+        "Image": "C:\\Windows\\regedit.exe",
+        "ProcessGuid": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+        "ProcessId": "6072",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2",
+        "UtcTime": "2020-05-05 14:57:44.714"
       },
       "event_id": "13",
       "process": {
@@ -186,37 +129,17 @@
     }
   },
   {
-    "@timestamp": "2020-05-05T14:57:46.808Z",
+    "@timestamp": "2020-05-05T14:57:46.8188214Z",
     "event": {
-      "category": [
-        "configuration",
-        "registry"
-      ],
       "code": "13",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
-      "executable": "C:\\Windows\\Explorer.EXE",
-      "name": "Explorer.EXE",
-      "pid": 4320
-    },
-    "registry": {
-      "hive": "HKU",
-      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr",
-      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr",
-      "value": "ertrqvg.rkr"
     },
     "winlog": {
       "api": "wineventlog",
@@ -225,7 +148,12 @@
       "event_data": {
         "Details": "Binary Data",
         "EventType": "SetValue",
-        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr"
+        "Image": "C:\\Windows\\Explorer.EXE",
+        "ProcessGuid": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+        "ProcessId": "4320",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr",
+        "UtcTime": "2020-05-05 14:57:46.808"
       },
       "event_id": "13",
       "process": {
@@ -244,37 +172,17 @@
     }
   },
   {
-    "@timestamp": "2020-05-05T14:57:46.808Z",
+    "@timestamp": "2020-05-05T14:57:46.8188691Z",
     "event": {
-      "category": [
-        "configuration",
-        "registry"
-      ],
       "code": "13",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
-      "executable": "C:\\Windows\\Explorer.EXE",
-      "name": "Explorer.EXE",
-      "pid": 4320
-    },
-    "registry": {
-      "hive": "HKU",
-      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
-      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
-      "value": "HRZR_PGYFRFFVBA"
     },
     "winlog": {
       "api": "wineventlog",
@@ -283,7 +191,12 @@
       "event_data": {
         "Details": "Binary Data",
         "EventType": "SetValue",
-        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA"
+        "Image": "C:\\Windows\\Explorer.EXE",
+        "ProcessGuid": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+        "ProcessId": "4320",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+        "UtcTime": "2020-05-05 14:57:46.808"
       },
       "event_id": "13",
       "process": {

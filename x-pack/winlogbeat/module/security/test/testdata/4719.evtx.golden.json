@@ -2,34 +2,17 @@
   {
     "@timestamp": "2019-11-07T15:22:57.6553291Z",
     "event": {
-      "action": "changed-audit-config",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4719",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "WIN-41OB2LO92CR$"
-    },
-    "user": {
-      "domain": "WLBEAT",
-      "id": "S-1-5-18",
-      "name": "WIN-41OB2LO92CR$"
     },
     "winlog": {
       "activity_id": "{3eef0a0d-9551-0000-140c-ef3e5195d501}",
@@ -38,13 +21,7 @@
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_data": {
         "AuditPolicyChanges": "%%8449, %%8451",
-        "AuditPolicyChangesDescription": [
-          "Success Added",
-          "Failure Added"
-        ],
-        "Category": "Logon/Logoff",
         "CategoryId": "%%8273",
-        "SubCategory": "Network Policy Server",
         "SubcategoryGuid": "{0cce9243-69ae-11d9-bed3-505054503030}",
         "SubcategoryId": "%%12552",
         "SubjectDomainName": "WLBEAT",
@@ -56,9 +33,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 772,

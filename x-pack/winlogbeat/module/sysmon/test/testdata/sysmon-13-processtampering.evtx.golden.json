@@ -1,17 +1,10 @@
 [
   {
-    "@timestamp": "2021-02-25T14:43:23.55Z",
+    "@timestamp": "2021-02-25T14:43:23.5512694Z",
     "event": {
-      "category": [
-        "process"
-      ],
       "code": "25",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "DESKTOP-I9CQVAQ"
@@ -19,21 +12,17 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "entity_id": "{9497d8d9-b78b-6037-6f13-000000001000}",
-      "executable": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
-      "name": "git.exe",
-      "pid": 2628
-    },
-    "user": {
-      "id": "S-1-5-18"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "DESKTOP-I9CQVAQ",
       "event_data": {
-        "Type": "Image is replaced"
+        "Image": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+        "ProcessGuid": "{9497d8d9-b78b-6037-6f13-000000001000}",
+        "ProcessId": "2628",
+        "RuleName": "-",
+        "Type": "Image is replaced",
+        "UtcTime": "2021-02-25 14:43:23.550"
       },
       "event_id": "25",
       "process": {

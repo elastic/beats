@@ -2,37 +2,17 @@
   {
     "@timestamp": "2020-08-17T12:49:09.4942066Z",
     "event": {
-      "action": "object-audit-changed",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4817",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "WIN-BVM4LI1L1Q6$",
-        "Administrator"
-      ]
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-18",
-      "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
       "activity_id": "{dfcd2c2a-7481-0000-682c-cddf8174d601}",
@@ -41,8 +21,6 @@
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
         "NewSd": "S:(AU;SA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;S-1-5-21-2024912787-2692429404-2351956786-500)(AU;SA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;S-1-5-21-2024912787-2692429404-2351956786-1000)",
-        "NewSdSacl0": "Administrator :System Audit (Create All Child Objects,Delete All Child Objects,List Contents,All Validated,Read All Properties,Write All Properties,Delete Subtree,List Object,All Extended Rights,Delete,Read Permissions,Modify Permissions,Modify Owner)",
-        "NewSdSacl1": "S-1-5-21-2024912787-2692429404-2351956786-1000 :System Audit (Create All Child Objects,Delete All Child Objects,List Contents,All Validated,Read All Properties,Write All Properties,Delete Subtree,List Object,All Extended Rights,Delete,Read Permissions,Modify Permissions,Modify Owner)",
         "ObjectName": "File",
         "ObjectServer": "LSA",
         "ObjectType": "Global SACL",
@@ -55,9 +33,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 776,

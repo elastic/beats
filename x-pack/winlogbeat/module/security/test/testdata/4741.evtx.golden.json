@@ -2,19 +2,11 @@
   {
     "@timestamp": "2019-12-18T16:22:12.3112534Z",
     "event": {
-      "action": "added-computer-account",
-      "category": [
-        "iam"
-      ],
+      "action": "Computer Account Management",
       "code": "4741",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "creation",
-        "admin"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -22,22 +14,9 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "user": "at_adm"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-21-1717121054-434620538-60925301-2794",
-      "name": "at_adm"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
-      "computerObject": {
-        "domain": "TEST",
-        "id": "S-1-5-21-1717121054-434620538-60925301-2902",
-        "name": "TESTCOMPUTEROBJ$"
-      },
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
         "AccountExpires": "%%1794",
@@ -47,17 +26,11 @@
         "HomeDirectory": "-",
         "HomePath": "-",
         "LogonHours": "%%1793",
-        "NewUACList": [
-          "SCRIPT",
-          "ENCRYPTED_TEXT_PWD_ALLOWED"
-        ],
         "NewUacValue": "0x85",
         "OldUacValue": "0x0",
         "PasswordLastSet": "%%1794",
         "PrimaryGroupId": "515",
-        "PrivilegeList": [
-          "-"
-        ],
+        "PrivilegeList": "-",
         "ProfilePath": "-",
         "SamAccountName": "TESTCOMPUTEROBJ$",
         "ScriptPath": "-",
@@ -70,11 +43,7 @@
         "TargetDomainName": "TEST",
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2902",
         "TargetUserName": "TESTCOMPUTEROBJ$",
-        "UserAccountControl": [
-          "2080",
-          "2082",
-          "2087"
-        ],
+        "UserAccountControl": "\n\t\t%%2080\n\t\t%%2082\n\t\t%%2087",
         "UserParameters": "-",
         "UserPrincipalName": "-",
         "UserWorkstations": "-"
@@ -83,9 +52,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x2e67800"
-      },
       "opcode": "Info",
       "process": {
         "pid": 492,

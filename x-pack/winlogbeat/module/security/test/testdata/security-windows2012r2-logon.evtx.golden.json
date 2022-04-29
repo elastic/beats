@@ -2,40 +2,17 @@
   {
     "@timestamp": "2019-03-29T21:10:39.7868321Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -51,6 +28,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -65,10 +44,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -86,40 +61,17 @@
   {
     "@timestamp": "2019-03-29T21:10:40.2555609Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -135,6 +87,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -149,10 +103,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -170,46 +120,17 @@
   {
     "@timestamp": "2019-03-29T21:10:40.3805426Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\winlogon.exe",
-      "name": "winlogon.exe",
-      "pid": 448
-    },
-    "related": {
-      "ip": "127.0.0.1",
-      "user": [
-        "vagrant",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "source": {
-      "domain": "VAGRANT-2012-R2",
-      "ip": "127.0.0.1",
-      "port": 0
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -218,11 +139,15 @@
       "event_data": {
         "AuthenticationPackageName": "Negotiate",
         "ImpersonationLevel": "%%1833",
+        "IpAddress": "127.0.0.1",
+        "IpPort": "0",
         "KeyLength": "0",
         "LmPackageName": "-",
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "User32 ",
         "LogonType": "2",
+        "ProcessId": "0x1c0",
+        "ProcessName": "C:\\Windows\\System32\\winlogon.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -231,16 +156,13 @@
         "TargetLogonId": "0x1008e",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-        "TransmittedServices": "-"
+        "TransmittedServices": "-",
+        "WorkstationName": "VAGRANT-2012-R2"
       },
       "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x1008e",
-        "type": "Interactive"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -258,40 +180,17 @@
   {
     "@timestamp": "2019-03-29T21:10:40.5055514Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -307,6 +206,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -321,10 +222,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -342,37 +239,17 @@
   {
     "@timestamp": "2019-03-29T21:10:40.6305447Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "-",
-      "name": "-",
-      "pid": 0
-    },
-    "related": {
-      "user": "ANONYMOUS LOGON"
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-7",
-      "name": "ANONYMOUS LOGON"
     },
     "winlog": {
       "api": "wineventlog",
@@ -388,6 +265,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "NtLmSsp ",
         "LogonType": "3",
+        "ProcessId": "0x0",
+        "ProcessName": "-",
         "SubjectDomainName": "-",
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
@@ -402,10 +281,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x129f1",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -423,37 +298,17 @@
   {
     "@timestamp": "2019-03-29T21:10:53.6617957Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "-",
-      "name": "-",
-      "pid": 0
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -469,6 +324,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "NtLmSsp ",
         "LogonType": "3",
+        "ProcessId": "0x0",
+        "ProcessName": "-",
         "SubjectDomainName": "-",
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
@@ -483,10 +340,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x28d31",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -504,37 +357,17 @@
   {
     "@timestamp": "2019-03-29T21:10:54.6618303Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "-",
-      "name": "-",
-      "pid": 0
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -550,6 +383,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "NtLmSsp ",
         "LogonType": "3",
+        "ProcessId": "0x0",
+        "ProcessName": "-",
         "SubjectDomainName": "-",
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
@@ -564,10 +399,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x29f0f",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -585,37 +416,17 @@
   {
     "@timestamp": "2019-03-29T21:10:55.4587259Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "-",
-      "name": "-",
-      "pid": 0
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -631,6 +442,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "NtLmSsp ",
         "LogonType": "3",
+        "ProcessId": "0x0",
+        "ProcessName": "-",
         "SubjectDomainName": "-",
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
@@ -645,10 +458,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x2a362",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -666,40 +475,17 @@
   {
     "@timestamp": "2019-03-29T21:13:17.3025591Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "-",
-      "name": "-",
-      "pid": 0
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "source": {
-      "domain": "127.0.0.1"
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -715,6 +501,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "NtLmSsp ",
         "LogonType": "3",
+        "ProcessId": "0x0",
+        "ProcessName": "-",
         "SubjectDomainName": "-",
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
@@ -723,16 +511,13 @@
         "TargetLogonId": "0x324f8",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-        "TransmittedServices": "-"
+        "TransmittedServices": "-",
+        "WorkstationName": "127.0.0.1"
       },
       "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x324f8",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -750,40 +535,17 @@
   {
     "@timestamp": "2019-03-29T21:13:17.5213056Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\winlogon.exe",
-      "name": "winlogon.exe",
-      "pid": 2812
-    },
-    "related": {
-      "user": [
-        "DWM-2",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "Window Manager",
-      "id": "S-1-5-90-2",
-      "name": "DWM-2"
     },
     "winlog": {
       "api": "wineventlog",
@@ -799,6 +561,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "2",
+        "ProcessId": "0xafc",
+        "ProcessName": "C:\\Windows\\System32\\winlogon.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -813,10 +577,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x33444",
-        "type": "Interactive"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -834,46 +594,17 @@
   {
     "@timestamp": "2019-03-29T21:13:17.6149946Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\winlogon.exe",
-      "name": "winlogon.exe",
-      "pid": 2812
-    },
-    "related": {
-      "ip": "10.0.2.2",
-      "user": [
-        "vagrant",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "source": {
-      "domain": "VAGRANT-2012-R2",
-      "ip": "10.0.2.2",
-      "port": 0
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -882,11 +613,15 @@
       "event_data": {
         "AuthenticationPackageName": "Negotiate",
         "ImpersonationLevel": "%%1833",
+        "IpAddress": "10.0.2.2",
+        "IpPort": "0",
         "KeyLength": "0",
         "LmPackageName": "-",
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "User32 ",
         "LogonType": "10",
+        "ProcessId": "0xafc",
+        "ProcessName": "C:\\Windows\\System32\\winlogon.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -895,16 +630,13 @@
         "TargetLogonId": "0x3444f",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-        "TransmittedServices": "-"
+        "TransmittedServices": "-",
+        "WorkstationName": "VAGRANT-2012-R2"
       },
       "event_id": "4624",
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3444f",
-        "type": "RemoteInteractive"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -922,40 +654,17 @@
   {
     "@timestamp": "2019-03-29T21:13:18.7869259Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\winlogon.exe",
-      "name": "winlogon.exe",
-      "pid": 2188
-    },
-    "related": {
-      "user": [
-        "DWM-3",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "Window Manager",
-      "id": "S-1-5-90-3",
-      "name": "DWM-3"
     },
     "winlog": {
       "api": "wineventlog",
@@ -971,6 +680,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "2",
+        "ProcessId": "0x88c",
+        "ProcessName": "C:\\Windows\\System32\\winlogon.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -985,10 +696,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x357fd",
-        "type": "Interactive"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1006,40 +713,17 @@
   {
     "@timestamp": "2019-03-29T21:20:48.7402309Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1055,6 +739,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -1069,10 +755,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1090,40 +772,17 @@
   {
     "@timestamp": "2019-03-29T21:20:48.7402309Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1139,6 +798,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -1153,10 +814,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1174,40 +831,17 @@
   {
     "@timestamp": "2019-03-29T21:20:50.5840151Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1223,6 +857,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -1237,10 +873,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1258,40 +890,17 @@
   {
     "@timestamp": "2019-03-29T21:23:42.5201798Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1307,6 +916,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -1321,10 +932,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1342,40 +949,17 @@
   {
     "@timestamp": "2019-03-29T21:26:24.1764267Z",
     "event": {
-      "action": "logged-in",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4624",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 508
-    },
-    "related": {
-      "user": [
-        "SYSTEM",
-        "VAGRANT-2012-R2$"
-      ]
-    },
-    "user": {
-      "domain": "NT AUTHORITY",
-      "id": "S-1-5-18",
-      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1391,6 +975,8 @@
         "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
         "LogonProcessName": "Advapi  ",
         "LogonType": "5",
+        "ProcessId": "0x1fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "WORKGROUP",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
@@ -1405,10 +991,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7",
-        "type": "Service"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1426,43 +1008,17 @@
   {
     "@timestamp": "2019-03-29T21:45:35.177054Z",
     "event": {
-      "action": "logon-failed",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logon",
       "code": "4625",
       "kind": "event",
-      "module": "security",
       "outcome": "failure",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\svchost.exe",
-      "name": "svchost.exe",
-      "pid": 836
-    },
-    "related": {
-      "ip": "::1",
-      "user": "bosch"
-    },
-    "source": {
-      "domain": "VAGRANT-2012-R2",
-      "ip": "::1",
-      "port": 0
-    },
-    "user": {
-      "domain": "VAGRANT-2012-R2",
-      "id": "S-1-0-0",
-      "name": "bosch"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1471,10 +1027,14 @@
       "event_data": {
         "AuthenticationPackageName": "Negotiate",
         "FailureReason": "%%2313",
+        "IpAddress": "::1",
+        "IpPort": "0",
         "KeyLength": "0",
         "LmPackageName": "-",
         "LogonProcessName": "seclogo",
         "LogonType": "2",
+        "ProcessId": "0x344",
+        "ProcessName": "C:\\Windows\\System32\\svchost.exe",
         "Status": "0xc000006d",
         "SubStatus": "0xc0000064",
         "SubjectDomainName": "VAGRANT-2012-R2",
@@ -1484,21 +1044,13 @@
         "TargetDomainName": "VAGRANT-2012-R2",
         "TargetUserName": "bosch",
         "TargetUserSid": "S-1-0-0",
-        "TransmittedServices": "-"
+        "TransmittedServices": "-",
+        "WorkstationName": "VAGRANT-2012-R2"
       },
       "event_id": "4625",
       "keywords": [
         "Audit Failure"
       ],
-      "logon": {
-        "failure": {
-          "reason": "Unknown user name or bad password.",
-          "status": "This is either due to a bad username or authentication information",
-          "sub_status": "User logon with misspelled or bad user account"
-        },
-        "id": "0x1008e",
-        "type": "Interactive"
-      },
       "opcode": "Info",
       "process": {
         "pid": 516,

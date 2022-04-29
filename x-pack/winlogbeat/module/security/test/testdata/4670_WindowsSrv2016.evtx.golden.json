@@ -2,39 +2,17 @@
   {
     "@timestamp": "2020-07-28T13:22:18.7993488Z",
     "event": {
-      "action": "permissions-changed",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Authorization Policy Change",
       "code": "4670",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\System32\\services.exe",
-      "name": "services.exe",
-      "pid": 764
-    },
-    "related": {
-      "user": "WIN-BVM4LI1L1Q6$"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-18",
-      "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
       "api": "wineventlog",
@@ -43,15 +21,12 @@
       "event_data": {
         "HandleId": "0x56c",
         "NewSd": "D:(A;;GA;;;SY)(A;;RC;;;OW)(A;;GA;;;S-1-5-80-123231216-2592883651-3715271367-3753151631-4175906628)",
-        "NewSdDacl0": "Local system :Access Allowed (Generic All)",
-        "NewSdDacl1": "OW :Access Allowed (Read Permissions)",
-        "NewSdDacl2": "S-1-5-80-123231216-2592883651-3715271367-3753151631-4175906628 :Access Allowed (Generic All)",
         "ObjectName": "-",
         "ObjectServer": "Security",
         "ObjectType": "Token",
         "OldSd": "D:(A;;GA;;;SY)(A;;GA;;;NS)",
-        "OldSdDacl0": "Local system :Access Allowed (Generic All)",
-        "OldSdDacl1": "Network service account :Access Allowed (Generic All)",
+        "ProcessId": "0x2fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
         "SubjectDomainName": "TEST",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
@@ -61,9 +36,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 4,

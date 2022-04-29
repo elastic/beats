@@ -21,14 +21,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	// Register javascript modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -48,10 +44,10 @@ func WithFieldFilter(filter []string) Option {
 	}
 }
 
-// TestPipeline tests the given pipeline by reading events from the .evtx files
-// and processing them with the pipeline. Then it compares the results against
+// TestPipeline tests the partial pipeline by reading events from the .evtx files
+// and processing them with a basic enrichment. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
-func TestPipeline(t *testing.T, evtx string, pipeline string, opts ...Option) {
+func TestPipeline(t *testing.T, evtx string, opts ...Option) {
 	files, err := filepath.Glob(evtx)
 	if err != nil {
 		t.Fatal(err)
@@ -67,12 +63,12 @@ func TestPipeline(t *testing.T, evtx string, pipeline string, opts ...Option) {
 
 	for _, f := range files {
 		t.Run(filepath.Base(f), func(t *testing.T) {
-			testPipeline(t, f, pipeline, &p)
+			testPipeline(t, f, &p)
 		})
 	}
 }
 
-func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
+func testPipeline(t testing.TB, evtx string, p *params) {
 	t.Helper()
 
 	path, err := filepath.Abs(evtx)
@@ -95,24 +91,17 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 		t.Fatal(err)
 	}
 
-	// Load javascript processor.
-	processor, err := javascript.New(config.MustNewConfigFrom(mapstr.M{
-		"file": pipeline,
-	}))
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	// Read and process events.
 	var events []mapstr.M
 	for stop := false; !stop; {
 		records, err := log.Read()
-		if err == io.EOF {
+		if err == io.EOF { //nolint:errorlint // io.EOF should never be wrapped.
 			stop = true
 		} else if err != nil {
 			t.Fatal(err)
 		}
 
+		//nolint:errcheck // All the errors returned here are from beat.Event queries and may be ignored.
 		for _, r := range records {
 			record := r.ToEvent()
 
@@ -130,14 +119,10 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 				record.Delete("winlog.user.domain")
 			}
 
-			evt, err := processor.Run(&record)
-			if err != nil {
-				t.Fatalf("%v while processing event:\n%v", err, record.Fields.StringToPrint())
-			}
-
 			// Copy the timestamp to the beat.Event.Fields because this is what
 			// we write to the golden data for testing purposes. In the normal
 			// Beats output this the handled by the encoder (go-structform).
+			evt := &record
 			if !evt.Timestamp.IsZero() {
 				evt.Fields["@timestamp"] = evt.Timestamp.UTC()
 			}
@@ -189,12 +174,12 @@ func writeGolden(t testing.TB, source string, events []mapstr.M) {
 		t.Fatal(err)
 	}
 
-	if err := os.MkdirAll("testdata", 0o755); err != nil {
+	if err := os.MkdirAll("testdata", 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	outPath := filepath.Join("testdata", filepath.Base(source)+".golden.json")
-	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil {
+	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil { //nolint:gosec // Bad linter!
 		t.Fatal(err)
 	}
 }
@@ -235,7 +220,7 @@ func normalize(t testing.TB, m mapstr.M) mapstr.M {
 
 func filterEvent(m mapstr.M, ignores []string) mapstr.M {
 	for _, f := range ignores {
-		m.Delete(f)
+		m.Delete(f) //nolint:errcheck // Deleting a thing that doesn't exist is ok.
 	}
 	return m
 }
@@ -252,7 +237,7 @@ func lowercaseGUIDs(m mapstr.M) mapstr.M {
 			continue
 		}
 		if uppercaseGUIDRegex.MatchString(str) {
-			m.Put(k, strings.ToLower(str))
+			m.Put(k, strings.ToLower(str)) //nolint:errcheck // Can't fail because k has been obtained from m.
 		}
 	}
 	return m

@@ -2,41 +2,17 @@
   {
     "@timestamp": "2019-09-06T13:40:52.3149485Z",
     "event": {
-      "action": "unlocked-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4767",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "elastictest1"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1005",
-        "name": "elastictest1"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -56,9 +32,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

@@ -2,18 +2,11 @@
   {
     "@timestamp": "2020-04-06T06:38:31.1087891Z",
     "event": {
-      "action": "privileged-operation",
-      "category": [
-        "iam"
-      ],
+      "action": "Sensitive Privilege Use",
       "code": "4674",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -21,39 +14,19 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "executable": "C:\\Windows\\System32\\svchost.exe",
-      "name": "svchost.exe",
-      "pid": 884
-    },
-    "related": {
-      "user": "at_adm"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-21-1717121054-434620538-60925301-2794",
-      "name": "at_adm"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
-        "AccessMask": [
-          "1538",
-          "1542"
-        ],
-        "AccessMaskDescription": [
-          "READ_CONTROL",
-          "ACCESS_SYS_SEC"
-        ],
+        "AccessMask": "%%1538\n\t\t\t\t%%1542\n\t\t\t\t",
         "HandleId": "0x1ee0",
         "ObjectName": "C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\PLA\\Server Manager Performance Monitor",
         "ObjectServer": "Security",
         "ObjectType": "File",
-        "PrivilegeList": [
-          "SeSecurityPrivilege"
-        ],
+        "PrivilegeList": "SeSecurityPrivilege",
+        "ProcessId": "0x374",
+        "ProcessName": "C:\\Windows\\System32\\svchost.exe",
         "SubjectDomainName": "TEST",
         "SubjectLogonId": "0x8aa365b",
         "SubjectUserName": "at_adm",
@@ -63,9 +36,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x8aa365b"
-      },
       "opcode": "Info",
       "process": {
         "pid": 496,

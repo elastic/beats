@@ -2,41 +2,17 @@
   {
     "@timestamp": "2019-09-06T13:36:17.5667652Z",
     "event": {
-      "action": "modified-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4738",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "elastictest1"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1005",
-        "name": "elastictest1"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -51,10 +27,6 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUACList": [
-          "LOCKOUT",
-          "NORMAL_ACCOUNT"
-        ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x210",
         "PasswordLastSet": "6/9/2019 10:30:28",
@@ -71,9 +43,7 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1005",
         "TargetUserName": "elastictest1",
-        "UserAccountControl": [
-          "-"
-        ],
+        "UserAccountControl": "-",
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
@@ -82,9 +52,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,
@@ -101,41 +68,17 @@
   {
     "@timestamp": "2019-09-06T13:36:36.3634107Z",
     "event": {
-      "action": "modified-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4738",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "audittest0609"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1006",
-        "name": "audittest0609"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -150,10 +93,6 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUACList": [
-          "LOCKOUT",
-          "NORMAL_ACCOUNT"
-        ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x10",
         "PasswordLastSet": "6/9/2019 10:25:21",
@@ -170,9 +109,7 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006",
         "TargetUserName": "audittest0609",
-        "UserAccountControl": [
-          "2089"
-        ],
+        "UserAccountControl": "\n\t\t%%2089",
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
@@ -181,9 +118,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

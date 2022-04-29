@@ -2,51 +2,17 @@
   {
     "@timestamp": "2019-11-14T17:10:15.1515514Z",
     "event": {
-      "action": "created-process",
-      "category": [
-        "process"
-      ],
+      "action": "Process Creation",
       "code": "4688",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\system32\\wevtutil.exe",
-        "cl",
-        "Security"
-      ],
-      "command_line": "\"C:\\Windows\\system32\\wevtutil.exe\" cl Security",
-      "executable": "C:\\Windows\\System32\\wevtutil.exe",
-      "name": "wevtutil.exe",
-      "parent": {
-        "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "name": "powershell.exe",
-        "pid": 4652
-      },
-      "pid": 4556
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "effective": {
-        "id": "S-1-0-0"
-      },
-      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
-      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -55,6 +21,9 @@
       "event_data": {
         "CommandLine": "\"C:\\Windows\\system32\\wevtutil.exe\" cl Security",
         "MandatoryLabel": "S-1-16-12288",
+        "NewProcessId": "0x11cc",
+        "NewProcessName": "C:\\Windows\\System32\\wevtutil.exe",
+        "ParentProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
         "ProcessId": "0x122c",
         "SubjectDomainName": "VAGRANT",
         "SubjectLogonId": "0x274a2",
@@ -70,9 +39,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x274a2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 4,

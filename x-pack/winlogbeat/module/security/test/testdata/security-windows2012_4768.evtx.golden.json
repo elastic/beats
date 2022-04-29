@@ -2,18 +2,11 @@
   {
     "@timestamp": "2020-04-01T08:45:44.1717416Z",
     "event": {
-      "action": "kerberos-authentication-ticket-requested",
-      "category": [
-        "authentication"
-      ],
+      "action": "Kerberos Authentication Service",
       "code": "4768",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -21,41 +14,22 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "ip": "::1",
-      "user": "at_adm"
-    },
-    "source": {
-      "ip": "::1",
-      "port": 0
-    },
-    "user": {
-      "domain": "TEST.SAAS",
-      "id": "S-1-5-21-1717121054-434620538-60925301-2794",
-      "name": "at_adm"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
+        "IpAddress": "::1",
+        "IpPort": "0",
         "PreAuthType": "2",
         "ServiceName": "krbtgt",
         "ServiceSid": "S-1-5-21-1717121054-434620538-60925301-502",
         "Status": "0x0",
-        "StatusDescription": "KDC_ERR_NONE",
         "TargetDomainName": "TEST.SAAS",
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2794",
         "TargetUserName": "at_adm",
         "TicketEncryptionType": "0x12",
-        "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
-        "TicketOptions": "0x40810010",
-        "TicketOptionsDescription": [
-          "Renewable-ok",
-          "Name-canonicalize",
-          "Renewable",
-          "Forwardable"
-        ]
+        "TicketOptions": "0x40810010"
       },
       "event_id": "4768",
       "keywords": [

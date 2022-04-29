@@ -2,32 +2,17 @@
   {
     "@timestamp": "2020-07-28T10:15:43.4951882Z",
     "event": {
-      "action": "kerberos-policy-changed",
-      "category": [
-        "configuration"
-      ],
+      "action": "Authentication Policy Change",
       "code": "4713",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "WIN-BVM4LI1L1Q6$"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-18",
-      "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
       "activity_id": "{be129571-63f8-0000-a795-12bef863d601}",
@@ -45,9 +30,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 776,

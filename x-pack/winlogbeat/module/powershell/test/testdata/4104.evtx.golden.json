@@ -3,16 +3,9 @@
     "@timestamp": "2020-05-14T11:33:51.3892662Z",
     "event": {
       "action": "Execute a Remote Command",
-      "category": [
-        "process"
-      ],
       "code": "4104",
       "kind": "event",
-      "module": "powershell",
-      "provider": "Microsoft-Windows-PowerShell",
-      "type": [
-        "info"
-      ]
+      "provider": "Microsoft-Windows-PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -20,22 +13,17 @@
     "log": {
       "level": "verbose"
     },
-    "powershell": {
-      "file": {
-        "script_block_id": "50d2dbda-7361-4926-a94d-d9eadfdb43fa",
-        "script_block_text": ".\\patata.ps1"
-      },
-      "sequence": 1,
-      "total": 1
-    },
-    "user": {
-      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000"
-    },
     "winlog": {
       "activity_id": "{fb13c9de-29f7-0001-18e0-13fbf729d601}",
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "MessageNumber": "1",
+        "MessageTotal": "1",
+        "ScriptBlockId": "50d2dbda-7361-4926-a94d-d9eadfdb43fa",
+        "ScriptBlockText": ".\\patata.ps1"
+      },
       "event_id": "4104",
       "opcode": "On create calls",
       "process": {
@@ -58,22 +46,9 @@
     "@timestamp": "2020-05-14T11:33:51.3938848Z",
     "event": {
       "action": "Execute a Remote Command",
-      "category": [
-        "process"
-      ],
       "code": "4104",
       "kind": "event",
-      "module": "powershell",
-      "provider": "Microsoft-Windows-PowerShell",
-      "type": [
-        "info"
-      ]
-    },
-    "file": {
-      "directory": "C:\\Users\\vagrant\\Desktop",
-      "extension": "ps1",
-      "name": "patata.ps1",
-      "path": "C:\\Users\\vagrant\\Desktop\\patata.ps1"
+      "provider": "Microsoft-Windows-PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -81,21 +56,17 @@
     "log": {
       "level": "verbose"
     },
-    "powershell": {
-      "file": {
-        "script_block_id": "f5521cbd-656e-4296-b74d-9ffb4eec23b0"
-      },
-      "sequence": 1,
-      "total": 1
-    },
-    "user": {
-      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000"
-    },
     "winlog": {
       "activity_id": "{fb13c9de-29f7-0000-79db-13fbf729d601}",
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "MessageNumber": "1",
+        "MessageTotal": "1",
+        "Path": "C:\\Users\\vagrant\\Desktop\\patata.ps1",
+        "ScriptBlockId": "f5521cbd-656e-4296-b74d-9ffb4eec23b0"
+      },
       "event_id": "4104",
       "opcode": "On create calls",
       "process": {

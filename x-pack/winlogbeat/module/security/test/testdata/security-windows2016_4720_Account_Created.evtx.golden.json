@@ -2,41 +2,17 @@
   {
     "@timestamp": "2019-09-06T13:24:39.2933111Z",
     "event": {
-      "action": "added-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4720",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "creation"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "elastictest1"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1005",
-        "name": "elastictest1"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -50,10 +26,6 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUACList": [
-          "SCRIPT",
-          "LOCKOUT"
-        ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
         "PasswordLastSet": "%%1794",
@@ -70,11 +42,7 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1005",
         "TargetUserName": "elastictest1",
-        "UserAccountControl": [
-          "2080",
-          "2082",
-          "2084"
-        ],
+        "UserAccountControl": "\n\t\t%%2080\n\t\t%%2082\n\t\t%%2084",
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
@@ -83,9 +51,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,
@@ -102,41 +67,17 @@
   {
     "@timestamp": "2019-09-06T13:25:21.8672707Z",
     "event": {
-      "action": "added-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4720",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "creation"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "audittest0609"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1006",
-        "name": "audittest0609"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -150,10 +91,6 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUACList": [
-          "SCRIPT",
-          "LOCKOUT"
-        ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
         "PasswordLastSet": "%%1794",
@@ -170,11 +107,7 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006",
         "TargetUserName": "audittest0609",
-        "UserAccountControl": [
-          "2080",
-          "2082",
-          "2084"
-        ],
+        "UserAccountControl": "\n\t\t%%2080\n\t\t%%2082\n\t\t%%2084",
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
@@ -183,9 +116,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

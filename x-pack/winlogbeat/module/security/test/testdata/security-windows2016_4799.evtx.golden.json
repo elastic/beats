@@ -2,38 +2,17 @@
   {
     "@timestamp": "2019-10-08T10:20:44.4724208Z",
     "event": {
-      "action": "user-member-enumerated",
-      "category": [
-        "iam"
-      ],
+      "action": "Security Group Management",
       "code": "4799",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "group",
-        "info"
-      ]
-    },
-    "group": {
-      "domain": "Builtin",
-      "id": "S-1-5-32-544",
-      "name": "Administrators"
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "WIN-41OB2LO92CR$"
-    },
-    "user": {
-      "domain": "WORKGROUP",
-      "id": "S-1-5-18",
-      "name": "WIN-41OB2LO92CR$"
     },
     "winlog": {
       "activity_id": "{c3ff3c1c-7dc1-0000-233e-ffc3c17dd501}",
@@ -55,9 +34,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

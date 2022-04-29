@@ -2,33 +2,17 @@
   {
     "@timestamp": "2019-11-07T10:34:29.0559196Z",
     "event": {
-      "action": "audit-log-cleared",
-      "category": [
-        "iam"
-      ],
+      "action": "Log clear",
       "code": "1102",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Eventlog",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Eventlog"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "Administrator"
-    },
-    "user": {
-      "domain": "WLBEAT",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator"
     },
     "winlog": {
       "api": "wineventlog",
@@ -38,9 +22,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x50e87"
-      },
       "opcode": "Info",
       "process": {
         "pid": 1144,

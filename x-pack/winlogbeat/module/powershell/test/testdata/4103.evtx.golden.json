@@ -1,25 +1,11 @@
 [
   {
     "@timestamp": "2020-05-15T08:11:47.8979495Z",
-    "destination": {
-      "user": {
-        "domain": "VAGRANT",
-        "name": "vagrant"
-      }
-    },
     "event": {
       "action": "Executing Pipeline",
-      "category": [
-        "process"
-      ],
       "code": "4103",
       "kind": "event",
-      "module": "powershell",
-      "provider": "Microsoft-Windows-PowerShell",
-      "sequence": 34,
-      "type": [
-        "info"
-      ]
+      "provider": "Microsoft-Windows-PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -27,73 +13,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "command": {
-        "invocation_details": [
-          {
-            "related_command": "cmd.exe",
-            "type": "CommandInvocation",
-            "value": "\"cmd.exe\""
-          },
-          {
-            "related_command": "Out-Null",
-            "type": "CommandInvocation",
-            "value": "\"Out-Null\""
-          },
-          {
-            "name": "\"InputObject\"",
-            "related_command": "Out-Null",
-            "type": "ParameterBinding",
-            "value": "\"symbolic link created for C:\\vagrant \u003c\u003c===\u003e\u003e \\\\vboxsvr\\vagrant\""
-          }
-        ],
-        "name": "cmd.exe",
-        "path": "C:\\Windows\\system32\\cmd.exe",
-        "type": "Application"
-      },
-      "connected_user": {
-        "domain": "VAGRANT",
-        "name": "vagrant"
-      },
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "id": "Microsoft.PowerShell",
-      "pipeline_id": "1",
-      "process": {
-        "executable_version": "1.0.0.0"
-      },
-      "runspace_id": "0729459a-8646-4176-8b02-024421a9632e"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\system32\\wsmprovhost.exe",
-        "-Embedding"
-      ],
-      "args_count": 2,
-      "command_line": "C:\\Windows\\system32\\wsmprovhost.exe -Embedding",
-      "entity_id": "ed57761b-ba0f-4d11-87d9-fac33820d20e",
-      "title": "ServerRemoteHost"
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "source": {
-      "user": {
-        "domain": "VAGRANT",
-        "name": "vagrant"
-      }
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000",
-      "name": "vagrant"
-    },
     "winlog": {
       "activity_id": "{1aca0717-2acb-0002-c208-ca1acb2ad601}",
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "ContextInfo": "        Severity = Informational\n        Host Name = ServerRemoteHost\n        Host Version = 1.0.0.0\n        Host ID = ed57761b-ba0f-4d11-87d9-fac33820d20e\n        Host Application = C:\\Windows\\system32\\wsmprovhost.exe -Embedding\n        Engine Version = 5.1.17763.1007\n        Runspace ID = 0729459a-8646-4176-8b02-024421a9632e\n        Pipeline ID = 1\n        Command Name = cmd.exe\n        Command Type = Application\n        Script Name = \n        Command Path = C:\\Windows\\system32\\cmd.exe\n        Sequence Number = 34\n        User = VAGRANT\\vagrant\n        Connected User = VAGRANT\\vagrant\n        Shell ID = Microsoft.PowerShell",
+        "Payload": "CommandInvocation(cmd.exe): \"cmd.exe\"\nCommandInvocation(Out-Null): \"Out-Null\"\nParameterBinding(Out-Null): name=\"InputObject\"; value=\"symbolic link created for C:\\vagrant \u003c\u003c===\u003e\u003e \\\\vboxsvr\\vagrant\""
+      },
       "event_id": "4103",
       "opcode": "To be used when operation is just executing a method",
       "process": {
@@ -116,17 +44,9 @@
     "@timestamp": "2020-05-15T08:13:06.7032939Z",
     "event": {
       "action": "Executing Pipeline",
-      "category": [
-        "process"
-      ],
       "code": "4103",
       "kind": "event",
-      "module": "powershell",
-      "provider": "Microsoft-Windows-PowerShell",
-      "sequence": 22,
-      "type": [
-        "info"
-      ]
+      "provider": "Microsoft-Windows-PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -134,89 +54,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "command": {
-        "invocation_details": [
-          {
-            "related_command": "Resolve-Path",
-            "type": "CommandInvocation",
-            "value": "\"Resolve-Path\""
-          },
-          {
-            "name": "\"ErrorAction\"",
-            "related_command": "Resolve-Path",
-            "type": "ParameterBinding",
-            "value": "\"Ignore\""
-          },
-          {
-            "name": "\"WarningAction\"",
-            "related_command": "Resolve-Path",
-            "type": "ParameterBinding",
-            "value": "\"Ignore\""
-          },
-          {
-            "name": "\"InformationAction\"",
-            "related_command": "Resolve-Path",
-            "type": "ParameterBinding",
-            "value": "\"Ignore\""
-          },
-          {
-            "name": "\"Verbose\"",
-            "related_command": "Resolve-Path",
-            "type": "ParameterBinding",
-            "value": "\"False\""
-          },
-          {
-            "name": "\"Debug\"",
-            "related_command": "Resolve-Path",
-            "type": "ParameterBinding",
-            "value": "\"False\""
-          },
-          {
-            "name": "\"Path\"",
-            "related_command": "Resolve-Path",
-            "type": "ParameterBinding",
-            "value": "\"C:\\Gopath\\src\\github.com\\elastic\\beats\\x*\""
-          }
-        ],
-        "name": "Resolve-Path",
-        "type": "Cmdlet"
-      },
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "id": "Microsoft.PowerShell",
-      "pipeline_id": "9",
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "a87e8389-57c7-4997-95ff-f82f644965bf"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "-noexit",
-        "-command",
-        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
-      ],
-      "args_count": 4,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
-      "entity_id": "aae5217d-054f-435f-9968-4b5bebf12116",
-      "title": "ConsoleHost"
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000",
-      "name": "vagrant"
-    },
     "winlog": {
       "activity_id": "{1aca0717-2acb-0003-db0b-ca1acb2ad601}",
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "ContextInfo": "        Severity = Informational\n        Host Name = ConsoleHost\n        Host Version = 5.1.17763.1007\n        Host ID = aae5217d-054f-435f-9968-4b5bebf12116\n        Host Application = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n        Engine Version = 5.1.17763.1007\n        Runspace ID = a87e8389-57c7-4997-95ff-f82f644965bf\n        Pipeline ID = 9\n        Command Name = Resolve-Path\n        Command Type = Cmdlet\n        Script Name = \n        Command Path = \n        Sequence Number = 22\n        User = VAGRANT\\vagrant\n        Connected User = \n        Shell ID = Microsoft.PowerShell",
+        "Payload": "CommandInvocation(Resolve-Path): \"Resolve-Path\"\nParameterBinding(Resolve-Path): name=\"ErrorAction\"; value=\"Ignore\"\nParameterBinding(Resolve-Path): name=\"WarningAction\"; value=\"Ignore\"\nParameterBinding(Resolve-Path): name=\"InformationAction\"; value=\"Ignore\"\nParameterBinding(Resolve-Path): name=\"Verbose\"; value=\"False\"\nParameterBinding(Resolve-Path): name=\"Debug\"; value=\"False\"\nParameterBinding(Resolve-Path): name=\"Path\"; value=\"C:\\Gopath\\src\\github.com\\elastic\\beats\\x*\""
+      },
       "event_id": "4103",
       "opcode": "To be used when operation is just executing a method",
       "process": {

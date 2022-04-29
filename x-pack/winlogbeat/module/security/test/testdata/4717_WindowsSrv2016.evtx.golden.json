@@ -2,34 +2,17 @@
   {
     "@timestamp": "2020-07-27T09:30:41.9034803Z",
     "event": {
-      "action": "system-security-access-granted",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Authentication Policy Change",
       "code": "4717",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "WIN-BVM4LI1L1Q6$"
-    },
-    "user": {
-      "domain": "WORKGROUP",
-      "id": "S-1-5-18",
-      "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
       "activity_id": "{b69bb9ff-63f5-0000-35ba-9bb6f563d601}",
@@ -48,9 +31,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 776,

@@ -2,20 +2,11 @@
   {
     "@timestamp": "2020-08-18T09:19:00.2372249Z",
     "event": {
-      "action": "crash-on-audit-changed",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4906",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"

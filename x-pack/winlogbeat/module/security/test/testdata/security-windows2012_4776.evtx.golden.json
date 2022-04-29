@@ -2,30 +2,17 @@
   {
     "@timestamp": "2020-04-01T08:45:42.1873153Z",
     "event": {
-      "action": "credential-validated",
-      "category": [
-        "authentication"
-      ],
+      "action": "Credential Validation",
       "code": "4776",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "at_adm"
-    },
-    "user": {
-      "name": "at_adm"
     },
     "winlog": {
       "api": "wineventlog",
@@ -41,11 +28,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "failure": {
-          "status": "Status OK."
-        }
-      },
       "opcode": "Info",
       "process": {
         "pid": 496,

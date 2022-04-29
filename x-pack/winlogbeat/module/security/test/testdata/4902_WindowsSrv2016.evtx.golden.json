@@ -2,20 +2,11 @@
   {
     "@timestamp": "2020-08-19T06:07:08.801981Z",
     "event": {
-      "action": "user-audit-policy-created",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4902",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "creation"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"

@@ -2,18 +2,11 @@
   {
     "@timestamp": "2019-11-07T10:37:04.2260925Z",
     "event": {
-      "action": "logging-service-shutdown",
-      "category": [
-        "process"
-      ],
+      "action": "Service shutdown",
       "code": "1100",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Eventlog",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Eventlog"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"

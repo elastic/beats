@@ -2,18 +2,11 @@
   {
     "@timestamp": "2019-11-08T07:56:17.3217049Z",
     "event": {
-      "action": "logging-full",
-      "category": [
-        "iam"
-      ],
+      "action": "Event processing",
       "code": "1104",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Eventlog",
-      "type": [
-        "admin"
-      ]
+      "provider": "Microsoft-Windows-Eventlog"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"

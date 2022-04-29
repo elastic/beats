@@ -3,16 +3,9 @@
     "@timestamp": "2020-05-13T09:04:04.7552325Z",
     "event": {
       "action": "Starting Command",
-      "category": [
-        "process"
-      ],
       "code": "4105",
       "kind": "event",
-      "module": "powershell",
-      "provider": "Microsoft-Windows-PowerShell",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -20,20 +13,15 @@
     "log": {
       "level": "verbose"
     },
-    "powershell": {
-      "file": {
-        "script_block_id": "f4a378ab-b74f-41a7-a5ef-6dd55562fdb9"
-      },
-      "runspace_id": "9c031e5c-8d5a-4b91-a12e-b3624970b623"
-    },
-    "user": {
-      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000"
-    },
     "winlog": {
       "activity_id": "{dd68516a-2930-0000-5962-68dd3029d601}",
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "RunspaceId": "9c031e5c-8d5a-4b91-a12e-b3624970b623",
+        "ScriptBlockId": "f4a378ab-b74f-41a7-a5ef-6dd55562fdb9"
+      },
       "event_id": "4105",
       "opcode": "On create calls",
       "process": {

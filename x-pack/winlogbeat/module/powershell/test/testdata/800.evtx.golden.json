@@ -3,23 +3,9 @@
     "@timestamp": "2020-02-26T09:37:40.4872415Z",
     "event": {
       "action": "Pipeline Execution Details",
-      "category": [
-        "process"
-      ],
       "code": "800",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 17,
-      "type": [
-        "info"
-      ]
-    },
-    "file": {
-      "directory": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive",
-      "extension": "psm1",
-      "name": "Microsoft.PowerShell.Archive.psm1",
-      "path": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive\\Microsoft.PowerShell.Archive.psm1"
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant-2019"
@@ -27,70 +13,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "command": {
-        "invocation_details": [
-          {
-            "related_command": "Add-Type",
-            "type": "CommandInvocation",
-            "value": "\"Add-Type\""
-          },
-          {
-            "name": "\"AssemblyName\"",
-            "related_command": "Add-Type",
-            "type": "ParameterBinding",
-            "value": "\"System.IO.Compression.FileSystem\""
-          }
-        ],
-        "value": "Add-Type -AssemblyName System.IO.Compression.FileSystem"
-      },
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "pipeline_id": "1",
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "6a447a2c-693e-4d41-948d-129b455b2569",
-      "sequence": 1,
-      "total": 1
-    },
-    "process": {
-      "args": [
-        "powershell",
-        "-executionpolicy",
-        "bypass",
-        "\u0026",
-        "{",
-        "if",
-        "(Test-Path",
-        "variable:global:ProgressPreference){set-variable",
-        "-name",
-        "variable:global:ProgressPreference",
-        "-value",
-        "'SilentlyContinue'};.",
-        "c:/Windows/Temp/packer-ps-env-vars-5e5637dd-15a9-73e0-889a-c01f541a8bc6.ps1;",
-        "\u0026'c:/Windows/Temp/script-5e5637dd-5626-019d-027a-02e78baaacc9.ps1';",
-        "exit",
-        "$LastExitCode",
-        "}"
-      ],
-      "args_count": 17,
-      "command_line": "powershell -executionpolicy bypass \u0026 { if (Test-Path variable:global:ProgressPreference){set-variable -name variable:global:ProgressPreference -value 'SilentlyContinue'};. c:/Windows/Temp/packer-ps-env-vars-5e5637dd-15a9-73e0-889a-c01f541a8bc6.ps1; \u0026'c:/Windows/Temp/script-5e5637dd-5626-019d-027a-02e78baaacc9.ps1'; exit $LastExitCode }",
-      "entity_id": "ac3c99ce-7983-4996-807e-6a689eaba50b",
-      "title": "ConsoleHost"
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT-2019",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant-2019",
+      "event_data": {
+        "param1": "        Add-Type -AssemblyName System.IO.Compression.FileSystem",
+        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=17\n\n\tUserId=VAGRANT-2019\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=ac3c99ce-7983-4996-807e-6a689eaba50b\n\tHostApplication=powershell -executionpolicy bypass \u0026 { if (Test-Path variable:global:ProgressPreference){set-variable -name variable:global:ProgressPreference -value 'SilentlyContinue'};. c:/Windows/Temp/packer-ps-env-vars-5e5637dd-15a9-73e0-889a-c01f541a8bc6.ps1; \u0026'c:/Windows/Temp/script-5e5637dd-5626-019d-027a-02e78baaacc9.ps1'; exit $LastExitCode }\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=6a447a2c-693e-4d41-948d-129b455b2569\n\tPipelineId=1\n\tScriptName=C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive\\Microsoft.PowerShell.Archive.psm1\n\tCommandLine=        Add-Type -AssemblyName System.IO.Compression.FileSystem",
+        "param3": "CommandInvocation(Add-Type): \"Add-Type\"\nParameterBinding(Add-Type): name=\"AssemblyName\"; value=\"System.IO.Compression.FileSystem\""
+      },
       "event_id": "800",
       "keywords": [
         "Classic"
@@ -105,17 +36,9 @@
     "@timestamp": "2020-05-15T08:33:26.3769931Z",
     "event": {
       "action": "Pipeline Execution Details",
-      "category": [
-        "process"
-      ],
       "code": "800",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 135,
-      "type": [
-        "info"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -123,57 +46,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "command": {
-        "invocation_details": [
-          {
-            "related_command": "Set-StrictMode",
-            "type": "CommandInvocation",
-            "value": "\"Set-StrictMode\""
-          },
-          {
-            "name": "\"Version\"",
-            "related_command": "Set-StrictMode",
-            "type": "ParameterBinding",
-            "value": "\"1.0\""
-          }
-        ],
-        "value": "\u0026 { Set-StrictMode -Version 1; $this.Exception.InnerException.PSMessageDetails }"
-      },
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "pipeline_id": "71",
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "a87e8389-57c7-4997-95ff-f82f644965bf",
-      "sequence": 1,
-      "total": 1
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "-noexit",
-        "-command",
-        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
-      ],
-      "args_count": 4,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
-      "entity_id": "aae5217d-054f-435f-9968-4b5bebf12116",
-      "title": "ConsoleHost"
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "\u0026 { Set-StrictMode -Version 1; $this.Exception.InnerException.PSMessageDetails }",
+        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=135\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine=\u0026 { Set-StrictMode -Version 1; $this.Exception.InnerException.PSMessageDetails }",
+        "param3": "CommandInvocation(Set-StrictMode): \"Set-StrictMode\"\nParameterBinding(Set-StrictMode): name=\"Version\"; value=\"1.0\""
+      },
       "event_id": "800",
       "keywords": [
         "Classic"
@@ -188,17 +69,9 @@
     "@timestamp": "2020-05-15T08:33:26.393089Z",
     "event": {
       "action": "Pipeline Execution Details",
-      "category": [
-        "process"
-      ],
       "code": "800",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 141,
-      "type": [
-        "info"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -206,68 +79,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "command": {
-        "invocation_details": [
-          {
-            "related_command": "Import-LocalizedData",
-            "type": "CommandInvocation",
-            "value": "\"Import-LocalizedData\""
-          },
-          {
-            "name": "\"FileName\"",
-            "related_command": "Import-LocalizedData",
-            "type": "ParameterBinding",
-            "value": "\"ArchiveResources\""
-          },
-          {
-            "name": "\"BindingVariable\"",
-            "related_command": "Import-LocalizedData",
-            "type": "ParameterBinding",
-            "value": "\"LocalizedData\""
-          },
-          {
-            "related_command": "Import-LocalizedData",
-            "type": "NonTerminatingError",
-            "value": "\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
-          }
-        ],
-        "value": "Import-LocalizedData  LocalizedData -filename ArchiveResources"
-      },
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "pipeline_id": "71",
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "a87e8389-57c7-4997-95ff-f82f644965bf",
-      "sequence": 1,
-      "total": 1
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "-noexit",
-        "-command",
-        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
-      ],
-      "args_count": 4,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
-      "entity_id": "aae5217d-054f-435f-9968-4b5bebf12116",
-      "title": "ConsoleHost"
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Import-LocalizedData  LocalizedData -filename ArchiveResources",
+        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=141\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine=Import-LocalizedData  LocalizedData -filename ArchiveResources",
+        "param3": "CommandInvocation(Import-LocalizedData): \"Import-LocalizedData\"\nParameterBinding(Import-LocalizedData): name=\"FileName\"; value=\"ArchiveResources\"\nParameterBinding(Import-LocalizedData): name=\"BindingVariable\"; value=\"LocalizedData\"\nNonTerminatingError(Import-LocalizedData): \"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
+      },
       "event_id": "800",
       "keywords": [
         "Classic"
@@ -282,17 +102,9 @@
     "@timestamp": "2020-05-15T08:33:26.393089Z",
     "event": {
       "action": "Pipeline Execution Details",
-      "category": [
-        "process"
-      ],
       "code": "800",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 143,
-      "type": [
-        "info"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -300,56 +112,14 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "command": {
-        "invocation_details": [
-          {
-            "related_command": "Out-Default",
-            "type": "CommandInvocation",
-            "value": "\"Out-Default\""
-          },
-          {
-            "name": "\"InputObject\"",
-            "related_command": "Out-Default",
-            "type": "ParameterBinding",
-            "value": "\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
-          }
-        ]
-      },
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "pipeline_id": "71",
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "a87e8389-57c7-4997-95ff-f82f644965bf",
-      "sequence": 1,
-      "total": 1
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "-noexit",
-        "-command",
-        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
-      ],
-      "args_count": 4,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
-      "entity_id": "aae5217d-054f-435f-9968-4b5bebf12116",
-      "title": "ConsoleHost"
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=143\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine=",
+        "param3": "CommandInvocation(Out-Default): \"Out-Default\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
+      },
       "event_id": "800",
       "keywords": [
         "Classic"

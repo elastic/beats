@@ -2,38 +2,17 @@
   {
     "@timestamp": "2019-12-19T08:10:57.4737631Z",
     "event": {
-      "action": "changed-distribution-group-account",
-      "category": [
-        "iam"
-      ],
+      "action": "Distribution Group Management",
       "code": "4750",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "group",
-        "change"
-      ]
-    },
-    "group": {
-      "domain": "TEST",
-      "id": "S-1-5-21-1717121054-434620538-60925301-2904",
-      "name": "testglobal1"
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "at_adm"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-21-1717121054-434620538-60925301-2794",
-      "name": "at_adm"
     },
     "winlog": {
       "api": "wineventlog",
@@ -55,9 +34,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x2e67800"
-      },
       "opcode": "Info",
       "process": {
         "pid": 492,

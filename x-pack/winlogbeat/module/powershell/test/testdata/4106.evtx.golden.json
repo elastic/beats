@@ -3,16 +3,9 @@
     "@timestamp": "2020-05-13T10:40:32.5957152Z",
     "event": {
       "action": "Stopping Command",
-      "category": [
-        "process"
-      ],
       "code": "4106",
       "kind": "event",
-      "module": "powershell",
-      "provider": "Microsoft-Windows-PowerShell",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -20,20 +13,15 @@
     "log": {
       "level": "verbose"
     },
-    "powershell": {
-      "file": {
-        "script_block_id": "4c487c13-46f7-4485-925b-34855c7e873c"
-      },
-      "runspace_id": "3f1a9181-0523-4645-a42c-2c1868c39332"
-    },
-    "user": {
-      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000"
-    },
     "winlog": {
       "activity_id": "{e3200b8a-290e-0002-332a-20e30e29d601}",
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
+      "event_data": {
+        "RunspaceId": "3f1a9181-0523-4645-a42c-2c1868c39332",
+        "ScriptBlockId": "4c487c13-46f7-4485-925b-34855c7e873c"
+      },
       "event_id": "4106",
       "opcode": "On create calls",
       "process": {

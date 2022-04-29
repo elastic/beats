@@ -2,43 +2,17 @@
   {
     "@timestamp": "2019-09-06T13:38:17.5566269Z",
     "event": {
-      "action": "renamed-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4781",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "audittest06",
-        "audittest0609"
-      ]
-    },
-    "user": {
-      "changes": {
-        "name": "audittest06"
-      },
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "name": "audittest0609"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -60,9 +34,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,
@@ -79,43 +50,17 @@
   {
     "@timestamp": "2019-09-06T13:38:23.5161066Z",
     "event": {
-      "action": "renamed-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4781",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "audittest0609",
-        "audittest06"
-      ]
-    },
-    "user": {
-      "changes": {
-        "name": "audittest0609"
-      },
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "name": "audittest06"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -137,9 +82,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

@@ -2,39 +2,17 @@
   {
     "@timestamp": "2020-08-19T07:56:51.5792901Z",
     "event": {
-      "action": "security-event-source-removed",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4905",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "deletion"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "-",
-      "name": "-",
-      "pid": 4964
-    },
-    "related": {
-      "user": "WIN-BVM4LI1L1Q6$"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-18",
-      "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
       "activity_id": "{dab46f85-75ee-0000-c36f-b4daee75d601}",
@@ -44,6 +22,8 @@
       "event_data": {
         "AuditSourceName": "IIS-METABASE",
         "EventSourceId": "0x457b22",
+        "ProcessId": "0x1364",
+        "ProcessName": "-",
         "SubjectDomainName": "TEST",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
@@ -53,9 +33,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 784,

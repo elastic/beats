@@ -1,14 +1,10 @@
 [
   {
-    "@timestamp": "2021-02-25T15:04:48.592Z",
+    "@timestamp": "2021-02-25T15:04:48.6073435Z",
     "event": {
       "code": "24",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "DESKTOP-I9CQVAQ"
@@ -16,33 +12,20 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "entity_id": "{9497d8d9-aa1b-602f-a600-000000001000}",
-      "executable": "C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe",
-      "hash": {
-        "sha256": "7adb1cf1a75973079c055f929573ae92557a8c0e5b0e38a6a5427e412fb73d59"
-      },
-      "name": "vmtoolsd.exe",
-      "pid": 2144
-    },
-    "related": {
-      "hash": "7adb1cf1a75973079c055f929573ae92557a8c0e5b0e38a6a5427e412fb73d59"
-    },
-    "sysmon": {
-      "file": {
-        "archived": true
-      }
-    },
-    "user": {
-      "id": "S-1-5-18"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "DESKTOP-I9CQVAQ",
       "event_data": {
+        "Archived": "true",
         "ClientInfo": "user: DESKTOP-I9CQVAQ\\luks",
-        "Session": "1"
+        "Hashes": "SHA256=7ADB1CF1A75973079C055F929573AE92557A8C0E5B0E38A6A5427E412FB73D59,IMPHASH=00000000000000000000000000000000",
+        "Image": "C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe",
+        "ProcessGuid": "{9497d8d9-aa1b-602f-a600-000000001000}",
+        "ProcessId": "2144",
+        "RuleName": "-",
+        "Session": "1",
+        "UtcTime": "2021-02-25 15:04:48.592"
       },
       "event_id": "24",
       "process": {

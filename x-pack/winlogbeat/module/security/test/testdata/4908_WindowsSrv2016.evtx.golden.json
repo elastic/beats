@@ -2,20 +2,11 @@
   {
     "@timestamp": "2020-08-19T06:07:25.0461779Z",
     "event": {
-      "action": "special-group-table-changed",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4908",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
@@ -28,15 +19,7 @@
       "channel": "Security",
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
-        "SidList": [
-          "",
-          "%{S-1-5-32-544}",
-          "%{S-1-5-32-123-54-65}"
-        ],
-        "SidListDesc": [
-          "Administrators",
-          "S-1-5-32-123-54-65"
-        ]
+        "SidList": "\n\t\t%{S-1-5-32-544}\n\t\t%{S-1-5-32-123-54-65}"
       },
       "event_id": "4908",
       "keywords": [

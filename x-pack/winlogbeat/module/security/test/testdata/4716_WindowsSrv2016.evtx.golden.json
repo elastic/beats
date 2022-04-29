@@ -2,32 +2,17 @@
   {
     "@timestamp": "2020-07-28T08:17:00.4706442Z",
     "event": {
-      "action": "trusted-domain-information-changed",
-      "category": [
-        "configuration"
-      ],
+      "action": "Authentication Policy Change",
       "code": "4716",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "Administrator"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-21-2024912787-2692429404-2351956786-500",
-      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{be129571-63f8-0000-a795-12bef863d601}",
@@ -50,9 +35,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x6a868"
-      },
       "opcode": "Info",
       "process": {
         "pid": 776,
@@ -63,10 +45,7 @@
       "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 14929,
-      "task": "Authentication Policy Change",
-      "trustAttribute": "TRUST_ATTRIBUTE_NON_TRANSITIVE",
-      "trustDirection": "TRUST_DIRECTION_BIDIRECTIONAL",
-      "trustType": "TRUST_TYPE_MIT"
+      "task": "Authentication Policy Change"
     }
   }
 ]

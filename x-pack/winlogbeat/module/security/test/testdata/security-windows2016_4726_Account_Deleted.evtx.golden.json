@@ -2,41 +2,17 @@
   {
     "@timestamp": "2019-09-06T13:35:25.5153959Z",
     "event": {
-      "action": "deleted-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4726",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "deletion"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "audittest23"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1001",
-        "name": "audittest23"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -57,9 +33,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,
@@ -76,41 +49,17 @@
   {
     "@timestamp": "2019-09-06T13:35:29.6900555Z",
     "event": {
-      "action": "deleted-user-account",
-      "category": [
-        "iam"
-      ],
+      "action": "User Account Management",
       "code": "4726",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "user",
-        "deletion"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": [
-        "Administrator",
-        "audittest"
-      ]
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator",
-      "target": {
-        "domain": "WIN-41OB2LO92CR",
-        "id": "S-1-5-21-101361758-2486510592-3018839910-1000",
-        "name": "audittest"
-      }
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -131,9 +80,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x264b2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

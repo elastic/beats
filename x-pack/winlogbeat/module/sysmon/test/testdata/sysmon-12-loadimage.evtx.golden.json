@@ -1,62 +1,16 @@
 [
   {
-    "@timestamp": "2020-10-28T02:39:26.374Z",
+    "@timestamp": "2020-10-28T02:39:26.3883252Z",
     "event": {
-      "category": [
-        "process"
-      ],
       "code": "7",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "change"
-      ]
-    },
-    "file": {
-      "code_signature": {
-        "signed": true,
-        "status": "Valid",
-        "subject_name": "Microsoft Windows",
-        "valid": true
-      },
-      "directory": "C:\\Windows\\System32",
-      "extension": "dll",
-      "hash": {
-        "md5": "c7c45610f644906e6f7d664ef2e45b08",
-        "sha1": "9955a1c071c44a7ceecc0d928a9cfb7f64cc3f93",
-        "sha256": "4808f1101f4e42387d8ddb7a355668bae3bf6f781c42d3bcd82e23446b1deb3e"
-      },
-      "name": "IDStore.dll",
-      "path": "C:\\Windows\\System32\\IDStore.dll",
-      "pe": {
-        "company": "Microsoft Corporation",
-        "description": "Identity Store",
-        "file_version": "10.0.17763.1 (WinBuild.160101.0800)",
-        "imphash": "194f3797b52231028c718b6d776c6853",
-        "original_file_name": "IdStore.dll",
-        "product": "Microsoft® Windows® Operating System"
-      }
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "entity_id": "{9f32b55f-d9de-5f98-f006-000000000600}",
-      "executable": "C:\\Windows\\System32\\dllhost.exe",
-      "name": "dllhost.exe",
-      "pid": 5184
-    },
-    "related": {
-      "hash": [
-        "9955a1c071c44a7ceecc0d928a9cfb7f64cc3f93",
-        "c7c45610f644906e6f7d664ef2e45b08",
-        "4808f1101f4e42387d8ddb7a355668bae3bf6f781c42d3bcd82e23446b1deb3e",
-        "194f3797b52231028c718b6d776c6853"
-      ]
     },
     "winlog": {
       "api": "wineventlog",
@@ -66,10 +20,18 @@
         "Company": "Microsoft Corporation",
         "Description": "Identity Store",
         "FileVersion": "10.0.17763.1 (WinBuild.160101.0800)",
+        "Hashes": "SHA1=9955A1C071C44A7CEECC0D928A9CFB7F64CC3F93,MD5=C7C45610F644906E6F7D664EF2E45B08,SHA256=4808F1101F4E42387D8DDB7A355668BAE3BF6F781C42D3BCD82E23446B1DEB3E,IMPHASH=194F3797B52231028C718B6D776C6853",
+        "Image": "C:\\Windows\\System32\\dllhost.exe",
+        "ImageLoaded": "C:\\Windows\\System32\\IDStore.dll",
+        "OriginalFileName": "IdStore.dll",
+        "ProcessGuid": "{9f32b55f-d9de-5f98-f006-000000000600}",
+        "ProcessId": "5184",
         "Product": "Microsoft® Windows® Operating System",
+        "RuleName": "-",
         "Signature": "Microsoft Windows",
         "SignatureStatus": "Valid",
-        "Signed": "true"
+        "Signed": "true",
+        "UtcTime": "2020-10-28 02:39:26.374"
       },
       "event_id": "7",
       "process": {

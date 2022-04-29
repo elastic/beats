@@ -3,17 +3,9 @@
     "@timestamp": "2020-05-13T13:21:43.1831809Z",
     "event": {
       "action": "Provider Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "600",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 35,
-      "type": [
-        "info"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -21,34 +13,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "engine": {
-        "version": "5.1.17763.1007"
-      },
-      "pipeline_id": "15",
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "provider": {
-        "name": "Certificate",
-        "new_state": "Started"
-      },
-      "runspace_id": "9d21da0b-e402-40e1-92ff-98c5ab1137a9"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe",
-        "C:\\Users\\vagrant\\Desktop\\lateral.ps1"
-      ],
-      "args_count": 2,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe C:\\Users\\vagrant\\Desktop\\lateral.ps1",
-      "entity_id": "86edc16f-6943-469e-8bd8-ef1857080206",
-      "title": "Windows PowerShell ISE Host"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Certificate",
+        "param2": "Started",
+        "param3": "\tProviderName=Certificate\n\tNewProviderState=Started\n\n\tSequenceNumber=35\n\n\tHostName=Windows PowerShell ISE Host\n\tHostVersion=5.1.17763.1007\n\tHostId=86edc16f-6943-469e-8bd8-ef1857080206\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe C:\\Users\\vagrant\\Desktop\\lateral.ps1\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=9d21da0b-e402-40e1-92ff-98c5ab1137a9\n\tPipelineId=15\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "600",
       "keywords": [
         "Classic"
@@ -63,17 +36,9 @@
     "@timestamp": "2020-05-13T13:25:04.6564269Z",
     "event": {
       "action": "Provider Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "600",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 1,
-      "type": [
-        "info"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -81,31 +46,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "provider": {
-        "name": "Registry",
-        "new_state": "Started"
-      }
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "-noexit",
-        "-command",
-        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
-      ],
-      "args_count": 4,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
-      "entity_id": "44b8d66c-f5a2-4abb-ac7d-6db73990a6d3",
-      "title": "ConsoleHost"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Registry",
+        "param2": "Started",
+        "param3": "\tProviderName=Registry\n\tNewProviderState=Started\n\n\tSequenceNumber=1\n\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=44b8d66c-f5a2-4abb-ac7d-6db73990a6d3\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=\n\tRunspaceId=\n\tPipelineId=\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "600",
       "keywords": [
         "Classic"
@@ -120,17 +69,9 @@
     "@timestamp": "2020-06-04T07:25:04.8574302Z",
     "event": {
       "action": "Provider Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "600",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 8,
-      "type": [
-        "info"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -138,23 +79,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "process": {
-        "executable_version": "2.0"
-      },
-      "provider": {
-        "name": "Certificate",
-        "new_state": "Started"
-      }
-    },
-    "process": {
-      "entity_id": "99a16837-7392-463d-afe5-5f3ed24bd358",
-      "title": "ConsoleHost"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Certificate",
+        "param2": "Started",
+        "param3": "\tProviderName=Certificate\n\tNewProviderState=Started\n\n\tSequenceNumber=8\n\n\tHostName=ConsoleHost\n\tHostVersion=2.0\n\tHostId=99a16837-7392-463d-afe5-5f3ed24bd358\n\tEngineVersion=\n\tRunspaceId=\n\tPipelineId=\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "600",
       "keywords": [
         "Classic"

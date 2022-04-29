@@ -2,34 +2,17 @@
   {
     "@timestamp": "2020-08-18T13:45:57.4803543Z",
     "event": {
-      "action": "changed-audit-config",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4719",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "related": {
-      "user": "Administrator"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-21-2024912787-2692429404-2351956786-500",
-      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{65461d39-753f-0000-731d-46653f75d601}",
@@ -38,12 +21,7 @@
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
         "AuditPolicyChanges": "%%8448",
-        "AuditPolicyChangesDescription": [
-          "Success removed"
-        ],
-        "Category": "Object Access",
         "CategoryId": "%%8274",
-        "SubCategory": "Other Object Access Events",
         "SubcategoryGuid": "{0cce9227-69ae-11d9-bed3-505054503030}",
         "SubcategoryId": "%%12804",
         "SubjectDomainName": "TEST",
@@ -55,9 +33,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x44d7d"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,

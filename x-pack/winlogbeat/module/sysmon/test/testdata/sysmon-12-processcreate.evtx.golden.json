@@ -1,18 +1,10 @@
 [
   {
-    "@timestamp": "2020-10-27T20:00:14.32Z",
+    "@timestamp": "2020-10-27T20:00:14.3242341Z",
     "event": {
-      "category": [
-        "process"
-      ],
       "code": "1",
       "kind": "event",
-      "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon",
-      "type": [
-        "start",
-        "process_start"
-      ]
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "host": {
       "name": "vagrant"
@@ -20,59 +12,33 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "args": [
-        "C:\\Windows\\system32\\notepad.exe"
-      ],
-      "command_line": "\"C:\\Windows\\system32\\notepad.exe\" ",
-      "entity_id": "{9f32b55f-7c4e-5f98-5803-000000000500}",
-      "executable": "C:\\Windows\\System32\\notepad.exe",
-      "hash": {
-        "sha1": "b6d237154f2e528f0b503b58b025862d66b02b73"
-      },
-      "name": "notepad.exe",
-      "parent": {
-        "args": [
-          "C:\\Windows\\Explorer.EXE"
-        ],
-        "command_line": "C:\\Windows\\Explorer.EXE",
-        "entity_id": "{9f32b55f-6fdf-5f98-7000-000000000500}",
-        "executable": "C:\\Windows\\explorer.exe",
-        "name": "explorer.exe",
-        "pid": 4212
-      },
-      "pe": {
-        "company": "Microsoft Corporation",
-        "description": "Notepad",
-        "file_version": "10.0.17763.475 (WinBuild.160101.0800)",
-        "original_file_name": "NOTEPAD.EXE",
-        "product": "Microsoft® Windows® Operating System"
-      },
-      "pid": 3616,
-      "working_directory": "C:\\Users\\vagrant\\"
-    },
-    "related": {
-      "hash": "b6d237154f2e528f0b503b58b025862d66b02b73",
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "id": "S-1-5-18",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
+        "CommandLine": "\"C:\\Windows\\system32\\notepad.exe\" ",
         "Company": "Microsoft Corporation",
+        "CurrentDirectory": "C:\\Users\\vagrant\\",
         "Description": "Notepad",
         "FileVersion": "10.0.17763.475 (WinBuild.160101.0800)",
+        "Hashes": "SHA1=B6D237154F2E528F0B503B58B025862D66B02B73",
+        "Image": "C:\\Windows\\System32\\notepad.exe",
         "IntegrityLevel": "Medium",
         "LogonGuid": "{9f32b55f-6fdd-5f98-e7c9-020000000000}",
         "LogonId": "0x2c9e7",
+        "OriginalFileName": "NOTEPAD.EXE",
+        "ParentCommandLine": "C:\\Windows\\Explorer.EXE",
+        "ParentImage": "C:\\Windows\\explorer.exe",
+        "ParentProcessGuid": "{9f32b55f-6fdf-5f98-7000-000000000500}",
+        "ParentProcessId": "4212",
+        "ProcessGuid": "{9f32b55f-7c4e-5f98-5803-000000000500}",
+        "ProcessId": "3616",
         "Product": "Microsoft® Windows® Operating System",
-        "TerminalSessionId": "1"
+        "RuleName": "-",
+        "TerminalSessionId": "1",
+        "User": "VAGRANT\\vagrant",
+        "UtcTime": "2020-10-27 20:00:14.320"
       },
       "event_id": "1",
       "process": {

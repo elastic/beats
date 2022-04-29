@@ -2,18 +2,11 @@
   {
     "@timestamp": "2020-04-06T06:39:04.5491199Z",
     "event": {
-      "action": "privileged-service-called",
-      "category": [
-        "iam"
-      ],
+      "action": "Sensitive Privilege Use",
       "code": "4673",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -21,28 +14,15 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "executable": "C:\\Windows\\System32\\lsass.exe",
-      "name": "lsass.exe",
-      "pid": 496
-    },
-    "related": {
-      "user": "DC_TEST2K12$"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-18",
-      "name": "DC_TEST2K12$"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
         "ObjectServer": "NT Local Security Authority / Authentication Service",
-        "PrivilegeList": [
-          "SeTcbPrivilege"
-        ],
+        "PrivilegeList": "SeTcbPrivilege",
+        "ProcessId": "0x1f0",
+        "ProcessName": "C:\\Windows\\System32\\lsass.exe",
         "Service": "LsaRegisterLogonProcess()",
         "SubjectDomainName": "TEST",
         "SubjectLogonId": "0x3e7",
@@ -53,9 +33,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 496,

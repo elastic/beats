@@ -3,17 +3,9 @@
     "@timestamp": "2020-05-14T07:00:30.8914235Z",
     "event": {
       "action": "Engine Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "400",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 13,
-      "type": [
-        "start"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -21,31 +13,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "engine": {
-        "new_state": "Available",
-        "previous_state": "None",
-        "version": "5.1.17763.1007"
-      },
-      "process": {
-        "executable_version": "1.0.0.0"
-      },
-      "runspace_id": "405e84eb-9ca3-40d8-a4da-cf6ed1b38ed2"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\system32\\wsmprovhost.exe",
-        "-Embedding"
-      ],
-      "args_count": 2,
-      "command_line": "C:\\Windows\\system32\\wsmprovhost.exe -Embedding",
-      "entity_id": "2458050c-5e21-47a6-bbdf-41ef2151b519",
-      "title": "ServerRemoteHost"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Available",
+        "param2": "None",
+        "param3": "\tNewEngineState=Available\n\tPreviousEngineState=None\n\n\tSequenceNumber=13\n\n\tHostName=ServerRemoteHost\n\tHostVersion=1.0.0.0\n\tHostId=2458050c-5e21-47a6-bbdf-41ef2151b519\n\tHostApplication=C:\\Windows\\system32\\wsmprovhost.exe -Embedding\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=405e84eb-9ca3-40d8-a4da-cf6ed1b38ed2\n\tPipelineId=\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "400",
       "keywords": [
         "Classic"
@@ -60,17 +36,9 @@
     "@timestamp": "2020-05-14T07:01:14.3715076Z",
     "event": {
       "action": "Engine Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "400",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 13,
-      "type": [
-        "start"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -78,33 +46,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "engine": {
-        "new_state": "Available",
-        "previous_state": "None",
-        "version": "5.1.17763.1007"
-      },
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "056a5045-a7bb-49c6-9a9d-2ea95acea751"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "-noexit",
-        "-command",
-        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
-      ],
-      "args_count": 4,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
-      "entity_id": "83c6a631-910d-4530-bec2-18b2d0fc380a",
-      "title": "ConsoleHost"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Available",
+        "param2": "None",
+        "param3": "\tNewEngineState=Available\n\tPreviousEngineState=None\n\n\tSequenceNumber=13\n\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=83c6a631-910d-4530-bec2-18b2d0fc380a\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=056a5045-a7bb-49c6-9a9d-2ea95acea751\n\tPipelineId=\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "400",
       "keywords": [
         "Classic"
@@ -119,17 +69,9 @@
     "@timestamp": "2020-05-14T11:32:51.9892568Z",
     "event": {
       "action": "Engine Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "400",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 13,
-      "type": [
-        "start"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -137,31 +79,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "engine": {
-        "new_state": "Available",
-        "previous_state": "None",
-        "version": "5.1.17763.1007"
-      },
-      "process": {
-        "executable_version": "5.1.17763.1007"
-      },
-      "runspace_id": "24067d05-e98a-4fbb-9cda-020e4c65017d"
-    },
-    "process": {
-      "args": [
-        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe",
-        "C:\\Users\\vagrant\\Desktop\\patata.ps1"
-      ],
-      "args_count": 2,
-      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe C:\\Users\\vagrant\\Desktop\\patata.ps1",
-      "entity_id": "f3d0acd6-4ec1-4e0a-9c8e-27ee07eec3ab",
-      "title": "Windows PowerShell ISE Host"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Available",
+        "param2": "None",
+        "param3": "\tNewEngineState=Available\n\tPreviousEngineState=None\n\n\tSequenceNumber=13\n\n\tHostName=Windows PowerShell ISE Host\n\tHostVersion=5.1.17763.1007\n\tHostId=f3d0acd6-4ec1-4e0a-9c8e-27ee07eec3ab\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe C:\\Users\\vagrant\\Desktop\\patata.ps1\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=24067d05-e98a-4fbb-9cda-020e4c65017d\n\tPipelineId=\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "400",
       "keywords": [
         "Classic"
@@ -176,17 +102,9 @@
     "@timestamp": "2020-06-04T07:20:27.7472275Z",
     "event": {
       "action": "Engine Lifecycle",
-      "category": [
-        "process"
-      ],
       "code": "400",
       "kind": "event",
-      "module": "powershell",
-      "provider": "PowerShell",
-      "sequence": 9,
-      "type": [
-        "start"
-      ]
+      "provider": "PowerShell"
     },
     "host": {
       "name": "vagrant"
@@ -194,25 +112,15 @@
     "log": {
       "level": "information"
     },
-    "powershell": {
-      "engine": {
-        "new_state": "Available",
-        "previous_state": "None",
-        "version": "2.0"
-      },
-      "process": {
-        "executable_version": "2.0"
-      },
-      "runspace_id": "6ebeca05-d618-4c66-a0d8-4269d800d099"
-    },
-    "process": {
-      "entity_id": "7018c049-c75b-4e02-9c0f-6761b97e1657",
-      "title": "ConsoleHost"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
+      "event_data": {
+        "param1": "Available",
+        "param2": "None",
+        "param3": "\tNewEngineState=Available\n\tPreviousEngineState=None\n\n\tSequenceNumber=9\n\n\tHostName=ConsoleHost\n\tHostVersion=2.0\n\tHostId=7018c049-c75b-4e02-9c0f-6761b97e1657\n\tEngineVersion=2.0\n\tRunspaceId=6ebeca05-d618-4c66-a0d8-4269d800d099\n\tPipelineId=\n\tCommandName=\n\tCommandType=\n\tScriptName=\n\tCommandPath=\n\tCommandLine="
+      },
       "event_id": "400",
       "keywords": [
         "Classic"

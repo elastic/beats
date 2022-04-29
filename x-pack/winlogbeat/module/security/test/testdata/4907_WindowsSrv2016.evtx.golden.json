@@ -2,39 +2,17 @@
   {
     "@timestamp": "2020-08-19T07:56:17.1121901Z",
     "event": {
-      "action": "audit-setting-changed",
-      "category": [
-        "iam",
-        "configuration"
-      ],
+      "action": "Audit Policy Change",
       "code": "4907",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "admin",
-        "change"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-BVM4LI1L1Q6.TEST.local"
     },
     "log": {
       "level": "information"
-    },
-    "process": {
-      "executable": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.14393.1883_none_7ed84bd822106081\\TiWorker.exe",
-      "name": "TiWorker.exe",
-      "pid": 4300
-    },
-    "related": {
-      "user": "WIN-BVM4LI1L1Q6$"
-    },
-    "user": {
-      "domain": "TEST",
-      "id": "S-1-5-18",
-      "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
       "api": "wineventlog",
@@ -43,10 +21,11 @@
       "event_data": {
         "HandleId": "0x93c",
         "NewSd": "S:ARAI(AU;SAFA;DCLCRPCRSDWDWO;;;WD)",
-        "NewSdSacl0": "Everyone :System Audit (Delete All Child Objects,List Contents,Read All Properties,All Extended Rights,Delete,Modify Permissions,Modify Owner)",
         "ObjectName": "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\Modules\\RemoteAccess\\RemoteAccess.psd1",
         "ObjectServer": "Security",
         "ObjectType": "File",
+        "ProcessId": "0x10cc",
+        "ProcessName": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.14393.1883_none_7ed84bd822106081\\TiWorker.exe",
         "SubjectDomainName": "TEST",
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
@@ -56,9 +35,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x3e7"
-      },
       "opcode": "Info",
       "process": {
         "pid": 4,

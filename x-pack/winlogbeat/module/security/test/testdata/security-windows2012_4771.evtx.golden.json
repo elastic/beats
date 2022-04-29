@@ -2,18 +2,11 @@
   {
     "@timestamp": "2020-03-31T07:50:27.1681182Z",
     "event": {
-      "action": "kerberos-preauth-failed",
-      "category": [
-        "authentication"
-      ],
+      "action": "Kerberos Authentication Service",
       "code": "4771",
       "kind": "event",
-      "module": "security",
       "outcome": "failure",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "start"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -21,36 +14,19 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "ip": "192.168.5.44",
-      "user": "MPUIG"
-    },
-    "source": {
-      "ip": "192.168.5.44",
-      "port": 53366
-    },
-    "user": {
-      "id": "S-1-5-21-1717121054-434620538-60925301-3057",
-      "name": "MPUIG"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
+        "IpAddress": "::ffff:192.168.5.44",
+        "IpPort": "53366",
         "PreAuthType": "0",
         "ServiceName": "krbtgt/test.saas",
         "Status": "0x12",
-        "StatusDescription": "KDC_ERR_CLIENT_REVOKED",
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-3057",
         "TargetUserName": "MPUIG",
-        "TicketOptions": "0x40810010",
-        "TicketOptionsDescription": [
-          "Renewable-ok",
-          "Name-canonicalize",
-          "Renewable",
-          "Forwardable"
-        ]
+        "TicketOptions": "0x40810010"
       },
       "event_id": "4771",
       "keywords": [

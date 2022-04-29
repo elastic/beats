@@ -2,18 +2,11 @@
   {
     "@timestamp": "2019-11-14T21:26:49.4961966Z",
     "event": {
-      "action": "exited-process",
-      "category": [
-        "process"
-      ],
+      "action": "Process Termination",
       "code": "4689",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant"
@@ -21,24 +14,13 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "executable": "C:\\Windows\\System32\\wevtutil.exe",
-      "name": "wevtutil.exe",
-      "pid": 5412
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "vagrant",
       "event_data": {
+        "ProcessId": "0x1524",
+        "ProcessName": "C:\\Windows\\System32\\wevtutil.exe",
         "Status": "0x0",
         "SubjectDomainName": "VAGRANT",
         "SubjectLogonId": "0x274a2",
@@ -49,9 +31,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x274a2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 4,
@@ -68,18 +47,11 @@
   {
     "@timestamp": "2019-11-14T21:27:46.9609089Z",
     "event": {
-      "action": "exited-process",
-      "category": [
-        "process"
-      ],
+      "action": "Process Termination",
       "code": "4689",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant"
@@ -87,24 +59,13 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "executable": "C:\\Windows\\System32\\taskhostw.exe",
-      "name": "taskhostw.exe",
-      "pid": 3988
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "vagrant",
       "event_data": {
+        "ProcessId": "0xf94",
+        "ProcessName": "C:\\Windows\\System32\\taskhostw.exe",
         "Status": "0x0",
         "SubjectDomainName": "VAGRANT",
         "SubjectLogonId": "0x274f1",
@@ -115,9 +76,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x274f1"
-      },
       "opcode": "Info",
       "process": {
         "pid": 4,
@@ -134,18 +92,11 @@
   {
     "@timestamp": "2019-11-14T21:28:18.4605129Z",
     "event": {
-      "action": "exited-process",
-      "category": [
-        "process"
-      ],
+      "action": "Process Termination",
       "code": "4689",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "vagrant"
@@ -153,24 +104,13 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "executable": "C:\\Windows\\System32\\wevtutil.exe",
-      "name": "wevtutil.exe",
-      "pid": 2760
-    },
-    "related": {
-      "user": "vagrant"
-    },
-    "user": {
-      "domain": "VAGRANT",
-      "id": "S-1-5-21-1610636575-2290000098-1654242922-1000",
-      "name": "vagrant"
-    },
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "vagrant",
       "event_data": {
+        "ProcessId": "0xac8",
+        "ProcessName": "C:\\Windows\\System32\\wevtutil.exe",
         "Status": "0x0",
         "SubjectDomainName": "VAGRANT",
         "SubjectLogonId": "0x274a2",
@@ -181,9 +121,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x274a2"
-      },
       "opcode": "Info",
       "process": {
         "pid": 4,
