@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	bay "github.com/elastic/bayeux"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type eventCaptor struct {
@@ -57,7 +58,7 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("cometd input", "cometd")) //nolint:errcheck // Bad linter! no need to test this.
 
 	// Setup the input config.
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(conf.MapStr{
 		"channel_name":              "channel_name1",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
@@ -73,7 +74,7 @@ func TestInput(t *testing.T) {
 	captor := newEventCaptor(eventsCh)
 	defer captor.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(captor), nil
 	})
 

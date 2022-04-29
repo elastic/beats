@@ -22,8 +22,8 @@ import (
 	finput "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -107,7 +107,7 @@ func TestSingleInput(t *testing.T) {
 	serverURL = server.URL
 	config["auth.oauth2.token_url"] = server.URL + "/token"
 
-	cfg := common.MustNewConfigFrom(config)
+	cfg := conf.MustNewConfigFrom(config)
 
 	input, err := NewInput(cfg, connector, inputContext)
 	require.NoError(t, err)
@@ -164,7 +164,7 @@ func TestInputStop_Wait(t *testing.T) {
 	serverURL = server.URL
 	config["auth.oauth2.token_url"] = server.URL + "/token"
 
-	cfg := common.MustNewConfigFrom(config)
+	cfg := conf.MustNewConfigFrom(config)
 
 	input, err := NewInput(cfg, connector, inputContext)
 	require.NoError(t, err)
@@ -249,8 +249,8 @@ func TestMultiInput(t *testing.T) {
 	config2["auth.oauth2.token_url"] = serverURL + "/token"
 
 	// get common config
-	cfg1 := common.MustNewConfigFrom(config1)
-	cfg2 := common.MustNewConfigFrom(config2)
+	cfg1 := conf.MustNewConfigFrom(config1)
+	cfg2 := conf.MustNewConfigFrom(config2)
 
 	var inputContext finput.Context
 

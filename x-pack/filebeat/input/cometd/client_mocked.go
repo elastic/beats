@@ -7,7 +7,7 @@ package cometd
 import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type mockedConnector struct {
@@ -17,11 +17,11 @@ type mockedConnector struct {
 
 var _ channel.Connector = new(mockedConnector)
 
-func (m *mockedConnector) Connect(c *common.Config) (channel.Outleter, error) {
+func (m *mockedConnector) Connect(c *conf.C) (channel.Outleter, error) {
 	return m.ConnectWith(c, beat.ClientConfig{})
 }
 
-func (m *mockedConnector) ConnectWith(*common.Config, beat.ClientConfig) (channel.Outleter, error) {
+func (m *mockedConnector) ConnectWith(*conf.C, beat.ClientConfig) (channel.Outleter, error) {
 	if m.connectWithError != nil {
 		return nil, m.connectWithError
 	}

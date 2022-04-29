@@ -14,11 +14,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	bay "github.com/elastic/bayeux"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -93,7 +93,7 @@ func init() {
 // NewInput creates a new CometD input that consumes events from
 // a topic subscription.
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (inp input.Input, err error) {
