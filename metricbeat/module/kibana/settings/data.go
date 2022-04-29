@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -54,7 +54,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event := mb.Event{
 		ModuleFields:    res,
 		MetricSetFields: nil,
-		RootFields:      make(common.MapStr),
+		RootFields:      make(mapstr.M),
 	}
 
 	// Set service address

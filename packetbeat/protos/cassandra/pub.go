@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -78,7 +79,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	fields := evt.Fields
 	fields["type"] = pbf.Event.Dataset
 
-	cassandra := common.MapStr{}
+	cassandra := mapstr.M{}
 	status := common.OK_STATUS
 
 	// requ can be null, if the message is a PUSHed message
@@ -90,7 +91,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		if pub.sendRequest {
 			if pub.sendRequestHeader {
 				if requ.data == nil {
-					requ.data = common.MapStr{}
+					requ.data = mapstr.M{}
 				}
 				requ.data["headers"] = requ.header
 			}
@@ -116,7 +117,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		if pub.sendResponse {
 			if pub.sendResponseHeader {
 				if resp.data == nil {
-					resp.data = common.MapStr{}
+					resp.data = mapstr.M{}
 				}
 				resp.data["headers"] = resp.header
 			}

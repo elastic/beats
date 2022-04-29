@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/format"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -28,7 +29,7 @@ type Matcher interface {
 	// MetadataIndex returns the index string to use in annotation lookups for the given
 	// event. A previous indexer should have generated that index for this to work
 	// This function can return "" if the event doesn't match
-	MetadataIndex(event common.MapStr) string
+	MetadataIndex(event mapstr.M) string
 }
 
 // Matchers holds a collections of Matcher objects and the associated lock
@@ -67,7 +68,7 @@ func NewMatchers(configs PluginConfig) *Matchers {
 }
 
 // MetadataIndex returns the index string for the first matcher from the Registry returning one
-func (m *Matchers) MetadataIndex(event common.MapStr) string {
+func (m *Matchers) MetadataIndex(event mapstr.M) string {
 	m.RLock()
 	defer m.RUnlock()
 	for _, matcher := range m.matchers {
@@ -116,7 +117,7 @@ func NewFieldMatcher(cfg common.Config) (Matcher, error) {
 }
 
 // MetadataIndex returns the first key of an event that satisfies a matcher
-func (f *FieldMatcher) MetadataIndex(event common.MapStr) string {
+func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 	for _, field := range f.MatchFields {
 		keyIface, err := event.GetValue(field)
 		if err == nil {
@@ -158,7 +159,7 @@ func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
 
 // MetadataIndex returns the content of the dynamic field defined by the FieldFormatMatcher, usually,
 // but not limited to, a concatenation of multiple fields
-func (f *FieldFormatMatcher) MetadataIndex(event common.MapStr) string {
+func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
 	bytes, err := f.Codec.Encode("", &beat.Event{
 		Fields: event,
 	})

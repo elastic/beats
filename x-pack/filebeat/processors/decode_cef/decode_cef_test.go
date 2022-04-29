@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var updateGolden = flag.Bool("update", false, "update golden test files")
@@ -25,7 +25,7 @@ func TestProcessorRun(t *testing.T) {
 	type testCase struct {
 		config  func() config
 		message string
-		fields  common.MapStr
+		fields  mapstr.M
 	}
 
 	testCases := map[string]testCase{
@@ -36,7 +36,7 @@ func TestProcessorRun(t *testing.T) {
 				return c
 			},
 			message: "CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5",
-			fields: common.MapStr{
+			fields: mapstr.M{
 				"version":                   "1",
 				"device.event_class_id":     "600",
 				"device.product":            "Deep Security Manager",
@@ -61,7 +61,7 @@ func TestProcessorRun(t *testing.T) {
 		},
 		"parse_errors": {
 			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|Low|msg=User signed in with =xyz",
-			fields: common.MapStr{
+			fields: mapstr.M{
 				"cef.version":               "0",
 				"cef.device.event_class_id": "600",
 				"cef.device.product":        "Deep Security Manager",
@@ -89,7 +89,7 @@ func TestProcessorRun(t *testing.T) {
 				return c
 			},
 			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5",
-			fields: common.MapStr{
+			fields: mapstr.M{
 				"cef.version":                   "0",
 				"cef.device.event_class_id":     "600",
 				"cef.device.product":            "Deep Security Manager",
@@ -111,7 +111,7 @@ func TestProcessorRun(t *testing.T) {
 				return c
 			},
 			message: "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT",
-			fields: common.MapStr{
+			fields: mapstr.M{
 				"cef.version":                      "0",
 				"cef.device.product":               "Mgmt",
 				"cef.device.vendor":                "SentinelOne",
@@ -147,7 +147,7 @@ func TestProcessorRun(t *testing.T) {
 			}
 
 			evt := &beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": tc.message,
 				},
 			}
@@ -163,7 +163,7 @@ func TestProcessorRun(t *testing.T) {
 
 	t.Run("not_cef", func(t *testing.T) {
 		evt := &beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": "hello world!",
 			},
 		}
@@ -178,7 +178,7 @@ func TestProcessorRun(t *testing.T) {
 		tc := testCases["custom_target_root"]
 
 		evt := &beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": "leading garbage" + tc.message,
 			},
 		}
@@ -212,7 +212,7 @@ func TestGolden(t *testing.T) {
 	}
 }
 
-func readCEFSamples(t testing.TB, source string) []common.MapStr {
+func readCEFSamples(t testing.TB, source string) []mapstr.M {
 	f, err := os.Open(source)
 	if err != nil {
 		t.Fatal(err)
@@ -226,7 +226,7 @@ func readCEFSamples(t testing.TB, source string) []common.MapStr {
 		t.Fatal(err)
 	}
 
-	var samples []common.MapStr
+	var samples []mapstr.M
 	s := bufio.NewScanner(f)
 	for s.Scan() {
 		data := s.Bytes()
@@ -235,8 +235,8 @@ func readCEFSamples(t testing.TB, source string) []common.MapStr {
 		}
 
 		evt := &beat.Event{
-			Fields: common.MapStr{
-				"event": common.MapStr{"original": string(data)},
+			Fields: mapstr.M{
+				"event": mapstr.M{"original": string(data)},
 			},
 		}
 
@@ -254,7 +254,7 @@ func readCEFSamples(t testing.TB, source string) []common.MapStr {
 	return samples
 }
 
-func readGoldenJSON(t testing.TB, source string) []common.MapStr {
+func readGoldenJSON(t testing.TB, source string) []mapstr.M {
 	source = source + ".golden.json"
 
 	f, err := os.Open(source)
@@ -265,7 +265,7 @@ func readGoldenJSON(t testing.TB, source string) []common.MapStr {
 
 	dec := json.NewDecoder(bufio.NewReader(f))
 
-	var events []common.MapStr
+	var events []mapstr.M
 	if err = dec.Decode(&events); err != nil {
 		t.Fatal(err)
 	}
@@ -273,7 +273,7 @@ func readGoldenJSON(t testing.TB, source string) []common.MapStr {
 	return events
 }
 
-func writeGoldenJSON(t testing.TB, source string, events []common.MapStr) {
+func writeGoldenJSON(t testing.TB, source string, events []mapstr.M) {
 	dest := source + ".golden.json"
 
 	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
@@ -289,13 +289,13 @@ func writeGoldenJSON(t testing.TB, source string, events []common.MapStr) {
 	}
 }
 
-func normalize(t testing.TB, m common.MapStr) common.MapStr {
+func normalize(t testing.TB, m mapstr.M) mapstr.M {
 	data, err := json.Marshal(m)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var out common.MapStr
+	var out mapstr.M
 	if err = json.Unmarshal(data, &out); err != nil {
 		t.Fatal(err)
 	}

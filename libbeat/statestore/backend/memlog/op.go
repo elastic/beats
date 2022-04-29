@@ -17,7 +17,7 @@
 
 package memlog
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
 type (
 	op interface {
@@ -27,7 +27,7 @@ type (
 	// opSet encodes the 'Set' operations in the update log.
 	opSet struct {
 		K string
-		V common.MapStr
+		V mapstr.M
 	}
 
 	// opRemove encodes the 'Remove' operation in the update log.

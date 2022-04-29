@@ -20,13 +20,13 @@ package jsontransform
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TransformNumbers walks a json decoded tree an replaces json.Number
 // with int64, float64, or string, in this order of preference (i.e. if it
 // parses as an int, use int. if it parses as a float, use float. etc).
-func TransformNumbers(dict common.MapStr) {
+func TransformNumbers(dict mapstr.M) {
 	for k, v := range dict {
 		switch vv := v.(type) {
 		case json.Number:

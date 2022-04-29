@@ -25,10 +25,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -49,12 +49,12 @@ func TestFetch(t *testing.T) {
 
 	// Check event fields
 	if _, isQuery := event["database"]; isQuery {
-		db_oid := event["database"].(common.MapStr)["oid"].(int64)
+		db_oid := event["database"].(mapstr.M)["oid"].(int64)
 		assert.True(t, db_oid > 0)
 
 		assert.Contains(t, event, "user")
-		assert.Contains(t, event["user"].(common.MapStr), "name")
-		assert.Contains(t, event["user"].(common.MapStr), "id")
+		assert.Contains(t, event["user"].(mapstr.M), "name")
+		assert.Contains(t, event["user"].(mapstr.M), "id")
 	} else {
 		assert.Contains(t, event, "backend_type")
 		assert.Contains(t, event, "wait_event")
@@ -68,11 +68,11 @@ func TestData(t *testing.T) {
 	f := mbtest.NewFetcher(t, getConfig(service.Host()))
 
 	dbNameKey := "postgresql.activity.database.name"
-	f.WriteEventsCond(t, "", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "", func(event mapstr.M) bool {
 		_, err := event.GetValue(dbNameKey)
 		return err == nil
 	})
-	f.WriteEventsCond(t, "./_meta/data_backend.json", func(event common.MapStr) bool {
+	f.WriteEventsCond(t, "./_meta/data_backend.json", func(event mapstr.M) bool {
 		_, err := event.GetValue(dbNameKey)
 		return err != nil
 	})

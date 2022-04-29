@@ -23,10 +23,10 @@ package statement
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -46,21 +46,21 @@ func TestFetch(t *testing.T) {
 
 	// Check event fields
 	assert.Contains(t, event, "user")
-	assert.Contains(t, event["user"].(common.MapStr), "id")
+	assert.Contains(t, event["user"].(mapstr.M), "id")
 
 	assert.Contains(t, event, "database")
-	db_oid := event["database"].(common.MapStr)["oid"].(int64)
+	db_oid := event["database"].(mapstr.M)["oid"].(int64)
 	assert.True(t, db_oid > 0)
 
 	assert.Contains(t, event, "query")
-	query := event["query"].(common.MapStr)
+	query := event["query"].(mapstr.M)
 	assert.Contains(t, query, "id")
 	assert.Contains(t, query, "text")
 	assert.Contains(t, query, "calls")
 	assert.Contains(t, query, "rows")
 
 	assert.Contains(t, query, "time")
-	time := query["time"].(common.MapStr)
+	time := query["time"].(mapstr.M)
 	assert.Contains(t, time, "total")
 	assert.Contains(t, time, "min")
 	assert.Contains(t, time, "max")
@@ -68,24 +68,24 @@ func TestFetch(t *testing.T) {
 	assert.Contains(t, time, "stddev")
 
 	assert.Contains(t, query["memory"], "shared")
-	memory := query["memory"].(common.MapStr)
+	memory := query["memory"].(mapstr.M)
 
 	assert.Contains(t, memory, "shared")
-	shared := memory["shared"].(common.MapStr)
+	shared := memory["shared"].(mapstr.M)
 	assert.Contains(t, shared, "hit")
 	assert.Contains(t, shared, "read")
 	assert.Contains(t, shared, "dirtied")
 	assert.Contains(t, shared, "written")
 
 	assert.Contains(t, memory, "local")
-	local := memory["local"].(common.MapStr)
+	local := memory["local"].(mapstr.M)
 	assert.Contains(t, local, "hit")
 	assert.Contains(t, local, "read")
 	assert.Contains(t, local, "dirtied")
 	assert.Contains(t, local, "written")
 
 	assert.Contains(t, memory, "temp")
-	temp := memory["temp"].(common.MapStr)
+	temp := memory["temp"].(mapstr.M)
 	assert.Contains(t, temp, "read")
 	assert.Contains(t, temp, "written")
 }

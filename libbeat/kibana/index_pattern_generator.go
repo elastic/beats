@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type IndexPatternGenerator struct {
@@ -50,7 +51,7 @@ func NewGenerator(indexName, beatName string, fields []byte, beatVersion string,
 }
 
 // Generate creates the Index-Pattern for Kibana.
-func (i *IndexPatternGenerator) Generate() (common.MapStr, error) {
+func (i *IndexPatternGenerator) Generate() (mapstr.M, error) {
 	idxPattern, err := i.generate()
 	if err != nil {
 		return nil, err
@@ -59,8 +60,8 @@ func (i *IndexPatternGenerator) Generate() (common.MapStr, error) {
 	return i.generatePattern(idxPattern), nil
 }
 
-func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
-	indexPattern := common.MapStr{
+func (i *IndexPatternGenerator) generate() (mapstr.M, error) {
+	indexPattern := mapstr.M{
 		"timeFieldName": "@timestamp",
 		"title":         i.indexName,
 	}
@@ -78,8 +79,8 @@ func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
 	return indexPattern, nil
 }
 
-func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapStr {
-	out := common.MapStr{
+func (i *IndexPatternGenerator) generatePattern(attrs mapstr.M) mapstr.M {
+	out := mapstr.M{
 		"type":       "index-pattern",
 		"id":         i.indexName,
 		"version":    i.beatVersion,
@@ -89,13 +90,13 @@ func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapS
 	return out
 }
 
-func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
+func (i *IndexPatternGenerator) addGeneral(indexPattern *mapstr.M) error {
 	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fields)
 	if err != nil {
 		return err
 	}
 	transformed := newTransformer(kibanaEntries).transform()
-	if srcFilters, ok := transformed["sourceFilters"].([]common.MapStr); ok {
+	if srcFilters, ok := transformed["sourceFilters"].([]mapstr.M); ok {
 		sourceFiltersBytes, err := json.Marshal(srcFilters)
 		if err != nil {
 			return err
@@ -105,7 +106,7 @@ func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
 	return nil
 }
 
-func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
+func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *mapstr.M) error {
 	fields, err := mapping.LoadFields(i.fields)
 	if err != nil {
 		return err
@@ -138,7 +139,7 @@ func clean(name string) string {
 	return reg.ReplaceAllString(name, "")
 }
 
-func dumpToFile(f string, pattern common.MapStr) error {
+func dumpToFile(f string, pattern mapstr.M) error {
 	patternIndent, err := json.MarshalIndent(pattern, "", "  ")
 	if err != nil {
 		return err

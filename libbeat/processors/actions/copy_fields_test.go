@@ -21,29 +21,29 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestCopyFields(t *testing.T) {
 	log := logp.NewLogger("copy_fields_test")
 	var tests = map[string]struct {
 		FromTo   fromTo
-		Input    common.MapStr
-		Expected common.MapStr
+		Input    mapstr.M
+		Expected mapstr.M
 	}{
 		"copy string from message to message_copied": {
 			FromTo: fromTo{
 				From: "message",
 				To:   "message_copied",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": "please copy this line",
 			},
-			Expected: common.MapStr{
+			Expected: mapstr.M{
 				"message":        "please copy this line",
 				"message_copied": "please copy this line",
 			},
@@ -53,13 +53,13 @@ func TestCopyFields(t *testing.T) {
 				From: "nested.message",
 				To:   "message_copied",
 			},
-			Input: common.MapStr{
-				"nested": common.MapStr{
+			Input: mapstr.M{
+				"nested": mapstr.M{
 					"message": "please copy this line",
 				},
 			},
-			Expected: common.MapStr{
-				"nested": common.MapStr{
+			Expected: mapstr.M{
+				"nested": mapstr.M{
 					"message": "please copy this line",
 				},
 				"message_copied": "please copy this line",
@@ -70,10 +70,10 @@ func TestCopyFields(t *testing.T) {
 				From: "dotted.message",
 				To:   "message_copied",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"dotted.message": "please copy this line",
 			},
-			Expected: common.MapStr{
+			Expected: mapstr.M{
 				"dotted.message": "please copy this line",
 				"message_copied": "please copy this line",
 			},
@@ -83,12 +83,12 @@ func TestCopyFields(t *testing.T) {
 				From: "message.original",
 				To:   "message.copied",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message.original": 42,
 			},
-			Expected: common.MapStr{
+			Expected: mapstr.M{
 				"message.original": 42,
-				"message": common.MapStr{
+				"message": mapstr.M{
 					"copied": 42,
 				},
 			},
@@ -98,13 +98,13 @@ func TestCopyFields(t *testing.T) {
 				From: "message.original",
 				To:   "message",
 			},
-			Input: common.MapStr{
-				"message": common.MapStr{
+			Input: mapstr.M{
+				"message": mapstr.M{
 					"original": 42,
 				},
 			},
-			Expected: common.MapStr{
-				"message": common.MapStr{
+			Expected: mapstr.M{
+				"message": mapstr.M{
 					"original": 42,
 				},
 			},
@@ -114,10 +114,10 @@ func TestCopyFields(t *testing.T) {
 				From: "message.original",
 				To:   "message",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message.original": 42,
 			},
-			Expected: common.MapStr{
+			Expected: mapstr.M{
 				"message.original": 42,
 				"message":          42,
 			},
@@ -127,20 +127,20 @@ func TestCopyFields(t *testing.T) {
 				From: "message.original",
 				To:   "message_copied",
 			},
-			Input: common.MapStr{
-				"message": common.MapStr{
-					"original": common.MapStr{
+			Input: mapstr.M{
+				"message": mapstr.M{
+					"original": mapstr.M{
 						"original": "original",
 					},
 				},
 			},
-			Expected: common.MapStr{
-				"message": common.MapStr{
-					"original": common.MapStr{
+			Expected: mapstr.M{
+				"message": mapstr.M{
+					"original": mapstr.M{
 						"original": "original",
 					},
 				},
-				"message_copied": common.MapStr{
+				"message_copied": mapstr.M{
 					"original": "original",
 				},
 			},
@@ -183,12 +183,12 @@ func TestCopyFields(t *testing.T) {
 		}
 
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"message": "please copy this line",
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"message":        "please copy this line",
 			"message_copied": "please copy this line",
 		}

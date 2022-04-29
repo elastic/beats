@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/zeek/_meta/docs.asciidoc
+
 [[filebeat-module-zeek]]
 [role="xpack"]
 
@@ -798,3 +800,4 @@ image::./images/kibana-zeek.png[]
 For a description of each field in the module, see the
 <<exported-fields-zeek,exported fields>> section.
 
+edit_url!:

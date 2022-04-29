@@ -23,13 +23,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -142,10 +142,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		for i := range gotDomainMemoryStats {
 			reported := report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"id":   d.ID,
 					"name": d.Name,
-					"stat": common.MapStr{
+					"stat": mapstr.M{
 						"name":  getDomainMemoryStatName(gotDomainMemoryStats[i].Tag),
 						"value": gotDomainMemoryStats[i].Val,
 					},

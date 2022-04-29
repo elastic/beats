@@ -1,5 +1,14 @@
 provider "aws" {
-  version = "~> 2.58"
+  version = "~> 3.33"
+  default_tags {
+    tags = {
+      environment  = var.ENVIRONMENT
+      repo         = var.REPO
+      branch       = var.BRANCH
+      build        = var.BUILD_ID
+      created_date = var.CREATED_DATE
+    }
+  }
 }
 
 provider "random" {

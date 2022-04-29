@@ -24,10 +24,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Debug selectors used in this package.
@@ -85,7 +85,7 @@ func (e Record) ToEvent() beat.Event {
 	win.Delete("time_created")
 	win.Put("api", e.API)
 
-	m := common.MapStr{
+	m := mapstr.M{
 		"winlog": win,
 	}
 
@@ -116,7 +116,7 @@ func (e Record) ToEvent() beat.Event {
 }
 
 // rename will rename a map entry overriding any previous value
-func rename(m common.MapStr, oldKey, newKey string) {
+func rename(m mapstr.M, oldKey, newKey string) {
 	v, err := m.GetValue(oldKey)
 	if err != nil {
 		return

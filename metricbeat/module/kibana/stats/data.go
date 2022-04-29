@@ -23,8 +23,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -115,7 +115,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return errors.Wrap(err, "failure to apply stats schema")
 	}
 
-	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
+	event := mb.Event{ModuleFields: mapstr.M{}, RootFields: mapstr.M{}}
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]

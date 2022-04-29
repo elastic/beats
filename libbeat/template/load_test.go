@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,41 +38,41 @@ func TestFileLoader_Load(t *testing.T) {
 
 	for name, test := range map[string]struct {
 		settings TemplateSettings
-		body     common.MapStr
+		body     mapstr.M
 		fields   []byte
-		want     common.MapStr
+		want     mapstr.M
 		wantErr  error
 	}{
 		"load minimal config info": {
-			body: common.MapStr{
+			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
-				"template": common.MapStr{
-					"settings": common.MapStr{"index": nil}},
+				"template": mapstr.M{
+					"settings": mapstr.M{"index": nil}},
 			},
 		},
 		"load minimal config with index settings": {
-			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
-			body: common.MapStr{
+			settings: TemplateSettings{Index: mapstr.M{"code": "best_compression"}},
+			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
-				"template": common.MapStr{
-					"settings": common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
+				"template": mapstr.M{
+					"settings": mapstr.M{"index": mapstr.M{"code": "best_compression"}}},
 			},
 		},
 		"load minimal config with source settings": {
-			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
-			body: common.MapStr{
+			settings: TemplateSettings{Source: mapstr.M{"enabled": false}},
+			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
-				"template": common.MapStr{
-					"settings": common.MapStr{"index": nil},
-					"mappings": common.MapStr{
-						"_source":           common.MapStr{"enabled": false},
-						"_meta":             common.MapStr{"beat": prefix, "version": ver},
+				"template": mapstr.M{
+					"settings": mapstr.M{"index": nil},
+					"mappings": mapstr.M{
+						"_source":           mapstr.M{"enabled": false},
+						"_meta":             mapstr.M{"beat": prefix, "version": ver},
 						"date_detection":    false,
 						"dynamic_templates": nil,
 						"properties":        nil,
@@ -79,12 +80,12 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load config and in-line analyzer fields": {
-			body: common.MapStr{
+			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
-				"template": common.MapStr{
-					"settings": common.MapStr{"index": nil}},
+				"template": mapstr.M{
+					"settings": mapstr.M{"index": nil}},
 			},
 			fields: []byte(`- key: test
   title: Test fields.yml with analyzer
@@ -109,21 +110,21 @@ func TestFileLoader_Load(t *testing.T) {
       type: text
       analyzer: simple
 `),
-			want: common.MapStr{
+			want: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
-				"template": common.MapStr{
-					"mappings": common.MapStr{
-						"_meta": common.MapStr{
+				"template": mapstr.M{
+					"mappings": mapstr.M{
+						"_meta": mapstr.M{
 							"version": "7.0.0",
 							"beat":    "mock",
 						},
 						"date_detection": false,
-						"dynamic_templates": []common.MapStr{
+						"dynamic_templates": []mapstr.M{
 							{
-								"strings_as_keyword": common.MapStr{
-									"mapping": common.MapStr{
+								"strings_as_keyword": mapstr.M{
+									"mapping": mapstr.M{
 										"ignore_above": 1024,
 										"type":         "keyword",
 									},
@@ -131,41 +132,41 @@ func TestFileLoader_Load(t *testing.T) {
 								},
 							},
 						},
-						"properties": common.MapStr{
-							"code_block_text": common.MapStr{
+						"properties": mapstr.M{
+							"code_block_text": mapstr.M{
 								"type":     "text",
 								"norms":    false,
 								"analyzer": "test_powershell",
 							},
-							"script_block_text": common.MapStr{
+							"script_block_text": mapstr.M{
 								"type":     "text",
 								"norms":    false,
 								"analyzer": "test_powershell",
 							},
-							"standard_text": common.MapStr{
+							"standard_text": mapstr.M{
 								"type":     "text",
 								"norms":    false,
 								"analyzer": "simple",
 							},
 						},
 					},
-					"settings": common.MapStr{
-						"index": common.MapStr{
+					"settings": mapstr.M{
+						"index": mapstr.M{
 							"refresh_interval": "5s",
-							"mapping": common.MapStr{
-								"total_fields": common.MapStr{
+							"mapping": mapstr.M{
+								"total_fields": mapstr.M{
 									"limit": 10000,
 								},
 							},
-							"query": common.MapStr{
+							"query": mapstr.M{
 								"default_field": []string{
 									"fields.*",
 								},
 							},
 							"max_docvalue_fields_search": 200,
 						},
-						"analysis": common.MapStr{
-							"analyzer": common.MapStr{
+						"analysis": mapstr.M{
+							"analyzer": mapstr.M{
 								"test_powershell": map[string]interface{}{
 									"type":    "pattern",
 									"pattern": "[\\W&&[^-]]+",
@@ -177,9 +178,9 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load config and in-line analyzer fields with name collision": {
-			body: common.MapStr{
+			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
-				"settings":       common.MapStr{"index": nil},
+				"settings":       mapstr.M{"index": nil},
 			},
 			fields: []byte(`- key: test
   title: Test fields.yml with analyzer

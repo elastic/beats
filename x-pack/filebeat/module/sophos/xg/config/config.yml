@@ -25,16 +25,12 @@ tags: {{ .tags | tojson }}
 processors:
   - add_locale: ~
   - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.12.0
-  - add_fields:
       target: '_conf'
       fields:
           default: {{ .default_host_name | printf "%q" }}
           mappings:
 {{ range $i, $entry := .known_devices }}
-            - serial: {{$entry.serial_number | printf "%q"}}
+            - serial_number: {{$entry.serial_number | printf "%q"}}
               hostname: {{$entry.hostname | printf "%q"}}
 {{ end }}
 

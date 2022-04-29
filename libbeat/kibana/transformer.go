@@ -18,7 +18,7 @@
 package kibana
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -35,13 +35,13 @@ func newTransformer(entries []kibanaEntry) *transformer {
 	return &transformer{entries: entries}
 }
 
-func (t *transformer) transform() common.MapStr {
-	transformed := common.MapStr{}
+func (t *transformer) transform() mapstr.M {
+	transformed := mapstr.M{}
 
-	var srcFilters []common.MapStr
+	var srcFilters []mapstr.M
 	for _, entry := range t.entries {
 		for _, sourceFilter := range entry.Kibana.SourceFilters {
-			srcFilters = append(srcFilters, common.MapStr{"value": sourceFilter})
+			srcFilters = append(srcFilters, mapstr.M{"value": sourceFilter})
 		}
 	}
 	if len(srcFilters) > 0 {

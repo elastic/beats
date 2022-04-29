@@ -60,6 +60,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 - Removed deprecated disk spool from Beats. Use disk queue instead. {pull}28869[28869]
 - Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
+- Remove `common.MapStr` and use `mapstr.M` from `github.com/elastic/elastic-agent-libs` instead. {pull}31420[31420]
 
 ==== Bugfixes
 
@@ -70,6 +71,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 - Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
+- Allow to use metricbeat for named mssql instances. {issue}24076[24076] {pull}30859[30859]
 
 ==== Added
 

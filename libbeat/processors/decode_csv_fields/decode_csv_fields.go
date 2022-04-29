@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type decodeCSVFields struct {
@@ -39,12 +40,12 @@ type decodeCSVFields struct {
 }
 
 type csvConfig struct {
-	Fields           common.MapStr `config:"fields"`
-	IgnoreMissing    bool          `config:"ignore_missing"`
-	TrimLeadingSpace bool          `config:"trim_leading_space"`
-	OverwriteKeys    bool          `config:"overwrite_keys"`
-	FailOnError      bool          `config:"fail_on_error"`
-	Separator        string        `config:"separator"`
+	Fields           mapstr.M `config:"fields"`
+	IgnoreMissing    bool     `config:"ignore_missing"`
+	TrimLeadingSpace bool     `config:"trim_leading_space"`
+	OverwriteKeys    bool     `config:"overwrite_keys"`
+	FailOnError      bool     `config:"fail_on_error"`
+	Separator        string   `config:"separator"`
 }
 
 var (
@@ -115,7 +116,7 @@ func (f *decodeCSVFields) Run(event *beat.Event) (*beat.Event, error) {
 func (f *decodeCSVFields) decodeCSVField(src, dest string, event *beat.Event) error {
 	data, err := event.GetValue(src)
 	if err != nil {
-		if f.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return errors.Wrapf(err, "could not fetch value for field %s", src)

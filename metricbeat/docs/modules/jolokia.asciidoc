@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: jolokia
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/jolokia/_meta/docs.asciidoc
+
 
 [[metricbeat-module-jolokia]]
 == Jolokia module
@@ -21,6 +23,8 @@ The Jolokia module is tested with Jolokia 1.5.0. It should work with version
 1.2.2 and later.
 
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -74,3 +78,4 @@ The following metricsets are available:
 
 include::jolokia/jmx.asciidoc[]
 
+:edit_url!:

@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
@@ -98,7 +99,7 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	}
 
 	// build event only if it's a nfs packet
-	rpcInfo := common.MapStr{
+	rpcInfo := mapstr.M{
 		"xid": xid,
 	}
 
@@ -111,7 +112,7 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		rpcInfo["auth_flavor"] = "none"
 	case 1:
 		rpcInfo["auth_flavor"] = "unix"
-		cred := common.MapStr{}
+		cred := mapstr.M{}
 		credXdr := makeXDR(authOpaque)
 		cred["stamp"] = credXdr.getUInt()
 		machine := credXdr.getString()
@@ -194,13 +195,13 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 		nfs.pbf.Destination.Bytes = int64(xdr.size())
 
 		fields := nfs.event.Fields
-		rpcInfo := fields["rpc"].(common.MapStr)
+		rpcInfo := fields["rpc"].(mapstr.M)
 		status := int(xdr.getUInt())
 		rpcInfo["status"] = acceptStatus[status]
 
 		// populate nfs info for successfully executed requests
 		if status == 0 {
-			nfsInfo := fields["nfs"].(common.MapStr)
+			nfsInfo := fields["nfs"].(mapstr.M)
 			nfsInfo["status"] = nfs.getNFSReplyStatus(xdr)
 		} else {
 			nfs.pbf.Event.Outcome = "failure"

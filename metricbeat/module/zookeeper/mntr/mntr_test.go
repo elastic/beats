@@ -25,19 +25,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func assertExpectations(t *testing.T, expectations common.MapStr, report common.MapStr, message ...string) {
+func assertExpectations(t *testing.T, expectations mapstr.M, report mapstr.M, message ...string) {
 	for key, expectation := range expectations {
 		assert.Contains(t, report, key, message)
 		switch expectation := expectation.(type) {
-		case common.MapStr:
+		case mapstr.M:
 			nestedReport, _ := report.GetValue(key)
 			assert.IsType(t, nestedReport, report, message)
-			assertExpectations(t, expectation, nestedReport.(common.MapStr), message...)
+			assertExpectations(t, expectation, nestedReport.(mapstr.M), message...)
 		default:
 			reportValue, _ := report.GetValue(key)
 			assert.Equal(t, expectation, reportValue, message)
@@ -56,17 +56,17 @@ func TestEventMapping(t *testing.T) {
 	type TestCase struct {
 		Version        string
 		MntrSample     string
-		ExpectedValues common.MapStr
+		ExpectedValues mapstr.M
 	}
 
 	mntrSamples := []TestCase{
 		{
 			"3.5.3",
 			mntrTestInputZooKeeper35,
-			common.MapStr{
+			mapstr.M{
 				"learners":  int64(1),
 				"followers": int64(1),
-				"latency": common.MapStr{
+				"latency": mapstr.M{
 					"max": float64(29),
 					"avg": float64(0),
 					"min": float64(0),
@@ -76,10 +76,10 @@ func TestEventMapping(t *testing.T) {
 		{
 			"3.7.0",
 			mntrTestInputZooKeeper37,
-			common.MapStr{
+			mapstr.M{
 				"learners":  int64(1),
 				"followers": int64(1),
-				"latency": common.MapStr{
+				"latency": mapstr.M{
 					"max": float64(8),
 					"avg": float64(0.5714),
 					"min": float64(0),

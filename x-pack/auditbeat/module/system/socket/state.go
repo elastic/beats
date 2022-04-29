@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
 
@@ -934,14 +935,14 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	localAddr := f.local.addr
 	remoteAddr := f.remote.addr
 
-	local := common.MapStr{
+	local := mapstr.M{
 		"ip":      localAddr.IP.String(),
 		"port":    localAddr.Port,
 		"packets": f.local.packets,
 		"bytes":   f.local.bytes,
 	}
 
-	remote := common.MapStr{
+	remote := mapstr.M{
 		"ip":      remoteAddr.IP.String(),
 		"port":    remoteAddr.Port,
 		"packets": f.remote.packets,
@@ -976,12 +977,12 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		eventType = append(eventType, "connection")
 	}
 
-	root := common.MapStr{
+	root := mapstr.M{
 		"source":      src,
 		"client":      src,
 		"destination": dst,
 		"server":      dst,
-		"network": common.MapStr{
+		"network": mapstr.M{
 			"direction": f.dir.String(),
 			"type":      inetType.String(),
 			"transport": f.proto.String(),
@@ -995,7 +996,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 				Protocol:        uint8(f.proto),
 			}),
 		},
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"kind":     "event",
 			"action":   "network_flow",
 			"category": []string{"network", "network_traffic"},
@@ -1004,7 +1005,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"end":      f.lastSeenTime,
 			"duration": f.lastSeenTime.Sub(f.createdTime).Nanoseconds(),
 		},
-		"flow": common.MapStr{
+		"flow": mapstr.M{
 			"final":    final,
 			"complete": f.complete,
 		},
@@ -1021,12 +1022,12 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		root.Put("related.ip", relatedIPs)
 	}
 
-	metricset := common.MapStr{
+	metricset := mapstr.M{
 		"kernel_sock_address": fmt.Sprintf("0x%x", f.sock),
 	}
 
 	if f.pid != 0 {
-		process := common.MapStr{
+		process := mapstr.M{
 			"pid": int(f.pid),
 		}
 		if f.process != nil {

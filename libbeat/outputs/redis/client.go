@@ -28,13 +28,13 @@ import (
 	"github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -222,7 +222,7 @@ func (c *client) makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
 
 func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 	// XXX: requires key.IsConst() == true
-	dest, _ := c.key.Select(&beat.Event{Fields: common.MapStr{}})
+	dest, _ := c.key.Select(&beat.Event{Fields: mapstr.M{}})
 	return func(_ outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest

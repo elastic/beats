@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processor.timestamp"
@@ -87,7 +88,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	// Get the source field value.
 	val, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreFailure || (p.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound) {
+		if p.IgnoreFailure || (p.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound) {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "failed to get time field %v", p.Field)
