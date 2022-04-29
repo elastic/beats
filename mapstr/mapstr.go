@@ -295,6 +295,37 @@ func flatten(prefix string, in, out M) M {
 	return out
 }
 
+// FlattenKeys flattens given MapStr keys and returns a containing array pointer
+//
+// Example:
+//   "hello": MapStr{"world": "test" }
+//
+// This is converted to:
+//   ["hello.world"]
+func (m M) FlattenKeys() *[]string {
+	out := make([]string, 0)
+	flattenKeys("", m, &out)
+
+	return &out
+}
+
+func flattenKeys(prefix string, in M, out *[]string) {
+	for k, v := range in {
+		var fullKey string
+		if prefix == "" {
+			fullKey = k
+		} else {
+			fullKey = prefix + "." + k
+		}
+
+		if m, ok := tryToMapStr(v); ok {
+			flattenKeys(fullKey, m, out)
+		}
+
+		*out = append(*out, fullKey)
+	}
+}
+
 // Union creates a new M containing the union of the
 // key-value pairs of the two maps. If the same key is present in
 // both, the key-value pairs from dict2 overwrite the ones from dict1.
