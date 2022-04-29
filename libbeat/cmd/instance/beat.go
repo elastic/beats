@@ -877,7 +877,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
-	if isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
+	if !isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
 		return
 	}
 
@@ -888,7 +888,7 @@ func (b *Beat) checkElasticsearchVersion() {
 			return err
 		}
 		if esVersion.LessThanMajorMinor(beatVersion) {
-			return fmt.Errorf("%w ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
+			return fmt.Errorf("%w ES=%s, Beat=%s", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
 		}
 		return nil
 	})
@@ -908,7 +908,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
+	if !isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
