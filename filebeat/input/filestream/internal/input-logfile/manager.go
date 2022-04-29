@@ -173,7 +173,6 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 	}
 
 	if settings.ID == "" {
-<<<<<<< HEAD
 		cim.Logger.Error("filestream input ID without ID might lead to data" +
 			" duplication, please add an ID and restart Filebeat")
 	}
@@ -185,14 +184,6 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 
 	cim.ids[settings.ID] = struct{}{}
 
-=======
-		cim.Logger.Warn("creating a filestream input without an ID, which may lead to duplicated data." +
-			"Filestream inputs will require an ID in a future release." +
-			"NOTE: Adding an ID to an existing input will cause all files to be re-read from the beginning.",
-		)
-	}
-
->>>>>>> 3f583b1f09 (input/filestream: filestream input ID is required (#30401))
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
 		return nil, err
