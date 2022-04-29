@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type journald struct {
@@ -105,7 +106,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		Backoff:            config.Backoff,
 		MaxBackoff:         config.MaxBackoff,
 		Seek:               config.Seek,
-		CursorSeekFallback: conf.CursorSeekFallback,
+		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            journalfield.IncludeMatches(config.Matches),
 		Units:              config.Units,
 		Transports:         config.Transports,
