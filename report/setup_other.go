@@ -21,7 +21,7 @@
 // +build !linux
 // +build !windows
 
-package metrics
+package report
 
 import "github.com/elastic/elastic-agent-libs/logp"
 
