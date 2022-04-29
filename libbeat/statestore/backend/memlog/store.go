@@ -24,10 +24,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // store implements an actual memlog based store.
@@ -184,7 +184,7 @@ func (s *store) Get(key string, to interface{}) error {
 // If encoding was successful the in-memory state will be updated and a
 // set-operation is logged to the diskstore.
 func (s *store) Set(key string, value interface{}) error {
-	var tmp common.MapStr
+	var tmp mapstr.M
 	if err := typeconv.Convert(&tmp, value); err != nil {
 		return err
 	}
@@ -263,7 +263,7 @@ func (m *memstore) Get(key string) backend.ValueDecoder {
 	return entry
 }
 
-func (m *memstore) Set(key string, value common.MapStr) {
+func (m *memstore) Set(key string, value mapstr.M) {
 	m.table[key] = entry{value: value}
 }
 

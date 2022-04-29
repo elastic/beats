@@ -19,14 +19,14 @@ package processing
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // SupportFactory creates a new processing Supporter that can be used with
 // the publisher pipeline.  The factory gets the global configuration passed,
 // in order to configure some shared global event processing.
-type SupportFactory func(info beat.Info, log *logp.Logger, cfg *common.Config) (Supporter, error)
+type SupportFactory func(info beat.Info, log *logp.Logger, cfg *config.C) (Supporter, error)
 
 // Supporter is used to create an event processing pipeline. It is used by the
 // publisher pipeline when a client connects to the pipeline. The supporter

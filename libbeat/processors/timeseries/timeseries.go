@@ -21,10 +21,10 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/mitchellh/hashstructure"
 )
@@ -67,7 +67,7 @@ func NewTimeSeriesProcessor(fields mapping.Fields) processors.Processor {
 
 func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if event.TimeSeries {
-		instanceFields := common.MapStr{}
+		instanceFields := mapstr.M{}
 
 		// map all dimensions & values
 		for k, v := range event.Fields.Flatten() {
@@ -81,7 +81,7 @@ func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			// this should not happen, keep the event in any case
 			return event, err
 		}
-		event.Fields["timeseries"] = common.MapStr{
+		event.Fields["timeseries"] = mapstr.M{
 			"instance": h,
 		}
 	}

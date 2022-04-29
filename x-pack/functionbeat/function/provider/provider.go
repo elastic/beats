@@ -10,16 +10,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Create a new pipeline client based on the function configuration.
-type clientFactory func(*common.Config) (pipeline.ISyncClient, error)
+type clientFactory func(*conf.C) (pipeline.ISyncClient, error)
 
 // Function is temporary
 type Function interface {
@@ -41,7 +41,7 @@ type Provider interface {
 // Runnable is the unit of work managed by the coordinator, anything related to the life of a function
 // is encapsulated into the runnable.
 type Runnable struct {
-	config     *common.Config
+	config     *conf.C
 	function   Function
 	makeClient clientFactory
 }
@@ -62,7 +62,7 @@ func (r *Runnable) String() string {
 }
 
 // NewProvider return the provider specified in the configuration or an error.
-func NewProvider(name string, cfg *common.Config) (Provider, error) {
+func NewProvider(name string, cfg *conf.C) (Provider, error) {
 	// Configure the provider, the provider will take care of the configuration for the
 	// functions.
 	registry := NewRegistry(feature.GlobalRegistry())
@@ -111,7 +111,7 @@ func ListFunctions(provider string) ([]string, error) {
 }
 
 // Create returns the provider from a configuration.
-func Create(cfg *common.Config) (Provider, error) {
+func Create(cfg *conf.C) (Provider, error) {
 	providers, err := List()
 	if err != nil {
 		return nil, err

@@ -9,11 +9,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type performanceCounter struct {
@@ -100,7 +99,7 @@ WHERE  counter_name = 'SQL Compilations/sec'
 		}
 	}()
 
-	mapStr := common.MapStr{}
+	mapStr := mapstr.M{}
 	for rows.Next() {
 		var row performanceCounter
 		if err = rows.Scan(&row.objectName, &row.counterName, &row.instanceName, &row.counterValue); err != nil {

@@ -30,13 +30,14 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -47,7 +48,7 @@ const (
 	logGroupNamePrefix = "filebeat-log-group-integtest-"
 )
 
-var cloudwatchConfig = common.MapStr{
+var cloudwatchConfig = mapstr.M{
 	"start_position":    "beginning",
 	"scan_frequency":    10 * time.Second,
 	"api_timeout":       120 * time.Second,
@@ -83,7 +84,7 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 	return rtn
 }
 
-func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
+func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{}) {
 	n, _ := snapshot.GetValue(inputID + "." + name)
 	assert.EqualValues(t, value, n, name)
 }
@@ -119,7 +120,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }
 
-func createInput(t *testing.T, cfg *common.Config) *cloudwatchInput {
+func createInput(t *testing.T, cfg *conf.C) *cloudwatchInput {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -128,8 +129,8 @@ func createInput(t *testing.T, cfg *common.Config) *cloudwatchInput {
 	return inputV2.(*cloudwatchInput)
 }
 
-func makeTestConfigWithLogGroupNamePrefix(regionName string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigWithLogGroupNamePrefix(regionName string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 log_group_name_prefix: %s
 region_name: %s
 `, logGroupNamePrefix, regionName))
@@ -218,7 +219,7 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
+	snap := mapstr.M(monitoring.CollectStructSnapshot(
 		monitoring.GetNamespace("dataset").GetRegistry(),
 		monitoring.Full,
 		false))

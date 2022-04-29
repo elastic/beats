@@ -26,21 +26,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigIncludeMatches(t *testing.T) {
 	verify := func(t *testing.T, yml string) {
 		t.Helper()
 
-		c, err := common.NewConfigWithYAML([]byte(yml), "source")
+		c, err := conf.NewConfigWithYAML([]byte(yml), "source")
 		require.NoError(t, err)
 
-		conf := defaultConfig()
-		require.NoError(t, c.Unpack(&conf))
+		config := defaultConfig()
+		require.NoError(t, c.Unpack(&config))
 
-		assert.EqualValues(t, "_SYSTEMD_UNIT=foo.service", conf.Matches.OR[0].Matches[0].String())
-		assert.EqualValues(t, "_SYSTEMD_UNIT=bar.service", conf.Matches.OR[1].Matches[0].String())
+		assert.EqualValues(t, "_SYSTEMD_UNIT=foo.service", config.Matches.OR[0].Matches[0].String())
+		assert.EqualValues(t, "_SYSTEMD_UNIT=bar.service", config.Matches.OR[1].Matches[0].String())
 	}
 
 	t.Run("normal", func(t *testing.T) {

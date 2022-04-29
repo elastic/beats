@@ -23,12 +23,12 @@ package process_summary
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -79,7 +79,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 
-	outMap := common.MapStr{}
+	outMap := mapstr.M{}
 	typeconv.Convert(&outMap, procStates)
 	outMap["total"] = len(procList)
 	r.Event(mb.Event{

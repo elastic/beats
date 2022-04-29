@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestInvalidConfiguration(t *testing.T) {
@@ -61,7 +61,7 @@ func TestInvalidConfiguration(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			var config Config
-			c := common.MustNewConfigFrom(test.config)
+			c := c.MustNewConfigFrom(test.config)
 			err := c.Unpack(&config)
 			require.NotNil(t, err)
 			require.Contains(t, err.Error(), test.expectedError.Error())
@@ -98,7 +98,7 @@ func TestValidConfiguration(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			var config Config
-			c := common.MustNewConfigFrom(test.config)
+			c := c.MustNewConfigFrom(test.config)
 			err := c.Unpack(&config)
 			require.Nil(t, err)
 		})

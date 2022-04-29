@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type retryConfig struct {
@@ -88,7 +88,7 @@ func (u *urlConfig) Unpack(in string) error {
 type requestConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
 	Method                 string           `config:"method" validate:"required"`
-	Body                   *common.MapStr   `config:"body"`
+	Body                   *mapstr.M        `config:"body"`
 	EncodeAs               string           `config:"encode_as"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`

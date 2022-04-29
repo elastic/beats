@@ -23,8 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type OsdTreeResponse struct {
@@ -44,7 +44,7 @@ type OsdTreeResponse struct {
 	} `json:"nodes"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var response OsdTreeResponse
 	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
@@ -72,9 +72,9 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	}
 
 	// OSD node list
-	var events []common.MapStr
+	var events []mapstr.M
 	for _, node := range nodeList {
-		nodeInfo := common.MapStr{}
+		nodeInfo := mapstr.M{}
 		if node.ID < 0 {
 			// bucket node
 			nodeInfo["children"] = strings.Split(childrenMap[node.Name], ",")

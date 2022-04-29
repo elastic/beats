@@ -29,11 +29,12 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type pod struct {
@@ -53,7 +54,7 @@ type pod struct {
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
-func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
+func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
 
 	config := defaultConfig()
@@ -173,16 +174,16 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var kubeMeta, container common.MapStr
+	var kubeMeta, container mapstr.M
 
-	annotations := make(common.MapStr, 0)
+	annotations := make(mapstr.M, 0)
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(common.MapStr)
+		kubeMeta = rawMeta.(mapstr.M)
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			anns, _ := rawAnn.(common.MapStr)
+			anns, _ := rawAnn.(mapstr.M)
 			if len(anns) != 0 {
 				annotations = anns.Clone()
 			}
@@ -190,7 +191,7 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
 		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			namespaceAnnotations, _ := rawNsAnn.(common.MapStr)
+			namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
 			if len(namespaceAnnotations) != 0 {
 				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
 			}
@@ -207,7 +208,7 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	}
 
 	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(common.MapStr)
+		container = rawCont.(mapstr.M)
 		// This would end up adding a runtime entry into the event. This would make sure
 		// that there is not an attempt to spin up a docker input for a rkt container and when a
 		// rkt input exists it would be natively supported.
@@ -278,7 +279,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	namespaceAnnotations := kubernetes.PodNamespaceAnnotations(pod, p.namespaceWatcher)
 
 	eventList := make([][]bus.Event, 0)
-	portsMap := common.MapStr{}
+	portsMap := mapstr.M{}
 	containers := kubernetes.GetContainersInPod(pod)
 	anyContainerRunning := false
 	for _, c := range containers {
@@ -312,7 +313,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 // running.
 // If the container ID is unknown, only "stop" events are generated.
 // It also returns a map with the named ports.
-func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes.ContainerInPod, annotations, namespaceAnnotations common.MapStr) ([]bus.Event, common.MapStr) {
+func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes.ContainerInPod, annotations, namespaceAnnotations mapstr.M) ([]bus.Event, mapstr.M) {
 	if c.ID == "" && flag != "stop" {
 		return nil, nil
 	}
@@ -323,20 +324,20 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 
 	meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Spec.Name))
 
-	cmeta := common.MapStr{
+	cmeta := mapstr.M{
 		"id":      c.ID,
 		"runtime": c.Runtime,
-		"image": common.MapStr{
+		"image": mapstr.M{
 			"name": c.Spec.Image,
 		},
 	}
 
 	// Information that can be used in discovering a workload
 	kubemetaMap, _ := meta.GetValue("kubernetes")
-	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta, _ := kubemetaMap.(mapstr.M)
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
-	kubemeta["container"] = common.MapStr{
+	kubemeta["container"] = mapstr.M{
 		"id":      c.ID,
 		"name":    c.Spec.Name,
 		"image":   c.Spec.Image,
@@ -355,7 +356,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 	}
 
 	var events []bus.Event
-	portsMap := common.MapStr{}
+	portsMap := mapstr.M{}
 
 	meta.Put("container", cmeta)
 
@@ -386,12 +387,12 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 
 // podEvent creates an event for a pod.
 // It only includes network information if `includeNetwork` is true.
-func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, includeNetwork bool, annotations, namespaceAnnotations common.MapStr) bus.Event {
+func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports mapstr.M, includeNetwork bool, annotations, namespaceAnnotations mapstr.M) bus.Event {
 	meta := p.metagen.Generate(pod)
 
 	// Information that can be used in discovering a workload
 	kubemetaMap, _ := meta.GetValue("kubernetes")
-	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta, _ := kubemetaMap.(mapstr.M)
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
 	if len(namespaceAnnotations) != 0 {

@@ -24,9 +24,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type runner struct {
@@ -56,11 +57,11 @@ func (r *runner) Stop() {
 }
 
 type runnerFactory struct {
-	CreateRunner func(beat.PipelineConnector, *common.Config) (Runner, error)
+	CreateRunner func(beat.PipelineConnector, *conf.C) (Runner, error)
 	runners      []Runner
 }
 
-func (r *runnerFactory) Create(x beat.PipelineConnector, c *common.Config) (Runner, error) {
+func (r *runnerFactory) Create(x beat.PipelineConnector, c *conf.C) (Runner, error) {
 	config := struct {
 		ID int64 `config:"id"`
 	}{}
@@ -89,7 +90,7 @@ func (r *runnerFactory) Create(x beat.PipelineConnector, c *common.Config) (Runn
 	return runner, err
 }
 
-func (r *runnerFactory) CheckConfig(config *common.Config) error {
+func (r *runnerFactory) CheckConfig(config *conf.C) error {
 	return nil
 }
 
@@ -232,17 +233,17 @@ func TestHas(t *testing.T) {
 }
 
 func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
-	newMapStrPointer := func(m common.MapStr) *common.MapStrPointer {
-		p := common.NewMapStrPointer(m)
+	newMapStrPointer := func(m mapstr.M) *mapstr.Pointer {
+		p := mapstr.NewPointer(m)
 		return &p
 	}
 
 	cases := map[string]struct {
-		meta *common.MapStrPointer
+		meta *mapstr.Pointer
 	}{
 		"no dynamic metadata": {},
 		"with dynamic fields": {
-			meta: newMapStrPointer(common.MapStr{"test": 1}),
+			meta: newMapStrPointer(mapstr.M{"test": 1}),
 		},
 	}
 
@@ -250,7 +251,7 @@ func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			factory := &runnerFactory{
-				CreateRunner: func(p beat.PipelineConnector, cfg *common.Config) (Runner, error) {
+				CreateRunner: func(p beat.PipelineConnector, cfg *conf.C) (Runner, error) {
 					return &runner{
 						OnStart: func() {
 							c, _ := p.Connect()
@@ -269,7 +270,7 @@ func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
 			}
 
 			runner, _ := createRunner(factory, pipeline, &reload.ConfigWithMeta{
-				Config: common.NewConfig(),
+				Config: conf.NewConfig(),
 				Meta:   test.meta,
 			})
 			runner.Start()
@@ -281,7 +282,7 @@ func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
 }
 
 func createConfig(id int64) *reload.ConfigWithMeta {
-	c := common.NewConfig()
+	c := conf.NewConfig()
 	c.SetInt("id", -1, id)
 	return &reload.ConfigWithMeta{
 		Config: c,

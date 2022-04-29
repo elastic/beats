@@ -11,12 +11,17 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
@@ -29,7 +34,7 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 		PackageVersion:       "1.0.0",
 		Step:                 &Step{Name: name, Index: index, Status: status},
 		Error:                err,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 		URL:                  urlstr,
 	}
 }
@@ -56,18 +61,18 @@ func TestJourneyEnricher(t *testing.T) {
 		Stack:   "last\nerr\nstack",
 	}
 	journeyStart := &SynthEvent{
-		Type:                 "journey/start",
+		Type:                 JourneyStart,
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	journeyEnd := &SynthEvent{
-		Type:                 "journey/end",
+		Type:                 JourneyEnd,
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	url1 := "http://example.net/url1"
 	url2 := "http://example.net/url2"
@@ -77,15 +82,15 @@ func TestJourneyEnricher(t *testing.T) {
 		journeyStart,
 		makeStepEvent("step/start", 10, "Step1", 1, "succeeded", "", nil),
 		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
-		makeStepEvent("step/start", 21, "Step2", 1, "", "", nil),
-		makeStepEvent("step/end", 30, "Step2", 1, "failed", url2, syntherr),
-		makeStepEvent("step/start", 31, "Step3", 1, "", "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1, "", url3, otherErr),
+		makeStepEvent("step/start", 21, "Step2", 2, "", "", nil),
+		makeStepEvent("step/end", 30, "Step2", 2, "failed", url2, syntherr),
+		makeStepEvent("step/start", 31, "Step3", 3, "", "", nil),
+		makeStepEvent("step/end", 40, "Step3", 3, "", url3, otherErr),
 		journeyEnd,
 	}
 
 	suiteValidator := func() validator.Validator {
-		return lookslike.MustCompile(common.MapStr{
+		return lookslike.MustCompile(mapstr.M{
 			"suite.id":     stdFields.Id,
 			"suite.name":   stdFields.Name,
 			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
@@ -94,7 +99,7 @@ func TestJourneyEnricher(t *testing.T) {
 		})
 	}
 	inlineValidator := func() validator.Validator {
-		return lookslike.MustCompile(common.MapStr{
+		return lookslike.MustCompile(mapstr.M{
 			"monitor.id":   stdFields.Id,
 			"monitor.name": stdFields.Name,
 			"monitor.type": stdFields.Type,
@@ -105,14 +110,15 @@ func TestJourneyEnricher(t *testing.T) {
 
 		// We need an expectation for each input plus a final
 		// expectation for the summary which comes on the nil data.
-		if se.Type != "journey/end" {
+
+		if se.Type != JourneyEnd {
 			// Test that the created event includes the mapped
 			// version of the event
 			v = append(v, lookslike.MustCompile(se.ToMap()))
 		} else {
 			u, _ := url.Parse(url1)
 			// journey end gets a summary
-			v = append(v, lookslike.MustCompile(common.MapStr{
+			v = append(v, lookslike.MustCompile(mapstr.M{
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -178,15 +184,15 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			&journeyEnricher{},
 			&SynthEvent{
 				Type: "stderr",
-				Payload: common.MapStr{
+				Payload: mapstr.M{
 					"message": "Error from synthetics",
 				},
 				PackageVersion: "1.0.0",
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
-					"synthetics": common.MapStr{
-						"payload": common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
+					"synthetics": mapstr.M{
+						"payload": mapstr.M{
 							"message": "Error from synthetics",
 						},
 						"type":            "stderr",
@@ -202,15 +208,15 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			&journeyEnricher{},
 			&SynthEvent{
 				Type: "stdout",
-				Payload: common.MapStr{
+				Payload: mapstr.M{
 					"message": "debug output",
 				},
 				PackageVersion: "1.0.0",
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
-					"synthetics": common.MapStr{
-						"payload": common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
+					"synthetics": mapstr.M{
+						"payload": mapstr.M{
 							"message": "debug output",
 						},
 						"type":            "stdout",
@@ -226,6 +232,8 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &beat.Event{}
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
 			tt.je.enrichSynthEvent(e, tt.se)
 			tt.check(t, e, tt.je)
 		})
@@ -244,12 +252,12 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - with error",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type:  "cmd/status",
+				Type:  CmdStatus,
 				Error: &SynthError{Name: "cmdexit", Message: "cmd err msg"},
 			},
 			true,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"summary": map[string]int{
 						"up":   0,
 						"down": 1,
@@ -264,12 +272,12 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - without error",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type:  "cmd/status",
+				Type:  CmdStatus,
 				Error: nil,
 			},
 			true,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"summary": map[string]int{
 						"up":   1,
 						"down": 0,
@@ -284,7 +292,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			&SynthEvent{Type: "journey/end"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"summary": map[string]int{
 						"up":   1,
 						"down": 0,
@@ -363,7 +371,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	syntherr := &SynthError{
 		Message: "my-errmsg",
@@ -375,10 +383,10 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 	cmdStatus := &SynthEvent{
-		Type:                 "cmd/status",
+		Type:                 CmdStatus,
 		Error:                &SynthError{Name: "cmdexit", Message: "cmd err msg"},
 		TimestampEpochMicros: 3000,
 	}
@@ -400,7 +408,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
-			if se != nil && se.Type == "cmd/status" {
+			if se != nil && se.Type == CmdStatus {
 				t.Run("no summary in cmd/status", func(t *testing.T) {
 					require.NotContains(t, e.Fields, "summary")
 				})
@@ -408,12 +416,12 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 			// Only the journey/end event should get a summary when
 			// it's emitted before the cmd/status (when an afterX hook fails).
-			if se != nil && se.Type == "journey/end" {
+			if se != nil && se.Type == JourneyEnd {
 				require.Equal(t, stepError(syntherr), enrichErr)
 
 				u, _ := url.Parse(badStepUrl)
 				t.Run("summary in journey/end", func(t *testing.T) {
-					v := lookslike.MustCompile(common.MapStr{
+					v := lookslike.MustCompile(mapstr.M{
 						"synthetics.type":     "heartbeat/summary",
 						"url":                 wrappers.URLFields(u),
 						"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -436,11 +444,11 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
-		Payload:              common.MapStr{},
+		Payload:              mapstr.M{},
 	}
 
 	cmdStatus := &SynthEvent{
-		Type:                 "cmd/status",
+		Type:                 CmdStatus,
 		Error:                nil,
 		TimestampEpochMicros: 3000,
 	}
@@ -462,13 +470,13 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
-			if se != nil && se.Type == "cmd/status" {
+			if se != nil && se.Type == CmdStatus {
 				hasCmdStatus = true
 				require.Error(t, enrichErr, "journey did not finish executing, 1 steps ran")
 
 				u, _ := url.Parse(url1)
 
-				v := lookslike.MustCompile(common.MapStr{
+				v := lookslike.MustCompile(mapstr.M{
 					"synthetics.type":     "heartbeat/summary",
 					"url":                 wrappers.URLFields(u),
 					"monitor.duration.us": int64(cmdStatus.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -483,61 +491,84 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 }
 
 func TestCreateSummaryEvent(t *testing.T) {
+	baseTime := time.Now()
+
+	defaultLogValidator := func(stepCount int) func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
+		return func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
+			require.Len(t, observed, 1)
+			require.Equal(t, "Monitor finished", observed[0].Message)
+
+			durationMs := baseTime.Add(10 * time.Microsecond).Sub(baseTime).Milliseconds()
+			expectedMonitor := logger.NewMonitorRunInfo("my-monitor", "browser", durationMs)
+			expectedMonitor.Steps = &stepCount
+			require.ElementsMatch(t, []zap.Field{
+				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
+				logp.Any("monitor", &expectedMonitor),
+			}, observed[0].Context)
+		}
+	}
+
 	tests := []struct {
-		name     string
-		je       *journeyEnricher
-		expected common.MapStr
-		wantErr  bool
+		name         string
+		je           *journeyEnricher
+		expected     mapstr.M
+		wantErr      bool
+		logValidator func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry)
 	}{{
 		name: "completed without errors",
 		je: &journeyEnricher{
 			journey:         &Journey{},
-			start:           time.Now(),
-			end:             time.Now().Add(10 * time.Microsecond),
+			start:           baseTime,
+			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
+			stepCount:       3,
 		},
-		expected: common.MapStr{
+		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
-			"summary": common.MapStr{
+			"summary": mapstr.M{
 				"down": 0,
 				"up":   1,
 			},
 		},
-		wantErr: false,
+		wantErr:      false,
+		logValidator: defaultLogValidator(3),
 	}, {
 		name: "completed with error",
 		je: &journeyEnricher{
 			journey:         &Journey{},
-			start:           time.Now(),
-			end:             time.Now().Add(10 * time.Microsecond),
+			start:           baseTime,
+			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
 			errorCount:      1,
 			firstError:      fmt.Errorf("journey errored"),
 		},
-		expected: common.MapStr{
+		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
-			"summary": common.MapStr{
+			"summary": mapstr.M{
 				"down": 1,
 				"up":   0,
 			},
 		},
-		wantErr: true,
+		wantErr:      true,
+		logValidator: defaultLogValidator(0),
 	}, {
 		name: "started, but exited without running steps",
 		je: &journeyEnricher{
 			journey:         &Journey{},
-			start:           time.Now(),
-			end:             time.Now().Add(10 * time.Microsecond),
+			start:           baseTime,
+			end:             baseTime.Add(10 * time.Microsecond),
+			stepCount:       0,
 			journeyComplete: false,
 		},
-		expected: common.MapStr{
+		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
-			"summary": common.MapStr{
+			"summary": mapstr.M{
 				"down": 0,
 				"up":   1,
 			},
 		},
-		wantErr: true,
+		wantErr:      true,
+		logValidator: defaultLogValidator(0),
 	}, {
 		name: "syntax error - exited without starting",
 		je: &journeyEnricher{
@@ -546,31 +577,52 @@ func TestCreateSummaryEvent(t *testing.T) {
 			journeyComplete: false,
 			errorCount:      1,
 		},
-		expected: common.MapStr{
-			"summary": common.MapStr{
+		expected: mapstr.M{
+			"summary": mapstr.M{
 				"down": 1,
 				"up":   0,
 			},
+		},
+		logValidator: func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
+			// We don't log run data without duration
+			require.Len(t, observed, 1)
+			require.Equal(t, "Error gathering information to log event", observed[0].Message)
 		},
 		wantErr: true,
 	}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &beat.Event{}
+			core, observed := observer.New(zapcore.InfoLevel)
+			logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+				return zapcore.NewTee(in, core)
+			})))
+
+			monitorField := mapstr.M{"id": "my-monitor", "type": "browser"}
+
+			e := &beat.Event{
+				Fields: mapstr.M{"monitor": monitorField},
+			}
 			err := tt.je.createSummary(e)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
 			}
-			common.MergeFields(tt.expected, common.MapStr{
-				"url":                common.MapStr{},
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			mapstr.MergeFields(tt.expected, mapstr.M{
+				"monitor":            monitorField,
+				"url":                mapstr.M{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
 				"synthetics.journey": Journey{},
 			}, true)
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
+
+			if tt.logValidator != nil {
+				tt.logValidator(t, tt.expected, observed.All())
+			}
 		})
 	}
 }

@@ -20,7 +20,7 @@ package syslog
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // stringToInt converts a string, assumed to be ASCII numeric characters, to an int.
@@ -104,7 +104,7 @@ func mapIndexToString(idx int, values []string) (string, bool) {
 // value will be converted to a string slice. If the existing field is a string slice or
 // interface slice, then the new value will be appended. If the existing value is some
 // other type, then this function does nothing.
-func appendStringField(m common.MapStr, field, value string) {
+func appendStringField(m mapstr.M, field, value string) {
 	v, _ := m.GetValue(field)
 	switch t := v.(type) {
 	case nil:

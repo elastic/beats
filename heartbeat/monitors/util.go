@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // IPSettings provides common configuration settings for IP resolution and ping
@@ -49,7 +49,7 @@ const (
 )
 
 // DefaultIPSettings provides an instance of default IPSettings to be copied
-// when unpacking settings from a common.Config object.
+// when unpacking settings from a config.C object.
 var DefaultIPSettings = IPSettings{
 	IPv4: true,
 	IPv6: true,
@@ -109,8 +109,8 @@ func MakeByIPJob(
 		return nil, err
 	}
 
-	fields := common.MapStr{
-		"monitor": common.MapStr{"ip": addr.String()},
+	fields := mapstr.M{
+		"monitor": mapstr.M{"ip": addr.String()},
 	}
 
 	return wrappers.WithFields(fields, pingFactory(addr)), nil
@@ -214,12 +214,12 @@ func makeByHostAllIPJob(
 	}
 }
 
-func resolveIPEvent(ip string, rtt time.Duration) common.MapStr {
-	return common.MapStr{
-		"monitor": common.MapStr{
+func resolveIPEvent(ip string, rtt time.Duration) mapstr.M {
+	return mapstr.M{
+		"monitor": mapstr.M{
 			"ip": ip,
 		},
-		"resolve": common.MapStr{
+		"resolve": mapstr.M{
 			"ip":  ip,
 			"rtt": look.RTT(rtt),
 		},

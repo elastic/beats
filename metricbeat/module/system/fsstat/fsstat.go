@@ -25,11 +25,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 )
 
@@ -92,8 +92,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		totalSizeUsed += fs.Used.Bytes.ValueOr(0)
 	}
 
-	event := common.MapStr{
-		"total_size": common.MapStr{
+	event := mapstr.M{
+		"total_size": mapstr.M{
 			"free":  totalSizeFree,
 			"used":  totalSizeUsed,
 			"total": totalSize,

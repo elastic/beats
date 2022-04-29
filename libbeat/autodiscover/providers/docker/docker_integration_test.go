@@ -28,11 +28,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test docker start emits an autodiscover event
@@ -55,7 +56,7 @@ func TestDockerStart(t *testing.T) {
 	s := &template.MapperSettings{nil, nil}
 	config.Templates = *s
 	k, _ := keystore.NewFileKeystore("test")
-	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, common.MustNewConfigFrom(config), k)
+	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +84,7 @@ func TestDockerStart(t *testing.T) {
 }
 
 func getValue(e bus.Event, key string) interface{} {
-	val, err := common.MapStr(e).GetValue(key)
+	val, err := mapstr.M(e).GetValue(key)
 	if err != nil {
 		return nil
 	}
@@ -109,8 +110,8 @@ func checkEvent(t *testing.T, listener bus.Listener, id string, start bool) {
 			assert.Equal(t, getValue(e, "container.image.name"), "busybox:latest")
 			// labels.dedot=true by default
 			assert.Equal(t,
-				common.MapStr{
-					"label": common.MapStr{
+				mapstr.M{
+					"label": mapstr.M{
 						"value": "foo",
 						"child": "bar",
 					},

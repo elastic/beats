@@ -27,10 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Defaults for config variables which are not set
@@ -39,13 +39,13 @@ const (
 )
 
 type Config struct {
-	Inputs             []*common.Config     `config:"inputs"`
+	Inputs             []*conf.C            `config:"inputs"`
 	Registry           Registry             `config:"registry"`
 	ConfigDir          string               `config:"config_dir"`
 	ShutdownTimeout    time.Duration        `config:"shutdown_timeout"`
-	Modules            []*common.Config     `config:"modules"`
-	ConfigInput        *common.Config       `config:"config.inputs"`
-	ConfigModules      *common.Config       `config:"config.modules"`
+	Modules            []*conf.C            `config:"modules"`
+	ConfigInput        *conf.C              `config:"config.inputs"`
+	ConfigModules      *conf.C              `config:"config.modules"`
 	Autodiscover       *autodiscover.Config `config:"autodiscover"`
 	OverwritePipelines bool                 `config:"overwrite_pipelines"`
 }

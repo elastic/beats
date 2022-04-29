@@ -22,17 +22,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConvertMapStr(t *testing.T) {
 	cases := []struct {
 		name   string
-		value  common.MapStr
+		value  mapstr.M
 		exp    *structpb.Value
 		expErr string
 	}{
@@ -42,25 +42,25 @@ func TestConvertMapStr(t *testing.T) {
 		},
 		{
 			name:  "empty map returns empty struct",
-			value: common.MapStr{},
+			value: mapstr.M{},
 			exp:   protoStruct(t, nil),
 		},
 		{
 			name: "returns error when type is not supported",
-			value: common.MapStr{
+			value: mapstr.M{
 				"key": time.Now(),
 			},
 			expErr: "invalid type: time.Time",
 		},
 		{
 			name: "values are preserved",
-			value: common.MapStr{
+			value: mapstr.M{
 				"key1": "string",
 				"key2": 42,
 				"key3": 42.2,
-				"key4": common.MapStr{
+				"key4": mapstr.M{
 					"subkey1": "string",
-					"subkey2": common.MapStr{
+					"subkey2": mapstr.M{
 						"subsubkey1": "string",
 					},
 				},

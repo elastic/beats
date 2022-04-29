@@ -18,8 +18,8 @@
 package readfile
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Reader produces lines by reading lines from an io.Reader
@@ -47,10 +47,10 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
-	message.Fields.DeepUpdate(common.MapStr{
-		"log": common.MapStr{
+	message.Fields.DeepUpdate(mapstr.M{
+		"log": mapstr.M{
 			"offset": r.offset,
-			"file": common.MapStr{
+			"file": mapstr.M{
 				"path": r.path,
 			},
 		},

@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestRegxpCreate(t *testing.T) {
@@ -100,7 +100,7 @@ func TestRegexpCondition(t *testing.T) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message":    `[Fri Dec 16 01:46:23 2005] [error] [client 1.2.3.4] Directory index forbidden by rule: /home/test/`,
 			"source":     "/var/log/apache2/error.log",
 			"type":       "log",
@@ -111,7 +111,7 @@ func TestRegexpCondition(t *testing.T) {
 
 	event1 := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message":    `127.0.0.1 - - [28/Jul/2006:10:27:32 -0300] "GET /hidden/ HTTP/1.0" 404 7218`,
 			"source":     "/var/log/apache2/access.log",
 			"type":       "log",

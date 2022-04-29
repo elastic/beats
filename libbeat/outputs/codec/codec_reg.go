@@ -21,13 +21,13 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
-type Factory func(beat.Info, *common.Config) (Codec, error)
+type Factory func(beat.Info, *config.C) (Codec, error)
 
 type Config struct {
-	Namespace common.ConfigNamespace `config:",inline"`
+	Namespace config.Namespace `config:",inline"`
 }
 
 var codecs = map[string]Factory{}

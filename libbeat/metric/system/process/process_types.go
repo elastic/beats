@@ -20,9 +20,9 @@ package process
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ProcState is the main struct for process information and metrics.
@@ -36,11 +36,11 @@ type ProcState struct {
 	Pgid     opt.Int  `struct:"pgid,omitempty"`
 
 	// Extended Process Data
-	Args    []string      `struct:"args,omitempty"`
-	Cmdline string        `struct:"cmdline,omitempty"`
-	Cwd     string        `struct:"cwd,omitempty"`
-	Exe     string        `struct:"exe,omitempty"`
-	Env     common.MapStr `struct:"env,omitempty"`
+	Args    []string `struct:"args,omitempty"`
+	Cmdline string   `struct:"cmdline,omitempty"`
+	Cwd     string   `struct:"cwd,omitempty"`
+	Exe     string   `struct:"exe,omitempty"`
+	Env     mapstr.M `struct:"env,omitempty"`
 
 	// Resource Metrics
 	Memory ProcMemInfo `struct:"memory,omitempty"`

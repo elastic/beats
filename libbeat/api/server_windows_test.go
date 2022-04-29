@@ -29,13 +29,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNamedPipe(t *testing.T) {
 	p := "npipe:///hello"
 
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"host": p,
 	})
 

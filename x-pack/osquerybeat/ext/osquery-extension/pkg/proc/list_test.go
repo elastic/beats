@@ -8,9 +8,10 @@
 package proc
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"testing/fstest"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestList(t *testing.T) {

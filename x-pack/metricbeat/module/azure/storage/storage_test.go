@@ -11,12 +11,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	missingResourcesConfig = common.MapStr{
+	missingResourcesConfig = mapstr.M{
 		"module":          "azure",
 		"period":          "60s",
 		"metricsets":      []string{"storage"},
@@ -26,7 +27,7 @@ var (
 		"tenant_id":       "unique identifier",
 	}
 
-	resourceConfig = common.MapStr{
+	resourceConfig = mapstr.M{
 		"module":          "azure",
 		"period":          "60s",
 		"metricsets":      []string{"storage"},
@@ -34,7 +35,7 @@ var (
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
 		"tenant_id":       "unique identifier",
-		"resources": []common.MapStr{
+		"resources": []mapstr.M{
 			{
 				"resource_id": "test",
 				"metrics": []map[string]interface{}{
@@ -46,7 +47,7 @@ var (
 )
 
 func TestFetch(t *testing.T) {
-	c, err := common.NewConfigFrom(missingResourcesConfig)
+	c, err := config.NewConfigFrom(missingResourcesConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +59,7 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, len(ms.Client.Config.Resources), 1)
 	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace))
 
-	c, err = common.NewConfigFrom(resourceConfig)
+	c, err = config.NewConfigFrom(resourceConfig)
 	if err != nil {
 		t.Fatal(err)
 	}

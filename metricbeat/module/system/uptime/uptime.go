@@ -23,9 +23,9 @@ package uptime
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -54,8 +54,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	r.Event(mb.Event{
-		MetricSetFields: common.MapStr{
-			"duration": common.MapStr{
+		MetricSetFields: mapstr.M{
+			"duration": mapstr.M{
 				"ms": int64(uptime.Length * 1000),
 			},
 		},

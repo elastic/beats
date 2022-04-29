@@ -22,7 +22,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // IMPORTANT:
@@ -55,11 +55,11 @@ func newBeatEventV0Constructor(s Session) func(call goja.ConstructorCall) *goja.
 
 		a0 := call.Argument(0).Export()
 
-		var fields common.MapStr
+		var fields mapstr.M
 		switch v := a0.(type) {
 		case map[string]interface{}:
 			fields = v
-		case common.MapStr:
+		case mapstr.M:
 			fields = v
 		default:
 			panic(errors.Errorf("Event constructor requires a "+
@@ -265,7 +265,7 @@ func (e *beatEventV0) appendTo(call goja.FunctionCall) goja.Value {
 	return goja.Undefined()
 }
 
-func appendString(m common.MapStr, field, value string, alwaysArray bool) error {
+func appendString(m mapstr.M, field, value string, alwaysArray bool) error {
 	list, _ := m.GetValue(field)
 	switch v := list.(type) {
 	case nil:

@@ -25,26 +25,27 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfigsMapping(t *testing.T) {
 	logp.TestingSetup()
 
-	config, _ := common.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]interface{}{
 		"correct": "config",
 	})
 
-	configPorts, _ := common.NewConfigFrom(map[string]interface{}{
+	configPorts, _ := conf.NewConfigFrom(map[string]interface{}{
 		"correct": "config",
 		"hosts":   [1]string{"1.2.3.4:8080"},
 	})
 
 	const envValue = "valuefromenv"
-	configFromEnv, _ := common.NewConfigFrom(map[string]interface{}{
+	configFromEnv, _ := conf.NewConfigFrom(map[string]interface{}{
 		"correct": envValue,
 	})
 
@@ -53,7 +54,7 @@ func TestConfigsMapping(t *testing.T) {
 	tests := []struct {
 		mapping  string
 		event    bus.Event
-		expected []*common.Config
+		expected []*conf.C
 	}{
 		// No match
 		{
@@ -77,7 +78,7 @@ func TestConfigsMapping(t *testing.T) {
 			event: bus.Event{
 				"foo": 3,
 			},
-			expected: []*common.Config{config},
+			expected: []*conf.C{config},
 		},
 		// No condition
 		{
@@ -87,7 +88,7 @@ func TestConfigsMapping(t *testing.T) {
 			event: bus.Event{
 				"foo": 3,
 			},
-			expected: []*common.Config{config},
+			expected: []*conf.C{config},
 		},
 		// No condition, value from environment
 		{
@@ -97,7 +98,7 @@ func TestConfigsMapping(t *testing.T) {
 			event: bus.Event{
 				"foo": 3,
 			},
-			expected: []*common.Config{configFromEnv},
+			expected: []*conf.C{configFromEnv},
 		},
 		// Match config and replace data.host and data.ports.<name> properly
 		{
@@ -110,11 +111,11 @@ func TestConfigsMapping(t *testing.T) {
 			event: bus.Event{
 				"foo":  3,
 				"host": "1.2.3.4",
-				"ports": common.MapStr{
+				"ports": mapstr.M{
 					"web": 8080,
 				},
 			},
-			expected: []*common.Config{configPorts},
+			expected: []*conf.C{configPorts},
 		},
 		// Match config and replace data.host and data.port properly
 		{
@@ -129,7 +130,7 @@ func TestConfigsMapping(t *testing.T) {
 				"host": "1.2.3.4",
 				"port": 8080,
 			},
-			expected: []*common.Config{configPorts},
+			expected: []*conf.C{configPorts},
 		},
 		// Missing variable, config is not generated
 		{
@@ -146,7 +147,7 @@ func TestConfigsMapping(t *testing.T) {
 
 	for _, test := range tests {
 		var mappings MapperSettings
-		config, err := common.NewConfigWithYAML([]byte(test.mapping), "")
+		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -168,7 +169,7 @@ func TestConfigsMapping(t *testing.T) {
 func TestConfigsMappingKeystore(t *testing.T) {
 	secret := "mapping_secret"
 	//expected config
-	config, _ := common.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]interface{}{
 		"correct":  "config",
 		"password": secret,
 	})
@@ -181,7 +182,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 	tests := []struct {
 		mapping  string
 		event    bus.Event
-		expected []*common.Config
+		expected []*conf.C
 	}{
 		// Match config
 		{
@@ -194,13 +195,13 @@ func TestConfigsMappingKeystore(t *testing.T) {
 			event: bus.Event{
 				"foo": 3,
 			},
-			expected: []*common.Config{config},
+			expected: []*conf.C{config},
 		},
 	}
 
 	for _, test := range tests {
 		var mappings MapperSettings
-		config, err := common.NewConfigWithYAML([]byte(test.mapping), "")
+		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -222,7 +223,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 func TestConfigsMappingKeystoreProvider(t *testing.T) {
 	secret := "mapping_provider_secret"
 	//expected config
-	config, _ := common.NewConfigFrom(map[string]interface{}{
+	config, _ := conf.NewConfigFrom(map[string]interface{}{
 		"correct":  "config",
 		"password": secret,
 	})
@@ -235,7 +236,7 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 	tests := []struct {
 		mapping  string
 		event    bus.Event
-		expected []*common.Config
+		expected []*conf.C
 	}{
 		// Match config
 		{
@@ -248,14 +249,14 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 			event: bus.Event{
 				"foo": 3,
 			},
-			expected: []*common.Config{config},
+			expected: []*conf.C{config},
 		},
 	}
 
 	keystoreProvider := newMockKeystoreProvider(secret)
 	for _, test := range tests {
 		var mappings MapperSettings
-		config, err := common.NewConfigWithYAML([]byte(test.mapping), "")
+		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -296,7 +297,7 @@ func TestNilConditionConfig(t *testing.T) {
 	data := `
 - config:
     - type: config1`
-	config, err := common.NewConfigWithYAML([]byte(data), "")
+	config, err := conf.NewConfigWithYAML([]byte(data), "")
 	if err != nil {
 		t.Fatal(err)
 	}

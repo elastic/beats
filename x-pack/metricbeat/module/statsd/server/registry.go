@@ -9,9 +9,9 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var logger = logp.NewLogger("statd")
@@ -182,7 +182,7 @@ func (t *samplingTimerSnapshot) Variance() float64 {
 
 type metricsGroup struct {
 	tags    map[string]string
-	metrics common.MapStr
+	metrics mapstr.M
 }
 
 func (r *registry) getMetric(metric interface{}) map[string]interface{} {
@@ -242,7 +242,7 @@ func (r *registry) GetAll() []metricsGroup {
 
 	tagGroups := []metricsGroup{}
 	for tagGroupKey, metricsMap := range r.metrics {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		for key, m := range metricsMap {
 
 			// cleanups according to ttl
@@ -374,7 +374,7 @@ func (r *registry) GetOrNewSet(name string, tags map[string]string) *setMetric {
 }
 
 func (r *registry) metricHash(tags map[string]string) string {
-	mapstrTags := common.MapStr{}
+	mapstrTags := mapstr.M{}
 	for k, v := range tags {
 		mapstrTags[k] = v
 	}

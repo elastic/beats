@@ -25,22 +25,23 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNew(t *testing.T) {
 	cases := map[string]struct {
-		config common.MapStr
+		config mapstr.M
 		err    string
 	}{
 		"default": {
-			common.MapStr{},
+			mapstr.M{},
 			"",
 		},
 		"unknown_algo": {
-			common.MapStr{
-				"algorithm": common.MapStr{
-					"foobar": common.MapStr{},
+			mapstr.M{
+				"algorithm": mapstr.M{
+					"foobar": mapstr.M{},
 				},
 			},
 			"rate limiting algorithm 'foobar' not implemented",
@@ -49,7 +50,7 @@ func TestNew(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			config := common.MustNewConfigFrom(test.config)
+			config := conf.MustNewConfigFrom(test.config)
 			_, err := new(config)
 			if test.err == "" {
 				require.NoError(t, err)
@@ -65,7 +66,7 @@ func TestRateLimit(t *testing.T) {
 	for i := 1; i <= 6; i++ {
 		event := beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"event_number": i,
 			},
 		}
@@ -81,39 +82,39 @@ func TestRateLimit(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		config    common.MapStr
+		config    mapstr.M
 		inEvents  []beat.Event
 		delay     time.Duration
 		outEvents []beat.Event
 	}{
 		"rate_0": {
-			config:    common.MapStr{},
+			config:    mapstr.M{},
 			inEvents:  inEvents,
 			outEvents: []beat.Event{},
 		},
 		"rate_1_per_min": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"limit": "1/m",
 			},
 			inEvents:  inEvents,
 			outEvents: inEvents[0:1],
 		},
 		"rate_2_per_min": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"limit": "2/m",
 			},
 			inEvents:  inEvents,
 			outEvents: inEvents[0:2],
 		},
 		"rate_6_per_min": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"limit": "6/m",
 			},
 			inEvents:  inEvents,
 			outEvents: inEvents,
 		},
 		"rate_2_per_sec": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"limit": "2/s",
 			},
 			delay:     200 * time.Millisecond,
@@ -121,7 +122,7 @@ func TestRateLimit(t *testing.T) {
 			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3], inEvents[5]},
 		},
 		"with_fields": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"limit":  "1/s",
 				"fields": []string{"foo"},
 			},
@@ -139,7 +140,7 @@ func TestRateLimit(t *testing.T) {
 			},
 		},
 		"with_burst": {
-			config: common.MapStr{
+			config: mapstr.M{
 				"limit":            "2/s",
 				"burst_multiplier": 2,
 			},
@@ -151,7 +152,7 @@ func TestRateLimit(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			p, err := new(common.MustNewConfigFrom(test.config))
+			p, err := new(conf.MustNewConfigFrom(test.config))
 			require.NoError(t, err)
 
 			fakeClock := clockwork.NewFakeClock()

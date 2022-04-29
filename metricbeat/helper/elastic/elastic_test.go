@@ -24,9 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -191,7 +191,7 @@ func TestConfigureModule(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.initConfig)
+			cfg := conf.MustNewConfigFrom(test.initConfig)
 			m, _, err := mb.NewModule(cfg, mockRegistry)
 			require.NoError(t, err)
 

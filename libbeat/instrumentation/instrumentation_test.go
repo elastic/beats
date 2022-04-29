@@ -23,12 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestInstrumentationConfig(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "true",
 		},
@@ -43,7 +43,7 @@ func TestInstrumentationConfig(t *testing.T) {
 }
 
 func TestInstrumentationConfigExplicitHosts(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "true",
 			"hosts":   []string{"localhost:8200"},
@@ -59,7 +59,7 @@ func TestInstrumentationConfigExplicitHosts(t *testing.T) {
 }
 
 func TestInstrumentationConfigListener(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "true",
 		},
@@ -74,7 +74,7 @@ func TestInstrumentationConfigListener(t *testing.T) {
 }
 
 func TestAPMTracerDisabledByDefault(t *testing.T) {
-	instrumentation, err := New(common.NewConfig(), "beat", "8.0")
+	instrumentation, err := New(config.NewConfig(), "beat", "8.0")
 	require.NoError(t, err)
 	tracer := instrumentation.Tracer()
 	require.NotNil(t, tracer)
@@ -82,7 +82,7 @@ func TestAPMTracerDisabledByDefault(t *testing.T) {
 }
 
 func TestInstrumentationDisabled(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "false",
 		},

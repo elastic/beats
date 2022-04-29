@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -163,8 +163,8 @@ func (ms *MetricSet) readAndEmit(report mb.ReporterV2) int {
 func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 	event := mb.Event{
 		Timestamp: loginRecord.Timestamp,
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":   eventTypeEvent,
 				"action": loginRecord.Type.string(),
 				"origin": loginRecord.Origin,

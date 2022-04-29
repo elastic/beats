@@ -23,16 +23,16 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDecodeBase64Run(t *testing.T) {
 	var testCases = []struct {
 		description string
 		config      base64Config
-		Input       common.MapStr
-		Output      common.MapStr
+		Input       mapstr.M
+		Output      mapstr.M
 		error       bool
 	}{
 		{
@@ -44,10 +44,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 				"field2": "correct data",
 			},
@@ -62,10 +62,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct data",
 			},
 			error: false,
@@ -79,10 +79,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct data",
 			},
 			error: false,
@@ -96,10 +96,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Y29ycmVjdCBwYWRkZWQgZGF0YQ==",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct padded data",
 			},
 			error: false,
@@ -113,10 +113,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "dW5wYWRkZWQgZGF0YQ",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "unpadded data",
 			},
 			error: false,
@@ -130,12 +130,12 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "bad data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "bad data",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "failed to decode base64 fields in processor: error trying to decode bad data: illegal base64 data at input byte 3",
 				},
 			},
@@ -150,10 +150,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   false,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "bad data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "bad data",
 			},
 			error: false,
@@ -167,12 +167,12 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "failed to decode base64 fields in processor: could not fetch base64 value for key: field2, Error: key not found",
 				},
 			},
@@ -187,10 +187,10 @@ func TestDecodeBase64Run(t *testing.T) {
 				IgnoreMissing: true,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
 			error: false,
@@ -231,8 +231,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		}
 
 		event := &beat.Event{
-			Meta: common.MapStr{},
-			Fields: common.MapStr{
+			Meta: mapstr.M{},
+			Fields: mapstr.M{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
 		}
@@ -242,10 +242,10 @@ func TestDecodeBase64Run(t *testing.T) {
 			config: config,
 		}
 
-		expectedFields := common.MapStr{
+		expectedFields := mapstr.M{
 			"field1": "Y29ycmVjdCBkYXRh",
 		}
-		expectedMeta := common.MapStr{
+		expectedMeta := mapstr.M{
 			"field": "correct data",
 		}
 

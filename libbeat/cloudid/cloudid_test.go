@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestDecode(t *testing.T) {
@@ -180,7 +180,7 @@ func TestOverwriteSettings(t *testing.T) {
 	for _, test := range tests {
 		t.Logf("Executing test: %s", test.name)
 
-		cfg, err := common.NewConfigFrom(test.inCfg)
+		cfg, err := config.NewConfigFrom(test.inCfg)
 		assert.NoError(t, err)
 
 		err = OverwriteSettings(cfg)
@@ -191,7 +191,7 @@ func TestOverwriteSettings(t *testing.T) {
 		assert.NoError(t, err)
 
 		var expected map[string]interface{}
-		expectedCfg, err := common.NewConfigFrom(test.outCfg)
+		expectedCfg, err := config.NewConfigFrom(test.outCfg)
 		assert.NoError(t, err)
 		err = expectedCfg.Unpack(&expected)
 		assert.NoError(t, err)
@@ -241,7 +241,7 @@ func TestOverwriteErrors(t *testing.T) {
 	for _, test := range tests {
 		t.Logf("Executing test: %s", test.name)
 
-		cfg, err := common.NewConfigFrom(test.inCfg)
+		cfg, err := config.NewConfigFrom(test.inCfg)
 		assert.NoError(t, err)
 
 		err = OverwriteSettings(cfg)

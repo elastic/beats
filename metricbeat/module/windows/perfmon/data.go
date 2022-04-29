@@ -28,10 +28,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var processRegexp = regexp.MustCompile(`(.+?[^\s])(?:#\d+|$)`)
@@ -71,7 +71,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			// Create a new event if the key doesn't exist in the map
 			if _, ok := eventMap[eventKey]; !ok {
 				eventMap[eventKey] = &mb.Event{
-					MetricSetFields: common.MapStr{},
+					MetricSetFields: mapstr.M{},
 					Error:           errors.Wrapf(val.Err.Error, "failed on query=%v", counterPath),
 				}
 				if val.Instance != "" {
@@ -105,7 +105,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 
 func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.Event {
 	event := mb.Event{
-		MetricSetFields: common.MapStr{},
+		MetricSetFields: mapstr.M{},
 	}
 	measurements := make(map[string]float64, 0)
 	for counterPath, values := range counters {

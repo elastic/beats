@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
 	"log"
@@ -30,10 +31,9 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/elastic-agent-libs/file"
 )
 
 const defaultCrossBuildTarget = "golangCrossBuild"
@@ -158,7 +158,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 			}
 		}
 		// If we're here, something isn't set.
-		return errors.New("Cannot crossbuild on AIX. Either run `mage build` or set PLATFORMS='aix/ppc64'")
+		return errors.New("cannot crossbuild on AIX, either run `mage build` or set PLATFORMS='aix/ppc64'")
 	}
 
 	// Docker is required for this target.
@@ -184,8 +184,8 @@ func CrossBuild(options ...CrossBuildOption) error {
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
-				return errors.Wrapf(err, "failed cross-building target=%s for platform=%s",
-					params.Target, buildPlatform.Name)
+				return fmt.Errorf("failed cross-building target=%s for platform=%s: %w",
+					params.Target, buildPlatform.Name, err)
 			}
 		} else {
 			deps = append(deps, builder.Build)
@@ -195,46 +195,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Each build runs in parallel.
 	Parallel(deps...)
 
-	// // It needs to run after all the builds, as it needs the darwin binaries.
-	// if err := assembleDarwinUniversal(params); err != nil {
-	// 	return err
-	// }
-
 	return nil
-}
-
-// assembleDarwinUniversal checks if darwin/amd64 and darwin/arm64 were build,
-// if so, it generates a darwin/universal binary that is the merge fo them two.
-func assembleDarwinUniversal(params crossBuildParams) error {
-	if !IsDarwinUniversal() {
-		return nil // nothing to do
-	}
-
-	fmt.Println("-----------------------------------------")
-	fmt.Println(">> assembleDarwinUniversal DEBUG")
-	out, err := sh.Output("pwd")
-	fmt.Println(">> assembleDarwinUniversal on:", out, err)
-	fmt.Println("-----------------------------------------")
-	out, err = sh.Output("ls", "build")
-	fmt.Println(">> assembleDarwinUniversal:", "ls", "build:", out, err)
-	fmt.Println("-----------------------------------------")
-	out, err = sh.Output("ls", "build/golang-crossbuild")
-	fmt.Println(">> assembleDarwinUniversal debug:", out, err)
-	fmt.Println("-----------------------------------------")
-	fmt.Println(">> assembleDarwinUniversal DEBUG END")
-	fmt.Println("-----------------------------------------")
-
-	builder := GolangCrossBuilder{
-		// the docker image for darwin/arm64 is the one capable of merging the binaries.
-		Platform:      "darwin/arm64",
-		Target:        "assembleDarwinUniversal",
-		InDir:         params.InDir,
-		ImageSelector: params.ImageSelector}
-	return errors.Wrapf(builder.Build(),
-		"failed merging darwin/amd64 and darwin/arm64 into darwin/universal target=%v for platform=%v",
-		builder.Target,
-		builder.Platform)
-
 }
 
 // CrossBuildXPack executes the 'golangCrossBuild' target in the Beat's
@@ -312,7 +273,7 @@ func (b GolangCrossBuilder) Build() error {
 
 	repoInfo, err := GetProjectRepoInfo()
 	if err != nil {
-		return errors.Wrap(err, "failed to determine repo root and package sub dir")
+		return fmt.Errorf("failed to determine repo root and package sub dir: %w", err)
 	}
 
 	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
@@ -326,13 +287,13 @@ func (b GolangCrossBuilder) Build() error {
 	builderArch := runtime.GOARCH
 	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-"+builderArch))
 	if err != nil {
-		return errors.Wrap(err, "failed to determine mage-linux-"+builderArch+" relative path")
+		return fmt.Errorf("failed to determine mage-linux-"+builderArch+" relative path: %w", err)
 	}
 
 	dockerRun := sh.RunCmd("docker", "run")
 	image, err := b.ImageSelector(b.Platform)
 	if err != nil {
-		return errors.Wrap(err, "failed to determine golang-crossbuild image tag")
+		return fmt.Errorf("failed to determine golang-crossbuild image tag: %w", err)
 	}
 	verbose := ""
 	if mg.Verbose() {
@@ -393,7 +354,7 @@ func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
 	numFixed := 0
 	defer func() {
-		log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+		log.Printf("chown took: %v, changed %d files", time.Since(start), numFixed)
 	}()
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
@@ -414,7 +375,7 @@ func chownPaths(uid, gid int, path string) error {
 		}
 
 		if err := os.Chown(name, uid, gid); err != nil {
-			return errors.Wrapf(err, "failed to chown path=%v", name)
+			return fmt.Errorf("failed to chown path=%v: %w", name, err)
 		}
 		numFixed++
 		return nil

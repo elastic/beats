@@ -26,8 +26,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Outlet is an empty outlet for testing.
@@ -39,7 +40,7 @@ func (o Outlet) Done() <-chan struct{}         { return nil }
 
 // Connector is a connector to a test empty outlet.
 var Connector = channel.ConnectorFunc(
-	func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return Outlet{}, nil
 	},
 )
@@ -47,11 +48,11 @@ var Connector = channel.ConnectorFunc(
 // AssertNotStartedInputCanBeDone checks that the context of an input can be
 // done before starting the input, and it doesn't leak goroutines. This is
 // important to confirm that leaks don't happen with CheckConfig.
-func AssertNotStartedInputCanBeDone(t *testing.T, factory input.Factory, configMap *common.MapStr) {
+func AssertNotStartedInputCanBeDone(t *testing.T, factory input.Factory, configMap *mapstr.M) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	config, err := common.NewConfigFrom(configMap)
+	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
 	context := input.Context{

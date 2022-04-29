@@ -25,12 +25,13 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/host"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -44,8 +45,8 @@ type addHostMetadata struct {
 		time.Time
 		sync.Mutex
 	}
-	data    common.MapStrPointer
-	geoData common.MapStr
+	data    mapstr.Pointer
+	geoData mapstr.M
 	config  Config
 	logger  *logp.Logger
 }
@@ -55,7 +56,7 @@ const (
 )
 
 // New constructs a new add_host_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *config.C) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -63,7 +64,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	p := &addHostMetadata{
 		config: config,
-		data:   common.NewMapStrPointer(nil),
+		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_host_metadata"),
 	}
 	p.loadData()
@@ -73,7 +74,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		if err != nil {
 			return nil, err
 		}
-		p.geoData = common.MapStr{"host": common.MapStr{"geo": geoFields}}
+		p.geoData = mapstr.M{"host": mapstr.M{"geo": geoFields}}
 	}
 
 	return p, nil
@@ -162,7 +163,7 @@ func skipAddingHostMetadata(event *beat.Event) bool {
 	}
 
 	switch m := hostFields.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		// if "name" is the only field, don't skip
 		hasName, _ := m.HasKey("name")
 		if hasName && len(m) == 1 {
@@ -170,7 +171,7 @@ func skipAddingHostMetadata(event *beat.Event) bool {
 		}
 		return true
 	case map[string]interface{}:
-		hostMapStr := common.MapStr(m)
+		hostMapStr := mapstr.M(m)
 		// if "name" is the only field, don't skip
 		hasName, _ := hostMapStr.HasKey("name")
 		if hasName && len(m) == 1 {

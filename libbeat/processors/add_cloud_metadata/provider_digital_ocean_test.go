@@ -25,8 +25,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const digitalOceanMetadataV1 = `{
@@ -94,7 +95,7 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 	server := initDigitalOceanTestServer()
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -106,18 +107,18 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
 			"provider": "digitalocean",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id": "1111111",
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "Droplets",
 			},
 			"region": "nyc3",

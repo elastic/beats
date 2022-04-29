@@ -99,6 +99,7 @@ require (
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/lib/pq v1.10.3
 	github.com/magefile/mage v1.13.0
+	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.12
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/gox v1.0.1
@@ -159,7 +160,7 @@ require (
 )
 
 require (
-	github.com/elastic/elastic-agent-libs v0.1.3-0.20220413130536-4b45f2742994
+	github.com/elastic/elastic-agent-libs v0.2.1
 	github.com/elastic/elastic-agent-system-metrics v0.0.0-20220413153735-05ffe60fc5c7
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
@@ -244,7 +245,6 @@ require (
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
-	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

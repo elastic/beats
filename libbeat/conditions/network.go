@@ -24,8 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -121,7 +121,7 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 			"strings or []strings are allowed", field, value, value)
 	}
 
-	for field, value := range common.MapStr(fields).Flatten() {
+	for field, value := range mapstr.M(fields).Flatten() {
 		switch v := value.(type) {
 		case string:
 			m, err := makeMatcher(v)
