@@ -25,14 +25,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test Annotator is skipped if kubernetes metadata already exist
 func TestAnnotatorSkipped(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
 	matcher, err := NewFieldMatcher(*cfg)
@@ -92,7 +92,7 @@ func TestAnnotatorSkipped(t *testing.T) {
 
 // Test metadata are not included in the event
 func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
 	matcher, err := NewFieldMatcher(*cfg)
@@ -134,12 +134,12 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 	emptyRegister := NewRegister()
 	registerWithDefaults := NewRegister()
-	registerWithDefaults.AddDefaultIndexerConfig("ip_port", *common.NewConfig())
-	registerWithDefaults.AddDefaultMatcherConfig("field_format", *common.MustNewConfigFrom(map[string]interface{}{
+	registerWithDefaults.AddDefaultIndexerConfig("ip_port", *config.NewConfig())
+	registerWithDefaults.AddDefaultMatcherConfig("field_format", *config.MustNewConfigFrom(map[string]interface{}{
 		"format": "%{[destination.ip]}:%{[destination.port]}",
 	}))
 
-	configWithIndexersAndMatchers := common.MustNewConfigFrom(map[string]interface{}{
+	configWithIndexersAndMatchers := config.MustNewConfigFrom(map[string]interface{}{
 		"indexers": []map[string]interface{}{
 			{
 				"container": map[string]interface{}{},
@@ -153,7 +153,7 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 			},
 		},
 	})
-	configOverrideDefaults := common.MustNewConfigFrom(map[string]interface{}{
+	configOverrideDefaults := config.MustNewConfigFrom(map[string]interface{}{
 		"default_indexers.enabled": "false",
 		"default_matchers.enabled": "false",
 	})
@@ -161,13 +161,13 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 
 	cases := map[string]struct {
 		register         *Register
-		config           *common.Config
+		config           *config.C
 		expectedMatchers []string
 		expectedIndexers []string
 	}{
 		"no matchers": {
 			register: emptyRegister,
-			config:   common.NewConfig(),
+			config:   config.NewConfig(),
 		},
 		"one configured indexer and matcher": {
 			register:         emptyRegister,
@@ -177,20 +177,20 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 		},
 		"default indexers and matchers": {
 			register:         registerWithDefaults,
-			config:           common.NewConfig(),
+			config:           config.NewConfig(),
 			expectedIndexers: []string{"ip_port"},
 			expectedMatchers: []string{"field_format"},
 		},
 		"default indexers and matchers, don't use indexers": {
 			register: registerWithDefaults,
-			config: common.MustNewConfigFrom(map[string]interface{}{
+			config: config.MustNewConfigFrom(map[string]interface{}{
 				"default_indexers.enabled": "false",
 			}),
 			expectedMatchers: []string{"field_format"},
 		},
 		"default indexers and matchers, don't use matchers": {
 			register: registerWithDefaults,
-			config: common.MustNewConfigFrom(map[string]interface{}{
+			config: config.MustNewConfigFrom(map[string]interface{}{
 				"default_matchers.enabled": "false",
 			}),
 			expectedIndexers: []string{"ip_port"},

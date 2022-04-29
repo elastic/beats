@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestOnlyOneOfExpressionCondition(t *testing.T) {
@@ -138,12 +138,12 @@ func TestCheckJsonExpression(t *testing.T) {
 }
 
 func TestCheckJsonCondition(t *testing.T) {
-	fooBazEqualsBar := common.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": map[string]interface{}{"baz": "bar"}}})
+	fooBazEqualsBar := conf.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": map[string]interface{}{"baz": "bar"}}})
 	fooBazEqualsBarConf := &conditions.Config{}
 	err := fooBazEqualsBar.Unpack(fooBazEqualsBarConf)
 	require.NoError(t, err)
 
-	fooBazEqualsBarInt := common.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": 1}})
+	fooBazEqualsBarInt := conf.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": 1}})
 	fooBazEqualsBarIntConf := &conditions.Config{}
 	err = fooBazEqualsBarInt.Unpack(fooBazEqualsBarIntConf)
 	require.NoError(t, err)

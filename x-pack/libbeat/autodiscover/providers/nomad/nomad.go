@@ -14,12 +14,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -48,7 +48,7 @@ func AutodiscoverBuilder(
 	name string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *conf.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The nomad autodiscover provider is experimental.")

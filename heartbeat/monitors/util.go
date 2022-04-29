@@ -49,7 +49,7 @@ const (
 )
 
 // DefaultIPSettings provides an instance of default IPSettings to be copied
-// when unpacking settings from a common.Config object.
+// when unpacking settings from a config.C object.
 var DefaultIPSettings = IPSettings{
 	IPv4: true,
 	IPv6: true,

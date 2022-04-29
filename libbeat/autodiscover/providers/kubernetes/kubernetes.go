@@ -35,12 +35,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/k8skeystore"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -92,7 +92,7 @@ func AutodiscoverBuilder(
 	beatName string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *config.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
@@ -172,7 +172,7 @@ func (p *Provider) publish(events []bus.Event) {
 		return
 	}
 
-	configs := make([]*common.Config, 0)
+	configs := make([]*config.C, 0)
 	id, _ := events[0]["id"]
 	for _, event := range events {
 		// Ensure that all events have the same ID. If not panic
@@ -231,7 +231,7 @@ func (p *Provider) stopLeading(uuid string, eventID string) {
 
 func NewEventerManager(
 	uuid uuid.UUID,
-	c *common.Config,
+	c *config.C,
 	cfg *Config,
 	client k8s.Interface,
 	publish func(event []bus.Event),

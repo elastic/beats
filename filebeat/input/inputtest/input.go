@@ -26,8 +26,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +40,7 @@ func (o Outlet) Done() <-chan struct{}         { return nil }
 
 // Connector is a connector to a test empty outlet.
 var Connector = channel.ConnectorFunc(
-	func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return Outlet{}, nil
 	},
 )
@@ -52,7 +52,7 @@ func AssertNotStartedInputCanBeDone(t *testing.T, factory input.Factory, configM
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	config, err := common.NewConfigFrom(configMap)
+	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
 	context := input.Context{

@@ -25,10 +25,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -87,7 +87,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			info := beat.Info{Beat: "test", Version: "9.9.9"}
 			factory := MakeDefaultSupport(makeMockILMSupport(test.ilmCalls...))
-			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
+			im, err := factory(nil, info, config.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 			assert.Equal(t, test.enabled, im.Enabled())
 		})
@@ -187,10 +187,10 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			info := beat.Info{Beat: "test", Version: "9.9.9"}
 
 			factory := MakeDefaultSupport(makeMockILMSupport(test.ilmCalls...))
-			im, err := factory(nil, info, common.MustNewConfigFrom(test.imCfg))
+			im, err := factory(nil, info, config.MustNewConfigFrom(test.imCfg))
 			require.NoError(t, err)
 
-			sel, err := im.BuildSelector(common.MustNewConfigFrom(test.cfg))
+			sel, err := im.BuildSelector(config.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 
 			meta := test.meta
@@ -253,7 +253,7 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(mapstr.M{
+			cfg, err := config.NewConfigFrom(mapstr.M{
 				"setup.ilm.enabled":      setup.ilmEnabled,
 				"setup.ilm.overwrite":    setup.ilmOverwrite,
 				"setup.template.enabled": setup.tmplEnabled,
@@ -290,7 +290,7 @@ func TestIndexManager_Setup(t *testing.T) {
 
 	cfgWith := func(s template.TemplateConfig, mods ...map[string]interface{}) *template.TemplateConfig {
 		for _, mod := range mods {
-			cfg := common.MustNewConfigFrom(mod)
+			cfg := config.MustNewConfigFrom(mod)
 			s = cloneCfg(s)
 			err := cfg.Unpack(&s)
 			if err != nil {
@@ -414,7 +414,7 @@ func TestIndexManager_Setup(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			factory := MakeDefaultSupport(ilm.StdSupport)
-			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
+			im, err := factory(nil, info, config.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 
 			clientHandler := newMockClientHandler()

@@ -12,10 +12,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,7 +35,7 @@ type addCloudFoundryMetadata struct {
 const selector = "add_cloudfoundry_metadata"
 
 // New constructs a new add_cloudfoundry_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (processors.Processor, error) {
 	var config cloudfoundry.Config
 
 	// ShardID is required in cloudfoundry config to consume from the firehose,

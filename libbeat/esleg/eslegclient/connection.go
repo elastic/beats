@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 type esHTTPClient interface {
@@ -170,7 +171,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // configuration. It accepts the same configuration parameters as the Elasticsearch
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
-func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
+func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -217,7 +218,7 @@ func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
 	return clients, nil
 }
 
-func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error) {
+func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	clients, err := NewClients(cfg, beatname)
 	if err != nil {
 		return nil, err

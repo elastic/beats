@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -34,7 +35,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
@@ -79,8 +79,8 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 	return rtn
 }
 
-func makeTestConfigS3(s3bucket string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigS3(s3bucket string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 bucket_arn: aws:s3:::%s
 number_of_workers: 1
 file_selectors:
@@ -107,8 +107,8 @@ file_selectors:
 `, s3bucket))
 }
 
-func makeTestConfigSQS(queueURL string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigSQS(queueURL string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 queue_url: %s
 max_number_of_messages: 1
 visibility_timeout: 30s
@@ -158,7 +158,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }
 
-func createInput(t *testing.T, cfg *common.Config) *s3Input {
+func createInput(t *testing.T, cfg *conf.C) *s3Input {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)

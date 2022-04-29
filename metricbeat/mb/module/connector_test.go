@@ -26,8 +26,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -137,7 +137,7 @@ func TestUseMetricSetProcessors_ReadingProcessorsSucceeded(t *testing.T) {
 // connectorConfig
 func connectorConfigFromString(s string) (connectorConfig, error) {
 	config := connectorConfig{}
-	cfg, err := common.NewConfigFrom(s)
+	cfg, err := conf.NewConfigFrom(s)
 	if err != nil {
 		return config, err
 	}

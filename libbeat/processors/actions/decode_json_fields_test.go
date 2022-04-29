@@ -25,37 +25,37 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var fields = [1]string{"msg"}
-var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+var testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 	"fields":       fields,
 	"processArray": false,
 })
 
 func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 	// All fields defined in config should be allowed.
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"decode_json_fields": &config{
 			// Rely on zero values for all fields that don't have validation.
 			MaxDepth: 1,
 		},
 	})
-	_, err := processors.New(processors.PluginConfig([]*common.Config{cfg}))
+	_, err := processors.New(processors.PluginConfig([]*conf.C{cfg}))
 	assert.NoError(t, err)
 
 	// Unknown fields should not be allowed.
-	cfg = common.MustNewConfigFrom(map[string]interface{}{
+	cfg = conf.MustNewConfigFrom(map[string]interface{}{
 		"decode_json_fields": map[string]interface{}{
 			"fields":     []string{"required"},
 			"extraneous": "field",
 		},
 	})
-	_, err = processors.New(processors.PluginConfig([]*common.Config{cfg}))
+	_, err = processors.New(processors.PluginConfig([]*conf.C{cfg}))
 	assert.Error(t, err)
 	assert.EqualError(t, err, "unexpected extraneous option in decode_json_fields")
 }
@@ -127,7 +127,7 @@ func TestDocumentID(t *testing.T) {
 		"msg": `{"log": "message", "myid": "myDocumentID"}`,
 	}
 
-	config := common.MustNewConfigFrom(map[string]interface{}{
+	config := conf.MustNewConfigFrom(map[string]interface{}{
 		"fields":      []string{"msg"},
 		"document_id": "myid",
 	})
@@ -178,7 +178,7 @@ func TestValidJSONDepthTwo(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -206,7 +206,7 @@ func TestTargetOption(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -236,7 +236,7 @@ func TestTargetRootOption(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -267,7 +267,7 @@ func TestTargetMetadata(t *testing.T) {
 		Meta: mapstr.M{},
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"process_array": false,
 		"max_depth":     2,
@@ -347,7 +347,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 				  }`,
 			}
 
-			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+			testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 				"fields":        fields,
 				"process_array": true,
 				"max_depth":     testCase.MaxDepth,
@@ -366,7 +366,7 @@ func TestArrayWithArraysDisabled(t *testing.T) {
 		  }`,
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"max_depth":     10,
 		"process_array": false,
@@ -390,7 +390,7 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 		  }`,
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"max_depth":     10,
 		"process_array": true,
@@ -414,7 +414,7 @@ func TestArrayWithInvalidArray(t *testing.T) {
 		  }`,
 	}
 
-	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+	testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"max_depth":     10,
 		"process_array": true,
@@ -451,7 +451,7 @@ func TestAddErrKeyOption(t *testing.T) {
 				"msg": "{\"@timestamp\":\"{}\"}",
 			}
 
-			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+			testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 				"fields":         fields,
 				"add_error_key":  test.addErrOption,
 				"overwrite_keys": true,
@@ -466,7 +466,7 @@ func TestAddErrKeyOption(t *testing.T) {
 }
 
 func TestExpandKeys(t *testing.T) {
-	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
 		"fields":      fields,
 		"expand_keys": true,
 		"target":      "",
@@ -486,7 +486,7 @@ func TestExpandKeys(t *testing.T) {
 }
 
 func TestExpandKeysError(t *testing.T) {
-	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
 		"fields":        fields,
 		"expand_keys":   true,
 		"add_error_key": true,
@@ -514,7 +514,7 @@ func TestExpandKeysError(t *testing.T) {
 }
 
 func TestOverwriteMetadata(t *testing.T) {
-	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
 		"fields":         fields,
 		"target":         "",
 		"overwrite_keys": true,
@@ -533,7 +533,7 @@ func TestOverwriteMetadata(t *testing.T) {
 }
 
 func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
-	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
 		"fields":        "message",
 		"add_error_key": true,
 	})
@@ -553,7 +553,7 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 	assert.NotNil(t, errObj["message"])
 }
 
-func getActualValue(t *testing.T, config *common.Config, input mapstr.M) mapstr.M {
+func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
 	log := logp.NewLogger("decode_json_fields_test")
 
 	p, err := NewDecodeJSONFields(config)

@@ -22,8 +22,8 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -36,7 +36,7 @@ type MockInputManager struct {
 
 // InputConfigurer describes the interface for user supplied functions, that is
 // used to create a new input from a configuration object.
-type InputConfigurer func(*common.Config) (v2.Input, error)
+type InputConfigurer func(*conf.C) (v2.Input, error)
 
 // MockInput can be used as an Input instance in tests that require a new Input with definable behavior.
 // The OnTest and OnRun functions are executed if the corresponding methods get called.
@@ -56,7 +56,7 @@ func (m *MockInputManager) Init(_ unison.Group, mode v2.Mode) error {
 
 // Create fails with an error if OnConfigure is not set. Otherwise the return
 // values of OnConfigure are returned.
-func (m *MockInputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (m *MockInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	if m.OnConfigure != nil {
 		return m.OnConfigure(cfg)
 	}
@@ -91,7 +91,7 @@ func ConstInputManager(input v2.Input) *MockInputManager {
 
 // ConfigureConstInput return an InputConfigurer that returns always input when called.
 func ConfigureConstInput(input v2.Input) InputConfigurer {
-	return func(_ *common.Config) (v2.Input, error) {
+	return func(_ *conf.C) (v2.Input, error) {
 		return input, nil
 	}
 }

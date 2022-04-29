@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
@@ -77,7 +78,7 @@ var (
 	duplicateRequests  = monitoring.NewInt(nil, "icmp.duplicate_requests")
 )
 
-func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*icmpPlugin, error) {
+func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (*icmpPlugin, error) {
 	p := &icmpPlugin{}
 	config := defaultConfig
 	if !testMode {

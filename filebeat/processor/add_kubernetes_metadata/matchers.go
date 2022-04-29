@@ -23,15 +23,15 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
 	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 
 	// Add a container indexer config by default.
 	add_kubernetes_metadata.Indexing.AddDefaultIndexerConfig(add_kubernetes_metadata.ContainerIndexerName, *cfg)
@@ -51,7 +51,7 @@ type LogPathMatcher struct {
 	logger       *logp.Logger
 }
 
-func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
 		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`

@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,7 +33,7 @@ func TestMimeTypeFromTo(t *testing.T) {
 			"foo.bar.baz": "hello world!",
 		},
 	}
-	p, err := NewDetectMimeType(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "bar.baz.zoiks",
 	}))
@@ -55,7 +55,7 @@ func TestMimeTypeFromToMetadata(t *testing.T) {
 	expectedMeta := mapstr.M{
 		"field": "text/plain; charset=utf-8",
 	}
-	p, err := NewDetectMimeType(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "@metadata.field",
 	}))
@@ -73,7 +73,7 @@ func TestMimeTypeTestNoMatch(t *testing.T) {
 			"foo.bar.baz": string([]byte{0, 0}),
 		},
 	}
-	p, err := NewDetectMimeType(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "bar.baz.zoiks",
 	}))

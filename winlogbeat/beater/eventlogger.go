@@ -22,13 +22,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -56,7 +56,7 @@ type eventLoggerConfig struct {
 func newEventLogger(
 	beatInfo beat.Info,
 	source eventlog.EventLog,
-	options *common.Config,
+	options *conf.C,
 	log *logp.Logger,
 ) (*eventLogger, error) {
 	config := eventLoggerConfig{}

@@ -20,8 +20,8 @@ package module
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Factory creates new Runner instances from configuration objects.
@@ -40,7 +40,7 @@ func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
-func (r *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
+func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
 	module, metricSets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 }
 
 // CheckConfig checks if a config is valid or not
-func (r *Factory) CheckConfig(config *common.Config) error {
+func (r *Factory) CheckConfig(config *conf.C) error {
 	_, err := NewWrapper(config, mb.Registry, r.options...)
 	if err != nil {
 		return err

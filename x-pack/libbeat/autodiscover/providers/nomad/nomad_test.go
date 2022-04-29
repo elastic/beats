@@ -16,11 +16,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -172,7 +172,7 @@ func TestEmitEvent(t *testing.T) {
 			Expected: bus.Event{
 				"provider": UUID,
 				"id":       fmt.Sprintf("%s-%s", UUID.String(), "task1"),
-				"config":   []*common.Config{},
+				"config":   []*conf.C{},
 				"start":    true,
 				"host":     host,
 				"nomad": mapstr.M{
@@ -305,7 +305,7 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen, err := nomad.NewMetaGenerator(common.NewConfig(), client)
+			metaGen, err := nomad.NewMetaGenerator(conf.NewConfig(), client)
 			if err != nil {
 				t.Fatal(err)
 			}

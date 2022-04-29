@@ -22,15 +22,15 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // SupportFactory is used to provide custom index management support to libbeat.
-type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, *config.C) (Supporter, error)
 
 // Supporter provides index management and configuration related services
 // throughout libbeat.
@@ -46,7 +46,7 @@ type Supporter interface {
 	// The defaultIndex string is interpreted as format string. It is used
 	// as default index if the configuration provided does not define an index or
 	// has no default fallback if all indices are guarded by conditionals.
-	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
+	BuildSelector(cfg *config.C) (outputs.IndexSelector, error)
 
 	// Manager creates a new manager that can be used to execute the required steps
 	// for initializing an index, ILM policies, and write aliases.
@@ -92,7 +92,7 @@ func (m *LoadMode) Enabled() bool {
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.
-func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
+func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 	factory := MakeDefaultSupport(nil)
 	return factory(log, info, configRoot)
 }
@@ -104,14 +104,14 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 		ilmSupport = ilm.DefaultSupport
 	}
 
-	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
+	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
 
 		cfg := struct {
-			ILM       *common.Config         `config:"setup.ilm"`
-			Template  *common.Config         `config:"setup.template"`
-			Output    common.ConfigNamespace `config:"output"`
-			Migration *common.Config         `config:"migration.6_to_7"`
+			ILM       *config.C        `config:"setup.ilm"`
+			Template  *config.C        `config:"setup.template"`
+			Output    config.Namespace `config:"output"`
+			Migration *config.C        `config:"migration.6_to_7"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
@@ -142,7 +142,7 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 // TODO: check if it's safe to move this check to the elasticsearch output
 //       (Not doing so, so to not interfere with outputs being setup via Central
 //       Management for now).
-func checkTemplateESSettings(tmpl *common.Config, out common.ConfigNamespace) error {
+func checkTemplateESSettings(tmpl *config.C, out config.Namespace) error {
 	if out.Name() != "elasticsearch" {
 		return nil
 	}

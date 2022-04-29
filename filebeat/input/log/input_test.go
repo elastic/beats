@@ -35,9 +35,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -145,7 +145,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	assert.NoError(t, err)
 
 	// Setup the input
-	config, _ := common.NewConfigFrom(mapstr.M{
+	config, _ := conf.NewConfigFrom(mapstr.M{
 		"paths":     path.Join(tmpdir, "*.log"),
 		"close_eof": true,
 	})
@@ -154,7 +154,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	defer close(events)
 	capturer := NewEventCapturer(events)
 	defer capturer.Close()
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(capturer), nil
 	})
 
@@ -198,9 +198,9 @@ func TestNewInputError(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	config := common.NewConfig()
+	config := conf.NewConfig()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return inputtest.Outlet{}, nil
 	})
 

@@ -22,11 +22,11 @@ import (
 	"io/ioutil"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,7 +41,7 @@ type tokenAppender struct {
 
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
 // protected endpoints
-func NewTokenAppender(cfg *common.Config) (autodiscover.Appender, error) {
+func NewTokenAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	cfgwarn.Deprecate("7.0.0", "token appender is deprecated in favor of bearer_token_file config parameter")
 	conf := defaultConfig()
 
@@ -74,7 +74,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 		return
 	}
 
-	cfgs, ok := cfgsRaw.([]*common.Config)
+	cfgs, ok := cfgsRaw.([]*conf.C)
 	// Config key doesnt have an array of config objects
 	if !ok {
 		return
@@ -111,7 +111,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 			c["headers"] = headers
 
 			// Repack the configuration
-			newCfg, err := common.NewConfigFrom(&c)
+			newCfg, err := conf.NewConfigFrom(&c)
 			if err != nil {
 				logp.Debug("kubernetes.config", "unable to repack config due to error: %v", err)
 				continue

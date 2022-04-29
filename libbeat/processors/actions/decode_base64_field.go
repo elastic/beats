@@ -25,11 +25,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -57,7 +57,7 @@ func init() {
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
-func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
+func NewDecodeBase64Field(c *cfg.C) (processors.Processor, error) {
 	config := base64Config{
 		IgnoreMissing: false,
 		FailOnError:   true,

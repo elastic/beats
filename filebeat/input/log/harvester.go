@@ -55,6 +55,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -124,7 +125,7 @@ type harvesterProgressMetrics struct {
 // NewHarvester creates a new harvester
 func NewHarvester(
 	logger *logp.Logger,
-	config *common.Config,
+	config *conf.C,
 	state file.State,
 	states *file.States,
 	publishState func(file.State) bool,

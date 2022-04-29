@@ -17,13 +17,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type startingPosition uint
@@ -100,7 +100,7 @@ type KinesisTriggerConfig struct {
 }
 
 // Unpack unpacks the trigger and make sure the defaults settings are correctly sets.
-func (c *KinesisTriggerConfig) Unpack(cfg *common.Config) error {
+func (c *KinesisTriggerConfig) Unpack(cfg *conf.C) error {
 	type tmpConfig KinesisTriggerConfig
 	config := tmpConfig{
 		BatchSize:             100,
@@ -121,7 +121,7 @@ type Kinesis struct {
 }
 
 // NewKinesis creates a new function to receives events from a kinesis stream.
-func NewKinesis(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
+func NewKinesis(provider provider.Provider, cfg *conf.C) (provider.Function, error) {
 	config := &KinesisConfig{LambdaConfig: DefaultLambdaConfig}
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err

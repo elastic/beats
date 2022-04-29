@@ -20,8 +20,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
@@ -60,7 +60,7 @@ func init() {
 
 // NewInput creates a new azure-eventhub input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {

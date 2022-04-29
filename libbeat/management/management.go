@@ -22,11 +22,11 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Status describes the current status of the beat.
@@ -97,7 +97,7 @@ type Manager interface {
 	SetStopCallback(f func())
 
 	// CheckRawConfig check settings are correct before launching the beat.
-	CheckRawConfig(cfg *common.Config) error
+	CheckRawConfig(cfg *config.C) error
 
 	// RegisterAction registers action handler with the client
 	RegisterAction(action client.Action)
@@ -110,10 +110,10 @@ type Manager interface {
 }
 
 // PluginFunc for creating FactoryFunc if it matches a config
-type PluginFunc func(*common.Config) FactoryFunc
+type PluginFunc func(*config.C) FactoryFunc
 
 // FactoryFunc for creating a config manager
-type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (Manager, error)
+type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 
 // Register a config manager
 func Register(name string, fn PluginFunc, stability feature.Stability) {
@@ -123,7 +123,7 @@ func Register(name string, fn PluginFunc, stability feature.Stability) {
 
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
-func Factory(cfg *common.Config) FactoryFunc {
+func Factory(cfg *config.C) FactoryFunc {
 	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
@@ -159,7 +159,7 @@ type nilManager struct {
 	stopFunc func()
 }
 
-func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (Manager, error) {
+func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
 	log := logp.NewLogger("mgmt")
 	return &nilManager{
 		logger: log,
@@ -168,11 +168,11 @@ func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (Manager, error) {
 	}, nil
 }
 
-func (*nilManager) SetStopCallback(func())                  {}
-func (*nilManager) Enabled() bool                           { return false }
-func (*nilManager) Start() error                            { return nil }
-func (*nilManager) Stop()                                   {}
-func (*nilManager) CheckRawConfig(cfg *common.Config) error { return nil }
+func (*nilManager) SetStopCallback(func())             {}
+func (*nilManager) Enabled() bool                      { return false }
+func (*nilManager) Start() error                       { return nil }
+func (*nilManager) Stop()                              {}
+func (*nilManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *nilManager) UpdateStatus(status Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()

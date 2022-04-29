@@ -22,9 +22,9 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,7 +46,7 @@ var gceMetadataFetcher = provider{
 
 	Local: true,
 
-	Create: func(provider string, config *common.Config) (metadataFetcher, error) {
+	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
 		gceSchema := func(m map[string]interface{}) mapstr.M {

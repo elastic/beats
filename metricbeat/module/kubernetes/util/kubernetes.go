@@ -29,10 +29,10 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -99,7 +99,7 @@ func NewResourceMetadataEnricher(
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
-	cfg, _ := common.NewConfigFrom(&commonMetaConfig)
+	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
 	metaGen := metadata.NewResourceMetadataGenerator(cfg, watcher.Client())
 	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
@@ -192,7 +192,7 @@ func NewContainerMetadataEnricher(
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
-	cfg, _ := common.NewConfigFrom(&commonMetaConfig)
+	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
 	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
 

@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -63,7 +64,7 @@ type metricHints struct {
 }
 
 // NewMetricHints builds a new metrics builder based on hints
-func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
+func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -75,9 +76,9 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create configs based on hints passed from providers
-func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
+func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
 	var (
-		configs []*common.Config
+		configs []*conf.C
 		noPort  bool
 	)
 	host, _ := event["host"].(string)
@@ -98,9 +99,9 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	modulesConfig := m.getModuleConfigs(hints)
 	// here we handle raw configs if provided
 	if modulesConfig != nil {
-		configs := []*common.Config{}
+		configs := []*conf.C{}
 		for _, cfg := range modulesConfig {
-			if config, err := common.NewConfigFrom(cfg); err == nil {
+			if config, err := conf.NewConfigFrom(cfg); err == nil {
 				configs = append(configs, config)
 			}
 		}
@@ -191,12 +192,12 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	return template.ApplyConfigTemplate(event, configs, options...)
 }
 
-func (m *metricHints) generateConfig(mod mapstr.M) *common.Config {
-	cfg, err := common.NewConfigFrom(mod)
+func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
+	cfg, err := conf.NewConfigFrom(mod)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
+	logp.Debug("hints.builder", "generated config: %+v", conf.DebugString(cfg, true))
 	return cfg
 }
 

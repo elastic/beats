@@ -29,16 +29,16 @@ import (
 	finput "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var logger = logp.NewLogger("test")
 
 func TestNewInput_MissingConfigField(t *testing.T) {
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"topics": "#",
 	})
 	connector := new(mockedConnector)
@@ -52,7 +52,7 @@ func TestNewInput_MissingConfigField(t *testing.T) {
 
 func TestNewInput_ConnectWithFailed(t *testing.T) {
 	connectWithError := errors.New("failure")
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":  "tcp://mocked:1234",
 		"topics": "#",
 	})
@@ -68,7 +68,7 @@ func TestNewInput_ConnectWithFailed(t *testing.T) {
 }
 
 func TestNewInput_Run(t *testing.T) {
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":  "tcp://mocked:1234",
 		"topics": []string{"first", "second"},
 		"qos":    2,
@@ -140,7 +140,7 @@ func TestNewInput_Run(t *testing.T) {
 }
 
 func TestNewInput_Run_Wait(t *testing.T) {
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":  "tcp://mocked:1234",
 		"topics": []string{"first", "second"},
 		"qos":    2,

@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 )
@@ -53,7 +53,7 @@ func defaultDevice() string {
 	return "0"
 }
 
-func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, error) {
+func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 	namespace := i.Datastream.Namespace
 	if namespace == "" {
 		namespace = "default"
@@ -64,7 +64,7 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 	if err := cfg.Unpack(&datastreamConfig); err != nil {
 		return nil, err
 	}
-	mergeConfig, err := common.NewConfigFrom(mapstr.M{
+	mergeConfig, err := conf.NewConfigFrom(mapstr.M{
 		"index": datastreamConfig.Datastream.Type + "-" + datastreamConfig.Datastream.Dataset + "-" + namespace,
 		"processors": append([]mapstr.M{
 			{
@@ -117,7 +117,7 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 
 // NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
-func NewAgentConfig(cfg *common.Config) (Config, error) {
+func NewAgentConfig(cfg *conf.C) (Config, error) {
 	logp.Debug("agent", "Normalizing agent configuration")
 	var input agentInput
 	config := Config{
@@ -133,7 +133,7 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 	logp.Debug("agent", fmt.Sprintf("Found %d inputs", len(input.Streams)))
 	for _, stream := range input.Streams {
 		if interfaceOverride, ok := stream["interface"]; ok {
-			cfg, err := common.NewConfigFrom(interfaceOverride)
+			cfg, err := conf.NewConfigFrom(interfaceOverride)
 			if err != nil {
 				return config, err
 			}
@@ -143,7 +143,7 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 		}
 
 		if procsOverride, ok := stream["procs"]; ok {
-			cfg, err := common.NewConfigFrom(procsOverride)
+			cfg, err := conf.NewConfigFrom(procsOverride)
 			if err != nil {
 				return config, err
 			}
@@ -160,7 +160,7 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 				return config, fmt.Errorf("invalid input type of: '%T'", rawStreamType)
 			}
 			logp.Debug("agent", fmt.Sprintf("Found agent configuration for %v", streamType))
-			cfg, err := common.NewConfigFrom(stream)
+			cfg, err := conf.NewConfigFrom(stream)
 			if err != nil {
 				return config, err
 			}

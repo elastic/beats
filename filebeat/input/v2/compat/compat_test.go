@@ -25,11 +25,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/internal/inputest"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestRunnerFactory_CheckConfig(t *testing.T) {
@@ -39,7 +39,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 
 		// setup
 		plugins := inputest.SinglePlugin("test", &inputest.MockInputManager{
-			OnConfigure: func(_ *common.Config) (v2.Input, error) {
+			OnConfigure: func(_ *conf.C) (v2.Input, error) {
 				countConfigure++
 				return &inputest.MockInput{
 					OnTest: func(_ v2.TestContext) error { countTest++; return nil },
@@ -51,7 +51,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
 
 		// run
-		err := factory.CheckConfig(common.NewConfig())
+		err := factory.CheckConfig(conf.NewConfig())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -69,7 +69,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
 
 		// run
-		err := factory.CheckConfig(common.MustNewConfigFrom(map[string]interface{}{
+		err := factory.CheckConfig(conf.MustNewConfigFrom(map[string]interface{}{
 			"type": "unknown",
 		}))
 		assert.Error(t, err)
@@ -92,7 +92,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
 
-		runner, err := factory.Create(nil, common.MustNewConfigFrom(map[string]interface{}{
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
 			"type": "test",
 		}))
 		require.NoError(t, err)
@@ -111,7 +111,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
 
 		// run
-		runner, err := factory.Create(nil, common.MustNewConfigFrom(map[string]interface{}{
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
 			"type": "unknown",
 		}))
 		assert.Nil(t, runner)

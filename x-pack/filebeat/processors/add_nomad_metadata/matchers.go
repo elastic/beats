@@ -10,9 +10,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/processors/add_nomad_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -28,7 +28,7 @@ const (
 
 func init() {
 	add_nomad_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 
 	// Add a container indexer config by default.
 	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.AllocationNameIndexerName, *cfg)
@@ -44,7 +44,7 @@ type LogPathMatcher struct {
 	allocIDRegex *regexp.Regexp
 }
 
-func newLogsPathMatcher(cfg common.Config) (add_nomad_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C) (add_nomad_metadata.Matcher, error) {
 	config := struct {
 		LogsPath string `config:"logs_path"`
 	}{

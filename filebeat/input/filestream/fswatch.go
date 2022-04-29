@@ -28,10 +28,10 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -44,7 +44,7 @@ var watcherFactories = map[string]watcherFactory{
 	scannerName: newScannerWatcher,
 }
 
-type watcherFactory func(paths []string, cfg *common.Config) (loginp.FSWatcher, error)
+type watcherFactory func(paths []string, cfg *conf.C) (loginp.FSWatcher, error)
 
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
@@ -79,9 +79,9 @@ type fileWatcher struct {
 	sameFileFunc    func(os.FileInfo, os.FileInfo) bool
 }
 
-func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
+func newFileWatcher(paths []string, ns *conf.Namespace) (loginp.FSWatcher, error) {
 	if ns == nil {
-		return newScannerWatcher(paths, common.NewConfig())
+		return newScannerWatcher(paths, conf.NewConfig())
 	}
 
 	watcherType := ns.Name()
@@ -93,7 +93,7 @@ func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatche
 	return f(paths, ns.Config())
 }
 
-func newScannerWatcher(paths []string, c *common.Config) (loginp.FSWatcher, error) {
+func newScannerWatcher(paths []string, c *conf.C) (loginp.FSWatcher, error) {
 	config := defaultFileWatcherConfig()
 	err := c.Unpack(&config)
 	if err != nil {

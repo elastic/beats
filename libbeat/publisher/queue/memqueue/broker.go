@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -86,7 +86,7 @@ func init() {
 }
 
 func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, inQueueSize int,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *c.C, inQueueSize int,
 ) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {

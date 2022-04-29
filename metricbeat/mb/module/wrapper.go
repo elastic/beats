@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -80,7 +81,7 @@ type stats struct {
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
-func NewWrapper(config *common.Config, r *mb.Register, options ...Option) (*Wrapper, error) {
+func NewWrapper(config *conf.C, r *mb.Register, options ...Option) (*Wrapper, error) {
 	module, metricSets, err := mb.NewModule(config, r)
 	if err != nil {
 		return nil, err

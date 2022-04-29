@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -50,7 +51,7 @@ type KibanaLoader struct {
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
-func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
+func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
 
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Kibana is not configured or enabled")
@@ -77,7 +78,7 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 	return &loader, nil
 }
 
-func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
+func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
 	client, err := kibana.NewKibanaClient(cfg, beatname)
 	if err != nil {
 		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {

@@ -33,13 +33,13 @@ import (
 	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -423,14 +423,14 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	return r
 }
 
-func newEventLogging(options *common.Config) (EventLog, error) {
+func newEventLogging(options *conf.C) (EventLog, error) {
 	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
 	return newWinEventLog(options)
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLog(options *common.Config) (EventLog, error) {
+func newWinEventLog(options *conf.C) (EventLog, error) {
 	var xmlQuery string
 	var err error
 

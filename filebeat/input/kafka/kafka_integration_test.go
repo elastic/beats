@@ -33,13 +33,13 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 )
@@ -88,7 +88,7 @@ func TestInput(t *testing.T) {
 	}
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   groupID,
@@ -163,7 +163,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":                        getTestKafkaHost(),
 		"topics":                       []string{testTopic},
 		"group_id":                     "filebeat",
@@ -219,7 +219,7 @@ func TestInputWithJsonPayload(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   "filebeat",
@@ -281,7 +281,7 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":                        getTestKafkaHost(),
 		"topics":                       []string{testTopic},
 		"group_id":                     "filebeat",
@@ -347,7 +347,7 @@ func TestSASLAuthentication(t *testing.T) {
 	}
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":          []string{getTestSASLKafkaHost()},
 		"protocol":       "https",
 		"sasl.mechanism": "SCRAM-SHA-512",
@@ -430,7 +430,7 @@ func TestTest(t *testing.T) {
 	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
 
 	// Setup the input config
-	config := common.MustNewConfigFrom(mapstr.M{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":    getTestKafkaHost(),
 		"topics":   []string{testTopic},
 		"group_id": "filebeat",
@@ -591,7 +591,7 @@ func writeToKafkaTopic(
 	}
 }
 
-func run(t *testing.T, cfg *common.Config, client *beattest.ChanClient) (*kafkaInput, func()) {
+func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, func()) {
 	inp, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)

@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -106,7 +107,7 @@ func New(config PluginConfig) (*Processors, error) {
 			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
-		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)
+		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
 		plugin, err := constructor(actionCfg)
 		if err != nil {

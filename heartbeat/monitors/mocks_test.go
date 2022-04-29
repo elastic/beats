@@ -31,9 +31,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -150,7 +150,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Make: func(s string, config *common.Config) (plugin.Plugin, error) {
+			Make: func(s string, config *conf.C) (plugin.Plugin, error) {
 				built.Inc()
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
@@ -185,7 +185,7 @@ func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.I
 	return reg, built, closed
 }
 
-func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *common.Config {
+func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *conf.C {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
@@ -198,7 +198,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 		confMap["id"] = id
 	}
 
-	conf, err := common.NewConfigFrom(confMap)
+	conf, err := conf.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
@@ -208,7 +208,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
 //nolint:unparam // There are no new changes to this line but
 // linter has been activated in the meantime. We'll cleanup separately.
-func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+func mockBadPluginConf(t *testing.T, id string, schedule string) *conf.C {
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},
@@ -218,24 +218,24 @@ func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config 
 		confMap["id"] = id
 	}
 
-	conf, err := common.NewConfigFrom(confMap)
+	conf, err := conf.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
 }
 
-func mockInvalidPluginConf(t *testing.T) *common.Config {
+func mockInvalidPluginConf(t *testing.T) *conf.C {
 	confMap := map[string]interface{}{
 		"hoeutnheou": "oueanthoue",
 	}
 
-	conf, err := common.NewConfigFrom(confMap)
+	conf, err := conf.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
 }
 
-func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *common.Config {
+func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *conf.C {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"id":       id,
@@ -243,7 +243,7 @@ func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, sc
 		"schedule": schedule,
 	}
 
-	conf, err := common.NewConfigFrom(confMap)
+	conf, err := conf.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf

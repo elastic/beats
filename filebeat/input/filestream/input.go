@@ -29,7 +29,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -40,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const pluginName = "filestream"
@@ -80,7 +80,7 @@ func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) {
+func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err

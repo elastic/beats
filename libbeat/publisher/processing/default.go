@@ -22,13 +22,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -97,7 +97,7 @@ func MakeDefaultSupport(
 	normalize bool,
 	modifiers ...modifier,
 ) SupportFactory {
-	return func(info beat.Info, log *logp.Logger, beatCfg *common.Config) (Supporter, error) {
+	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
 		cfg := struct {
 			mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`

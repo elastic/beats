@@ -7,12 +7,12 @@ package httpjson
 import (
 	"go.uber.org/multierr"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -54,7 +54,7 @@ func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
 
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
-func (m InputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
