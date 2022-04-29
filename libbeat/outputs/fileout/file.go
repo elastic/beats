@@ -23,12 +23,12 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	c "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -57,7 +57,7 @@ func makeFileout(
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("bulk_max_size", -1, -1)
+	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
 		log:      logp.NewLogger("file"),

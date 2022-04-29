@@ -35,9 +35,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/file"
 )
 
 func defaultConfig() Config {
@@ -397,7 +397,7 @@ func randomString(l int) string {
 	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
 	message := make([]byte, l)
 	for i := range message {
-		message[i] = charsets[rand.Intn(len(charsets))]
+		message[i] = charsets[rand.Intn(len(charsets))] //nolint:gosec // it generates test string, allowed to be weak
 	}
 	return string(message)
 }
