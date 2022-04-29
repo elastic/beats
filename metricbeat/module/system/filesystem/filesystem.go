@@ -24,12 +24,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 )
 
@@ -89,7 +89,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		if err != nil {
 			return fmt.Errorf("error getting filesystem usage for %s: %w", fs.Directory, err)
 		}
-		out := common.MapStr{}
+		out := mapstr.M{}
 		err = typeconv.Convert(&out, fs)
 		if err != nil {
 			return fmt.Errorf("error converting event %s: %w", fs.Device, err)
