@@ -244,6 +244,10 @@ func (k *FileKeystore) doSave(override bool) error {
 		return fmt.Errorf("cannot open file to save the keystore to '%s', error: %s", k.Path, err)
 	}
 
+	// Writing files can and allowed to go wrong here.
+	// Where it is important to write to disk we use SafeFileRotate or safeWriteFile.
+	// As this function only makes a checkpoint, the keystore is going to be in a consistent
+	// state eventually.
 	_, _ = f.Write(version)
 	base64Encoder := base64.NewEncoder(base64.StdEncoding, f)
 	_, _ = io.Copy(base64Encoder, encrypted)
