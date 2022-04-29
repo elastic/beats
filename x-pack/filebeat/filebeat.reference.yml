@@ -3404,7 +3404,7 @@ filebeat.inputs:
 # (flushed). When an unwritten update exceeds this value, it triggers a write
 # to disk. When flush is set to 0s, the registry is written to disk after each
 # batch of events has been published successfully. The default value is 0s.
-#filebeat.registry.flush: 0s
+#filebeat.registry.flush: 1s
 
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store

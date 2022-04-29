@@ -64,6 +64,7 @@ var DefaultConfig = Config{
 		Permissions:   0o600,
 		MigrateFile:   "",
 		CleanInterval: 5 * time.Minute,
+		FlushTimeout:  time.Second,
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,
@@ -108,7 +109,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		}{}
 		err := cfgfile.Read(&tmpConfig, file)
 		if err != nil {
-			return fmt.Errorf("Failed to read %s: %s", file, err)
+			return fmt.Errorf("Failed to read %s: %w", file, err)
 		}
 
 		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
@@ -157,7 +158,7 @@ func (config *Config) ListEnabledInputs() []string {
 	var inputs []string
 	for _, input := range config.Inputs {
 		if input.Enabled() {
-			input.Unpack(&t)
+			_ = input.Unpack(&t)
 			inputs = append(inputs, t.Type)
 		}
 	}
