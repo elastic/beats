@@ -35,6 +35,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 )
 
@@ -73,11 +74,11 @@ type serializableSecureString struct {
 }
 
 // Factory Create the right keystore with the configured options.
-func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
+func Factory(cfg *c.C, defaultPath string) (Keystore, error) {
 	config := defaultConfig
 
 	if cfg == nil {
-		cfg = common.NewConfig()
+		cfg = c.NewConfig()
 	}
 	err := cfg.Unpack(&config)
 
@@ -171,9 +172,9 @@ func (k *FileKeystore) List() ([]string, error) {
 	return keys, nil
 }
 
-// GetConfig returns common.Config representation of the key / secret pair to be merged with other
+// GetConfig returns config.C representation of the key / secret pair to be merged with other
 // loaded configuration.
-func (k *FileKeystore) GetConfig() (*common.Config, error) {
+func (k *FileKeystore) GetConfig() (*c.C, error) {
 	k.RLock()
 	defer k.RUnlock()
 
@@ -182,7 +183,7 @@ func (k *FileKeystore) GetConfig() (*common.Config, error) {
 		configHash[key] = string(secret.Value)
 	}
 
-	return common.NewConfigFrom(configHash)
+	return c.NewConfigFrom(configHash)
 }
 
 // Create create an empty keystore, if the store already exist we will return an error.

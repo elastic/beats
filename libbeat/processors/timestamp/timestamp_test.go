@@ -26,9 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -274,7 +274,7 @@ func TestTimezone(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config := common.MustNewConfigFrom(map[string]interface{}{
+			config := conf.MustNewConfigFrom(map[string]interface{}{
 				"field":    "ts",
 				"timezone": c.Timezone,
 				"layouts":  []string{time.ANSIC},

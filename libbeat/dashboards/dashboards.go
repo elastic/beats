@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,7 +35,7 @@ import (
 func ImportDashboards(
 	ctx context.Context,
 	beatInfo beat.Info, homePath string,
-	kibanaConfig, dashboardsConfig *common.Config,
+	kibanaConfig, dashboardsConfig *config.C,
 	msgOutputter MessageOutputter,
 	pattern mapstr.M,
 ) error {
@@ -58,7 +59,7 @@ func ImportDashboards(
 	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, beatInfo.Beat, kibanaConfig, &dashConfig, msgOutputter, pattern)
 }
 
-func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname string, kibanaConfig *common.Config,
+func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname string, kibanaConfig *config.C,
 	dashboardsConfig *Config, msgOutputter MessageOutputter, fields mapstr.M) error {
 
 	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, hostname, msgOutputter, beatname)

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -44,7 +44,7 @@ type Indexers struct {
 }
 
 // IndexerConstructor builds a new indexer from its settings
-type IndexerConstructor func(config common.Config, metaGen nomad.MetaGenerator) (Indexer, error)
+type IndexerConstructor func(config conf.C, metaGen nomad.MetaGenerator) (Indexer, error)
 
 // NewIndexers builds an Indexers object from its configurations
 func NewIndexers(configs PluginConfig, metaGen nomad.MetaGenerator) *Indexers {
@@ -117,7 +117,7 @@ type AllocationNameIndexer struct {
 }
 
 // NewAllocationNameIndexer initializes and returns a AllocationNameIndexer
-func NewAllocationNameIndexer(_ common.Config, metaGen nomad.MetaGenerator) (Indexer, error) {
+func NewAllocationNameIndexer(_ conf.C, metaGen nomad.MetaGenerator) (Indexer, error) {
 	return &AllocationNameIndexer{metaGen: metaGen}, nil
 }
 
@@ -144,7 +144,7 @@ type AllocationUUIDIndexer struct {
 }
 
 // NewAllocationUUIDIndexer initializes and returns a AllocationUUIDIndexer
-func NewAllocationUUIDIndexer(_ common.Config, metaGen nomad.MetaGenerator) (Indexer, error) {
+func NewAllocationUUIDIndexer(_ conf.C, metaGen nomad.MetaGenerator) (Indexer, error) {
 	return &AllocationUUIDIndexer{metaGen: metaGen}, nil
 }
 

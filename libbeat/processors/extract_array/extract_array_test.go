@@ -23,12 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestExtractArrayProcessor_String(t *testing.T) {
-	p, err := New(common.MustNewConfigFrom(mapstr.M{
+	p, err := New(conf.MustNewConfigFrom(mapstr.M{
 		"field": "csv",
 		"mappings": mapstr.M{
 			"source.ip":         0,
@@ -248,7 +248,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 	}
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tt.config)
+			cfg := conf.MustNewConfigFrom(tt.config)
 			processor, err := New(cfg)
 			if err != nil {
 				t.Fatal(err)
@@ -291,7 +291,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			"second": mapstr.M{"two": 2},
 		}
 
-		cfg := common.MustNewConfigFrom(config)
+		cfg := conf.MustNewConfigFrom(config)
 		processor, err := New(cfg)
 		if err != nil {
 			t.Fatal(err)

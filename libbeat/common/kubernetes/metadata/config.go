@@ -17,7 +17,7 @@
 
 package metadata
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/config"
 
 // Config declares supported configuration for metadata generation
 type Config struct {
@@ -32,10 +32,10 @@ type Config struct {
 
 // AddResourceMetadataConfig allows adding config for enriching additional resources
 type AddResourceMetadataConfig struct {
-	Node       *common.Config `config:"node"`
-	Namespace  *common.Config `config:"namespace"`
-	Deployment bool           `config:"deployment"`
-	CronJob    bool           `config:"cronjob"`
+	Node       *config.C `config:"node"`
+	Namespace  *config.C `config:"namespace"`
+	Deployment bool      `config:"deployment"`
+	CronJob    bool      `config:"cronjob"`
 }
 
 // InitDefaults initializes the defaults for the config.
@@ -45,14 +45,14 @@ func (c *Config) InitDefaults() {
 }
 
 // Unmarshal unpacks a Config into the metagen Config
-func (c *Config) Unmarshal(cfg *common.Config) error {
+func (c *Config) Unmarshal(cfg *config.C) error {
 	return cfg.Unpack(c)
 }
 
 func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
 	metaConfig := Config{}
 	metaConfig.InitDefaults()
-	metaCfg, _ := common.NewConfigFrom(&metaConfig)
+	metaCfg, _ := config.NewConfigFrom(&metaConfig)
 	return &AddResourceMetadataConfig{
 		Node:       metaCfg,
 		Namespace:  metaCfg,

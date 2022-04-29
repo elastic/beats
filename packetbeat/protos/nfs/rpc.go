@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -72,7 +73,7 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	_ procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &rpc{}
 	config := defaultConfig

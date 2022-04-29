@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -243,7 +243,7 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run (%v): %v -> %v", i, test.v, test.expected)
 
-		config, err := common.NewConfigFrom(mapstr.M{
+		cfg, err := config.NewConfigFrom(mapstr.M{
 			"test": test.v,
 		})
 		if err != nil {
@@ -254,7 +254,7 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 		testConfig := struct {
 			Test *EventFormatString `config:"test"`
 		}{}
-		err = config.Unpack(&testConfig)
+		err = cfg.Unpack(&testConfig)
 		if err != nil {
 			t.Error(err)
 			continue

@@ -24,10 +24,10 @@ import (
 	"go.elastic.co/apm/module/apmhttp/v2"
 	"golang.org/x/net/http2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // HTTPTransportSettings provides common HTTP settings for HTTP clients.
@@ -157,7 +157,7 @@ func DefaultHTTPTransportSettings() HTTPTransportSettings {
 }
 
 // Unpack reads a config object into the settings.
-func (settings *HTTPTransportSettings) Unpack(cfg *common.Config) error {
+func (settings *HTTPTransportSettings) Unpack(cfg *config.C) error {
 	tmp := struct {
 		TLS     *tlscommon.Config `config:"ssl"`
 		Timeout time.Duration     `config:"timeout"`

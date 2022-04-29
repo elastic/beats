@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -66,7 +66,7 @@ func TestConfigAcceptValid(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c := common.MustNewConfigFrom(test)
+			c := config.MustNewConfigFrom(test)
 			c.SetString("hosts", 0, "localhost")
 			cfg, err := readConfig(c)
 			if err != nil {
@@ -94,7 +94,7 @@ func TestConfigInvalid(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c := common.MustNewConfigFrom(test)
+			c := config.MustNewConfigFrom(test)
 			c.SetString("hosts", 0, "localhost")
 			_, err := readConfig(c)
 			if err == nil {
@@ -178,7 +178,7 @@ func TestTopicSelection(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			selector, err := buildTopicSelector(common.MustNewConfigFrom(test.cfg))
+			selector, err := buildTopicSelector(config.MustNewConfigFrom(test.cfg))
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)
 			}

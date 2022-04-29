@@ -27,12 +27,12 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/winlogbeat/module"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/config"
@@ -55,7 +55,7 @@ type Winlogbeat struct {
 }
 
 // New returns a new Winlogbeat.
-func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 	// Read configuration.
 	config := config.DefaultSettings
 	if err := b.BeatConfig.Unpack(&config); err != nil {
@@ -103,7 +103,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 
 		eb.eventLogs = append(eb.eventLogs, logger)
 	}
-	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		overwritePipelines := config.OverwritePipelines
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Winlogbeat")
 		if err != nil {

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -92,8 +93,8 @@ func newTestRegistry(t testing.TB) *mb.Register {
 	return r
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
-	config, err := common.NewConfigFrom(moduleConfig)
+func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
+	config, err := conf.NewConfigFrom(moduleConfig)
 	require.NoError(t, err)
 	return config
 }

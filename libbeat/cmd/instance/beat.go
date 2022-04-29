@@ -70,6 +70,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	sysinfo "github.com/elastic/go-sysinfo"
@@ -82,7 +83,7 @@ type Beat struct {
 	beat.Beat
 
 	Config       beatConfig
-	RawConfig    *common.Config // Raw config that can be unpacked to get Beat specific config data.
+	RawConfig    *config.C // Raw config that can be unpacked to get Beat specific config data.
 	IdxSupporter idxmgmt.Supporter
 
 	keystore   keystore.Keystore
@@ -101,16 +102,16 @@ type beatConfig struct {
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
-	Seccomp *common.Config `config:"seccomp"`
+	Seccomp *config.C `config:"seccomp"`
 
 	// beat internal components configurations
-	HTTP            *common.Config         `config:"http"`
-	HTTPPprof       *common.Config         `config:"http.pprof"`
-	BufferConfig    *common.Config         `config:"http.buffer"`
+	HTTP            *config.C              `config:"http"`
+	HTTPPprof       *config.C              `config:"http.pprof"`
+	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
-	Logging         *common.Config         `config:"logging"`
-	MetricLogging   *common.Config         `config:"logging.metrics"`
-	Keystore        *common.Config         `config:"keystore"`
+	Logging         *config.C              `config:"logging"`
+	MetricLogging   *config.C              `config:"logging.metrics"`
+	Keystore        *config.C              `config:"keystore"`
 	Instrumentation instrumentation.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
@@ -120,14 +121,14 @@ type beatConfig struct {
 	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
 	// central management settings
-	Management *common.Config `config:"management"`
+	Management *config.C `config:"management"`
 
 	// elastic stack 'setup' configurations
-	Dashboards *common.Config `config:"setup.dashboards"`
-	Kibana     *common.Config `config:"setup.kibana"`
+	Dashboards *config.C `config:"setup.dashboards"`
+	Kibana     *config.C `config:"setup.kibana"`
 
 	// Migration config to migration from 6 to 7
-	Migration *common.Config `config:"migration.6_to_7"`
+	Migration *config.C `config:"migration.6_to_7"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -294,7 +295,7 @@ func (b *Beat) Init() error {
 }
 
 // BeatConfig returns config section for this beat
-func (b *Beat) BeatConfig() (*common.Config, error) {
+func (b *Beat) BeatConfig() (*config.C, error) {
 	configName := strings.ToLower(b.Info.Beat)
 	if b.RawConfig.HasField(configName) {
 		sub, err := b.RawConfig.Child(configName, -1)
@@ -305,7 +306,7 @@ func (b *Beat) BeatConfig() (*common.Config, error) {
 		return sub, nil
 	}
 
-	return common.NewConfig(), nil
+	return config.NewConfig(), nil
 }
 
 // Keystore return the configured keystore for this beat
@@ -650,10 +651,10 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if settings.DisableConfigResolver {
-		common.OverwriteConfigOpts(obfuscateConfigOpts())
+		config.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		common.OverwriteConfigOpts(configOpts(store))
+		config.OverwriteConfigOpts(configOpts(store))
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
@@ -829,7 +830,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	if force {
 		// force implies dashboards.enabled=true
 		if b.Config.Dashboards == nil {
-			b.Config.Dashboards = common.NewConfig()
+			b.Config.Dashboards = config.NewConfig()
 		}
 		err := b.Config.Dashboards.SetBool("enabled", -1, true)
 		if err != nil {
@@ -937,7 +938,7 @@ func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Re
 }
 
 func (b *Beat) makeOutputFactory(
-	cfg common.ConfigNamespace,
+	cfg config.Namespace,
 ) func(outputs.Observer) (string, outputs.Group, error) {
 	return func(outStats outputs.Observer) (string, outputs.Group, error) {
 		out, err := b.createOutput(outStats, cfg)
@@ -945,7 +946,7 @@ func (b *Beat) makeOutputFactory(
 	}
 }
 
-func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) (outputs.Group, error) {
+func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
 	}
@@ -1131,14 +1132,14 @@ func obfuscateConfigOpts() []ucfg.Option {
 }
 
 // LoadKeystore returns the appropriate keystore based on the configuration.
-func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
+func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
 	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
 
-func InitKibanaConfig(beatConfig beatConfig) *common.Config {
-	var esConfig *common.Config
+func InitKibanaConfig(beatConfig beatConfig) *config.C {
+	var esConfig *config.C
 	if isElasticsearchOutput(beatConfig.Output.Name()) {
 		esConfig = beatConfig.Output.Config()
 	}
@@ -1146,7 +1147,7 @@ func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	// init kibana config object
 	kibanaConfig := beatConfig.Kibana
 	if kibanaConfig == nil {
-		kibanaConfig = common.NewConfig()
+		kibanaConfig = config.NewConfig()
 	}
 
 	if esConfig.Enabled() {
@@ -1171,7 +1172,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func initPaths(cfg *common.Config) error {
+func initPaths(cfg *config.C) error {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference

@@ -1,92 +1,93 @@
 [
     {
         "@timestamp": "2020-07-23T23:49:54.000Z",
-        "cisco.umbrella.blocked_categories": "SomeIdentityType",
-        "cisco.umbrella.categories": "elastic.co.",
+        "cisco.umbrella.categories": "Software/Technology,Business Services,Application",
         "cisco.umbrella.identities": [
-            "elasticuser2"
+            "elasticuser2",
+            "some other identity"
         ],
-        "cisco.umbrella.identity_types": "Test Policy Name",
-        "cisco.umbrella.policy_identity_type": "Software/Technology,Business Services,Application",
-        "destination.address": "192.168.1.1",
-        "destination.domain": "NOERROR",
-        "destination.ip": "192.168.1.1",
-        "dns.question.type": "Allowed",
-        "dns.response_code": "1 (A)",
+        "cisco.umbrella.identity_types": "SomeIdentityType",
+        "cisco.umbrella.policy_identity_type": "Test Policy Name",
+        "destination.domain": "elastic.co.",
+        "dns.question.type": "1 (A)",
+        "dns.response_code": "NOERROR",
         "dns.type": "query",
-        "event.action": "dns-request-175.16.199.1",
+        "event.action": "dns-request-Allowed",
         "event.category": "network",
         "event.dataset": "cisco.umbrella",
         "event.module": "cisco",
-        "event.original": "\\\"2020-07-23 23:49:54\\\",\\\"elasticuser\\\",\\\"elasticuser2\\\",\\\"some other identity\\\",\\\"192.168.1.1\\\",\\\"175.16.199.1\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Software/Technology,Business Services,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"\\\"",
+        "event.original": "\\\"2020-07-23 23:49:54\\\",\\\"elasticuser\\\",\\\"elasticuser2,some other identity\\\",\\\"192.168.1.1\\\",\\\"175.16.199.1\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Software/Technology,Business Services,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"\\\"",
         "event.type": [
+            "allowed",
             "connection"
         ],
         "fileset.name": "umbrella",
         "input.type": "log",
         "log.offset": 0,
-        "message": "\"2020-07-23 23:49:54\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"175.16.199.1\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Software/Technology,Business Services,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"\"",
+        "message": "\"2020-07-23 23:49:54\",\"elasticuser\",\"elasticuser2,some other identity\",\"192.168.1.1\",\"175.16.199.1\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Software/Technology,Business Services,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"\"",
         "observer.product": "Umbrella",
         "observer.type": "dns",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "NOERROR",
-            "some other identity"
+            "elastic.co."
         ],
         "related.ip": [
+            "175.16.199.1",
             "192.168.1.1"
         ],
         "related.user": [
             "elasticuser"
         ],
         "service.type": "cisco",
-        "source.address": "some other identity",
-        "source.domain": "some other identity",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.nat.ip": "175.16.199.1",
         "source.user.name": "elasticuser"
     },
     {
         "@timestamp": "2020-07-23T23:50:25.000Z",
-        "cisco.umbrella.blocked_categories": "SomeIdentityType",
-        "cisco.umbrella.categories": "elastic.co/something.",
+        "cisco.umbrella.blocked_categories": "BlockedCategories",
+        "cisco.umbrella.categories": "Chat,Instant Messaging,Block List,Application",
         "cisco.umbrella.identities": [
-            "elasticuser2"
+            "elasticuser2",
+            "some other identity"
         ],
-        "cisco.umbrella.identity_types": "Test Policy Name",
-        "cisco.umbrella.policy_identity_type": "Chat,Instant Messaging,Block List,Application",
-        "destination.address": "192.168.1.1",
-        "destination.domain": "NOERROR",
-        "destination.ip": "192.168.1.1",
-        "dns.question.type": "Blocked",
-        "dns.response_code": "1 (A)",
+        "cisco.umbrella.identity_types": "SomeIdentityType",
+        "cisco.umbrella.policy_identity_type": "Test Policy Name",
+        "destination.domain": "elastic.co/something.",
+        "dns.question.type": "1 (A)",
+        "dns.response_code": "NOERROR",
         "dns.type": "query",
-        "event.action": "dns-request-4.4.4.4",
+        "event.action": "dns-request-Blocked",
         "event.category": "network",
         "event.dataset": "cisco.umbrella",
         "event.module": "cisco",
-        "event.original": "\\\"2020-07-23 23:50:25\\\",\\\"elasticuser\\\",\\\"elasticuser2\\\",\\\"some other identity\\\",\\\"192.168.1.1\\\",\\\"4.4.4.4\\\",\\\"Blocked\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co/something.\\\",\\\"Chat,Instant Messaging,Block List,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"BlockedCategories\\\"",
+        "event.original": "\\\"2020-07-23 23:50:25\\\",\\\"elasticuser\\\",\\\"elasticuser2,some other identity\\\",\\\"192.168.1.1\\\",\\\"4.4.4.4\\\",\\\"Blocked\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co/something.\\\",\\\"Chat,Instant Messaging,Block List,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"BlockedCategories\\\"",
         "event.type": [
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "umbrella",
         "input.type": "log",
-        "log.offset": 237,
-        "message": "\"2020-07-23 23:50:25\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"4.4.4.4\",\"Blocked\",\"1 (A)\",\"NOERROR\",\"elastic.co/something.\",\"Chat,Instant Messaging,Block List,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"BlockedCategories\"",
+        "log.offset": 235,
+        "message": "\"2020-07-23 23:50:25\",\"elasticuser\",\"elasticuser2,some other identity\",\"192.168.1.1\",\"4.4.4.4\",\"Blocked\",\"1 (A)\",\"NOERROR\",\"elastic.co/something.\",\"Chat,Instant Messaging,Block List,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"BlockedCategories\"",
         "observer.product": "Umbrella",
         "observer.type": "dns",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "NOERROR",
-            "some other identity"
+            "elastic.co/something."
         ],
         "related.ip": [
-            "192.168.1.1"
+            "192.168.1.1",
+            "4.4.4.4"
         ],
         "related.user": [
             "elasticuser"
         ],
         "service.type": "cisco",
-        "source.address": "some other identity",
-        "source.domain": "some other identity",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.nat.ip": "4.4.4.4",
         "source.user.name": "elasticuser"
     },
     {
@@ -98,9 +99,7 @@
         ],
         "cisco.umbrella.identity_types": "Roaming Computers,AD Users",
         "cisco.umbrella.policy_identity_type": "Roaming Computers",
-        "destination.address": "2.2.2.2",
         "destination.domain": "elastic.co.",
-        "destination.ip": "2.2.2.2",
         "dns.question.type": "1 (A)",
         "dns.response_code": "NOERROR",
         "dns.type": "query",
@@ -115,7 +114,7 @@
         ],
         "fileset.name": "umbrella",
         "input.type": "log",
-        "log.offset": 492,
+        "log.offset": 488,
         "message": "\"2021-05-14 19:39:58\",\"elastic_machine\",\"elastic_machine,Elastic User (ElasticUser@elastic.co)\",\"89.160.20.156\",\"2.2.2.2\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Infrastructure\",\"Roaming Computers\",\"Roaming Computers,AD Users\",\"\"",
         "observer.product": "Umbrella",
         "observer.type": "dns",
@@ -134,6 +133,7 @@
         "service.type": "cisco",
         "source.address": "89.160.20.156",
         "source.ip": "89.160.20.156",
+        "source.nat.ip": "2.2.2.2",
         "source.user.name": "elastic_machine"
     }
 ]

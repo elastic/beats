@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type kubeAnnotatorConfig struct {
@@ -48,7 +48,7 @@ type Enabled struct {
 	Enabled bool `config:"enabled"`
 }
 
-type PluginConfig []map[string]common.Config
+type PluginConfig []map[string]config.C
 
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{

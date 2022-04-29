@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // InputManager is used to create, manage, and coordinate stateful inputs and
@@ -64,7 +64,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *common.Config) (Prospector, Harvester, error)
+	Configure func(cfg *conf.C) (Prospector, Harvester, error)
 
 	initOnce   sync.Once
 	initErr    error
@@ -157,7 +157,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}

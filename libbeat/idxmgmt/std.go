@@ -24,13 +24,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type indexSupport struct {
@@ -92,8 +92,8 @@ func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
 	ilmFactory ilm.SupportFactory,
-	tmplConfig *common.Config,
-	ilmConfig *common.Config,
+	tmplConfig *config.C,
+	ilmConfig *config.C,
 	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
@@ -146,12 +146,12 @@ func (s *indexSupport) Manager(
 	}
 }
 
-func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
+func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error) {
 	var err error
 	// we construct our own configuration object based on the available settings
 	// in cfg and defaultIndex. The configuration object provided must not be
 	// modified.
-	selCfg := common.NewConfig()
+	selCfg := config.NewConfig()
 	if cfg.HasField("indices") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
@@ -313,7 +313,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	return ""
 }
 
-func unpackTemplateConfig(info beat.Info, cfg *common.Config) (config template.TemplateConfig, err error) {
+func unpackTemplateConfig(info beat.Info, cfg *config.C) (config template.TemplateConfig, err error) {
 	config = template.DefaultConfig(info)
 
 	if cfg != nil {

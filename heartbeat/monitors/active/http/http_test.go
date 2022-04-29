@@ -47,9 +47,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -78,7 +78,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 		configSrc[k] = v
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("tls", config)
@@ -318,7 +318,7 @@ func TestLargeResponse(t *testing.T) {
 		"check.response.body": "x",
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("largeresp", config)
@@ -434,7 +434,7 @@ func TestJsonBody(t *testing.T) {
 				},
 			}
 
-			config, err := common.NewConfigFrom(configSrc)
+			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
 			p, err := create("largeresp", config)
@@ -669,7 +669,7 @@ func TestRedirect(t *testing.T) {
 		"max_redirects":       10,
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("redirect", config)
@@ -716,7 +716,7 @@ func TestNoHeaders(t *testing.T) {
 		"response.include_headers": false,
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("http", config)
@@ -898,7 +898,7 @@ func TestUserAgentInject(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cfg, err := common.NewConfigFrom(map[string]interface{}{
+	cfg, err := conf.NewConfigFrom(map[string]interface{}{
 		"urls": ts.URL,
 	})
 	require.NoError(t, err)

@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -93,8 +93,8 @@ func TestOverrideWithCloudSettings(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.in)
-			expected := common.MustNewConfigFrom(test.out)
+			cfg := config.MustNewConfigFrom(test.in)
+			expected := config.MustNewConfigFrom(test.out)
 
 			err := OverrideWithCloudSettings(cfg)
 

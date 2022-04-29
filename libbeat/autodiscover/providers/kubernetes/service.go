@@ -28,11 +28,11 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
@@ -48,7 +48,7 @@ type service struct {
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
+func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.service")
 
 	config := defaultConfig()

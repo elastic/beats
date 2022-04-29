@@ -21,13 +21,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type mockProcessor struct{}
 
-func newMock(c *common.Config) (processors.Processor, error) {
+func newMock(c *conf.C) (processors.Processor, error) {
 	return &mockProcessor{}, nil
 }
 
@@ -180,12 +180,12 @@ func TestMutuallyExclusiveRequiredFields(t *testing.T) {
 
 func runTest(
 	t *testing.T,
-	check func(fields ...string) func(*common.Config) error,
+	check func(fields ...string) func(*conf.C) error,
 	config map[string]interface{},
 	fields []string,
 	valid bool,
 ) {
-	cfg, err := common.NewConfigFrom(config)
+	cfg, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatalf("Unexpected error while creating configuration: %+v\n", err)
 	}

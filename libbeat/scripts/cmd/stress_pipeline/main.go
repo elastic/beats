@@ -36,16 +36,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/service"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
 	duration   time.Duration // -duration <duration>
-	overwrites = common.SettingFlag(nil, "E", "Configuration overwrite")
+	overwrites = conf.SettingFlag(nil, "E", "Configuration overwrite")
 )
 
 type config struct {
 	Path    paths.Path
-	Logging *common.Config
+	Logging *conf.C
 }
 
 func main() {
@@ -92,7 +93,7 @@ func run() error {
 		return err
 	}
 
-	cfg.PrintDebugf("input config:")
+	common.PrintConfigDebugf(cfg, "input config:")
 
 	return stress.RunTests(info, duration, cfg, nil)
 }

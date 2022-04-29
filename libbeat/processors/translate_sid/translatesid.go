@@ -29,11 +29,11 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -53,7 +53,7 @@ type processor struct {
 
 // New returns a new translate_sid processor for converting windows SID values
 // to names.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the translate_sid configuration")

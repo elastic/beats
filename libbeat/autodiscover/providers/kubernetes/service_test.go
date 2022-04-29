@@ -29,11 +29,11 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -299,7 +299,7 @@ func TestEmitEvent_Service(t *testing.T) {
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*conf.C{},
 			},
 		},
 		{
@@ -386,7 +386,7 @@ func TestEmitEvent_Service(t *testing.T) {
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*conf.C{},
 			},
 		},
 	}
@@ -398,7 +398,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil, client)
+			metaGen := metadata.NewServiceMetadataGenerator(conf.NewConfig(), nil, nil, client)
 
 			p := &Provider{
 				config:    defaultConfig(),

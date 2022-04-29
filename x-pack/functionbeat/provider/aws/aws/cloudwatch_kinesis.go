@@ -12,13 +12,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // CloudwatchKinesis receives events from a kinesis stream and forward them to elasticsearch.
@@ -36,7 +36,7 @@ type CloudwatchKinesisConfig struct {
 }
 
 // NewCloudwatchKinesis creates a new function to receives events from a kinesis stream.
-func NewCloudwatchKinesis(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
+func NewCloudwatchKinesis(provider provider.Provider, cfg *conf.C) (provider.Function, error) {
 	config := defaultCloudwatchKinesisConfig()
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
