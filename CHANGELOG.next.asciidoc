@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
 
 *Auditbeat*
 
@@ -18,7 +17,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Filebeat*
 
 *Heartbeat*
-- Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
 
@@ -36,53 +34,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
-- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
-- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
-- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
-- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
-- Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
-- Add ecs container fields {pull}31020[31020]
-- Fix docs reference for syslog processor {pull}31087[31087]
-- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
-- Fix group write permissions on runtime directories. {pull}30869[30869]
-- Store syslog version as string. {pull}31446[31446]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
-- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
-- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
-- Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
-- Netflow: replace invalid field value. {pull}31295[31295]
-- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
-- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 
 *Heartbeat*
 
-- Heartbeat now successfully runs synthetic monitors on ARM processors. {pull}31114[31114]
 
 *Metricbeat*
 
-- Enhance metricbeat on openshift documentation {pull}30054[30054]
-- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
-- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
-- Add back missing metrics to system/linux. {pull}30774[30774]
-- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
-- Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
-- Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
 
 *Packetbeat*
 
 
 *Winlogbeat*
 
-- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
-- Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
 
 *Functionbeat*
 
@@ -95,29 +64,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Add support for port mapping in docker hints. {pull}31243[31243]
-- Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
-- Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
-- Add support in httpjson input for chain calls. {pull}29816[29816]
-- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 
 *Auditbeat*
 
-- Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
 
 
 *Filebeat*
@@ -128,15 +83,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
-- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-- Fix overflow in `iostat` metrics {pull}30679[30679]
-- Add `commandstats` field to Redis module {pull}29662[29662]
-- Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
-- Improve Kubernetes dashboard. {pull}30913[30913]
-- Populate new container ECS fields in Docker module. {pull}30399[30399]
-- Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
-- Populate ecs container fields in Containerd module. {pull}31025[31025]
 
 *Packetbeat*
 
@@ -146,7 +92,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-- Improve the error message when the registry file content is invalid. {pull}30543[30543]
 
 
 *Elastic Log Driver*
@@ -172,6 +117,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 

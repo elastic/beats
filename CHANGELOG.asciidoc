@@ -3,6 +3,160 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.2.0]]
+=== Beats version 8.2.0
+https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+*Heartbeat*
+- Restrict setuid to containerized environments. {pull}30869[30869]
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
+- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
+- Netflow: replace invalid field value. {pull}31295[31295]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+
+*Heartbeat*
+
+- Heartbeat now successfully runs synthetic monitors on ARM processors. {pull}31114[31114]
+
+*Metricbeat*
+
+- Add back missing metrics to system/linux. {pull}30774[30774]
+- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
+- Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
+- Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
+- Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add support for port mapping in docker hints. {pull}31243[31243]
+- Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
+- Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
+- Add support in httpjson input for chain calls. {pull}29816[29816]
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
+
+*Auditbeat*
+
+- Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
+- Add `commandstats` field to Redis module {pull}29662[29662]
+- Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
+- Improve Kubernetes dashboard. {pull}30913[30913]
+- Populate new container ECS fields in Docker module. {pull}30399[30399]
+- Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
+- Populate ecs container fields in Containerd module. {pull}31025[31025]
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+- Improve the error message when the registry file content is invalid. {pull}30543[30543]
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
 [[release-notes-8.1.3]]
 === Beats version 8.1.3
 https://github.com/elastic/beats/compare/v8.1.2...v8.1.3[View commits]
