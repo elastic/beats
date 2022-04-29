@@ -22,14 +22,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestValidDropPolicyConfig(t *testing.T) {
 	config := `
 non_indexable_policy.drop: ~
 `
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	elasticsearchOutputConfig, err := readConfig(c)
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
@@ -46,7 +46,7 @@ func TestDeadLetterIndexPolicyConfig(t *testing.T) {
 non_indexable_policy.dead_letter_index:
     index: "my-dead-letter-index"
 `
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	elasticsearchOutputConfig, err := readConfig(c)
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
@@ -83,7 +83,7 @@ non_indexable_policy.dead_letter_index:
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c := common.MustNewConfigFrom(test)
+			c := conf.MustNewConfigFrom(test)
 			elasticsearchOutputConfig, err := readConfig(c)
 			if err != nil {
 				t.Fatalf("Can't create test configuration from valid input")
@@ -97,7 +97,7 @@ non_indexable_policy.dead_letter_index:
 	}
 }
 
-func readConfig(cfg *common.Config) (*elasticsearchConfig, error) {
+func readConfig(cfg *conf.C) (*elasticsearchConfig, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,7 +34,7 @@ func TestConfigDefault(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -56,7 +56,7 @@ func TestOverwriteFalse(t *testing.T) {
 		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
 	require.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -74,7 +74,7 @@ func TestOverwriteTrue(t *testing.T) {
 		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{"overwrite": true})
+	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{"overwrite": true})
 	require.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -92,7 +92,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{
 		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
@@ -128,7 +128,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		"geo.city_name":        "Yerevan",
 	}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := cfg.NewConfigFrom(config)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -151,7 +151,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 
 	config := map[string]interface{}{}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := cfg.NewConfigFrom(config)
 	require.NoError(t, err)
 
 	p, err := New(testConfig)

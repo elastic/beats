@@ -21,8 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -65,7 +64,7 @@ var (
 	}
 )
 
-func newDeadLetterIndexPolicy(config *common.Config) (nonIndexablePolicy, error) {
+func newDeadLetterIndexPolicy(config *config.C) (nonIndexablePolicy, error) {
 	cfgwarn.Beta("The non_indexable_policy dead_letter_index is beta.")
 	policy := DeadLetterIndexPolicy{}
 	err := config.Unpack(&policy)
@@ -75,7 +74,7 @@ func newDeadLetterIndexPolicy(config *common.Config) (nonIndexablePolicy, error)
 	return policy, err
 }
 
-func newDropPolicy(*common.Config) (nonIndexablePolicy, error) {
+func newDropPolicy(*config.C) (nonIndexablePolicy, error) {
 	return defaultDropPolicy(), nil
 }
 
@@ -87,9 +86,9 @@ func defaultDropPolicy() nonIndexablePolicy {
 	return &DropPolicy{}
 }
 
-type policyFactory func(config *common.Config) (nonIndexablePolicy, error)
+type policyFactory func(config *config.C) (nonIndexablePolicy, error)
 
-func newNonIndexablePolicy(configNamespace *common.ConfigNamespace) (nonIndexablePolicy, error) {
+func newNonIndexablePolicy(configNamespace *config.Namespace) (nonIndexablePolicy, error) {
 	if configNamespace == nil {
 		return defaultPolicy(), nil
 	}

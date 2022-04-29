@@ -23,8 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -79,7 +79,7 @@ func TestCommonPaths(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		var testConfig, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     test.Field,
 			"separator": test.Separator,
 			"index":     test.Index,
@@ -109,7 +109,7 @@ func TestCommonPaths(t *testing.T) {
 	}
 
 	t.Run("supports a metadata field", func(t *testing.T) {
-		var config, _ = common.NewConfigFrom(map[string]interface{}{
+		var config, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "field",
 			"separator": "/",
 			"index":     3,
@@ -142,7 +142,7 @@ func TestCommonPaths(t *testing.T) {
 	})
 }
 
-func runExtractField(t *testing.T, config *common.Config, input mapstr.M) (*beat.Event, error) {
+func runExtractField(t *testing.T, config *conf.C, input mapstr.M) (*beat.Event, error) {
 	logp.TestingSetup()
 
 	p, err := NewExtractField(config)

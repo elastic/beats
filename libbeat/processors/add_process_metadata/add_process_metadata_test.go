@@ -28,10 +28,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -714,7 +714,7 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
-			config, err := common.NewConfigFrom(test.config)
+			config, err := conf.NewConfigFrom(test.config)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -755,7 +755,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			"include_fields": []string{"process.name"},
 		}
 
-		config, err := common.NewConfigFrom(c)
+		config, err := conf.NewConfigFrom(c)
 		assert.NoError(t, err)
 
 		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
@@ -818,7 +818,7 @@ func TestUsingCache(t *testing.T) {
 		return testMap[pid], nil
 	}
 
-	config, err := common.NewConfigFrom(mapstr.M{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids":     []string{"system.process.ppid"},
 		"include_fields": []string{"container.id"},
 		"target":         "meta",
@@ -878,7 +878,7 @@ func TestUsingCache(t *testing.T) {
 
 func TestSelf(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
-	config, err := common.NewConfigFrom(mapstr.M{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
 	})
@@ -911,7 +911,7 @@ func TestSelf(t *testing.T) {
 
 func TestBadProcess(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
-	config, err := common.NewConfigFrom(mapstr.M{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
 	})

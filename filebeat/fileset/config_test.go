@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestInputSettings(t *testing.T) {
@@ -34,7 +34,7 @@ func TestInputSettings(t *testing.T) {
 		},
 	}
 
-	c, err := common.NewConfigFrom(cfg)
+	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
 
 	f, err := NewFilesetConfig(c)

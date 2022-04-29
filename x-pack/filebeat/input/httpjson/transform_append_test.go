@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -118,7 +118,7 @@ func TestNewAppend(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.config)
+			cfg := conf.MustNewConfigFrom(tc.config)
 			gotAppend, gotErr := tc.constructor(cfg, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
@@ -206,7 +206,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 		"value_type": "json",
 	}
 
-	cfg, err := common.NewConfigFrom(c1)
+	cfg, err := conf.NewConfigFrom(c1)
 	require.NoError(t, err)
 
 	transform, err := newAppendResponse(cfg, logp.NewLogger("test"))
@@ -236,7 +236,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 		"value_type": "int",
 	}
 
-	cfg, err = common.NewConfigFrom(c2)
+	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
@@ -257,7 +257,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 
 	c2["value_type"] = "string"
 
-	cfg, err = common.NewConfigFrom(c2)
+	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))

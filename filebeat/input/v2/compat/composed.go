@@ -21,7 +21,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // composeFactory combines to factories. Instances are created using the Combine function.
@@ -44,7 +44,7 @@ func Combine(factory, fallback cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return composeFactory{factory: factory, fallback: fallback}
 }
 
-func (f composeFactory) CheckConfig(cfg *common.Config) error {
+func (f composeFactory) CheckConfig(cfg *conf.C) error {
 	err := f.factory.CheckConfig(cfg)
 	if !v2.IsUnknownInputError(err) {
 		return err
@@ -54,7 +54,7 @@ func (f composeFactory) CheckConfig(cfg *common.Config) error {
 
 func (f composeFactory) Create(
 	p beat.PipelineConnector,
-	config *common.Config,
+	config *conf.C,
 ) (cfgfile.Runner, error) {
 	var runner cfgfile.Runner
 	var err1, err2 error

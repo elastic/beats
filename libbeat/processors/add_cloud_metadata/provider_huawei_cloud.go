@@ -20,7 +20,7 @@ package add_cloud_metadata
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -45,7 +45,7 @@ var huaweiMetadataFetcher = provider{
 
 	Local: true,
 
-	Create: func(_ string, c *common.Config) (metadataFetcher, error) {
+	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		metadataHost := "169.254.169.254"
 		huaweiCloudMetadataJSONURI := "/openstack/latest/meta_data.json"
 

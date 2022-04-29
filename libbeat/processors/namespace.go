@@ -23,7 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type Namespace struct {
@@ -87,7 +87,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 }
 
 func (ns *Namespace) Plugin() Constructor {
-	return NewConditional(func(cfg *common.Config) (Processor, error) {
+	return NewConditional(func(cfg *config.C) (Processor, error) {
 		var section string
 		for _, name := range cfg.GetFields() {
 			if name == "when" { // TODO: remove check for "when" once fields are filtered

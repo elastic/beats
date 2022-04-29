@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -48,7 +48,7 @@ var (
 )
 
 func TestFetch(t *testing.T) {
-	c, err := common.NewConfigFrom(missingResourcesConfig)
+	c, err := config.NewConfigFrom(missingResourcesConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func TestFetch(t *testing.T) {
 	assert.Nil(t, module)
 	assert.Nil(t, metricsets)
 	assert.Error(t, err, "no resource options defined: module azure - monitor metricset")
-	c, err = common.NewConfigFrom(resourceConfig)
+	c, err = config.NewConfigFrom(resourceConfig)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -28,12 +28,12 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type partitionBuilder func(*logp.Logger, *common.Config) (func() partitioner, error)
+type partitionBuilder func(*logp.Logger, *config.C) (func() partitioner, error)
 
 type partitioner func(*message, int32) (int32, error)
 
@@ -47,7 +47,7 @@ type messagePartitioner struct {
 
 func makePartitioner(
 	log *logp.Logger,
-	partition map[string]*common.Config,
+	partition map[string]*config.C,
 ) (sarama.PartitionerConstructor, error) {
 	mkStrategy, reachable, err := initPartitionStrategy(log, partition)
 	if err != nil {
@@ -70,7 +70,7 @@ var partitioners = map[string]partitionBuilder{
 
 func initPartitionStrategy(
 	log *logp.Logger,
-	partition map[string]*common.Config,
+	partition map[string]*config.C,
 ) (func() partitioner, bool, error) {
 	if len(partition) == 0 {
 		// default use `hash` partitioner + all partitions (block if unreachable)
@@ -83,7 +83,7 @@ func initPartitionStrategy(
 
 	// extract partitioner from config
 	var name string
-	var config *common.Config
+	var config *config.C
 	for n, c := range partition {
 		name, config = n, c
 	}
@@ -139,7 +139,7 @@ func (p *messagePartitioner) Partition(
 	return msg.partition, nil
 }
 
-func cfgRandomPartitioner(_ *logp.Logger, config *common.Config) (func() partitioner, error) {
+func cfgRandomPartitioner(_ *logp.Logger, config *config.C) (func() partitioner, error) {
 	cfg := struct {
 		GroupEvents int `config:"group_events" validate:"min=1"`
 	}{
@@ -166,7 +166,7 @@ func cfgRandomPartitioner(_ *logp.Logger, config *common.Config) (func() partiti
 	}, nil
 }
 
-func cfgRoundRobinPartitioner(_ *logp.Logger, config *common.Config) (func() partitioner, error) {
+func cfgRoundRobinPartitioner(_ *logp.Logger, config *config.C) (func() partitioner, error) {
 	cfg := struct {
 		GroupEvents int `config:"group_events" validate:"min=1"`
 	}{
@@ -194,7 +194,7 @@ func cfgRoundRobinPartitioner(_ *logp.Logger, config *common.Config) (func() par
 	}, nil
 }
 
-func cfgHashPartitioner(log *logp.Logger, config *common.Config) (func() partitioner, error) {
+func cfgHashPartitioner(log *logp.Logger, config *config.C) (func() partitioner, error) {
 	cfg := struct {
 		Hash   []string `config:"hash"`
 		Random bool     `config:"random"`

@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -43,12 +43,12 @@ type Input struct {
 	started  bool
 	outlet   channel.Outleter
 	config   config
-	cfg      *common.Config
+	cfg      *conf.C
 	registry *harvester.Registry
 }
 
 // NewInput creates a new redis input
-func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *conf.C, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig

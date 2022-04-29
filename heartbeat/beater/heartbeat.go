@@ -31,10 +31,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 )
@@ -51,7 +51,7 @@ type Heartbeat struct {
 }
 
 // New creates a new heartbeat.
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)

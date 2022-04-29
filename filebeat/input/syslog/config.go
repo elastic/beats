@@ -29,16 +29,16 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	Format                    syslogFormat           `config:"format"`
-	Protocol                  common.ConfigNamespace `config:"protocol"`
-	Timezone                  *cfgtype.Timezone      `config:"timezone"`
+	Format                    syslogFormat      `config:"format"`
+	Protocol                  conf.Namespace    `config:"protocol"`
+	Timezone                  *cfgtype.Timezone `config:"timezone"`
 }
 
 type syslogFormat int
@@ -98,7 +98,7 @@ var defaultUDP = udp.Config{
 
 func factory(
 	nf inputsource.NetworkFunc,
-	config common.ConfigNamespace,
+	config conf.Namespace,
 ) (inputsource.Network, error) {
 	n, cfg := config.Name(), config.Config()
 
