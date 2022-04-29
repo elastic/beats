@@ -4,9 +4,7 @@
 
 package cometd
 
-import (
-	"errors"
-)
+import "fmt"
 
 type authConfig struct {
 	OAuth2 *oAuth2Config `config:"oauth2"`
@@ -24,16 +22,16 @@ type oAuth2Config struct {
 // Validate checks if oauth2 config is valid.
 func (o *oAuth2Config) Validate() error {
 	if o.TokenURL == "" {
-		return errors.New("token_url must be provided")
+		return fmt.Errorf("token_url must be provided")
 	}
 	if o.ClientID == "" {
-		return errors.New("client.id must be provided")
+		return fmt.Errorf("client.id must be provided")
 	}
 	if o.ClientSecret == "" {
-		return errors.New("client.secret must be provided")
+		return fmt.Errorf("client.secret must be provided")
 	}
 	if o.User == "" || o.Password == "" {
-		return errors.New("both user and password must be provided")
+		return fmt.Errorf("both user and password must be provided")
 	}
 	return nil
 }

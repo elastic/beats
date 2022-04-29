@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -39,7 +40,7 @@ var (
 )
 
 func TestInputDone(t *testing.T) {
-	config := common.MapStr{
+	config := mapstr.M{
 		"channel_name":              firstChannel,
 		"auth.oauth2.client.id":     "DEMOCLIENTID",
 		"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
@@ -53,13 +54,13 @@ func TestInputDone(t *testing.T) {
 func TestMakeEventFailure(t *testing.T) {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
-			"event": common.MapStr{
+		Fields: mapstr.M{
+			"event": mapstr.M{
 				"id":      "DEMOID",
 				"created": time.Now().UTC(),
 			},
 			"message": "DEMOBODYFAIL",
-			"cometd": common.MapStr{
+			"cometd": mapstr.M{
 				"channel_name": "DEMOCHANNEL",
 			},
 		},

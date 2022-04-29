@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	bay "github.com/elastic/bayeux"
 )
@@ -181,13 +182,13 @@ type event struct {
 func makeEvent(id string, channel string, body string) beat.Event {
 	e := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
-			"event": common.MapStr{
+		Fields: mapstr.M{
+			"event": mapstr.M{
 				"id":      id,
 				"created": time.Now().UTC(),
 			},
 			"message": body,
-			"cometd": common.MapStr{
+			"cometd": mapstr.M{
 				"channel_name": channel,
 			},
 		},
