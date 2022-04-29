@@ -29,10 +29,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -77,7 +77,7 @@ type Module interface {
 type BaseModule struct {
 	name      string
 	config    ModuleConfig
-	rawConfig *common.Config
+	rawConfig *conf.C
 }
 
 func (m *BaseModule) String() string {
@@ -102,7 +102,7 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 // Intended to be called from module factories. Note that if metricsets are specified
 // in the new configuration, those metricsets must already be registered with
 // mb.Registry.
-func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
+func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	var chkConfig struct {
 		Module string `config:"module"`
 	}

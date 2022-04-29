@@ -22,9 +22,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectResponse) {
@@ -84,7 +84,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		// Unfortunately the config structs for the parser package are not
 		// exported to use config parsing.
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
 			"parsers": []map[string]interface{}{
 				{
 					"multiline": map[string]interface{}{

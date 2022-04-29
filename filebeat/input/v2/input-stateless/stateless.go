@@ -25,13 +25,13 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // InputManager provides an InputManager for transient inputs, that do not store
 // state in the registry or require end-to-end event acknowledgement.
 type InputManager struct {
-	Configure func(*common.Config) (Input, error)
+	Configure func(*conf.C) (Input, error)
 }
 
 // Input is the interface transient inputs are required to implemented.
@@ -53,7 +53,7 @@ type configuredInput struct {
 var _ v2.InputManager = InputManager{}
 
 // NewInputManager wraps the given configure function to create a new stateless input manager.
-func NewInputManager(configure func(*common.Config) (Input, error)) InputManager {
+func NewInputManager(configure func(*conf.C) (Input, error)) InputManager {
 	return InputManager{Configure: configure}
 }
 
@@ -62,7 +62,7 @@ func (m InputManager) Init(_ unison.Group, _ v2.Mode) error { return nil }
 
 // Create configures a transient input and ensures that the final input can be used with
 // with the filebeat input architecture.
-func (m InputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	inp, err := m.Configure(cfg)
 	if err != nil {
 		return nil, err

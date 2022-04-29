@@ -23,10 +23,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -100,7 +100,7 @@ type reporter struct {
 
 // MakeReporter returns a new Reporter that periodically reports metrics via
 // logp. If cfg is nil defaults will be used.
-func MakeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
+func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 	config := defaultConfig()
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {

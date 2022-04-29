@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Reporting V2 MetricSet
@@ -113,7 +113,7 @@ func TestModuleConfig(t *testing.T) {
 
 	for i, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test.in)
+			c, err := conf.NewConfigFrom(test.in)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -142,7 +142,7 @@ func TestModuleConfig(t *testing.T) {
 // Any changes to this test case are probably indicators of non-backwards
 // compatible changes affect all modules (including community modules).
 func TestModuleConfigDefaults(t *testing.T) {
-	c, err := common.NewConfigFrom(map[string]interface{}{
+	c, err := conf.NewConfigFrom(map[string]interface{}{
 		"module":     "mymodule",
 		"metricsets": []string{"mymetricset"},
 	})
@@ -349,8 +349,8 @@ func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) 
 	return metricsets[0]
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
-	config, err := common.NewConfigFrom(moduleConfig)
+func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
+	config, err := conf.NewConfigFrom(moduleConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -425,7 +425,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			}
 
-			m, _, err := NewModule(common.MustNewConfigFrom(initConfig), mockRegistry)
+			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry)
 			require.NoError(t, err)
 
 			bm, ok := m.(*BaseModule)
@@ -433,7 +433,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newBM, err := bm.WithConfig(*common.MustNewConfigFrom(test.newConfig))
+			newBM, err := bm.WithConfig(*conf.MustNewConfigFrom(test.newConfig))
 
 			if err == nil {
 				var actualNewConfig metricSetConfig

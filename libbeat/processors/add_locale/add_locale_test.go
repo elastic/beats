@@ -25,13 +25,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestExportTimezone(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"format": "abbreviation",
 	})
 	if err != nil {
@@ -85,7 +85,7 @@ func TestTimezoneFormat(t *testing.T) {
 	assert.Regexp(t, regexp.MustCompile(`\-[\d]{2}\:[\d]{2}`), negVal)
 }
 
-func getActualValue(t *testing.T, config *common.Config, input mapstr.M) mapstr.M {
+func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {
 	log := logp.NewLogger("add_locale_test")
 	p, err := New(config)
 	if err != nil {
@@ -98,7 +98,7 @@ func getActualValue(t *testing.T, config *common.Config, input mapstr.M) mapstr.
 }
 
 func BenchmarkConstruct(b *testing.B) {
-	var testConfig = common.NewConfig()
+	var testConfig = config.NewConfig()
 
 	input := mapstr.M{}
 

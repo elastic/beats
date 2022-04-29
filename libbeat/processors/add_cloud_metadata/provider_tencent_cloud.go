@@ -18,7 +18,7 @@
 package add_cloud_metadata
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -29,7 +29,7 @@ var qcloudMetadataFetcher = provider{
 
 	Local: false,
 
-	Create: func(_ string, c *common.Config) (metadataFetcher, error) {
+	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		qcloudMetadataHost := "metadata.tencentyun.com"
 		qcloudMetadataInstanceIDURI := "/meta-data/instance-id"
 		qcloudMetadataRegionURI := "/meta-data/placement/region"

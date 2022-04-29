@@ -25,11 +25,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -84,7 +84,7 @@ func TestParsersConfigSuffix(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -306,7 +306,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -423,7 +423,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.config)
+			cfg := config.MustNewConfigFrom(test.config)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -537,7 +537,7 @@ func TestContainerParser(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -558,7 +558,7 @@ func TestContainerParser(t *testing.T) {
 }
 
 type testParsersConfig struct {
-	Parsers []common.ConfigNamespace `struct:"parsers"`
+	Parsers []config.Namespace `struct:"parsers"`
 }
 
 func testReader(lines string) reader.Reader {

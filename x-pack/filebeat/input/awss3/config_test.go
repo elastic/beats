@@ -13,10 +13,10 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -28,7 +28,7 @@ func TestConfig(t *testing.T) {
 		// Have a separate copy of defaults in the test to make it clear when
 		// anyone changes the defaults.
 		parserConf := parser.Config{}
-		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
+		require.NoError(t, parserConf.Unpack(conf.MustNewConfigFrom("")))
 		return config{
 			QueueURL:            quequeURL,
 			BucketARN:           s3Bucket,
@@ -381,7 +381,7 @@ func TestConfig(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			in := common.MustNewConfigFrom(tc.config)
+			in := conf.MustNewConfigFrom(tc.config)
 
 			c := defaultConfig()
 			if err := in.Unpack(&c); err != nil {

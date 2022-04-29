@@ -17,9 +17,9 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -49,7 +49,7 @@ type Manager struct {
 }
 
 // NewFleetManager returns a X-Pack Beats Fleet Management manager.
-func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
+func NewFleetManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -145,7 +145,7 @@ func (cm *Manager) Stop() {
 // fleet management can configure.
 //
 // NOTE: This is currently not implemented for fleet.
-func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
+func (cm *Manager) CheckRawConfig(cfg *conf.C) error {
 	// TODO implement this method
 	return nil
 }
@@ -183,7 +183,7 @@ func (cm *Manager) OnConfig(s string) {
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
 	var configMap mapstr.M
-	uconfig, err := common.NewConfigFrom(s)
+	uconfig, err := conf.NewConfigFrom(s)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.updateStatusWithError(err)

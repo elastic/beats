@@ -22,11 +22,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -197,8 +197,8 @@ func ifNotDone(ctx context.Context, f func()) func() {
 	}
 }
 
-func defaultTestConfig() *common.Config {
-	return common.MustNewConfigFrom(map[string]interface{}{
+func defaultTestConfig() *conf.C {
+	return conf.MustNewConfigFrom(map[string]interface{}{
 		"project_id": emulatorProjectID,
 		"topic":      emulatorTopic,
 		"subscription": map[string]interface{}{
@@ -213,11 +213,11 @@ func isInDockerIntegTestEnv() bool {
 	return os.Getenv("BEATS_INSIDE_INTEGRATION_TEST_ENV") != ""
 }
 
-func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
+func runTest(t *testing.T, cfg *conf.C, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
 	runTestWithACKer(t, cfg, ackEvent, run)
 }
 
-func runTestWithACKer(t *testing.T, cfg *common.Config, onEvent eventHandler, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
+func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
 	if !isInDockerIntegTestEnv() {
 		// Don't test goroutines when using our compose.EnsureUp.
 		defer resources.NewGoroutinesChecker().Check(t)
@@ -236,7 +236,7 @@ func runTestWithACKer(t *testing.T, cfg *common.Config, onEvent eventHandler, ru
 	eventOutlet := newStubOutlet(onEvent)
 	defer eventOutlet.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, cliCfg beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, cliCfg beat.ClientConfig) (channel.Outleter, error) {
 		eventOutlet.setClientConfig(cliCfg)
 		return eventOutlet, nil
 	})

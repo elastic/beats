@@ -26,10 +26,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *common.Config, int) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *config.C, int) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {

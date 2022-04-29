@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -80,7 +81,7 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &tlsPlugin{}
 	config := defaultConfig

@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
@@ -417,7 +417,7 @@ func TestFieldValidate(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(test.cfg)
+			cfg, err := config.NewConfigFrom(test.cfg)
 			require.NoError(t, err)
 			var f Field
 			err = cfg.Unpack(&f)

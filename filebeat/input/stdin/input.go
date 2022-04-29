@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/log"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -40,14 +40,14 @@ func init() {
 type Input struct {
 	harvester *log.Harvester
 	started   bool
-	cfg       *common.Config
+	cfg       *conf.C
 	outlet    channel.Outleter
 	registry  *harvester.Registry
 }
 
 // NewInput creates a new stdin input
 // This input contains one harvester which is reading from stdin
-func NewInput(cfg *common.Config, outlet channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *conf.C, outlet channel.Connector, context input.Context) (input.Input, error) {
 	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err

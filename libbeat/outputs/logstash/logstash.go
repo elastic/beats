@@ -19,10 +19,10 @@ package logstash
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -39,7 +39,7 @@ func makeLogstash(
 	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (outputs.Group, error) {
 	config, err := readConfig(cfg, beat)
 	if err != nil {

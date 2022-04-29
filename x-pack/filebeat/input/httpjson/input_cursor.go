@@ -7,7 +7,7 @@ package httpjson
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type cursorInput struct{}
@@ -24,7 +24,7 @@ func (src source) Name() string {
 	return src.config.Request.URL.String()
 }
 
-func cursorConfigure(cfg *common.Config) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err

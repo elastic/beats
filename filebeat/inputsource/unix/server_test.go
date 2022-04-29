@@ -35,9 +35,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func defaultConfig() Config {
@@ -175,7 +175,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			}
 			path := filepath.Join(os.TempDir(), "test.sock")
 			test.cfg["path"] = path
-			cfg, _ := common.NewConfigFrom(test.cfg)
+			cfg, _ := conf.NewConfigFrom(test.cfg)
 			config := defaultConfig()
 			err := cfg.Unpack(&config)
 			if !assert.NoError(t, err) {
@@ -232,7 +232,7 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 	require.NoError(t, err)
 
 	path := filepath.Join(os.TempDir(), "test.sock")
-	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
 		"path":           path,
 		"group":          group.Name,
 		"mode":           "0740",
@@ -267,7 +267,7 @@ func TestSocketCleanup(t *testing.T) {
 	require.NoError(t, err)
 	defer mockStaleSocket.Close()
 
-	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
 		"path":           path,
 		"line_delimiter": "\n",
 	})
@@ -291,7 +291,7 @@ func TestSocketCleanupRefusal(t *testing.T) {
 	require.NoError(t, f.Close())
 	defer os.Remove(path)
 
-	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
 		"path":           path,
 		"line_delimiter": "\n",
 	})
@@ -325,7 +325,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 			to := func(message []byte, mt inputsource.NetworkMetadata) {
 				ch <- &info{message: string(message), mt: mt}
 			}
-			cfg, err := common.NewConfigFrom(map[string]interface{}{
+			cfg, err := conf.NewConfigFrom(map[string]interface{}{
 				"path":           path,
 				"line_delimiter": "\n",
 				"socket_type":    socketType,

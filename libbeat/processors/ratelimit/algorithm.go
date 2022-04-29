@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 var registry = make(map[string]constructor, 0)
@@ -33,7 +33,7 @@ type algoConfig struct {
 	limit rate
 
 	// config is any algorithm-specific additional configuration.
-	config common.Config
+	config cfg.C
 }
 
 // algorithm is the interface that all rate limiting algorithms must

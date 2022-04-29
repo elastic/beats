@@ -28,9 +28,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -256,7 +256,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config, err := common.NewConfigFrom(c.config)
+			config, err := conf.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
 			module, metricSets, err := NewModule(config, r)
@@ -308,7 +308,7 @@ func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
 		}))
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	config, err := common.NewConfigFrom(
+	config, err := conf.NewConfigFrom(
 		mapstr.M{
 			"module":     "httpextended",
 			"metricsets": []string{"extends"},
@@ -331,7 +331,7 @@ func TestLightMetricSet_WithoutHostParser(t *testing.T) {
 	r.MustAddMetricSet("http", "json", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	config, err := common.NewConfigFrom(
+	config, err := conf.NewConfigFrom(
 		mapstr.M{
 			"module":     "httpextended",
 			"metricsets": []string{"extends"},
@@ -364,7 +364,7 @@ func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
 		}))
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	config, err := common.NewConfigFrom(
+	config, err := conf.NewConfigFrom(
 		mapstr.M{
 			"module":     "httpextended",
 			"metricsets": []string{"extends"},
@@ -393,7 +393,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 		return DefaultModuleFactory(base)
 	})
 
-	config, err := common.NewConfigFrom(mapstr.M{"module": "service"})
+	config, err := conf.NewConfigFrom(mapstr.M{"module": "service"})
 	require.NoError(t, err)
 
 	_, _, err = NewModule(config, r)

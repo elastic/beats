@@ -21,9 +21,9 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type mockILMSupport struct {
@@ -37,7 +37,7 @@ type onCall struct {
 }
 
 func makeMockILMSupport(calls ...onCall) ilm.SupportFactory {
-	return func(_ *logp.Logger, _ beat.Info, _ *common.Config) (ilm.Supporter, error) {
+	return func(_ *logp.Logger, _ beat.Info, _ *config.C) (ilm.Supporter, error) {
 		m := &mockILMSupport{}
 		for _, c := range calls {
 			m.On(c.name, c.args...).Return(c.returns...)
