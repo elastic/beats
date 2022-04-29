@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -29,7 +30,7 @@ output:
     hosts:
       - localhost:9200`
 
-	var cfg common.MapStr
+	var cfg mapstr.M
 	uconfig, err := common.NewConfigFrom(input)
 	if err != nil {
 		t.Fatalf("Config blocks unsuccessfully generated: %+v", err)

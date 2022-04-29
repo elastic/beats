@@ -18,21 +18,22 @@
 package actions
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDropFieldRun(t *testing.T) {
 	event := &beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"field": "value",
 		},
-		Meta: common.MapStr{
+		Meta: mapstr.M{
 			"meta_field": "value",
 		},
 	}
@@ -44,7 +45,7 @@ func TestDropFieldRun(t *testing.T) {
 
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
-		assert.Equal(t, common.MapStr{}, newEvent.Fields)
+		assert.Equal(t, mapstr.M{}, newEvent.Fields)
 		assert.Equal(t, event.Meta, newEvent.Meta)
 	})
 
@@ -55,20 +56,20 @@ func TestDropFieldRun(t *testing.T) {
 
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
-		assert.Equal(t, common.MapStr{}, newEvent.Meta)
+		assert.Equal(t, mapstr.M{}, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
 
 	t.Run("supports a regexp field", func(t *testing.T) {
 		event = &beat.Event{
-			Fields: common.MapStr{
-				"field_1": common.MapStr{
+			Fields: mapstr.M{
+				"field_1": mapstr.M{
 					"subfield_1": "sf_1_value",
-					"subfield_2": common.MapStr{
+					"subfield_2": mapstr.M{
 						"subfield_2_1": "sf_2_1_value",
 						"subfield_2_2": "sf_2_2_value",
 					},
-					"subfield_3": common.MapStr{
+					"subfield_3": mapstr.M{
 						"subfield_3_1": "sf_3_1_value",
 						"subfield_3_2": "sf_3_2_value",
 					},
@@ -84,8 +85,8 @@ func TestDropFieldRun(t *testing.T) {
 
 		newEvent, err := p.Run(event)
 		assert.NoError(t, err)
-		assert.Equal(t, common.MapStr{
-			"field_1": common.MapStr{
+		assert.Equal(t, mapstr.M{
+			"field_1": mapstr.M{
 				"subfield_1": "sf_1_value",
 			},
 		}, newEvent.Fields)

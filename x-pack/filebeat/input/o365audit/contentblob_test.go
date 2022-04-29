@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type contentStore struct {
@@ -33,7 +33,7 @@ func (s *contentStore) onEvent(b beat.Event, checkpointUpdate interface{}) error
 	return nil
 }
 
-func (f *fakePoll) BlobContent(t testing.TB, b poll.Transaction, data []common.MapStr, nextUrl string) poll.Transaction {
+func (f *fakePoll) BlobContent(t testing.TB, b poll.Transaction, data []mapstr.M, nextUrl string) poll.Transaction {
 	urls, next := f.deliverResult(t, b, data, nextUrl)
 	if !assert.Empty(t, urls) {
 		t.Fatal("blob returned urls to fetch")
@@ -41,8 +41,8 @@ func (f *fakePoll) BlobContent(t testing.TB, b poll.Transaction, data []common.M
 	return next
 }
 
-func makeEvent(ts time.Time, id string) common.MapStr {
-	return common.MapStr{
+func makeEvent(ts time.Time, id string) mapstr.M {
+	return mapstr.M{
 		"CreationTime": ts.Format(apiDateFormat),
 		"Id":           id,
 	}
@@ -81,7 +81,7 @@ func TestContentBlob(t *testing.T) {
 	}
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx)
-	data := []common.MapStr{
+	data := []mapstr.M{
 		makeEvent(now.Add(-time.Hour), "e1"),
 		makeEvent(now.Add(-2*time.Hour), "e2"),
 		makeEvent(now.Add(-30*time.Minute), "e3"),
@@ -104,7 +104,7 @@ func TestContentBlobResumeToLine(t *testing.T) {
 	const skip = 3
 	baseCursor.Line = skip
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx).WithSkipLines(skip)
-	data := []common.MapStr{
+	data := []mapstr.M{
 		makeEvent(now.Add(-time.Hour), "e1"),
 		makeEvent(now.Add(-2*time.Hour), "e2"),
 		makeEvent(now.Add(-30*time.Minute), "e3"),
@@ -127,7 +127,7 @@ func TestContentBlobPaged(t *testing.T) {
 	}
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx)
-	data := []common.MapStr{
+	data := []mapstr.M{
 		makeEvent(now.Add(-time.Hour), "e1"),
 		makeEvent(now.Add(-2*time.Hour), "e2"),
 		makeEvent(now.Add(-30*time.Minute), "e3"),

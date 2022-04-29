@@ -19,10 +19,10 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -114,8 +114,8 @@ func (host *Host) changeDetectionHash() uint64 {
 	return h.Sum64()
 }
 
-func (host *Host) toMapStr() common.MapStr {
-	mapstr := common.MapStr{
+func (host *Host) toMapStr() mapstr.M {
+	mapstr := mapstr.M{
 		// https://github.com/elastic/ecs#-host-fields
 		"uptime":              host.Uptime,
 		"boottime":            host.Info.BootTime,
@@ -126,7 +126,7 @@ func (host *Host) toMapStr() common.MapStr {
 		"architecture":        host.Info.Architecture,
 
 		// https://github.com/elastic/ecs#-operating-system-fields
-		"os": common.MapStr{
+		"os": mapstr.M{
 			"platform": host.Info.OS.Platform,
 			"name":     host.Info.OS.Name,
 			"family":   host.Info.OS.Family,
@@ -340,8 +340,8 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	hostFields := host.toMapStr()
 
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"host"},
 				"type":     []string{action.Type()},
@@ -353,7 +353,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	}
 
 	// Copy select host.* fields in case add_host_metadata is not configured.
-	hostTopLevel := common.MapStr{}
+	hostTopLevel := mapstr.M{}
 	hostFields.CopyFieldsTo(hostTopLevel, "architecture")
 	hostFields.CopyFieldsTo(hostTopLevel, "containerized")
 	hostFields.CopyFieldsTo(hostTopLevel, "hostname")

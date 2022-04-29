@@ -22,9 +22,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
@@ -99,17 +99,17 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 		usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
-		event := common.MapStr{
+		event := mapstr.M{
 			"name":   ds.Summary.Name,
 			"fstype": ds.Summary.Type,
-			"capacity": common.MapStr{
-				"total": common.MapStr{
+			"capacity": mapstr.M{
+				"total": mapstr.M{
 					"bytes": ds.Summary.Capacity,
 				},
-				"free": common.MapStr{
+				"free": mapstr.M{
 					"bytes": ds.Summary.FreeSpace,
 				},
-				"used": common.MapStr{
+				"used": mapstr.M{
 					"bytes": usedSpaceBytes,
 					"pct":   usedSpacePercent,
 				},

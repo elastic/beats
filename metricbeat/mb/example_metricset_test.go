@@ -20,9 +20,9 @@ package mb_test
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var hostParser = parse.URLHostParserBuilder{
@@ -48,7 +48,7 @@ func NewMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch will be called periodically by the framework.
 func (ms *MetricSet) Fetch(report mb.Reporter) {
 	// Fetch data from the host at ms.HostData().URI and return the data.
-	data, err := common.MapStr{
+	data, err := mapstr.M{
 		"some_metric":          18.0,
 		"answer_to_everything": 42,
 	}, error(nil)

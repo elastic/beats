@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ExtensionID is the 16-bit identifier for an extension
@@ -30,7 +30,7 @@ type ExtensionID uint16
 
 // Extensions stores the data from parsed extensions
 type Extensions struct {
-	Parsed  common.MapStr
+	Parsed  mapstr.M
 	Raw     map[ExtensionID][]byte
 	InOrder []ExtensionID
 }
@@ -82,7 +82,7 @@ func ParseExtensions(buffer bufferView) Extensions {
 
 	limit := 2 + int(extensionsLength)
 	result := Extensions{
-		Parsed: common.MapStr{},
+		Parsed: mapstr.M{},
 		Raw:    make(map[ExtensionID][]byte),
 	}
 
@@ -168,7 +168,7 @@ func ignoreContent(_ bufferView) interface{} {
 func parseStatusReq(buffer bufferView) interface{} {
 	if buffer.length() == 0 {
 		// Initial server response.
-		return common.MapStr{"response": true}
+		return mapstr.M{"response": true}
 	}
 	// Client query.
 	var (
@@ -182,7 +182,7 @@ func parseStatusReq(buffer bufferView) interface{} {
 	if code != 1 {
 		typ = fmt.Sprint(code)
 	}
-	return common.MapStr{"type": typ, "responder_id_list_length": list, "request_extensions": exts}
+	return mapstr.M{"type": typ, "responder_id_list_length": list, "request_extensions": exts}
 }
 
 func expectEmpty(buffer bufferView) interface{} {

@@ -21,11 +21,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func makeEvent(fields common.MapStr) publisher.Event {
+func makeEvent(fields mapstr.M) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{
 			Timestamp: time.Now(),

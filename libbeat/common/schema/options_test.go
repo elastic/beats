@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestApplyOptions(t *testing.T) {
@@ -91,7 +91,7 @@ func TestApplyOptions(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		event := common.MapStr{}
+		event := mapstr.M{}
 		errors := c.Errors
 		for _, opt := range c.Options {
 			event, errors = opt(event, errors)
@@ -143,6 +143,6 @@ func TestNotFoundKeys(t *testing.T) {
 		opt := NotFoundKeys(func(keys []string) {
 			assert.ElementsMatch(t, c.Expected, keys, c.Description)
 		})
-		opt(common.MapStr{}, c.Errors)
+		opt(mapstr.M{}, c.Errors)
 	}
 }

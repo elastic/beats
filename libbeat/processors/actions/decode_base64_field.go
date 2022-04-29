@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -100,7 +101,7 @@ func (f decodeBase64Field) String() string {
 func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 	value, err := event.GetValue(f.config.Field.From)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return nil
 		}
 		return fmt.Errorf("could not fetch base64 value for key: %s, Error: %v", f.config.Field.From, err)

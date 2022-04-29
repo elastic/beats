@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventConversionToBeatEvent(t *testing.T) {
@@ -41,31 +41,31 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 	t.Run("all levels", func(t *testing.T) {
 		e := (&Event{
 			Timestamp: timestamp,
-			RootFields: common.MapStr{
+			RootFields: mapstr.M{
 				"type": "docker",
 			},
-			ModuleFields: common.MapStr{
-				"container": common.MapStr{
+			ModuleFields: mapstr.M{
+				"container": mapstr.M{
 					"name": "wordpress",
 				},
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"ms": 1000,
 			},
 		}).BeatEvent(module, metricSet)
 
 		assert.Equal(t, timestamp, e.Timestamp)
-		assert.Equal(t, common.MapStr{
+		assert.Equal(t, mapstr.M{
 			"type": "docker",
-			"docker": common.MapStr{
-				"container": common.MapStr{
+			"docker": mapstr.M{
+				"container": mapstr.M{
 					"name": "wordpress",
 				},
-				"uptime": common.MapStr{
+				"uptime": mapstr.M{
 					"ms": 1000,
 				},
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"type": "docker",
 			},
 		}, e.Fields)
@@ -74,15 +74,15 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 	t.Run("idempotent", func(t *testing.T) {
 		mbEvent := &Event{
 			Timestamp: timestamp,
-			RootFields: common.MapStr{
+			RootFields: mapstr.M{
 				"type": "docker",
 			},
-			ModuleFields: common.MapStr{
-				"container": common.MapStr{
+			ModuleFields: mapstr.M{
+				"container": mapstr.M{
 					"name": "wordpress",
 				},
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"ms": 1000,
 			},
 		}
@@ -90,17 +90,17 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		e = mbEvent.BeatEvent(module, metricSet)
 
 		assert.Equal(t, timestamp, e.Timestamp)
-		assert.Equal(t, common.MapStr{
+		assert.Equal(t, mapstr.M{
 			"type": "docker",
-			"docker": common.MapStr{
-				"container": common.MapStr{
+			"docker": mapstr.M{
+				"container": mapstr.M{
 					"name": "wordpress",
 				},
-				"uptime": common.MapStr{
+				"uptime": mapstr.M{
 					"ms": 1000,
 				},
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"type": "docker",
 			},
 		}, e.Fields)
@@ -113,10 +113,10 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		}
 
 		e := (&Event{}).BeatEvent(module, metricSet, modifier)
-		assert.Equal(t, common.MapStr{
+		assert.Equal(t, mapstr.M{
 			"module":    module,
 			"metricset": metricSet,
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"type": "docker",
 			},
 		}, e.Fields)
@@ -126,15 +126,15 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		mbEvent := &Event{
 			ID:        "foobar",
 			Timestamp: timestamp,
-			RootFields: common.MapStr{
+			RootFields: mapstr.M{
 				"type": "docker",
 			},
-			ModuleFields: common.MapStr{
-				"container": common.MapStr{
+			ModuleFields: mapstr.M{
+				"container": mapstr.M{
 					"name": "wordpress",
 				},
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"ms": 1000,
 			},
 		}
@@ -143,17 +143,17 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 
 		assert.Equal(t, "foobar", e.Meta[events.FieldMetaID])
 		assert.Equal(t, timestamp, e.Timestamp)
-		assert.Equal(t, common.MapStr{
+		assert.Equal(t, mapstr.M{
 			"type": "docker",
-			"docker": common.MapStr{
-				"container": common.MapStr{
+			"docker": mapstr.M{
+				"container": mapstr.M{
 					"name": "wordpress",
 				},
-				"uptime": common.MapStr{
+				"uptime": mapstr.M{
 					"ms": 1000,
 				},
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"type": "docker",
 			},
 		}, e.Fields)
@@ -187,16 +187,16 @@ func TestAddMetricSetInfo(t *testing.T) {
 
 		AddMetricSetInfo(moduleName, metricSetName, &e)
 
-		assert.Equal(t, common.MapStr{
-			"event": common.MapStr{
+		assert.Equal(t, mapstr.M{
+			"event": mapstr.M{
 				"module":   moduleName,
 				"dataset":  moduleName + "." + metricSetName,
 				"duration": time.Duration(500000000),
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"address": host,
 			},
-			"metricset": common.MapStr{
+			"metricset": mapstr.M{
 				"name": metricSetName,
 			},
 		}, e.RootFields)
@@ -207,12 +207,12 @@ func TestAddMetricSetInfo(t *testing.T) {
 
 		AddMetricSetInfo(moduleName, metricSetName, &e)
 
-		assert.Equal(t, common.MapStr{
-			"event": common.MapStr{
+		assert.Equal(t, mapstr.M{
+			"event": mapstr.M{
 				"module":  moduleName,
 				"dataset": moduleName + "." + metricSetName,
 			},
-			"metricset": common.MapStr{
+			"metricset": mapstr.M{
 				"name": metricSetName,
 			},
 		}, e.RootFields)
@@ -223,16 +223,16 @@ func TestTransformMapStrToEvent(t *testing.T) {
 	var (
 		timestamp  = time.Now()
 		took       = time.Duration(1)
-		moduleData = common.MapStr{
+		moduleData = mapstr.M{
 			"container_id": "busybox",
 		}
-		metricSetData = common.MapStr{
+		metricSetData = mapstr.M{
 			"uptime": "1 day",
 		}
 		failure = errors.New("failed")
 	)
 
-	m := common.MapStr{
+	m := mapstr.M{
 		TimestampKey:  timestamp,
 		RTTKey:        took,
 		ModuleDataKey: moduleData,

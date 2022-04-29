@@ -28,10 +28,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type flowsChan struct {
@@ -136,9 +136,9 @@ func TestFlowsCounting(t *testing.T) {
 	event := events[0].Fields
 	t.Logf("event: %v", event)
 
-	source := event["source"].(common.MapStr)
-	dest := event["destination"].(common.MapStr)
-	network := event["network"].(common.MapStr)
+	source := event["source"].(mapstr.M)
+	dest := event["destination"].(mapstr.M)
+	network := event["network"].(mapstr.M)
 
 	// validate generated event
 	assert.Equal(t, net.HardwareAddr(mac1).String(), source["mac"])

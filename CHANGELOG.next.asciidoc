@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix docs reference for syslog processor {pull}31087[31087]
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 - Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
 
 *Auditbeat*
 
@@ -119,6 +120,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add URL Encode template function for httpjson input. {pull}30962[30962]
 - Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 - Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
+- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 
 *Auditbeat*
 

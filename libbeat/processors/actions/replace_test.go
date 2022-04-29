@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestReplaceRun(t *testing.T) {
@@ -34,8 +34,8 @@ func TestReplaceRun(t *testing.T) {
 		Fields        []replaceConfig
 		IgnoreMissing bool
 		FailOnError   bool
-		Input         common.MapStr
-		Output        common.MapStr
+		Input         mapstr.M
+		Output        mapstr.M
 		error         bool
 	}{
 		{
@@ -47,10 +47,10 @@ func TestReplaceRun(t *testing.T) {
 					Replacement: "b",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"f": "abc",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"f": "bbc",
 			},
 			error:         false,
@@ -66,13 +66,13 @@ func TestReplaceRun(t *testing.T) {
 					Replacement: "b",
 				},
 			},
-			Input: common.MapStr{
-				"f": common.MapStr{
+			Input: mapstr.M{
+				"f": mapstr.M{
 					"b": "abc",
 				},
 			},
-			Output: common.MapStr{
-				"f": common.MapStr{
+			Output: mapstr.M{
+				"f": mapstr.M{
 					"b": "bbc",
 				},
 			},
@@ -94,11 +94,11 @@ func TestReplaceRun(t *testing.T) {
 					Replacement: "oor",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"f": "abbbc",
 				"g": "def",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"f": "cab",
 				"g": "door",
 			},
@@ -120,14 +120,14 @@ func TestReplaceRun(t *testing.T) {
 					Replacement: "",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"m": "abc",
 				"n": "def",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"m": "abc",
 				"n": "def",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "Failed to replace fields in processor: could not fetch value for key: f, Error: key not found",
 				},
 			},
@@ -169,8 +169,8 @@ func TestReplaceField(t *testing.T) {
 		Replacement   string
 		ignoreMissing bool
 		failOnError   bool
-		Input         common.MapStr
-		Output        common.MapStr
+		Input         mapstr.M
+		Output        mapstr.M
 		error         bool
 		description   string
 	}{
@@ -179,10 +179,10 @@ func TestReplaceField(t *testing.T) {
 			Field:       "f",
 			Pattern:     regexp.MustCompile(`a`),
 			Replacement: "b",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"f": "abc",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"f": "bbc",
 			},
 			error:         false,
@@ -194,13 +194,13 @@ func TestReplaceField(t *testing.T) {
 			Field:       "f.b",
 			Pattern:     regexp.MustCompile(`a`),
 			Replacement: "b",
-			Input: common.MapStr{
-				"f": common.MapStr{
+			Input: mapstr.M{
+				"f": mapstr.M{
 					"b": "abc",
 				},
 			},
-			Output: common.MapStr{
-				"f": common.MapStr{
+			Output: mapstr.M{
+				"f": mapstr.M{
 					"b": "bbc",
 				},
 			},
@@ -213,11 +213,11 @@ func TestReplaceField(t *testing.T) {
 			Field:       "f",
 			Pattern:     regexp.MustCompile(`abc`),
 			Replacement: "xyz",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"m": "abc",
 				"n": "def",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"m": "abc",
 				"n": "def",
 			},
@@ -248,12 +248,12 @@ func TestReplaceField(t *testing.T) {
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"f": "abc",
 			},
 		}
 
-		expectedMeta := common.MapStr{
+		expectedMeta := mapstr.M{
 			"f": "bbc",
 		}
 

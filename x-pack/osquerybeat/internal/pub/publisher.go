@@ -10,11 +10,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -107,13 +107,13 @@ func processorsForInputsConfig(inputs []config.InputConfig) (procs *processors.P
 }
 
 func hitToEvent(index, eventType, actionID, responseID string, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
-	var fields common.MapStr
+	var fields mapstr.M
 
 	if len(ecsm) > 0 {
 		// Map ECS fields if the mapping is provided
-		fields = common.MapStr(ecsm.Map(hit))
+		fields = mapstr.M(ecsm.Map(hit))
 	} else {
-		fields = common.MapStr{}
+		fields = mapstr.M{}
 	}
 
 	// Add event.module for ECS
@@ -146,7 +146,7 @@ func hitToEvent(index, eventType, actionID, responseID string, hit map[string]in
 		event.Fields["response_id"] = responseID
 	}
 	if index != "" {
-		event.Meta = common.MapStr{events.FieldMetaRawIndex: index}
+		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
 	}
 
 	return event

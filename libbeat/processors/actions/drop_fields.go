@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type dropFields struct {
@@ -101,7 +102,7 @@ func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 
 func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {
 	if err := event.Delete(field); err != nil {
-		if !f.IgnoreMissing || err != common.ErrKeyNotFound {
+		if !f.IgnoreMissing || err != mapstr.ErrKeyNotFound {
 			*errs = append(*errs, errors.Wrapf(err, "failed to drop field [%v]", field))
 		}
 	}

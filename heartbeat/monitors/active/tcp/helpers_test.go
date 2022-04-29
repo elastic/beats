@@ -32,9 +32,10 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port uint16) *beat.Event {
+func testTCPConfigCheck(t *testing.T, configMap mapstr.M, host string, port uint16) *beat.Event {
 	config, err := common.NewConfigFrom(configMap)
 	require.NoError(t, err)
 

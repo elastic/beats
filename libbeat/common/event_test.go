@@ -26,110 +26,111 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConvertNestedMapStr(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
-		Input  MapStr
-		Output MapStr
+		Input  mapstr.M
+		Output mapstr.M
 	}
 
 	type String string
 
 	tests := []io{
 		{
-			Input: MapStr{
-				"key": MapStr{
+			Input: mapstr.M{
+				"key": mapstr.M{
 					"key1": "value1",
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
 					"key1": "value1",
 				},
 			},
 		},
 		{
-			Input: MapStr{
-				"key": MapStr{
+			Input: mapstr.M{
+				"key": mapstr.M{
 					"key1": String("value1"),
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
 					"key1": "value1",
 				},
 			},
 		},
 		{
-			Input: MapStr{
-				"key": MapStr{
+			Input: mapstr.M{
+				"key": mapstr.M{
 					"key1": []string{"value1", "value2"},
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
 					"key1": []string{"value1", "value2"},
 				},
 			},
 		},
 		{
-			Input: MapStr{
-				"key": MapStr{
+			Input: mapstr.M{
+				"key": mapstr.M{
 					"key1": []String{"value1", "value2"},
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
 					"key1": []interface{}{"value1", "value2"},
 				},
 			},
 		},
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
 			},
-			Output: MapStr{
+			Output: mapstr.M{
 				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
 			},
 		},
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"env":  nil,
 				"key2": uintptr(88),
 				"key3": func() { t.Log("hello") },
 			},
-			Output: MapStr{},
+			Output: mapstr.M{},
 		},
 		{
-			Input: MapStr{
-				"key": []MapStr{
+			Input: mapstr.M{
+				"key": []mapstr.M{
 					{"keyX": []String{"value1", "value2"}},
 				},
 			},
-			Output: MapStr{
-				"key": []MapStr{
+			Output: mapstr.M{
+				"key": []mapstr.M{
 					{"keyX": []interface{}{"value1", "value2"}},
 				},
 			},
 		},
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"key": []interface{}{
-					MapStr{"key1": []string{"value1", "value2"}},
+					mapstr.M{"key1": []string{"value1", "value2"}},
 				},
 			},
-			Output: MapStr{
+			Output: mapstr.M{
 				"key": []interface{}{
-					MapStr{"key1": []string{"value1", "value2"}},
+					mapstr.M{"key1": []string{"value1", "value2"}},
 				},
 			},
 		},
 		{
-			MapStr{"k": map[string]int{"hits": 1}},
-			MapStr{"k": MapStr{"hits": float64(1)}},
+			mapstr.M{"k": map[string]int{"hits": 1}},
+			mapstr.M{"k": mapstr.M{"hits": float64(1)}},
 		},
 	}
 
@@ -143,8 +144,8 @@ func TestConvertNestedStruct(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
-		Input  MapStr
-		Output MapStr
+		Input  mapstr.M
+		Output mapstr.M
 	}
 
 	type TestStruct struct {
@@ -154,17 +155,17 @@ func TestConvertNestedStruct(t *testing.T) {
 
 	tests := []io{
 		{
-			Input: MapStr{
-				"key": MapStr{
+			Input: mapstr.M{
+				"key": mapstr.M{
 					"key1": TestStruct{
 						A: "hello",
 						B: 5,
 					},
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
-					"key1": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
+					"key1": mapstr.M{
 						"A": "hello",
 						"B": float64(5),
 					},
@@ -172,7 +173,7 @@ func TestConvertNestedStruct(t *testing.T) {
 			},
 		},
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"key": []interface{}{
 					TestStruct{
 						A: "hello",
@@ -180,9 +181,9 @@ func TestConvertNestedStruct(t *testing.T) {
 					},
 				},
 			},
-			Output: MapStr{
+			Output: mapstr.M{
 				"key": []interface{}{
-					MapStr{
+					mapstr.M{
 						"A": "hello",
 						"B": float64(5),
 					},
@@ -201,8 +202,8 @@ func TestConvertWithNullEmission(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
-		Input  MapStr
-		Output MapStr
+		Input  mapstr.M
+		Output mapstr.M
 	}
 
 	type String string
@@ -212,25 +213,25 @@ func TestConvertWithNullEmission(t *testing.T) {
 
 	tests := []io{
 		{
-			Input: MapStr{
-				"key": MapStr{
+			Input: mapstr.M{
+				"key": mapstr.M{
 					"key1": nil,
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
 					"key1": nil,
 				},
 			},
 		},
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"key": TestStruct{
 					A: nil,
 				},
 			},
-			Output: MapStr{
-				"key": MapStr{
+			Output: mapstr.M{
+				"key": mapstr.M{
 					"A": nil,
 				},
 			},
@@ -295,21 +296,21 @@ func TestNormalizeValue(t *testing.T) {
 		"uint8 value":                       {uint8(8), uint8(8)},
 		"uint64 masked":                     {uint64(1<<63 + 10), uint64(10)},
 		"string value":                      {"hello", "hello"},
-		"map to MapStr":                     {map[string]interface{}{"foo": "bar"}, MapStr{"foo": "bar"}},
+		"map to mapstr.M":                   {map[string]interface{}{"foo": "bar"}, mapstr.M{"foo": "bar"}},
 
 		// Other map types are converted using marshalUnmarshal which will lose
 		// type information for arrays which become []interface{} and numbers
 		// which all become float64.
-		"map[string]string to MapStr":   {map[string]string{"foo": "bar"}, MapStr{"foo": "bar"}},
-		"map[string][]string to MapStr": {map[string][]string{"list": {"foo", "bar"}}, MapStr{"list": []interface{}{"foo", "bar"}}},
+		"map[string]string to mapstr.M":   {map[string]string{"foo": "bar"}, mapstr.M{"foo": "bar"}},
+		"map[string][]string to mapstr.M": {map[string][]string{"list": {"foo", "bar"}}, mapstr.M{"list": []interface{}{"foo", "bar"}}},
 
-		"array of strings":       {[]string{"foo", "bar"}, []string{"foo", "bar"}},
-		"array of bools":         {[]bool{true, false}, []bool{true, false}},
-		"array of ints":          {[]int{10, 11}, []int{10, 11}},
-		"array of uint64 ok":     {[]uint64{1, 2, 3}, []uint64{1, 2, 3}},
-		"array of uint64 masked": {[]uint64{1<<63 + 1, 1<<63 + 2, 1<<63 + 3}, []uint64{1, 2, 3}},
-		"array of MapStr":        {[]MapStr{{"foo": "bar"}}, []MapStr{{"foo": "bar"}}},
-		"array of map to MapStr": {[]map[string]interface{}{{"foo": "bar"}}, []MapStr{{"foo": "bar"}}},
+		"array of strings":         {[]string{"foo", "bar"}, []string{"foo", "bar"}},
+		"array of bools":           {[]bool{true, false}, []bool{true, false}},
+		"array of ints":            {[]int{10, 11}, []int{10, 11}},
+		"array of uint64 ok":       {[]uint64{1, 2, 3}, []uint64{1, 2, 3}},
+		"array of uint64 masked":   {[]uint64{1<<63 + 1, 1<<63 + 2, 1<<63 + 3}, []uint64{1, 2, 3}},
+		"array of mapstr.M":        {[]mapstr.M{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
+		"array of map to mapstr.M": {[]map[string]interface{}{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
 
 		// Wrapper types are converted to primitives using reflection.
 		"custom bool type":          {mybool(true), true},
@@ -333,7 +334,7 @@ func TestNormalizeValue(t *testing.T) {
 }
 
 func TestNormalizeMapError(t *testing.T) {
-	badInputs := []MapStr{
+	badInputs := []mapstr.M{
 		{"func": func() {}},
 		{"chan": make(chan struct{})},
 		{"uintptr": uintptr(123)},
@@ -358,14 +359,14 @@ func TestJoinKeys(t *testing.T) {
 
 func TestMarshalUnmarshalMap(t *testing.T) {
 	tests := []struct {
-		in  MapStr
-		out MapStr
+		in  mapstr.M
+		out mapstr.M
 	}{
-		{MapStr{"names": []string{"a", "b"}}, MapStr{"names": []interface{}{"a", "b"}}},
+		{mapstr.M{"names": []string{"a", "b"}}, mapstr.M{"names": []interface{}{"a", "b"}}},
 	}
 
 	for i, test := range tests {
-		var out MapStr
+		var out mapstr.M
 		err := marshalUnmarshal(test.in, &out)
 		if err != nil {
 			t.Error(err)
@@ -422,7 +423,7 @@ func TestNormalizeTime(t *testing.T) {
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(MapStr{"key": NetString("hola")})
+		g.Convert(mapstr.M{"key": NetString("hola")})
 	}
 }
 
@@ -430,15 +431,15 @@ func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(MapStr{"key": map[string]string{"greeting": "hola"}})
+		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
 	}
 }
 
-// Uses recursion to step into the nested MapStr.
+// Uses recursion to step into the nested mapstr.M.
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(MapStr{"key": map[string]interface{}{"greeting": "hola"}})
+		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
 	}
 }
 
@@ -446,7 +447,7 @@ func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(MapStr{"key": []string{"foo", "bar"}})
+		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
 	}
 }
 
@@ -455,7 +456,7 @@ func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	type myString string
 	for i := 0; i < b.N; i++ {
-		g.Convert(MapStr{"key": []myString{"foo", "bar"}})
+		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
 	}
 }
 
@@ -464,7 +465,7 @@ func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	val := "foo"
 	for i := 0; i < b.N; i++ {
-		g.Convert(MapStr{"key": &val})
+		g.Convert(mapstr.M{"key": &val})
 	}
 }
 func TestDeDotJSON(t *testing.T) {
@@ -520,7 +521,7 @@ func TestDeDotJSON(t *testing.T) {
 		assert.Nil(t, json.Unmarshal(test.output, &output))
 		assert.Equal(t, output, DeDotJSON(input))
 		if _, ok := test.valuer().(map[string]interface{}); ok {
-			assert.Equal(t, MapStr(output.(map[string]interface{})), DeDotJSON(MapStr(input.(map[string]interface{}))))
+			assert.Equal(t, mapstr.M(output.(map[string]interface{})), DeDotJSON(mapstr.M(input.(map[string]interface{}))))
 		}
 	}
 }

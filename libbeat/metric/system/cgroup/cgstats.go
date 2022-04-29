@@ -26,11 +26,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // CGStats in an interface wrapper around the V2 and V1 cgroup stat objects
 type CGStats interface {
-	Format() (common.MapStr, error)
+	Format() (mapstr.M, error)
 	CGVersion() CgroupsVersion
 	FillPercentages(prev CGStats, curTime, prevTime time.Time)
 }
@@ -41,8 +42,8 @@ func (stat StatsV1) CGVersion() CgroupsVersion {
 }
 
 //Format converts the stats object to a MapStr that can be sent to Report()
-func (stat StatsV1) Format() (common.MapStr, error) {
-	to := common.MapStr{}
+func (stat StatsV1) Format() (mapstr.M, error) {
+	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
 	if err != nil {
 		return to, errors.Wrap(err, "error formatting statsV1 object")
@@ -97,8 +98,8 @@ func (curStat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Tim
 }
 
 //Format converts the stats object to a MapStr that can be sent to Report()
-func (stat StatsV2) Format() (common.MapStr, error) {
-	to := common.MapStr{}
+func (stat StatsV2) Format() (mapstr.M, error) {
+	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
 	if err != nil {
 		return to, errors.Wrap(err, "error formatting statsV2 object")

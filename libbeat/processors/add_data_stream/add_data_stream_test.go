@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestAddDataStream(t *testing.T) {
@@ -52,7 +52,7 @@ func TestAddDataStream(t *testing.T) {
 		{
 			"existing meta",
 			simpleDs,
-			&beat.Event{Meta: common.MapStr{}},
+			&beat.Event{Meta: mapstr.M{}},
 			"mytype-myds-myns",
 			simpleDs,
 			false,
@@ -60,7 +60,7 @@ func TestAddDataStream(t *testing.T) {
 		{
 			"custom ds",
 			simpleDs,
-			&beat.Event{Meta: common.MapStr{
+			&beat.Event{Meta: mapstr.M{
 				FieldMetaCustomDataset: "custom-ds",
 			}},
 			"mytype-custom-ds-myns",
@@ -88,7 +88,7 @@ func TestAddDataStream(t *testing.T) {
 			}
 			require.Equal(t, tt.wantIndex, got.Meta[events.FieldMetaRawIndex])
 			require.Equal(t, tt.wantDataStream, got.Fields["data_stream"])
-			require.Equal(t, tt.wantDataStream.Dataset, got.Fields["event"].(common.MapStr)["dataset"])
+			require.Equal(t, tt.wantDataStream.Dataset, got.Fields["event"].(mapstr.M)["dataset"])
 		})
 	}
 }

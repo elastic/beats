@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
@@ -31,19 +32,19 @@ import (
 func TestUnnestStream(t *testing.T) {
 	type testCase struct {
 		name string
-		cfg  common.MapStr
+		cfg  mapstr.M
 		v    validator.Validator
 	}
 	tests := []testCase{
 		{
 			name: "simple",
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"id": "myuuid",
-				"streams": []common.MapStr{
+				"streams": []mapstr.M{
 					{
 						"type":     "montype",
 						"streamid": "mystreamid",
-						"data_stream": common.MapStr{
+						"data_stream": mapstr.M{
 							"namespace": "mynamespace",
 							"dataset":   "mydataset",
 							"type":      "mytype",
@@ -51,10 +52,10 @@ func TestUnnestStream(t *testing.T) {
 					},
 				},
 			},
-			v: lookslike.MustCompile(common.MapStr{
+			v: lookslike.MustCompile(mapstr.M{
 				"id":   "myuuid",
 				"type": "montype",
-				"data_stream": common.MapStr{
+				"data_stream": mapstr.M{
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
 					"type":      "mytype",
@@ -63,26 +64,26 @@ func TestUnnestStream(t *testing.T) {
 		},
 		{
 			name: "split data stream",
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"id":   "myuuid",
 				"type": "montype",
-				"data_stream": common.MapStr{
+				"data_stream": mapstr.M{
 					"namespace": "mynamespace",
 				},
-				"streams": []common.MapStr{
+				"streams": []mapstr.M{
 					{
 						"type": "montype",
-						"data_stream": common.MapStr{
+						"data_stream": mapstr.M{
 							"type":    "mytype",
 							"dataset": "mydataset",
 						},
 					},
 				},
 			},
-			v: lookslike.MustCompile(common.MapStr{
+			v: lookslike.MustCompile(mapstr.M{
 				"id":   "myuuid",
 				"type": "montype",
-				"data_stream": common.MapStr{
+				"data_stream": mapstr.M{
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
 					"type":      "mytype",
@@ -91,14 +92,14 @@ func TestUnnestStream(t *testing.T) {
 		},
 		{
 			name: "base is last, not first stream",
-			cfg: common.MapStr{
+			cfg: mapstr.M{
 				"id": "myuuid",
-				"data_stream": common.MapStr{
+				"data_stream": mapstr.M{
 					"namespace": "parentnamespace",
 				},
-				"streams": []common.MapStr{
+				"streams": []mapstr.M{
 					{
-						"data_stream": common.MapStr{
+						"data_stream": mapstr.M{
 							// Intentionally missing `type` since
 							// this is not the base dataset.
 							// There is only one stream with `type`
@@ -107,17 +108,17 @@ func TestUnnestStream(t *testing.T) {
 					},
 					{
 						"type": "montype",
-						"data_stream": common.MapStr{
+						"data_stream": mapstr.M{
 							"type":    "basetype",
 							"dataset": "basedataset",
 						},
 					},
 				},
 			},
-			v: lookslike.MustCompile(common.MapStr{
+			v: lookslike.MustCompile(mapstr.M{
 				"id":   "myuuid",
 				"type": "montype",
-				"data_stream": common.MapStr{
+				"data_stream": mapstr.M{
 					"namespace": "parentnamespace",
 					"type":      "basetype",
 					"dataset":   "basedataset",
@@ -134,7 +135,7 @@ func TestUnnestStream(t *testing.T) {
 			unnested, err := UnnestStream(src)
 			require.NoError(t, err)
 
-			unpacked := common.MapStr{}
+			unpacked := mapstr.M{}
 			err = unnested.Unpack(unpacked)
 			require.NoError(t, err)
 			testslike.Test(t, test.v, unpacked)

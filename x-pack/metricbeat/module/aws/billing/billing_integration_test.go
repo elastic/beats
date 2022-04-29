@@ -14,10 +14,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -34,8 +34,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	resultTypeIs := func(resultType string) func(e common.MapStr) bool {
-		return func(e common.MapStr) bool {
+	resultTypeIs := func(resultType string) func(e mapstr.M) bool {
+		return func(e mapstr.M) bool {
 			v, err := e.GetValue("aws.billing.group_definition.key")
 			if err == nil {
 				// Check for Cost Explorer billing metrics

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
@@ -106,31 +107,31 @@ func TestDecodeJSON(t *testing.T) {
 		Text         string
 		Config       Config
 		ExpectedText string
-		ExpectedMap  common.MapStr
+		ExpectedMap  mapstr.M
 	}{
 		{
 			Text:         `{"message": "test", "value": 1}`,
 			Config:       Config{MessageKey: "message"},
 			ExpectedText: "test",
-			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
+			ExpectedMap:  mapstr.M{"message": "test", "value": int64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": 1}`,
 			Config:       Config{MessageKey: "message1"},
 			ExpectedText: "",
-			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
+			ExpectedMap:  mapstr.M{"message": "test", "value": int64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": 1}`,
 			Config:       Config{MessageKey: "value"},
 			ExpectedText: "",
-			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
+			ExpectedMap:  mapstr.M{"message": "test", "value": int64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": "1"}`,
 			Config:       Config{MessageKey: "value"},
 			ExpectedText: "1",
-			ExpectedMap:  common.MapStr{"message": "test", "value": "1"},
+			ExpectedMap:  mapstr.M{"message": "test", "value": "1"},
 		},
 		{
 			// in case of JSON decoding errors, the text is passed as is
@@ -144,35 +145,35 @@ func TestDecodeJSON(t *testing.T) {
 			Text:         `null`,
 			Config:       Config{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `null`,
-			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: <nil>", "type": "json"}},
+			ExpectedMap:  mapstr.M{"error": mapstr.M{"message": "Error decoding JSON: <nil>", "type": "json"}},
 		},
 		{
 			// Add key error helps debugging this
 			Text:         `{"message": "test", "value": "`,
 			Config:       Config{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `{"message": "test", "value": "`,
-			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: unexpected EOF", "type": "json"}},
+			ExpectedMap:  mapstr.M{"error": mapstr.M{"message": "Error decoding JSON: unexpected EOF", "type": "json"}},
 		},
 		{
 			// If the text key is not found, put an error
 			Text:         `{"message": "test", "value": "1"}`,
 			Config:       Config{MessageKey: "hello", AddErrorKey: true},
 			ExpectedText: ``,
-			ExpectedMap:  common.MapStr{"message": "test", "value": "1", "error": common.MapStr{"message": "Key 'hello' not found", "type": "json"}},
+			ExpectedMap:  mapstr.M{"message": "test", "value": "1", "error": mapstr.M{"message": "Key 'hello' not found", "type": "json"}},
 		},
 		{
 			// If the text key is found, but not a string, put an error
 			Text:         `{"message": "test", "value": 1}`,
 			Config:       Config{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: ``,
-			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1), "error": common.MapStr{"message": "Value of key 'value' is not a string", "type": "json"}},
+			ExpectedMap:  mapstr.M{"message": "test", "value": int64(1), "error": mapstr.M{"message": "Value of key 'value' is not a string", "type": "json"}},
 		},
 		{
 			// Without a text key, simple return the json and an empty text
 			Text:         `{"message": "test", "value": 1}`,
 			Config:       Config{AddErrorKey: true},
 			ExpectedText: ``,
-			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
+			ExpectedMap:  mapstr.M{"message": "test", "value": int64(1)},
 		},
 		{
 			// If AddErrorKey set to false, error event should not be set.
@@ -203,28 +204,28 @@ func TestMergeJSONFields(t *testing.T) {
 	now := time.Now().UTC()
 
 	tests := map[string]struct {
-		Data              common.MapStr
+		Data              mapstr.M
 		Text              *string
 		JSONConfig        Config
-		ExpectedItems     common.MapStr
+		ExpectedItems     mapstr.M
 		ExpectedTimestamp time.Time
 		ExpectedID        string
 	}{
 		"default: do not overwrite": {
-			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": "test", "text": "hello"}},
+			Data:       mapstr.M{"type": "test_type", "json": mapstr.M{"type": "test", "text": "hello"}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type": "test_type",
 				"text": "hello",
 			},
 			ExpectedTimestamp: time.Time{},
 		},
 		"overwrite keys if configured": {
-			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": "test", "text": "hello"}},
+			Data:       mapstr.M{"type": "test_type", "json": mapstr.M{"type": "test", "text": "hello"}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type": "test",
 				"text": "hello",
 			},
@@ -232,22 +233,22 @@ func TestMergeJSONFields(t *testing.T) {
 		},
 		"use json namespace w/o keys_under_root": {
 			// without keys_under_root, put everything in a json key
-			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": "test", "text": "hello"}},
+			Data:       mapstr.M{"type": "test_type", "json": mapstr.M{"type": "test", "text": "hello"}},
 			Text:       &text,
 			JSONConfig: Config{},
-			ExpectedItems: common.MapStr{
-				"json": common.MapStr{"type": "test", "text": "hello"},
+			ExpectedItems: mapstr.M{
+				"json": mapstr.M{"type": "test", "text": "hello"},
 			},
 			ExpectedTimestamp: time.Time{},
 		},
 
 		"write result to message_key field": {
 			// when MessageKey is defined, the Text overwrites the value of that key
-			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": "test", "text": "hi"}},
+			Data:       mapstr.M{"type": "test_type", "json": mapstr.M{"type": "test", "text": "hi"}},
 			Text:       &text,
 			JSONConfig: Config{MessageKey: "text"},
-			ExpectedItems: common.MapStr{
-				"json": common.MapStr{"type": "test", "text": "hello"},
+			ExpectedItems: mapstr.M{
+				"json": mapstr.M{"type": "test", "text": "hello"},
 				"type": "test_type",
 			},
 			ExpectedTimestamp: time.Time{},
@@ -255,10 +256,10 @@ func TestMergeJSONFields(t *testing.T) {
 		"parse @timestamp": {
 			// when @timestamp is in JSON and overwrite_keys is true, parse it
 			// in a common.Time
-			Data:       common.MapStr{"@timestamp": now, "type": "test_type", "json": common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"}},
+			Data:       mapstr.M{"@timestamp": now, "type": "test_type", "json": mapstr.M{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type": "test",
 			},
 			ExpectedTimestamp: time.Time(common.MustParseTime("2016-04-05T18:47:18.444Z")),
@@ -266,12 +267,12 @@ func TestMergeJSONFields(t *testing.T) {
 		"fail to parse @timestamp": {
 			// when the parsing on @timestamp fails, leave the existing value and add an error key
 			// in a common.Time
-			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"}},
+			Data:       mapstr.M{"@timestamp": common.Time(now), "type": "test_type", "json": mapstr.M{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type":  "test",
-				"error": common.MapStr{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
+				"error": mapstr.M{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
 			},
 			ExpectedTimestamp: time.Time{},
 		},
@@ -279,54 +280,54 @@ func TestMergeJSONFields(t *testing.T) {
 		"wrong @timestamp format": {
 			// when the @timestamp has the wrong type, leave the existing value and add an error key
 			// in a common.Time
-			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "test", "@timestamp": 42}},
+			Data:       mapstr.M{"@timestamp": common.Time(now), "type": "test_type", "json": mapstr.M{"type": "test", "@timestamp": 42}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type":  "test",
-				"error": common.MapStr{"type": "json", "message": "@timestamp not overwritten (not string)"},
+				"error": mapstr.M{"type": "json", "message": "@timestamp not overwritten (not string)"},
 			},
 			ExpectedTimestamp: time.Time{},
 		},
 		"ignore non-string type field": {
 			// if overwrite_keys is true, but the `type` key in json is not a string, ignore it
-			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": 42}},
+			Data:       mapstr.M{"type": "test_type", "json": mapstr.M{"type": 42}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type":  "test_type",
-				"error": common.MapStr{"type": "json", "message": "type not overwritten (not string)"},
+				"error": mapstr.M{"type": "json", "message": "type not overwritten (not string)"},
 			},
 			ExpectedTimestamp: time.Time{},
 		},
 
 		"ignore empty type field": {
 			// if overwrite_keys is true, but the `type` key in json is empty, ignore it
-			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": ""}},
+			Data:       mapstr.M{"type": "test_type", "json": mapstr.M{"type": ""}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type":  "test_type",
-				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [])"},
+				"error": mapstr.M{"type": "json", "message": "type not overwritten (invalid value [])"},
 			},
 			ExpectedTimestamp: time.Time{},
 		},
 		"ignore type names starting with underscore": {
 			// if overwrite_keys is true, but the `type` key in json starts with _, ignore it
-			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "_type"}},
+			Data:       mapstr.M{"@timestamp": common.Time(now), "type": "test_type", "json": mapstr.M{"type": "_type"}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type":  "test_type",
-				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [_type])"},
+				"error": mapstr.M{"type": "json", "message": "type not overwritten (invalid value [_type])"},
 			},
 			ExpectedTimestamp: time.Time{},
 		},
 		"do not set error if AddErrorKey is false": {
-			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "_type"}},
+			Data:       mapstr.M{"@timestamp": common.Time(now), "type": "test_type", "json": mapstr.M{"type": "_type"}},
 			Text:       &text,
 			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: false},
-			ExpectedItems: common.MapStr{
+			ExpectedItems: mapstr.M{
 				"type":  "test_type",
 				"error": nil,
 			},
@@ -334,28 +335,28 @@ func TestMergeJSONFields(t *testing.T) {
 		},
 		"extract event id": {
 			// if document_id is set, extract the ID from the event
-			Data:       common.MapStr{"@timestamp": common.Time(now), "json": common.MapStr{"id": "test_id"}},
+			Data:       mapstr.M{"@timestamp": common.Time(now), "json": mapstr.M{"id": "test_id"}},
 			JSONConfig: Config{DocumentID: "id"},
 			ExpectedID: "test_id",
 		},
 		"extract event id with wrong type": {
 			// if document_id is set, extract the ID from the event
-			Data:       common.MapStr{"@timestamp": common.Time(now), "json": common.MapStr{"id": 42}},
+			Data:       mapstr.M{"@timestamp": common.Time(now), "json": mapstr.M{"id": 42}},
 			JSONConfig: Config{DocumentID: "id"},
 			ExpectedID: "",
 		},
 		"expand dotted fields": {
-			Data:          common.MapStr{"json": common.MapStr{"a.b": common.MapStr{"c": "c"}, "a.b.d": "d"}},
+			Data:          mapstr.M{"json": mapstr.M{"a.b": mapstr.M{"c": "c"}, "a.b.d": "d"}},
 			JSONConfig:    Config{ExpandKeys: true, KeysUnderRoot: true},
-			ExpectedItems: common.MapStr{"a": common.MapStr{"b": common.MapStr{"c": "c", "d": "d"}}},
+			ExpectedItems: mapstr.M{"a": mapstr.M{"b": mapstr.M{"c": "c", "d": "d"}}},
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			var jsonFields common.MapStr
+			var jsonFields mapstr.M
 			if fields, ok := test.Data["json"]; ok {
-				jsonFields = fields.(common.MapStr)
+				jsonFields = fields.(mapstr.M)
 			}
 
 			id, ts := MergeJSONFields(test.Data, jsonFields, test.Text, test.JSONConfig)
