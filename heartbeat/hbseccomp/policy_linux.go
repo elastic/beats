@@ -21,12 +21,10 @@ import (
 	"github.com/elastic/go-seccomp-bpf"
 )
 
-var (
-	defaultArmPolicy *seccomp.Policy
-)
+var DefaultArmPolicy *seccomp.Policy
 
 func init() {
-	defaultArmPolicy = &seccomp.Policy{
+	DefaultArmPolicy = &seccomp.Policy{
 		DefaultAction: seccomp.ActionErrno,
 		Syscalls: []seccomp.SyscallGroup{
 			{

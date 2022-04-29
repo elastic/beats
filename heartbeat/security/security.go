@@ -32,8 +32,8 @@ import (
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 
-	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/heartbeat/hbseccomp"
+	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 )
 
 func init() {
@@ -247,7 +247,7 @@ func setSeccompRules() error {
 
 	case "arm64", "aarch64":
 		// Register default arm64/aarch64 policy
-		seccomp.MustRegisterPolicy(hbseccomp.defaultArmPolicy)
+		seccomp.MustRegisterPolicy(hbseccomp.DefaultArmPolicy)
 	}
 
 	return nil
