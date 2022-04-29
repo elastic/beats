@@ -20,6 +20,7 @@ import (
 
 	bay "github.com/elastic/bayeux"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type eventCaptor struct {
@@ -57,7 +58,7 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("cometd input", "cometd")) //nolint:errcheck // Bad linter! no need to test this.
 
 	// Setup the input config.
-	config := conf.MustNewConfigFrom(conf.MapStr{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"channel_name":              "channel_name1",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
