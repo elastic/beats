@@ -10,7 +10,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/Azure/go-autorest/autorest"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // AppInsightsService service wrapper to the azure sdk for go

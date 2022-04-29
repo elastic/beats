@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/gosigar/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var once sync.Once

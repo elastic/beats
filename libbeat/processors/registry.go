@@ -20,9 +20,9 @@ package processors
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	p "github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type processorPlugin struct {

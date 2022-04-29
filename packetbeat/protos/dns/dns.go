@@ -35,12 +35,12 @@ import (
 	"golang.org/x/net/publicsuffix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/generator/fileset"
 	"github.com/elastic/beats/v7/filebeat/generator/module"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var defaultHomePath = paths.Resolve(paths.Home, "")

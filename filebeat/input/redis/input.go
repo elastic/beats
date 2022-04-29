@@ -27,8 +27,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {

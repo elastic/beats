@@ -34,12 +34,12 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

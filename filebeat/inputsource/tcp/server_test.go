@@ -32,8 +32,8 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var defaultConfig = Config{

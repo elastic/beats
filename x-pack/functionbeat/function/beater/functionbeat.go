@@ -18,7 +18,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/licenser"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
@@ -26,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (

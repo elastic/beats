@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestEventIterator(t *testing.T) {

@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type inodeMarkerIdentifier struct {

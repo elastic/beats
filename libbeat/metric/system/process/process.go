@@ -34,10 +34,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/logp"
 	sysinfo "github.com/elastic/go-sysinfo"
 )
 

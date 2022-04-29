@@ -26,10 +26,11 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	helper "github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type registryVersion string

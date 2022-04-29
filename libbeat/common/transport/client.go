@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Client struct {

@@ -32,11 +32,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type backoffConfig struct {

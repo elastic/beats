@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // fetcher is an interface that can fetch a list of lbListener (load balancer + listener) objects without pagination being necessary.

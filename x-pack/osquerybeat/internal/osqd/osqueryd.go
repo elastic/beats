@@ -21,7 +21,7 @@ import (
 	"github.com/dolmen-go/contextio"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 )

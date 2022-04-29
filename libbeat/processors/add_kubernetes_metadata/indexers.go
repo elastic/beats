@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

@@ -28,9 +28,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

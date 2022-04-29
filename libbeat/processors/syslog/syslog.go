@@ -27,13 +27,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

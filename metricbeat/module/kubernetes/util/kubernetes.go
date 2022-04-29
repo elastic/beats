@@ -30,9 +30,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata

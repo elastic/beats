@@ -19,11 +19,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

@@ -32,10 +32,10 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type journald struct {

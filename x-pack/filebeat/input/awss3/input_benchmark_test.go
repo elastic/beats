@@ -22,13 +22,13 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

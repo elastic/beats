@@ -30,7 +30,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/mod/semver"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (

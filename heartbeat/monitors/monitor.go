@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.

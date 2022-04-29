@@ -21,9 +21,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Flows struct {

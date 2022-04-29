@@ -23,7 +23,7 @@ import (
 
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // TODO: more types (that are not provided as constants in gopacket)

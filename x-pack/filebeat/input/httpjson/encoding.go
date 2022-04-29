@@ -12,7 +12,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type encoderFunc func(trReq transformable) ([]byte, error)

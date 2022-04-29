@@ -25,7 +25,7 @@ import (
 
 	"github.com/google/gopacket/pcap"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var deviceAnySupported = runtime.GOOS == "linux"

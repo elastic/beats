@@ -25,7 +25,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestNpcap(t *testing.T) {

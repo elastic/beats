@@ -22,9 +22,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectResponse) {

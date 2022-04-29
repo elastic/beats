@@ -30,8 +30,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type config struct {

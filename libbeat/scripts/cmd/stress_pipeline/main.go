@@ -27,16 +27,16 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	logpcfg "github.com/elastic/beats/v7/libbeat/logp/configure"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/service"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (

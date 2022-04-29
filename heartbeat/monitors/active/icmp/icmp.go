@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var debugf = logp.MakeDebug("icmp")

@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // TestLocker tests that two beats pointing to the same data path cannot

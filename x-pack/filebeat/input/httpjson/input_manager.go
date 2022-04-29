@@ -13,7 +13,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // inputManager wraps one stateless input manager

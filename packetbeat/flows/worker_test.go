@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/go-lookslike"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Use `go test -data` to update sample event files.

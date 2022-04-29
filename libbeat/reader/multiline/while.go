@@ -21,9 +21,9 @@ import (
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // MultiLine reader combining multiple line events into one multi-line event.

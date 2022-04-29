@@ -25,9 +25,9 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (

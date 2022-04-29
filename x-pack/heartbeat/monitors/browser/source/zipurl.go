@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type ZipURLSource struct {

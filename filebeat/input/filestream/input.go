@@ -33,13 +33,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const pluginName = "filestream"

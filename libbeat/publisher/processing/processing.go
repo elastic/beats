@@ -19,8 +19,8 @@ package processing
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // SupportFactory creates a new processing Supporter that can be used with

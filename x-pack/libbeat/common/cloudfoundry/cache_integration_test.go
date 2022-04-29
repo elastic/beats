@@ -16,8 +16,8 @@ import (
 
 	"github.com/cloudfoundry-community/go-cfclient"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetApps(t *testing.T) {

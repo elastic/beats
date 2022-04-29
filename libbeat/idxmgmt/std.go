@@ -26,11 +26,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type indexSupport struct {

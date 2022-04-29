@@ -5,8 +5,8 @@
 package provider
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // TemplateBuilderFactory factory method to call to create a new template builder.

@@ -23,10 +23,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // client connects a beat with the processors and pipeline queue.

@@ -14,12 +14,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type message struct {

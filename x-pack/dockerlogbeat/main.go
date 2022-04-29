@@ -11,7 +11,6 @@ import (
 
 	"github.com/docker/go-plugins-helpers/sdk"
 
-	logpcfg "github.com/elastic/beats/v7/libbeat/logp/configure"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
@@ -22,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 	"github.com/elastic/elastic-agent-libs/config"
+	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
 )
 
 // genNewMonitoringConfig is a hacked-in function to enable a debug stderr logger
