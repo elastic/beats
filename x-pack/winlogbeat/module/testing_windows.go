@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -48,6 +49,17 @@ func WithFieldFilter(filter []string) Option {
 // and processing them with a basic enrichment. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
 func TestPipeline(t *testing.T, evtx string, opts ...Option) {
+	// FIXME: We cannot generate golden files on Windows 2022.
+	if *update {
+		os, err := windows.OperatingSystem()
+		if err != nil {
+			t.Fatalf("failed to get operating system info: %v", err)
+		}
+		if strings.Contains(os.Name, "2022") {
+			t.Fatal("cannot generate golden files on Windows 2022: see note in powershell/test/powershell_windows_test.go")
+		}
+	}
+
 	files, err := filepath.Glob(evtx)
 	if err != nil {
 		t.Fatal(err)
@@ -141,7 +153,7 @@ func testPipeline(t testing.TB, evtx string, p *params) {
 		return
 	}
 	for i, e := range events {
-		assertEqual(t, expected[i], normalize(t, e))
+		assertEqual(t, filterEvent(expected[i], p.ignoreFields), normalize(t, e))
 	}
 }
 
