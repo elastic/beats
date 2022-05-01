@@ -39,15 +39,40 @@ type broker struct {
 
 	bufSize int
 
+	///////////////////////////
 	// api channels
-	events    chan pushRequest
-	requests  chan getRequest
-	pubCancel chan producerCancelRequest
 
+	// Producers send requests to pushChan to add events to the queue.
+	pushChan chan pushRequest
+
+	// Consumers send requests to getChan to read events from the queue.
+	getChan chan getRequest
+
+	// Producers send requests to cancelChan to cancel events they've
+	// sent so far that have not yet reached a consumer.
+	cancelChan chan producerCancelRequest
+
+	///////////////////////////
 	// internal channels
-	acks          chan int
+
+	// When ackLoop receives events ACKs from a consumer, it sends the number
+	// of ACKed events to ackChan to notify the event loop that those
+	// events can be removed from the queue.
+	ackChan chan int
+
+	// When events are sent to consumers, the ACK channels for their batches
+	// are collected into chanLists and sent to scheduledACKs.
+	// These are then read by ackLoop and concatenated to its internal
+	// chanList of all outstanding ACK channels.
 	scheduledACKs chan chanList
 
+	// A listener that should be notified when ACKs are processed.
+	// ackLoop calls this listener's OnACK function when it advances
+	// the consumer ACK position.
+	// Right now this listener always points at the Pipeline associated with
+	// this queue. Pipeline.OnACK then forwards the notification to
+	// Pipeline.observer.queueACKed(), which updates the beats registry
+	// if needed.
 	ackListener queue.ACKListener
 
 	// wait group for worker shutdown
@@ -62,17 +87,19 @@ type Settings struct {
 	InputQueueSize int
 }
 
-type ackChan struct {
-	next         *ackChan
-	ch           chan batchAckMsg
-	seq          uint
+// batchACKState stores the metadata associated with a batch of events sent to
+// a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
+// ackChan and received by
+type batchACKState struct {
+	next         *batchACKState
+	ackChan      chan batchAckMsg
 	start, count int // number of events waiting for ACK
-	states       []clientState
+	entries      []queueEntry
 }
 
 type chanList struct {
-	head *ackChan
-	tail *ackChan
+	head *batchACKState
+	tail *batchACKState
 }
 
 func init() {
@@ -141,12 +168,12 @@ func NewQueue(
 		logger: logger,
 
 		// broker API channels
-		events:    make(chan pushRequest, chanSize),
-		requests:  make(chan getRequest),
-		pubCancel: make(chan producerCancelRequest, 5),
+		pushChan:   make(chan pushRequest, chanSize),
+		getChan:    make(chan getRequest),
+		cancelChan: make(chan producerCancelRequest, 5),
 
 		// internal broker and ACK handler channels
-		acks:          make(chan int),
+		ackChan:       make(chan int),
 		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,
@@ -164,7 +191,9 @@ func NewQueue(
 	}
 
 	b.bufSize = sz
-	ack := newACKLoop(b, eventLoop.processACK)
+	ackLoop := &ackLoop{
+		broker:     b,
+		processACK: eventLoop.processACK}
 
 	b.wg.Add(2)
 	go func() {
@@ -173,7 +202,7 @@ func NewQueue(
 	}()
 	go func() {
 		defer b.wg.Done()
-		ack.run()
+		ackLoop.run()
 	}()
 
 	return b
@@ -204,29 +233,28 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
-		return &ackChan{
-			ch: make(chan batchAckMsg, 1),
+		return &batchACKState{
+			ackChan: make(chan batchAckMsg, 1),
 		}
 	},
 }
 
-func newACKChan(seq uint, start, count int, states []clientState) *ackChan {
+func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
 	//nolint: errcheck // Return value doesn't need to be checked before conversion.
-	ch := ackChanPool.Get().(*ackChan)
+	ch := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
-	ch.seq = seq
 	ch.start = start
 	ch.count = count
-	ch.states = states
+	ch.entries = entries
 	return ch
 }
 
-func releaseACKChan(c *ackChan) {
+func releaseACKChan(c *batchACKState) {
 	c.next = nil
 	ackChanPool.Put(c)
 }
 
-func (l *chanList) prepend(ch *ackChan) {
+func (l *chanList) prepend(ch *batchACKState) {
 	ch.next = l.head
 	l.head = ch
 	if l.tail == nil {
@@ -248,7 +276,7 @@ func (l *chanList) concat(other *chanList) {
 	l.tail = other.tail
 }
 
-func (l *chanList) append(ch *ackChan) {
+func (l *chanList) append(ch *batchACKState) {
 	if l.head == nil {
 		l.head = ch
 	} else {
@@ -261,7 +289,7 @@ func (l *chanList) empty() bool {
 	return l.head == nil
 }
 
-func (l *chanList) front() *ackChan {
+func (l *chanList) front() *batchACKState {
 	return l.head
 }
 
@@ -269,10 +297,10 @@ func (l *chanList) channel() chan batchAckMsg {
 	if l.head == nil {
 		return nil
 	}
-	return l.head.ch
+	return l.head.ackChan
 }
 
-func (l *chanList) pop() *ackChan {
+func (l *chanList) pop() *batchACKState {
 	ch := l.head
 	if ch != nil {
 		l.head = ch.next
