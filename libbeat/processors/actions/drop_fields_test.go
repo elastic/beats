@@ -102,7 +102,7 @@ func TestNewDropFields(t *testing.T) {
 
 		procInt, err := newDropFields(c)
 		assert.NoError(t, err)
-		
+
 		processor := procInt.(*dropFields)
 		assert.Equal(t, []string{"third"}, processor.Fields)
 		assert.Equal(t, "<substring 'second'>", processor.RegexpFields[0].String())
@@ -116,6 +116,6 @@ func TestNewDropFields(t *testing.T) {
 
 		_, err := newDropFields(c)
 
-		assert.Equal(t, "wrong configuration in drop_fields. error parsing regexp: missing closing ]: `[/`", err.Error())
+		assert.Equal(t, "wrong configuration in drop_fields[0]=/[//. error parsing regexp: missing closing ]: `[/`", err.Error())
 	})
 }

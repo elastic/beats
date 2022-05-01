@@ -76,7 +76,7 @@ func newDropFields(c *conf.C) (processors.Processor, error) {
 
 			matcher, err := match.Compile(field[1 : len(field)-1])
 			if err != nil {
-				return nil, fmt.Errorf("wrong configuration in drop_fields. %w", err)
+				return nil, fmt.Errorf("wrong configuration in drop_fields[%d]=%s. %w", i, field, err)
 			}
 
 			regexpFields = append(regexpFields, matcher)
