@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -54,7 +54,7 @@ func newDropFields(c *conf.C) (processors.Processor, error) {
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the drop_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the drop_fields configuration: %w", err)
 	}
 
 	/* remove read only fields */
@@ -76,7 +76,7 @@ func newDropFields(c *conf.C) (processors.Processor, error) {
 
 			matcher, err := match.Compile(field[1 : len(field)-1])
 			if err != nil {
-				return nil, fmt.Errorf("wrong configuration in drop_fields. %s", err)
+				return nil, fmt.Errorf("wrong configuration in drop_fields. %w", err)
 			}
 
 			regexpFields = append(regexpFields, matcher)
@@ -109,8 +109,8 @@ func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 
 func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {
 	if err := event.Delete(field); err != nil {
-		if !f.IgnoreMissing || err != mapstr.ErrKeyNotFound {
-			*errs = append(*errs, errors.Wrapf(err, "failed to drop field [%v]", field))
+		if !f.IgnoreMissing || !errors.Is(err, mapstr.ErrKeyNotFound) {
+			*errs = append(*errs, fmt.Errorf("failed to drop field [%v], error: %w", field, err))
 		}
 	}
 }

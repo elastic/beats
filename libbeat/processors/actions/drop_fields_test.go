@@ -101,9 +101,9 @@ func TestNewDropFields(t *testing.T) {
 		})
 
 		procInt, err := newDropFields(c)
-		processor := procInt.(*dropFields)
-
 		assert.NoError(t, err)
+		
+		processor := procInt.(*dropFields)
 		assert.Equal(t, []string{"third"}, processor.Fields)
 		assert.Equal(t, "<substring 'second'>", processor.RegexpFields[0].String())
 		assert.Equal(t, "field_(?-s:.)*1", processor.RegexpFields[1].String())
