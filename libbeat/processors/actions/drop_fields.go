@@ -74,7 +74,12 @@ func newDropFields(c *conf.C) (processors.Processor, error) {
 		if strings.HasPrefix(field, "/") && strings.HasSuffix(field, "/") && len(field) > 2 {
 			config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
 
-			regexpFields = append(regexpFields, match.MustCompile(field[1:len(field)-1]))
+			matcher, err := match.Compile(field[1 : len(field)-1])
+			if err != nil {
+				return nil, fmt.Errorf("wrong configuration in drop_fields. %s", err)
+			}
+
+			regexpFields = append(regexpFields, matcher)
 		}
 	}
 

@@ -108,4 +108,14 @@ func TestNewDropFields(t *testing.T) {
 		assert.Equal(t, "<substring 'second'>", processor.RegexpFields[0].String())
 		assert.Equal(t, "field_(?-s:.)*1", processor.RegexpFields[1].String())
 	})
+
+	t.Run("returns error when regexp field is badly written", func(t *testing.T) {
+		c := config2.MustNewConfigFrom(map[string]interface{}{
+			"fields": []string{"/[//"},
+		})
+
+		_, err := newDropFields(c)
+
+		assert.Equal(t, "wrong configuration in drop_fields. error parsing regexp: missing closing ]: `[/`", err.Error())
+	})
 }
