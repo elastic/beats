@@ -5,11 +5,10 @@
 package metrics
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -36,7 +35,7 @@ type KeyValuePoint struct {
 }
 
 // extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
+func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint) {
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -56,19 +55,16 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 		points = append(points, p)
 	}
 
-	return points, nil
+	return points
 }
 
 func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
-		if ts, err = ptypes.Timestamp(p.Interval.EndTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.EndTime)
-		}
-		return ts, nil
+		return p.Interval.EndTime.AsTime(), nil
 	}
 
-	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
+	return time.Time{}, fmt.Errorf("error trying to extract the timestamp from the point data")
 }
 
 func cleanMetricNameString(s string, aligner string, mc metricsConfig) string {
@@ -218,6 +214,28 @@ var reMapping = map[string]string{
 	"document.delete_count.value": "document.delete.count",
 	"document.read_count.value":   "document.read.count",
 	"document.write_count.value":  "document.write.count",
+<<<<<<< HEAD
+=======
+	// gcp.dataproc
+	"batch.spark.executors.value":                    "batch.spark.executors.count",
+	"cluster.hdfs.datanodes.value":                   "cluster.hdfs.datanodes.count",
+	"cluster.hdfs.storage_capacity.value":            "cluster.hdfs.storage_capacity.value",
+	"cluster.hdfs.storage_utilization.value":         "cluster.hdfs.storage_utilization.value",
+	"cluster.hdfs.unhealthy_blocks.value":            "cluster.hdfs.unhealthy_blocks.count",
+	"cluster.job.failed_count.value":                 "cluster.job.failed.count",
+	"cluster.job.running_count.value":                "cluster.job.running.count",
+	"cluster.job.submitted_count.value":              "cluster.job.submitted.count",
+	"cluster.operation.failed_count.value":           "cluster.operation.failed.count",
+	"cluster.operation.running_count.value":          "cluster.operation.running.count",
+	"cluster.operation.submitted_count.value":        "cluster.operation.submitted.count",
+	"cluster.yarn.allocated_memory_percentage.value": "cluster.yarn.allocated_memory_percentage.value",
+	"cluster.yarn.apps.value":                        "cluster.yarn.apps.count",
+	"cluster.yarn.containers.value":                  "cluster.yarn.containers.count",
+	"cluster.yarn.memory_size.value":                 "cluster.yarn.memory_size.value",
+	"cluster.yarn.nodemanagers.value":                "cluster.yarn.nodemanagers.count",
+	"cluster.yarn.pending_memory_size.value":         "cluster.yarn.pending_memory_size.value",
+	"cluster.yarn.virtual_cores.value":               "cluster.yarn.virtual_cores.count",
+>>>>>>> f646970946 ([Metricbeat] gcp: fix dataproc fields (#30979))
 }
 
 func remap(l *logp.Logger, s string) string {
@@ -243,7 +261,7 @@ func getValueFromPoint(p *monitoring.Point) (out interface{}) {
 	case *monitoring.TypedValue_StringValue:
 		out = v.StringValue
 	case *monitoring.TypedValue_DistributionValue:
-		//TODO Distribution values aren't simple values. Take a look at this
+		// Distribution values aren't simple values. Take a look at this
 		out = v.DistributionValue
 	}
 
