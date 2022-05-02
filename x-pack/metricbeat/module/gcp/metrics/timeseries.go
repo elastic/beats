@@ -12,7 +12,7 @@ import (
 
 //timeSeriesGrouped groups TimeSeries responses into common Elasticsearch friendly events. This is to avoid sending
 // events with a single metric that shares info (like timestamp) with another event with a single metric too
-func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.MetadataService, tsas []timeSeriesWithAligner, e *incomingFieldExtractor) (map[string][]KeyValuePoint, error) {
+func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.MetadataService, tsas []timeSeriesWithAligner, e *incomingFieldExtractor) map[string][]KeyValuePoint {
 	eventGroups := make(map[string][]KeyValuePoint)
 
 	metadataService := gcpService
@@ -20,10 +20,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.Metada
 	for _, tsa := range tsas {
 		aligner := tsa.aligner
 		for _, ts := range tsa.timeSeries {
-			keyValues, err := e.extractTimeSeriesMetricValues(ts, aligner)
-			if err != nil {
-				return nil, err
-			}
+			keyValues := e.extractTimeSeriesMetricValues(ts, aligner)
 
 			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
 			if gcpService == nil {
@@ -58,5 +55,5 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.Metada
 		}
 	}
 
-	return eventGroups, nil
+	return eventGroups
 }
