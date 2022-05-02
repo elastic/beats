@@ -1,0 +1,122 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "oracle.sysmetric.metrics.name",
+                            "negate": false,
+                            "params": {
+                                "query": "Response Time Per Txn"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "oracle.sysmetric.metrics.name": "Response Time Per Txn"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Response Time (Centi-Second) per transaction [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "75beaee0-c7bd-11ec-92b7-c5ca08f4288e"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "id": "42d37eeb-105d-4c32-845e-347cdd0efdff",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "isModelInvalid": false,
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "60ea5eb0-0b9f-40b1-bbe4-ddc2fc795155",
+                        "label": "Response Time (Centi-Second) per txn",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "oracle.sysmetric.metrics.value",
+                                "id": "c92b4dba-3592-4d2e-9f60-bcab33fa9072",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "top_hit"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "service.address",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "metric",
+                "use_kibana_indexes": true
+            },
+            "title": "Response Time (Centi-Second) per transaction [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "93361970-c922-11ec-891a-5f50c7522a3a",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-05-01T07:44:47.786Z",
+    "version": "WzMxODEyLDFd"
+}

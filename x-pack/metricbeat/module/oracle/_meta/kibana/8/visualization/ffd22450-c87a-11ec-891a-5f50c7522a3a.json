@@ -1,0 +1,116 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "oracle.sysmetric.metrics.name",
+                            "negate": false,
+                            "params": {
+                                "query": "Host CPU Utilization (%)"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "oracle.sysmetric.metrics.name": "Host CPU Utilization (%)"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Host CPU Utilization (%) [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "drop_last_bucket": 0,
+                "id": "0590e530-cf66-4e39-a8ac-47015d91def9",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "e55e9af3-e602-4fa6-a99b-ddac067b027f",
+                        "label": "Host CPU Utilization (%)",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "oracle.sysmetric.metrics.value",
+                                "id": "3d751ffd-899e-41f4-b5f8-a673534be12f",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "top_hit"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "service.address",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "timeseries",
+                "use_kibana_indexes": true
+            },
+            "title": "Host CPU Utilization (%) [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "ffd22450-c87a-11ec-891a-5f50c7522a3a",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-04-30T11:45:14.523Z",
+    "version": "WzI2NTg4LDFd"
+}

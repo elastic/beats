@@ -1,0 +1,116 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "oracle.sysmetric.metrics.name",
+                            "negate": false,
+                            "params": {
+                                "query": "Physical Writes Per Sec"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "oracle.sysmetric.metrics.name": "Physical Writes Per Sec"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Physical Writes per second [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "drop_last_bucket": 0,
+                "id": "1aecb7d4-67f6-432c-a1c9-d7f92db7b5ea",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "fbc600ac-5913-4aab-bc54-46ed3ee5f010",
+                        "label": "Physical Writes per second",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "oracle.sysmetric.metrics.value",
+                                "id": "1f50728e-6c16-4543-b103-f35a4e37a415",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "top_hit"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "service.address",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "timeseries",
+                "use_kibana_indexes": true
+            },
+            "title": "Physical Writes per second [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "09929750-c87a-11ec-891a-5f50c7522a3a",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-04-30T11:38:21.387Z",
+    "version": "WzI2MjYxLDFd"
+}

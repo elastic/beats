@@ -1,0 +1,124 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "oracle.sysmetric.metrics.name",
+                            "negate": false,
+                            "params": {
+                                "query": "User Rollbacks Per Sec"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "oracle.sysmetric.metrics.name": "User Rollbacks Per Sec"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "User Rollbacks per second [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "drop_last_bucket": 0,
+                "gauge_color_rules": [
+                    {
+                        "id": "7cf215c0-c7b9-11ec-92b7-c5ca08f4288e"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "9c78a97b-16f5-43d0-8b6b-007f0944d37f",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "06d50f65-9ee9-43e9-b27a-561f598ae8c5",
+                        "label": "User Rollbacks per second",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "oracle.sysmetric.metrics.value",
+                                "id": "312e4114-c5a7-4518-894b-dd53c59309d4",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "top_hit"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "service.address",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "timeseries",
+                "use_kibana_indexes": true
+            },
+            "title": "User Rollbacks per second [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "d5e99370-c87b-11ec-891a-5f50c7522a3a",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-04-30T11:51:13.720Z",
+    "version": "WzI2Nzc3LDFd"
+}

@@ -1,0 +1,122 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "oracle.sysmetric.metrics.name",
+                            "negate": false,
+                            "params": {
+                                "query": "Total Table Scans Per Txn"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "oracle.sysmetric.metrics.name": "Total Table Scans Per Txn"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Total Table Scans per transaction [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "4fed3540-c7b0-11ec-92b7-c5ca08f4288e"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "id": "0a642abd-0af3-4be0-8b32-e64e2435e4cd",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "isModelInvalid": false,
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "dcb1b4af-bd64-4dbe-b27f-fc6652098b4d",
+                        "label": "Total Table Scans per transaction",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "oracle.sysmetric.metrics.value",
+                                "id": "e7116e83-4a2a-4500-98e4-121db45772e6",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "top_hit"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "service.address",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "timeseries",
+                "use_kibana_indexes": true
+            },
+            "title": "Total Table Scans per transaction [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "a65d8eb0-c879-11ec-891a-5f50c7522a3a",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-04-30T11:35:34.945Z",
+    "version": "WzI2MTU2LDFd"
+}

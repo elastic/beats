@@ -1,0 +1,374 @@
+{
+    "attributes": {
+        "description": "An overview of key metrics from Sysmetric Metricsets in the Oracle database Metricbeat module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "c1235d00-17bf-46e3-be1a-f9e04689ba4f",
+                    "w": 14,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "c1235d00-17bf-46e3-be1a-f9e04689ba4f",
+                "panelRefName": "panel_c1235d00-17bf-46e3-be1a-f9e04689ba4f",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "a1adaf6d-7149-4e92-8736-08d293af580f",
+                    "w": 10,
+                    "x": 14,
+                    "y": 0
+                },
+                "panelIndex": "a1adaf6d-7149-4e92-8736-08d293af580f",
+                "panelRefName": "panel_a1adaf6d-7149-4e92-8736-08d293af580f",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "25e28f7d-5aa8-4f7b-a549-fda815fd37d6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "25e28f7d-5aa8-4f7b-a549-fda815fd37d6",
+                "panelRefName": "panel_25e28f7d-5aa8-4f7b-a549-fda815fd37d6",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "a8222df9-8ae7-4fb3-b2b5-0c26928869c2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 8
+                },
+                "panelIndex": "a8222df9-8ae7-4fb3-b2b5-0c26928869c2",
+                "panelRefName": "panel_a8222df9-8ae7-4fb3-b2b5-0c26928869c2",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "114ba664-4260-47b8-86a5-ca34f7c0e2d2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 18
+                },
+                "panelIndex": "114ba664-4260-47b8-86a5-ca34f7c0e2d2",
+                "panelRefName": "panel_114ba664-4260-47b8-86a5-ca34f7c0e2d2",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "fc5c5920-5103-4a35-a26d-5d33c7263c88",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "fc5c5920-5103-4a35-a26d-5d33c7263c88",
+                "panelRefName": "panel_fc5c5920-5103-4a35-a26d-5d33c7263c88",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "94880c13-d232-426d-892e-095ddb9e9534",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "94880c13-d232-426d-892e-095ddb9e9534",
+                "panelRefName": "panel_94880c13-d232-426d-892e-095ddb9e9534",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "2b006213-1ca0-4392-a0c3-91ad24d50355",
+                    "w": 24,
+                    "x": 0,
+                    "y": 40
+                },
+                "panelIndex": "2b006213-1ca0-4392-a0c3-91ad24d50355",
+                "panelRefName": "panel_2b006213-1ca0-4392-a0c3-91ad24d50355",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "b009d3ec-23cc-4838-8528-f9f928d29d6f",
+                    "w": 24,
+                    "x": 24,
+                    "y": 40
+                },
+                "panelIndex": "b009d3ec-23cc-4838-8528-f9f928d29d6f",
+                "panelRefName": "panel_b009d3ec-23cc-4838-8528-f9f928d29d6f",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "9e163181-aade-48e1-a853-5f32782f7b44",
+                    "w": 24,
+                    "x": 0,
+                    "y": 51
+                },
+                "panelIndex": "9e163181-aade-48e1-a853-5f32782f7b44",
+                "panelRefName": "panel_9e163181-aade-48e1-a853-5f32782f7b44",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "a35d8006-6c05-4c0d-87b0-af47e27e364d",
+                    "w": 24,
+                    "x": 24,
+                    "y": 51
+                },
+                "panelIndex": "a35d8006-6c05-4c0d-87b0-af47e27e364d",
+                "panelRefName": "panel_a35d8006-6c05-4c0d-87b0-af47e27e364d",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "c620c47e-dfc8-4ce9-b499-41b6c87ad9e3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 62
+                },
+                "panelIndex": "c620c47e-dfc8-4ce9-b499-41b6c87ad9e3",
+                "panelRefName": "panel_c620c47e-dfc8-4ce9-b499-41b6c87ad9e3",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "79ed566c-3361-48cf-8454-8151458bcbd1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 62
+                },
+                "panelIndex": "79ed566c-3361-48cf-8454-8151458bcbd1",
+                "panelRefName": "panel_79ed566c-3361-48cf-8454-8151458bcbd1",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "411deb47-0f86-4bf1-a384-7977a03c11f6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "411deb47-0f86-4bf1-a384-7977a03c11f6",
+                "panelRefName": "panel_411deb47-0f86-4bf1-a384-7977a03c11f6",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "a1f88dda-83e1-4519-91f8-fd17a4ccca9a",
+                    "w": 10,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "a1f88dda-83e1-4519-91f8-fd17a4ccca9a",
+                "panelRefName": "panel_a1f88dda-83e1-4519-91f8-fd17a4ccca9a",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "b11f4872-dfd2-448a-b9d5-d4bb7a3367ac",
+                    "w": 14,
+                    "x": 34,
+                    "y": 0
+                },
+                "panelIndex": "b11f4872-dfd2-448a-b9d5-d4bb7a3367ac",
+                "panelRefName": "panel_b11f4872-dfd2-448a-b9d5-d4bb7a3367ac",
+                "type": "visualization",
+                "version": "8.2.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Oracle] Sysmetric",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.2.0",
+    "id": "a3f4d080-c7d3-11ec-891a-5f50c7522a3a",
+    "migrationVersion": {
+        "dashboard": "8.2.0"
+    },
+    "references": [
+        {
+            "id": "c2178960-c83f-11ec-891a-5f50c7522a3a",
+            "name": "c1235d00-17bf-46e3-be1a-f9e04689ba4f:panel_c1235d00-17bf-46e3-be1a-f9e04689ba4f",
+            "type": "visualization"
+        },
+        {
+            "id": "c777ba10-c83f-11ec-891a-5f50c7522a3a",
+            "name": "a1adaf6d-7149-4e92-8736-08d293af580f:panel_a1adaf6d-7149-4e92-8736-08d293af580f",
+            "type": "visualization"
+        },
+        {
+            "id": "3af08cd0-c843-11ec-891a-5f50c7522a3a",
+            "name": "25e28f7d-5aa8-4f7b-a549-fda815fd37d6:panel_25e28f7d-5aa8-4f7b-a549-fda815fd37d6",
+            "type": "visualization"
+        },
+        {
+            "id": "81c1f9a0-c843-11ec-891a-5f50c7522a3a",
+            "name": "a8222df9-8ae7-4fb3-b2b5-0c26928869c2:panel_a8222df9-8ae7-4fb3-b2b5-0c26928869c2",
+            "type": "visualization"
+        },
+        {
+            "id": "a65d8eb0-c879-11ec-891a-5f50c7522a3a",
+            "name": "114ba664-4260-47b8-86a5-ca34f7c0e2d2:panel_114ba664-4260-47b8-86a5-ca34f7c0e2d2",
+            "type": "visualization"
+        },
+        {
+            "id": "09929750-c87a-11ec-891a-5f50c7522a3a",
+            "name": "fc5c5920-5103-4a35-a26d-5d33c7263c88:panel_fc5c5920-5103-4a35-a26d-5d33c7263c88",
+            "type": "visualization"
+        },
+        {
+            "id": "2ee49e30-c87b-11ec-891a-5f50c7522a3a",
+            "name": "94880c13-d232-426d-892e-095ddb9e9534:panel_94880c13-d232-426d-892e-095ddb9e9534",
+            "type": "visualization"
+        },
+        {
+            "id": "ffd22450-c87a-11ec-891a-5f50c7522a3a",
+            "name": "2b006213-1ca0-4392-a0c3-91ad24d50355:panel_2b006213-1ca0-4392-a0c3-91ad24d50355",
+            "type": "visualization"
+        },
+        {
+            "id": "00b53be0-c87c-11ec-891a-5f50c7522a3a",
+            "name": "b009d3ec-23cc-4838-8528-f9f928d29d6f:panel_b009d3ec-23cc-4838-8528-f9f928d29d6f",
+            "type": "visualization"
+        },
+        {
+            "id": "d5e99370-c87b-11ec-891a-5f50c7522a3a",
+            "name": "9e163181-aade-48e1-a853-5f32782f7b44:panel_9e163181-aade-48e1-a853-5f32782f7b44",
+            "type": "visualization"
+        },
+        {
+            "id": "400c71a0-c87c-11ec-891a-5f50c7522a3a",
+            "name": "a35d8006-6c05-4c0d-87b0-af47e27e364d:panel_a35d8006-6c05-4c0d-87b0-af47e27e364d",
+            "type": "visualization"
+        },
+        {
+            "id": "21744290-c87c-11ec-891a-5f50c7522a3a",
+            "name": "c620c47e-dfc8-4ce9-b499-41b6c87ad9e3:panel_c620c47e-dfc8-4ce9-b499-41b6c87ad9e3",
+            "type": "visualization"
+        },
+        {
+            "id": "5e35d950-c87c-11ec-891a-5f50c7522a3a",
+            "name": "79ed566c-3361-48cf-8454-8151458bcbd1:panel_79ed566c-3361-48cf-8454-8151458bcbd1",
+            "type": "visualization"
+        },
+        {
+            "id": "61d15a20-c87d-11ec-891a-5f50c7522a3a",
+            "name": "411deb47-0f86-4bf1-a384-7977a03c11f6:panel_411deb47-0f86-4bf1-a384-7977a03c11f6",
+            "type": "visualization"
+        },
+        {
+            "id": "8fb638f0-c90b-11ec-891a-5f50c7522a3a",
+            "name": "a1f88dda-83e1-4519-91f8-fd17a4ccca9a:panel_a1f88dda-83e1-4519-91f8-fd17a4ccca9a",
+            "type": "visualization"
+        },
+        {
+            "id": "93361970-c922-11ec-891a-5f50c7522a3a",
+            "name": "b11f4872-dfd2-448a-b9d5-d4bb7a3367ac:panel_b11f4872-dfd2-448a-b9d5-d4bb7a3367ac",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-05-01T07:44:59.298Z",
+    "version": "WzMxODM2LDFd"
+}
