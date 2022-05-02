@@ -79,8 +79,6 @@ type Provider interface {
 	GetKeystore(event bus.Event) Keystore
 }
 
-var parseConfig = parse.DefaultConfig
-
 // ResolverWrap wrap a config resolver around an existing keystore.
 func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) {
 	return func(keyName string) (string, parse.Config, error) {
@@ -90,17 +88,17 @@ func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) 
 			// If we cannot find the key, its a non fatal error
 			// and we pass to other resolver.
 			if err == ErrKeyDoesntExists {
-				return "", parseConfig, ucfg.ErrMissing
+				return "", parse.NoopConfig, ucfg.ErrMissing
 			}
-			return "", parseConfig, err
+			return "", parse.NoopConfig, err
 		}
 
 		v, err := key.Get()
 		if err != nil {
-			return "", parseConfig, err
+			return "", parse.NoopConfig, err
 		}
 
-		return string(v), parseConfig, nil
+		return string(v), parse.NoopConfig, nil
 	}
 }
 
