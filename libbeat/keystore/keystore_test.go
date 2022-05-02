@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
@@ -46,7 +47,18 @@ func TestResolverWhenTheKeyExist(t *testing.T) {
 
 	resolver := ResolverWrap(keystore)
 	v, pCfg, err := resolver("output.elasticsearch.password")
-	assert.NoError(t, err)
-	assert.Equal(t, pCfg, parse.DefaultConfig)
-	assert.Equal(t, v, "secret")
+	require.NoError(t, err)
+	require.Equal(t, pCfg, parseConfig)
+
+	// Cheat a bit by reproducing part of the go-ucfg dynamic variable resolution process here. The
+	// config returned by the resolver will be used with a call to the go-ucfg parser. The
+	// public entrypoint is the ValueWithConfig function below. Make sure the parsed value is
+	// correct. See https://github.com/elastic/go-ucfg/blob/fc880abbe1f30b653d113da96a4a7e82743c0cc1/types.go#L539
+	iface, err := parse.ValueWithConfig(v, pCfg)
+	require.NoError(t, err)
+	t.Logf("%v", iface)
+
+	secret, ok := iface.(string)
+	require.True(t, ok, "parsed secret is not a string")
+	require.Equal(t, string(secretValue), secret)
 }
