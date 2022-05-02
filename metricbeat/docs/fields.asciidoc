@@ -54111,6 +54111,104 @@ type: double
 --
 
 [float]
+=== sysmetric
+
+Sysmetric related metrics.
+
+
+
+
+*`oracle.sysmetric.metrics.begin_time`*::
++
+--
+Begin time of the interval.
+
+
+type: date
+
+--
+
+*`oracle.sysmetric.metrics.container_id`*::
++
+--
+Container ID.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.metrics.end_time`*::
++
+--
+End time of the interval.
+
+
+type: date
+
+--
+
+*`oracle.sysmetric.metrics.group_id`*::
++
+--
+Metric group ID.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.metrics.interval_size_csec`*::
++
+--
+Interval size (in hundredths of a second).
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.metrics.metric_id`*::
++
+--
+Metric ID.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.metrics.metric_unit`*::
++
+--
+Description of metric unit.
+
+
+type: keyword
+
+--
+
+*`oracle.sysmetric.metrics.name`*::
++
+--
+Metric name.
+
+
+type: keyword
+
+--
+
+*`oracle.sysmetric.metrics.value`*::
++
+--
+Metric value.
+
+
+type: double
+
+--
+
+[float]
 === tablespace
 
 tablespace
