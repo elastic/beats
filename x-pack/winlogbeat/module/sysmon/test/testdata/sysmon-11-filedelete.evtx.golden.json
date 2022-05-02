@@ -29,6 +29,7 @@
         "UtcTime": "2020-05-07 08:14:44.489"
       },
       "event_id": "23",
+      "opcode": "Info",
       "process": {
         "pid": 664,
         "thread": {
@@ -39,7 +40,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 612,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }
@@ -74,6 +78,7 @@
         "UtcTime": "2020-05-07 07:27:18.722"
       },
       "event_id": "23",
+      "opcode": "Info",
       "process": {
         "pid": 664,
         "thread": {
@@ -84,7 +89,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }
@@ -119,6 +127,7 @@
         "UtcTime": "2020-05-12 06:48:27.084"
       },
       "event_id": "23",
+      "opcode": "Info",
       "process": {
         "pid": 1188,
         "thread": {
@@ -129,7 +138,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2243,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }

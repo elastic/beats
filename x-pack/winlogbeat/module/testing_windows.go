@@ -38,7 +38,7 @@ type params struct {
 }
 
 // WithFieldFilter filters the specified fields from the event prior to
-// creating the golden file.
+// comparison of values, but retains them in the written golden files.
 func WithFieldFilter(filter []string) Option {
 	return func(p *params) {
 		p.ignoreFields = filter
@@ -139,7 +139,7 @@ func testPipeline(t testing.TB, evtx string, p *params) {
 				evt.Fields["@timestamp"] = evt.Timestamp.UTC()
 			}
 
-			events = append(events, filterEvent(evt.Fields, p.ignoreFields))
+			events = append(events, evt.Fields)
 		}
 	}
 
@@ -153,7 +153,7 @@ func testPipeline(t testing.TB, evtx string, p *params) {
 		return
 	}
 	for i, e := range events {
-		assertEqual(t, filterEvent(expected[i], p.ignoreFields), normalize(t, e))
+		assertEqual(t, filterEvent(expected[i], p.ignoreFields), normalize(t, filterEvent(e, p.ignoreFields)))
 	}
 }
 

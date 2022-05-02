@@ -28,6 +28,7 @@
         "UtcTime": "2022-01-24 05:12:34.328"
       },
       "event_id": "26",
+      "opcode": "Info",
       "process": {
         "pid": 2764,
         "thread": {
@@ -38,7 +39,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 456,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }
@@ -72,6 +76,7 @@
         "UtcTime": "2022-01-24 05:12:51.031"
       },
       "event_id": "26",
+      "opcode": "Info",
       "process": {
         "pid": 2764,
         "thread": {
@@ -82,7 +87,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 457,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }

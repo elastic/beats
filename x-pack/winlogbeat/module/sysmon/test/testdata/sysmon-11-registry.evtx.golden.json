@@ -27,6 +27,7 @@
         "UtcTime": "2020-05-05 14:57:40.589"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -37,7 +38,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2682,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -70,6 +74,7 @@
         "UtcTime": "2020-05-05 14:57:44.714"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -80,7 +85,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2686,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -113,6 +121,7 @@
         "UtcTime": "2020-05-05 14:57:44.714"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -123,7 +132,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2687,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -156,6 +168,7 @@
         "UtcTime": "2020-05-05 14:57:46.808"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -166,7 +179,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2690,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -199,6 +215,7 @@
         "UtcTime": "2020-05-05 14:57:46.808"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -209,7 +226,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2691,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
