@@ -1,0 +1,27 @@
+rules:
+  - path: /token
+    methods: ["POST"]
+    responses:
+      - status_code: 200
+        body: |
+          {"instance_url": "http://cometd:8080", "expires_in": "60", "access_token": "abcd"}
+  - path: /cometd/38.0
+    methods: ["POST"]
+    request_body: '{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}'
+    responses:
+      - status_code: 200
+        body: |
+          [{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"94b112sp7ph1c9s41mycpzik4rkj3","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]
+  - path: /cometd/38.0
+    methods: ["POST"]
+    request_body: '{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "94b112sp7ph1c9s41mycpzik4rkj3"} '
+    responses:
+      - status_code: 200
+        body: |
+          [{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "/event/LoginEventStream"}]
+  - path: /cometd/38.0
+    methods: ["POST"]
+    responses:
+      - status_code: 200
+        body: |
+          [{"clientId": "94b112sp7ph1c9s41mycpzik4rkj3", "channel": "/meta/subscribe", "subscription": "/event/LoginEventStream", "successful":true}]
