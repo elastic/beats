@@ -18,7 +18,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
-* <<exported-fields-awscloudwatch>>
+* <<exported-fields-aws-cloudwatch>>
 * <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-barracuda>>
@@ -2025,7 +2025,7 @@ type: keyword
 
 --
 
-[[exported-fields-awscloudwatch]]
+[[exported-fields-aws-cloudwatch]]
 == AWS CloudWatch fields
 
 Fields from AWS CloudWatch logs.

@@ -1,4 +1,4 @@
-- key: awscloudwatch
+- key: aws-cloudwatch
   title: "AWS CloudWatch"
   description: >
     Fields from AWS CloudWatch logs.
