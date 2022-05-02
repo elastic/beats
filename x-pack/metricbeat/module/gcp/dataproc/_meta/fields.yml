@@ -1,0 +1,59 @@
+- name: dataproc
+  description: Google Cloud Dataproc metrics
+  release: beta
+  type: group
+  fields:
+    - name: batch.spark.executors.count
+      type: long
+      description: Indicates the number of Batch Spark executors.
+    - name: cluster.hdfs.datanodes.count
+      type: long
+      description: Indicates the number of HDFS DataNodes that are running inside a cluster.
+    - name: cluster.hdfs.storage_capacity.value
+      type: double
+      description: Indicates capacity of HDFS system running on cluster in GB.
+    - name: cluster.hdfs.storage_utilization.value
+      type: double
+      description: The percentage of HDFS storage currently used.
+    - name: cluster.hdfs.unhealthy_blocks.count
+      type: long
+      description: Indicates the number of unhealthy blocks inside the cluster.
+    - name: cluster.job.failed.count
+      type: long
+      description: Indicates the number of jobs that have failed on a cluster.
+    - name: cluster.job.running.count
+      type: long
+      description: Indicates the number of jobs that are running on a cluster.
+    - name: cluster.job.submitted.count
+      type: long
+      description: Indicates the number of jobs that have been submitted to a cluster.
+    - name: cluster.operation.failed.count
+      type: long
+      description: Indicates the number of operations that have failed on a cluster.
+    - name: cluster.operation.running.count
+      type: long
+      description: Indicates the number of operations that are running on a cluster.
+    - name: cluster.operation.submitted.count
+      type: long
+      description: Indicates the number of operations that have been submitted to a cluster.
+    - name: cluster.yarn.allocated_memory_percentage.value
+      type: double
+      description: The percentage of YARN memory is allocated.
+    - name: cluster.yarn.apps.count
+      type: long
+      description: Indicates the number of active YARN applications.
+    - name: cluster.yarn.containers.count
+      type: long
+      description: Indicates the number of YARN containers.
+    - name: cluster.yarn.memory_size.value
+      type: double
+      description: Indicates the YARN memory size in GB.
+    - name: cluster.yarn.nodemanagers.count
+      type: long
+      description: Indicates the number of YARN NodeManagers running inside cluster.
+    - name: cluster.yarn.pending_memory_size.value
+      type: double
+      description: The current memory request, in GB, that is pending to be fulfilled by the scheduler.
+    - name: cluster.yarn.virtual_cores.count
+      type: long
+      description: Indicates the number of virtual cores in YARN.
