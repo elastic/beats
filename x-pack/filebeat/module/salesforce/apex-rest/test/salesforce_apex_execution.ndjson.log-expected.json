@@ -1,0 +1,48 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "access_mode": "rest",
+            "apex": {
+              "cpu_time": 79,
+              "login_key": "MroEDyLplzWdOHPJ",
+              "run_time": 162,
+              "number_soql_queries": 0,
+              "db_total_time": 0,
+              "callout_time": 0,
+              "uri_id_derived": "",
+              "user_id_derived": "0055j000000utlPAAQ",
+              "event_type": "ApexExecution",
+              "quiddity": "V",
+              "is_long_running_request": 0,
+              "organization_id": "00D5j000000VI3n",
+              "entry_point": "VF- /apex/listApexClass.apexp",
+              "request_id": "4fDkD4xoOfMXKFl1cJOo_V"
+            }
+          },
+          "@timestamp": "2021-11-02T09:20:46.003Z",
+          "event": {
+            "duration": 1,
+            "ingested": "2021-12-09T11:48:01.881644602Z",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "apex-execution",
+            "dataset": "salesforce.apex",
+            "url": ""
+          },
+          "user": {
+            "id": "0055j000000utlP"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-09T11:48:01.881644602Z"
+        }
+      }
+    }
+  ]
+}

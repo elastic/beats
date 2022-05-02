@@ -1,0 +1,58 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "access_mode": "stream",
+            "logout": {
+              "session_level": "STANDARD",
+              "login_key": "CuRVtbMjat6xxbTH",
+              "created_by_id": "0055j000000q9s7AAA"
+            }
+          },
+          "@timestamp": "2021-10-19T11:38:54.000Z",
+          "related": {
+            "ip": [
+              "123.201.231.106"
+            ]
+          },
+          "source": {
+            "geo": {
+              "continent_name": "Asia",
+              "region_iso_code": "IN-GJ",
+              "city_name": "Vapi",
+              "country_iso_code": "IN",
+              "country_name": "India",
+              "region_name": "Gujarat",
+              "location": {
+                "lon": 72.8998,
+                "lat": 20.3661
+              }
+            },
+            "ip": "123.201.231.106"
+          },
+          "event": {
+            "ingested": "2021-12-14T10:31:37.625223214Z",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "logout",
+            "type": "info",
+            "category": "authentication",
+            "dataset": "salesforce.logout"
+          },
+          "user": {
+            "email": "kush.rana@elastic.co",
+            "id": "0055j000000utlPAAQ"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-14T10:31:37.625223214Z"
+        }
+      }
+    }
+  ]
+}

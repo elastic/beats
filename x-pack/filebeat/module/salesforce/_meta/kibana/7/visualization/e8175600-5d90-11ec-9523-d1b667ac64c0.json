@@ -1,0 +1,118 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.login"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.login"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "[Filebeat Salesforce][Login] Activity segmentation by browser/client",
+        "uiStateJSON": {
+            "vis": {
+                "legendOpen": false
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "User Agent",
+                        "field": "user_agent.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "distinctColors": false,
+                "isDonut": true,
+                "labels": {
+                    "last_level": false,
+                    "percentDecimals": 2,
+                    "position": "default",
+                    "show": true,
+                    "truncate": 100,
+                    "values": true,
+                    "valuesFormat": "percent"
+                },
+                "legendPosition": "right",
+                "maxLegendLines": 1,
+                "nestedLegend": false,
+                "palette": {
+                    "name": "default",
+                    "type": "palette"
+                },
+                "truncateLegend": true,
+                "type": "pie"
+            },
+            "title": "[Filebeat Salesforce][Login] Activity segmentation by browser/client",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "e8175600-5d90-11ec-9523-d1b667ac64c0",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-12-17T10:39:08.695Z",
+    "version": "WzIzNDY4LDJd"
+}
