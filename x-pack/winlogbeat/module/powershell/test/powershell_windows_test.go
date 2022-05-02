@@ -28,6 +28,8 @@ func TestPowerShell(t *testing.T) {
 	// This means that golden values should be generated on a non-2022 version of
 	// Windows to ensure that this field is properly rendered. This is checked in
 	// the module.TestPipeline function.
+	//
+	// See https://github.com/elastic/beats/issues/31490 for tracking issue.
 	os, err := windows.OperatingSystem()
 	if err != nil {
 		t.Fatalf("failed to get operating system info: %v", err)
