@@ -40,7 +40,7 @@ func (e *sysmetricExtractor) calQuery() string {
 	}
 
 	query := "SELECT * FROM V$SYSMETRIC WHERE (" + "METRIC_NAME LIKE '" + e.patterns[0] + "'"
-	for _, pattern := range e.patterns {
+	for _, pattern := range e.patterns[1:] {
 		query = query + " OR " + "METRIC_NAME LIKE '" + pattern + "'"
 	}
 	query = query + ")"
