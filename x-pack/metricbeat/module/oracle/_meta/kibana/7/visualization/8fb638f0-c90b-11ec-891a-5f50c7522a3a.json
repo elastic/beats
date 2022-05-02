@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Physical Writes Per Sec"
+                                "query": "Session Count"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Physical Writes Per Sec"
+                                "oracle.sysmetric.metrics.name": "Session Count"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "Physical Writes per second [Metricbeat Oracle]",
+        "title": "Session Count [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -41,8 +41,13 @@
                 "axis_formatter": "number",
                 "axis_position": "left",
                 "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "b0845e80-c7d1-11ec-92b7-c5ca08f4288e"
+                    }
+                ],
                 "drop_last_bucket": 0,
-                "id": "1aecb7d4-67f6-432c-a1c9-d7f92db7b5ea",
+                "id": "4d7989fe-1b37-49c0-9226-7ff0945b5b0a",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
                 "max_lines_legend": 1,
@@ -53,14 +58,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "fbc600ac-5913-4aab-bc54-46ed3ee5f010",
-                        "label": "Physical Writes per second",
+                        "id": "5312c701-ad2c-4a4e-aaa7-725379cf1da9",
+                        "label": "Session Count",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "1f50728e-6c16-4543-b103-f35a4e37a415",
+                                "id": "ceb12d6e-4e52-4fe4-88cb-79eba943ed47",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -86,17 +91,17 @@
                 "time_range_mode": "entire_time_range",
                 "tooltip_mode": "show_all",
                 "truncate_legend": 1,
-                "type": "timeseries",
+                "type": "metric",
                 "use_kibana_indexes": true
             },
-            "title": "Physical Writes per second [Metricbeat Oracle]",
+            "title": "Session Count [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "09929750-c87a-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "8fb638f0-c90b-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -111,6 +116,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:38:21.387Z",
-    "version": "WzI2MjYxLDFd"
+    "updated_at": "2022-05-01T05:00:03.462Z",
+    "version": "WzI4MTkwLDFd"
 }

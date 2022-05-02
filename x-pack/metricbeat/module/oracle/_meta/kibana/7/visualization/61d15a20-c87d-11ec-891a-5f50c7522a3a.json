@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Current OS Load"
+                                "query": "User Transaction Per Sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Current OS Load"
+                                "oracle.sysmetric.metrics.name": "User Transaction Per Sec"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "Current OS Load [Metricbeat Oracle]",
+        "title": "User Transactions per second [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -42,10 +42,9 @@
                 "axis_position": "left",
                 "axis_scale": "normal",
                 "drop_last_bucket": 0,
-                "id": "d1ccd565-8204-4134-8b4f-7e5af26d2712",
+                "id": "896af1a1-badb-4109-a3cd-43c91c8e2aa2",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
-                "isModelInvalid": false,
                 "max_lines_legend": 1,
                 "series": [
                     {
@@ -54,14 +53,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "23a79e09-a8d8-4cad-af8e-de72117d0c5a",
-                        "label": "Current OS Load",
+                        "id": "e9a6077f-9afb-47c8-8f27-8b797c04e40c",
+                        "label": "User Transactions per second",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "9f054aac-6be0-4e51-a21b-48a078761230",
+                                "id": "313f52b8-c418-42c3-872f-578a17b28827",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -90,14 +89,14 @@
                 "type": "timeseries",
                 "use_kibana_indexes": true
             },
-            "title": "Current OS Load [Metricbeat Oracle]",
+            "title": "User Transactions per second [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "3af08cd0-c843-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "61d15a20-c87d-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -112,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:33:12.744Z",
-    "version": "WzI1OTQ5LDFd"
+    "updated_at": "2022-04-30T12:02:17.932Z",
+    "version": "WzI3MTQ1LDFd"
 }

@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Total Table Scans Per Txn"
+                                "query": "Physical Reads Per Sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Total Table Scans Per Txn"
+                                "oracle.sysmetric.metrics.name": "Physical Reads Per Sec"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "Total Table Scans per transaction [Metricbeat Oracle]",
+        "title": "Physical Reads per second [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -41,13 +41,8 @@
                 "axis_formatter": "number",
                 "axis_position": "left",
                 "axis_scale": "normal",
-                "background_color_rules": [
-                    {
-                        "id": "4fed3540-c7b0-11ec-92b7-c5ca08f4288e"
-                    }
-                ],
                 "drop_last_bucket": 0,
-                "id": "0a642abd-0af3-4be0-8b32-e64e2435e4cd",
+                "id": "bf98b445-17ae-48cd-80d2-309d0b4fc3f1",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
                 "isModelInvalid": false,
@@ -59,14 +54,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "dcb1b4af-bd64-4dbe-b27f-fc6652098b4d",
-                        "label": "Total Table Scans per transaction",
+                        "id": "f94cdd87-3e42-482d-a944-fe5551cd45ff",
+                        "label": "Physical Reads per second",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "e7116e83-4a2a-4500-98e4-121db45772e6",
+                                "id": "a19b2652-8832-40a8-9f62-e2a09a78a292",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -83,6 +78,7 @@
                         "split_mode": "terms",
                         "stacked": "none",
                         "terms_field": "service.address",
+                        "terms_size": "10",
                         "time_range_mode": "entire_time_range"
                     }
                 ],
@@ -95,14 +91,14 @@
                 "type": "timeseries",
                 "use_kibana_indexes": true
             },
-            "title": "Total Table Scans per transaction [Metricbeat Oracle]",
+            "title": "Physical Reads per second [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "a65d8eb0-c879-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "81c1f9a0-c843-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -117,6 +113,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:35:34.945Z",
-    "version": "WzI2MTU2LDFd"
+    "updated_at": "2022-04-30T05:08:00.706Z",
+    "version": "WzI1NTAyLDFd"
 }

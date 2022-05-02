@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "User Transaction Per Sec"
+                                "query": "Physical Writes Per Sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "User Transaction Per Sec"
+                                "oracle.sysmetric.metrics.name": "Physical Writes Per Sec"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "User Transactions per second [Metricbeat Oracle]",
+        "title": "Physical Writes per second [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -42,7 +42,7 @@
                 "axis_position": "left",
                 "axis_scale": "normal",
                 "drop_last_bucket": 0,
-                "id": "896af1a1-badb-4109-a3cd-43c91c8e2aa2",
+                "id": "1aecb7d4-67f6-432c-a1c9-d7f92db7b5ea",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
                 "max_lines_legend": 1,
@@ -53,14 +53,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "e9a6077f-9afb-47c8-8f27-8b797c04e40c",
-                        "label": "User Transactions per second",
+                        "id": "fbc600ac-5913-4aab-bc54-46ed3ee5f010",
+                        "label": "Physical Writes per second",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "313f52b8-c418-42c3-872f-578a17b28827",
+                                "id": "1f50728e-6c16-4543-b103-f35a4e37a415",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -89,14 +89,14 @@
                 "type": "timeseries",
                 "use_kibana_indexes": true
             },
-            "title": "User Transactions per second [Metricbeat Oracle]",
+            "title": "Physical Writes per second [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "61d15a20-c87d-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "09929750-c87a-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T12:02:17.932Z",
-    "version": "WzI3MTQ1LDFd"
+    "updated_at": "2022-04-30T11:38:21.387Z",
+    "version": "WzI2MjYxLDFd"
 }

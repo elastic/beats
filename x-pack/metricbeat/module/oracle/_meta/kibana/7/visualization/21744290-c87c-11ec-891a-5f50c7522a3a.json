@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Physical Read Total Bytes Per Sec"
+                                "query": "DB Block Changes Per Sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Physical Read Total Bytes Per Sec"
+                                "oracle.sysmetric.metrics.name": "DB Block Changes Per Sec"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "Physical Read Total Bytes per second [Metricbeat Oracle]",
+        "title": "DB Block Changes per second [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -42,7 +42,7 @@
                 "axis_position": "left",
                 "axis_scale": "normal",
                 "drop_last_bucket": 0,
-                "id": "df95ef37-41af-4228-a8f3-cc5ba7217eb1",
+                "id": "3109b107-a1a0-437c-b719-7614f6963831",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
                 "max_lines_legend": 1,
@@ -53,14 +53,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "81a640b4-1cff-4ae3-8b9e-2e38c6c40991",
-                        "label": "Physical Read Total Bytes per second",
+                        "id": "ea5f6c6d-9837-4b97-9816-a9d5810e9565",
+                        "label": "DB Block Changes per second",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "391f7ff8-685d-43d4-b215-936a2018614f",
+                                "id": "c3f9567a-8092-4b7e-8913-5f9c94d10698",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -89,14 +89,14 @@
                 "type": "timeseries",
                 "use_kibana_indexes": true
             },
-            "title": "Physical Read Total Bytes per second [Metricbeat Oracle]",
+            "title": "DB Block Changes per second [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "5e35d950-c87c-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "21744290-c87c-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:55:02.379Z",
-    "version": "WzI3MDM0LDFd"
+    "updated_at": "2022-04-30T11:53:20.448Z",
+    "version": "WzI2OTA1LDFd"
 }

@@ -85,10 +85,10 @@
             "type": "metric"
         }
     },
-    "coreMigrationVersion": "8.2.0",
+    "coreMigrationVersion": "7.14.0",
     "id": "c777ba10-c83f-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {

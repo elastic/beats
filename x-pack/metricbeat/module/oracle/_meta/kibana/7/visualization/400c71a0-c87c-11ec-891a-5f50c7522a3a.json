@@ -93,10 +93,10 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
+    "coreMigrationVersion": "7.14.0",
     "id": "400c71a0-c87c-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {

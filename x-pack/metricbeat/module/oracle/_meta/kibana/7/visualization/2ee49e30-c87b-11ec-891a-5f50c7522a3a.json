@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Physical Reads Per Sec"
+                                "query": "Total Index Scans Per Txn"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Physical Reads Per Sec"
+                                "oracle.sysmetric.metrics.name": "Total Index Scans Per Txn"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "Physical Reads per second [Metricbeat Oracle]",
+        "title": "Total Index Scans per transaction [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -42,10 +42,9 @@
                 "axis_position": "left",
                 "axis_scale": "normal",
                 "drop_last_bucket": 0,
-                "id": "bf98b445-17ae-48cd-80d2-309d0b4fc3f1",
+                "id": "437d5319-0c8c-4f97-860d-094d0a62f3e9",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
-                "isModelInvalid": false,
                 "max_lines_legend": 1,
                 "series": [
                     {
@@ -54,14 +53,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "f94cdd87-3e42-482d-a944-fe5551cd45ff",
-                        "label": "Physical Reads per second",
+                        "id": "64209a25-471f-4c43-9053-cb4937a535e0",
+                        "label": "Total Index Scans per transaction",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "a19b2652-8832-40a8-9f62-e2a09a78a292",
+                                "id": "de615d10-f4fa-42d7-aff3-1e74a43a52d7",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -78,7 +77,6 @@
                         "split_mode": "terms",
                         "stacked": "none",
                         "terms_field": "service.address",
-                        "terms_size": "10",
                         "time_range_mode": "entire_time_range"
                     }
                 ],
@@ -91,14 +89,14 @@
                 "type": "timeseries",
                 "use_kibana_indexes": true
             },
-            "title": "Physical Reads per second [Metricbeat Oracle]",
+            "title": "Total Index Scans per transaction [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "81c1f9a0-c843-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "2ee49e30-c87b-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -113,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T05:08:00.706Z",
-    "version": "WzI1NTAyLDFd"
+    "updated_at": "2022-04-30T11:46:33.508Z",
+    "version": "WzI2Njg1LDFd"
 }

@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Network Traffic Volume Per Sec"
+                                "query": "Response Time Per Txn"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Network Traffic Volume Per Sec"
+                                "oracle.sysmetric.metrics.name": "Response Time Per Txn"
                             }
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "title": "Network Traffic Volume per second [Metricbeat Oracle]",
+        "title": "Response Time (Centi-Second) per transaction [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -41,10 +41,16 @@
                 "axis_formatter": "number",
                 "axis_position": "left",
                 "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "75beaee0-c7bd-11ec-92b7-c5ca08f4288e"
+                    }
+                ],
                 "drop_last_bucket": 0,
-                "id": "748bd318-1ee4-4533-945b-bb6853a32ac2",
+                "id": "42d37eeb-105d-4c32-845e-347cdd0efdff",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
+                "isModelInvalid": false,
                 "max_lines_legend": 1,
                 "series": [
                     {
@@ -53,14 +59,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "feb0d746-e5b9-4ca6-ac2e-a8e12bd25fca",
-                        "label": "Network Traffic Volume per second",
+                        "id": "60ea5eb0-0b9f-40b1-bbe4-ddc2fc795155",
+                        "label": "Response Time (Centi-Second) per txn",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "d2752c2a-af50-4cc9-a8a4-212399bb67e5",
+                                "id": "c92b4dba-3592-4d2e-9f60-bcab33fa9072",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -86,17 +92,17 @@
                 "time_range_mode": "entire_time_range",
                 "tooltip_mode": "show_all",
                 "truncate_legend": 1,
-                "type": "timeseries",
+                "type": "metric",
                 "use_kibana_indexes": true
             },
-            "title": "Network Traffic Volume per second [Metricbeat Oracle]",
+            "title": "Response Time (Centi-Second) per transaction [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "00b53be0-c87c-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "93361970-c922-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -111,6 +117,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:52:25.509Z",
-    "version": "WzI2ODM5LDFd"
+    "updated_at": "2022-05-01T07:44:47.786Z",
+    "version": "WzMxODEyLDFd"
 }

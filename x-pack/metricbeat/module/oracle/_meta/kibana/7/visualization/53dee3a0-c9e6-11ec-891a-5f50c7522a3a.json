@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Host CPU Utilization (%)"
+                                "query": "Average Active Sessions"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Host CPU Utilization (%)"
+                                "oracle.sysmetric.metrics.name": "Average Active Sessions"
                             }
                         }
                     }
@@ -32,8 +32,15 @@
                 }
             }
         },
-        "title": "Host CPU Utilization (%) [Metricbeat Oracle]",
-        "uiStateJSON": {},
+        "title": "Top 10 Average Active Session counts by host [Metricbeat Oracle]",
+        "uiStateJSON": {
+            "table": {
+                "sort": {
+                    "column": "_default_",
+                    "order": "asc"
+                }
+            }
+        },
         "version": 1,
         "visState": {
             "aggs": [],
@@ -41,11 +48,19 @@
                 "axis_formatter": "number",
                 "axis_position": "left",
                 "axis_scale": "normal",
+                "bar_color_rules": [
+                    {
+                        "id": "7c823200-c9df-11ec-bab5-652476a9e8f4"
+                    }
+                ],
                 "drop_last_bucket": 0,
-                "id": "0590e530-cf66-4e39-a8ac-47015d91def9",
+                "id": "37de0557-33eb-44de-a7e5-50e03a0d5207",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
                 "max_lines_legend": 1,
+                "pivot_id": "service.address",
+                "pivot_label": "Host Name",
+                "pivot_type": "string",
                 "series": [
                     {
                         "axis_position": "right",
@@ -53,14 +68,14 @@
                         "color": "#68BC00",
                         "fill": 0.5,
                         "formatter": "default",
-                        "id": "e55e9af3-e602-4fa6-a99b-ddac067b027f",
-                        "label": "Host CPU Utilization (%)",
+                        "id": "ae0aa359-2745-4f69-9c18-cab79b2d7692",
+                        "label": "Average Active Sessions",
                         "line_width": 1,
                         "metrics": [
                             {
                                 "agg_with": "avg",
                                 "field": "oracle.sysmetric.metrics.value",
-                                "id": "3d751ffd-899e-41f4-b5f8-a673534be12f",
+                                "id": "63e5475d-5d50-4796-a13a-1e53ebca3a5c",
                                 "order": "desc",
                                 "size": 1,
                                 "type": "top_hit"
@@ -74,9 +89,8 @@
                         "point_size": 1,
                         "separate_axis": 0,
                         "series_drop_last_bucket": 0,
-                        "split_mode": "terms",
+                        "split_mode": "everything",
                         "stacked": "none",
-                        "terms_field": "service.address",
                         "time_range_mode": "entire_time_range"
                     }
                 ],
@@ -86,17 +100,17 @@
                 "time_range_mode": "entire_time_range",
                 "tooltip_mode": "show_all",
                 "truncate_legend": 1,
-                "type": "timeseries",
+                "type": "table",
                 "use_kibana_indexes": true
             },
-            "title": "Host CPU Utilization (%) [Metricbeat Oracle]",
+            "title": "Top 10 Average Active Session counts by host [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.2.0",
-    "id": "ffd22450-c87a-11ec-891a-5f50c7522a3a",
+    "coreMigrationVersion": "7.14.0",
+    "id": "53dee3a0-c9e6-11ec-891a-5f50c7522a3a",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "7.14.0"
     },
     "references": [
         {
@@ -111,6 +125,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:45:14.523Z",
-    "version": "WzI2NTg4LDFd"
+    "updated_at": "2022-05-02T07:06:02.848Z",
+    "version": "WzM1MzUyLDFd"
 }
