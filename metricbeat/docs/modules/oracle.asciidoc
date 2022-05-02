@@ -17,8 +17,6 @@ This is the https://www.oracle.com[Oracle] module for Metricbeat. It is under ac
 Oracle Metricbeat module is being tested version 12c R2 by using the store/oracle/database-enterprise:12.2.0.1 Docker image downloaded directly from the https://hub.docker.com/_/oracle-database-enterprise-edition[Oracle Docker Hub repository]
 which is based on 5.0.13-arch1-1-ARCH Arch Linux. This is important, the module has only been tested with the mentioned image in Linux environments.
 
-OCI Instant Client is also required and the module has been tested by using version 18.5. See below for more information.
-
 [float]
 == Dashboard
 An overview dashboard for Kibana is already included:
@@ -28,14 +26,35 @@ image::./images/metricbeat-oracle-overview.png[]
 [float]
 
 == Requirements
-Oracle database requires a special OCI connector to get connected to the database. You can find more information about it in the https://www.oracle.com/database/technologies/instant-client.html[official link of Oracle's webpage]. Oracle's webpage contains a comprehensive manual about installation methods and troubleshooting. A small description is included here but follow Oracle's official documentation if you find some issue. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found https://www.oracle.com/database/technologies/instant-client/downloads.html[here]. The Oracle Technology Network License Agreement with Oracle must be accepted to download the library.
 
-The OCI library install few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. The environment variable `LD_LIBRARY_PATH` is used to set the reference required by the Metricbeat library. For example, let's say you have downloaded the library into your `Downloads` folder, you can follow the steps below to install the ZIP library on `/usr/lib` (assuming you have `wget` and a zip unpacker):
+*Oracle Database Connection Pre-requisites*
 
-	unzip $HOME/Downloads/instantclient-basic-linux.x64-18.5.0.0.0dbru.zip -d /usr/lib
-	export LD_LIBRARY_PATH=/usr/lib/instantclient_18_5:$LD_LIBRARY_PATH`
+To get connected with the Oracle Database ORACLE_SID, ORACLE_BASE, ORACLE_HOME environment variables should be set.
 
-Then, Metricbeat can be launched normally if the environment variable is set.
+For example: Let’s consider Oracle Database 21c installation using RPM manually by following https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html[this] link, environment variables should be set as follows:
+    `ORACLE_SID=ORCLCDB`
+    `ORACLE_BASE=/opt/oracle/oradata`
+    `ORACLE_HOME=/opt/oracle/product/21c/dbhome_1`
+Also, add `ORACLE_HOME/bin` to the `PATH` environment variable.
+
+*Oracle Instant Client*
+
+Oracle Instant Client enables development and deployment of applications that connect to Oracle Database. The Instant Client libraries provide the necessary network connectivity and advanced data features to make full use of Oracle Database. If you have OCI Oracle server which comes with these libraries pre-installed, you don't need a separate client installation.
+
+The OCI library install few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. Please follow https://docs.oracle.com/en/database/oracle/oracle-database/21/lacli/install-instant-client-using-zip.html#GUID-D3DCB4FB-D3CA-4C25-BE48-3A1FB5A22E84[this] link for OCI Instant Client set up. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found https://www.oracle.com/database/technologies/instant-client/downloads.html[here].
+
+*Enable Listener*
+
+The Oracle listener is a service that runs on the database host and receives requests from Oracle clients. Make sure that https://docs.oracle.com/cd/B19306_01/network.102/b14213/lsnrctl.htm[listener] should be running. 
+To check if the listener is running or not, run: 
+
+`lsnrctl STATUS`
+
+If the listener is not running, use the command to start:
+
+`lsnrctl START`
+
+Then, Metricbeat can be launched.
 
 [float]
 == Metricsets
