@@ -18,12 +18,12 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -117,13 +117,13 @@ func (p Process) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (p Process) toMapStr() common.MapStr {
-	return common.MapStr{
+func (p Process) toMapStr() mapstr.M {
+	return mapstr.M{
 		// https://github.com/elastic/ecs#-process-fields
 		"name": p.Info.Name,
 		"args": p.Info.Args,
 		"pid":  p.Info.PID,
-		"parent": common.MapStr{
+		"parent": mapstr.M{
 			"pid": p.Info.PPID,
 		},
 		"working_directory": p.Info.CWD,
@@ -341,8 +341,8 @@ func (ms *MetricSet) enrichProcess(process *Process) {
 
 func (ms *MetricSet) processEvent(process *Process, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"process"},
 				"type":     []string{action.Type()},
@@ -394,7 +394,7 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 	return event
 }
 
-func putIfNotEmpty(mapstr *common.MapStr, key string, value string) {
+func putIfNotEmpty(mapstr *mapstr.M, key string, value string) {
 	if value != "" {
 		mapstr.Put(key, value)
 	}

@@ -23,10 +23,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -79,7 +79,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	report.Event(mb.Event{
-		MetricSetFields: common.MapStr{
+		MetricSetFields: mapstr.M{
 			"nodes":      zones.Zones,
 			"buddy_info": zones.BuddyInfo,
 		},

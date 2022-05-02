@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TimestampFormatString is a wrapper around EventFormatString for the
@@ -29,14 +29,14 @@ import (
 // shared static fields (typically agent / version) and the event timestamp.
 type TimestampFormatString struct {
 	eventFormatString *EventFormatString
-	fields            common.MapStr
+	fields            mapstr.M
 }
 
 // NewTimestampFormatString creates from the given event format string a
 // TimestampFormatString that includes only the given static fields and
 // a timestamp.
 func NewTimestampFormatString(
-	eventFormatString *EventFormatString, staticFields common.MapStr,
+	eventFormatString *EventFormatString, staticFields mapstr.M,
 ) (*TimestampFormatString, error) {
 	return &TimestampFormatString{
 		eventFormatString: eventFormatString,
@@ -44,21 +44,21 @@ func NewTimestampFormatString(
 	}, nil
 }
 
-// FieldsForBeat returns a common.MapStr with the given beat name and
+// FieldsForBeat returns a mapstr.M with the given beat name and
 // version assigned to their standard field names.
-func FieldsForBeat(beat string, version string) common.MapStr {
-	return common.MapStr{
+func FieldsForBeat(beat string, version string) mapstr.M {
+	return mapstr.M{
 		// beat object was left in for backward compatibility reason for older configs.
-		"beat": common.MapStr{
+		"beat": mapstr.M{
 			"name":    beat,
 			"version": version,
 		},
-		"agent": common.MapStr{
+		"agent": mapstr.M{
 			"name":    beat,
 			"version": version,
 		},
 		// For the Beats that have an observer role
-		"observer": common.MapStr{
+		"observer": mapstr.M{
 			"name":    beat,
 			"version": version,
 		},

@@ -26,11 +26,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -48,7 +49,7 @@ type EventConfigurer interface {
 
 	// CreateConfig creates a list of configurations from a bus.Event. The
 	// received event will have all keys defined in `EventFilter`.
-	CreateConfig(bus.Event) ([]*common.Config, error)
+	CreateConfig(bus.Event) ([]*conf.C, error)
 }
 
 // Autodiscover process, it takes a beat adapter and user config and runs autodiscover process, spawning
@@ -76,7 +77,7 @@ func NewAutodiscover(
 	pipeline beat.PipelineConnector,
 	factory cfgfile.RunnerFactory,
 	configurer EventConfigurer,
-	config *Config,
+	c *Config,
 	keystore keystore.Keystore,
 ) (*Autodiscover, error) {
 	logger := logp.NewLogger("autodiscover")
@@ -86,7 +87,7 @@ func NewAutodiscover(
 
 	// Init providers
 	var providers []Provider
-	for _, providerCfg := range config.Providers {
+	for _, providerCfg := range c.Providers {
 		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
 		if err != nil {
 			return nil, errors.Wrap(err, "error in autodiscover provider settings")
@@ -199,7 +200,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 	if a.logger.IsDebug() {
 		for _, c := range configs {
-			a.logger.Debugf("Generated config: %+v", common.DebugString(c, true))
+			a.logger.Debugf("Generated config: %+v", conf.DebugString(c, true))
 		}
 	}
 
@@ -212,7 +213,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	for _, config := range configs {
 		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
-			a.logger.Debugf("Could not hash config %v: %v", common.DebugString(config, true), err)
+			a.logger.Debugf("Could not hash config %v: %v", conf.DebugString(config, true), err)
 			continue
 		}
 
@@ -220,12 +221,12 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 		dynFields := a.meta.Store(hash, meta)
 
 		if _, ok := newCfg[hash]; ok {
-			a.logger.Debugf("Config %v duplicated in start event", common.DebugString(config, true))
+			a.logger.Debugf("Config %v duplicated in start event", conf.DebugString(config, true))
 			continue
 		}
 
 		if cfg, ok := a.configs[eventID][hash]; ok {
-			a.logger.Debugf("Config %v is already running", common.DebugString(config, true))
+			a.logger.Debugf("Config %v is already running", conf.DebugString(config, true))
 			newCfg[hash] = cfg
 			continue
 		}
@@ -234,7 +235,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 		if err != nil {
 			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
 				"Auto discover config check failed for config '%s', won't start runner",
-				common.DebugString(config, true))))
+				conf.DebugString(config, true))))
 			continue
 		}
 		newCfg[hash] = &reload.ConfigWithMeta{
@@ -280,14 +281,14 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	return updated
 }
 
-func (a *Autodiscover) getMeta(event bus.Event) common.MapStr {
+func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
 	m := event["meta"]
 	if m == nil {
 		return nil
 	}
 
 	a.logger.Debugf("Got a meta field in the event")
-	meta, ok := m.(common.MapStr)
+	meta, ok := m.(mapstr.M)
 	if !ok {
 		a.logger.Errorf("Got a wrong meta field for event %v", event)
 		return nil

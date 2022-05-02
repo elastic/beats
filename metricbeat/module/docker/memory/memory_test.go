@@ -24,9 +24,9 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {
@@ -56,23 +56,23 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	memoryRawStats.Stats = memorystats
 
 	totalRSS := memorystats.MemoryStats.Stats["total_rss"]
-	expectedRootFields := common.MapStr{
-		"container": common.MapStr{
+	expectedRootFields := mapstr.M{
+		"container": mapstr.M{
 			"id":   containerID,
 			"name": "name1",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "image",
 			},
 			"runtime": "docker",
-			"memory": common.MapStr{
+			"memory": mapstr.M{
 				"usage": 0.5,
 			},
 		},
-		"docker": common.MapStr{
-			"container": common.MapStr{
-				"labels": common.MapStr{
+		"docker": mapstr.M{
+			"container": mapstr.M{
+				"labels": mapstr.M{
 					"label1": "val1",
-					"label2": common.MapStr{
+					"label2": mapstr.M{
 						"foo":   "val3",
 						"value": "val2",
 					},
@@ -80,19 +80,19 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 			},
 		},
 	}
-	expectedFields := common.MapStr{
+	expectedFields := mapstr.M{
 		"stats": map[string]uint64{
 			"total_rss": 5,
 		},
-		"fail": common.MapStr{
+		"fail": mapstr.M{
 			"count": memorystats.MemoryStats.Failcnt,
 		},
 		"limit": memorystats.MemoryStats.Limit,
-		"rss": common.MapStr{
+		"rss": mapstr.M{
 			"total": totalRSS,
 			"pct":   float64(totalRSS) / float64(memorystats.MemoryStats.Limit),
 		},
-		"usage": common.MapStr{
+		"usage": mapstr.M{
 			"total": memorystats.MemoryStats.Usage,
 			"pct":   float64(memorystats.MemoryStats.Usage) / float64(memorystats.MemoryStats.Limit),
 			"max":   memorystats.MemoryStats.MaxUsage,

@@ -11,7 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewDelete(t *testing.T) {
@@ -115,7 +116,7 @@ func TestNewDelete(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.config)
+			cfg := conf.MustNewConfigFrom(tc.config)
 			gotDelete, gotErr := tc.constructor(cfg, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
@@ -141,9 +142,9 @@ func TestDeleteFunctions(t *testing.T) {
 			name:        "deleteBody",
 			tfunc:       deleteBody,
 			paramCtx:    &transformContext{},
-			paramTr:     transformable{"body": common.MapStr{"a_key": "a_value"}},
+			paramTr:     transformable{"body": mapstr.M{"a_key": "a_value"}},
 			paramKey:    "a_key",
-			expectedTr:  transformable{"body": common.MapStr{}},
+			expectedTr:  transformable{"body": mapstr.M{}},
 			expectedErr: nil,
 		},
 		{

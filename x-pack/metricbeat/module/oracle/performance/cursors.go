@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type cursorsByUsernameAndMachine struct {
@@ -84,11 +84,11 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 	return results, nil
 }
 
-func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachine) []common.MapStr {
-	out := make([]common.MapStr, 0)
+func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachine) []mapstr.M {
+	out := make([]mapstr.M, 0)
 
 	for _, v := range cs {
-		ms := common.MapStr{}
+		ms := mapstr.M{}
 
 		oracle.SetSqlValue(m.Logger(), ms, "username", &oracle.StringValue{NullString: v.username})
 		oracle.SetSqlValue(m.Logger(), ms, "machine", &oracle.StringValue{NullString: v.machine})
@@ -136,8 +136,8 @@ func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors,
 	return &dest, nil
 }
 
-func (m *MetricSet) addCursorData(cs *totalCursors) common.MapStr {
-	out := make(common.MapStr)
+func (m *MetricSet) addCursorData(cs *totalCursors) mapstr.M {
+	out := make(mapstr.M)
 
 	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.total", &oracle.Int64Value{NullInt64: cs.totalCursors})
 	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.current", &oracle.Int64Value{NullInt64: cs.currentCursors})

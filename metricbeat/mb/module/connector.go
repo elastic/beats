@@ -21,10 +21,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Connector configures and establishes a beat.Client for publishing events
@@ -32,7 +33,7 @@ import (
 type Connector struct {
 	pipeline   beat.PipelineConnector
 	processors *processors.Processors
-	eventMeta  common.EventMetadata
+	eventMeta  mapstr.EventMetadata
 	timeSeries bool
 	keepNull   bool
 }
@@ -45,7 +46,7 @@ type connectorConfig struct {
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`
 
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
 
 type metricSetRegister interface {
@@ -55,7 +56,7 @@ type metricSetRegister interface {
 func NewConnector(
 	beatInfo beat.Info,
 	pipeline beat.PipelineConnector,
-	c *common.Config,
+	c *conf.C,
 ) (*Connector, error) {
 	config := connectorConfig{}
 	if err := c.Unpack(&config); err != nil {

@@ -13,12 +13,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/test"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func Test_internalBuilder(t *testing.T) {
@@ -69,12 +69,12 @@ func Test_internalBuilder(t *testing.T) {
 		"id":       instance.instanceID(),
 		"provider": uuid,
 		"start":    true,
-		"aws": common.MapStr{
+		"aws": mapstr.M{
 			"ec2": instance.toMap(),
 		},
 		"cloud": instance.toCloudMap(),
-		"meta": common.MapStr{
-			"aws": common.MapStr{
+		"meta": mapstr.M{
+			"aws": mapstr.M{
 				"ec2": instance.toMap(),
 			},
 			"cloud": instance.toCloudMap(),

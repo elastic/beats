@@ -42,6 +42,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
+	c "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type testIndexSelector struct{}
@@ -78,7 +80,7 @@ func TestPublishStatusCode(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 	events := []publisher.Event{event}
 
 	t.Run("returns pre-defined error and drops batch when 413", func(t *testing.T) {
@@ -99,7 +101,7 @@ func TestPublishStatusCode(t *testing.T) {
 		)
 		assert.NoError(t, err)
 
-		event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
+		event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 		events := []publisher.Event{event}
 		batch := &batchMock{
 			events: events,
@@ -154,7 +156,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 	item := `{"create": {"status": 200}},`
 	response := []byte(`{"items": [` + strings.Repeat(item, N) + `]}`)
 
-	event := common.MapStr{"field": 1}
+	event := mapstr.M{"field": 1}
 	events := make([]publisher.Event, N)
 	for i := 0; i < N; i++ {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
@@ -181,8 +183,8 @@ func TestCollectPublishFailMiddle(t *testing.T) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
-	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
+	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
 	res, stats := client.bulkCollectPublishFails(response, events)
@@ -227,8 +229,8 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": 1}}}
-	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": "bar1"}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}}
+	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}}
 	events := []publisher.Event{event, eventFail, event}
 
 	res, stats := client.bulkCollectPublishFails(response, events)
@@ -236,12 +238,12 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 	if len(res) == 1 {
 		expected := publisher.Event{
 			Content: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message":       "{\"bar\":\"bar1\"}",
 					"error.type":    400,
 					"error.message": "{\n\t\t\t\"root_cause\" : [\n\t\t\t  {\n\t\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\"\n\t\t\t  }\n\t\t\t],\n\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\",\n\t\t\t\"caused_by\" : {\n\t\t\t  \"type\" : \"illegal_argument_exception\",\n\t\t\t  \"reason\" : \"For input string: \\\"bar1\\\"\"\n\t\t\t}\n\t\t  }",
 				},
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					dead_letter_marker_field: true,
 				},
 			},
@@ -285,8 +287,8 @@ func TestCollectPublishFailDrop(t *testing.T) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": 1}}}
-	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": "bar1"}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}}
+	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}}
 	events := []publisher.Event{event, eventFail, event}
 
 	res, stats := client.bulkCollectPublishFails(response, events)
@@ -311,7 +313,7 @@ func TestCollectPublishFailAll(t *testing.T) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
 	res, stats := client.bulkCollectPublishFails(response, events)
@@ -360,7 +362,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
       ]
     }`)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
 	events := []publisher.Event{event}
 
 	res, _ := client.bulkCollectPublishFails(response, events)
@@ -385,7 +387,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 	events := []publisher.Event{event, event, event}
 
 	for i := 0; i < b.N; i++ {
@@ -413,8 +415,8 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
-	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
+	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
 	for i := 0; i < b.N; i++ {
@@ -442,7 +444,7 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
+	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
 	for i := 0; i < b.N; i++ {
@@ -492,7 +494,7 @@ func TestClientWithHeaders(t *testing.T) {
 	assert.Equal(t, 1, requestCount)
 
 	// bulk request
-	event := beat.Event{Fields: common.MapStr{
+	event := beat.Event{Fields: mapstr.M{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "libbeat",
 		"message":    "Test message from libbeat",
@@ -508,33 +510,33 @@ func TestBulkEncodeEvents(t *testing.T) {
 	cases := map[string]struct {
 		version string
 		docType string
-		config  common.MapStr
-		events  []common.MapStr
+		config  mapstr.M
+		events  []mapstr.M
 	}{
 		"6.x": {
 			version: "6.8.0",
 			docType: "doc",
-			config:  common.MapStr{},
-			events:  []common.MapStr{{"message": "test"}},
+			config:  mapstr.M{},
+			events:  []mapstr.M{{"message": "test"}},
 		},
 		"latest": {
 			version: version.GetDefaultVersion(),
 			docType: "",
-			config:  common.MapStr{},
-			events:  []common.MapStr{{"message": "test"}},
+			config:  mapstr.M{},
+			events:  []mapstr.M{{"message": "test"}},
 		},
 	}
 
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.config)
+			cfg := c.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
 				Version:     test.version,
 			}
 
-			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+			im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -585,7 +587,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 }
 
 func TestBulkEncodeEventsWithOpType(t *testing.T) {
-	cases := []common.MapStr{
+	cases := []mapstr.M{
 		{"_id": "111", "op_type": e.OpTypeIndex, "message": "test 1", "bulkIndex": 0},
 		{"_id": "112", "message": "test 2", "bulkIndex": 2},
 		{"_id": "", "op_type": e.OpTypeDelete, "message": "test 6", "bulkIndex": -1}, // this won't get encoded due to missing _id
@@ -594,13 +596,13 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		{"_id": "115", "op_type": e.OpTypeIndex, "message": "test 5", "bulkIndex": 7},
 	}
 
-	cfg := common.MustNewConfigFrom(common.MapStr{})
+	cfg := c.MustNewConfigFrom(mapstr.M{})
 	info := beat.Info{
 		IndexPrefix: "test",
 		Version:     version.GetDefaultVersion(),
 	}
 
-	im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+	im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
 	require.NoError(t, err)
 
 	index, pipeline, err := buildSelectors(im, info, cfg)
@@ -608,7 +610,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 
 	events := make([]publisher.Event, len(cases))
 	for i, fields := range cases {
-		meta := common.MapStr{
+		meta := mapstr.M{
 			"_id": fields["_id"],
 		}
 		if opType, exists := fields["op_type"]; exists {
@@ -618,7 +620,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		events[i] = publisher.Event{
 			Content: beat.Event{
 				Meta: meta,
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": fields["message"],
 				},
 			},

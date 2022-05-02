@@ -20,8 +20,8 @@ package heap
 import (
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/golang"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 //Stats contains the memory info that we get from the fetch request
@@ -30,15 +30,15 @@ type Stats struct {
 	Cmdline  []interface{}
 }
 
-func eventMapping(stats Stats, m *MetricSet) common.MapStr {
-	var event = common.MapStr{
+func eventMapping(stats Stats, m *MetricSet) mapstr.M {
+	var event = mapstr.M{
 		"cmdline": golang.GetCmdStr(stats.Cmdline),
 	}
 	//currentNumGC
 	ms := &stats.MemStats
 
 	// add heap summary
-	event["allocations"] = common.MapStr{
+	event["allocations"] = mapstr.M{
 		"mallocs": ms.Mallocs,
 		"frees":   ms.Frees,
 		"objects": ms.HeapObjects,
@@ -50,7 +50,7 @@ func eventMapping(stats Stats, m *MetricSet) common.MapStr {
 		"active":    ms.HeapInuse,
 	}
 
-	event["system"] = common.MapStr{
+	event["system"] = mapstr.M{
 		"total":    ms.Sys,
 		"obtained": ms.HeapSys,
 		"stack":    ms.StackSys,
@@ -84,22 +84,22 @@ func eventMapping(stats Stats, m *MetricSet) common.MapStr {
 		m.lastNumGC = ms.NumGC
 	}
 
-	event["gc"] = common.MapStr{
+	event["gc"] = mapstr.M{
 		"next_gc_limit": ms.NextGC,
 		"total_count":   ms.NumGC,
 		"cpu_fraction":  ms.GCCPUFraction,
-		"total_pause": common.MapStr{
+		"total_pause": mapstr.M{
 			"ns": ms.PauseTotalNs,
 		},
-		"pause": common.MapStr{
+		"pause": mapstr.M{
 			"count": count,
-			"sum": common.MapStr{
+			"sum": mapstr.M{
 				"ns": duration,
 			},
-			"avg": common.MapStr{
+			"avg": mapstr.M{
 				"ns": avgDuration,
 			},
-			"max": common.MapStr{
+			"max": mapstr.M{
 				"ns": maxDuration,
 			},
 		},

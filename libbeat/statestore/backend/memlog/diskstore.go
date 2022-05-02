@@ -29,9 +29,9 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // diskstore manages the on-disk state of the memlog store.
@@ -79,8 +79,8 @@ type dataFileInfo struct {
 
 // storeEntry is used to write entries to the checkpoint file only.
 type storeEntry struct {
-	Key    string        `struct:"_key"`
-	Fields common.MapStr `struct:",inline"`
+	Key    string   `struct:"_key"`
+	Fields mapstr.M `struct:",inline"`
 }
 
 // storeMeta is read from the meta file.
@@ -520,7 +520,7 @@ func loadDataFile(path string, tbl map[string]entry) error {
 		return nil
 	}
 
-	err := readDataFile(path, func(key string, state common.MapStr) {
+	err := readDataFile(path, func(key string, state mapstr.M) {
 		tbl[key] = entry{value: state}
 	})
 	return err
@@ -528,7 +528,7 @@ func loadDataFile(path string, tbl map[string]entry) error {
 
 var ErrCorruptStore = errors.New("corrupted data file")
 
-func readDataFile(path string, fn func(string, common.MapStr)) error {
+func readDataFile(path string, fn func(string, mapstr.M)) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -549,7 +549,7 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 		}
 
 		delete(state, keyField)
-		fn(key, common.MapStr(state))
+		fn(key, mapstr.M(state))
 	}
 
 	return nil

@@ -21,11 +21,11 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -42,7 +42,7 @@ func makeKafka(
 	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *config.C,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	log.Debug("initialize kafka output")
@@ -84,7 +84,7 @@ func makeKafka(
 	return outputs.Success(config.BulkMaxSize, retry, client)
 }
 
-func buildTopicSelector(cfg *common.Config) (outil.Selector, error) {
+func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "topic",
 		MultiKey:         "topics",

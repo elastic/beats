@@ -31,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -132,8 +133,8 @@ func AddFileSystemUsedPercentage(f *FSStat) {
 }
 
 // GetFilesystemEvent turns a stat struct into a MapStr
-func GetFilesystemEvent(fsStat *FSStat, addStats bool) common.MapStr {
-	evt := common.MapStr{
+func GetFilesystemEvent(fsStat *FSStat, addStats bool) mapstr.M {
+	evt := mapstr.M{
 		"type":        fsStat.SysTypeName,
 		"device_name": fsStat.DevName,
 		"mount_point": fsStat.Mount,
@@ -142,7 +143,7 @@ func GetFilesystemEvent(fsStat *FSStat, addStats bool) common.MapStr {
 		evt.Put("total", fsStat.Total)
 		evt.Put("available", fsStat.Avail)
 		evt.Put("free", fsStat.Free)
-		evt.Put("used", common.MapStr{
+		evt.Put("used", mapstr.M{
 			"pct":   fsStat.UsedPercent,
 			"bytes": fsStat.Used,
 		})

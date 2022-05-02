@@ -13,10 +13,11 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfig(t *testing.T) {
@@ -27,7 +28,7 @@ func TestConfig(t *testing.T) {
 		// Have a separate copy of defaults in the test to make it clear when
 		// anyone changes the defaults.
 		parserConf := parser.Config{}
-		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
+		require.NoError(t, parserConf.Unpack(conf.MustNewConfigFrom("")))
 		return config{
 			QueueURL:            quequeURL,
 			BucketARN:           s3Bucket,
@@ -54,7 +55,7 @@ func TestConfig(t *testing.T) {
 		queueURL       string
 		s3Bucket       string
 		nonAWSS3Bucket string
-		config         common.MapStr
+		config         mapstr.M
 		expectedErr    string
 		expectedCfg    func(queueURL, s3Bucket string, nonAWSS3Bucket string) config
 	}{
@@ -63,7 +64,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url": queueURL,
 			},
 			"",
@@ -74,7 +75,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 			},
@@ -90,9 +91,9 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url": queueURL,
-				"file_selectors": []common.MapStr{
+				"file_selectors": []mapstr.M{
 					{
 						"regex": "/CloudTrail/",
 					},
@@ -116,7 +117,7 @@ func TestConfig(t *testing.T) {
 			"",
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":           "",
 				"bucket_arn":          "",
 				"non_aws_bucket_name": "",
@@ -129,7 +130,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":  queueURL,
 				"bucket_arn": s3Bucket,
 			},
@@ -141,7 +142,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			nonAWSS3Bucket,
-			common.MapStr{
+			mapstr.M{
 				"queue_url":           queueURL,
 				"non_aws_bucket_name": nonAWSS3Bucket,
 			},
@@ -153,7 +154,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			nonAWSS3Bucket,
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":          s3Bucket,
 				"non_aws_bucket_name": nonAWSS3Bucket,
 			},
@@ -165,7 +166,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			s3Bucket,
 			nonAWSS3Bucket,
-			common.MapStr{
+			mapstr.M{
 				"queue_url":           queueURL,
 				"bucket_arn":          s3Bucket,
 				"non_aws_bucket_name": nonAWSS3Bucket,
@@ -178,7 +179,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":   queueURL,
 				"api_timeout": "0",
 			},
@@ -190,7 +191,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":          queueURL,
 				"visibility_timeout": "0",
 			},
@@ -202,7 +203,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":          queueURL,
 				"visibility_timeout": "12h1ns",
 			},
@@ -214,7 +215,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":           s3Bucket,
 				"bucket_list_interval": "0",
 			},
@@ -226,7 +227,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": "0",
 			},
@@ -238,7 +239,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":              queueURL,
 				"max_number_of_messages": "0",
 			},
@@ -250,7 +251,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":   queueURL,
 				"buffer_size": "0",
 			},
@@ -262,7 +263,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url": queueURL,
 				"max_bytes": "0",
 			},
@@ -274,7 +275,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":                    queueURL,
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
@@ -287,7 +288,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":                   s3Bucket,
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
@@ -300,7 +301,7 @@ func TestConfig(t *testing.T) {
 			"",
 			"",
 			nonAWSS3Bucket,
-			common.MapStr{
+			mapstr.M{
 				"non_aws_bucket_name": nonAWSS3Bucket,
 				"number_of_workers":   5,
 			},
@@ -316,7 +317,7 @@ func TestConfig(t *testing.T) {
 			"",
 			"",
 			nonAWSS3Bucket,
-			common.MapStr{
+			mapstr.M{
 				"non_aws_bucket_name": nonAWSS3Bucket,
 				"number_of_workers":   5,
 				"fips_enabled":        true,
@@ -329,7 +330,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 				"path_style":        true,
@@ -342,7 +343,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":         queueURL,
 				"number_of_workers": 5,
 				"path_style":        true,
@@ -355,7 +356,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			"",
-			common.MapStr{
+			mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 				"provider":          "asdf",
@@ -368,7 +369,7 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			"",
 			"",
-			common.MapStr{
+			mapstr.M{
 				"queue_url":         queueURL,
 				"number_of_workers": 5,
 				"provider":          "asdf",
@@ -380,7 +381,7 @@ func TestConfig(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			in := common.MustNewConfigFrom(tc.config)
+			in := conf.MustNewConfigFrom(tc.config)
 
 			c := defaultConfig()
 			if err := in.Unpack(&c); err != nil {

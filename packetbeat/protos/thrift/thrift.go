@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -184,7 +186,7 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &thriftPlugin{}
 	config := defaultConfig
@@ -1104,7 +1106,7 @@ func (thrift *thriftPlugin) publishTransactions() {
 		fields := evt.Fields
 		fields["type"] = pbf.Event.Dataset
 		fields["status"] = status
-		thriftFields := common.MapStr{}
+		thriftFields := mapstr.M{}
 		fields["thrift"] = thriftFields
 
 		if t.request != nil {

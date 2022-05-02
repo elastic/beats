@@ -24,7 +24,6 @@ import (
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -32,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type eventlogRunner struct{}
@@ -55,7 +55,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	// TODO: do we want to allow to read multiple eventLogs using a single config
 	//       as is common for other inputs?
 	eventLog, err := eventlog.New(cfg)

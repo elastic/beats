@@ -32,6 +32,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -40,7 +41,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
@@ -175,9 +175,9 @@ func createPingFactory(
 		defer cbMutex.Unlock()
 
 		if !readStart.IsZero() {
-			eventext.MergeEventFields(event, common.MapStr{
-				"http": common.MapStr{
-					"rtt": common.MapStr{
+			eventext.MergeEventFields(event, mapstr.M{
+				"http": mapstr.M{
+					"rtt": mapstr.M{
 						"write_request":   look.RTT(writeEnd.Sub(writeStart)),
 						"response_header": look.RTT(readStart.Sub(writeStart)),
 					},
@@ -252,7 +252,7 @@ func execPing(
 
 	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
 
-	responseFields := common.MapStr{
+	responseFields := mapstr.M{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
 	}
@@ -262,7 +262,7 @@ func execPing(
 	}
 
 	if responseConfig.IncludeHeaders {
-		headerFields := common.MapStr{}
+		headerFields := mapstr.M{}
 		for canonicalHeaderKey, vals := range resp.Header {
 			if len(vals) > 1 {
 				headerFields[canonicalHeaderKey] = vals
@@ -273,9 +273,9 @@ func execPing(
 		responseFields["headers"] = headerFields
 	}
 
-	httpFields := common.MapStr{"response": responseFields}
+	httpFields := mapstr.M{"response": responseFields}
 
-	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
+	eventext.MergeEventFields(event, mapstr.M{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
@@ -283,14 +283,14 @@ func execPing(
 	// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
 	// a proxy.
 	if resp.TLS != nil {
-		tlsFields := common.MapStr{}
+		tlsFields := mapstr.M{}
 		tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
 		eventext.MergeEventFields(event, tlsFields)
 	}
 
 	// Add total HTTP RTT
-	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-		"rtt": common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{"http": mapstr.M{
+		"rtt": mapstr.M{
 			"total": look.RTT(end.Sub(start)),
 		},
 	}})

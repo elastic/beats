@@ -7,7 +7,7 @@ package add_nomad_metadata
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers
@@ -20,8 +20,8 @@ type Register struct {
 	indexers map[string]IndexerConstructor
 	matchers map[string]MatcherConstructor
 
-	defaultIndexerConfigs map[string]common.Config
-	defaultMatcherConfigs map[string]common.Config
+	defaultIndexerConfigs map[string]conf.C
+	defaultMatcherConfigs map[string]conf.C
 }
 
 // NewRegister creates and returns a new Register.
@@ -30,8 +30,8 @@ func NewRegister() *Register {
 		indexers: make(map[string]IndexerConstructor, 0),
 		matchers: make(map[string]MatcherConstructor, 0),
 
-		defaultIndexerConfigs: make(map[string]common.Config, 0),
-		defaultMatcherConfigs: make(map[string]common.Config, 0),
+		defaultIndexerConfigs: make(map[string]conf.C, 0),
+		defaultMatcherConfigs: make(map[string]conf.C, 0),
 	}
 }
 
@@ -50,12 +50,12 @@ func (r *Register) AddMatcher(name string, matcher MatcherConstructor) {
 }
 
 // AddDefaultIndexerConfig add default indexer configuration to the register
-func (r *Register) AddDefaultIndexerConfig(name string, config common.Config) {
+func (r *Register) AddDefaultIndexerConfig(name string, config conf.C) {
 	r.defaultIndexerConfigs[name] = config
 }
 
 // AddDefaultMatcherConfig add a default matcher configuration to the register
-func (r *Register) AddDefaultMatcherConfig(name string, config common.Config) {
+func (r *Register) AddDefaultMatcherConfig(name string, config conf.C) {
 	r.defaultMatcherConfigs[name] = config
 }
 
@@ -80,11 +80,11 @@ func (r *Register) GetMatcher(name string) MatcherConstructor {
 }
 
 // GetDefaultIndexerConfigs get default indexer configuration
-func (r *Register) GetDefaultIndexerConfigs() map[string]common.Config {
+func (r *Register) GetDefaultIndexerConfigs() map[string]conf.C {
 	return r.defaultIndexerConfigs
 }
 
 // GetDefaultMatcherConfigs get default matcher configuration
-func (r *Register) GetDefaultMatcherConfigs() map[string]common.Config {
+func (r *Register) GetDefaultMatcherConfigs() map[string]conf.C {
 	return r.defaultMatcherConfigs
 }

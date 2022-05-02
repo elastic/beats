@@ -20,9 +20,10 @@ package actions
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // LabelsKey is the default target key for the add_labels processor.
@@ -35,9 +36,9 @@ func init() {
 			checks.AllowedFields(LabelsKey, "when")))
 }
 
-func createAddLabels(c *common.Config) (processors.Processor, error) {
+func createAddLabels(c *conf.C) (processors.Processor, error) {
 	config := struct {
-		Labels common.MapStr `config:"labels" validate:"required"`
+		Labels mapstr.M `config:"labels" validate:"required"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -58,25 +59,25 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 // If labels contains nested objects, NewAddLabels will flatten keys into labels by
 // by joining names with a dot ('.') .
 // The labels will be inserted into the 'labels' field.
-func NewAddLabels(labels common.MapStr, shared bool) (processors.Processor, error) {
+func NewAddLabels(labels mapstr.M, shared bool) (processors.Processor, error) {
 	flatLabels, err := flattenLabels(labels)
 	if err != nil {
 		return nil, fmt.Errorf("failed to flatten labels: %w", err)
 	}
 
-	return NewAddFields(common.MapStr{
+	return NewAddFields(mapstr.M{
 		LabelsKey: flatLabels,
 	}, shared, true), nil
 }
 
-func flattenLabels(labels common.MapStr) (common.MapStr, error) {
-	labelConfig, err := common.NewConfigFrom(labels)
+func flattenLabels(labels mapstr.M) (mapstr.M, error) {
+	labelConfig, err := conf.NewConfigFrom(labels)
 	if err != nil {
 		return nil, err
 	}
 
 	flatKeys := labelConfig.FlattenedKeys()
-	flatMap := make(common.MapStr, len(flatKeys))
+	flatMap := make(mapstr.M, len(flatKeys))
 	for _, k := range flatKeys {
 		v, err := labelConfig.String(k, -1)
 		if err != nil {

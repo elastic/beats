@@ -24,22 +24,23 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestTokenAppender(t *testing.T) {
 	tests := []struct {
 		eventConfig string
 		event       bus.Event
-		result      common.MapStr
+		result      mapstr.M
 		config      string
 	}{
 		// Appender without a condition should apply the config regardless
 		// Empty event config should return a config with only the headers
 		{
 			event: bus.Event{},
-			result: common.MapStr{
+			result: mapstr.M{
 				"headers": map[string]interface{}{
 					"Authorization": "Bearer foo bar",
 				},
@@ -52,7 +53,7 @@ token_path: "test"
 		// Metricbeat module config should return a config that has headers section
 		{
 			event: bus.Event{},
-			result: common.MapStr{
+			result: mapstr.M{
 				"module": "prometheus",
 				"hosts":  []interface{}{"1.2.3.4:8080"},
 				"headers": map[string]interface{}{
@@ -70,17 +71,17 @@ token_path: "test"
 	}
 
 	for _, test := range tests {
-		config, err := common.NewConfigWithYAML([]byte(test.config), "")
+		config, err := conf.NewConfigWithYAML([]byte(test.config), "")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		eConfig, err := common.NewConfigWithYAML([]byte(test.eventConfig), "")
+		eConfig, err := conf.NewConfigWithYAML([]byte(test.eventConfig), "")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.event["config"] = []*common.Config{eConfig}
+		test.event["config"] = []*conf.C{eConfig}
 		writeFile("test", "foo bar")
 
 		appender, err := NewTokenAppender(config)
@@ -88,10 +89,10 @@ token_path: "test"
 		assert.NotNil(t, appender)
 
 		appender.Append(test.event)
-		cfgs, _ := test.event["config"].([]*common.Config)
+		cfgs, _ := test.event["config"].([]*conf.C)
 		assert.Equal(t, len(cfgs), 1)
 
-		out := common.MapStr{}
+		out := mapstr.M{}
 		cfgs[0].Unpack(&out)
 
 		assert.Equal(t, out, test.result)

@@ -23,10 +23,10 @@ import (
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -132,7 +132,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	families, err := m.prometheus.GetFamilies()
-	eventList := map[string]common.MapStr{}
+	eventList := map[string]mapstr.M{}
 	if err != nil {
 		// send up event only
 		families = append(families, m.upMetricFamily(0.0))
@@ -153,7 +153,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		for _, promEvent := range promEvents {
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
-				eventList[labelsHash] = common.MapStr{}
+				eventList[labelsHash] = mapstr.M{}
 
 				// Add default instance label if not already there
 				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
@@ -177,7 +177,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// Report events
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
-			RootFields: common.MapStr{m.namespace: e},
+			RootFields: mapstr.M{m.namespace: e},
 		})
 		if !isOpen {
 			break

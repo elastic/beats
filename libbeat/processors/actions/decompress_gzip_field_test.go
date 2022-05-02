@@ -23,16 +23,16 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDecompressGzip(t *testing.T) {
 	var testCases = []struct {
 		description string
 		config      decompressGzipFieldConfig
-		input       common.MapStr
-		output      common.MapStr
+		input       mapstr.M
+		output      mapstr.M
 		error       bool
 	}{
 		{
@@ -44,10 +44,10 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": []byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0},
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": []byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0},
 				"field2": "decompressed data",
 			},
@@ -62,10 +62,10 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": string([]byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0}),
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": string([]byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0}),
 				"field2": "decompressed data",
 			},
@@ -80,10 +80,10 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": []byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0},
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": "decompressed data",
 			},
 			error: false,
@@ -97,12 +97,12 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": "invalid gzipped data",
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": "invalid gzipped data",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "Failed to decompress field in decompress_gzip_field processor: error decompressing field field1: gzip: invalid header",
 				},
 			},
@@ -117,10 +117,10 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   false,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": "invalid gzipped data",
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": "invalid gzipped data",
 			},
 			error: false,
@@ -134,12 +134,12 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": "my value",
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": "my value",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "Failed to decompress field in decompress_gzip_field processor: could not fetch value for key: field2, Error: key not found",
 				},
 			},
@@ -154,10 +154,10 @@ func TestDecompressGzip(t *testing.T) {
 				IgnoreMissing: true,
 				FailOnError:   true,
 			},
-			input: common.MapStr{
+			input: mapstr.M{
 				"field1": "my value",
 			},
-			output: common.MapStr{
+			output: mapstr.M{
 				"field1": "my value",
 			},
 			error: false,
@@ -193,13 +193,13 @@ func TestDecompressGzip(t *testing.T) {
 		t.Parallel()
 
 		event := &beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"field1": []byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0},
 			},
-			Meta: common.MapStr{},
+			Meta: mapstr.M{},
 		}
 
-		expectedMeta := common.MapStr{
+		expectedMeta := mapstr.M{
 			"field": "decompressed data",
 		}
 

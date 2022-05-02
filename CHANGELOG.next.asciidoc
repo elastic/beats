@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix docs reference for syslog processor {pull}31087[31087]
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 - Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
 
 *Auditbeat*
 
@@ -61,6 +62,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Netflow: replace invalid field value. {pull}31295[31295]
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+- Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 
 *Heartbeat*
 
@@ -74,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
 - Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 - Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
 
 *Packetbeat*
@@ -118,6 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add URL Encode template function for httpjson input. {pull}30962[30962]
 - Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 - Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
+- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 
 *Auditbeat*
 

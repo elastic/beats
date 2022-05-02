@@ -20,8 +20,8 @@ package bucket
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type BucketQuota struct {
@@ -46,40 +46,40 @@ type Buckets []struct {
 	BasicStats BucketBasicStats `json:"basicStats"`
 }
 
-func eventsMapping(content []byte) []common.MapStr {
+func eventsMapping(content []byte) []mapstr.M {
 	var d Buckets
 	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: %+v", err)
 	}
 
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 
 	for _, Bucket := range d {
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": Bucket.Name,
 			"type": Bucket.BucketType,
-			"data": common.MapStr{
-				"used": common.MapStr{
+			"data": mapstr.M{
+				"used": mapstr.M{
 					"bytes": Bucket.BasicStats.DataUsed,
 				},
 			},
-			"disk": common.MapStr{
+			"disk": mapstr.M{
 				"fetches": Bucket.BasicStats.DiskFetches,
-				"used": common.MapStr{
+				"used": mapstr.M{
 					"bytes": Bucket.BasicStats.DiskUsed,
 				},
 			},
-			"memory": common.MapStr{
-				"used": common.MapStr{
+			"memory": mapstr.M{
+				"used": mapstr.M{
 					"bytes": Bucket.BasicStats.MemUsed,
 				},
 			},
-			"quota": common.MapStr{
-				"ram": common.MapStr{
+			"quota": mapstr.M{
+				"ram": mapstr.M{
 					"bytes": Bucket.Quota.RAM,
 				},
-				"use": common.MapStr{
+				"use": mapstr.M{
 					"pct": Bucket.BasicStats.QuotaPercentUsed,
 				},
 			},

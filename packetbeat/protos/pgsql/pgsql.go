@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -97,7 +99,7 @@ type pgsqlTransaction struct {
 	notes    []string
 	isError  bool
 
-	pgsql common.MapStr
+	pgsql mapstr.M
 
 	requestRaw  string
 	responseRaw string
@@ -138,7 +140,7 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
 	config := defaultConfig
@@ -412,7 +414,7 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 			trans.src, trans.dst = trans.dst, trans.src
 		}
 
-		trans.pgsql = common.MapStr{}
+		trans.pgsql = mapstr.M{}
 		trans.query = query
 		trans.method = getQueryMethod(query)
 		trans.bytesIn = msg.size
@@ -445,12 +447,12 @@ func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 		return
 	}
 
-	trans.pgsql.Update(common.MapStr{
+	trans.pgsql.Update(mapstr.M{
 		"num_rows":   msg.numberOfRows,
 		"num_fields": msg.numberOfFields,
 	})
 	if msg.isError {
-		trans.pgsql.Update(common.MapStr{
+		trans.pgsql.Update(mapstr.M{
 			"error_code":     msg.errorCode,
 			"error_message":  msg.errorInfo,
 			"error_severity": msg.errorSeverity,

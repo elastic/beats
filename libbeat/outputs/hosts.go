@@ -17,12 +17,12 @@
 
 package outputs
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/config"
 
 // ReadHostList reads a list of hosts to connect to from an configuration
 // object. If the `workers` settings is > 1, each host is duplicated in the final
 // host list by the number of `workers`.
-func ReadHostList(cfg *common.Config) ([]string, error) {
+func ReadHostList(cfg *config.C) ([]string, error) {
 	config := struct {
 		Hosts  []string `config:"hosts"  validate:"required"`
 		Worker int      `config:"worker" validate:"min=1"`

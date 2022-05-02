@@ -30,8 +30,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -69,7 +69,7 @@ func RunnerFactory(
 	return &factory{log: log, info: info, loader: loader}
 }
 
-func (f *factory) CheckConfig(cfg *common.Config) error {
+func (f *factory) CheckConfig(cfg *conf.C) error {
 	_, err := f.loader.Configure(cfg)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (f *factory) CheckConfig(cfg *common.Config) error {
 
 func (f *factory) Create(
 	p beat.PipelineConnector,
-	config *common.Config,
+	config *conf.C,
 ) (cfgfile.Runner, error) {
 	input, err := f.loader.Configure(config)
 	if err != nil {
@@ -132,7 +132,7 @@ func (r *runner) Stop() {
 	r.log.Infof("Input '%v' stopped", r.input.Name())
 }
 
-func configID(config *common.Config) (string, error) {
+func configID(config *conf.C) (string, error) {
 	tmp := struct {
 		ID string `config:"id"`
 	}{}

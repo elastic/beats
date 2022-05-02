@@ -28,9 +28,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -187,62 +188,62 @@ func TestNewModuleFromConfig(t *testing.T) {
 	logp.TestingSetup()
 
 	cases := map[string]struct {
-		config         common.MapStr
+		config         mapstr.M
 		err            bool
 		expectedOption string
 		expectedQuery  QueryParams
 		expectedPeriod time.Duration
 	}{
 		"normal module": {
-			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
+			config:         mapstr.M{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
 			expectedQuery:  nil,
 		},
 		"light module": {
-			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
+			config:         mapstr.M{"module": "service", "metricsets": []string{"metricset"}},
 			expectedOption: "test",
 			expectedQuery:  nil,
 		},
 		"light module default metricset": {
-			config:         common.MapStr{"module": "service"},
+			config:         mapstr.M{"module": "service"},
 			expectedOption: "test",
 			expectedQuery:  nil,
 		},
 		"light module override option": {
-			config:         common.MapStr{"module": "service", "option": "overriden"},
+			config:         mapstr.M{"module": "service", "option": "overriden"},
 			expectedOption: "overriden",
 			expectedQuery:  nil,
 		},
 		"light module with query": {
-			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
+			config:         mapstr.M{"module": "service", "query": mapstr.M{"param": "foo"}},
 			expectedOption: "test",
 			expectedQuery:  QueryParams{"param": "foo"},
 		},
 		"light module with custom period": {
-			config:         common.MapStr{"module": "service", "period": "42s"},
+			config:         mapstr.M{"module": "service", "period": "42s"},
 			expectedOption: "test",
 			expectedPeriod: 42 * time.Second,
 			expectedQuery:  nil,
 		},
 		"light module is broken": {
-			config: common.MapStr{"module": "broken"},
+			config: mapstr.M{"module": "broken"},
 			err:    true,
 		},
 		"light metric set doesn't exist": {
-			config: common.MapStr{"module": "service", "metricsets": []string{"notexists"}},
+			config: mapstr.M{"module": "service", "metricsets": []string{"notexists"}},
 			err:    true,
 		},
 		"disabled light module": {
-			config: common.MapStr{"module": "service", "enabled": false},
+			config: mapstr.M{"module": "service", "enabled": false},
 			err:    true,
 		},
 		"mixed module with standard and light metricsets": {
-			config:         common.MapStr{"module": "mixed", "metricsets": []string{"standard", "light"}},
+			config:         mapstr.M{"module": "mixed", "metricsets": []string{"standard", "light"}},
 			expectedOption: "default",
 			expectedQuery:  nil,
 		},
 		"mixed module with unregistered and light metricsets": {
-			config: common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
+			config: mapstr.M{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
 			err:    true,
 		},
 	}
@@ -255,7 +256,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config, err := common.NewConfigFrom(c.config)
+			config, err := conf.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
 			module, metricSets, err := NewModule(config, r)
@@ -307,8 +308,8 @@ func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
 		}))
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	config, err := common.NewConfigFrom(
-		common.MapStr{
+	config, err := conf.NewConfigFrom(
+		mapstr.M{
 			"module":     "httpextended",
 			"metricsets": []string{"extends"},
 			"hosts":      []string{sampleHttpsEndpoint},
@@ -330,8 +331,8 @@ func TestLightMetricSet_WithoutHostParser(t *testing.T) {
 	r.MustAddMetricSet("http", "json", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	config, err := common.NewConfigFrom(
-		common.MapStr{
+	config, err := conf.NewConfigFrom(
+		mapstr.M{
 			"module":     "httpextended",
 			"metricsets": []string{"extends"},
 			"hosts":      []string{sampleHttpsEndpoint},
@@ -363,8 +364,8 @@ func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
 		}))
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	config, err := common.NewConfigFrom(
-		common.MapStr{
+	config, err := conf.NewConfigFrom(
+		mapstr.M{
 			"module":     "httpextended",
 			"metricsets": []string{"extends"},
 			"hosts":      []string{postgresEndpoint},
@@ -392,7 +393,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 		return DefaultModuleFactory(base)
 	})
 
-	config, err := common.NewConfigFrom(common.MapStr{"module": "service"})
+	config, err := conf.NewConfigFrom(mapstr.M{"module": "service"})
 	require.NoError(t, err)
 
 	_, _, err = NewModule(config, r)

@@ -20,7 +20,8 @@ package stdfields
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // OptionalStream represents a config that has a stream set, which in practice
@@ -28,9 +29,9 @@ import (
 // config, but we do pull the Id from the root, and merge the root data stream
 // in as well
 type OptionalStream struct {
-	Id         string           `config:"id"`
-	DataStream *common.Config   `config:"data_stream"`
-	Streams    []*common.Config `config:"streams"`
+	Id         string    `config:"id"`
+	DataStream *conf.C   `config:"data_stream"`
+	Streams    []*conf.C `config:"streams"`
 }
 
 type BaseStream struct {
@@ -40,7 +41,7 @@ type BaseStream struct {
 // UnnestStream detects configs that come from fleet and transforms the config into something compatible
 // with heartbeat, by mixing some fields (id, data_stream) with those from the first stream. It assumes
 // that there is exactly one stream associated with the input.
-func UnnestStream(config *common.Config) (res *common.Config, err error) {
+func UnnestStream(config *conf.C) (res *conf.C, err error) {
 	optS := &OptionalStream{}
 	err = config.Unpack(optS)
 	if err != nil {
@@ -68,6 +69,6 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 		return nil, fmt.Errorf("could not determine base stream for config: %s", id)
 	}
 
-	err = res.Merge(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
+	err = res.Merge(mapstr.M{"id": optS.Id, "data_stream": optS.DataStream})
 	return
 }

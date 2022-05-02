@@ -23,8 +23,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -77,7 +77,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	debugf("opCode = %d (%v)", s.message.opCode, s.message.opCode)
 
 	// then split depending on operation type
-	s.message.event = common.MapStr{}
+	s.message.event = mapstr.M{}
 
 	switch s.message.opCode {
 	case opReply:

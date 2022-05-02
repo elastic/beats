@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -137,7 +137,7 @@ func (g *guessInetSockFamily) Trigger() error {
 }
 
 // Extract scans the struct inet_sock* memory for the current address family value.
-func (g *guessInetSockFamily) Extract(event interface{}) (common.MapStr, bool) {
+func (g *guessInetSockFamily) Extract(event interface{}) (mapstr.M, bool) {
 	raw := event.([]byte)
 	var expected [2]byte
 	var hits []int
@@ -151,7 +151,7 @@ func (g *guessInetSockFamily) Extract(event interface{}) (common.MapStr, bool) {
 	if len(hits) == 0 {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"INET_SOCK_AF": hits,
 	}, true
 }
@@ -162,7 +162,7 @@ func (g *guessInetSockFamily) NumRepeats() int {
 }
 
 // Reduce takes the output of the multiple runs and consolidates a single result.
-func (g *guessInetSockFamily) Reduce(results []common.MapStr) (result common.MapStr, err error) {
+func (g *guessInetSockFamily) Reduce(results []mapstr.M) (result mapstr.M, err error) {
 	if result, err = consolidate(results); err != nil {
 		return nil, err
 	}

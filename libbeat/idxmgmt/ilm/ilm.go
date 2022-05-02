@@ -25,13 +25,14 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // SupportFactory is used to define a policy type to be used.
-type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, *config.C) (Supporter, error)
 
 // Supporter implements ILM support. For loading the policies
 // a manager instance must be generated.
@@ -61,27 +62,27 @@ type Manager interface {
 // See: [Policy phases and actions documentation](https://www.elastic.co/guide/en/elasticsearch/reference/master/ilm-policy-definition.html).
 type Policy struct {
 	Name string
-	Body common.MapStr
+	Body mapstr.M
 }
 
 // DefaultSupport configures a new default ILM support implementation.
-func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+func DefaultSupport(log *logp.Logger, info beat.Info, c *config.C) (Supporter, error) {
 	cfg := defaultConfig(info)
-	if config != nil {
-		if err := config.Unpack(&cfg); err != nil {
+	if c != nil {
+		if err := c.Unpack(&cfg); err != nil {
 			return nil, err
 		}
 	}
 
 	if !cfg.Enabled {
-		return NewNoopSupport(info, config)
+		return NewNoopSupport(info, c)
 	}
 
-	return StdSupport(log, info, config)
+	return StdSupport(log, info, c)
 }
 
 // StdSupport configures a new std ILM support implementation.
-func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+func StdSupport(log *logp.Logger, info beat.Info, c *config.C) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
 	} else {
@@ -89,8 +90,8 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 	}
 
 	cfg := defaultConfig(info)
-	if config != nil {
-		if err := config.Unpack(&cfg); err != nil {
+	if c != nil {
+		if err := c.Unpack(&cfg); err != nil {
 			return nil, err
 		}
 	}
@@ -123,8 +124,8 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 
 // NoopSupport configures a new noop ILM support implementation,
 // should be used when ILM is disabled
-func NoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
-	return NewNoopSupport(info, config)
+func NoopSupport(_ *logp.Logger, info beat.Info, c *config.C) (Supporter, error) {
+	return NewNoopSupport(info, c)
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {

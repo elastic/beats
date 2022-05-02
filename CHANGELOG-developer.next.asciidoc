@@ -60,6 +60,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 - Removed deprecated disk spool from Beats. Use disk queue instead. {pull}28869[28869]
 - Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
+- Remove `common.MapStr` and use `mapstr.M` from `github.com/elastic/elastic-agent-libs` instead. {pull}31420[31420]
 
 ==== Bugfixes
 
@@ -136,6 +137,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
 - Add gcp dataproc metricset. {pull}30008[30008]
 - Add Github action for linting
+- Add regex support for drop_fields processor.
 
 ==== Deprecated
 

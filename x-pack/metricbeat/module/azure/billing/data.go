@@ -13,8 +13,8 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func EventsMapping(subscriptionId string, results Usage) []mb.Event {
@@ -22,15 +22,15 @@ func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 	if len(results.UsageDetails) > 0 {
 		for _, usageDetail := range results.UsageDetails {
 			event := mb.Event{
-				ModuleFields: common.MapStr{
-					"resource": common.MapStr{
+				ModuleFields: mapstr.M{
+					"resource": mapstr.M{
 						"type":  usageDetail.ConsumedService,
 						"group": getResourceGroupFromId(*usageDetail.InstanceID),
 						"name":  usageDetail.InstanceName,
 					},
 					"subscription_id": usageDetail.SubscriptionGUID,
 				},
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"pretax_cost":       usageDetail.PretaxCost,
 					"department_name":   usageDetail.DepartmentName,
 					"product":           usageDetail.Product,
@@ -42,7 +42,7 @@ func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 				},
 				Timestamp: time.Now().UTC(),
 			}
-			event.RootFields = common.MapStr{}
+			event.RootFields = mapstr.M{}
 			event.RootFields.Put("cloud.provider", "azure")
 			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
 			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
@@ -73,13 +73,13 @@ func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 			parsedDate = time.Now().UTC()
 		}
 		event := mb.Event{
-			RootFields: common.MapStr{
+			RootFields: mapstr.M{
 				"cloud.provider": "azure",
 			},
-			ModuleFields: common.MapStr{
+			ModuleFields: mapstr.M{
 				"subscription_id": subscriptionId,
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"actual_cost":   actualCost,
 				"forecast_cost": forecastCost,
 				"usage_date":    parsedDate,

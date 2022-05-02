@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processors"
@@ -106,7 +107,7 @@ func New(config PluginConfig) (*Processors, error) {
 			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
-		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)
+		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
 		plugin, err := constructor(actionCfg)
 		if err != nil {
@@ -144,12 +145,12 @@ func (procs *Processors) AddProcessors(p Processors) {
 }
 
 // RunBC (run backwards-compatible) applies the processors, by providing the
-// old interface based on common.MapStr.
+// old interface based on mapstr.M.
 // The event us temporarily converted to beat.Event. By this 'conversion' the
 // '@timestamp' field can not be accessed by processors.
 // Note: this method will be removed, when the publisher pipeline BC-API is to
 //       be removed.
-func (procs *Processors) RunBC(event common.MapStr) common.MapStr {
+func (procs *Processors) RunBC(event mapstr.M) mapstr.M {
 	ret, err := procs.Run(&beat.Event{Fields: event})
 	if err != nil {
 		procs.log.Debugw("Error in processor pipeline", "error", err)

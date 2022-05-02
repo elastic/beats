@@ -28,10 +28,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var info = elasticsearch.Info{
@@ -113,18 +113,18 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 		{"./_meta/test/empty.json", []mb.Event(nil)},
 		{"./_meta/test/task.622.json", []mb.Event{
 			{
-				RootFields: common.MapStr{
-					"service": common.MapStr{
+				RootFields: mapstr.M{
+					"service": mapstr.M{
 						"name": "elasticsearch",
 					},
 				},
-				ModuleFields: common.MapStr{
-					"cluster": common.MapStr{
+				ModuleFields: mapstr.M{
+					"cluster": mapstr.M{
 						"id":   "1234",
 						"name": "helloworld",
 					},
 				},
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"priority":         "URGENT",
 					"source":           "create-index [foo_9], cause [api]",
 					"time_in_queue.ms": int64(86),
@@ -136,18 +136,18 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 		}},
 		{"./_meta/test/tasks.622.json", []mb.Event{
 			{
-				RootFields: common.MapStr{
-					"service": common.MapStr{
+				RootFields: mapstr.M{
+					"service": mapstr.M{
 						"name": "elasticsearch",
 					},
 				},
-				ModuleFields: common.MapStr{
-					"cluster": common.MapStr{
+				ModuleFields: mapstr.M{
+					"cluster": mapstr.M{
 						"id":   "1234",
 						"name": "helloworld",
 					},
 				},
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"priority":         "URGENT",
 					"source":           "create-index [foo_9], cause [api]",
 					"time_in_queue.ms": int64(86),
@@ -157,18 +157,18 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 				Took:      0,
 			},
 			{
-				RootFields: common.MapStr{
-					"service": common.MapStr{
+				RootFields: mapstr.M{
+					"service": mapstr.M{
 						"name": "elasticsearch",
 					},
 				},
-				ModuleFields: common.MapStr{
-					"cluster": common.MapStr{
+				ModuleFields: mapstr.M{
+					"cluster": mapstr.M{
 						"id":   "1234",
 						"name": "helloworld",
 					},
 				},
-				MetricSetFields: common.MapStr{"priority": "HIGH",
+				MetricSetFields: mapstr.M{"priority": "HIGH",
 					"source":           "shard-started ([foo_2][1], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
 					"time_in_queue.ms": int64(842),
 					"insert_order":     int64(46),
@@ -176,18 +176,18 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 				Timestamp: time.Time{},
 				Took:      0,
 			}, {
-				RootFields: common.MapStr{
-					"service": common.MapStr{
+				RootFields: mapstr.M{
+					"service": mapstr.M{
 						"name": "elasticsearch",
 					},
 				},
-				ModuleFields: common.MapStr{
-					"cluster": common.MapStr{
+				ModuleFields: mapstr.M{
+					"cluster": mapstr.M{
 						"id":   "1234",
 						"name": "helloworld",
 					},
 				},
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"priority":         "HIGH",
 					"source":           "shard-started ([foo_2][0], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
 					"time_in_queue.ms": int64(858),

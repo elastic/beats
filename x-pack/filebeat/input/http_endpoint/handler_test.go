@@ -18,15 +18,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func Test_httpReadJSON(t *testing.T) {
 	tests := []struct {
 		name           string
 		body           string
-		wantObjs       []common.MapStr
+		wantObjs       []mapstr.M
 		wantStatus     int
 		wantErr        bool
 		wantRawMessage []json.RawMessage
@@ -34,13 +34,13 @@ func Test_httpReadJSON(t *testing.T) {
 		{
 			name:       "single object",
 			body:       `{"a": 42, "b": "c"}`,
-			wantObjs:   []common.MapStr{{"a": int64(42), "b": "c"}},
+			wantObjs:   []mapstr.M{{"a": int64(42), "b": "c"}},
 			wantStatus: http.StatusOK,
 		},
 		{
 			name:       "array accepted",
 			body:       `[{"a":"b"},{"c":"d"}]`,
-			wantObjs:   []common.MapStr{{"a": "b"}, {"c": "d"}},
+			wantObjs:   []mapstr.M{{"a": "b"}, {"c": "d"}},
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -60,7 +60,7 @@ func Test_httpReadJSON(t *testing.T) {
 		{
 			name:       "sequence of objects accepted (CRLF)",
 			body:       `{"a":1}` + "\r" + `{"a":2}`,
-			wantObjs:   []common.MapStr{{"a": int64(1)}, {"a": int64(2)}},
+			wantObjs:   []mapstr.M{{"a": int64(1)}, {"a": int64(2)}},
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -71,19 +71,19 @@ func Test_httpReadJSON(t *testing.T) {
 				[]byte(`{"a":"1"}`),
 				[]byte(`{"a":"2"}`),
 			},
-			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}},
+			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}},
 			wantStatus: http.StatusOK,
 		},
 		{
 			name:       "sequence of objects accepted (SP)",
 			body:       `{"a":"2"} {"a":"2"}`,
-			wantObjs:   []common.MapStr{{"a": "2"}, {"a": "2"}},
+			wantObjs:   []mapstr.M{{"a": "2"}, {"a": "2"}},
 			wantStatus: http.StatusOK,
 		},
 		{
 			name:       "sequence of objects accepted (no separator)",
 			body:       `{"a":"2"}{"a":"2"}`,
-			wantObjs:   []common.MapStr{{"a": "2"}, {"a": "2"}},
+			wantObjs:   []mapstr.M{{"a": "2"}, {"a": "2"}},
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -103,7 +103,7 @@ func Test_httpReadJSON(t *testing.T) {
 				[]byte(`{"a":"3"}`),
 				[]byte(`{"a":"4"}`),
 			},
-			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
+			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -115,7 +115,7 @@ func Test_httpReadJSON(t *testing.T) {
 				[]byte(`{"a":3.14}`),
 				[]byte(`{"a":-4}`),
 			},
-			wantObjs: []common.MapStr{
+			wantObjs: []mapstr.M{
 				{"a": int64(1)},
 				{"a": false},
 				{"a": 3.14},
@@ -155,9 +155,9 @@ func (p *publisher) Publish(event beat.Event) {
 
 func Test_apiResponse(t *testing.T) {
 	testCases := []struct {
-		name    string          // Sub-test name.
-		request *http.Request   // Input request.
-		events  []common.MapStr // Expected output events.
+		name    string        // Sub-test name.
+		request *http.Request // Input request.
+		events  []mapstr.M    // Expected output events.
 	}{
 		{
 			name: "single event",
@@ -166,9 +166,9 @@ func Test_apiResponse(t *testing.T) {
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
-			events: []common.MapStr{
+			events: []mapstr.M{
 				{
-					"json": common.MapStr{
+					"json": mapstr.M{
 						"id": int64(0),
 					},
 				},
@@ -187,9 +187,9 @@ func Test_apiResponse(t *testing.T) {
 				req.Header.Set("Content-Encoding", "gzip")
 				return req
 			}(),
-			events: []common.MapStr{
+			events: []mapstr.M{
 				{
-					"json": common.MapStr{
+					"json": mapstr.M{
 						"id": int64(0),
 					},
 				},
@@ -213,14 +213,14 @@ func Test_apiResponse(t *testing.T) {
 				req.Header.Set("Content-Encoding", "gzip")
 				return req
 			}(),
-			events: []common.MapStr{
+			events: []mapstr.M{
 				{
-					"json": common.MapStr{
+					"json": mapstr.M{
 						"id": int64(0),
 					},
 				},
 				{
-					"json": common.MapStr{
+					"json": mapstr.M{
 						"id": int64(1),
 					},
 				},

@@ -11,10 +11,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/test"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -47,8 +46,8 @@ func TestDataMultipleDimensions(t *testing.T) {
 		"metrics": []map[string]interface{}{{"namespace": "Microsoft.KeyVault/vaults",
 			"name": []string{"Availability"}, "dimensions": []map[string]interface{}{{"name": "ActivityName", "value": "*"}}}}}}
 	metricSet := mbtest.NewFetcher(t, config)
-	metricSet.WriteEventsCond(t, "/", func(m common.MapStr) bool {
-		if m["azure"].(common.MapStr)["dimensions"].(common.MapStr)["activity_name"] == "secretget" {
+	metricSet.WriteEventsCond(t, "/", func(m mapstr.M) bool {
+		if m["azure"].(mapstr.M)["dimensions"].(mapstr.M)["activity_name"] == "secretget" {
 			return true
 		}
 		return false

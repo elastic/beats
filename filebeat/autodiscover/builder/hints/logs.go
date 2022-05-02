@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"regexp"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -29,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -57,7 +58,7 @@ type logHints struct {
 }
 
 // NewLogHints builds a log hints builder
-func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
+func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
@@ -72,10 +73,10 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create config based on input hints in the bus event
-func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
-	var hints common.MapStr
+func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
+	var hints mapstr.M
 	if hintsIfc, found := event["hints"]; found {
-		hints, _ = hintsIfc.(common.MapStr)
+		hints, _ = hintsIfc.(mapstr.M)
 	}
 
 	// Hint must be explicitly enabled when default_config sets enabled=false.
@@ -86,9 +87,9 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*comm
 	}
 
 	if inputConfig := l.getInputsConfigs(hints); inputConfig != nil {
-		var configs []*common.Config
+		var configs []*conf.C
 		for _, cfg := range inputConfig {
-			if config, err := common.NewConfigFrom(cfg); err == nil {
+			if config, err := conf.NewConfigFrom(cfg); err == nil {
 				configs = append(configs, config)
 			} else {
 				l.log.Warnw("Failed to create config from input.", "error", err)
@@ -99,14 +100,14 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*comm
 		return template.ApplyConfigTemplate(event, configs)
 	}
 
-	var configs []*common.Config
+	var configs []*conf.C
 	inputs := l.getInputs(hints)
 	for _, h := range inputs {
 		// Clone original config, enable it if disabled
-		config, _ := common.NewConfigFrom(l.config.DefaultConfig)
+		config, _ := conf.NewConfigFrom(l.config.DefaultConfig)
 		config.Remove("enabled", -1)
 
-		tempCfg := common.MapStr{}
+		tempCfg := mapstr.M{}
 		mline := l.getMultiline(h)
 		if len(mline) != 0 {
 			tempCfg.Put(multiline, mline)
@@ -142,21 +143,21 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*comm
 			}
 
 			filesets := l.getFilesets(hints, module)
-			for fileset, conf := range filesets {
-				filesetConf, _ := common.NewConfigFrom(config)
+			for fileset, cfg := range filesets {
+				filesetConf, _ := conf.NewConfigFrom(config)
 
 				if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
-					filesetConf.SetString("stream", -1, conf.Stream)
+					filesetConf.SetString("stream", -1, cfg.Stream)
 				} else {
-					filesetConf.SetString("containers.stream", -1, conf.Stream)
+					filesetConf.SetString("containers.stream", -1, cfg.Stream)
 				}
 
-				moduleConf[fileset+".enabled"] = conf.Enabled
+				moduleConf[fileset+".enabled"] = cfg.Enabled
 				moduleConf[fileset+".input"] = filesetConf
 
 				logp.Debug("hints.builder", "generated config %+v", moduleConf)
 			}
-			config, _ = common.NewConfigFrom(moduleConf)
+			config, _ = conf.NewConfigFrom(moduleConf)
 		}
 		logp.Debug("hints.builder", "generated config %+v", config)
 		configs = append(configs, config)
@@ -166,37 +167,37 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*comm
 	return template.ApplyConfigTemplate(event, configs)
 }
 
-func (l *logHints) getMultiline(hints common.MapStr) common.MapStr {
+func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
 	return builder.GetHintMapStr(hints, l.config.Key, multiline)
 }
 
-func (l *logHints) getIncludeLines(hints common.MapStr) []string {
+func (l *logHints) getIncludeLines(hints mapstr.M) []string {
 	return builder.GetHintAsList(hints, l.config.Key, includeLines)
 }
 
-func (l *logHints) getExcludeLines(hints common.MapStr) []string {
+func (l *logHints) getExcludeLines(hints mapstr.M) []string {
 	return builder.GetHintAsList(hints, l.config.Key, excludeLines)
 }
 
-func (l *logHints) getModule(hints common.MapStr) string {
+func (l *logHints) getModule(hints mapstr.M) string {
 	module := builder.GetHintString(hints, l.config.Key, "module")
 	// for security, strip module name
 	return validModuleNames.ReplaceAllString(module, "")
 }
 
-func (l *logHints) getInputsConfigs(hints common.MapStr) []common.MapStr {
+func (l *logHints) getInputsConfigs(hints mapstr.M) []mapstr.M {
 	return builder.GetHintAsConfigs(hints, l.config.Key)
 }
 
-func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
+func (l *logHints) getProcessors(hints mapstr.M) []mapstr.M {
 	return builder.GetProcessors(hints, l.config.Key)
 }
 
-func (l *logHints) getPipeline(hints common.MapStr) string {
+func (l *logHints) getPipeline(hints mapstr.M) string {
 	return builder.GetHintString(hints, l.config.Key, "pipeline")
 }
 
-func (l *logHints) getJSONOptions(hints common.MapStr) common.MapStr {
+func (l *logHints) getJSONOptions(hints mapstr.M) mapstr.M {
 	return builder.GetHintMapStr(hints, l.config.Key, json)
 }
 
@@ -206,7 +207,7 @@ type filesetConfig struct {
 }
 
 // Return a map containing filesets -> enabled & stream (stdout, stderr, all)
-func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*filesetConfig {
+func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filesetConfig {
 	var configured bool
 	filesets := make(map[string]*filesetConfig)
 
@@ -251,20 +252,20 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 	return filesets
 }
 
-func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
+func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
 	modules := builder.GetHintsAsList(hints, l.config.Key)
-	var output []common.MapStr
+	var output []mapstr.M
 
 	for _, mod := range modules {
-		output = append(output, common.MapStr{
+		output = append(output, mapstr.M{
 			l.config.Key: mod,
 		})
 	}
 
 	// Generate this so that no hints with completely valid templates work
 	if len(output) == 0 {
-		output = append(output, common.MapStr{
-			l.config.Key: common.MapStr{},
+		output = append(output, mapstr.M{
+			l.config.Key: mapstr.M{},
 		})
 	}
 

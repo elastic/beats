@@ -21,8 +21,8 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Fetcher is an interface implemented by all fetchers for testing purpouses
@@ -32,7 +32,7 @@ type Fetcher interface {
 
 	FetchEvents() ([]mb.Event, []error)
 	WriteEvents(testing.TB, string)
-	WriteEventsCond(testing.TB, string, func(common.MapStr) bool)
+	WriteEventsCond(testing.TB, string, func(mapstr.M) bool)
 	StandardizeEvent(mb.Event, ...mb.EventModifier) beat.Event
 }
 
@@ -68,7 +68,7 @@ func (f *reportingMetricSetV2Fetcher) WriteEvents(t testing.TB, path string) {
 	f.WriteEventsCond(t, path, nil)
 }
 
-func (f *reportingMetricSetV2Fetcher) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
+func (f *reportingMetricSetV2Fetcher) WriteEventsCond(t testing.TB, path string, cond func(mapstr.M) bool) {
 	err := WriteEventsReporterV2Cond(f, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)
@@ -95,7 +95,7 @@ func (f *reportingMetricSetV2FetcherError) WriteEvents(t testing.TB, path string
 	f.WriteEventsCond(t, path, nil)
 }
 
-func (f *reportingMetricSetV2FetcherError) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
+func (f *reportingMetricSetV2FetcherError) WriteEventsCond(t testing.TB, path string, cond func(mapstr.M) bool) {
 	t.Helper()
 
 	err := WriteEventsReporterV2ErrorCond(f, t, path, cond)
@@ -124,7 +124,7 @@ func (f *reportingMetricSetV2FetcherWithContext) WriteEvents(t testing.TB, path 
 	f.WriteEventsCond(t, path, nil)
 }
 
-func (f *reportingMetricSetV2FetcherWithContext) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
+func (f *reportingMetricSetV2FetcherWithContext) WriteEventsCond(t testing.TB, path string, cond func(mapstr.M) bool) {
 	err := WriteEventsReporterV2WithContextCond(f, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)

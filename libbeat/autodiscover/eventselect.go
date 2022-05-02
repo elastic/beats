@@ -20,8 +20,8 @@ package autodiscover
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type queryConfigFrom string
@@ -29,7 +29,7 @@ type queryConfigFrom string
 var defaultConfigQuery = queryConfigFrom("config")
 
 // EventConfigQuery creates an EventConfigurer that tries to cast the given event
-// field from from the buf event into a []*common.Config.
+// field from from the buf event into a []*config.C.
 func EventConfigQuery(field string) EventConfigurer {
 	if field == "" || field == "config" {
 		return defaultConfigQuery
@@ -37,15 +37,15 @@ func EventConfigQuery(field string) EventConfigurer {
 	return queryConfigFrom(field)
 }
 
-// QueryConfig extract an array of *common.Config from bus.Event.
+// QueryConfig extract an array of *config.C from bus.Event.
 // The configurations are expected to be in the 'config' field.
 func QueryConfig() EventConfigurer { return defaultConfigQuery }
 
 func (q queryConfigFrom) EventFilter() []string { return []string{string(q)} }
 
-func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*common.Config, error) {
+func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*config.C, error) {
 	fieldName := string(q)
-	config, ok := e[fieldName].([]*common.Config)
+	config, ok := e[fieldName].([]*config.C)
 	if !ok {
 		return nil, fmt.Errorf("Event field '%v' does not contain a valid configuration object", fieldName)
 	}

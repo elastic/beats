@@ -24,13 +24,13 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -53,13 +53,13 @@ type Config struct {
 	Suffix string
 
 	pCfg    CommonConfig
-	parsers []common.ConfigNamespace
+	parsers []config.Namespace
 }
 
-func (c *Config) Unpack(cc *common.Config) error {
+func (c *Config) Unpack(cc *config.C) error {
 	tmp := struct {
-		Common  CommonConfig             `config:",inline"`
-		Parsers []common.ConfigNamespace `config:"parsers"`
+		Common  CommonConfig       `config:",inline"`
+		Parsers []config.Namespace `config:"parsers"`
 	}{
 		CommonConfig{
 			MaxBytes:       10 * humanize.MiByte,
@@ -81,7 +81,7 @@ func (c *Config) Unpack(cc *common.Config) error {
 	return nil
 }
 
-func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 	var suffix string
 	for _, ns := range parsers {
 		name := ns.Name()
