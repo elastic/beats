@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
@@ -43,7 +44,7 @@ type MetaGeneratorConfig struct {
 type metaGenerator = MetaGeneratorConfig
 
 // NewMetaGenerator initializes and returns a new nomad metadata generator
-func NewMetaGenerator(cfg *common.Config, c *Client) (MetaGenerator, error) {
+func NewMetaGenerator(cfg *conf.C, c *Client) (MetaGenerator, error) {
 	// default settings:
 	generator := metaGenerator{
 		LabelsDedot: true,

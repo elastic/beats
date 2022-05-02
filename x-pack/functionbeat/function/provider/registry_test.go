@@ -12,12 +12,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type mockProvider struct {
@@ -59,7 +59,7 @@ func testProviderLookup(t *testing.T) {
 	name := "myprovider"
 	myprovider := &mockProvider{}
 
-	providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+	providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 		return myprovider, nil
 	}
 
@@ -111,7 +111,7 @@ func testFunctionLookup(t *testing.T) {
 	name := "myprovider"
 	myprovider := &mockProvider{}
 
-	providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+	providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 		return myprovider, nil
 	}
 
@@ -123,7 +123,7 @@ func testFunctionLookup(t *testing.T) {
 
 	fnName := "myfunc"
 	myfunction := &mockFunction{name}
-	functionFn := func(provider Provider, config *common.Config) (Function, error) {
+	functionFn := func(provider Provider, config *conf.C) (Function, error) {
 		return myfunction, nil
 	}
 
@@ -221,8 +221,8 @@ func TestFindFunctionByName(t *testing.T) {
 		global *feature.Registry,
 		wrapper *Registry,
 	) {
-		configs := []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		configs := []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"name":    "mysqs",
 				"type":    "sqs",
 				"enabled": false,
@@ -241,8 +241,8 @@ func TestFindFunctionByName(t *testing.T) {
 		wrapper *Registry,
 	) {
 		fnName := "sqs"
-		configs := []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		configs := []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"name":    "mysqs",
 				"type":    fnName,
 				"enabled": true,
@@ -252,13 +252,13 @@ func TestFindFunctionByName(t *testing.T) {
 		name := "myprovider"
 		myprovider := &mockProvider{name: name}
 
-		providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+		providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 			return myprovider, nil
 		}
 		f := Feature(name, providerFn, feature.MakeDetails(name, "provider for testing", feature.Experimental))
 
 		myfunction := &mockFunction{name}
-		functionFn := func(provider Provider, config *common.Config) (Function, error) {
+		functionFn := func(provider Provider, config *conf.C) (Function, error) {
 			return myfunction, nil
 		}
 

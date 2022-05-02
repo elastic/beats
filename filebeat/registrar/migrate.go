@@ -24,23 +24,21 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	helper "github.com/elastic/elastic-agent-libs/file"
 )
 
 type registryVersion string
 
 const (
 	noRegistry    registryVersion = ""
-	legacyVersion                 = "<legacy>"
-	version0                      = "0"
-	version1                      = "1"
+	legacyVersion registryVersion = "<legacy>"
+	version0      registryVersion = "0"
+	version1      registryVersion = "1"
 )
 
 const currentVersion = version1
@@ -162,7 +160,7 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 	if !isDir(regHome) {
 		logp.Info("No registry home found. Create: %v", regHome)
 		if err := os.MkdirAll(regHome, 0o750); err != nil {
-			return errors.Wrapf(err, "failed to create registry dir '%v'", regHome)
+			return fmt.Errorf("failed to create registry dir '%v': %w", regHome, err)
 		}
 	}
 
@@ -171,7 +169,7 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 		logp.Info("Initialize registry meta file")
 		err := safeWriteFile(metaFile, []byte(`{"version": "0"}`), perm)
 		if err != nil {
-			return errors.Wrap(err, "failed writing registry meta.json")
+			return fmt.Errorf("failed writing registry meta.json: %w", err)
 		}
 	}
 
@@ -193,14 +191,14 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 	states, err := func() ([]file.State, error) {
 		origIn, err := os.Open(origDataFile)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to open original data file")
+			return nil, fmt.Errorf("failed to open original data file: %w", err)
 		}
 		defer origIn.Close()
 
 		var states []file.State
 		decoder := json.NewDecoder(origIn)
 		if err := decoder.Decode(&states); err != nil {
-			return nil, errors.Wrapf(err, "Error decoding original data file '%v'", origDataFile)
+			return nil, fmt.Errorf("error decoding original data file '%v': %w", origDataFile, err)
 		}
 		return states, nil
 	}()
@@ -217,18 +215,18 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		IgnoreVersionCheck: true,
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to create new registry backend")
+		return fmt.Errorf("failed to create new registry backend: %w", err)
 	}
 	defer registryBackend.Close()
 
 	store, err := registryBackend.Access("filebeat")
 	if err != nil {
-		return errors.Wrap(err, "failed to open filebeat registry store")
+		return fmt.Errorf("failed to open filebeat registry store: %w", err)
 	}
 	defer store.Close()
 
 	if err := writeStates(store, states); err != nil {
-		return errors.Wrap(err, "failed to migrate registry states")
+		return fmt.Errorf("failed to migrate registry states: %w", err)
 	}
 
 	if checkpointer, ok := store.(interface{ Checkpoint() error }); ok {
@@ -239,7 +237,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 	}
 
 	if err := os.Remove(origDataFile); err != nil {
-		return errors.Wrapf(err, "migration complete but failed to remove original data file: %v", origDataFile)
+		return fmt.Errorf("migration complete but failed to remove original data file: %v: %w", origDataFile, err)
 	}
 
 	if err := ioutil.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
@@ -265,12 +263,12 @@ func readVersion(regHome, migrateFile string) (registryVersion, error) {
 
 	tmp, err := ioutil.ReadFile(metaFile)
 	if err != nil {
-		return noRegistry, errors.Wrap(err, "failed to open meta file")
+		return noRegistry, fmt.Errorf("failed to open meta file: %w", err)
 	}
 
 	meta := struct{ Version string }{}
 	if err := json.Unmarshal(tmp, &meta); err != nil {
-		return noRegistry, errors.Wrap(err, "failed reading meta file")
+		return noRegistry, fmt.Errorf("failed reading meta file: %w", err)
 	}
 
 	return registryVersion(meta.Version), nil

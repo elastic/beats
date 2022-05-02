@@ -37,7 +37,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -47,7 +46,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -72,6 +70,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -83,7 +83,7 @@ type Beat struct {
 	beat.Beat
 
 	Config       beatConfig
-	RawConfig    *common.Config // Raw config that can be unpacked to get Beat specific config data.
+	RawConfig    *config.C // Raw config that can be unpacked to get Beat specific config data.
 	IdxSupporter idxmgmt.Supporter
 
 	keystore   keystore.Keystore
@@ -102,16 +102,16 @@ type beatConfig struct {
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
-	Seccomp *common.Config `config:"seccomp"`
+	Seccomp *config.C `config:"seccomp"`
 
 	// beat internal components configurations
-	HTTP            *common.Config         `config:"http"`
-	HTTPPprof       *common.Config         `config:"http.pprof"`
-	BufferConfig    *common.Config         `config:"http.buffer"`
+	HTTP            *config.C              `config:"http"`
+	HTTPPprof       *config.C              `config:"http.pprof"`
+	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
-	Logging         *common.Config         `config:"logging"`
-	MetricLogging   *common.Config         `config:"logging.metrics"`
-	Keystore        *common.Config         `config:"keystore"`
+	Logging         *config.C              `config:"logging"`
+	MetricLogging   *config.C              `config:"logging.metrics"`
+	Keystore        *config.C              `config:"keystore"`
 	Instrumentation instrumentation.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
@@ -121,14 +121,14 @@ type beatConfig struct {
 	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
 	// central management settings
-	Management *common.Config `config:"management"`
+	Management *config.C `config:"management"`
 
 	// elastic stack 'setup' configurations
-	Dashboards *common.Config `config:"setup.dashboards"`
-	Kibana     *common.Config `config:"setup.kibana"`
+	Dashboards *config.C `config:"setup.dashboards"`
+	Kibana     *config.C `config:"setup.kibana"`
 
 	// Migration config to migration from 6 to 7
-	Migration *common.Config `config:"migration.6_to_7"`
+	Migration *config.C `config:"migration.6_to_7"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -187,7 +187,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
 		if u, err := user.Current(); err != nil {
-			if _, ok := err.(user.UnknownUserIdError); ok {
+			if _, ok := err.(user.UnknownUserIdError); ok { //nolint:errorlint // keep legacy behaviour
 				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
 				// if the user set securityContext.runAsUser to an arbitrary value.
 				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
@@ -295,7 +295,7 @@ func (b *Beat) Init() error {
 }
 
 // BeatConfig returns config section for this beat
-func (b *Beat) BeatConfig() (*common.Config, error) {
+func (b *Beat) BeatConfig() (*config.C, error) {
 	configName := strings.ToLower(b.Info.Beat)
 	if b.RawConfig.HasField(configName) {
 		sub, err := b.RawConfig.Child(configName, -1)
@@ -306,7 +306,7 @@ func (b *Beat) BeatConfig() (*common.Config, error) {
 		return sub, nil
 	}
 
-	return common.NewConfig(), nil
+	return config.NewConfig(), nil
 }
 
 // Keystore return the configured keystore for this beat
@@ -332,10 +332,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
-	err = b.registerClusterUUIDFetching()
-	if err != nil {
-		return nil, err
-	}
+	b.registerClusterUUIDFetching()
 
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
@@ -357,7 +354,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		if b.Manager.Enabled() {
 			logp.Info("Output is configured through Central Management")
 		} else {
-			msg := "No outputs are defined. Please define one under the output section."
+			msg := "no outputs are defined, please define one under the output section"
 			logp.Info(msg)
 			return nil, errors.New(msg)
 		}
@@ -383,7 +380,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("error initializing publisher: %+v", err)
+		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
 	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
@@ -402,7 +399,9 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 }
 
 func (b *Beat) launch(settings Settings, bt beat.Creator) error {
-	defer logp.Sync()
+	defer func() {
+		_ = logp.Sync()
+	}()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	defer func() {
@@ -424,7 +423,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
-	defer bl.unlock()
+	defer func() {
+		_ = bl.unlock()
+	}()
 
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
@@ -444,10 +445,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if b.Config.HTTP.Enabled() {
 		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
-			return errw.Wrap(err, "could not start the HTTP server for the API")
+			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
 		s.Start()
-		defer s.Stop()
+		defer func() {
+			_ = s.Stop()
+		}()
 		if b.Config.HTTPPprof.Enabled() {
 			s.AttachPprof()
 		}
@@ -525,7 +528,7 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 			return err
 		}
 
-		fmt.Println("Config OK")
+		fmt.Println("Config OK") //nolint:forbidigo // required to give feedback to user
 		return beat.GracefulExit
 	}())
 }
@@ -542,6 +545,7 @@ type SetupSettings struct {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
+//nolint:forbidigo // required to give feedback to user
 func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {
 		err := b.InitWithSettings(settings)
@@ -560,8 +564,8 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 
 		if setup.IndexManagement || setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
-			if outCfg.Name() != "elasticsearch" {
-				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
+			if !isElasticsearchOutput(outCfg.Name()) {
+				return fmt.Errorf("index management requested but the Elasticsearch output is not configured/enabled")
 			}
 			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
 			if err != nil {
@@ -590,10 +594,10 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			err = b.loadDashboards(context.Background(), true)
 
 			if err != nil {
-				switch err := errw.Cause(err).(type) {
-				case *dashboards.ErrNotFound:
+				var notFoundErr *dashboards.ErrNotFound
+				if errors.As(err, &notFoundErr) {
 					fmt.Printf("Skipping loading dashboards, %+v\n", err)
-				default:
+				} else {
 					return err
 				}
 			} else {
@@ -632,7 +636,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
-		return fmt.Errorf("error loading config file: %v", err)
+		return fmt.Errorf("error loading config file: %w", err)
 	}
 
 	if err := initPaths(cfg); err != nil {
@@ -643,14 +647,14 @@ func (b *Beat) configure(settings Settings) error {
 	// options.
 	store, err := LoadKeystore(cfg, b.Info.Beat)
 	if err != nil {
-		return fmt.Errorf("could not initialize the keystore: %v", err)
+		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
 
 	if settings.DisableConfigResolver {
-		common.OverwriteConfigOpts(obfuscateConfigOpts())
+		config.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		common.OverwriteConfigOpts(configOpts(store))
+		config.OverwriteConfigOpts(configOpts(store))
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
@@ -669,7 +673,7 @@ func (b *Beat) configure(settings Settings) error {
 	b.RawConfig = cfg
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
-		return fmt.Errorf("error unpacking config data: %v", err)
+		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -679,7 +683,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
-		return fmt.Errorf("error initializing logging: %v", err)
+		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
 	// log paths values to help with troubleshooting
@@ -745,14 +749,14 @@ func (b *Beat) loadMeta(metaPath string) error {
 
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("Beat meta file failed to open: %s", err)
+		return fmt.Errorf("meta file failed to open: %w", err)
 	}
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
 			f.Close()
-			return fmt.Errorf("Beat meta file reading error: %v", err)
+			return fmt.Errorf("Beat meta file reading error: %w", err)
 		}
 
 		f.Close()
@@ -776,22 +780,22 @@ func (b *Beat) loadMeta(metaPath string) error {
 	tempFile := metaPath + ".new"
 	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("Failed to create Beat meta file: %s", err)
+		return fmt.Errorf("failed to create Beat meta file: %w", err)
 	}
 
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
 	err = f.Sync()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", err)
+		return fmt.Errorf("Beat meta file failed to write: %w", err)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", err)
+		return fmt.Errorf("Beat meta file failed to write: %w", err)
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", encodeErr)
+		return fmt.Errorf("Beat meta file failed to write: %w", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -826,11 +830,11 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	if force {
 		// force implies dashboards.enabled=true
 		if b.Config.Dashboards == nil {
-			b.Config.Dashboards = common.NewConfig()
+			b.Config.Dashboards = config.NewConfig()
 		}
 		err := b.Config.Dashboards.SetBool("enabled", -1, true)
 		if err != nil {
-			return fmt.Errorf("Error setting dashboard.enabled=true: %v", err)
+			return fmt.Errorf("error setting dashboard.enabled=true: %w", err)
 		}
 	}
 
@@ -842,7 +846,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
-			return fmt.Errorf("error connecting to Kibana: %v", err)
+			return fmt.Errorf("error connecting to Kibana: %w", err)
 		}
 		// This fetches the version for Kibana. For the alias feature the version of ES would be needed
 		// but it's assumed that KB and ES have the same minor version.
@@ -850,18 +854,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, b.Config.Migration.Enabled())
 		if err != nil {
-			return fmt.Errorf("error creating index pattern generator: %v", err)
+			return fmt.Errorf("error creating index pattern generator: %w", err)
 		}
 
 		pattern, err := indexPattern.Generate()
 		if err != nil {
-			return fmt.Errorf("error generating index pattern: %v", err)
+			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
 		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
-			return errw.Wrap(err, "Error importing Kibana dashboards")
+			return fmt.Errorf("error importing Kibana dashboards: %w", err)
 		}
 		logp.Info("Kibana dashboards successfully loaded.")
 	}
@@ -873,18 +877,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
-	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
+	if !isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
 		return
 	}
 
-	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := common.NewVersion(b.Info.Version)
 		if err != nil {
 			return err
 		}
 		if esVersion.LessThanMajorMinor(beatVersion) {
-			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
+			return fmt.Errorf("%w ES=%s, Beat=%s", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
 		}
 		return nil
 	})
@@ -895,7 +899,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 		AllowOlder bool `config:"allow_older_versions"`
 	}{false}
 
-	b.Config.Output.Config().Unpack(&config)
+	_ = b.Config.Output.Config().Unpack(&config)
 
 	return config.AllowOlder
 }
@@ -904,7 +908,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if b.Config.Output.Name() != "elasticsearch" || !b.IdxSupporter.Enabled() {
+	if !isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
@@ -934,7 +938,7 @@ func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Re
 }
 
 func (b *Beat) makeOutputFactory(
-	cfg common.ConfigNamespace,
+	cfg config.Namespace,
 ) func(outputs.Observer) (string, outputs.Group, error) {
 	return func(outStats outputs.Observer) (string, outputs.Group, error) {
 		out, err := b.createOutput(outStats, cfg)
@@ -942,7 +946,7 @@ func (b *Beat) makeOutputFactory(
 	}
 }
 
-func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) (outputs.Group, error) {
+func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
 	}
@@ -950,19 +954,15 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
 }
 
-func (b *Beat) registerClusterUUIDFetching() error {
-	if b.Config.Output.Name() == "elasticsearch" {
-		callback, err := b.clusterUUIDFetchingCallback()
-		if err != nil {
-			return err
-		}
-		elasticsearch.RegisterConnectCallback(callback)
+func (b *Beat) registerClusterUUIDFetching() {
+	if isElasticsearchOutput(b.Config.Output.Name()) {
+		callback := b.clusterUUIDFetchingCallback()
+		_, _ = elasticsearch.RegisterConnectCallback(callback)
 	}
-	return nil
 }
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
-func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
+func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
 	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
 	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
@@ -974,21 +974,21 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 
 		status, body, err := esClient.Request("GET", "/", "", nil, nil)
 		if err != nil {
-			return errw.Wrap(err, "error querying /")
+			return fmt.Errorf("error querying /: %w", err)
 		}
 		if status > 299 {
-			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
+			return fmt.Errorf("error querying /. Status: %d. Response body: %s", status, body)
 		}
 		err = json.Unmarshal(body, &response)
 		if err != nil {
-			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
+			return fmt.Errorf("error unmarshaling json when querying /. Body: %s", body)
 		}
 
 		clusterUUIDRegVar.Set(response.ClusterUUID)
 		return nil
 	}
 
-	return callback, nil
+	return callback
 }
 
 func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
@@ -1031,7 +1031,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 // error. If the err is nil or is a GracefulExit error then the method will
 // return nil without logging anything.
 func handleError(err error) error {
-	if err == nil || err == beat.GracefulExit {
+	if err == nil || err == beat.GracefulExit { //nolint:errorlint // keep old behaviour
 		return nil
 	}
 
@@ -1112,7 +1112,7 @@ func logSystemInfo(info beat.Info) {
 }
 
 // configOpts returns ucfg config options with a resolver linked to the current keystore.
-// TODO: Refactor to allow insert into the config option array without having to redefine everything
+// Refactor to allow insert into the config option array without having to redefine everything
 func configOpts(store keystore.Keystore) []ucfg.Option {
 	return []ucfg.Option{
 		ucfg.PathSep("."),
@@ -1132,22 +1132,22 @@ func obfuscateConfigOpts() []ucfg.Option {
 }
 
 // LoadKeystore returns the appropriate keystore based on the configuration.
-func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
+func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
 	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
 
-func InitKibanaConfig(beatConfig beatConfig) *common.Config {
-	var esConfig *common.Config
-	if beatConfig.Output.Name() == "elasticsearch" {
+func InitKibanaConfig(beatConfig beatConfig) *config.C {
+	var esConfig *config.C
+	if isElasticsearchOutput(beatConfig.Output.Name()) {
 		esConfig = beatConfig.Output.Config()
 	}
 
 	// init kibana config object
 	kibanaConfig := beatConfig.Kibana
 	if kibanaConfig == nil {
-		kibanaConfig = common.NewConfig()
+		kibanaConfig = config.NewConfig()
 	}
 
 	if esConfig.Enabled() {
@@ -1156,19 +1156,23 @@ func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 		api_key, _ := esConfig.String("api_key", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
-			kibanaConfig.SetString("username", -1, username)
+			_ = kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
-			kibanaConfig.SetString("password", -1, password)
+			_ = kibanaConfig.SetString("password", -1, password)
 		}
 		if !kibanaConfig.HasField("api_key") && api_key != "" {
-			kibanaConfig.SetString("api_key", -1, api_key)
+			_ = kibanaConfig.SetString("api_key", -1, api_key)
 		}
 	}
 	return kibanaConfig
 }
 
-func initPaths(cfg *common.Config) error {
+func isElasticsearchOutput(name string) bool {
+	return name == "elasticsearch"
+}
+
+func initPaths(cfg *config.C) error {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference

@@ -7,15 +7,15 @@ package provider
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // DefaultProvider implements the minimal required to retrieve and start functions.
 type DefaultProvider struct {
-	rawConfig       *common.Config
+	rawConfig       *conf.C
 	config          *config.ProviderConfig
 	registry        *Registry
 	name            string
@@ -29,8 +29,8 @@ func NewDefaultProvider(
 	name string,
 	manager CLIManagerFactory,
 	templater TemplateBuilderFactory,
-) func(*logp.Logger, *Registry, *common.Config) (Provider, error) {
-	return func(log *logp.Logger, registry *Registry, cfg *common.Config) (Provider, error) {
+) func(*logp.Logger, *Registry, *conf.C) (Provider, error) {
+	return func(log *logp.Logger, registry *Registry, cfg *conf.C) (Provider, error) {
 		c := &config.ProviderConfig{}
 		err := cfg.Unpack(c)
 		if err != nil {
@@ -88,7 +88,7 @@ func (d *DefaultProvider) EnabledFunctions() ([]string, error) {
 type nullCLI struct{}
 
 // NewNullCli returns a NOOP CliManager.
-func NewNullCli(_ *logp.Logger, _ *common.Config, _ Provider) (CLIManager, error) {
+func NewNullCli(_ *logp.Logger, _ *conf.C, _ Provider) (CLIManager, error) {
 	return (*nullCLI)(nil), nil
 }
 
@@ -102,7 +102,7 @@ func (*nullCLI) Package(_ string) error { return fmt.Errorf("package not impleme
 type nullTemplateBuilder struct{}
 
 // NewNullTemplateBuilder returns a NOOP TemplateBuilder.
-func NewNullTemplateBuilder(_ *logp.Logger, _ *common.Config, _ Provider) (TemplateBuilder, error) {
+func NewNullTemplateBuilder(_ *logp.Logger, _ *conf.C, _ Provider) (TemplateBuilder, error) {
 	return (*nullTemplateBuilder)(nil), nil
 }
 

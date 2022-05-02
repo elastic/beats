@@ -99,6 +99,7 @@ require (
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/lib/pq v1.10.3
 	github.com/magefile/mage v1.13.0
+	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.12
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/gox v1.0.1
@@ -128,8 +129,8 @@ require (
 	go.elastic.co/ecszap v1.0.0
 	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.6
-	go.uber.org/atomic v1.8.0
-	go.uber.org/multierr v1.6.0
+	go.uber.org/atomic v1.9.0
+	go.uber.org/multierr v1.8.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
@@ -159,7 +160,7 @@ require (
 )
 
 require (
-	github.com/elastic/elastic-agent-libs v0.1.1
+	github.com/elastic/elastic-agent-libs v0.2.3
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
@@ -243,7 +244,6 @@ require (
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
-	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

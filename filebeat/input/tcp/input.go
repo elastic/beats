@@ -28,8 +28,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -52,7 +52,7 @@ type Input struct {
 
 // NewInput creates a new TCP input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {

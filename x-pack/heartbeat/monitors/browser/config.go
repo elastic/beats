@@ -7,9 +7,9 @@ package browser
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func DefaultConfig() *Config {
@@ -22,7 +22,7 @@ func DefaultConfig() *Config {
 type Config struct {
 	Schedule  string                 `config:"schedule"`
 	Params    map[string]interface{} `config:"params"`
-	RawConfig *common.Config
+	RawConfig *config.C
 	Source    *source.Source `config:"source"`
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`

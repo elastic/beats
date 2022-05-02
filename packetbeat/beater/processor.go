@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
@@ -34,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	"github.com/elastic/beats/v7/packetbeat/sniffer"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type processor struct {
@@ -94,10 +94,10 @@ type processorFactory struct {
 	name         string
 	err          chan error
 	beat         *beat.Beat
-	configurator func(*common.Config) (config.Config, error)
+	configurator func(*conf.C) (config.Config, error)
 }
 
-func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*common.Config) (config.Config, error)) *processorFactory {
+func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C) (config.Config, error)) *processorFactory {
 	return &processorFactory{
 		name:         name,
 		err:          err,
@@ -106,7 +106,7 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 	}
 }
 
-func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.Config) (cfgfile.Runner, error) {
+func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	config, err := p.configurator(cfg)
 	if err != nil {
 		logp.Err("Failed to read the beat config: %v, %v", err, config)
@@ -157,7 +157,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
 // on the provided configuration. This will involve setting up some dummy
 // sniffers and so will need libpcap to be loaded.
-func (p *processorFactory) CheckConfig(config *common.Config) error {
+func (p *processorFactory) CheckConfig(config *conf.C) error {
 	runner, err := p.Create(pipeline.NewNilPipeline(), config)
 	if err != nil {
 		return err

@@ -20,11 +20,11 @@ import (
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register javascript modules.
@@ -81,7 +81,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Open evtx file.
-	log, err := eventlog.New(common.MustNewConfigFrom(mapstr.M{
+	log, err := eventlog.New(config.MustNewConfigFrom(mapstr.M{
 		"name":           path,
 		"api":            "wineventlog",
 		"no_more_events": "stop",
@@ -96,7 +96,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 	}
 
 	// Load javascript processor.
-	processor, err := javascript.New(common.MustNewConfigFrom(mapstr.M{
+	processor, err := javascript.New(config.MustNewConfigFrom(mapstr.M{
 		"file": pipeline,
 	}))
 	if err != nil {

@@ -25,8 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -62,7 +62,7 @@ func TestRetrieveHuaweiCloudMetadata(t *testing.T) {
 	server := initHuaweiCloudTestServer()
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"providers": []string{"huawei"},
 		"host":      server.Listener.Addr().String(),
 	})

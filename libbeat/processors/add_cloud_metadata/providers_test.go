@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestProvidersFilter(t *testing.T) {
@@ -67,7 +67,7 @@ func TestProvidersFilter(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			rawConfig := common.MustNewConfigFrom(test.config)
+			rawConfig := conf.MustNewConfigFrom(test.config)
 
 			config := defaultConfig()
 			err := rawConfig.Unpack(&config)

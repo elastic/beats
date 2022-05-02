@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // ModuleConfig contains the configuration file options for a module
@@ -42,8 +42,8 @@ type FilesetConfig struct {
 	Input   map[string]interface{} `config:"input"`
 }
 
-// NewFilesetConfig creates a new FilesetConfig from a common.Config.
-func NewFilesetConfig(cfg *common.Config) (*FilesetConfig, error) {
+// NewFilesetConfig creates a new FilesetConfig from a conf.C.
+func NewFilesetConfig(cfg *conf.C) (*FilesetConfig, error) {
 	if err := cfgwarn.CheckRemoved6xSetting(cfg, "prospector"); err != nil {
 		return nil, err
 	}
@@ -60,8 +60,8 @@ func NewFilesetConfig(cfg *common.Config) (*FilesetConfig, error) {
 // mergePathDefaults returns a copy of c containing the path variables that must
 // be available for variable expansion in module configuration (e.g. it enables
 // the use of ${path.config} in module config).
-func mergePathDefaults(c *common.Config) (*common.Config, error) {
-	defaults := common.MustNewConfigFrom(map[string]interface{}{
+func mergePathDefaults(c *conf.C) (*conf.C, error) {
+	defaults := conf.MustNewConfigFrom(map[string]interface{}{
 		"path": map[string]interface{}{
 			"home":   paths.Paths.Home,
 			"config": "${path.home}",

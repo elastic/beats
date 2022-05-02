@@ -29,8 +29,8 @@ import (
 
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
@@ -89,7 +89,7 @@ func WithMetadata(kind string) FieldOptions {
 // GetPodMetaGen is a wrapper function that creates a metaGen for pod resource and has embeeded
 // nodeMetaGen and namespaceMetaGen
 func GetPodMetaGen(
-	cfg *common.Config,
+	cfg *config.C,
 	podWatcher kubernetes.Watcher,
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
@@ -107,11 +107,11 @@ func GetPodMetaGen(
 }
 
 // GetKubernetesClusterIdentifier returns ClusterInfo for k8s if available
-func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
+func GetKubernetesClusterIdentifier(cfg *config.C, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
-	var config Config
-	config.Unmarshal(cfg)
-	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
+	var c Config
+	c.Unmarshal(cfg)
+	clusterInfo, err := getClusterInfoFromKubeConfigFile(c.KubeConfig)
 	if err == nil {
 		return clusterInfo, nil
 	}

@@ -19,7 +19,6 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -27,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -70,7 +70,7 @@ type osquerybeat struct {
 }
 
 // New creates an instance of osquerybeat.
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	log := logp.NewLogger("osquerybeat")
 
 	c := config.DefaultConfig

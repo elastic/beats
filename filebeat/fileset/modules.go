@@ -29,9 +29,9 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const logName = "modules"
@@ -116,7 +116,7 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init bool) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
@@ -177,7 +177,7 @@ func enableFilesetsFromOverrides(mcfgs []*ModuleConfig, overrides *ModuleOverrid
 	}
 }
 
-func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
+func mcfgFromConfig(cfg *conf.C) (*ModuleConfig, error) {
 	var mcfg ModuleConfig
 
 	err := cfg.Unpack(&mcfg)
@@ -205,7 +205,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 		filesetConfig, _ := dict[name] // Nil config if name is not present.
 
-		tmpCfg, err := common.NewConfigFrom(filesetConfig)
+		tmpCfg, err := conf.NewConfigFrom(filesetConfig)
 		if err != nil {
 			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
 		}
@@ -272,15 +272,15 @@ func applyOverrides(fcfg *FilesetConfig,
 		return fcfg, nil
 	}
 
-	config, err := common.NewConfigFrom(fcfg)
+	config, err := conf.NewConfigFrom(fcfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating vars config object: %v", err)
 	}
 
-	toMerge := []*common.Config{config}
+	toMerge := []*conf.C{config}
 	toMerge = append(toMerge, overridesConfigs...)
 
-	resultConfig, err := common.MergeConfigs(toMerge...)
+	resultConfig, err := conf.MergeConfigs(toMerge...)
 	if err != nil {
 		return nil, fmt.Errorf("error merging configs: %v", err)
 	}
@@ -318,8 +318,8 @@ func appendWithoutDuplicates(moduleConfigs []*ModuleConfig, modules []string) ([
 	return moduleConfigs, nil
 }
 
-func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
-	var result []*common.Config
+func (reg *ModuleRegistry) GetInputConfigs() ([]*conf.C, error) {
+	var result []*conf.C
 	for _, module := range reg.registry {
 		for _, fileset := range module.filesets {
 			fcfg, err := fileset.getInputConfig()
