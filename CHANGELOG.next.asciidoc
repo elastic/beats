@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 - cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
+- Duplicate awscloudwatch.* fields to aws.cloudwatch.* in aws-cloudwatch input. {pull}31488[31488]
 
 *Heartbeat*
 
