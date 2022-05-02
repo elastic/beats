@@ -160,7 +160,7 @@ require (
 )
 
 require (
-	github.com/elastic/elastic-agent-libs v0.2.1
+	github.com/elastic/elastic-agent-libs v0.2.3
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
