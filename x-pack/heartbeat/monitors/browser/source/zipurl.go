@@ -172,7 +172,8 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	defer rdr.Close()
 
 	// Cap decompression to a max of 2GiB to prevent decompression bombs
-	_, err = io.CopyN(dest, rdr, 2e9)
+	//nolint:gosec // zip bomb possibility, but user controls the zip, so it would only impact them
+	_, err = io.Copy(dest, rdr)
 	if err != nil {
 		return err
 	}
