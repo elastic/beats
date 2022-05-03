@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// TODO: Support other architectures (e.g. arm)
 //go:build linux
 // +build linux
 
@@ -50,7 +49,7 @@ func init() {
 	// Note that we discard any errors because they are not actionable.
 	// The beat should use `getcap` at a later point to examine available capabilities
 	// rather than relying on errors from `setcap`
-	setCapabilities()
+	_ = setCapabilities()
 
 	switch runtime.GOARCH {
 	case "amd64", "386":
@@ -95,7 +94,7 @@ func changeUser(localUserName string) error {
 		return fmt.Errorf("could not setuid to %d: %w", localUserUid, err)
 	}
 
-	// This may not be necessary, but is good hygeine, we do some shelling out to node/npm etc.
+	// This may not be necessary, but is good hygiene, we do some shelling out to node/npm etc.
 	// and $HOME should reflect the user's preferences
 	return os.Setenv("HOME", localUser.HomeDir)
 }

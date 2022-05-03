@@ -56,7 +56,10 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 	// base stream has the full monitor config contained within
 	for _, stream := range optS.Streams {
 		bs := &BaseStream{}
-		stream.Unpack(bs)
+		err = stream.Unpack(bs)
+		if err != nil {
+			return nil, fmt.Errorf("could not unpack stream: %w", err)
+		}
 		if bs.Type != "" {
 			res = stream
 			break
@@ -69,5 +72,5 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 	}
 
 	err = res.Merge(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
-	return
+	return res, err
 }

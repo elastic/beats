@@ -185,7 +185,7 @@ func (r *PluginsReg) Get(name string) (PluginFactory, bool) {
 }
 
 func (r *PluginsReg) String() string {
-	var monitors []string
+	var monitors = []string{}
 	for m := range r.monitors {
 		monitors = append(monitors, m)
 	}

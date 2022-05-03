@@ -58,7 +58,7 @@ func Test_runPublishJob(t *testing.T) {
 		{
 			"one cont",
 			func(event *beat.Event) (j []jobs.Job, e error) {
-				simpleJob(event)
+				_, _ = simpleJob(event)
 				return []jobs.Job{simpleJob}, nil
 			},
 			[]validator.Validator{
@@ -69,7 +69,7 @@ func Test_runPublishJob(t *testing.T) {
 		{
 			"multiple conts",
 			func(event *beat.Event) (j []jobs.Job, e error) {
-				simpleJob(event)
+				_, _ = simpleJob(event)
 				return []jobs.Job{
 					defineJob(common.MapStr{"baz": "bot"}),
 					defineJob(common.MapStr{"blah": "blargh"}),
@@ -108,9 +108,7 @@ func Test_runPublishJob(t *testing.T) {
 				tf := queue[0]
 				queue = queue[1:]
 				conts := tf(context.Background())
-				for _, cont := range conts {
-					queue = append(queue, cont)
-				}
+				queue = append(queue, conts...)
 			}
 			client.Close()
 

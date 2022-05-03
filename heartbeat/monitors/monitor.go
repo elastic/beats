@@ -213,17 +213,7 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configur
 
 	var mTasks []*configuredJob
 	for _, job := range jobs {
-		t, err := newConfiguredJob(job, mtConf, m)
-		if err != nil {
-			// Failure to compile monitor processors should not crash hb or prevent progress
-			if _, ok := err.(ProcessorsError); ok {
-				logp.Critical("Failed to load monitor processors: %v", err)
-				continue
-			}
-
-			return nil, err
-		}
-
+		t := newConfiguredJob(job, mtConf, m)
 		mTasks = append(mTasks, t)
 	}
 

@@ -40,12 +40,12 @@ type configuredJob struct {
 	client   *WrappedClient
 }
 
-func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) *configuredJob {
 	return &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
-	}, nil
+	}
 }
 
 // jobConfig represents fields needed to execute a single job.
@@ -97,7 +97,7 @@ func (t *configuredJob) Stop() {
 		t.cancelFn()
 	}
 	if t.client != nil {
-		t.client.Close()
+		_ = t.client.Close()
 	}
 }
 
