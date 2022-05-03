@@ -27,6 +27,7 @@ import (
 
 const (
 	sqsApproximateReceiveCountAttribute = "ApproximateReceiveCount"
+	sqsInvalidParameterValueErrorCode   = "InvalidParameterValue"
 )
 
 type nonRetryableError struct {
@@ -188,7 +189,7 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 				var awsErr awserr.Error
 				if errors.As(err, &awsErr) {
 					switch awsErr.Code() {
-					case sqs.ErrCodeReceiptHandleIsInvalid:
+					case sqs.ErrCodeReceiptHandleIsInvalid, sqsInvalidParameterValueErrorCode:
 						log.Warnw("Failed to extend message visibility timeout "+
 							"because SQS receipt handle is no longer valid. "+
 							"Stopping SQS message keepalive routine.", "error", err)

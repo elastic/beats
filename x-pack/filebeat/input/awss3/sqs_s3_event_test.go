@@ -168,30 +168,48 @@ func TestSQSS3EventProcessor(t *testing.T) {
 func TestSqsProcessor_keepalive(t *testing.T) {
 	msg := newSQSMessage(newS3Event("log.json"))
 
-	// Test will call ChangeMessageVisibility once and then keepalive will
-	// exit because the SQS receipt handle is not usable.
-	t.Run("keepalive stops after receipt handle is invalid", func(t *testing.T) {
-		const visibilityTimeout = time.Second
+	// Ensure both ReceiptHandleIsInvalid and InvalidParameterValue error codes trigger stops.
+	// See https://github.com/elastic/beats/issues/30675.
+	testCases := []struct {
+		Name string
+		Err  error
+	}{
+		{
+			Name: "keepalive stop after ReceiptHandleIsInvalid",
+			Err:  awserr.New(sqs.ErrCodeReceiptHandleIsInvalid, "fake receipt handle is invalid.", nil),
+		},
+		{
+			Name: "keepalive stop after InvalidParameterValue",
+			Err:  awserr.New(sqsInvalidParameterValueErrorCode, "The receipt handle has expired.", nil),
+		},
+	}
 
-		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
-		defer cancel()
+	for _, tc := range testCases {
+		tc := tc
 
-		ctrl, ctx := gomock.WithContext(ctx, t)
-		defer ctrl.Finish()
-		mockAPI := NewMockSQSAPI(ctrl)
-		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
+		// Test will call ChangeMessageVisibility once and then keepalive will
+		// exit because the SQS receipt handle is not usable.
+		t.Run(tc.Name, func(t *testing.T) {
+			const visibilityTimeout = time.Second
 
-		receiptHandleErr := awserr.New(sqs.ErrCodeReceiptHandleIsInvalid, "fake receipt handle is invalid.", nil)
+			ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+			defer cancel()
 
-		mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).
-			Times(1).Return(receiptHandleErr)
+			ctrl, ctx := gomock.WithContext(ctx, t)
+			defer ctrl.Finish()
+			mockAPI := NewMockSQSAPI(ctrl)
+			mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
-		var wg sync.WaitGroup
-		wg.Add(1)
-		p.keepalive(ctx, p.log, &wg, &msg)
-		wg.Wait()
-	})
+			mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).
+				Times(1).Return(tc.Err)
+
+			p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
+			var wg sync.WaitGroup
+			wg.Add(1)
+			p.keepalive(ctx, p.log, &wg, &msg)
+			wg.Wait()
+		})
+	}
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
