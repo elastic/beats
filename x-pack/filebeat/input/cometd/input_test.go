@@ -192,6 +192,60 @@ func TestInputStop_Wait(t *testing.T) {
 	input.Wait()
 }
 
+func TestStop(t *testing.T) {
+	conf := defaultConfig()
+	logger := logp.NewLogger("test")
+	authParams := bay.AuthenticationParameters{}
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	defer cancelInputCtx()
+	input := &cometdInput{
+		config:       conf,
+		log:          logger,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		authParams:   authParams,
+	}
+	input.msgCh = make(chan bay.MaybeMsg)
+
+	input.Stop()
+	select {
+	case <-workerCtx.Done():
+	case <-time.After(time.Second): // let input.Stop() be executed.
+		require.NoError(t, fmt.Errorf("input is not stopped."))
+	}
+}
+
+func TestWait(t *testing.T) {
+	conf := defaultConfig()
+	logger := logp.NewLogger("test")
+	authParams := bay.AuthenticationParameters{}
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	defer cancelInputCtx()
+
+	input := &cometdInput{
+		config:       conf,
+		log:          logger,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		authParams:   authParams,
+	}
+	input.msgCh = make(chan bay.MaybeMsg)
+
+	go func() {
+		input.Wait()
+	}()
+
+	select {
+	case <-workerCtx.Done():
+	case <-time.After(time.Second): // let input.Stop() be executed.
+		require.NoError(t, fmt.Errorf("input is not stopped."))
+	}
+}
+
 func TestMultiInput(t *testing.T) {
 	defer atomic.StoreUint64(&called1, 0)
 	defer atomic.StoreUint64(&called2, 0)
@@ -286,81 +340,18 @@ func TestMultiInput(t *testing.T) {
 	}
 }
 
-func TestStop(t *testing.T) {
-	conf := defaultConfig()
-	logger := logp.NewLogger("test")
-	authParams := bay.AuthenticationParameters{}
-	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-	workerCtx, workerCancel := context.WithCancel(inputCtx)
-	defer cancelInputCtx()
-	input := &cometdInput{
-		config:       conf,
-		log:          logger,
-		inputCtx:     inputCtx,
-		workerCtx:    workerCtx,
-		workerCancel: workerCancel,
-		authParams:   authParams,
-	}
-	input.msgCh = make(chan bay.MaybeMsg)
-
-	input.Stop()
-	select {
-	case <-workerCtx.Done():
-	case <-time.After(time.Second): // let input.Stop() be executed.
-		require.NoError(t, fmt.Errorf("input is not stopped."))
-	}
-}
-
-func TestWait(t *testing.T) {
-	conf := defaultConfig()
-	logger := logp.NewLogger("test")
-	authParams := bay.AuthenticationParameters{}
-	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-	workerCtx, workerCancel := context.WithCancel(inputCtx)
-	defer cancelInputCtx()
-
-	input := &cometdInput{
-		config:       conf,
-		log:          logger,
-		inputCtx:     inputCtx,
-		workerCtx:    workerCtx,
-		workerCancel: workerCancel,
-		authParams:   authParams,
-	}
-	input.msgCh = make(chan bay.MaybeMsg)
-
-	go func() {
-		input.Wait()
-	}()
-
-	select {
-	case <-workerCtx.Done():
-	case <-time.After(time.Second): // let input.Stop() be executed.
-		require.NoError(t, fmt.Errorf("input is not stopped."))
-	}
-}
-
-func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
+func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
+	if r.URL.Path == "/token" {
 		response := `{"instance_url": "` + serverURL + `", "expires_in": "60", "access_token": "abcd"}`
 		_, _ = w.Write([]byte(response))
+		return
 	}
-}
+	body, _ := ioutil.ReadAll(r.Body)
 
-func oauth2ClientIdHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
+	switch string(body) {
+	case `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`:
 		switch clientId {
 		case 0:
 			atomic.StoreUint64(&clientId, 1)
@@ -370,98 +361,40 @@ func oauth2ClientIdHandler(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id2","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		default:
 		}
-	}
-}
-
-func oauth2SubscribeHandlerChannel1(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id1", "channel": "/meta/subscribe", "subscription": "channel_name1", "successful":true}]`))
-	}
-}
-
-func oauth2SubscribeHandlerChannel2(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id2", "channel": "/meta/subscribe", "subscription": "channel_name2", "successful":true}]`))
-	}
-}
-
-func oauth2EventHandlerChannel1(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
+		return
+	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id1"} `:
 		if called1 < 1 {
 			atomic.AddUint64(&called1, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name1"}]`))
 		}
-	}
-}
-
-func oauth2EventHandlerChannel2(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
+		return
+	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id2"} `:
 		if called2 < 1 {
 			atomic.AddUint64(&called2, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "US"}, "event": {"replayId":1234}}, "channel": "channel_name2"}]`))
 		}
-	}
-}
-
-func oauth2Handler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/token" {
-		oauth2TokenHandler(w, r)
 		return
-	}
-	body, _ := ioutil.ReadAll(r.Body)
-	if string(body) == `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}` {
-		oauth2ClientIdHandler(w, r)
-		return
-	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id1"} ` {
-		oauth2EventHandlerChannel1(w, r)
-		return
-	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id2"} ` {
-		oauth2EventHandlerChannel2(w, r)
-		return
-	} else if string(body) == `{
+	case `{
 								"channel": "/meta/subscribe",
 								"subscription": "channel_name1",
 								"clientId": "client_id1",
 								"ext": {
 									"replay": {"channel_name1": "-1"}
 									}
-								}` {
-		oauth2SubscribeHandlerChannel1(w, r)
+								}`:
+		_, _ = w.Write([]byte(`[{"clientId": "client_id1", "channel": "/meta/subscribe", "subscription": "channel_name1", "successful":true}]`))
 		return
-	} else if string(body) == `{
+	case `{
 								"channel": "/meta/subscribe",
 								"subscription": "channel_name2",
 								"clientId": "client_id2",
 								"ext": {
 									"replay": {"channel_name2": "-1"}
 									}
-								}` {
-		oauth2SubscribeHandlerChannel2(w, r)
+								}`:
+		_, _ = w.Write([]byte(`[{"clientId": "client_id2", "channel": "/meta/subscribe", "subscription": "channel_name2", "successful":true}]`))
 		return
+	default:
 	}
 }
 
