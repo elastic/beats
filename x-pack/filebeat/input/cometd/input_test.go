@@ -253,14 +253,8 @@ func TestMultiInput(t *testing.T) {
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
-	const numMessages = 2
-
-	var eventProcessing sync.WaitGroup
-	eventProcessing.Add(numMessages)
-
 	outlet := &mockedOutleter{
 		onEventHandler: func(event beat.Event) bool {
-			eventProcessing.Done()
 			eventsCh <- event
 			return true
 		},
@@ -325,8 +319,6 @@ func TestMultiInput(t *testing.T) {
 	// run input
 	input2.Run()
 	defer input2.Stop()
-
-	eventProcessing.Wait()
 
 	for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
 		channel, err := event.GetValue("cometd.channel_name")
