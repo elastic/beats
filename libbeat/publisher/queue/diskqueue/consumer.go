@@ -29,10 +29,10 @@ type diskQueueBatch struct {
 	frames []*readFrame
 }
 
-func (queue *diskQueue) Get(eventCount int) (queue.Batch, error) {
+func (dq *diskQueue) Get(eventCount int) (queue.Batch, error) {
 	// We can always eventually read at least one frame unless the queue or the
 	// consumer is closed.
-	frame, ok := <-queue.readerLoop.output
+	frame, ok := <-dq.readerLoop.output
 	if !ok {
 		return nil, fmt.Errorf("tried to read from a closed disk queue")
 	}
@@ -41,7 +41,7 @@ func (queue *diskQueue) Get(eventCount int) (queue.Batch, error) {
 eventLoop:
 	for eventCount <= 0 || len(frames) < eventCount {
 		select {
-		case frame, ok := <-queue.readerLoop.output:
+		case frame, ok := <-dq.readerLoop.output:
 			if !ok {
 				// The queue was closed while we were reading it, just send back
 				// what we have so far.
@@ -74,7 +74,7 @@ eventLoop:
 	// queue itself, so we expect this corner case not to arise in practice, but
 	// if it does it is innocuous.
 	return &diskQueueBatch{
-		queue:  queue,
+		queue:  dq,
 		frames: frames,
 	}, nil
 }

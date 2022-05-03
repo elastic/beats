@@ -106,7 +106,7 @@ func TestSyncClient(t *testing.T) {
 		sc.Wait()
 	})
 
-	t.Run("PublishAll multiple independant ACKs", func(t *testing.T) {
+	t.Run("PublishAll multiple independent ACKs", func(t *testing.T) {
 		c := newDummyClient()
 
 		pipeline := newDummyPipeline(c)

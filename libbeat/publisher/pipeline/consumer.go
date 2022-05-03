@@ -171,11 +171,10 @@ outerLoop:
 			pendingRead = false
 
 		case req := <-c.retryChan:
-			alive := true
 			if req.decreaseTTL {
 				countFailed := len(req.batch.Events())
 
-				alive = req.batch.reduceTTL()
+				alive := req.batch.reduceTTL()
 
 				countDropped := countFailed - len(req.batch.Events())
 				c.observer.eventsDropped(countDropped)

@@ -139,14 +139,17 @@ func (l *TestLogger) Errf(format string, v ...interface{}) {
 
 func print(vs []interface{}) {
 	if printLog {
+		//nolint: forbidigo // Printing is ok during specialized tests.
 		fmt.Println(vs...)
 	}
 }
 
 func printf(format string, vs []interface{}) {
 	if printLog {
+		//nolint: forbidigo // Printing is ok during specialized tests.
 		fmt.Printf(format, vs...)
 		if format[len(format)-1] != '\n' {
+			//nolint: forbidigo // Printing is ok during specialized tests.
 			fmt.Println("")
 		}
 	}
