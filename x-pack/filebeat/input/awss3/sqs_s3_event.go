@@ -231,7 +231,7 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 }
 
 func (p *sqsS3EventProcessor) getS3Info(events s3EventsV2) ([]s3EventV2, error) {
-	var out []s3EventV2
+	out := make([]s3EventV2, 0, len(events.Records))
 	for _, record := range events.Records {
 		if !p.isObjectCreatedEvents(record) {
 			p.warnOnce.Do(func() {
