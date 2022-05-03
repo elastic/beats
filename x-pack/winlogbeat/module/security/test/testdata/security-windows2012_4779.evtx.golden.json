@@ -2,19 +2,11 @@
   {
     "@timestamp": "2020-04-03T10:18:01.8822336Z",
     "event": {
-      "action": "session-disconnected",
-      "category": [
-        "authentication",
-        "session"
-      ],
+      "action": "Other Logon/Logoff Events",
       "code": "4779",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -22,18 +14,7 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "ip": "10.100.150.17",
-      "user": "at_adm"
-    },
-    "source": {
-      "domain": "EQP01777",
-      "ip": "10.100.150.17"
-    },
-    "user": {
-      "domain": "TEST",
-      "name": "at_adm"
-    },
+    "message": "A session was disconnected from a Window Station.\n\nSubject:\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x60D1CCB\n\nSession:\n\tSession Name:\t\tRDP-Tcp#116\n\nAdditional Information:\n\tClient Name:\t\tEQP01777\n\tClient Address:\t\t10.100.150.17\n\n\nThis event is generated when a user disconnects from an existing Terminal Services session, or when a user switches away from an existing desktop using Fast User Switching.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
@@ -50,9 +31,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x60d1ccb"
-      },
       "opcode": "Info",
       "process": {
         "pid": 496,
