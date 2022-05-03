@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Filebeat*
 
 *Heartbeat*
+
 - Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
@@ -37,15 +38,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
-- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
-- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
-- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
-- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
-- Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
-- Add ecs container fields {pull}31020[31020]
-- Fix docs reference for syslog processor {pull}31087[31087]
-- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 - Fix group write permissions on runtime directories. {pull}30869[30869]
 - Store syslog version as string. {pull}31446[31446]
 
@@ -67,7 +59,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
-- Heartbeat now successfully runs synthetic monitors on ARM processors. {pull}31114[31114]
 
 *Metricbeat*
 
@@ -85,8 +76,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
-- Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
 
 *Functionbeat*
 
@@ -99,8 +88,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Add support for port mapping in docker hints. {pull}31243[31243]
-- Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
 
 *Auditbeat*
 
@@ -127,7 +114,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
-- Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
 
 
 *Filebeat*
@@ -186,6 +172,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
