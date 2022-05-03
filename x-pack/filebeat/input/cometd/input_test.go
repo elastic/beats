@@ -27,19 +27,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const (
-	firstChannel  = "channel_name1"
-	secondChannel = "channel_name2"
-)
-
 var (
 	serverURL string
+	inputType int
 	called    uint64
 )
 
 func TestInputDone(t *testing.T) {
 	config := mapstr.M{
-		"channel_name":              firstChannel,
+		"channel_name":              "channel_channel",
 		"auth.oauth2.client.id":     "DEMOCLIENTID",
 		"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
 		"auth.oauth2.user":          "salesforce_user",
@@ -68,6 +64,7 @@ func TestMakeEventFailure(t *testing.T) {
 }
 
 func TestSingleInput(t *testing.T) {
+	inputType = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
@@ -96,7 +93,7 @@ func TestSingleInput(t *testing.T) {
 		"auth.oauth2.password":      "password",
 	}
 
-	r := http.HandlerFunc(oauth2SingleEventHandler)
+	r := http.HandlerFunc(oauth2Handler)
 	server := httptest.NewServer(r)
 	defer server.Close()
 
@@ -117,6 +114,7 @@ func TestSingleInput(t *testing.T) {
 }
 
 func TestInputStop_Wait(t *testing.T) {
+	inputType = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
@@ -151,7 +149,7 @@ func TestInputStop_Wait(t *testing.T) {
 		"auth.oauth2.password":      "password",
 	}
 
-	r := http.HandlerFunc(oauth2SingleEventHandler)
+	r := http.HandlerFunc(oauth2Handler)
 	server := httptest.NewServer(r)
 	defer server.Close()
 
@@ -241,6 +239,7 @@ func TestWait(t *testing.T) {
 }
 
 func TestMultiInput(t *testing.T) {
+	inputType = 2
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
@@ -301,50 +300,14 @@ func TestMultiInput(t *testing.T) {
 
 	got := 0
 	go func() {
-		fmt.Println("start")
 		for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
 			assertEventMatches(t, expected1, event)
 			got++
-			fmt.Println(got)
 		}
 	}()
 	time.Sleep(2 * time.Second)
 	if got < 2 {
 		require.NoError(t, fmt.Errorf("not able to get events."))
-	}
-}
-
-func oauth2SingleEventHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	if r.URL.Path == "/token" {
-		response := `{"instance_url": "` + serverURL + `", "expires_in": "60", "access_token": "abcd"}`
-		_, _ = w.Write([]byte(response))
-		return
-	}
-	body, _ := ioutil.ReadAll(r.Body)
-
-	switch string(body) {
-	case `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`:
-		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
-		return
-	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
-		if called < 1 {
-			atomic.AddUint64(&called, 1)
-			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
-		}
-		return
-	case `{
-								"channel": "/meta/subscribe",
-								"subscription": "channel_name",
-								"clientId": "client_id",
-								"ext": {
-									"replay": {"channel_name": "-1"}
-									}
-								}`:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
-		return
-	default:
 	}
 }
 
@@ -363,7 +326,7 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
 	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
-		if called < 2 {
+		if called < uint64(inputType) {
 			atomic.AddUint64(&called, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
 		}
