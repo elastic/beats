@@ -34,9 +34,7 @@ const (
 
 var (
 	serverURL string
-	called1   uint64
-	called2   uint64
-	clientId  uint64
+	called    uint64
 )
 
 func TestInputDone(t *testing.T) {
@@ -70,9 +68,7 @@ func TestMakeEventFailure(t *testing.T) {
 }
 
 func TestSingleInput(t *testing.T) {
-	defer atomic.StoreUint64(&called1, 0)
-	defer atomic.StoreUint64(&called2, 0)
-	defer atomic.StoreUint64(&clientId, 0)
+	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
@@ -90,17 +86,17 @@ func TestSingleInput(t *testing.T) {
 	var expected bay.MaybeMsg
 	expected.Msg.Data.Event.ReplayID = 1234
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected.Msg.Channel = firstChannel
+	expected.Msg.Channel = "channel_name"
 
 	config := map[string]interface{}{
-		"channel_name":              firstChannel,
+		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
 		"auth.oauth2.password":      "password",
 	}
 
-	r := http.HandlerFunc(oauth2Handler)
+	r := http.HandlerFunc(oauth2SingleEventHandler)
 	server := httptest.NewServer(r)
 	defer server.Close()
 
@@ -121,9 +117,7 @@ func TestSingleInput(t *testing.T) {
 }
 
 func TestInputStop_Wait(t *testing.T) {
-	defer atomic.StoreUint64(&called1, 0)
-	defer atomic.StoreUint64(&called2, 0)
-	defer atomic.StoreUint64(&clientId, 0)
+	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
@@ -147,17 +141,17 @@ func TestInputStop_Wait(t *testing.T) {
 	var expected bay.MaybeMsg
 	expected.Msg.Data.Event.ReplayID = 1234
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected.Msg.Channel = firstChannel
+	expected.Msg.Channel = "channel_name"
 
 	config := map[string]interface{}{
-		"channel_name":              firstChannel,
+		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
 		"auth.oauth2.password":      "password",
 	}
 
-	r := http.HandlerFunc(oauth2Handler)
+	r := http.HandlerFunc(oauth2SingleEventHandler)
 	server := httptest.NewServer(r)
 	defer server.Close()
 
@@ -247,9 +241,7 @@ func TestWait(t *testing.T) {
 }
 
 func TestMultiInput(t *testing.T) {
-	defer atomic.StoreUint64(&called1, 0)
-	defer atomic.StoreUint64(&called2, 0)
-	defer atomic.StoreUint64(&clientId, 0)
+	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
@@ -266,22 +258,10 @@ func TestMultiInput(t *testing.T) {
 	var expected1 bay.MaybeMsg
 	expected1.Msg.Data.Event.ReplayID = 1234
 	expected1.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected1.Msg.Channel = firstChannel
+	expected1.Msg.Channel = "channel_name"
 
-	var expected2 bay.MaybeMsg
-	expected2.Msg.Data.Event.ReplayID = 1234
-	expected2.Msg.Data.Payload = []byte(`{"CountryIso": "US"}`)
-	expected2.Msg.Channel = secondChannel
-
-	config1 := map[string]interface{}{
-		"channel_name":              firstChannel,
-		"auth.oauth2.client.id":     "client.id",
-		"auth.oauth2.client.secret": "client.secret",
-		"auth.oauth2.user":          "user",
-		"auth.oauth2.password":      "password",
-	}
-	config2 := map[string]interface{}{
-		"channel_name":              secondChannel,
+	config := map[string]interface{}{
+		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
@@ -293,12 +273,11 @@ func TestMultiInput(t *testing.T) {
 	server := httptest.NewServer(r)
 	defer server.Close()
 	serverURL = server.URL
-	config1["auth.oauth2.token_url"] = serverURL + "/token"
-	config2["auth.oauth2.token_url"] = serverURL + "/token"
+	config["auth.oauth2.token_url"] = serverURL + "/token"
 
 	// get common config
-	cfg1 := conf.MustNewConfigFrom(config1)
-	cfg2 := conf.MustNewConfigFrom(config2)
+	cfg1 := conf.MustNewConfigFrom(config)
+	cfg2 := conf.MustNewConfigFrom(config)
 
 	var inputContext finput.Context
 
@@ -322,21 +301,50 @@ func TestMultiInput(t *testing.T) {
 
 	got := 0
 	go func() {
+		fmt.Println("start")
 		for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
-			channel, err := event.GetValue("cometd.channel_name")
-			require.NoError(t, err)
-
-			if channel == "channel_name1" {
-				assertEventMatches(t, expected1, event)
-			} else {
-				assertEventMatches(t, expected2, event)
-			}
+			assertEventMatches(t, expected1, event)
 			got++
+			fmt.Println(got)
 		}
 	}()
-	time.Sleep(5 * time.Second)
+	time.Sleep(2 * time.Second)
 	if got < 2 {
 		require.NoError(t, fmt.Errorf("not able to get events."))
+	}
+}
+
+func oauth2SingleEventHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	_ = r.ParseForm()
+	if r.URL.Path == "/token" {
+		response := `{"instance_url": "` + serverURL + `", "expires_in": "60", "access_token": "abcd"}`
+		_, _ = w.Write([]byte(response))
+		return
+	}
+	body, _ := ioutil.ReadAll(r.Body)
+
+	switch string(body) {
+	case `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`:
+		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
+		return
+	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
+		if called < 1 {
+			atomic.AddUint64(&called, 1)
+			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
+		}
+		return
+	case `{
+								"channel": "/meta/subscribe",
+								"subscription": "channel_name",
+								"clientId": "client_id",
+								"ext": {
+									"replay": {"channel_name": "-1"}
+									}
+								}`:
+		_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
+		return
+	default:
 	}
 }
 
@@ -352,47 +360,23 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 
 	switch string(body) {
 	case `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`:
-		switch clientId {
-		case 0:
-			atomic.StoreUint64(&clientId, 1)
-			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id1","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
-		case 1:
-			atomic.StoreUint64(&clientId, 0)
-			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id2","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
-		default:
-		}
+		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
-	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id1"} `:
-		if called1 < 1 {
-			atomic.AddUint64(&called1, 1)
-			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name1"}]`))
-		}
-		return
-	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id2"} `:
-		if called2 < 1 {
-			atomic.AddUint64(&called2, 1)
-			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "US"}, "event": {"replayId":1234}}, "channel": "channel_name2"}]`))
+	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
+		if called < 2 {
+			atomic.AddUint64(&called, 1)
+			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
 		}
 		return
 	case `{
 								"channel": "/meta/subscribe",
-								"subscription": "channel_name1",
-								"clientId": "client_id1",
+								"subscription": "channel_name",
+								"clientId": "client_id",
 								"ext": {
-									"replay": {"channel_name1": "-1"}
+									"replay": {"channel_name": "-1"}
 									}
 								}`:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id1", "channel": "/meta/subscribe", "subscription": "channel_name1", "successful":true}]`))
-		return
-	case `{
-								"channel": "/meta/subscribe",
-								"subscription": "channel_name2",
-								"clientId": "client_id2",
-								"ext": {
-									"replay": {"channel_name2": "-1"}
-									}
-								}`:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id2", "channel": "/meta/subscribe", "subscription": "channel_name2", "successful":true}]`))
+		_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
 		return
 	default:
 	}
