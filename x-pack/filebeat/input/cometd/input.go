@@ -43,7 +43,7 @@ func (in *cometdInput) Run() {
 				return
 			}
 			if err := in.run(); err != nil {
-				in.log.Error(err)
+				in.log.Errorw("got error while running input", "error", err)
 				return
 			}
 		}()
