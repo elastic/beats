@@ -320,15 +320,23 @@ func TestMultiInput(t *testing.T) {
 	input2.Run()
 	defer input2.Stop()
 
-	for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
-		channel, err := event.GetValue("cometd.channel_name")
-		require.NoError(t, err)
+	got := 0
+	go func() {
+		for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
+			channel, err := event.GetValue("cometd.channel_name")
+			require.NoError(t, err)
 
-		if channel == "channel_name1" {
-			assertEventMatches(t, expected1, event)
-		} else {
-			assertEventMatches(t, expected2, event)
+			if channel == "channel_name1" {
+				assertEventMatches(t, expected1, event)
+			} else {
+				assertEventMatches(t, expected2, event)
+			}
+			got++
 		}
+	}()
+	time.Sleep(5 * time.Second)
+	if got < 2 {
+		require.NoError(t, fmt.Errorf("not able to get events."))
 	}
 }
 
