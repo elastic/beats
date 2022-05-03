@@ -171,7 +171,7 @@ func TestingSetup(options ...Option) {
 	// Use the flag to avoid a dependency on the testing package.
 	f := flag.Lookup("test.v")
 	if f != nil && f.Value.String() == "true" {
-		DevelopmentSetup(options...)
+		_ = DevelopmentSetup(options...)
 	}
 }
 
