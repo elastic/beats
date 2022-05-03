@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "An attempt was made to register a security event source.\n\nSubject :\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nProcess:\n\tProcess ID:\t0xe18\n\tProcess Name:\tC:\\Windows\\System32\\inetsrv\\inetinfo.exe\n\nEvent Source:\n\tSource Name:\tIIS-METABASE\n\tEvent Source ID:\t0x460422",
     "process": {
       "executable": "C:\\Windows\\System32\\inetsrv\\inetinfo.exe",
       "name": "inetinfo.exe",

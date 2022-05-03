@@ -22,6 +22,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x1D22ED\n\tLogon GUID:\t{c25cdf73-2322-651f-f4fb-db862c0e03a8}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}",
     "related": {
       "user": "Administrator"
     },
@@ -91,6 +92,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x7C0BE\n\tLogon GUID:\t{38fec9bc-577f-76f6-5d29-e0175ce19797}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-512}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-1007}",
     "related": {
       "user": "Administrator"
     },

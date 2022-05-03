@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Auditing settings on object were changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nObject:\n\tObject Server:\tSecurity\n\tObject Type:\tFile\n\tObject Name:\tC:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\Modules\\RemoteAccess\\RemoteAccess.psd1\n\tHandle ID:\t0x93c\n\nProcess Information:\n\tProcess ID:\t0x10cc\n\tProcess Name:\tC:\\Windows\\WinSxS\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.14393.1883_none_7ed84bd822106081\\TiWorker.exe\n\nAuditing Settings:\n\tOriginal Security Descriptor:\t\n\tNew Security Descriptor:\t\tS:ARAI(AU;SAFA;DCLCRPCRSDWDWO;;;WD)",
     "process": {
       "executable": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.14393.1883_none_7ed84bd822106081\\TiWorker.exe",
       "name": "TiWorker.exe",

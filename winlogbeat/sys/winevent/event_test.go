@@ -20,7 +20,6 @@ package winevent
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -94,6 +93,7 @@ func TestXML(t *testing.T) {
 				EventIdentifier: EventIdentifier{ID: 91},
 				LevelRaw:        4,
 				TaskRaw:         9,
+				OpcodeRaw:       new(uint8), // The value in the XML is 0.
 				KeywordsRaw:     0x8020000000000000,
 				TimeCreated:     TimeCreated{allXMLTimeCreated},
 				RecordID:        100,
@@ -166,7 +166,7 @@ func TestXML(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			fmt.Println(string(json))
+			t.Logf("%s", json)
 		}
 	}
 }

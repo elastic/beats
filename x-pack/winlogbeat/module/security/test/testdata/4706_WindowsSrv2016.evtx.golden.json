@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "A new trust was created to a domain.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-2024912787-2692429404-2351956786-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x6A868\n\nTrusted Domain:\n\tDomain Name:\t\t192.168.230.153\n\tDomain ID:\t\tS-1-0-0\n\nTrust Information:\n\tTrust Type:\t\t3\n\tTrust Direction:\t\t3\n\tTrust Attributes:\t\t1\n\tSID Filtering:\t\tDisabled",
     "related": {
       "user": "Administrator"
     },

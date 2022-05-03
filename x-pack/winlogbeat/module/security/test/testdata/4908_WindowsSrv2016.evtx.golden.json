@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Special Groups Logon table modified.\n\nSpecial Groups:\t\n\t\t%{S-1-5-32-544}\n\t\t%{S-1-5-32-123-54-65}\n\nThis event is generated when the list of special groups is updated in the registry or through security policy. The updated list of special groups is indicated in the event.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
