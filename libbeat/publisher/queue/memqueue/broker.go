@@ -240,7 +240,7 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 		entryCount: count, responseChan: responseChan}:
 	}
 
-	// if request has been send, we do have to wait for a response
+	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
 	events := make([]publisher.Event, 0, len(resp.entries))
 	for _, entry := range resp.entries {
