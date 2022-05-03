@@ -89,6 +89,12 @@ type Settings struct {
 	InputQueueSize int
 }
 
+type batch struct {
+	queue   *broker
+	events  []publisher.Event
+	ackChan chan batchAckMsg
+}
+
 // batchACKState stores the metadata associated with a batch of events sent to
 // a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
 // ackChan and received by
@@ -354,4 +360,12 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 		actual = minInputQueueSize
 	}
 	return actual
+}
+
+func (b *batch) Events() []publisher.Event {
+	return b.events
+}
+
+func (b *batch) ACK() {
+	b.ackChan <- batchAckMsg{}
 }
