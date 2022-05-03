@@ -256,7 +256,7 @@ func (p *sqsS3EventProcessor) getS3Info(events s3EventsV2) ([]s3EventV2, error) 
 	return out, nil
 }
 
-func (_ *sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
+func (*sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
 	return event.EventSource == "aws:s3" && strings.HasPrefix(event.EventName, "ObjectCreated:")
 }
 
