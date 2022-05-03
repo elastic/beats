@@ -23,6 +23,7 @@ var ignoreFields = []string{
 }
 
 func TestPowerShell(t *testing.T) {
+	//nolint:godox // Bad linter!
 	// FIXME: We do not get opcode strings in the XML on Windows 2022, so ignore that
 	// field there. Only apply this to that platform to avoid regressions elsewhere.
 	// This means that golden values should be generated on a non-2022 version of

@@ -48,6 +48,7 @@ func WithFieldFilter(filter []string) Option {
 // and processing them with a basic enrichment. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
 func TestPipeline(t *testing.T, evtx string, opts ...Option) {
+	//nolint:godox // Bad linter!
 	// FIXME: We cannot generate golden files on Windows 2022.
 	if *update {
 		os, err := windows.OperatingSystem()
