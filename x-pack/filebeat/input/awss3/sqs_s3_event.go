@@ -42,11 +42,6 @@ func (e *nonRetryableError) Error() string {
 	return "non-retryable error: " + e.Err.Error()
 }
 
-func (e *nonRetryableError) Is(err error) bool {
-	_, ok := err.(*nonRetryableError)
-	return ok
-}
-
 func nonRetryableErrorWrap(err error) error {
 	if errors.Is(err, &nonRetryableError{}) {
 		return err
