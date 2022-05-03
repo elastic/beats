@@ -34,3 +34,9 @@ The following Metricset is included in the module:
 === `tablespaces`
 
 Includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.
+
+[float]
+
+=== `sysmetric`
+
+Includes the system metric values captured for the most current time interval from Oracle System View.

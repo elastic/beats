@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 
 *Packetbeat*
 

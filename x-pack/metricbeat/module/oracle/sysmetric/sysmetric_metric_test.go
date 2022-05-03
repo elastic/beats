@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestSysmetricExtractorCalQuery(t *testing.T) {
+func TestSysmetricExtractorCalculateQuery(t *testing.T) {
 	type fields struct {
 		patterns []string
 	}
@@ -28,12 +28,12 @@ func TestSysmetricExtractorCalQuery(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run("test func CalQuery()", func(t *testing.T) {
+		t.Run("test func CalculateQuery()", func(t *testing.T) {
 			e := &sysmetricExtractor{
 				patterns: tt.fields.patterns,
 			}
-			if got := e.calQuery(); got != tt.want {
-				t.Errorf("sysmetricExtractor.calQuery() = %v, want %v", got, tt.want)
+			if got := e.calculateQuery(); got != tt.want {
+				t.Errorf("sysmetricExtractor.calculateQuery() = %v, want %v", got, tt.want)
 			}
 		})
 	}

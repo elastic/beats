@@ -1,0 +1,60 @@
+`sysmetric` Metricset includes the system metric values captured for the most current time interval from Oracle System View.
+
+This metricset dynamically filters metrics based on given input patterns. These patterns can be keywords or regular expressions. The `sysmetric` metricset uses the `OR` operator when forming the SQL query internally. Refer https://docs.oracle.com/cd/B12037_01/server.101/b10759/conditions016.htm[here] for more details.
+
+[float]
+=== Required database access
+
+To ensure that the module has access to the appropriate metrics, the module requires that you configure a user with access to the following tables:
+
+* V$SYSMETRIC
+
+[float]
+=== Description of fields
+
+* *metrics.begin_time*: Begin time of the interval.
+* *metrics.container_id*: The ID of the container to which the data pertains.
+* *metrics.end_time*: End time of the interval.
+* *metrics.group_id*: Metric group ID.
+* *metrics.interval_size_csec*: Interval size (in hundredths of a second).
+* *metrics.metric_id*: Metric ID.
+* *metrics.metric_unit*: Metric unit description.
+* *metrics.name*: Metric name.
+* *metrics.value*: Metric value.
+
+[float]
+=== Example event
+
+----
+{
+  "@timestamp": "2022-04-19T11:32:48.252Z",
+  "event": {
+    "duration": 2953295950,
+    "dataset": "oracle.sysmetric",
+    "module": "oracle"
+  },
+  "metricset": {
+    "name": "sysmetric",
+    "period": 600000
+  },
+  "oracle": {
+    "sysmetric": {
+      "metrics": {
+        "begin_time": "2022-04-19T11:31:26Z",
+        "end_time": "2022-04-19T11:32:26Z",
+        "metric_id": 2151,
+        "interval_size_csec": 6041,
+        "container_id": 0,
+        "group_id": 2,
+        "value": 0,
+        "name": "Replayed user calls",
+        "metric_unit": "calls"
+      }
+    }
+  },
+  "service": {
+    "address": "oracle://localhost:1521/ORCLCDB.localdomain",
+    "type": "oracle"
+  }
+}
+----

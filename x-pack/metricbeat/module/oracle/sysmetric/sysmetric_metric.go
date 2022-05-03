@@ -34,7 +34,7 @@ type sysmetricMetric struct {
  *
  * Which is parsed into sysmetricMetric instances
  */
-func (e *sysmetricExtractor) calQuery() string {
+func (e *sysmetricExtractor) calculateQuery() string {
 	if len(e.patterns) == 0 {
 		e.patterns = []string{"%"}
 	}
@@ -49,7 +49,7 @@ func (e *sysmetricExtractor) calQuery() string {
 }
 
 func (e *sysmetricExtractor) sysmetricMetric(ctx context.Context) ([]sysmetricMetric, error) {
-	query := e.calQuery()
+	query := e.calculateQuery()
 
 	rows, err := e.db.QueryContext(ctx, query)
 	if err != nil {
