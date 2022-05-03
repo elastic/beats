@@ -24,7 +24,7 @@ import (
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
-	logp.TestingSetup()
+	require.NoError(t, logp.TestingSetup())
 
 	msg := newSQSMessage(newS3Event("log.json"))
 
@@ -106,7 +106,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		gomock.InOrder(
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 				Do(func(ctx context.Context, _ *logp.Logger, _ *awscommon.EventACKTracker, _ s3EventV2) {
-					timed.Wait(ctx, 5*visibilityTimeout)
+					require.NoError(t, timed.Wait(ctx, 5*visibilityTimeout))
 				}).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
@@ -213,7 +213,7 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
-	logp.TestingSetup()
+	require.NoError(t, logp.TestingSetup())
 
 	p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, nil, nil, time.Minute, 5, nil)
 
