@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "A privileged service was called.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tDC_TEST2K12$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nService:\n\tServer:\tNT Local Security Authority / Authentication Service\n\tService Name:\tLsaRegisterLogonProcess()\n\nProcess:\n\tProcess ID:\t0x1f0\n\tProcess Name:\tC:\\Windows\\System32\\lsass.exe\n\nService Request Information:\n\tPrivileges:\t\tSeTcbPrivilege",
     "process": {
       "executable": "C:\\Windows\\System32\\lsass.exe",
       "name": "lsass.exe",

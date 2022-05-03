@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "The CrashOnAuditFail value has changed.\n\nNew Value of CrashOnAuditFail:\t1",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",

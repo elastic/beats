@@ -78,6 +78,7 @@
         "TerminalSessionId": "1"
       },
       "event_id": "1",
+      "opcode": "Info",
       "process": {
         "pid": 7144,
         "thread": {
@@ -88,7 +89,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 20,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }

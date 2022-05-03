@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "System audit policy was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\nAudit Policy Change:\n\tCategory:\t\tLogon/Logoff\n\tSubcategory:\t\tNetwork Policy Server\n\tSubcategory GUID:\t{0cce9243-69ae-11d9-bed3-505054503030}\n\tChanges:\t\tSuccess Added, Failure added",
     "related": {
       "user": "WIN-41OB2LO92CR$"
     },

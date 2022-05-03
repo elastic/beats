@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "An operation was attempted on a privileged object.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x8AA365B\n\nObject:\n\tObject Server:\tSecurity\n\tObject Type:\tFile\n\tObject Name:\tC:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\PLA\\Server Manager Performance Monitor\n\tObject Handle:\t0x1ee0\n\nProcess Information:\n\tProcess ID:\t0x374\n\tProcess Name:\tC:\\Windows\\System32\\svchost.exe\n\nRequested Operation:\n\tDesired Access:\tREAD_CONTROL\n\t\t\t\tACCESS_SYS_SEC\n\t\t\t\t\n\tPrivileges:\t\tSeSecurityPrivilege",
     "process": {
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",

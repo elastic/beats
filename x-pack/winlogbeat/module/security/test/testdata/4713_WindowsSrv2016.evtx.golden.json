@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Kerberos policy was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nChanges Made:\n('--' means no changes, otherwise each change is shown as:\n(Parameter Name):\t(new value) (old value))\nKerMinT: 0x53d1ac1000 (0x53ade8ca00);  KerMaxR: 0x649534e0000 (0x58028e44000);  KerProxy: 0xd693a400 (0xb2d05e00);  ",
     "related": {
       "user": "WIN-BVM4LI1L1Q6$"
     },

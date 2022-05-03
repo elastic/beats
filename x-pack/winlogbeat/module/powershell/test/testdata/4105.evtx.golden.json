@@ -20,6 +20,7 @@
     "log": {
       "level": "verbose"
     },
+    "message": "Started invocation of ScriptBlock ID: f4a378ab-b74f-41a7-a5ef-6dd55562fdb9\nRunspace ID: 9c031e5c-8d5a-4b91-a12e-b3624970b623",
     "powershell": {
       "file": {
         "script_block_id": "f4a378ab-b74f-41a7-a5ef-6dd55562fdb9"
