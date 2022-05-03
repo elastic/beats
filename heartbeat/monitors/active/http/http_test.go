@@ -567,8 +567,10 @@ func TestExpiredHTTPSServer(t *testing.T) {
 	)
 }
 
+const Windows = "windows"
+
 func TestHTTPSx509Auth(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+	if runtime.GOOS == Windows && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}
 	wd, err := os.Getwd()
@@ -745,7 +747,7 @@ func TestNoHeaders(t *testing.T) {
 }
 
 func TestProxy(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+	if runtime.GOOS == Windows && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
@@ -756,7 +758,7 @@ func TestProxy(t *testing.T) {
 }
 
 func TestTLSProxy(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+	if runtime.GOOS == Windows && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))

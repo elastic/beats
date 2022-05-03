@@ -47,6 +47,8 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	return testTCPConfigCheck(t, config, host, port)
 }
 
+const Localhost = "localhost"
+
 // TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
 func TestUpEndpointJob(t *testing.T) {
 	// Test with domain, IPv4 and IPv6
@@ -57,8 +59,8 @@ func TestUpEndpointJob(t *testing.T) {
 		expectedIP string
 	}{
 		{
-			name:       "localhost",
-			hostname:   "localhost",
+			name:       Localhost,
+			hostname:   Localhost,
 			isIP:       false,
 			expectedIP: "127.0.0.1",
 		},
@@ -273,7 +275,7 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 		return "", 0, "", nil, err
 	}
 
-	return "localhost", uint16(portUint64), ip, listener.Close, nil
+	return Localhost, uint16(portUint64), ip, listener.Close, nil
 }
 
 // StaticResolver allows for a custom in-memory mapping of hosts to IPs, it ignores network names

@@ -100,14 +100,13 @@ func TestSocks5Job(t *testing.T) {
 }
 
 func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close func() error, err error) {
-	host = "localhost"
 	config := &socks5.Config{}
 	server, err := socks5.New(config)
 	if err != nil {
 		return "", 0, "", nil, err
 	}
 
-	listener, err := net.Listen("tcp", "localhost:0")
+	listener, err := net.Listen("tcp", Localhost+":0")
 	if err != nil {
 		return "", 0, "", nil, err
 	}
@@ -129,7 +128,7 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 		wg.Done()
 	}()
 
-	return host, uint16(portUint64), ip, func() error {
+	return Localhost, uint16(portUint64), ip, func() error {
 		err := listener.Close()
 		if err != nil {
 			return err

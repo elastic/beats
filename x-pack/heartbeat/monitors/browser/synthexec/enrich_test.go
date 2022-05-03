@@ -453,10 +453,10 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		TimestampEpochMicros: 3000,
 	}
 
-	url1 := "http://example.net/url1"
+	stepUrl := "http://example.net/url"
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+		makeStepEvent("step/end", 20, "Step1", 1, "", stepUrl, nil),
 		cmdStatus,
 	}
 
@@ -474,7 +474,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 				hasCmdStatus = true
 				require.Error(t, enrichErr, "journey did not finish executing, 1 steps ran")
 
-				u, _ := url.Parse(url1)
+				u, _ := url.Parse(stepUrl)
 
 				v := lookslike.MustCompile(common.MapStr{
 					"synthetics.type":     "heartbeat/summary",
