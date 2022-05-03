@@ -83,10 +83,6 @@ func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) 
 		config.RegionName = regionName
 	}
 
-	awsConfig, err = awscommon.InitializeAWSConfig(config.AWSConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "InitializeAWSConfig failed")
-	}
 	awsConfig.Region = config.RegionName
 
 	return &cloudwatchInput{
