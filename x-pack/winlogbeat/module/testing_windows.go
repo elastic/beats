@@ -24,15 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
-<<<<<<< HEAD
-
-	// Register javascript modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
-=======
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/providers/windows"
->>>>>>> f22abe3b60 ({,x-pack/}winlogbeat: resurrect tests for event processing (#31464))
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -110,17 +102,6 @@ func testPipeline(t testing.TB, evtx string, p *params) {
 		t.Fatal(err)
 	}
 
-<<<<<<< HEAD
-	// Load javascript processor.
-	processor, err := javascript.New(common.MustNewConfigFrom(common.MapStr{
-		"file": pipeline,
-	}))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-=======
->>>>>>> f22abe3b60 ({,x-pack/}winlogbeat: resurrect tests for event processing (#31464))
 	// Read and process events.
 	var events []common.MapStr
 	for stop := false; !stop; {
