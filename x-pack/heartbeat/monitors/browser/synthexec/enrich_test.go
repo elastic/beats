@@ -22,12 +22,12 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-func makeStepEvent(typ string, ts float64, name string, index int, status string, urlstr string, err *SynthError) *SynthEvent {
+func makeStepEvent(typ string, ts float64, name string, status string, urlstr string, err *SynthError) *SynthEvent {
 	return &SynthEvent{
 		Type:                 typ,
 		TimestampEpochMicros: 1000 + ts,
 		PackageVersion:       "1.0.0",
-		Step:                 &Step{Name: name, Index: index, Status: status},
+		Step:                 &Step{Name: name, Index: 1, Status: status},
 		Error:                err,
 		Payload:              common.MapStr{},
 		URL:                  urlstr,
@@ -56,31 +56,31 @@ func TestJourneyEnricher(t *testing.T) {
 		Stack:   "last\nerr\nstack",
 	}
 	journeyStart := &SynthEvent{
-		Type:                 "journey/start",
+		Type:                 JourneyStart,
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
 	journeyEnd := &SynthEvent{
-		Type:                 "journey/end",
+		Type:                 JourneyEnd,
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
-	url1 := "http://example.net/url1"
+	url1 := "http://example.net/url1" //nolint:goconst // silly warning for a test
 	url2 := "http://example.net/url2"
 	url3 := "http://example.net/url3"
 
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1, "succeeded", "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
-		makeStepEvent("step/start", 21, "Step2", 1, "", "", nil),
-		makeStepEvent("step/end", 30, "Step2", 1, "failed", url2, syntherr),
-		makeStepEvent("step/start", 31, "Step3", 1, "", "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1, "", url3, otherErr),
+		makeStepEvent("step/start", 10, "Step1", "succeeded", "", nil),
+		makeStepEvent("step/end", 20, "Step1", "", url1, nil),
+		makeStepEvent("step/start", 21, "Step2", "", "", nil),
+		makeStepEvent("step/end", 30, "Step2", "failed", url2, syntherr),
+		makeStepEvent("step/start", 31, "Step3", "", "", nil),
+		makeStepEvent("step/end", 40, "Step3", "", url3, otherErr),
 		journeyEnd,
 	}
 
@@ -105,7 +105,7 @@ func TestJourneyEnricher(t *testing.T) {
 
 		// We need an expectation for each input plus a final
 		// expectation for the summary which comes on the nil data.
-		if se.Type != "journey/end" {
+		if se.Type != JourneyEnd {
 			// Test that the created event includes the mapped
 			// version of the event
 			v = append(v, lookslike.MustCompile(se.ToMap()))
@@ -226,7 +226,8 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &beat.Event{}
-			tt.je.enrichSynthEvent(e, tt.se)
+			err := tt.je.enrichSynthEvent(e, tt.se)
+			require.NoError(t, err)
 			tt.check(t, e, tt.je)
 		})
 	}
@@ -244,7 +245,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - with error",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type:  "cmd/status",
+				Type:  CmdStatus,
 				Error: &SynthError{Name: "cmdexit", Message: "cmd err msg"},
 			},
 			true,
@@ -264,7 +265,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - without error",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type:  "cmd/status",
+				Type:  CmdStatus,
 				Error: nil,
 			},
 			true,
@@ -281,7 +282,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 		{
 			"journey/end",
 			&journeyEnricher{},
-			&SynthEvent{Type: "journey/end"},
+			&SynthEvent{Type: JourneyEnd},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(common.MapStr{
@@ -359,7 +360,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		Id:   "my-bad-after-all-hook",
 	}
 	journeyStart := &SynthEvent{
-		Type:                 "journey/start",
+		Type:                 JourneyStart,
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
@@ -371,14 +372,14 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		Stack:   "my\nerr\nstack",
 	}
 	journeyEnd := &SynthEvent{
-		Type:                 "journey/end",
+		Type:                 JourneyEnd,
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
 	cmdStatus := &SynthEvent{
-		Type:                 "cmd/status",
+		Type:                 CmdStatus,
 		Error:                &SynthError{Name: "cmdexit", Message: "cmd err msg"},
 		TimestampEpochMicros: 3000,
 	}
@@ -386,8 +387,8 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 	badStepUrl := "https://example.com/bad-step"
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1, "", "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1, "failed", badStepUrl, syntherr),
+		makeStepEvent("step/start", 10, "Step1", "", "", nil),
+		makeStepEvent("step/end", 20, "Step1", "failed", badStepUrl, syntherr),
 		journeyEnd,
 		cmdStatus,
 	}
@@ -400,7 +401,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
-			if se != nil && se.Type == "cmd/status" {
+			if se != nil && se.Type == CmdStatus {
 				t.Run("no summary in cmd/status", func(t *testing.T) {
 					require.NotContains(t, e.Fields, "summary")
 				})
@@ -408,7 +409,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 			// Only the journey/end event should get a summary when
 			// it's emitted before the cmd/status (when an afterX hook fails).
-			if se != nil && se.Type == "journey/end" {
+			if se != nil && se.Type == JourneyEnd {
 				require.Equal(t, stepError(syntherr), enrichErr)
 
 				u, _ := url.Parse(badStepUrl)
@@ -440,7 +441,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	}
 
 	cmdStatus := &SynthEvent{
-		Type:                 "cmd/status",
+		Type:                 CmdStatus,
 		Error:                nil,
 		TimestampEpochMicros: 3000,
 	}
@@ -448,7 +449,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	url1 := "http://example.net/url1"
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+		makeStepEvent("step/end", 20, "Step1", "", url1, nil),
 		cmdStatus,
 	}
 
@@ -564,7 +565,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			common.MergeFields(tt.expected, common.MapStr{
+			_ = common.MergeFields(tt.expected, common.MapStr{
 				"url":                common.MapStr{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",

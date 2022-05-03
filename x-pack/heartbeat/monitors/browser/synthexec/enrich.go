@@ -25,7 +25,7 @@ type streamEnricher struct {
 }
 
 func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
-	if e.je == nil || (se != nil && se.Type == "journey/start") {
+	if e.je == nil || (se != nil && se.Type == JourneyStart) {
 		e.je = newJourneyEnricher()
 	}
 
@@ -71,12 +71,12 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 		event.Timestamp = se.Timestamp()
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
-		case "journey/start":
+		case JourneyStart:
 			je.firstError = nil
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
-		case "journey/end", "cmd/status":
+		case JourneyEnd, CmdStatus:
 			je.end = event.Timestamp
 		}
 	} else {
@@ -129,14 +129,14 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	}
 
 	switch se.Type {
-	case "cmd/status":
+	case CmdStatus:
 		// If a command failed _after_ the journey was complete, as it happens
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
 			return je.createSummary(event)
 		}
-	case "journey/end":
+	case JourneyEnd:
 		je.journeyComplete = true
 		return je.createSummary(event)
 	case "step/end":
@@ -155,7 +155,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		event.SetID(se.Id)
 		// This is only relevant for screenshots, which have a specific ID
 		// In that case we always want to issue an update op
-		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+		_, _ = event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())

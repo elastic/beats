@@ -6,6 +6,7 @@ package source
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -36,7 +37,7 @@ type ZipURLSource struct {
 	httpClient *http.Client
 }
 
-var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
+var ErrNoEtag = fmt.Errorf("no ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 func (z *ZipURLSource) Validate() (err error) {
 	if z.httpClient == nil {
@@ -73,7 +74,10 @@ func (z *ZipURLSource) Fetch() error {
 	z.etag = newEtag
 
 	if z.TargetDirectory != "" {
-		os.MkdirAll(z.TargetDirectory, 0755)
+		err := os.MkdirAll(z.TargetDirectory, 0755)
+		if err != nil {
+			return fmt.Errorf("could not make directory %s: %w", z.TargetDirectory, err)
+		}
 	} else {
 		z.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
 		if err != nil {
@@ -167,7 +171,8 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	}
 	defer rdr.Close()
 
-	_, err = io.Copy(dest, rdr)
+	// Cap decompression to a max of 2GiB to prevent decompression bombs
+	_, err = io.CopyN(dest, rdr, 2e9)
 	if err != nil {
 		return err
 	}
@@ -199,7 +204,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 }
 
 func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
-	req, err := http.NewRequest(method, z.URL, nil)
+	req, err := http.NewRequestWithContext(context.TODO(), method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)
 	}
@@ -221,9 +226,12 @@ func download(z *ZipURLSource, tf *os.File) (etag string, err error) {
 		return "", ErrNoEtag
 	}
 
-	io.Copy(tf, resp.Body)
+	_, err = io.Copy(tf, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("could not copy resp body: %w", err)
+	}
 
-	return
+	return etag, nil
 }
 
 func checkIfChanged(z *ZipURLSource) (bool, error) {

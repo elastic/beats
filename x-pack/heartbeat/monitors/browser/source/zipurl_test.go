@@ -179,7 +179,7 @@ func createServer(tls bool) (addr *httptest.Server) {
 		user, pass, hasAuth := req.BasicAuth()
 		if hasAuth && (user != "testuser" || pass != "testpass") {
 			resp.WriteHeader(403)
-			resp.Write([]byte("forbidden"))
+			_, _ = resp.Write([]byte("forbidden"))
 		}
 		http.StripPrefix("/fixtures", fileServer).ServeHTTP(resp, req)
 	})

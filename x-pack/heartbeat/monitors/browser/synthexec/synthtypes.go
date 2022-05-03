@@ -15,6 +15,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+const JourneyStart = "journey/start"
+const JourneyEnd = "journey/end"
+const CmdStatus = "cmd/status"
+
 type SynthEvent struct {
 	Id                   string        `json:"_id"`
 	Type                 string        `json:"type"`
@@ -56,22 +60,22 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 		},
 	})
 	if len(se.Payload) > 0 {
-		m.Put("synthetics.payload", se.Payload)
+		_, _ = m.Put("synthetics.payload", se.Payload)
 	}
 	if se.Blob != "" {
-		m.Put("synthetics.blob", se.Blob)
+		_, _ = m.Put("synthetics.blob", se.Blob)
 	}
 	if se.BlobMime != "" {
-		m.Put("synthetics.blob_mime", se.BlobMime)
+		_, _ = m.Put("synthetics.blob_mime", se.BlobMime)
 	}
 	if se.Step != nil {
-		m.Put("synthetics.step", se.Step.ToMap())
+		_, _ = m.Put("synthetics.step", se.Step.ToMap())
 	}
 	if se.Journey != nil {
-		m.Put("synthetics.journey", se.Journey.ToMap())
+		_, _ = m.Put("synthetics.journey", se.Journey.ToMap())
 	}
 	if se.Error != nil {
-		m.Put("synthetics.error", se.Error.toMap())
+		_, _ = m.Put("synthetics.error", se.Error.toMap())
 	}
 
 	if se.URL != "" {
@@ -79,7 +83,7 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 		if e != nil {
 			logp.Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
-			m.Put("url", wrappers.URLFields(u))
+			_, _ = m.Put("url", wrappers.URLFields(u))
 		}
 	}
 
