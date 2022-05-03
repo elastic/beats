@@ -396,8 +396,17 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
 	}
 
+	md, err := win.NewPublisherMetadataStore(win.NilHandle, e.Provider.Name, logp.L())
+	if err != nil {
+		// Return an empty store on error (can happen in cases where the
+		// log was forwarded and the provider doesn't exist on collector).
+		md = win.NewEmptyPublisherMetadataStore(e.Provider.Name, logp.L())
+		logp.Warn("failed to load publisher metadata for %v "+
+			"(returning an empty metadata store): %v", e.Provider.Name, err)
+	}
+
 	// Get basic string values for raw fields.
-	winevent.EnrichRawValuesWithNames(nil, &e)
+	winevent.EnrichRawValuesWithNames(&md.WinMeta, &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
