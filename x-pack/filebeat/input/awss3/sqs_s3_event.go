@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -129,11 +129,11 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 
 	// No error. Delete SQS.
 	if processingErr == nil {
-		msgDelErr := p.sqs.DeleteMessage(context.Background(), msg)
-		if msgDelErr == nil {
-			p.metrics.sqsMessagesDeletedTotal.Inc()
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+			return fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr)
 		}
-		return errors.Wrap(msgDelErr, "failed deleting message from SQS queue (it may be reprocessed)")
+		p.metrics.sqsMessagesDeletedTotal.Inc()
+		return nil
 	}
 
 	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) {
@@ -150,14 +150,14 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 
 	// An error that reprocessing cannot correct. Delete SQS.
 	if errors.Is(processingErr, &nonRetryableError{}) {
-		msgDelErr := p.sqs.DeleteMessage(context.Background(), msg)
-		if msgDelErr == nil {
-			p.metrics.sqsMessagesDeletedTotal.Inc()
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+			return multierr.Combine(
+				fmt.Errorf("failed processing SQS message (attempted to delete message): %w", processingErr),
+				fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr),
+			)
 		}
-		return multierr.Combine(
-			errors.Wrap(processingErr, "failed processing SQS message (message will be deleted)"),
-			errors.Wrap(msgDelErr, "failed deleting message from SQS queue (it may be reprocessed)"),
-		)
+		p.metrics.sqsMessagesDeletedTotal.Inc()
+		return fmt.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
 	}
 
 	// An error that may be resolved by letting the visibility timeout
@@ -165,7 +165,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 	// queue is enabled then the message will eventually placed on the DLQ
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
-	return errors.Wrap(processingErr, "failed processing SQS message (it will return to queue after visibility timeout)")
+	return fmt.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *sqs.Message) {
@@ -290,9 +290,9 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 
 		// Process S3 object (download, parse, create events).
 		if err := s3Processor.ProcessS3Object(); err != nil {
-			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification)",
-				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events)))
+			errs = append(errs, fmt.Errorf(
+				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
+				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err))
 		}
 	}
 
