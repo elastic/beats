@@ -1,9 +1,3 @@
-variable "aws_region" {
-  description = "AWS Region"
-  type        = string
-  default     = "us-east-1"
-}
-
 variable "BRANCH" {
   description = "Branch name or pull request for tagging purposes"
   default = "unknown-branch"
