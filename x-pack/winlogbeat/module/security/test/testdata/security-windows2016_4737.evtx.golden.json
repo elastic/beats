@@ -2,24 +2,11 @@
   {
     "@timestamp": "2019-10-22T11:33:57.2710608Z",
     "event": {
-      "action": "modified-group-account",
-      "category": [
-        "iam"
-      ],
+      "action": "Security Group Management",
       "code": "4737",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "group",
-        "change"
-      ]
-    },
-    "group": {
-      "domain": "WLBEAT",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-1112",
-      "name": "test_group2v2"
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"
@@ -27,14 +14,7 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "user": "Administrator"
-    },
-    "user": {
-      "domain": "WLBEAT",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator"
-    },
+    "message": "A security-enabled global group was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1112\n\tGroup Name:\t\ttest_group2v2\n\tGroup Domain:\t\tWLBEAT\n\nChanged Attributes:\n\tSAM Account Name:\t-\n\tSID History:\t\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
@@ -55,9 +35,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x4a727"
-      },
       "opcode": "Info",
       "process": {
         "pid": 772,
