@@ -20,34 +20,13 @@ package parse
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	"github.com/stretchr/testify/assert"
 )
-
-const (
-	rawURL_unix  = "http+unix:///var/lib/docker.sock"
-	rawURL_npipe = "http+npipe://./pipe/custom"
-)
-
-type expected struct {
-	URI          string
-	SanitizedURI string
-	Host         string
-	User         string
-	Password     string
-}
-
-func assertTest(t *testing.T, hostData mb.HostData, err error, exp *expected) {
-	assert.NoError(t, err)
-	assert.Equal(t, exp.URI, hostData.URI)
-	assert.Equal(t, exp.SanitizedURI, hostData.SanitizedURI)
-	assert.Equal(t, exp.Host, hostData.Host)
-	assert.Equal(t, exp.User, hostData.User)
-	assert.Equal(t, exp.Password, hostData.Password)
-}
 
 func TestParseURL(t *testing.T) {
 	t.Run("http", func(t *testing.T) {
@@ -83,71 +62,63 @@ func TestParseURL(t *testing.T) {
 	})
 
 	t.Run("http+unix at root", func(t *testing.T) {
-		hostData, err := ParseURL(rawURL_unix, "http", "", "", "", "")
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
+			assert.Equal(t, "http://unix", hostData.URI)
+			assert.Equal(t, "http://unix", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
 		}
-		exp := &expected{
-			URI:          "http://unix",
-			SanitizedURI: "http://unix",
-			Host:         "unix",
-			User:         "",
-			Password:     "",
-		}
-		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+unix with path", func(t *testing.T) {
-		hostData, err := ParseURL(rawURL_unix, "http", "", "", "apath", "")
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
+			assert.Equal(t, "http://unix/apath", hostData.URI)
+			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
 		}
-		exp := &expected{
-			URI:          "http://unix/apath",
-			SanitizedURI: "http://unix/apath",
-			Host:         "unix",
-			User:         "",
-			Password:     "",
-		}
-		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+npipe at root", func(t *testing.T) {
-		hostData, err := ParseURL(rawURL_npipe, "http", "", "", "", "")
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe", hostData.URI)
+			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
 		}
-		exp := &expected{
-			URI:          "http://npipe",
-			SanitizedURI: "http://npipe",
-			Host:         "npipe",
-			User:         "",
-			Password:     "",
-		}
-		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+npipe with path", func(t *testing.T) {
-		hostData, err := ParseURL(rawURL_npipe, "http", "", "", "apath", "")
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
 			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe/apath", hostData.URI)
+			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
 		}
-		exp := &expected{
-			URI:          "http://npipe/apath",
-			SanitizedURI: "http://npipe/apath",
-			Host:         "npipe",
-			User:         "",
-			Password:     "",
-		}
-		assertTest(t, hostData, err, exp)
 	})
 
 	t.Run("http+npipe short with", func(t *testing.T) {
@@ -206,36 +177,6 @@ func TestParseURL(t *testing.T) {
 			assert.Equal(t, "", h.Password)
 		}
 	})
-
-	t.Run("oracle", func(t *testing.T) {
-		rawURL := "oracle://admin:secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB"
-		hostData, err := ParseURL(rawURL, "oracle", "", "", "", "")
-		if assert.NoError(t, err) {
-			assert.Equal(t, "oracle://admin:secret%25~%60%21%40%23$%25%5E&%2A%28%29_+=-%7B%5B%7D%5D%7C%27%3A;%3E.%3C,%3F%2F@127.0.0.1:8080/ORCLCDB", hostData.URI)
-			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.SanitizedURI)
-			assert.Equal(t, "127.0.0.1:8080", hostData.Host)
-			assert.Equal(t, "admin", hostData.User)
-			assert.Equal(t, "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", hostData.Password)
-		}
-		rawURL = "oracle://admin/secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB"
-		hostData, err = ParseURL(rawURL, "oracle", "", "", "", "")
-		if assert.NoError(t, err) {
-			assert.Equal(t, "oracle://admin:secret%25~%60%21%40%23$%25%5E&%2A%28%29_+=-%7B%5B%7D%5D%7C%27%3A;%3E.%3C,%3F%2F@127.0.0.1:8080/ORCLCDB", hostData.URI)
-			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.SanitizedURI)
-			assert.Equal(t, "127.0.0.1:8080", hostData.Host)
-			assert.Equal(t, "admin", hostData.User)
-			assert.Equal(t, "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", hostData.Password)
-		}
-		rawURL = "oracle://127.0.0.1:8080/ORCLCDB"
-		hostData, err = ParseURL(rawURL, "oracle", "admin", "password", "", "")
-		if assert.NoError(t, err) {
-			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.URI)
-			assert.Equal(t, "oracle://127.0.0.1:8080/ORCLCDB", hostData.SanitizedURI)
-			assert.Equal(t, "127.0.0.1:8080", hostData.Host)
-			assert.Equal(t, "", hostData.User)
-			assert.Equal(t, "", hostData.Password)
-		}
-	})
 }
 
 func TestURLHostParserBuilder(t *testing.T) {
@@ -269,40 +210,5 @@ func TestURLHostParserBuilder(t *testing.T) {
 		}
 
 		assert.Equal(t, test.url, hp.URI)
-	}
-}
-
-// TestOracleUrlParser function tests OracleUrlParser function with different urls
-func TestOracleUrlParser(t *testing.T) {
-	tests := []struct {
-		arg          string
-		wantHost     string
-		wantUsername string
-		wantPassword string
-		wantErr      bool
-	}{
-		{"oracle://admin:secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "admin", "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", false},
-		{"oracle://admin/secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "admin", "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", false},
-		{"admin:secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/@127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "admin", "secret%~`!@#$%^&*()_+=-{[}]|':;>.<,?/", false},
-		{"admin@127.0.0.1:8080/ORCLCDB", "", "", "", true},
-		{"127.0.0.1:8080/ORCLCDB", "oracle://127.0.0.1:8080/ORCLCDB", "", "", false},
-	}
-	for _, tt := range tests {
-		t.Run("oracle", func(t *testing.T) {
-			gotHost, gotUsername, gotPassword, err := OracleUrlParser(tt.arg)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("OracleUrlParser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if gotHost != tt.wantHost {
-				t.Errorf("OracleUrlParser() gotHost = %v, want %v", gotHost, tt.wantHost)
-			}
-			if gotUsername != tt.wantUsername {
-				t.Errorf("OracleUrlParser() gotUsername = %v, want %v", gotUsername, tt.wantUsername)
-			}
-			if gotPassword != tt.wantPassword {
-				t.Errorf("OracleUrlParser() gotPassword = %v, want %v", gotPassword, tt.wantPassword)
-			}
-		})
 	}
 }

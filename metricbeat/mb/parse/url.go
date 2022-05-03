@@ -19,7 +19,6 @@ package parse
 
 import (
 	"fmt"
-	"math"
 	"net"
 	"net/url"
 	p "path"
@@ -27,9 +26,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-)
 
-const http = "http"
+	"github.com/pkg/errors"
+)
 
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
@@ -56,7 +55,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			queryMap, ok := query.(map[string]interface{})
 			if !ok {
-				return mb.HostData{}, fmt.Errorf("'query' config for module %v is not a map", module.Name())
+				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a map", module.Name())
 			}
 
 			b.QueryParams = mb.QueryParams(queryMap).String()
@@ -67,7 +66,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			user, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, fmt.Errorf("'username' config for module %v is not a string", module.Name())
+				return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module.Name())
 			}
 		} else {
 			user = b.DefaultUsername
@@ -76,7 +75,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			pass, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, fmt.Errorf("'password' config for module %v is not a string", module.Name())
+				return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module.Name())
 			}
 		} else {
 			pass = b.DefaultPassword
@@ -85,7 +84,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			path, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, fmt.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
+				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
 			}
 		} else {
 			path = b.DefaultPath
@@ -97,7 +96,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			basePath, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, fmt.Errorf("'basepath' config for module %v is not a string", module.Name())
+				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
 			}
 		}
 
@@ -119,7 +118,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
 }
 
-// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjunction of the
+// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
 // url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
 func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
@@ -147,15 +146,6 @@ func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.Ho
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
 func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
-	var err error
-	if scheme == "oracle" {
-		rawHost, user, pass, err = OracleUrlParser(rawHost)
-
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error extracting username and password: %w", err)
-		}
-	}
-
 	u, transport, err := getURL(rawHost, scheme, user, pass, path, query)
 
 	if err != nil {
@@ -210,7 +200,7 @@ func getURL(
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, t, fmt.Errorf("error parsing URL: %w", err)
+		return nil, t, fmt.Errorf("error parsing URL: %v", err)
 	}
 
 	// discover the transport to use to communicate with the host if we have a combined scheme.
@@ -219,12 +209,12 @@ func getURL(
 	case "http+unix":
 		t = dialer.NewUnixDialerBuilder(u.Path)
 		u.Path = ""
-		u.Scheme = http
+		u.Scheme = "http"
 		u.Host = "unix"
 	case "http+npipe":
 		p := u.Path
 		u.Path = ""
-		u.Scheme = http
+		u.Scheme = "http"
 		u.Host = "npipe"
 
 		if p == "" && u.Host != "" {
@@ -262,7 +252,7 @@ func getURL(
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
 			} else {
-				return nil, t, fmt.Errorf("error parsing URL: %w", err)
+				return nil, t, fmt.Errorf("error parsing URL: %v", err)
 			}
 		}
 		if host == "" {
@@ -308,39 +298,4 @@ func redactURLCredentials(u *url.URL) *url.URL {
 	redacted := *u
 	redacted.User = nil
 	return &redacted
-}
-
-// OracleUrlParser extracts host, username and password from Oracle Metricbeat module.
-func OracleUrlParser(url string) (host, username, password string, err error) {
-	var separator string
-
-	// If the user has given username and password separately, there wont be any "@" in URL
-	if strings.LastIndex(url, "@") == -1 {
-		url = strings.TrimPrefix(url, "oracle://")
-		return "oracle://" + url, "", "", nil
-	}
-
-	leftPart := url[:strings.LastIndex(url, "@")]
-	rightPart := url[strings.LastIndex(url, "@")+1:]
-	leftPart = strings.TrimPrefix(leftPart, "oracle://")
-
-	// Separate username and password.
-	// User can give username and password separated with ":" or "/".
-	if indexCl := strings.Index(leftPart, ":"); indexCl == -1 { // If there is no colon in url "/" will be separator.
-		separator = "/"
-	} else if indexSl := strings.Index(leftPart, "/"); indexSl == -1 { // If there is no slash in url ":" will be separator.
-		separator = ":"
-	} else { // If both exist in URL than whichever comes first is considered as a separator.
-		index := int(math.Min(float64(indexCl), float64(indexSl)))
-		separator = leftPart[index : index+1]
-	}
-
-	parts := strings.SplitN(leftPart, separator, 2)
-	if len(parts) != 2 {
-		return "", "", "", fmt.Errorf("either username or password is missing")
-	}
-	username = parts[0]
-	password = parts[1]
-
-	return "oracle://" + rightPart, username, password, nil
 }

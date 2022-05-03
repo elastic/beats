@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/godror/godror"
+	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -36,25 +37,19 @@ func init() {
 
 // NewConnection returns a connection already established with Oracle
 func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
-	host, username, password, err := parse.OracleUrlParser(c.Hosts[0])
+	params, err := godror.ParseDSN(c.Hosts[0])
 	if err != nil {
 		return nil, fmt.Errorf("error trying to parse URL in field 'hosts': %w", err)
 	}
 
-	params, err := godror.ParseConnString(host)
-	if err != nil {
-		return nil, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
-	}
-
-	params.Username = username
-	params.Password = password
-
+	// If username and password are given in separate fields in the configuration then use them to authenticate
 	if params.Username == "" {
 		params.Username = c.Username
 	}
 
-	if params.Password == "" {
-		params.Password = c.Password
+	if params.Password.Secret() == "" {
+		params.StandaloneConnection = true
+		params.Password = dsn.NewPassword(c.Password)
 	}
 
 	db, err := sql.Open("godror", params.StringWithPassword())
