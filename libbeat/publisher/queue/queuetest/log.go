@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"gotest.tools/assert"
 )
 
 var debug bool
@@ -86,7 +87,8 @@ func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
 		if debug {
 			level = logp.DebugLevel
 		}
-		logp.DevelopmentSetup(logp.WithLevel(level))
+		err = logp.DevelopmentSetup(logp.WithLevel(level))
+		assert.NilError(t, err)
 		fn(t)
 	}
 }

@@ -92,7 +92,8 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		}
 
 		for i, event := range events {
-			value := event.Content.Fields["value"].(int)
+			value, ok := event.Content.Fields["value"].(int)
+			assert.True(t, ok, "event.value should be an int")
 			assert.Equal(t, i+N1, value)
 		}
 	})

@@ -30,15 +30,17 @@ type QueueFactory func(t *testing.T) queue.Queue
 
 type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()
 
+type testCase struct {
+	name                 string
+	producers, consumers workerFactory
+}
+
 func TestSingleProducerConsumer(
 	t *testing.T,
 	events, batchSize int,
-	factory QueueFactory,
+	queueFactory QueueFactory,
 ) {
-	tests := []struct {
-		name                 string
-		producers, consumers workerFactory
-	}{
+	tests := []testCase{
 		{
 			"single producer, consumer without ack, complete batches",
 			makeProducer(events, false, countEvent),
@@ -62,44 +64,15 @@ func TestSingleProducerConsumer(
 		},
 	}
 
-	for _, test := range tests {
-		verbose := testing.Verbose()
-		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
-			if !verbose {
-				t.Parallel()
-			}
-
-			log := NewTestLogger(t)
-			log.Debug("run test: ", test.name)
-
-			queue := factory(t)
-			defer func() {
-				err := queue.Close()
-				if err != nil {
-					t.Error(err)
-				}
-			}()
-
-			var wg sync.WaitGroup
-
-			go test.producers(&wg, nil, log, queue)()
-			go test.consumers(&wg, nil, log, queue)()
-
-			wg.Wait()
-		}))
-	}
-
+	runTestCases(t, tests, queueFactory)
 }
 
 func TestMultiProducerConsumer(
 	t *testing.T,
 	events, batchSize int,
-	factory QueueFactory,
+	queueFactory QueueFactory,
 ) {
-	tests := []struct {
-		name                 string
-		producers, consumers workerFactory
-	}{
+	tests := []testCase{
 		{
 			"2 producers, 1 consumer, without ack, complete batches",
 			multiple(
@@ -210,6 +183,10 @@ func TestMultiProducerConsumer(
 		},
 	}
 
+	runTestCases(t, tests, queueFactory)
+}
+
+func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 	for _, test := range tests {
 		verbose := testing.Verbose()
 		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
@@ -220,7 +197,7 @@ func TestMultiProducerConsumer(
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			queue := factory(t)
+			queue := queueFactory(t)
 			defer func() {
 				err := queue.Close()
 				if err != nil {
