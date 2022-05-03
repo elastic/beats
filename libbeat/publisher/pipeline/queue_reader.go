@@ -30,7 +30,7 @@ type queueReader struct {
 }
 
 type queueReaderRequest struct {
-	consumer   queue.Consumer
+	queue      queue.Queue
 	retryer    retryer
 	batchSize  int
 	timeToLive int
@@ -53,7 +53,7 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
-		queueBatch, _ := req.consumer.Get(req.batchSize)
+		queueBatch, _ := req.queue.Get(req.batchSize)
 		var batch *ttlBatch
 		if queueBatch != nil {
 			batch = newBatch(req.retryer, queueBatch, req.timeToLive)

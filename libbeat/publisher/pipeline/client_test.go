@@ -92,7 +92,7 @@ func TestClient(t *testing.T) {
 				routinesChecker := resources.NewGoroutinesChecker()
 				defer routinesChecker.Check(t)
 
-				pipeline := makePipeline(Settings{}, makeBlockingQueue())
+				pipeline := makePipeline(Settings{}, makeTestQueue())
 				defer pipeline.Close()
 
 				var ctx context.Context

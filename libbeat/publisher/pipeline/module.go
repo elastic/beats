@@ -118,11 +118,6 @@ func loadOutput(
 	monitors Monitors,
 	makeOutput OutputFactory,
 ) (outputs.Group, error) {
-	log := monitors.Logger
-	if log == nil {
-		log = logp.L()
-	}
-
 	if publishDisabled {
 		return outputs.Group{}, nil
 	}

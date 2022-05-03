@@ -42,15 +42,6 @@ func init() {
 	flag.BoolVar(&printLog, "debug-print", false, "print test log messages right away")
 }
 
-type testLogWriter struct {
-	t *testing.T
-}
-
-func (w *testLogWriter) Write(p []byte) (int, error) {
-	w.t.Log(string(p))
-	return len(p), nil
-}
-
 func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
 	if !capture {
 		return fn

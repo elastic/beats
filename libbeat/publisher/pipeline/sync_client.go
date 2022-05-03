@@ -45,11 +45,6 @@ type ISyncClient interface {
 
 // SyncClient wraps an existing beat.Client and provide a sync interface.
 type SyncClient struct {
-	// Chain callbacks already defined in the original ClientConfig
-	ackCount     func(int)
-	ackEvents    func([]interface{})
-	ackLastEvent func(interface{})
-
 	client beat.Client
 	wg     sync.WaitGroup
 	log    *logp.Logger

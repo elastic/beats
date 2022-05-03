@@ -72,12 +72,11 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 			}))
 		}
 
-		// consumer all events
-		consumer := b.Consumer()
+		// consume all events
 		total := N2 - N1
 		events := make([]publisher.Event, 0, total)
 		for len(events) < total {
-			batch, err := consumer.Get(-1) // collect all events
+			batch, err := b.Get(-1) // collect all events
 			if err != nil {
 				panic(err)
 			}

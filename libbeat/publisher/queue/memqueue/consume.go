@@ -19,11 +19,9 @@ package memqueue
 
 import (
 	"errors"
-	"io"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type consumer struct {
@@ -35,9 +33,9 @@ type consumer struct {
 }
 
 type batch struct {
-	consumer *consumer
-	events   []publisher.Event
-	ackChan  chan batchAckMsg
+	queue   *broker
+	events  []publisher.Event
+	ackChan chan batchAckMsg
 }
 
 func newConsumer(b *broker) *consumer {
@@ -48,6 +46,7 @@ func newConsumer(b *broker) *consumer {
 	}
 }
 
+/*
 func (c *consumer) Get(sz int) (queue.Batch, error) {
 	if c.closed.Load() {
 		return nil, io.EOF
@@ -68,11 +67,11 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 		}
 	}
 	return &batch{
-		consumer: c,
-		events:   events,
-		ackChan:  resp.ackChan,
+		queue:   c,
+		events:  events,
+		ackChan: resp.ackChan,
 	}, nil
-}
+}*/
 
 func (c *consumer) Close() error {
 	if c.closed.Swap(true) {

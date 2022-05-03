@@ -312,23 +312,18 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 
 			var events sync.WaitGroup
 
-			consumers := make([]queue.Consumer, numConsumers)
-			for i := range consumers {
-				consumers[i] = b.Consumer()
-			}
-
 			log.Debugf("consumer: wait for %v events\n", maxEvents)
 			events.Add(maxEvents)
 
-			for _, c := range consumers {
-				c := c
+			for i := 0; i < numConsumers; i++ {
+				b := b
 
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
 
 					for {
-						batch, err := c.Get(batchSize)
+						batch, err := b.Get(batchSize)
 						if err != nil {
 							return
 						}
@@ -345,11 +340,6 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 			}
 
 			events.Wait()
-
-			// disconnect consumers
-			for _, c := range consumers {
-				c.Close()
-			}
 		}
 	}
 }

@@ -18,11 +18,13 @@
 package memqueue
 
 import (
+	"io"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 )
@@ -223,8 +225,28 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *broker) Consumer() queue.Consumer {
-	return newConsumer(b)
+func (b *broker) Get(count int) (queue.Batch, error) {
+	responseChan := make(chan getResponse, 1)
+	select {
+	case <-b.done:
+		return nil, io.EOF
+	case b.getChan <- getRequest{
+		entryCount: count, responseChan: responseChan}:
+	}
+
+	// if request has been send, we do have to wait for a response
+	resp := <-responseChan
+	events := make([]publisher.Event, 0, len(resp.entries))
+	for _, entry := range resp.entries {
+		if event, ok := entry.event.(*publisher.Event); ok {
+			events = append(events, *event)
+		}
+	}
+	return &batch{
+		queue:   b,
+		events:  events,
+		ackChan: resp.ackChan,
+	}, nil
 }
 
 func (b *broker) Metrics() (queue.Metrics, error) {

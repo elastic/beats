@@ -118,10 +118,6 @@ func (c *eventConsumer) run() {
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
 		target consumerTarget
-
-		// The queue.Consumer we get the raw batches from. Reset whenever
-		// the target changes.
-		consumer queue.Consumer = c.queue.Consumer()
 	)
 
 outerLoop:
@@ -130,7 +126,7 @@ outerLoop:
 		if queueBatch == nil && !pendingRead {
 			pendingRead = true
 			queueReader.req <- queueReaderRequest{
-				consumer:   consumer,
+				queue:      c.queue,
 				retryer:    c,
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,
@@ -196,10 +192,6 @@ outerLoop:
 			break outerLoop
 		}
 	}
-
-	// Close the queue.Consumer, otherwise queueReader can get blocked
-	// waiting on a read.
-	consumer.Close()
 
 	// Close the queueReader request channel so it knows to shutdown.
 	close(queueReader.req)

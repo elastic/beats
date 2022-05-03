@@ -70,7 +70,10 @@ type Queue interface {
 	BufferConfig() BufferConfig
 
 	Producer(cfg ProducerConfig) Producer
-	Consumer() Consumer
+
+	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
+	// there is no bound on the number of returned events.
+	Get(eventCount int) (Batch, error)
 
 	Metrics() (Metrics, error)
 }
@@ -125,18 +128,6 @@ type Producer interface {
 	//       the originating Producer. The pipeline client must accept and
 	//       discard these ACKs.
 	Cancel() int
-}
-
-// Consumer is an interface to be used by the pipeline output workers,
-// used to read events from the head of the queue.
-type Consumer interface {
-	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
-	// there is no bound on the number of returned events.
-	Get(eventCount int) (Batch, error)
-
-	// Close closes this Consumer. Returns an error if the Consumer is
-	// already closed.
-	Close() error
 }
 
 // Batch of events to be returned to Consumers. The `ACK` method will send the
