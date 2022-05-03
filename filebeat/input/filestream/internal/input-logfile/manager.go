@@ -167,7 +167,7 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout, HarvesterLimit: 0}
+	}{CleanTimeout: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
