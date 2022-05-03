@@ -42,6 +42,7 @@ Example configuration:
 ----
 {beatname_lc}.inputs:
 - type: filestream
+  id: my-filestream-id
   paths:
     - /var/log/messages
     - /var/log/*.log
@@ -61,10 +62,12 @@ multiple input sections:
 ----
 {beatname_lc}.inputs:
 - type: filestream <1>
+  id: my-filestream-id
   paths:
     - /var/log/system.log
     - /var/log/wifi.log
 - type: filestream <2>
+  id: bar
   paths:
     - "/var/log/apache2/*"
   fields:
@@ -80,7 +83,7 @@ multiple input sections:
 [[filestream-file-identity]]
 ==== Reading files on network shares and cloud providers
 
-:WARNING: Filebeat does not support reading from network shares and cloud providers.
+WARNING: Filebeat does not support reading from network shares and cloud providers.
 
 However, one of the limitations of these data sources can be mitigated
 if you configure Filebeat adequately.
@@ -123,6 +126,7 @@ the input the following way:
 ----
 {beatname_lc}.inputs:
 - type: filestream
+  id: my-filestream-id
   paths:
     - /logs/*.log
   file_identity.inode_marker.path: /logs/.filebeat-marker
