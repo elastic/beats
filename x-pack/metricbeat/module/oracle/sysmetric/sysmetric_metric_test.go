@@ -10,7 +10,12 @@ import (
 
 func TestSysmetricExtractorCalculateQuery(t *testing.T) {
 	type fields struct {
-		patterns []string
+		patterns []interface{}
+	}
+	strpatterns := []string{"foo%", "%bar", "%foobar%"}
+	patterns := make([]interface{}, len(strpatterns))
+	for i, v := range strpatterns {
+		patterns[i] = v
 	}
 	tests := []struct {
 		fields fields
@@ -18,13 +23,13 @@ func TestSysmetricExtractorCalculateQuery(t *testing.T) {
 	}{
 		{
 			fields{
-				patterns: []string{"foo%", "%bar", "%foobar%"},
+				patterns: patterns,
 			},
-			"SELECT * FROM V$SYSMETRIC WHERE (METRIC_NAME LIKE 'foo%' OR METRIC_NAME LIKE '%bar' OR METRIC_NAME LIKE '%foobar%')",
+			"SELECT * FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0 OR METRIC_NAME LIKE :pattern1 OR METRIC_NAME LIKE :pattern2",
 		},
 		{
 			fields{},
-			"SELECT * FROM V$SYSMETRIC WHERE (METRIC_NAME LIKE '%')",
+			"SELECT * FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0",
 		},
 	}
 	for _, tt := range tests {

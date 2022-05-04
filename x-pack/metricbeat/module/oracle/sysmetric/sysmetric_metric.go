@@ -41,7 +41,7 @@ func (e *sysmetricExtractor) calculateQuery() string {
 	}
 	query := "SELECT * FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0"
 	for i := 1; i < len(e.patterns); i++ {
-		query = query + " OR METRIC_NAME LIKE :pattern" + strconv.Itoa(i+1)
+		query = query + " OR METRIC_NAME LIKE :pattern" + strconv.Itoa(i)
 	}
 	return query
 }
