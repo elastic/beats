@@ -100,7 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
-
+- auditd: Updated the go-libaudit library version to v2.3.0. This refreshes the syscall names for Linux and adds ECS categorizations for more audit anomaly events. {pull}31519[31519]
 
 *Filebeat*
 
