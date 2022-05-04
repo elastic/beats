@@ -71,7 +71,7 @@ func TestTLSHostname(t *testing.T) {
 	defer teardown()
 
 	hostname := cert.DNSNames[0] // Should be example.com
-	resolver := NewStaticResolver(map[string][]net.IP{hostname: []net.IP{net.ParseIP(ip)}})
+	resolver := NewStaticResolver(map[string][]net.IP{hostname: {net.ParseIP(ip)}})
 	event := testTLSTCPCheck(t, hostname, port, certFile.Name(), resolver)
 	testslike.Test(
 		t,
@@ -125,14 +125,15 @@ func TestTLSExpiredCert(t *testing.T) {
 	require.NoError(t, err)
 
 	ip, portStr, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeSrv()
 
 	portInt, err := strconv.Atoi(portStr)
 	port := uint16(portInt)
 	require.NoError(t, err)
 
-	host := "localhost"
-	event := testTLSTCPCheck(t, host, port, certFile, monitors.NewStdResolver())
+	event := testTLSTCPCheck(t, Localhost, port, certFile, monitors.NewStdResolver())
 
 	testslike.Test(
 		t,
@@ -140,7 +141,7 @@ func TestTLSExpiredCert(t *testing.T) {
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
-			hbtest.SimpleURLChecks(t, "ssl", host, port),
+			hbtest.SimpleURLChecks(t, "ssl", Localhost, port),
 			hbtest.ResolveChecks(ip),
 			hbtest.ExpiredCertChecks(cert),
 		)),
