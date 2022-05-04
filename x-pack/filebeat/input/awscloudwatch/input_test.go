@@ -187,7 +187,8 @@ func TestCreateEvent(t *testing.T) {
 		},
 	}
 	event := createEvent(logEvent, "logGroup1", "us-east-1")
-	event.Fields.Delete("event.ingested")
+	err := event.Fields.Delete("event.ingested")
+	assert.NoError(t, err)
 	assert.Equal(t, expectedEventFields, event.Fields)
 }
 
