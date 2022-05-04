@@ -23,5 +23,5 @@ type extractedData struct {
 // which refers to the origin of the data for organization purposes.
 type sysmetricExtractor struct {
 	db       *sql.DB
-	patterns []string
+	patterns []interface{}
 }

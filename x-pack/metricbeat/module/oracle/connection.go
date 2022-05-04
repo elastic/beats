@@ -17,10 +17,10 @@ import (
 // ConnectionDetails contains all possible data that can be used to create a connection with
 // an Oracle db
 type ConnectionDetails struct {
-	Username string   `config:"username"`
-	Password string   `config:"password"`
-	Hosts    []string `config:"hosts"    validate:"required"`
-	Patterns []string `config:"patterns"`
+	Username string        `config:"username"`
+	Password string        `config:"password"`
+	Hosts    []string      `config:"hosts"    validate:"required"`
+	Patterns []interface{} `config:"patterns"`
 }
 
 // HostParser parsers the host value as a URL

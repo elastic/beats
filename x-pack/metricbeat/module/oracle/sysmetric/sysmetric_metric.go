@@ -36,22 +36,19 @@ type sysmetricMetric struct {
  */
 func (e *sysmetricExtractor) calculateQuery() string {
 	if len(e.patterns) == 0 {
-		e.patterns = []string{"%"}
+		e.patterns = make([]interface{}, 1)
+		e.patterns[0] = "%"
 	}
-
-	query := "SELECT * FROM V$SYSMETRIC WHERE (" + "METRIC_NAME LIKE '" + e.patterns[0] + "'"
-	for _, pattern := range e.patterns[1:] {
-		query = query + " OR " + "METRIC_NAME LIKE '" + pattern + "'"
+	query := "SELECT * FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0"
+	for i := 1; i < len(e.patterns); i++ {
+		query = query + " OR METRIC_NAME LIKE :pattern" + strconv.Itoa(i+1)
 	}
-	query = query + ")"
-
 	return query
 }
 
 func (e *sysmetricExtractor) sysmetricMetric(ctx context.Context) ([]sysmetricMetric, error) {
 	query := e.calculateQuery()
-
-	rows, err := e.db.QueryContext(ctx, query)
+	rows, err := e.db.QueryContext(ctx, query, e.patterns...)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query %w", err)
 	}

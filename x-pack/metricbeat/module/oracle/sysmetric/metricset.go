@@ -29,7 +29,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	extractor         sysmetricExtractMethod
 	connectionDetails oracle.ConnectionDetails
-	Patterns          []string
+	Patterns          []interface{}
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
