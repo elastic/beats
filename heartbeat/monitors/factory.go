@@ -166,7 +166,7 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 
 		meta := clientCfg.Processing.Meta.Clone()
 		if settings.Pipeline != "" {
-			meta.Put("pipeline", settings.Pipeline)
+			_, _ = meta.Put("pipeline", settings.Pipeline)
 		}
 
 		procs := processors.NewList(nil)

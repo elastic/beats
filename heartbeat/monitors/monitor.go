@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -36,7 +35,7 @@ import (
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
-var ErrMonitorDisabled = errors.New("monitor not loaded, plugin is disabled")
+var ErrMonitorDisabled = fmt.Errorf("monitor not loaded, plugin is disabled")
 
 const (
 	MON_INIT = iota
@@ -173,7 +172,7 @@ func newMonitorUnsafe(
 	// that it can render.
 	if err != nil {
 		// Note, needed to hoist err to this scope, not just to add a prefix
-		fullErr := fmt.Errorf("job could not be initialized: %s", err)
+		fullErr := fmt.Errorf("job could not be initialized: %w", err)
 		// A placeholder job that always returns an error
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			return nil, fullErr
@@ -208,10 +207,10 @@ func (m *Monitor) configHash() (uint64, error) {
 func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
 	mtConf := jobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
-		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
+		return nil, fmt.Errorf("invalid config, could not unpack monitor config: %w", err)
 	}
 
-	var mTasks []*configuredJob
+	var mTasks = make([]*configuredJob, 0, len(jobs))
 	for _, job := range jobs {
 		t := newConfiguredJob(job, mtConf, m)
 		mTasks = append(mTasks, t)
@@ -234,7 +233,7 @@ func (m *Monitor) Start() {
 			}
 			t.Start(&WrappedClient{
 				Publish: func(event beat.Event) {
-					client.Publish(event)
+					_ = client.Publish(event)
 				},
 				Close: client.Close,
 				wait:  client.Wait,

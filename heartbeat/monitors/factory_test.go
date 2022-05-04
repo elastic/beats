@@ -138,7 +138,7 @@ func TestPreProcessors(t *testing.T) {
 			t.Run("event.data_stream", func(t *testing.T) {
 				dataStreamRaw, _ := e.GetValue("data_stream")
 				if tt.expectedDatastream != nil {
-					dataStream := dataStreamRaw.(add_data_stream.DataStream)
+					dataStream, _ := dataStreamRaw.(add_data_stream.DataStream)
 					require.Equal(t, eventDs, dataStream.Dataset, "event.dataset be identical to data_stream.dataset")
 
 					require.Equal(t, *tt.expectedDatastream, dataStream)
@@ -150,7 +150,7 @@ func TestPreProcessors(t *testing.T) {
 
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
-	badConf := mockBadPluginConf(t, "custom", "@every 1ms")
+	badConf := mockBadPluginConf(t, "custom")
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 

@@ -54,11 +54,11 @@ func TestSocks5Job(t *testing.T) {
 		t.Run(scenario.name, func(t *testing.T) {
 			host, port, ip, closeEcho, err := startEchoServer(t)
 			require.NoError(t, err)
-			defer closeEcho()
+			defer closeEcho() //nolint:errcheck // intentional discard
 
 			_, proxyPort, proxyIp, closeProxy, err := startSocks5Server(t)
 			require.NoError(t, err)
-			defer closeProxy()
+			defer closeProxy() //nolint:errcheck // intentional discard
 
 			proxyURL := &url.URL{Scheme: "socks5", Host: net.JoinHostPort(proxyIp, fmt.Sprint(proxyPort))}
 			configMap := common.MapStr{
@@ -70,7 +70,7 @@ func TestSocks5Job(t *testing.T) {
 				"check.receive":            "echo123",
 				"check.send":               "echo123",
 			}
-			event := testTCPConfigCheck(t, configMap, host, port)
+			event := testTCPConfigCheck(t, configMap)
 
 			testslike.Test(
 				t,
@@ -95,8 +95,8 @@ func TestSocks5Job(t *testing.T) {
 	}
 }
 
-func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close func() error, err error) {
-	host = "localhost"
+func startSocks5Server(_ *testing.T) (host string, port uint16, ip string, close func() error, err error) {
+	host = "localhost" //nolint:goconst // too much indirection
 	config := &socks5.Config{}
 	server, err := socks5.New(config)
 	if err != nil {
@@ -108,6 +108,10 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 		return "", 0, "", nil, err
 	}
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()

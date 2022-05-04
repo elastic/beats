@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -44,7 +45,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 		"ports":   port,
 		"timeout": "1s",
 	}
-	return testTCPConfigCheck(t, config, host, port)
+	return testTCPConfigCheck(t, config)
 }
 
 // TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
@@ -157,7 +158,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 func TestCheckUp(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
-	defer closeEcho()
+	defer closeEcho() //nolint:errcheck // not needed in test
 
 	configMap := common.MapStr{
 		"hosts":         host,
@@ -167,7 +168,7 @@ func TestCheckUp(t *testing.T) {
 		"check.send":    "echo123",
 	}
 
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -190,7 +191,7 @@ func TestCheckUp(t *testing.T) {
 func TestCheckDown(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
-	defer closeEcho()
+	defer closeEcho() //nolint:errcheck // not needed in test
 
 	configMap := common.MapStr{
 		"hosts":         host,
@@ -199,8 +200,7 @@ func TestCheckDown(t *testing.T) {
 		"check.receive": "BOOM", // should fail
 		"check.send":    "echo123",
 	}
-
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -249,19 +249,31 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	if err != nil {
 		return "", 0, "", nil, err
 	}
+
 	go func() {
-		conn, err := listener.Accept()
-		require.NoError(t, err)
-		buf := make([]byte, 1024)
-		rlen, err := conn.Read(buf)
-		require.NoError(t, err)
-		wlen, err := conn.Write(buf[:rlen])
-		require.NoError(t, err)
-		// Normally we'd retry partial writes, but for tests this is OK
-		require.Equal(t, wlen, rlen)
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				break
+			}
+			buf := make([]byte, 1024)
+			conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+			conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
+			rlen, err := conn.Read(buf)
+			require.NoError(t, err)
+			wlen, err := conn.Write(buf[:rlen])
+			require.NoError(t, err)
+			// Normally we'd retry partial writes, but for tests this is OK
+			require.Equal(t, wlen, rlen)
+			conn.Close()
+		}
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()
