@@ -275,9 +275,10 @@ func TestCertExpirationMetadata(t *testing.T) {
 }
 
 func parseCert(t *testing.T, pemStr string) *x509.Certificate {
-	block, _ := pem.Decode([]byte(elasticCert))
+	block, _ := pem.Decode([]byte(pemStr))
 	if block == nil {
 		require.Fail(t, "Test cert could not be parsed")
+		return nil
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	require.NoError(t, err)

@@ -72,7 +72,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
 	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1})
-	wrapped[0](e)
+	_, _ = wrapped[0](e)
 	return tl, e
 }
 

@@ -20,6 +20,7 @@
 package look
 
 import (
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,7 +30,7 @@ import (
 
 // RTT formats a round-trip-time given as time.Duration into an
 // event field. The duration is stored in `{"us": rtt}`.
-// TODO: This returns a time.Duration, which isn't quite right. time.Duration
+// NOTE: This returns a time.Duration, which isn't quite right. time.Duration
 // represents nanos, whereas this really returns millis. It should probably
 // return a plain int64 type instead.
 func RTT(rtt time.Duration) common.MapStr {
@@ -47,7 +48,8 @@ func RTT(rtt time.Duration) common.MapStr {
 
 // Reason formats an error into an error event field.
 func Reason(err error) common.MapStr {
-	if r, ok := err.(reason.Reason); ok {
+	var r reason.Reason
+	if errors.As(err, &r) {
 		return reason.Fail(r)
 	}
 	return reason.FailIO(err)

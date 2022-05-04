@@ -69,12 +69,12 @@ func UDPDialer(to time.Duration) NetDialer {
 func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
 		return makeDialer(func(network, address string) (net.Conn, error) {
-			namespace := ""
+			var namespace string
 
 			switch network {
-			case "tcp", "tcp4", "tcp6":
+			case "tcp", "tcp4", "tcp6": //nolint:goconst // too DRY
 				namespace = "tcp"
-			case "udp", "udp4", "udp6":
+			case "udp", "udp4", "udp6": //nolint:goconst // too DRY
 				namespace = "udp"
 			default:
 				return nil, fmt.Errorf("unsupported network type %v", network)

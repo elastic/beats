@@ -25,7 +25,6 @@ import (
 	"net/url"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -251,22 +250,16 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}
 
 	go func() {
-		for {
-			conn, err := listener.Accept()
-			if err != nil {
-				break
-			}
-			buf := make([]byte, 1024)
-			conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-			conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
-			rlen, err := conn.Read(buf)
-			require.NoError(t, err)
-			wlen, err := conn.Write(buf[:rlen])
-			require.NoError(t, err)
-			// Normally we'd retry partial writes, but for tests this is OK
-			require.Equal(t, wlen, rlen)
-			conn.Close()
-		}
+		conn, err := listener.Accept()
+		require.NoError(t, err)
+		buf := make([]byte, 1024)
+		rlen, err := conn.Read(buf)
+		require.NoError(t, err)
+		wlen, err := conn.Write(buf[:rlen])
+		require.NoError(t, err)
+		// Normally we'd retry partial writes, but for tests this is OK
+		require.Equal(t, wlen, rlen)
+		conn.Close()
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())

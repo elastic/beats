@@ -99,17 +99,18 @@ func TestCheckJsonExpression(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests[6:] {
+	for _, test := range tests[6:] { //nolint:dupl // similar to other lines, but with a different type. Not worth refactoring
 		t.Run(test.description, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, test.body)
 			}))
 			defer ts.Close()
 
-			res, err := http.Get(ts.URL)
+			res, err := http.Get(ts.URL) //nolint:noctx // fine for tests
 			if err != nil {
 				log.Fatal(err)
 			}
+			defer res.Body.Close()
 
 			checker, err := checkJson(
 				[]*jsonResponseCheck{
@@ -202,17 +203,18 @@ func TestCheckJsonCondition(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, test := range tests { //nolint:dupl // similar to other lines, but with a different type. Not worth refactoring
 		t.Run(test.description, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, test.body)
 			}))
 			defer ts.Close()
 
-			res, err := http.Get(ts.URL)
+			res, err := http.Get(ts.URL) //nolint:noctx // fine for tests
 			if err != nil {
 				log.Fatal(err)
 			}
+			defer res.Body.Close()
 
 			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
 			require.NoError(t, err)

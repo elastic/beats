@@ -29,11 +29,10 @@ import (
 	"sync"
 	"time"
 
-	//nolint:goimports // this works, no reason to compalin
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp" //nolint:goimports // this works, no reason to compalin
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
-	"golang.org/x/net/ipv6"
+	"golang.org/x/net/ipv6" //nolint:goimports // this works, no reason to compalin
 )
 
 var logger = logp.NewLogger("ICMP-Stdloop")

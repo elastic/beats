@@ -37,7 +37,7 @@ func testRTT(t *testing.T, expected time.Duration, provided time.Duration) {
 }
 
 func TestPositiveRTTIsKept(t *testing.T) {
-	testRTT(t, 5, time.Duration(5*time.Microsecond))
+	testRTT(t, 5, 5*time.Microsecond)
 }
 
 func TestNegativeRTTIsZero(t *testing.T) {

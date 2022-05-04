@@ -63,10 +63,6 @@ type requestParameters struct {
 	SendHeaders map[string]string `config:"headers"`     // http request headers
 	SendBody    string            `config:"body"`        // send body payload
 	Compression compressionConfig `config:"compression"` // optionally compress payload
-
-	// TODO:
-	//  - add support for cookies
-	//  - select HTTP version. golang lib will either use 1.1 or 2.0 if HTTPS is used, otherwise HTTP 1.1 . => implement/use specific http.RoundTripper implementation to change wire protocol/version being used
 }
 
 type responseParameters struct {
@@ -126,7 +122,7 @@ func defaultConfig() Config {
 // Validate validates of the responseConfig object is valid or not
 func (r *responseConfig) Validate() error {
 	switch strings.ToLower(r.IncludeBody) {
-	case "always", "on_error", "never":
+	case "always", "on_error", "never": //nolint:goconst // not worth it for the dupes
 	default:
 		return fmt.Errorf("unknown option for `include_body`: '%s', please use one of 'always', 'on_error', 'never'", r.IncludeBody)
 	}
@@ -152,7 +148,7 @@ func (r *requestParameters) Validate() error {
 // Validate validates of the compressionConfig object is valid or not
 func (c *compressionConfig) Validate() error {
 	t := strings.ToLower(c.Type)
-	if t != "" && t != "gzip" {
+	if t != "" && t != "gzip" { //nolint:goconst // not worth it for dupes of gzip
 		return fmt.Errorf("compression type '%v' not supported", c.Type)
 	}
 

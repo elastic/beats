@@ -72,10 +72,8 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 		configSrc["hosts"] = testURL
 	}
 
-	if extraConfig != nil {
-		for k, v := range extraConfig {
-			configSrc[k] = v
-		}
+	for k, v := range extraConfig {
+		configSrc[k] = v
 	}
 
 	config, err := common.NewConfigFrom(configSrc)
@@ -518,7 +516,7 @@ func runHTTPSServerCheck(
 		}
 		for k, v := range missing {
 			if found, err := event.Fields.HasKey(k); !found || err != nil {
-				event.Fields.Put(k, v)
+				_, _ = event.Fields.Put(k, v)
 			}
 		}
 	}
@@ -545,7 +543,7 @@ func TestExpiredHTTPSServer(t *testing.T) {
 	tlsCert, err := tls.LoadX509KeyPair("../fixtures/expired.cert", "../fixtures/expired.key")
 	require.NoError(t, err)
 	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
-	defer closeSrv()
+	defer closeSrv() //nolint:errcheck // no need to check
 	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
 
 	extraConfig := map[string]interface{}{"ssl.certificate_authorities": "../fixtures/expired.cert"}
@@ -566,6 +564,7 @@ func TestExpiredHTTPSServer(t *testing.T) {
 }
 
 func TestHTTPSx509Auth(t *testing.T) {
+	//nolint:goconst // not worth it for the few occurrences of 'windows'
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
 	}
@@ -792,22 +791,14 @@ func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		io.Copy(destConn, clientReadWriter)
+		_, _ = io.Copy(destConn, clientReadWriter)
 		wg.Done()
 	}()
 	go func() {
-		io.Copy(clientConn, destConn)
+		_, _ = io.Copy(clientConn, destConn)
 		wg.Done()
 	}()
 	wg.Wait()
-}
-
-func mustParseURL(t *testing.T, url string) *url.URL {
-	parsed, err := common.ParseURL(url)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return parsed
 }
 
 // helper that compresses some content as gzip

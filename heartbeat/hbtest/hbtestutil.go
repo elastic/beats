@@ -61,7 +61,7 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 				w.Header().Set("Location", "/somewhere")
 			}
 			w.WriteHeader(status)
-			io.WriteString(w, HelloWorldBody)
+			_, _ = io.WriteString(w, HelloWorldBody)
 		},
 	)
 }
@@ -72,13 +72,13 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 func SizedResponseHandler(bytes int) http.HandlerFunc {
 	var body strings.Builder
 	for i := 0; i < bytes; i++ {
-		body.WriteString("x")
+		_, _ = body.WriteString("x")
 	}
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			io.WriteString(w, body.String())
+			_, _ = io.WriteString(w, body.String())
 		},
 	)
 }
@@ -90,7 +90,7 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 				w.Header().Add(key, val)
 			}
 			w.WriteHeader(status)
-			w.Write(body)
+			_, _ = w.Write(body)
 		},
 	)
 }
@@ -107,7 +107,7 @@ func RedirectHandler(redirectingPaths map[string]string, body string) http.Handl
 				w.WriteHeader(302)
 			} else {
 				w.WriteHeader(200)
-				io.WriteString(w, body)
+				_, _ = io.WriteString(w, body)
 			}
 		})
 }
@@ -137,13 +137,13 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
-	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+	_, _ = expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
 
 	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
 	// We don't actually care about the exact cipher matching, since we're not testing the TLS
 	// implementation, we trust go there, just that most of the metadata is present
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		expected.Put("tls.cipher", isdef.IsString)
+		_, _ = expected.Put("tls.cipher", isdef.IsString)
 	}
 
 	return lookslike.MustCompile(expected)
@@ -259,7 +259,8 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// disk, not memory, so this little bit of extra work is worthwhile
 	certFile, err := ioutil.TempFile("", "sslcert")
 	require.NoError(t, err)
-	certFile.WriteString(x509util.CertToPEMString(cert))
+	_, err = certFile.WriteString(x509util.CertToPEMString(cert))
+	require.NoError(t, err)
 	return certFile
 }
 
@@ -269,13 +270,14 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 
 	// No need to start a real server, since this is invalid, we just
 	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		Certificates: []tls.Certificate{tlsCert},
 	})
 	require.NoError(t, err)
 
 	srv := &http.Server{Handler: HelloWorldHandler(200)}
 	go func() {
-		srv.Serve(l)
+		_ = srv.Serve(l)
 	}()
 
 	host, port, err = net.SplitHostPort(l.Addr().String())
