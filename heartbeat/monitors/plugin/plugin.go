@@ -185,7 +185,8 @@ func (r *PluginsReg) Get(name string) (PluginFactory, bool) {
 }
 
 func (r *PluginsReg) String() string {
-	var monitors = []string{}
+	monitors := make([]string, 0, len(r.monitors))
+	// note r.monitors is a map, we're iterating over the key names
 	for m := range r.monitors {
 		monitors = append(monitors, m)
 	}
