@@ -54,7 +54,7 @@ type Heartbeat struct {
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %w", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
