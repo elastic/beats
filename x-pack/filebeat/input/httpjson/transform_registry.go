@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-type constructor func(config *common.Config, log *logp.Logger) (transform, error)
+type constructor func(config *conf.C, log *logp.Logger) (transform, error)
 
 var registeredTransforms = newRegistry()
 

@@ -15,21 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package file
+package shipper
 
 import (
-	"os"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInfo, error) {
-	info, err := statFunc(name)
-	if err != nil {
-		return nil, err
-	}
-
-	return wrap(info)
+type Config struct {
+	// Server address in the format of host:port, e.g. `localhost:50051`
+	Server string `config:"server"`
+	// TLS/SSL configurationf or secure connection
+	TLS *tlscommon.Config `config:"ssl"`
+	// Timeout of a single batch publishing request
+	Timeout time.Duration `config:"timeout"             validate:"min=1"`
+	// MaxRetries is how many times the same batch is attempted to be sent
+	MaxRetries int `config:"max_retries"         validate:"min=-1,nonzero"`
+	// BulkMaxSize max amount of events in a single batch
+	BulkMaxSize int `config:"bulk_max_size"`
 }
 
-func wrap(info os.FileInfo) (FileInfo, error) {
-	return fileInfo{FileInfo: info}, nil
+func defaultConfig() Config {
+	return Config{
+		TLS:         nil,
+		Timeout:     30 * time.Second,
+		MaxRetries:  3,
+		BulkMaxSize: 50,
+	}
 }

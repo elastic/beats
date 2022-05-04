@@ -71,7 +71,7 @@
 
     # Timestamp
     timestamp_rfc3339 = (ts_yyyymmdd 'T' ts_hhmmss ('.' digit{1,6})? ts_offset) >tok %set_timestamp_rfc3339 $err(err_timestamp);
-    timestamp_bsd     = (month_str . sp . day_nopad . sp . ts_hhmmss) >tok %set_timestamp_bsd $err(err_timestamp);
+    timestamp_bsd     = (month_str . sp . (day_nopad|day) . sp . ts_hhmmss) >tok %set_timestamp_bsd $err(err_timestamp);
 
     # Hostname
     hostname_range    = graph{1,255};

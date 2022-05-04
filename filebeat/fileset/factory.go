@@ -25,11 +25,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var moduleList = monitoring.NewUniqueList()
@@ -75,7 +75,7 @@ func NewFactory(
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
 	m, pConfigs, err := f.createRegistry(c)
 	if err != nil {
 		return nil, fmt.Errorf("could not create module registry for filesets: %w", err)
@@ -110,7 +110,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 	}, nil
 }
 
-func (f *Factory) CheckConfig(c *common.Config) error {
+func (f *Factory) CheckConfig(c *conf.C) error {
 	_, pConfigs, err := f.createRegistry(c)
 	if err != nil {
 		return fmt.Errorf("could not create module registry for filesets: %w", err)
@@ -128,8 +128,8 @@ func (f *Factory) CheckConfig(c *common.Config) error {
 
 // createRegistry starts a registry for a set of filesets, it returns the registry and
 // its input configurations
-func (f *Factory) createRegistry(c *common.Config) (*ModuleRegistry, []*common.Config, error) {
-	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
+func (f *Factory) createRegistry(c *conf.C) (*ModuleRegistry, []*conf.C, error) {
+	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false)
 	if err != nil {
 		return nil, nil, err
 	}

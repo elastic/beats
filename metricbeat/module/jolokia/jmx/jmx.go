@@ -19,8 +19,8 @@ package jmx
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -95,7 +95,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	var allEvents []common.MapStr
+	var allEvents []mapstr.M
 
 	allEvents, err := m.jolokia.Fetch(m)
 	if err != nil {

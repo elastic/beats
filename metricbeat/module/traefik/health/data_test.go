@@ -23,9 +23,9 @@ package health
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -52,16 +52,16 @@ func TestEventMapping(t *testing.T) {
 	event, errors := eventMapping(input)
 	assert.Nil(t, errors, "Errors while mapping input to event")
 
-	uptime := event["uptime"].(common.MapStr)
+	uptime := event["uptime"].(mapstr.M)
 	assert.EqualValues(t, 60231, uptime["sec"])
 
-	response := event["response"].(common.MapStr)
+	response := event["response"].(mapstr.M)
 	assert.EqualValues(t, 18, response["count"])
 
-	avgTime := response["avg_time"].(common.MapStr)
+	avgTime := response["avg_time"].(mapstr.M)
 	assert.EqualValues(t, 15, avgTime["us"])
 
-	statusCodes := response["status_codes"].(common.MapStr)
+	statusCodes := response["status_codes"].(mapstr.M)
 	assert.EqualValues(t, 17, statusCodes["200"])
 	assert.EqualValues(t, 1, statusCodes["404"])
 }

@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/assert"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
@@ -41,8 +41,11 @@ func TestProduceConsumer(t *testing.T) {
 	minEvents := 32
 
 	rand.Seed(seed)
+	//nolint: gosec // These calls don't need to be cryptographically secure.
 	events := rand.Intn(maxEvents-minEvents) + minEvents
+	//nolint: gosec // These calls don't need to be cryptographically secure.
 	batchSize := rand.Intn(events-8) + 4
+	//nolint: gosec // These calls don't need to be cryptographically secure.
 	bufferSize := rand.Intn(batchSize*2) + 4
 
 	// events := 4
@@ -81,7 +84,6 @@ func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.Queu
 			Events:         sz,
 			FlushMinEvents: minEvents,
 			FlushTimeout:   flushTimeout,
-			WaitOnClose:    true,
 		})
 	}
 }

@@ -20,12 +20,12 @@ package container
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -93,7 +93,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	events, err := eventMapping(body, util.PerfMetrics, m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -109,14 +109,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Error(err)
 		}
 		// Enrich event with container ECS fields
-		containerEcsFields := ecsfields(event)
+		containerEcsFields := ecsfields(event, m.Logger())
 		if len(containerEcsFields) != 0 {
 			if e.RootFields != nil {
-				e.RootFields.DeepUpdate(common.MapStr{
+				e.RootFields.DeepUpdate(mapstr.M{
 					"container": containerEcsFields,
 				})
 			} else {
-				e.RootFields = common.MapStr{
+				e.RootFields = mapstr.M{
 					"container": containerEcsFields,
 				}
 			}

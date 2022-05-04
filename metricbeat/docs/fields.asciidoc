@@ -3,6 +3,8 @@
 This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
+:edit_url:
+
 [[exported-fields]]
 = Exported fields
 
@@ -35051,24 +35053,6 @@ type: long
 
 --
 
-*`gcp.dataproc.cluster.job.completion_time.value`*::
-+
---
-The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
-
-type: long
-
---
-
-*`gcp.dataproc.cluster.job.duration.value`*::
-+
---
-The time jobs have spent in a given state.
-
-type: long
-
---
-
 *`gcp.dataproc.cluster.job.failed.count`*::
 +
 --
@@ -35091,24 +35075,6 @@ type: long
 +
 --
 Indicates the number of jobs that have been submitted to a cluster.
-
-type: long
-
---
-
-*`gcp.dataproc.cluster.operation.completion_time.value`*::
-+
---
-The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
-
-type: long
-
---
-
-*`gcp.dataproc.cluster.operation.duration.value`*::
-+
---
-The time operations have spent in a given state.
 
 type: long
 
@@ -64603,3 +64569,4 @@ type: long
 
 --
 
+:edit_url!:

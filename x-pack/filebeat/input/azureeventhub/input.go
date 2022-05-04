@@ -20,8 +20,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
@@ -59,7 +60,7 @@ func init() {
 
 // NewInput creates a new azure-eventhub input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
@@ -174,7 +175,7 @@ func (a *azureInput) Wait() {
 
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
 	timestamp := time.Now()
-	azure := common.MapStr{
+	azure := mapstr.M{
 		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
 		//"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
@@ -187,7 +188,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		ok := a.outlet.OnEvent(beat.Event{
 			Timestamp: timestamp,
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": msg,
 				"azure":   azure,
 			},

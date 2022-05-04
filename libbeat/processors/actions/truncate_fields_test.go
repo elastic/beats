@@ -21,11 +21,11 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestTruncateFields(t *testing.T) {
@@ -33,19 +33,19 @@ func TestTruncateFields(t *testing.T) {
 	var tests = map[string]struct {
 		MaxBytes     int
 		MaxChars     int
-		Input        common.MapStr
-		Output       common.MapStr
+		Input        mapstr.M
+		Output       mapstr.M
 		ShouldError  bool
 		TruncateFunc truncater
 	}{
 		"truncate bytes of too long string line": {
 			MaxBytes: 3,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": "too long line",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": "too",
-				"log": common.MapStr{
+				"log": mapstr.M{
 					"flags": []string{"truncated"},
 				},
 			},
@@ -54,12 +54,12 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"truncate bytes of too long byte line": {
 			MaxBytes: 3,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": []byte("too long line"),
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": []byte("too"),
-				"log": common.MapStr{
+				"log": mapstr.M{
 					"flags": []string{"truncated"},
 				},
 			},
@@ -68,10 +68,10 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"do not truncate short string line": {
 			MaxBytes: 15,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": "shorter line",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": "shorter line",
 			},
 			ShouldError:  false,
@@ -79,10 +79,10 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"do not truncate short byte line": {
 			MaxBytes: 15,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": []byte("shorter line"),
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": []byte("shorter line"),
 			},
 			ShouldError:  false,
@@ -90,10 +90,10 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"try to truncate integer and get error": {
 			MaxBytes: 5,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": 42,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": 42,
 			},
 			ShouldError:  true,
@@ -101,10 +101,10 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"do not truncate characters of short byte line": {
 			MaxChars: 6,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": []byte("ez jó"), // this is good (hungarian)
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": []byte("ez jó"), // this is good (hungarian)
 			},
 			ShouldError:  false,
@@ -112,10 +112,10 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"do not truncate bytes of short byte line with multibyte runes": {
 			MaxBytes: 6,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": []byte("ez jó"), // this is good (hungarian)
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": []byte("ez jó"), // this is good (hungarian)
 			},
 			ShouldError:  false,
@@ -123,12 +123,12 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"truncate characters of too long byte line": {
 			MaxChars: 10,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": []byte("ez egy túl hosszú sor"), // this is a too long line (hungarian)
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": []byte("ez egy túl"), // this is a too (hungarian)
-				"log": common.MapStr{
+				"log": mapstr.M{
 					"flags": []string{"truncated"},
 				},
 			},
@@ -137,12 +137,12 @@ func TestTruncateFields(t *testing.T) {
 		},
 		"truncate bytes of too long byte line with multibyte runes": {
 			MaxBytes: 10,
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": []byte("ez egy túl hosszú sor"), // this is a too long line (hungarian)
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": []byte("ez egy tú"), // this is a "to" (hungarian)
-				"log": common.MapStr{
+				"log": mapstr.M{
 					"flags": []string{"truncated"},
 				},
 			},
@@ -191,19 +191,19 @@ func TestTruncateFields(t *testing.T) {
 		}
 
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"message": "too long line",
 			},
-			Fields: common.MapStr{},
+			Fields: mapstr.M{},
 		}
 
-		expFields := common.MapStr{
-			"log": common.MapStr{
+		expFields := mapstr.M{
+			"log": mapstr.M{
 				"flags": []string{"truncated"},
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"message": "too",
 		}
 

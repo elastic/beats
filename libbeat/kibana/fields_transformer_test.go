@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -40,10 +41,10 @@ func TestEmpty(t *testing.T) {
 	assert.NoError(t, err)
 	out, err := trans.transform()
 	assert.NoError(t, err)
-	expected := common.MapStr{
-		"fieldFormatMap": common.MapStr{},
-		"fields": []common.MapStr{
-			common.MapStr{
+	expected := mapstr.M{
+		"fieldFormatMap": mapstr.M{},
+		"fields": []mapstr.M{
+			mapstr.M{
 				"name":         "_id",
 				"type":         "string",
 				"scripted":     false,
@@ -54,7 +55,7 @@ func TestEmpty(t *testing.T) {
 				"doc_values":   false,
 				"searchable":   false,
 			},
-			common.MapStr{
+			mapstr.M{
 				"name":         "_type",
 				"type":         "string",
 				"scripted":     false,
@@ -65,7 +66,7 @@ func TestEmpty(t *testing.T) {
 				"doc_values":   false,
 				"searchable":   true,
 			},
-			common.MapStr{
+			mapstr.M{
 				"name":         "_index",
 				"type":         "string",
 				"scripted":     false,
@@ -76,7 +77,7 @@ func TestEmpty(t *testing.T) {
 				"doc_values":   false,
 				"searchable":   false,
 			},
-			common.MapStr{
+			mapstr.M{
 				"name":         "_score",
 				"type":         "number",
 				"scripted":     false,
@@ -157,8 +158,8 @@ func TestValidDuplicateField(t *testing.T) {
 	require.NoError(t, err)
 	transformed, err := trans.transform()
 	require.NoError(t, err)
-	out := transformed["fields"].([]common.MapStr)[0]
-	assert.Equal(t, out, common.MapStr{
+	out := transformed["fields"].([]mapstr.M)[0]
+	assert.Equal(t, out, mapstr.M{
 		"aggregatable": false,
 		"analyzed":     true,
 		"count":        2,
@@ -213,7 +214,7 @@ func TestTransformTypes(t *testing.T) {
 		trans, _ := newFieldsTransformer(version, mapping.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
-		out := transformed["fields"].([]common.MapStr)[0]
+		out := transformed["fields"].([]mapstr.M)[0]
 		assert.Equal(t, test.expected, out["type"], fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
@@ -258,7 +259,7 @@ func TestTransformGroup(t *testing.T) {
 		trans, _ := newFieldsTransformer(version, test.commonFields, false)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
-		out := transformed["fields"].([]common.MapStr)
+		out := transformed["fields"].([]mapstr.M)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
@@ -334,7 +335,7 @@ func TestTransformMisc(t *testing.T) {
 		trans, _ := newFieldsTransformer(version, mapping.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
-		out := transformed["fields"].([]common.MapStr)[0]
+		out := transformed["fields"].([]mapstr.M)[0]
 		msg := fmt.Sprintf("(%v): expected '%s' to be <%v> but was <%v>", idx, test.attr, test.expected, out[test.attr])
 		assert.Equal(t, test.expected, out[test.attr], msg)
 	}
@@ -349,21 +350,21 @@ func TestTransformFieldFormatMap(t *testing.T) {
 	tests := []struct {
 		commonField mapping.Field
 		version     *common.Version
-		expected    common.MapStr
+		expected    mapstr.M
 	}{
 		{
 			commonField: mapping.Field{Name: "c"},
-			expected:    common.MapStr{},
+			expected:    mapstr.M{},
 			version:     version,
 		},
 		{
 			commonField: mapping.Field{Name: "c", Format: "url"},
-			expected:    common.MapStr{"c": common.MapStr{"id": "url"}},
+			expected:    mapstr.M{"c": mapstr.M{"id": "url"}},
 			version:     version,
 		},
 		{
 			commonField: mapping.Field{Name: "c", Pattern: "p"},
-			expected:    common.MapStr{"c": common.MapStr{"params": common.MapStr{"pattern": "p"}}},
+			expected:    mapstr.M{"c": mapstr.M{"params": mapstr.M{"pattern": "p"}}},
 			version:     version,
 		},
 		{
@@ -372,10 +373,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				Format:  "url",
 				Pattern: "p",
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id":     "url",
-					"params": common.MapStr{"pattern": "p"},
+					"params": mapstr.M{"pattern": "p"},
 				},
 			},
 			version: version,
@@ -386,10 +387,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				Format:      "url",
 				InputFormat: "string",
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id": "url",
-					"params": common.MapStr{
+					"params": mapstr.M{
 						"inputFormat": "string",
 					},
 				},
@@ -404,10 +405,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				InputFormat:          "string",
 				OpenLinkInCurrentTab: &falsy,
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id": "url",
-					"params": common.MapStr{
+					"params": mapstr.M{
 						"pattern":              "[^-]",
 						"inputFormat":          "string",
 						"openLinkInCurrentTab": false,
@@ -421,7 +422,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				Name:        "c",
 				InputFormat: "string",
 			},
-			expected: common.MapStr{},
+			expected: mapstr.M{},
 			version:  version,
 		},
 		{
@@ -440,10 +441,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					{MinVersion: "6.0.0", Value: "6x.urlTemplate"},
 				},
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id": "url",
-					"params": common.MapStr{
+					"params": mapstr.M{
 						"pattern":              "[^-]",
 						"inputFormat":          "string",
 						"outputFormat":         "float",
@@ -464,8 +465,8 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					{MinVersion: "6.4.0", Value: "6x.urlTemplate"},
 				},
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{"id": "url"},
+			expected: mapstr.M{
+				"c": mapstr.M{"id": "url"},
 			},
 		},
 		{
@@ -478,10 +479,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					{MinVersion: "6.5.1", Value: "6x.urlTemplate"},
 				},
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id": "url",
-					"params": common.MapStr{
+					"params": mapstr.M{
 						"urlTemplate": "4x.urlTemplate",
 					},
 				},
@@ -498,10 +499,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					{MinVersion: "6.2.7", Value: "6.2.7.urlTemplate"},
 				},
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id": "url",
-					"params": common.MapStr{
+					"params": mapstr.M{
 						"urlTemplate": "6.2.0.urlTemplate",
 					},
 				},
@@ -519,10 +520,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					{MinVersion: "5.2.0-rc1", Value: "5.2.0-rc1.urlTemplate"},
 				},
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
+			expected: mapstr.M{
+				"c": mapstr.M{
 					"id": "url",
-					"params": common.MapStr{
+					"params": mapstr.M{
 						"urlTemplate": "5.2.0-rc3.urlTemplate",
 					},
 				},
@@ -601,7 +602,7 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 		trans, _ := newFieldsTransformer(version, test.commonFields, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
-		out := transformed["fields"].([]common.MapStr)
+		out := transformed["fields"].([]mapstr.M)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
@@ -621,7 +622,7 @@ func TestTransformMultiField(t *testing.T) {
 	trans, _ := newFieldsTransformer(version, mapping.Fields{f}, true)
 	transformed, err := trans.transform()
 	assert.NoError(t, err)
-	out := transformed["fields"].([]common.MapStr)
+	out := transformed["fields"].([]mapstr.M)
 	assert.Equal(t, "context", out[0]["name"])
 	assert.Equal(t, "context.keyword", out[1]["name"])
 	assert.Equal(t, "context.text", out[2]["name"])

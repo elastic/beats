@@ -22,12 +22,11 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -78,7 +77,7 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 	}
 
 	event, _ := schema.Apply(fullEvent)
-	e := mb.Event{RootFields: common.MapStr{}}
+	e := mb.Event{RootFields: mapstr.M{}}
 	e.RootFields.Put("service.node.name", serverId)
 
 	if version, ok := event["version"]; ok {

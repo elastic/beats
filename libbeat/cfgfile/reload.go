@@ -27,11 +27,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -73,12 +73,12 @@ type Reload struct {
 // of new Runners
 type RunnerFactory interface {
 	// Create creates a new Runner based on the given configuration.
-	Create(p beat.PipelineConnector, config *common.Config) (Runner, error)
+	Create(p beat.PipelineConnector, config *config.C) (Runner, error)
 
 	// CheckConfig tests if a confiugation can be used to create an input. If it
 	// is not possible to create an input using the configuration, an error must
 	// be returned.
-	CheckConfig(config *common.Config) error
+	CheckConfig(config *config.C) error
 }
 
 // Runner is a simple interface providing a simple way to
@@ -105,7 +105,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(pipeline beat.PipelineConnector, cfg *common.Config) *Reloader {
+func NewReloader(pipeline beat.PipelineConnector, cfg *config.C) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 

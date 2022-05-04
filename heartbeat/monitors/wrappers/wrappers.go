@@ -28,11 +28,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
@@ -92,8 +93,8 @@ func addMonitorMeta(sf stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper
 				id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
 			}
 
-			eventext.MergeEventFields(event, common.MapStr{
-				"monitor": common.MapStr{
+			eventext.MergeEventFields(event, mapstr.M{
+				"monitor": mapstr.M{
 					"id":   id,
 					"name": name,
 					"type": sf.Type,
@@ -109,8 +110,8 @@ func addMonitorTimespan(sf stdfields.StdMonitorFields) jobs.JobWrapper {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
 
-			eventext.MergeEventFields(event, common.MapStr{
-				"monitor": common.MapStr{
+			eventext.MergeEventFields(event, mapstr.M{
+				"monitor": mapstr.M{
 					"timespan": timespan(time.Now(), sf.Schedule, sf.Timeout),
 				},
 			})
@@ -126,8 +127,8 @@ func addServiceName(sf stdfields.StdMonitorFields) jobs.JobWrapper {
 			cont, err := origJob(event)
 
 			if sf.Service.Name != "" {
-				eventext.MergeEventFields(event, common.MapStr{
-					"service": common.MapStr{
+				eventext.MergeEventFields(event, mapstr.M{
+					"service": mapstr.M{
 						"name": sf.Service.Name,
 					},
 				})
@@ -137,14 +138,14 @@ func addServiceName(sf stdfields.StdMonitorFields) jobs.JobWrapper {
 	}
 }
 
-func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) common.MapStr {
+func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) mapstr.M {
 	maxEnd := sched.Next(started)
 
 	if maxEnd.Sub(started) < timeout {
 		maxEnd = started.Add(timeout)
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"gte": started,
 		"lt":  maxEnd,
 	}
@@ -166,8 +167,8 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 				}
 			}
 
-			fields := common.MapStr{
-				"monitor": common.MapStr{
+			fields := mapstr.M{
+				"monitor": mapstr.M{
 					"status": look.Status(err),
 				},
 			}
@@ -184,16 +185,18 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 func addMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
-
 		cont, err := job(event)
+		duration := time.Since(start)
 
 		if event != nil {
-			eventext.MergeEventFields(event, common.MapStr{
-				"monitor": common.MapStr{
-					"duration": look.RTT(time.Since(start)),
+			eventext.MergeEventFields(event, mapstr.M{
+				"monitor": mapstr.M{
+					"duration": look.RTT(duration),
 				},
 			})
 			event.Timestamp = start
+
+			logger.LogRun(event, nil)
 		}
 
 		return cont, err
@@ -260,8 +263,8 @@ func makeAddSummary() jobs.JobWrapper {
 				up := state.up
 				down := state.down
 
-				eventext.MergeEventFields(event, common.MapStr{
-					"summary": common.MapStr{
+				eventext.MergeEventFields(event, mapstr.M{
+					"summary": mapstr.M{
 						"up":   up,
 						"down": down,
 					},

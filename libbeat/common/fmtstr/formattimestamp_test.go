@@ -23,14 +23,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestTimestampFormatString(t *testing.T) {
 	tests := []struct {
 		title        string
 		format       string
-		staticFields common.MapStr
+		staticFields mapstr.M
 		timestamp    time.Time
 		expected     string
 	}{
@@ -51,7 +51,7 @@ func TestTimestampFormatString(t *testing.T) {
 		{
 			"expand field",
 			"%{[key]}",
-			common.MapStr{"key": "value"},
+			mapstr.M{"key": "value"},
 			time.Time{},
 			"value",
 		},
@@ -65,21 +65,21 @@ func TestTimestampFormatString(t *testing.T) {
 		{
 			"expand nested field",
 			"%{[nested.key]}",
-			common.MapStr{"nested": common.MapStr{"key": "value"}},
+			mapstr.M{"nested": mapstr.M{"key": "value"}},
 			time.Time{},
 			"value",
 		},
 		{
 			"test timestamp formatter",
 			"%{[key]}: %{+YYYY.MM.dd}",
-			common.MapStr{"key": "timestamp"},
+			mapstr.M{"key": "timestamp"},
 			time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
 			"timestamp: 2015.05.01",
 		},
 		{
 			"test timestamp formatter",
 			"%{[@timestamp]}: %{+YYYY.MM.dd}",
-			common.MapStr{"key": "timestamp"},
+			mapstr.M{"key": "timestamp"},
 			time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
 			"2015-05-01T20:12:34.000Z: 2015.05.01",
 		},

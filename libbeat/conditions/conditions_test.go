@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCreateNilCondition(t *testing.T) {
@@ -53,10 +53,10 @@ func GetConditions(t *testing.T, configs []Config) []Condition {
 
 var secdTestEvent = &beat.Event{
 	Timestamp: time.Now(),
-	Fields: common.MapStr{
-		"proc": common.MapStr{
+	Fields: mapstr.M{
+		"proc": mapstr.M{
 			"cmdline": "/usr/libexec/secd",
-			"cpu": common.MapStr{
+			"cpu": mapstr.M{
 				"start_time": "Apr10",
 				"system":     1988,
 				"total":      6029,
@@ -78,7 +78,7 @@ var secdTestEvent = &beat.Event{
 
 var httpResponseTestEvent = &beat.Event{
 	Timestamp: time.Now(),
-	Fields: common.MapStr{
+	Fields: mapstr.M{
 		"@timestamp":    "2015-06-11T09:51:23.642Z",
 		"bytes_in":      126,
 		"bytes_out":     28033,
@@ -86,7 +86,7 @@ var httpResponseTestEvent = &beat.Event{
 		"client_port":   42840,
 		"client_proc":   "",
 		"client_server": "mar.local",
-		"http": common.MapStr{
+		"http": mapstr.M{
 			"code":           200,
 			"content_length": 76985,
 			"phrase":         "OK",

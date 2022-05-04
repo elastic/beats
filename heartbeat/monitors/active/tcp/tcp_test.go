@@ -29,17 +29,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
-	config := common.MapStr{
+	config := mapstr.M{
 		"hosts":   host,
 		"ports":   port,
 		"timeout": "1s",
@@ -159,7 +159,7 @@ func TestCheckUp(t *testing.T) {
 	require.NoError(t, err)
 	defer closeEcho() //nolint:errcheck // not needed in test
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",
@@ -179,7 +179,7 @@ func TestCheckUp(t *testing.T) {
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
-					"rtt.validate.us": isdef.IsDuration,
+					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 			}),
 		)),
@@ -192,7 +192,7 @@ func TestCheckDown(t *testing.T) {
 	require.NoError(t, err)
 	defer closeEcho() //nolint:errcheck // not needed in test
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",
@@ -211,7 +211,7 @@ func TestCheckDown(t *testing.T) {
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
-					"rtt.validate.us": isdef.IsDuration,
+					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 				"error": map[string]interface{}{
 					"type":    "validate",

@@ -6,8 +6,8 @@ package httpjson
 
 import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type cursor struct {
@@ -15,7 +15,7 @@ type cursor struct {
 
 	cfg cursorConfig
 
-	state common.MapStr
+	state mapstr.M
 }
 
 func newCursor(cfg cursorConfig, log *logp.Logger) *cursor {
@@ -29,7 +29,7 @@ func (c *cursor) load(cursor *inputcursor.Cursor) {
 	}
 
 	if c.state == nil {
-		c.state = common.MapStr{}
+		c.state = mapstr.M{}
 	}
 
 	if err := cursor.Unpack(&c.state); err != nil {
@@ -46,7 +46,7 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 
 	if c.state == nil {
-		c.state = common.MapStr{}
+		c.state = mapstr.M{}
 	}
 
 	for k, cfg := range c.cfg {
@@ -58,9 +58,9 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 }
 
-func (c *cursor) clone() common.MapStr {
+func (c *cursor) clone() mapstr.M {
 	if c == nil || c.state == nil {
-		return common.MapStr{}
+		return mapstr.M{}
 	}
 	return c.state.Clone()
 }

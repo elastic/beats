@@ -5,8 +5,8 @@
 package provider
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // CLIManager is the interface implemented by each provider to expose a command CLI interface
@@ -29,4 +29,4 @@ type CLIManager interface {
 }
 
 // CLIManagerFactory factory method to call to create a new CLI manager
-type CLIManagerFactory func(*logp.Logger, *common.Config, Provider) (CLIManager, error)
+type CLIManagerFactory func(*logp.Logger, *conf.C, Provider) (CLIManager, error)

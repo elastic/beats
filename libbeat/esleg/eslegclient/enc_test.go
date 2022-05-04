@@ -24,15 +24,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestJSONEncoderMarshalBeatEvent(t *testing.T) {
 	encoder := NewJSONEncoder(nil, true)
 	event := beat.Event{
 		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"field1": "value1",
 		},
 	}
@@ -49,7 +49,7 @@ func TestJSONEncoderMarshalMonitoringEvent(t *testing.T) {
 	encoder := NewJSONEncoder(nil, true)
 	event := report.Event{
 		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"field1": "value1",
 		},
 	}

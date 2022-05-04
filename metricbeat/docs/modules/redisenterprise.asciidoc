@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: redisenterprise
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/redisenterprise/_meta/docs.asciidoc
+
 
 [[metricbeat-module-redisenterprise]]
 [role="xpack"]
@@ -38,6 +40,8 @@ of the monitored servers.
 image::./images/metricbeat-redisenterprise-overview.png[]
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -70,3 +74,4 @@ include::redisenterprise/node.asciidoc[]
 
 include::redisenterprise/proxy.asciidoc[]
 
+:edit_url!:

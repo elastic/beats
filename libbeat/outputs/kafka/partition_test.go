@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type partTestScenario func(*testing.T, bool, sarama.Partitioner) error
@@ -183,14 +185,14 @@ func TestPartitioners(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run test(%v): %v", i, test.title)
 
-		cfg, err := common.NewConfigFrom(test.config)
+		cfg, err := config.NewConfigFrom(test.config)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
 
 		pcfg := struct {
-			Partition map[string]*common.Config `config:"partition"`
+			Partition map[string]*config.C `config:"partition"`
 		}{}
 		err = cfg.Unpack(&pcfg)
 		if err != nil {
@@ -229,7 +231,7 @@ func partTestSimple(N int, makeKey bool) partTestScenario {
 		for i := 0; i <= N; i++ {
 			ts := time.Now()
 
-			event := common.MapStr{
+			event := mapstr.M{
 				"@timestamp": common.Time(ts),
 				"message":    randString(20),
 			}
@@ -281,7 +283,7 @@ func partTestHashInvariant(N int) partTestScenario {
 		for i := 0; i <= N; i++ {
 			ts := time.Now()
 
-			event := common.MapStr{
+			event := mapstr.M{
 				"@timestamp": common.Time(ts),
 				"message":    randString(20),
 			}

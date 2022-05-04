@@ -28,12 +28,13 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 type service struct {
@@ -47,7 +48,7 @@ type service struct {
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
+func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.service")
 
 	config := defaultConfig()
@@ -124,16 +125,16 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var kubeMeta common.MapStr
+	var kubeMeta mapstr.M
 
-	annotations := make(common.MapStr, 0)
+	annotations := make(mapstr.M, 0)
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(common.MapStr)
+		kubeMeta = rawMeta.(mapstr.M)
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			anns, _ := rawAnn.(common.MapStr)
+			anns, _ := rawAnn.(mapstr.M)
 			if len(anns) != 0 {
 				annotations = anns.Clone()
 			}
@@ -141,7 +142,7 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
 		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			nsAnn, _ := rawNsAnn.(common.MapStr)
+			nsAnn, _ := rawNsAnn.(mapstr.M)
 			if len(nsAnn) != 0 {
 				annotations.DeepUpdateNoOverwrite(nsAnn)
 			}
@@ -197,10 +198,10 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	meta := s.metagen.Generate(svc)
 
 	kubemetaMap, _ := meta.GetValue("kubernetes")
-	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta, _ := kubemetaMap.(mapstr.M)
 	kubemeta = kubemeta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
+	annotations := mapstr.M{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
 	}
@@ -209,7 +210,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	if s.namespaceWatcher != nil {
 		if rawNs, ok, err := s.namespaceWatcher.Store().GetByKey(svc.Namespace); ok && err == nil {
 			if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
-				nsAnns := common.MapStr{}
+				nsAnns := mapstr.M{}
 
 				for k, v := range namespace.GetAnnotations() {
 					safemapstr.Put(nsAnns, k, v)

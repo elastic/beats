@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/snyk/_meta/docs.asciidoc
+
 [[filebeat-module-snyk]]
 [role="xpack"]
 
@@ -242,3 +244,4 @@ This is a list of Snyk Vulnerability fields that are mapped to ECS.
 For a description of each field in the module, see the
 <<exported-fields-snyk,exported fields>> section.
 
+edit_url!:

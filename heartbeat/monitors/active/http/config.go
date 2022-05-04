@@ -122,7 +122,7 @@ func defaultConfig() Config {
 // Validate validates of the responseConfig object is valid or not
 func (r *responseConfig) Validate() error {
 	switch strings.ToLower(r.IncludeBody) {
-	case "always", "on_error", "never": //nolint:goconst // not worth it for the dupes
+	case "always", "on_error", "never":
 	default:
 		return fmt.Errorf("unknown option for `include_body`: '%s', please use one of 'always', 'on_error', 'never'", r.IncludeBody)
 	}
@@ -148,7 +148,7 @@ func (r *requestParameters) Validate() error {
 // Validate validates of the compressionConfig object is valid or not
 func (c *compressionConfig) Validate() error {
 	t := strings.ToLower(c.Type)
-	if t != "" && t != "gzip" { //nolint:goconst // not worth it for dupes of gzip
+	if t != "" && t != "gzip" {
 		return fmt.Errorf("compression type '%v' not supported", c.Type)
 	}
 

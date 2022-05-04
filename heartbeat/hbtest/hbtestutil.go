@@ -36,7 +36,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -61,7 +61,9 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 				w.Header().Set("Location", "/somewhere")
 			}
 			w.WriteHeader(status)
-			_, _ = io.WriteString(w, HelloWorldBody)
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			io.WriteString(w, HelloWorldBody)
 		},
 	)
 }
@@ -72,13 +74,15 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 func SizedResponseHandler(bytes int) http.HandlerFunc {
 	var body strings.Builder
 	for i := 0; i < bytes; i++ {
-		_, _ = body.WriteString("x")
+		body.WriteString("x")
 	}
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			_, _ = io.WriteString(w, body.String())
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			io.WriteString(w, body.String())
 		},
 	)
 }
@@ -90,7 +94,9 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 				w.Header().Add(key, val)
 			}
 			w.WriteHeader(status)
-			_, _ = w.Write(body)
+			//nolint:errcheck // There are no new changes to this line but
+			// linter has been activated in the meantime. We'll cleanup separately.
+			w.Write(body)
 		},
 	)
 }
@@ -107,7 +113,9 @@ func RedirectHandler(redirectingPaths map[string]string, body string) http.Handl
 				w.WriteHeader(302)
 			} else {
 				w.WriteHeader(200)
-				_, _ = io.WriteString(w, body)
+				//nolint:errcheck // There are no new changes to this line but
+				// linter has been activated in the meantime. We'll cleanup separately.
+				io.WriteString(w, body)
 			}
 		})
 }
@@ -127,7 +135,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
-	expected := common.MapStr{}
+	expected := mapstr.M{}
 	// This function is well tested independently, so we just test that things match up here.
 	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
 		Version:           tls.VersionTLS13,
@@ -137,20 +145,24 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
-	_, _ = expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
 
 	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
 	// We don't actually care about the exact cipher matching, since we're not testing the TLS
 	// implementation, we trust go there, just that most of the metadata is present
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		_, _ = expected.Put("tls.cipher", isdef.IsString)
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
+		expected.Put("tls.cipher", isdef.IsString)
 	}
 
 	return lookslike.MustCompile(expected)
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
-	expected := common.MapStr{}
+	expected := mapstr.M{}
 	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
 	return lookslike.MustCompile(expected)
 }
@@ -171,7 +183,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
 				"status":      status,
-				"duration.us": isdef.IsDuration,
+				"duration.us": hbtestllext.IsInt64,
 				"id":          isdef.IsNonEmptyString,
 				"name":        isdef.IsString,
 				"type":        typ,
@@ -197,7 +209,7 @@ func ResolveChecks(ip string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"resolve": map[string]interface{}{
 			"ip":     ip,
-			"rtt.us": isdef.IsDuration,
+			"rtt.us": hbtestllext.IsInt64,
 		},
 	})
 }
@@ -246,7 +258,7 @@ func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
 func RespondingTCPChecks() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": isdef.IsDuration})
+	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": hbtestllext.IsInt64})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded
@@ -259,8 +271,9 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// disk, not memory, so this little bit of extra work is worthwhile
 	certFile, err := ioutil.TempFile("", "sslcert")
 	require.NoError(t, err)
-	_, err = certFile.WriteString(x509util.CertToPEMString(cert))
-	require.NoError(t, err)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
 }
 
@@ -269,15 +282,18 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	require.NoError(t, err)
 
 	// No need to start a real server, since this is invalid, we just
+	//nolint:gosec // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
-		MinVersion:   tls.VersionTLS12,
 		Certificates: []tls.Certificate{tlsCert},
 	})
 	require.NoError(t, err)
 
 	srv := &http.Server{Handler: HelloWorldHandler(200)}
 	go func() {
-		_ = srv.Serve(l)
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
+		srv.Serve(l)
 	}()
 
 	host, port, err = net.SplitHostPort(l.Addr().String())

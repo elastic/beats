@@ -9,7 +9,7 @@ processors:
       if: ctx?.winlog?.channel == 'Microsoft-Windows-Sysmon/Operational'
   - pipeline:
       name: '{< IngestPipeline "powershell" >}'
-      if: ctx?.winlog?.channel == 'Windows Powershell'
+      if: ctx?.winlog?.channel == 'Windows PowerShell'
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
       if: ctx?.winlog?.channel == 'Microsoft-Windows-PowerShell/Operational'

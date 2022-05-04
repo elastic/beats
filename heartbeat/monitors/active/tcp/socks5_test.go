@@ -29,9 +29,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 )
 
@@ -61,7 +61,7 @@ func TestSocks5Job(t *testing.T) {
 			defer closeProxy() //nolint:errcheck // intentional discard
 
 			proxyURL := &url.URL{Scheme: "socks5", Host: net.JoinHostPort(proxyIp, fmt.Sprint(proxyPort))}
-			configMap := common.MapStr{
+			configMap := mapstr.M{
 				"hosts":                    host,
 				"ports":                    port,
 				"timeout":                  "1s",
@@ -82,10 +82,10 @@ func TestSocks5Job(t *testing.T) {
 					hbtest.ResolveChecks(ip),
 					lookslike.MustCompile(map[string]interface{}{
 						"tcp": map[string]interface{}{
-							"rtt.validate.us": isdef.IsDuration,
+							"rtt.validate.us": hbtestllext.IsInt64,
 						},
 						"socks5": map[string]interface{}{
-							"rtt.connect.us": isdef.IsDuration,
+							"rtt.connect.us": hbtestllext.IsInt64,
 						},
 					}),
 				)),
@@ -95,8 +95,8 @@ func TestSocks5Job(t *testing.T) {
 	}
 }
 
-func startSocks5Server(_ *testing.T) (host string, port uint16, ip string, close func() error, err error) {
-	host = "localhost" //nolint:goconst // too much indirection
+func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close func() error, err error) {
+	host = "localhost"
 	config := &socks5.Config{}
 	server, err := socks5.New(config)
 	if err != nil {
@@ -113,6 +113,7 @@ func startSocks5Server(_ *testing.T) (host string, port uint16, ip string, close
 		return "", 0, "", nil, err
 	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
+	require.NoError(t, err)
 	if err != nil {
 		listener.Close()
 		return "", 0, "", nil, err

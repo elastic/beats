@@ -72,7 +72,7 @@ func makeEndpoints(hosts []string, ports []uint16, defaultScheme string) (endpoi
 
 func makeURLEndpoint(u *url.URL, ports []uint16) (endpoint, error) {
 	switch u.Scheme {
-	case "tcp", "plain", "tls", "ssl": //nolint:goconst // too DRY
+	case "tcp", "plain", "tls", "ssl":
 	default:
 		err := fmt.Errorf(
 			"'%s' is not a supported connection scheme in '%s', supported schemes are tcp, plain, tls, and ssl",

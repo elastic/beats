@@ -25,7 +25,7 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const sep = '\xff'
@@ -48,7 +48,7 @@ func (ls labels) Swap(i, j int)      { ls[i], ls[j] = ls[j], ls[i] }
 func (ls labels) Less(i, j int) bool { return ls[i].key < ls[j].key }
 
 // LabelHash hashes the labels map and returns a string
-func LabelHash(labelMap common.MapStr) string {
+func LabelHash(labelMap mapstr.M) string {
 	ls := make(labels, len(labelMap))
 
 	for k, v := range labelMap {

@@ -17,21 +17,22 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestSimpleCases(t *testing.T) {
 	type testCase struct {
 		name         string
-		cfg          common.MapStr
+		cfg          mapstr.M
 		tlsServer    bool
 		wantFetchErr bool
 	}
 	testCases := []testCase{
 		{
 			"basics",
-			common.MapStr{
+			mapstr.M{
 				"folder":  "/",
 				"retries": 3,
 			},
@@ -40,7 +41,7 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"targetdir",
-			common.MapStr{
+			mapstr.M{
 				"folder":           "/",
 				"retries":          3,
 				"target_directory": "/tmp/synthetics/blah",
@@ -50,7 +51,7 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"auth success",
-			common.MapStr{
+			mapstr.M{
 				"folder":   "/",
 				"retries":  3,
 				"username": "testuser",
@@ -61,7 +62,7 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"auth failure",
-			common.MapStr{
+			mapstr.M{
 				"folder":   "/",
 				"retries":  3,
 				"username": "testuser",
@@ -72,10 +73,10 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"ssl ignore cert errors",
-			common.MapStr{
+			mapstr.M{
 				"folder":  "/",
 				"retries": 3,
-				"ssl": common.MapStr{
+				"ssl": mapstr.M{
 					"enabled":           "true",
 					"verification_mode": "none",
 				},
@@ -85,10 +86,10 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"bad ssl",
-			common.MapStr{
+			mapstr.M{
 				"folder":  "/",
 				"retries": 3,
-				"ssl": common.MapStr{
+				"ssl": mapstr.M{
 					"enabled":                 "true",
 					"certificate_authorities": []string{},
 				},
@@ -123,7 +124,7 @@ func TestZipUrlWithSameEtag(t *testing.T) {
 	address, teardown := setupTests(false)
 	defer teardown()
 
-	zus, err := dummyZus(common.MapStr{
+	zus, err := dummyZus(mapstr.M{
 		"url":     fmt.Sprintf("%s/fixtures/todos.zip", address),
 		"folder":  "/",
 		"retries": 3,
@@ -145,7 +146,7 @@ func TestZipUrlWithBadUrl(t *testing.T) {
 	_, teardown := setupTests(false)
 	defer teardown()
 
-	zus, err := dummyZus(common.MapStr{
+	zus, err := dummyZus(mapstr.M{
 		"url":     "http://notahost.notadomaintoehutoeuhn",
 		"folder":  "/",
 		"retries": 2,
@@ -209,7 +210,7 @@ func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
 func dummyZus(conf map[string]interface{}) (*ZipURLSource, error) {
 	zus := &ZipURLSource{}
 	y, _ := yaml.Marshal(conf)
-	c, err := common.NewConfigWithYAML(y, string(y))
+	c, err := config.NewConfigWithYAML(y, string(y))
 	if err != nil {
 		return nil, err
 	}

@@ -29,11 +29,12 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints_Service(t *testing.T) {
@@ -49,15 +50,15 @@ func TestGenerateHints_Service(t *testing.T) {
 		// Only kubernetes payload must return only kubernetes as part of the hint
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 				},
@@ -68,30 +69,30 @@ func TestGenerateHints_Service(t *testing.T) {
 		// not.to.include must not be part of hints
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"co.elastic.metrics/period": "10s",
 						"not.to.include":            "true",
 					}),
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"not.to.include":            "true",
 						"co.elastic.metrics/period": "10s",
 					}),
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 				},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 						"period": "10s",
 					},
@@ -103,36 +104,36 @@ func TestGenerateHints_Service(t *testing.T) {
 		// The resultant should have both
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"not.to.include":            "true",
 					}),
-					"namespace_annotations": getNestedAnnotations(common.MapStr{
+					"namespace_annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/period": "10s",
 					}),
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 					"namespace": "ns",
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"not.to.include":            "true",
 					}),
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
-					"namespace_annotations": getNestedAnnotations(common.MapStr{
+					"namespace_annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/period": "10s",
 					}),
 					"namespace": "ns",
 				},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 						"period": "10s",
 					},
@@ -144,40 +145,40 @@ func TestGenerateHints_Service(t *testing.T) {
 		// The resultant should have the ones from service alone
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"co.elastic.metrics/period": "10s",
 						"not.to.include":            "true",
 					}),
-					"namespace_annotations": getNestedAnnotations(common.MapStr{
+					"namespace_annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "dropwizard",
 						"co.elastic.metrics/period": "60s",
 					}),
 					"namespace": "ns",
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"co.elastic.metrics/period": "10s",
 						"not.to.include":            "true",
 					}),
-					"namespace_annotations": getNestedAnnotations(common.MapStr{
+					"namespace_annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "dropwizard",
 						"co.elastic.metrics/period": "60s",
 					}),
 					"namespace": "ns",
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 				},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 						"period": "10s",
 					},
@@ -189,30 +190,30 @@ func TestGenerateHints_Service(t *testing.T) {
 		// The resultant should have honored the namespace defaults
 		{
 			event: bus.Event{
-				"kubernetes": common.MapStr{
-					"namespace_annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"namespace_annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"co.elastic.metrics/period": "10s",
 					}),
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 					"namespace": "ns",
 				},
 			},
 			result: bus.Event{
-				"kubernetes": common.MapStr{
-					"namespace_annotations": getNestedAnnotations(common.MapStr{
+				"kubernetes": mapstr.M{
+					"namespace_annotations": getNestedAnnotations(mapstr.M{
 						"co.elastic.metrics/module": "prometheus",
 						"co.elastic.metrics/period": "10s",
 					}),
-					"service": common.MapStr{
+					"service": mapstr.M{
 						"name": "foobar",
 					},
 					"namespace": "ns",
 				},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "prometheus",
 						"period": "10s",
 					},
@@ -281,24 +282,24 @@ func TestEmitEvent_Service(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
 					"namespace":   "default",
-					"annotations": common.MapStr{},
+					"annotations": mapstr.M{},
 				},
-				"meta": common.MapStr{
-					"kubernetes": common.MapStr{
+				"meta": mapstr.M{
+					"kubernetes": mapstr.M{
 						"namespace": "default",
-						"service": common.MapStr{
+						"service": mapstr.M{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*conf.C{},
 			},
 		},
 		{
@@ -368,24 +369,24 @@ func TestEmitEvent_Service(t *testing.T) {
 				"host":     "",
 				"id":       uid,
 				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"service": common.MapStr{
+				"kubernetes": mapstr.M{
+					"service": mapstr.M{
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
 					"namespace":   "default",
-					"annotations": common.MapStr{},
+					"annotations": mapstr.M{},
 				},
-				"meta": common.MapStr{
-					"kubernetes": common.MapStr{
+				"meta": mapstr.M{
+					"kubernetes": mapstr.M{
 						"namespace": "default",
-						"service": common.MapStr{
+						"service": mapstr.M{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 						},
 					},
 				},
-				"config": []*common.Config{},
+				"config": []*conf.C{},
 			},
 		},
 	}
@@ -397,7 +398,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil, client)
+			metaGen := metadata.NewServiceMetadataGenerator(conf.NewConfig(), nil, nil, client)
 
 			p := &Provider{
 				config:    defaultConfig(),

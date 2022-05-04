@@ -21,9 +21,9 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type Encoder struct {
@@ -35,7 +35,7 @@ type Config struct {
 }
 
 func init() {
-	codec.RegisterType("format", func(_ beat.Info, cfg *common.Config) (codec.Codec, error) {
+	codec.RegisterType("format", func(_ beat.Info, cfg *config.C) (codec.Codec, error) {
 		config := Config{}
 		if cfg == nil {
 			return nil, errors.New("empty format codec configuration")

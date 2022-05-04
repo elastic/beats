@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // RemoveIndexPattern removes the index pattern entry from a given dashboard export
@@ -57,7 +57,7 @@ func removeLineIfIndexPattern(line []byte) ([]byte, error) {
 		return line, nil
 	}
 
-	var r common.MapStr
+	var r mapstr.M
 	// Full struct need to not loose any data
 	err := json.Unmarshal(line, &r)
 	if err != nil {

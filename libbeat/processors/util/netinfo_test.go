@@ -15,42 +15,42 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package util
 
 import (
+	"reflect"
+	"sort"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestMapStrPointer(t *testing.T) {
-	data := MapStr{
-		"foo": "bar",
+func TestUnique(t *testing.T) {
+	var tests = [][]string{
+		{},
+		{"a"},
+		{"a", "a"},
+		{"a", "b"},
+		{"b", "a"},
+		{"a", "b", "c"},
+		{"c", "b", "a"},
+		{"c", "a", "a", "b", "c", "a"},
 	}
 
-	p := NewMapStrPointer(data)
-	assert.Equal(t, p.Get(), data)
-
-	newData := MapStr{
-		"new": "data",
-	}
-	p.Set(newData)
-	assert.Equal(t, p.Get(), newData)
-}
-
-func BenchmarkMapStrPointer(b *testing.B) {
-	p := NewMapStrPointer(MapStr{"counter": 0})
-	go func() {
-		counter := 0
-		for {
-			counter++
-			p.Set(MapStr{"counter": counter})
-			time.Sleep(10 * time.Millisecond)
+	for i, test := range tests {
+		// Allocating naive implementation of unique.
+		seen := make(map[string]bool)
+		for _, e := range test {
+			seen[e] = true
 		}
-	}()
+		want := make([]string, 0, len(seen))
+		for e := range seen {
+			want = append(want, e)
+		}
+		sort.Strings(want)
 
-	for n := 0; n < b.N; n++ {
-		_ = p.Get()
+		got := unique(test)
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("unexpected result for test %d: got:%q want:%q", i, got, want)
+		}
 	}
 }

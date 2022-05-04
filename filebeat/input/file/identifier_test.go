@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type stateTestCase struct {
@@ -193,7 +193,7 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 }
 
 func newMockInodeMarkerIdentifier() StateIdentifier {
-	cfg := common.MustNewConfigFrom(map[string]string{"path": filepath.Join("testdata", "identifier_marker")})
+	cfg := conf.MustNewConfigFrom(map[string]string{"path": filepath.Join("testdata", "identifier_marker")})
 	i, err := newINodeMarkerIdentifier(cfg)
 	fmt.Println(err)
 	return i

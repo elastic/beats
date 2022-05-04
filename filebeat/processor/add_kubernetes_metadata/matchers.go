@@ -23,14 +23,15 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
 	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 
 	// Add a container indexer config by default.
 	add_kubernetes_metadata.Indexing.AddDefaultIndexerConfig(add_kubernetes_metadata.ContainerIndexerName, *cfg)
@@ -50,7 +51,7 @@ type LogPathMatcher struct {
 	logger       *logp.Logger
 }
 
-func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
 		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`
@@ -80,7 +81,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
 
-func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
+func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 	value, err := event.GetValue("log.file.path")
 	if err != nil {
 		f.logger.Debugf("Error extracting log.file.path from the event: %s.", event)

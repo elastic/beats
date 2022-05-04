@@ -23,16 +23,16 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestURLDecode(t *testing.T) {
 	var testCases = []struct {
 		description string
 		config      urlDecodeConfig
-		Input       common.MapStr
-		Output      common.MapStr
+		Input       mapstr.M
+		Output      mapstr.M
 		error       bool
 	}{
 		{
@@ -44,10 +44,10 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "correct%20data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct%20data",
 				"field2": "correct data",
 			},
@@ -63,11 +63,11 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "correct%20field1",
 				"field3": "correct%20field3",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct%20field1",
 				"field2": "correct field1",
 				"field3": "correct%20field3",
@@ -84,10 +84,10 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "correct%20data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct data",
 			},
 			error: false,
@@ -101,10 +101,10 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "correct%20data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct data",
 			},
 			error: false,
@@ -118,12 +118,12 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Hello G%ünter",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "Hello G%ünter",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "failed to decode fields in urldecode processor: error trying to URL-decode Hello G%ünter: invalid URL escape \"%ü\"",
 				},
 			},
@@ -138,10 +138,10 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   false,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "Hello G%ünter",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "Hello G%ünter",
 			},
 			error: false,
@@ -155,12 +155,12 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: false,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "correct%20data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct%20data",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "failed to decode fields in urldecode processor: could not fetch value for key: field2, Error: key not found",
 				},
 			},
@@ -175,10 +175,10 @@ func TestURLDecode(t *testing.T) {
 				IgnoreMissing: true,
 				FailOnError:   true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"field1": "correct%20data",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"field1": "correct%20data",
 			},
 			error: false,
@@ -226,11 +226,11 @@ func TestURLDecode(t *testing.T) {
 		}
 
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"field": "correct%20data",
 			},
 		}
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"field":  "correct%20data",
 			"target": "correct data",
 		}

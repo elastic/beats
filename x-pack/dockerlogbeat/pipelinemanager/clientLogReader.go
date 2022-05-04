@@ -15,11 +15,11 @@ import (
 	"github.com/docker/docker/api/types/backend"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	helper "github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ClientLogger collects logs for a docker container logging to stdout and stderr, using the FIFO provided by the docker daemon.
@@ -33,7 +33,7 @@ type ClientLogger struct {
 	// ContainerMeta is the metadata object for the container we get from docker
 	ContainerMeta logger.Info
 	// ContainerECSMeta is a container metadata object appended to every event
-	ContainerECSMeta common.MapStr
+	ContainerECSMeta mapstr.M
 	// logFile is the FIFO reader that reads from the docker container stdio
 	logFile *pipereader.PipeReader
 	// client is the libbeat client object that sends logs upstream
@@ -107,7 +107,7 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 }
 
 // constructECSContainerData creates an ES-ready MapString object with container metadata.
-func constructECSContainerData(metadata logger.Info) common.MapStr {
+func constructECSContainerData(metadata logger.Info) mapstr.M {
 
 	var containerImageName, containerImageTag string
 	if idx := strings.IndexRune(metadata.ContainerImageName, ':'); idx >= 0 {
@@ -115,11 +115,11 @@ func constructECSContainerData(metadata logger.Info) common.MapStr {
 		containerImageTag = string([]rune(metadata.ContainerImageName)[idx+1:])
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"labels": helper.DeDotLabels(metadata.ContainerLabels, true),
 		"id":     metadata.ContainerID,
 		"name":   helper.ExtractContainerName([]string{metadata.ContainerName}),
-		"image": common.MapStr{
+		"image": mapstr.M{
 			"name": containerImageName,
 			"tag":  containerImageTag,
 		},
@@ -142,10 +142,10 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 
 		cl.client.Publish(beat.Event{
 			Timestamp: time.Unix(0, entry.TimeNano),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message":   line,
 				"container": cl.ContainerECSMeta,
-				"host": common.MapStr{
+				"host": mapstr.M{
 					"name": cl.hostname,
 				},
 			},

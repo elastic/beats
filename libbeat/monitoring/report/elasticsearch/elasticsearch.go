@@ -36,6 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type reporter struct {
@@ -45,7 +47,7 @@ type reporter struct {
 	checkRetry time.Duration
 
 	// event metadata
-	beatMeta common.MapStr
+	beatMeta mapstr.M
 	tags     []string
 
 	// pipeline
@@ -95,7 +97,7 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) (report.Reporter, error) {
+func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
 	log := logp.NewLogger(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
@@ -147,7 +149,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
-	processing, err := processing.MakeDefaultSupport(true)(beat, log, common.NewConfig())
+	processing, err := processing.MakeDefaultSupport(true)(beat, log, conf.NewConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +263,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			continue
 		}
 
-		fields := common.MapStr{
+		fields := mapstr.M{
 			"beat": r.beatMeta,
 			prefix: snapshot,
 		}
@@ -269,7 +271,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			fields["tags"] = r.tags
 		}
 
-		meta := common.MapStr{
+		meta := mapstr.M{
 			"type":        "beats_" + namespace,
 			"interval_ms": int64(period / time.Millisecond),
 			// Converting to seconds as interval only accepts `s` as unit
@@ -321,8 +323,8 @@ func closing(log *logp.Logger, c io.Closer) {
 	}
 }
 
-func makeMeta(beat beat.Info) common.MapStr {
-	return common.MapStr{
+func makeMeta(beat beat.Info) mapstr.M {
+	return mapstr.M{
 		"type":    beat.Beat,
 		"version": beat.Version,
 		"name":    beat.Name,

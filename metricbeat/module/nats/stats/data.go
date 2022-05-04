@@ -22,11 +22,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/nats/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -66,7 +66,7 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var metricsetMetrics common.MapStr
+	var metricsetMetrics mapstr.M
 	var inInterface map[string]interface{}
 
 	err := json.Unmarshal(content, &inInterface)
@@ -87,7 +87,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving http_req_stats key")
 	}
-	httpStats, ok := d.(common.MapStr)
+	httpStats, ok := d.(mapstr.M)
 	if !ok {
 		return errors.Wrap(err, "failure casting http_req_stats to common.Mapstr")
 
@@ -97,9 +97,9 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure deleting http_req_stats key")
 
 	}
-	metricsetMetrics["http"] = common.MapStr{
-		"req_stats": common.MapStr{
-			"uri": common.MapStr{
+	metricsetMetrics["http"] = mapstr.M{
+		"req_stats": mapstr.M{
+			"uri": mapstr.M{
 				"root":   httpStats["root_uri"],
 				"connz":  httpStats["connz_uri"],
 				"routez": httpStats["routez_uri"],

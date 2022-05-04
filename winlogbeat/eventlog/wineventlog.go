@@ -33,13 +33,13 @@ import (
 	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -396,8 +396,17 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
 	}
 
+	md, err := win.NewPublisherMetadataStore(win.NilHandle, e.Provider.Name, logp.L())
+	if err != nil {
+		// Return an empty store on error (can happen in cases where the
+		// log was forwarded and the provider doesn't exist on collector).
+		md = win.NewEmptyPublisherMetadataStore(e.Provider.Name, logp.L())
+		logp.Warn("failed to load publisher metadata for %v "+
+			"(returning an empty metadata store): %v", e.Provider.Name, err)
+	}
+
 	// Get basic string values for raw fields.
-	winevent.EnrichRawValuesWithNames(nil, &e)
+	winevent.EnrichRawValuesWithNames(&md.WinMeta, &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
@@ -423,14 +432,14 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	return r
 }
 
-func newEventLogging(options *common.Config) (EventLog, error) {
+func newEventLogging(options *conf.C) (EventLog, error) {
 	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
 	return newWinEventLog(options)
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLog(options *common.Config) (EventLog, error) {
+func newWinEventLog(options *conf.C) (EventLog, error) {
 	var xmlQuery string
 	var err error
 

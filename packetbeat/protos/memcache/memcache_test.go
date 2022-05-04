@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type memcacheTest struct {
@@ -75,9 +76,9 @@ func makeBinMessage(
 	return binParseNoFail(t, buf.Bytes())
 }
 
-func makeTransactionEvent(t *testing.T, trans *transaction) common.MapStr {
+func makeTransactionEvent(t *testing.T, trans *transaction) mapstr.M {
 	event := beat.Event{
-		Fields: common.MapStr{},
+		Fields: mapstr.M{},
 	}
 	err := trans.Event(&event)
 	if err != nil {

@@ -19,9 +19,9 @@ package actions
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type dropEvent struct{}
@@ -33,7 +33,7 @@ func init() {
 
 var dropEventsSingleton = (*dropEvent)(nil)
 
-func newDropEvent(c *common.Config) (processors.Processor, error) {
+func newDropEvent(c *conf.C) (processors.Processor, error) {
 	return dropEventsSingleton, nil
 }
 

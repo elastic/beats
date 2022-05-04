@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: cockroachdb
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/cockroachdb/_meta/docs.asciidoc
+
 
 [[metricbeat-module-cockroachdb]]
 [role="xpack"]
@@ -27,6 +29,8 @@ of the monitored servers.
 
 image::./images/metricbeat-cockroachdb-overview.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -59,3 +63,4 @@ The following metricsets are available:
 
 include::cockroachdb/status.asciidoc[]
 
+:edit_url!:

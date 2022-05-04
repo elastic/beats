@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var _ protos.UDPPlugin = &dhcpv4Plugin{}
@@ -96,35 +97,35 @@ func TestParseDHCPRequest(t *testing.T) {
 
 	expected := beat.Event{
 		Timestamp: pkt.Ts,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":   "dhcpv4",
 			"status": "OK",
-			"source": common.MapStr{
+			"source": mapstr.M{
 				"ip":    "0.0.0.0",
 				"port":  68,
 				"bytes": 272,
 			},
-			"destination": common.MapStr{
+			"destination": mapstr.M{
 				"ip":   "255.255.255.255",
 				"port": 67,
 			},
-			"client": common.MapStr{
+			"client": mapstr.M{
 				"ip":    "0.0.0.0",
 				"port":  68,
 				"bytes": 272,
 			},
-			"server": common.MapStr{
+			"server": mapstr.M{
 				"ip":   "255.255.255.255",
 				"port": 67,
 			},
-			"event": common.MapStr{
+			"event": mapstr.M{
 				"category": []string{"network"},
 				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
 				"start":    pkt.Ts,
 			},
-			"network": common.MapStr{
+			"network": mapstr.M{
 				"type":         "ipv4",
 				"direction":    "unknown",
 				"transport":    "udp",
@@ -132,10 +133,10 @@ func TestParseDHCPRequest(t *testing.T) {
 				"bytes":        272,
 				"community_id": "1:t9O1j0qj71O4wJM7gnaHtgmfev8=",
 			},
-			"related": common.MapStr{
+			"related": mapstr.M{
 				"ip": []string{"0.0.0.0", "255.255.255.255"},
 			},
-			"dhcpv4": common.MapStr{
+			"dhcpv4": mapstr.M{
 				"client_mac":     "00:0b:82:01:fc:42",
 				"flags":          "unicast",
 				"hardware_type":  "Ethernet",
@@ -143,7 +144,7 @@ func TestParseDHCPRequest(t *testing.T) {
 				"op_code":        "bootrequest",
 				"seconds":        0,
 				"transaction_id": "0x00003d1e",
-				"option": common.MapStr{
+				"option": mapstr.M{
 					"message_type": "request",
 					"parameter_request_list": []string{
 						"Subnet Mask",
@@ -181,35 +182,35 @@ func TestParseDHCPACK(t *testing.T) {
 
 	expected := beat.Event{
 		Timestamp: pkt.Ts,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type":   "dhcpv4",
 			"status": "OK",
-			"source": common.MapStr{
+			"source": mapstr.M{
 				"ip":    "192.168.0.1",
 				"port":  67,
 				"bytes": 300,
 			},
-			"destination": common.MapStr{
+			"destination": mapstr.M{
 				"ip":   "192.168.0.10",
 				"port": 68,
 			},
-			"client": common.MapStr{
+			"client": mapstr.M{
 				"ip":   "192.168.0.10",
 				"port": 68,
 			},
-			"server": common.MapStr{
+			"server": mapstr.M{
 				"ip":    "192.168.0.1",
 				"port":  67,
 				"bytes": 300,
 			},
-			"event": common.MapStr{
+			"event": mapstr.M{
 				"category": []string{"network"},
 				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
 				"start":    pkt.Ts,
 			},
-			"network": common.MapStr{
+			"network": mapstr.M{
 				"type":         "ipv4",
 				"direction":    "unknown",
 				"transport":    "udp",
@@ -217,10 +218,10 @@ func TestParseDHCPACK(t *testing.T) {
 				"bytes":        300,
 				"community_id": "1:VbRSZnvQqvLiQRhYHLrdVI17sLQ=",
 			},
-			"related": common.MapStr{
+			"related": mapstr.M{
 				"ip": []string{"192.168.0.1", "192.168.0.10"},
 			},
-			"dhcpv4": common.MapStr{
+			"dhcpv4": mapstr.M{
 				"assigned_ip":    "192.168.0.10",
 				"client_mac":     "00:0b:82:01:fc:42",
 				"flags":          "unicast",
@@ -229,7 +230,7 @@ func TestParseDHCPACK(t *testing.T) {
 				"op_code":        "bootreply",
 				"seconds":        0,
 				"transaction_id": "0x00003d1e",
-				"option": common.MapStr{
+				"option": mapstr.M{
 					"ip_address_lease_time_sec": 3600,
 					"message_type":              "ack",
 					"rebinding_time_sec":        3150,

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: windows
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/windows/_meta/docs.asciidoc
+
 
 [[metricbeat-module-windows]]
 == Windows module
@@ -19,6 +21,8 @@ metricset is `perfmon` which collects Windows performance counter values.
 
 
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -63,3 +67,4 @@ include::windows/perfmon.asciidoc[]
 
 include::windows/service.asciidoc[]
 
+:edit_url!:

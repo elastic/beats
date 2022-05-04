@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type Context struct {
@@ -34,7 +34,7 @@ type Context struct {
 }
 
 // Factory is used to register functions creating new Input instances.
-type Factory = func(config *common.Config, connector channel.Connector, context Context) (Input, error)
+type Factory = func(config *conf.C, connector channel.Connector, context Context) (Input, error)
 
 var registry = make(map[string]Factory)
 

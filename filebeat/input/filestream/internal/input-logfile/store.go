@@ -222,7 +222,10 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			continue
 		}
 
-		res.lock.Lock()
+		if !res.lock.TryLock() {
+			s.store.log.Infof("cannot lock '%s', will not update registry for it", key)
+			continue
+		}
 
 		newKey, updatedMeta := getNewID(res)
 		if len(newKey) > 0 && res.internalState.TTL > 0 {

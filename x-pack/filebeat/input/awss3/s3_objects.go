@@ -20,12 +20,12 @@ import (
 	"time"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -324,26 +324,26 @@ func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.
 func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": message,
-			"log": common.MapStr{
+			"log": mapstr.M{
 				"offset": offset,
-				"file": common.MapStr{
+				"file": mapstr.M{
 					"path": p.s3RequestURL,
 				},
 			},
-			"aws": common.MapStr{
-				"s3": common.MapStr{
-					"bucket": common.MapStr{
+			"aws": mapstr.M{
+				"s3": mapstr.M{
+					"bucket": mapstr.M{
 						"name": p.s3Obj.S3.Bucket.Name,
 						"arn":  p.s3Obj.S3.Bucket.ARN,
 					},
-					"object": common.MapStr{
+					"object": mapstr.M{
 						"key": p.s3Obj.S3.Object.Key,
 					},
 				},
 			},
-			"cloud": common.MapStr{
+			"cloud": mapstr.M{
 				"provider": p.s3Obj.Provider,
 				"region":   p.s3Obj.AWSRegion,
 			},
@@ -386,7 +386,7 @@ func isStreamGzipped(r *bufio.Reader) (bool, error) {
 }
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.
-func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
+func s3Metadata(resp *s3.GetObjectResponse, keys ...string) mapstr.M {
 	if len(keys) == 0 {
 		return nil
 	}
@@ -441,7 +441,7 @@ func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
 	}
 
 	// Select the matching headers from the config.
-	metadata := common.MapStr{}
+	metadata := mapstr.M{}
 	for _, key := range keys {
 		key = strings.ToLower(key)
 

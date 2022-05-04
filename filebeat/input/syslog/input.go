@@ -29,8 +29,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Parser is generated from a ragel state machine using the following command:
@@ -106,7 +107,7 @@ type Input struct {
 
 // NewInput creates a new syslog input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
@@ -204,13 +205,13 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 }
 
 func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
-	f := common.MapStr{
+	f := mapstr.M{
 		"message": strings.TrimRight(ev.Message(), "\n"),
 	}
 
-	syslog := common.MapStr{}
-	event := common.MapStr{}
-	process := common.MapStr{}
+	syslog := mapstr.M{}
+	event := mapstr.M{}
+	process := mapstr.M{}
 
 	if ev.Hostname() != "" {
 		f["hostname"] = ev.Hostname()
@@ -283,7 +284,7 @@ func parseAndCreateEvent3164(data []byte, metadata inputsource.NetworkMetadata, 
 	ParserRFC3164(data, ev)
 	if !ev.IsValid() {
 		log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
-		return newBeatEvent(time.Now(), metadata, common.MapStr{
+		return newBeatEvent(time.Now(), metadata, mapstr.M{
 			"message": string(data),
 		})
 	}
@@ -295,17 +296,17 @@ func parseAndCreateEvent5424(data []byte, metadata inputsource.NetworkMetadata, 
 	ParserRFC5424(data, ev)
 	if !ev.IsValid() {
 		log.Errorw("can't parse event as syslog rfc5424", "message", string(data))
-		return newBeatEvent(time.Now(), metadata, common.MapStr{
+		return newBeatEvent(time.Now(), metadata, mapstr.M{
 			"message": string(data),
 		})
 	}
 	return createEvent(ev, metadata, timezone, log)
 }
 
-func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fields common.MapStr) beat.Event {
+func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fields mapstr.M) beat.Event {
 	event := beat.Event{
 		Timestamp: timestamp,
-		Meta: common.MapStr{
+		Meta: mapstr.M{
 			"truncated": metadata.Truncated,
 		},
 		Fields: fields,

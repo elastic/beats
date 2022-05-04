@@ -24,7 +24,6 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
@@ -34,6 +33,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -105,7 +106,7 @@ func defaultConfig() config {
 }
 
 // New creates a new processor from the provided configuration, or an error if the configuration is invalid.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *conf.C) (processors.Processor, error) {
 	cfg := defaultConfig()
 
 	if err := c.Unpack(&cfg); err != nil {
@@ -150,7 +151,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *processor) run(event *beat.Event) error {
 	value, err := event.GetValue(p.Field)
 	if err != nil {
-		if errors.Is(err, common.ErrKeyNotFound) {
+		if errors.Is(err, mapstr.ErrKeyNotFound) {
 			if p.IgnoreMissing {
 				return nil
 			}
@@ -193,7 +194,7 @@ func (p *processor) String() string {
 // value will be converted to a string slice. If the existing field is a string slice or
 // interface slice, then the new value will be appended. If the existing value is some
 // other type, then this function does nothing.
-func appendStringField(m common.MapStr, field, value string) {
+func appendStringField(m mapstr.M, field, value string) {
 	v, _ := m.GetValue(field)
 	switch t := v.(type) {
 	case nil:

@@ -29,9 +29,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
@@ -54,7 +54,7 @@ type WrappedClient struct {
 type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
-	config         *common.Config
+	config         *conf.C
 	addTask        scheduler.AddTask
 	configuredJobs []*configuredJob
 	enabled        bool
@@ -81,7 +81,7 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
+func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
 	_, err := newMonitor(config, registrar, nil, nil, nil, false)
 
 	return err
@@ -90,7 +90,7 @@ func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) err
 // newMonitor creates a new monitor, without leaking resources in the event of an error.
 // you do not need to call Stop(), it will be safely garbage collected unless Start is called.
 func newMonitor(
-	config *common.Config,
+	config *conf.C,
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	taskAdder scheduler.AddTask,
@@ -107,7 +107,7 @@ func newMonitor(
 // newMonitorUnsafe is the unsafe way of creating a new monitor because it may return a monitor instance along with an
 // error without freeing monitor resources. m.Stop() must always be called on a non-nil monitor to free resources.
 func newMonitorUnsafe(
-	config *common.Config,
+	config *conf.C,
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	addTask scheduler.AddTask,
@@ -204,7 +204,7 @@ func (m *Monitor) configHash() (uint64, error) {
 	return hash, nil
 }
 
-func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
+func (m *Monitor) makeTasks(config *conf.C, jobs []jobs.Job) ([]*configuredJob, error) {
 	mtConf := jobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
 		return nil, fmt.Errorf("invalid config, could not unpack monitor config: %w", err)
