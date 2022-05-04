@@ -6,6 +6,7 @@ package performance
 
 import (
 	"context"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -59,7 +60,7 @@ func (m *MetricSet) transform(in *extractedData) []mb.Event {
 	events := make([]mb.Event, 0)
 
 	for _, v := range bufferCache {
-		events = append(events, mb.Event{MetricSetFields: v})
+		events = append(events, mb.Event{MetricSetFields: v, Host: ServiceNameExtractor(m.BaseMetricSet.HostData().URI)})
 	}
 
 	events = append(events, mb.Event{MetricSetFields: cursorEvent})
@@ -69,4 +70,12 @@ func (m *MetricSet) transform(in *extractedData) []mb.Event {
 	}
 
 	return events
+}
+
+// ServiceName extracts ip address from host.
+func ServiceNameExtractor(host string) string {
+	address := host[strings.LastIndex(host, `connectString="`) : len(host)-1]
+	address = strings.TrimPrefix(address, `connectString="`)
+
+	return address
 }

@@ -6,6 +6,7 @@ package tablespace
 
 import (
 	"context"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -61,7 +62,7 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 
 	events := make([]mb.Event, 0)
 	for _, v := range out {
-		events = append(events, mb.Event{MetricSetFields: v})
+		events = append(events, mb.Event{MetricSetFields: v, Host: ServiceNameExtractor(m.BaseMetricSet.HostData().URI)})
 	}
 
 	return events, nil
@@ -125,4 +126,11 @@ func (m *MetricSet) addDataFileData(d *dataFile, output map[string]mapstr.M) {
 	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.max.bytes", &oracle.Int64Value{NullInt64: d.MaxFileSizeBytes})
 	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.free.bytes", &oracle.Int64Value{NullInt64: d.AvailableForUserBytes})
 
+}
+
+// ServiceName extracts ip address from host.
+func ServiceNameExtractor(host string) string {
+	address := host[strings.LastIndex(host, `connectString="`) : len(host)-1]
+	address = strings.TrimPrefix(address, `connectString="`)
+	return address
 }
