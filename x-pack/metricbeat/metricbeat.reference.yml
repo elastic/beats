@@ -1201,7 +1201,6 @@ metricbeat.modules:
   # username: ""
   # password: ""
 
-
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:

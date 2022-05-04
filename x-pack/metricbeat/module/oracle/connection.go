@@ -12,7 +12,6 @@ import (
 	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 // ConnectionDetails contains all possible data that can be used to create a connection with
@@ -22,11 +21,6 @@ type ConnectionDetails struct {
 	Password string   `config:"password"`
 	Hosts    []string `config:"hosts"    validate:"required"`
 }
-
-// HostParser parsers the host value as a URL
-var HostParser = parse.URLHostParserBuilder{
-	DefaultScheme: "oracle",
-}.Build()
 
 func init() {
 	// Register the ModuleFactory function for the "oracle" module.
@@ -39,7 +33,7 @@ func init() {
 func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
 	params, err := godror.ParseDSN(c.Hosts[0])
 	if err != nil {
-		return nil, fmt.Errorf("error trying to parse URL in field 'hosts': %w", err)
+		return nil, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}
 
 	// If username and password are given in separate fields in the configuration then use them to authenticate

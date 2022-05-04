@@ -208,7 +208,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
-	github.com/go-logr/logr v1.2.2 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
@@ -293,7 +293,11 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-require github.com/containerd/containerd v1.6.1 // indirect
+require (
+	github.com/containerd/containerd v1.6.1 // indirect
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
+	github.com/godror/knownpb v0.1.0 // indirect
+)
 
 replace (
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
@@ -306,7 +310,7 @@ replace (
 	github.com/elastic/go-ucfg => github.com/elastic/go-ucfg v0.8.3 // starting with v0.8.4 we need to re-write a lot of tests
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
-	github.com/godror/godror => github.com/godror/godror v0.10.4 // updating to v0.24.2 caused a breaking change
+	github.com/godror/godror => github.com/godror/godror v0.33.0
 	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
