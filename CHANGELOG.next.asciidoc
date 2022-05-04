@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 
 *Packetbeat*
 
