@@ -2024,7 +2024,7 @@ type: keyword
 --
 
 [[exported-fields-aws-cloudwatch]]
-== aws-cloudwatch fields
+== AWS CloudWatch fields
 
 Fields from AWS CloudWatch logs.
 
