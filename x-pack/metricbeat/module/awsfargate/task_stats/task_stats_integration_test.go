@@ -16,9 +16,43 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
+
+func TestFetch(t *testing.T) {
+	config := map[string]interface{}{
+		"period":     "10s",
+		"module":     "awsfargate",
+		"metricsets": []string{"task_stats"},
+	}
+
+	os.Setenv("ECS_CONTAINER_METADATA_URI_V4", "1.2.3.4")
+
+	taskStatsResp, err := buildResponse("./_meta/testdata/task_stats.json")
+	assert.NoError(t, err)
+
+	byteTaskResp, err := buildResponse("./_meta/testdata/task.json")
+	assert.NoError(t, err)
+
+	taskStatsOutput, err := getTaskStats(taskStatsResp)
+	assert.NoError(t, err)
+
+	taskOutput, err := getTask(byteTaskResp)
+	assert.NoError(t, err)
+
+	formattedStats := getStatsList(taskStatsOutput, taskOutput)
+	assert.Equal(t, 1, len(formattedStats))
+	event := createEvent(&formattedStats[0])
+
+	// Build a metricset to test the event
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	// The goal here is to make sure every element inside the
+	// event has a matching field ("no field left behind").
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, []mb.Event{event})
+}
 
 func TestData(t *testing.T) {
 	if !*flags.DataFlag {
@@ -34,27 +68,11 @@ func TestData(t *testing.T) {
 	os.Setenv("ECS_CONTAINER_METADATA_URI_V4", "1.2.3.4")
 	m := mbtest.NewFetcher(t, config)
 
-	taskStatsFile, err := os.Open("./_meta/testdata/task_stats.json")
-	assert.NoError(t, err)
-	defer taskStatsFile.Close()
-
-	byteTaskStats, err := ioutil.ReadAll(taskStatsFile)
+	taskStatsResp, err := buildResponse("./_meta/testdata/task_stats.json")
 	assert.NoError(t, err)
 
-	taskStatsResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader(byteTaskStats)),
-	}
-
-	taskFile, err := os.Open("./_meta/testdata/task.json")
+	byteTaskResp, err := buildResponse("./_meta/testdata/task.json")
 	assert.NoError(t, err)
-	defer taskStatsFile.Close()
-
-	byteTask, err := ioutil.ReadAll(taskFile)
-	assert.NoError(t, err)
-
-	byteTaskResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader(byteTask)),
-	}
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	assert.NoError(t, err)
@@ -68,4 +86,17 @@ func TestData(t *testing.T) {
 	standardizeEvent := m.StandardizeEvent(event)
 
 	mbtest.WriteEventToDataJSON(t, standardizeEvent, "")
+}
+
+// buildResponse is a test helper that loads the content of `filename` and returns
+// it as the body of a `http.Response`.
+func buildResponse(filename string) (*http.Response, error) {
+	fileContent, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return &http.Response{
+		Body: ioutil.NopCloser(bytes.NewReader(fileContent)),
+	}, nil
 }
