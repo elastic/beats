@@ -44,7 +44,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 		"ports":   port,
 		"timeout": "1s",
 	}
-	return testTCPConfigCheck(t, config, host, port)
+	return testTCPConfigCheck(t, config)
 }
 
 // TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
@@ -157,9 +157,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 func TestCheckUp(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	defer closeEcho()
+	defer closeEcho() //nolint:errcheck // not needed in test
 
 	configMap := mapstr.M{
 		"hosts":         host,
@@ -169,7 +167,7 @@ func TestCheckUp(t *testing.T) {
 		"check.send":    "echo123",
 	}
 
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -192,9 +190,7 @@ func TestCheckUp(t *testing.T) {
 func TestCheckDown(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	defer closeEcho()
+	defer closeEcho() //nolint:errcheck // not needed in test
 
 	configMap := mapstr.M{
 		"hosts":         host,
@@ -203,8 +199,7 @@ func TestCheckDown(t *testing.T) {
 		"check.receive": "BOOM", // should fail
 		"check.send":    "echo123",
 	}
-
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -253,6 +248,7 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	if err != nil {
 		return "", 0, "", nil, err
 	}
+
 	go func() {
 		conn, err := listener.Accept()
 		require.NoError(t, err)
@@ -263,10 +259,14 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 		require.NoError(t, err)
 		// Normally we'd retry partial writes, but for tests this is OK
 		require.Equal(t, wlen, rlen)
+		conn.Close()
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
-	require.NoError(t, err)
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()

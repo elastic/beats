@@ -49,7 +49,7 @@ type Plugin struct {
 	Endpoints int
 }
 
-// Close closes the plugin, invoking any DoClose hooks if avialable.
+// Close closes the plugin, invoking any DoClose hooks if available.
 func (p Plugin) Close() error {
 	if p.DoClose != nil {
 		return p.DoClose()
@@ -126,7 +126,7 @@ const (
 	PassiveMonitor
 )
 
-// globalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
+// GlobalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
 var GlobalPluginsReg = NewPluginsReg()
 
 type PluginsReg struct {
@@ -185,7 +185,8 @@ func (r *PluginsReg) Get(name string) (PluginFactory, bool) {
 }
 
 func (r *PluginsReg) String() string {
-	var monitors []string
+	monitors := make([]string, 0, len(r.monitors))
+	// note r.monitors is a map, we're iterating over the key names
 	for m := range r.monitors {
 		monitors = append(monitors, m)
 	}
