@@ -6,34 +6,34 @@ package tablespace
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
 // by doing queries to Oracle
-func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (out *extractedData, err error) {
-	out = &extractedData{}
+func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (*extractedData, error) {
+	out := &extractedData{}
+	var err error
 
 	if out.dataFiles, err = extractor.dataFilesData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting data_files")
+		return nil, fmt.Errorf("error getting data_files: %w", err)
 	}
 
 	if out.tempFreeSpace, err = extractor.tempFreeSpaceData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting temp_free_space")
+		return nil, fmt.Errorf("error getting temp_free_space: %w", err)
 	}
 
 	if out.freeSpace, err = extractor.usedAndFreeSpaceData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting free space data")
+		return nil, fmt.Errorf("error getting free space data: %w", err)
 	}
 
-	return
+	return out, nil
 }
 
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
@@ -42,20 +42,20 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
 	out = make(map[string]mapstr.M, 0)
 
-	for _, dataFile := range in.dataFiles {
-		m.addDataFileData(&dataFile, out)
+	for i := range in.dataFiles {
+		m.addDataFileData(&in.dataFiles[i], out)
 	}
 
 	m.addUsedAndFreeSpaceData(in.freeSpace, out)
 	m.addTempFreeSpaceData(in.tempFreeSpace, out)
 
-	return
+	return out
 }
 
 func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
 	extractedMetricsData, err := m.extract(ctx, m.extractor)
 	if err != nil {
-		return nil, errors.Wrap(err, "error extracting data")
+		return nil, fmt.Errorf("error extracting data: %w", err)
 	}
 
 	out := m.transform(extractedMetricsData)
