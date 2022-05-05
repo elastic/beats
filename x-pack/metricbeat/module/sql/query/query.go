@@ -7,11 +7,13 @@ package query
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common"
+
+	"github.com/jmoiron/sqlx"
+	
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/jmoiron/sqlx"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // represents the response format of the query
@@ -108,7 +110,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) Report(ms common.MapStr, report mb.ReporterV2) {
+func (m *MetricSet) Report(ms mapstr.M, report mb.ReporterV2) {
 	if !m.config.RawData.Enabled {
 		report.Event(m.getEvent(ms))
 	} else {
@@ -124,8 +126,8 @@ func (m *MetricSet) Report(ms common.MapStr, report mb.ReporterV2) {
 		}
 
 		report.Event(mb.Event{
-			RootFields: common.MapStr{
-				m.config.RawData.RootLevelName: common.MapStr{
+			RootFields: mapstr.M{
+				m.config.RawData.RootLevelName: mapstr.M{
 					m.config.RawData.DataLevelName: ms,
 				},
 			},
@@ -135,10 +137,10 @@ func (m *MetricSet) Report(ms common.MapStr, report mb.ReporterV2) {
 	}
 }
 
-func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
+func (m *MetricSet) getEvent(ms mapstr.M) mb.Event {
 	return mb.Event{
-		RootFields: common.MapStr{
-			"sql": common.MapStr{
+		RootFields: mapstr.M{
+			"sql": mapstr.M{
 				"driver":  m.config.Driver,
 				"query":   m.config.Query,
 				"metrics": getMetrics(ms),
@@ -147,12 +149,12 @@ func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
 	}
 }
 
-func getMetrics(ms common.MapStr) (ret common.MapStr) {
-	ret = common.MapStr{}
+func getMetrics(ms mapstr.M) (ret mapstr.M) {
+	ret = mapstr.M{}
 
-	numericMetrics := common.MapStr{}
-	stringMetrics := common.MapStr{}
-	boolMetrics := common.MapStr{}
+	numericMetrics := mapstr.M{}
+	stringMetrics := mapstr.M{}
+	boolMetrics := mapstr.M{}
 
 	for k, v := range ms {
 		switch v.(type) {
