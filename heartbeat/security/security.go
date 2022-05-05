@@ -24,16 +24,12 @@ import (
 	"fmt"
 	"os"
 	"os/user"
-	"runtime"
 	"strconv"
 	"syscall"
 
 	"github.com/elastic/go-sysinfo"
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
-
-	"github.com/elastic/beats/v7/heartbeat/hbseccomp"
-	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 )
 
 func init() {
@@ -59,11 +55,6 @@ func init() {
 	// The beat should use `getcap` at a later point to examine available capabilities
 	// rather than relying on errors from `setcap`
 	_ = setCapabilities()
-
-	err = setSeccompRules()
-	if err != nil {
-		panic(err)
-	}
 }
 
 func changeUser(localUserName string) error {
@@ -129,125 +120,6 @@ func setCapabilities() error {
 	err = newcaps.SetProc()
 	if err != nil {
 		return fmt.Errorf("error setting new process capabilities via setcap: %w", err)
-	}
-
-	return nil
-}
-
-func setSeccompRules() error {
-	// We require a number of syscalls to run. This list was generated with
-	// mage build && env ELASTIC_SYNTHETICS_CAPABLE=true strace -f --output=syscalls  ./heartbeat --path.config sample-synthetics-config/ -e
-	// then grepping for 'EPERM' in the 'syscalls' file.
-	switch runtime.GOARCH {
-	case "amd64", "386":
-		syscalls := []string{
-			"access",
-			"arch_prctl",
-			"bind",
-			"brk",
-			"capget",
-			"capset",
-			"chdir",
-			"chmod",
-			"chown",
-			"clone",
-			"close",
-			"connect",
-			"creat",
-			"dup",
-			"dup2",
-			"dup3",
-			"epoll_ctl",
-			"epoll_pwait",
-			"eventfd2",
-			"execve",
-			"exit",
-			"faccessat",
-			"fadvise64",
-			"fallocate",
-			"fcntl",
-			"flock",
-			"fstat",
-			"fsync",
-			"futex",
-			"capget",
-			"getcwd",
-			"getdents64",
-			"getegid",
-			"geteuid",
-			"getgroups",
-			"getgid",
-			"getpeername",
-			"getpgrp",
-			"getpid",
-			"getppid",
-			"getpriority",
-			"getrandom",
-			"getresuid",
-			"getresgid",
-			"getrusage",
-			"getsockname",
-			"gettid",
-			"getuid",
-			"ioctl",
-			"inotify_init",
-			"lchown",
-			"link",
-			"lseek",
-			"madvise",
-			"memfd_create",
-			"mkdir",
-			"mkdirat",
-			"mlock",
-			"mmap",
-			"mprotect",
-			"munmap",
-			"nanosleep",
-			"name_to_handle_at",
-			"newfstatat",
-			"openat",
-			"pipe",
-			"pipe2",
-			"poll",
-			"prctl",
-			"pread64",
-			"prlimit64",
-			"pwrite64",
-			"read",
-			"readlink",
-			"readlinkat",
-			"recvfrom",
-			"rename",
-			"rmdir",
-			"rt_sigaction",
-			"rt_sigprocmask",
-			"rt_sigreturn",
-			"sched_getaffinity",
-			"sched_getparam",
-			"sched_getscheduler",
-			"select",
-			"sendto",
-			"set_robust_list",
-			"set_tid_address",
-			"setpriority",
-			"setsid",
-			"sigaltstack",
-			"socket",
-			"socketpair",
-			"stat",
-			"statx",
-			"symlink",
-			"umask",
-			"uname",
-			"unlink",
-			"utimensat",
-			"write",
-		}
-		return seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...)
-
-	case "arm64", "aarch64":
-		// Register default arm64/aarch64 policy
-		seccomp.MustRegisterPolicy(hbseccomp.DefaultArmPolicy)
 	}
 
 	return nil
