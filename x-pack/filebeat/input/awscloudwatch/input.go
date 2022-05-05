@@ -6,6 +6,7 @@ package awscloudwatch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -15,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -76,17 +76,13 @@ func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) 
 	if config.LogGroupARN != "" {
 		logGroupName, regionName, err := parseARN(config.LogGroupARN)
 		if err != nil {
-			return nil, errors.Wrap(err, "parse log group ARN failed")
+			return nil, fmt.Errorf("parse log group ARN failed: %w", err)
 		}
 
 		config.LogGroupName = logGroupName
 		config.RegionName = regionName
 	}
 
-	awsConfig, err = awscommon.InitializeAWSConfig(config.AWSConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "InitializeAWSConfig failed")
-	}
 	awsConfig.Region = config.RegionName
 
 	return &cloudwatchInput{
@@ -168,7 +164,7 @@ func (in *cloudwatchInput) Receive(svc cloudwatchlogsiface.ClientAPI, cwPoller *
 	workerWg := new(sync.WaitGroup)
 	lastLogGroupOffset := 0
 	for ctx.Err() == nil {
-		if start == false {
+		if !start {
 			cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
 			time.Sleep(in.config.ScanFrequency)
 			cwPoller.log.Debug("done sleeping")
@@ -232,7 +228,7 @@ func (in *cloudwatchInput) Receive(svc cloudwatchlogsiface.ClientAPI, cwPoller *
 func parseARN(logGroupARN string) (string, string, error) {
 	arnParsed, err := arn.Parse(logGroupARN)
 	if err != nil {
-		return "", "", errors.Errorf("error Parse arn %s: %v", logGroupARN, err)
+		return "", "", fmt.Errorf("error Parse arn %s: %w", logGroupARN, err)
 	}
 
 	if strings.Contains(arnParsed.Resource, ":") {
@@ -241,7 +237,7 @@ func parseARN(logGroupARN string) (string, string, error) {
 			return resourceARNSplit[1], arnParsed.Region, nil
 		}
 	}
-	return "", "", errors.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
+	return "", "", fmt.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
 }
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names

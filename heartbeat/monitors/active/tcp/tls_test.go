@@ -126,7 +126,7 @@ func TestTLSExpiredCert(t *testing.T) {
 	require.NoError(t, err)
 
 	ip, portStr, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
-	defer closeSrv()
+	defer closeSrv() //nolint:errcheck // intentional discard
 
 	portInt, err := strconv.Atoi(portStr)
 	port := uint16(portInt)

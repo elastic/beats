@@ -36,7 +36,7 @@ func TestToMap(t *testing.T) {
 		{
 			"root fields with URL",
 			mapstr.M{
-				"type":            "journey/start",
+				"type":            JourneyStart,
 				"package_version": "1.2.3",
 				"root_fields": map[string]interface{}{
 					"synthetics": map[string]interface{}{
@@ -48,7 +48,7 @@ func TestToMap(t *testing.T) {
 			},
 			mapstr.M{
 				"synthetics": mapstr.M{
-					"type":            "journey/start",
+					"type":            JourneyStart,
 					"package_version": "1.2.3",
 					"nested":          "v1",
 				},
