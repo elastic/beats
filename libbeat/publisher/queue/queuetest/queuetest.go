@@ -295,10 +295,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 			for i := 0; i < numConsumers; i++ {
 				b := b
 
-				wg.Add(1)
 				go func() {
-					defer wg.Done()
-
 					for {
 						batch, err := b.Get(batchSize)
 						if err != nil {
