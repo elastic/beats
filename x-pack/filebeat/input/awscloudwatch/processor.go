@@ -36,12 +36,11 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 	}
 }
 
-func (p *logProcessor) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) error {
+func (p *logProcessor) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) {
 	for _, logEvent := range logEvents {
 		event := createEvent(logEvent, logGroup, regionName)
 		p.publish(p.ack, &event)
 	}
-	return nil
 }
 
 func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
@@ -66,7 +65,16 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 				"log_stream":     *logEvent.LogStreamName,
 				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
 			},
+<<<<<<< HEAD
 			"cloud": common.MapStr{
+=======
+			"aws.cloudwatch": mapstr.M{
+				"log_group":      logGroup,
+				"log_stream":     *logEvent.LogStreamName,
+				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+			},
+			"cloud": mapstr.M{
+>>>>>>> c0b3d5bf10 (Rename awscloudwatch.* fields to aws.cloudwatch.* (#31488))
 				"provider": "aws",
 				"region":   regionName,
 			},

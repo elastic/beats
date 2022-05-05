@@ -176,13 +176,23 @@ func TestCreateEvent(t *testing.T) {
 			"log_stream":     *logEvent.LogStreamName,
 			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
 		},
+<<<<<<< HEAD
 		"cloud": common.MapStr{
+=======
+		"aws.cloudwatch": mapstr.M{
+			"log_group":      "logGroup1",
+			"log_stream":     *logEvent.LogStreamName,
+			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+		},
+		"cloud": mapstr.M{
+>>>>>>> c0b3d5bf10 (Rename awscloudwatch.* fields to aws.cloudwatch.* (#31488))
 			"provider": "aws",
 			"region":   "us-east-1",
 		},
 	}
 	event := createEvent(logEvent, "logGroup1", "us-east-1")
-	event.Fields.Delete("event.ingested")
+	err := event.Fields.Delete("event.ingested")
+	assert.NoError(t, err)
 	assert.Equal(t, expectedEventFields, event.Fields)
 }
 
