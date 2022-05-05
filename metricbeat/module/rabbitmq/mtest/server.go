@@ -54,6 +54,7 @@ func Server(t *testing.T, c ServerConfig) *httptest.Server {
 		c.ManagementPathPrefix + "/api/nodes/rabbit@e2b1ae6390fd": {file: "node_sample_response.json"},
 		c.ManagementPathPrefix + "/api/overview":                  {file: "overview_sample_response.json"},
 		c.ManagementPathPrefix + "/api/queues":                    {file: "queue_sample_response.json"},
+		c.ManagementPathPrefix + "/api/shovels":                    {file: "shovel_sample_response.json"},
 	}
 
 	for k := range responses {
