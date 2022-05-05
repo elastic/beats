@@ -44,14 +44,18 @@ type MetricSet struct {
 }
 
 type config struct {
-	Driver         string `config:"driver" validate:"nonzero,required"`
-	Query          string `config:"sql_query" validate:"nonzero,required"`
-	ResponseFormat string `config:"sql_response_format"`
-	RawData        struct {
-		Enabled       bool   `config:"enabled"`
-		RootLevelName string `config:"root_level_name"`
-		DataLevelName string `config:"data_level_name"`
-	} `config:"raw_data"`
+	Driver         string  `config:"driver" validate:"nonzero,required"`
+	Query          string  `config:"sql_query" validate:"nonzero,required"`
+	ResponseFormat string  `config:"sql_response_format"`
+	RawData        rawData `config:"raw_data"`
+}
+
+// rawData is the minimum required set of fields to generate fully customized events with their own module key space
+// and their own metricset key space.
+type rawData struct {
+	Enabled       bool   `config:"enabled"`
+	RootLevelName string `config:"root_level_name"`
+	DataLevelName string `config:"data_level_name"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -80,10 +84,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	db, err := sql.NewDBClient(m.config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return fmt.Errorf("could not open connection: %s", err.Error())
+		return fmt.Errorf("could not open connection: %w", err)
 	}
 	defer db.Close()
 
@@ -94,7 +98,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		}
 
 		for _, ms := range mss {
-			m.Report(ms, report)
+			m.reportEvent(ms, reporter)
 		}
 
 		return nil
@@ -105,52 +109,71 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		return err
 	}
 
-	m.Report(ms, report)
+	m.reportEvent(ms, reporter)
 
 	return nil
 }
 
-func (m *MetricSet) Report(ms mapstr.M, report mb.ReporterV2) {
-	if !m.config.RawData.Enabled {
-		report.Event(m.getEvent(ms))
+// reportEvent using 'user' mode with keys under `sql.metrics.*` or using Raw data mode (module and metricset key spaces
+// provided by the user)
+func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2) {
+	if m.config.RawData.Enabled {
+		evt, err := composeEventFromRoot(ms, m.config.RawData.RootLevelName, m.config.RawData.DataLevelName)
+		if err != nil {
+			m.Logger().Errorf("could not send event: '%w'", err)
+			return
+		}
+
+		reporter.Event(*evt)
 	} else {
-		// Check that we have every we need
-		if m.config.RawData.RootLevelName == "" {
-			m.Logger().Errorf("'raw_data.root_level_name' field is required in sql config file if raw_data is enabled")
-			return
-		}
-
-		if m.config.RawData.DataLevelName == "" {
-			m.Logger().Errorf("'raw_data.data_level_name' field is required in sql config file if raw_data is enabled")
-			return
-		}
-
-		report.Event(mb.Event{
-			RootFields: mapstr.M{
-				m.config.RawData.RootLevelName: mapstr.M{
-					m.config.RawData.DataLevelName: ms,
-				},
-			},
-			Namespace: m.config.RawData.DataLevelName,
-			Service:   m.config.RawData.RootLevelName,
-		})
+		reporter.Event(*getUserEvent(ms, m.config.Driver, m.config.Query))
 	}
+
+	return
 }
 
-func (m *MetricSet) getEvent(ms mapstr.M) mb.Event {
-	return mb.Event{
+// composeEventFromRoot using the provided metrics and organizing their position in the event by using the rootLevelName
+// as the 'module' and the dataLevelName as the 'metricset'
+func composeEventFromRoot(ms mapstr.M, rootLevelName, dataLevelName string) (*mb.Event, error) {
+	// Check that we have every we need
+	if rootLevelName == "" {
+		return nil, fmt.Errorf("'raw_data.root_level_name' field is required in sql config file if raw_data is enabled")
+	}
+
+	if dataLevelName == "" {
+		return nil, fmt.Errorf("'raw_data.data_level_name' field is required in sql config file if raw_data is enabled")
+	}
+
+	return &mb.Event{
+		RootFields: mapstr.M{
+			rootLevelName: mapstr.M{
+				dataLevelName: ms,
+			},
+		},
+		Namespace: dataLevelName,
+		Service:   rootLevelName,
+	}, nil
+}
+
+// getUserEvent from some metrics, organizing them into known "spaces" inside the event to map them without knowing
+// their mapping in advance. To achieve this, all numeric values will go into `sql.metrics.numeric.*`, all string
+// values into `sql.metrics.strings.*`, etc.
+func getUserEvent(ms mapstr.M, driver, query string) *mb.Event {
+	return &mb.Event{
 		RootFields: mapstr.M{
 			"sql": mapstr.M{
-				"driver":  m.config.Driver,
-				"query":   m.config.Query,
-				"metrics": getMetrics(ms),
+				"driver":  driver,
+				"query":   query,
+				"metrics": inferTypeFromMetrics(ms),
 			},
 		},
 	}
 }
 
-func getMetrics(ms mapstr.M) (ret mapstr.M) {
-	ret = mapstr.M{}
+// inferTypeFromMetrics to organize the output event into 'numeric', 'strings', 'floats' and 'boolean' values
+// so we can dynamically map all fields inside those categories
+func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
+	ret := mapstr.M{}
 
 	numericMetrics := mapstr.M{}
 	stringMetrics := mapstr.M{}
@@ -159,31 +182,30 @@ func getMetrics(ms mapstr.M) (ret mapstr.M) {
 	for k, v := range ms {
 		switch v.(type) {
 		case float64:
-			numericMetrics.Put(k, v)
+			numericMetrics[k] = v
 		case string:
-			stringMetrics.Put(k, v)
+			stringMetrics[k] = v
 		case bool:
-			boolMetrics.Put(k, v)
+			boolMetrics[k] = v
 		case nil:
 		//Ignore because a nil has no data type and thus cannot be indexed
 		default:
-			stringMetrics.Put(k, v)
+			stringMetrics[k] = v
 		}
 	}
 
 	if len(numericMetrics) > 0 {
-		ret.Put("numeric", numericMetrics)
+		ret["numeric"] = numericMetrics
 	}
 
 	if len(stringMetrics) > 0 {
-		ret.Put("string", stringMetrics)
+		ret["string"] = stringMetrics
 	}
 
 	if len(boolMetrics) > 0 {
-		ret.Put("bool", boolMetrics)
+		ret["bool"] = boolMetrics
 	}
-
-	return
+	return nil
 }
 
 // Close closes the connection pool releasing its resources
