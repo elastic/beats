@@ -123,6 +123,7 @@ func showAuditdStatus() error {
 		"lost %d%c"+
 		"backlog %d%c"+
 		"backlog_wait_time %d%c"+
+		"backlog_wait_time_actual %d%c"+
 		"features %s\n",
 		status.Enabled, separator,
 		status.Failure, separator,
@@ -132,6 +133,7 @@ func showAuditdStatus() error {
 		status.Lost, separator,
 		status.Backlog, separator,
 		status.BacklogWaitTime, separator,
+		status.BacklogWaitTimeActual, separator,
 		fmt.Sprintf("%#x", status.FeatureBitmap))
 
 	return nil
