@@ -49,8 +49,9 @@ func TestFetch(t *testing.T) {
 			t.Fatalf("error reading sensors: %s", err)
 		}
 		to := mapstr.M{}
+
 		typeconv.Convert(&to, sensors)
 		// Report()
-		t.Logf("Sensor: %s", to.StringToPrint())
+		t.Logf("Sensor %s: %s", device.Name, to.StringToPrint())
 	}
 }

@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/go-structform"
 )
 
 var baseDir = "/sys/class/hwmon"
@@ -26,16 +28,19 @@ type Device struct {
 }
 
 // SensorType is for the string prefix of the sensor files
-type SensorType string
+type SensorType struct {
+	fileKey string
+	units   string
+}
 
 // TempSensor is the string prefix for a temp sensor
-var TempSensor SensorType = "temp"
+var TempSensor = SensorType{fileKey: "temp", units: "celsius"}
 
 // VoltSensor is the prefix for voltage sensors
-var VoltSensor SensorType = "in"
+var VoltSensor = SensorType{fileKey: "in", units: "millivolts"}
 
 // FanSensor is the prefix for fan sensors
-var FanSensor SensorType = "fan"
+var FanSensor = SensorType{fileKey: "fan", units: "rpm"}
 
 // Sensor is used to track a single hwmon chip metric
 type Sensor struct {
@@ -51,17 +56,65 @@ type SensorMetrics struct {
 	//Generic Fields
 	Label string `struct:"label,omitempty"`
 
-	Critical opt.Float `struct:"critical,omitempty"`
-	Max      opt.Float `struct:"max,omitempty"`
+	// This field gets inserted into the map, before individual values.
+	sensorType SensorType
 
-	// Temps
-	Celsius opt.Float `struct:"celsius,omitempty"`
+	Critical opt.Uint `struct:"critical,omitempty"`
+	Max      opt.Uint `struct:"max,omitempty"`
+	Lowest   opt.Uint `struct:"lowest,omitempty"`
+	Average  opt.Uint `struct:"average,omitempty"`
 
-	//Voltages
-	Millivolt opt.Uint `struct:"millivolts,omitempty"`
+	// The input value of the metric. The key is overriden and set to the value of sensorType by Fold()
+	Value opt.Uint `struct:"value,omitempty"`
+}
 
-	//Fans
-	RPM opt.Uint `struct:"rpm,omitempty"`
+// Fold implements the Folder interface for structform
+// This is entirely so we can carry around a relatively simple struct that transforms into the more heavily nested event that's the standard for beats events.
+func (sm *SensorMetrics) Fold(v structform.ExtVisitor) error {
+	val := reflect.ValueOf(sm).Elem()
+	types := reflect.TypeOf(sm).Elem()
+
+	v.OnObjectStart(val.NumField(), structform.AnyType)
+
+	for i := 0; i < val.NumField(); i++ {
+		if val.Field(i).CanInterface() {
+
+			// Fetch the struct tags
+			iface := val.Field(i).Interface()
+			skey, tagExists := types.Field(i).Tag.Lookup("struct")
+			if !tagExists {
+				skey = types.Field(i).Name
+			} else {
+				skey = strings.Split(skey, ",")[0]
+			}
+
+			if skey == "value" {
+				skey = sm.sensorType.fileKey
+			}
+
+			// Cast to an opt type, then create a nested dict
+			castUint, ok := iface.(opt.Uint)
+			if ok && castUint.Exists() {
+				err := v.OnKey(skey)
+				if err != nil {
+					return fmt.Errorf("error in OnKey for %s: %w", skey, err)
+				}
+				// This "inserts" the unit of the metric into the dict as an extra key
+				err = v.OnUint64Object(map[string]uint64{sm.sensorType.units: castUint.ValueOr(0)})
+				if err != nil {
+					return fmt.Errorf("error in OnKey for %s: %w", skey, err)
+				}
+
+			}
+		}
+
+	}
+	err := v.OnObjectFinished()
+	if err != nil {
+		return fmt.Errorf("error in OnObjectFinished for %s: %w", sm.Label, err)
+	}
+
+	return nil
 }
 
 // MonData is a simple wrapper type for the map returned by ReportSensors
@@ -165,7 +218,7 @@ func (s Sensor) Fetch(path string) (SensorMetrics, error) {
 	// Not sure if we want this to be an error, since a lot of OSes, particularly stuff running inside a VM,
 	// will just have this invalid hwmon entries with labels but no values. We may want this to be a log-level error instead.
 	inputName := s.getName("input")
-	input, err := stringStripInt(inputName, path)
+	input, err := getAndDiv(inputName, path, s.DevType)
 	if os.IsNotExist(err) {
 		return SensorMetrics{}, ErrNoMetric
 	} else if err != nil {
@@ -173,11 +226,13 @@ func (s Sensor) Fetch(path string) (SensorMetrics, error) {
 	}
 
 	sensorData := SensorMetrics{
-		Label: label,
+		Label:      label,
+		sensorType: s.DevType,
+		Value:      input,
 	}
-	sensorData.insertInputForType(s.DevType, input)
 
-	//Most, but not all, sensors have a critical & max value, so ignore errors.
+	// Other special metrics for some sensors
+	// We don't want to bulk fetch these with a glob or something, since the hwmon interface is so slapdash, we'll just end up picking up a bunch of garbage
 	critName := s.getName("crit")
 	critVal, _ := getAndDiv(critName, path, s.DevType)
 	sensorData.Critical = critVal
@@ -186,26 +241,20 @@ func (s Sensor) Fetch(path string) (SensorMetrics, error) {
 	maxVal, _ := getAndDiv(maxName, path, s.DevType)
 	sensorData.Max = maxVal
 
+	lowestName := s.getName("lowest")
+	lowestVal, _ := getAndDiv(lowestName, path, s.DevType)
+	sensorData.Lowest = lowestVal
+
+	avgName := s.getName("average")
+	avgVal, _ := getAndDiv(avgName, path, s.DevType)
+	sensorData.Average = avgVal
+
 	return sensorData, nil
 }
 
 // Get a formatted filename
 func (s Sensor) getName(file string) string {
-	return fmt.Sprintf("%s%d_%s", s.DevType, s.SensorNum, file)
-}
-
-// I wish there was a less awkward way to do this in Go, but we need logic
-// to deal with the fact that the struct fields we're accessing depends on the type of metric
-func (m *SensorMetrics) insertInputForType(st SensorType, input int64) {
-	switch st {
-	case TempSensor:
-		conv := float64(input) / 1000
-		m.Celsius = opt.FloatWith(conv)
-	case VoltSensor:
-		m.Millivolt = opt.UintWith(uint64(input))
-	case FanSensor:
-		m.RPM = opt.UintWith(uint64(input))
-	}
+	return fmt.Sprintf("%s%d_%s", s.DevType.fileKey, s.SensorNum, file)
 }
 
 // look for all the individual sensors in a hwmon path
@@ -285,18 +334,17 @@ func stringStripInt(name, path string) (int64, error) {
 }
 
 // Another helper that's used for float64 metrics where celsius values get divided from millidegrees.
-func getAndDiv(name, path string, st SensorType) (opt.Float, error) {
+func getAndDiv(name, path string, st SensorType) (opt.Uint, error) {
 	intval, err := stringStripInt(name, path)
 	if err != nil {
-		return opt.NewFloatNone(), fmt.Errorf("error fetching int val %s: %w", name, err)
+		return opt.NewUintNone(), fmt.Errorf("error fetching int val %s: %w", name, err)
 	}
 
-	sensorVal := float64(intval)
 	if st == TempSensor {
-		sensorVal = sensorVal / 1000
+		intval = intval / 1000
 	}
 
-	return opt.FloatWith(sensorVal), nil
+	return opt.UintWith(uint64(intval)), nil
 }
 
 func getSensorType(in string) (SensorType, bool) {
