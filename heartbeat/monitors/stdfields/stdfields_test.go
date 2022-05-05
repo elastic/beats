@@ -59,6 +59,7 @@ func TestLegacyServiceNameConfig(t *testing.T) {
 			c, err := conf.NewConfigFrom(cm)
 			require.NoError(t, err)
 			f, err := ConfigToStdMonitorFields(c)
+			require.NoError(t, err)
 			require.Equal(t, srvName, f.Service.Name)
 		})
 	}
