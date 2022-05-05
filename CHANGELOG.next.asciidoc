@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
+- Use /proc/<pid>/comm for linux process names where possible. {pull}31527[31527]
 
 *Winlogbeat*
 
