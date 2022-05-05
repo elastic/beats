@@ -71,13 +71,12 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 // addTempFreeSpaceData is specific to the TEMP Tablespace.
 func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map[string]mapstr.M) {
 	for key, cm := range out {
-		val, err := cm.GetValue("name")
+		name, err := cm.GetValue("name")
 		if err != nil {
 			m.Logger().Debug("error getting tablespace name")
 			continue
 		}
 
-		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
 				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TablespaceSize})
@@ -91,13 +90,12 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 // addUsedAndFreeSpaceData is specific to all Tablespaces but TEMP
 func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out map[string]mapstr.M) {
 	for key, cm := range out {
-		val, err := cm.GetValue("name")
+		name, err := cm.GetValue("name")
 		if err != nil {
 			m.Logger().Debug("error getting tablespace name")
 			continue
 		}
 
-		name := val.(string)
 		if name != "" {
 			for _, freeSpaceTable := range freeSpaces {
 				if name == freeSpaceTable.TablespaceName {
