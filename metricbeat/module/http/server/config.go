@@ -20,7 +20,7 @@ package server
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type HttpServerConfig struct {
@@ -29,9 +29,9 @@ type HttpServerConfig struct {
 }
 
 type PathConfig struct {
-	Path      string        `config:"path"`
-	Fields    common.MapStr `config:"fields"`
-	Namespace string        `config:"namespace"`
+	Path      string   `config:"path"`
+	Fields    mapstr.M `config:"fields"`
+	Namespace string   `config:"namespace"`
 }
 
 func defaultHttpServerConfig() HttpServerConfig {

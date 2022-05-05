@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNameMustBeUnique(t *testing.T) {
@@ -79,7 +79,7 @@ func TestNameMustBeUnique(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cfg, err := common.NewConfigFrom(test.v)
+			cfg, err := conf.NewConfigFrom(test.v)
 			if !assert.NoError(t, err) {
 				return
 			}

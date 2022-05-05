@@ -27,11 +27,11 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Jolokia Discovery query
@@ -76,7 +76,7 @@ type Event struct {
 	ProviderUUID uuid.UUID
 	Type         string
 	AgentID      string
-	Message      common.MapStr
+	Message      mapstr.M
 }
 
 // BusEvent converts a Jolokia Discovery event to a autodiscover bus event
@@ -86,7 +86,7 @@ func (e *Event) BusEvent() bus.Event {
 		"provider": e.ProviderUUID,
 		"id":       e.AgentID,
 		"jolokia":  e.Message,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"jolokia": e.Message,
 		},
 	}
@@ -99,7 +99,7 @@ type Instance struct {
 	LastSeen      time.Time
 	LastInterface *InterfaceConfig
 	AgentID       string
-	Message       common.MapStr
+	Message       mapstr.M
 }
 
 // Discovery controls the Jolokia Discovery probes
@@ -272,7 +272,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 	wg.Wait()
 }
 
-func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
+func (d *Discovery) update(config InterfaceConfig, message mapstr.M) {
 	log := d.log
 
 	v, err := message.GetValue("agent.id")

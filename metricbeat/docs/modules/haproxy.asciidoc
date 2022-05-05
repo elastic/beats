@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: haproxy
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/haproxy/_meta/docs.asciidoc
+
 
 [[metricbeat-module-haproxy]]
 == HAProxy module
@@ -73,6 +75,8 @@ on port 14567 after authentication.
 The HAProxy metricsets are tested with HAProxy versions from 1.6 to 1.8.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -113,3 +117,4 @@ include::haproxy/info.asciidoc[]
 
 include::haproxy/stat.asciidoc[]
 
+:edit_url!:

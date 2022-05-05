@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type stream struct {
@@ -79,7 +81,7 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &tlsPlugin{}
 	config := defaultConfig
@@ -276,7 +278,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	tls := ecs.Tls{
 		Established: conn.handshakeCompleted > 1,
 	}
-	detailed := common.MapStr{}
+	detailed := mapstr.M{}
 
 	emptyHello := &helloMessage{}
 	var clientHello, serverHello *helloMessage
@@ -359,7 +361,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 
 	numAlerts := len(client.parser.alerts) + len(server.parser.alerts)
-	alerts := make([]common.MapStr, 0, numAlerts)
+	alerts := make([]mapstr.M, 0, numAlerts)
 	alertTypes := make([]string, 0, numAlerts)
 	for _, alert := range client.parser.alerts {
 		alerts = append(alerts, alert.toMap("client"))
@@ -489,7 +491,7 @@ func hashCert(cert *x509.Certificate, algos []*FingerprintAlgorithm, req map[str
 	}
 }
 
-func (plugin *tlsPlugin) getCerts(certs []*x509.Certificate) (common.MapStr, []common.MapStr) {
+func (plugin *tlsPlugin) getCerts(certs []*x509.Certificate) (mapstr.M, []mapstr.M) {
 	if len(certs) == 0 {
 		return nil, nil
 	}
@@ -497,7 +499,7 @@ func (plugin *tlsPlugin) getCerts(certs []*x509.Certificate) (common.MapStr, []c
 	if len(certs) == 1 {
 		return cert, nil
 	}
-	chain := make([]common.MapStr, len(certs)-1)
+	chain := make([]mapstr.M, len(certs)-1)
 	for idx := 1; idx < len(certs); idx++ {
 		chain[idx-1] = certToMap(certs[idx])
 	}

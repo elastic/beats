@@ -25,11 +25,12 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -43,8 +44,8 @@ type observerMetadata struct {
 		time.Time
 		sync.Mutex
 	}
-	data    common.MapStrPointer
-	geoData common.MapStr
+	data    mapstr.Pointer
+	geoData mapstr.M
 	config  Config
 	logger  *logp.Logger
 }
@@ -54,7 +55,7 @@ const (
 )
 
 // New creates a new instance of the add_observer_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *config.C) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -62,7 +63,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	p := &observerMetadata{
 		config: config,
-		data:   common.NewMapStrPointer(nil),
+		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_observer_metadata"),
 	}
 	p.loadData()
@@ -73,7 +74,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 			return nil, err
 		}
 
-		p.geoData = common.MapStr{"observer": common.MapStr{"geo": geoFields}}
+		p.geoData = mapstr.M{"observer": mapstr.M{"geo": geoFields}}
 	}
 
 	return p, nil
@@ -128,8 +129,8 @@ func (p *observerMetadata) loadData() error {
 	}
 
 	hostInfo := h.Info()
-	data := common.MapStr{
-		"observer": common.MapStr{
+	data := mapstr.M{
+		"observer": mapstr.M{
 			"hostname": hostInfo.Hostname,
 		},
 	}

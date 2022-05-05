@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type apiError struct {
@@ -41,12 +41,12 @@ func (e apiError) ToBeatEvent() beat.Event {
 	code, msg := e.getErrorStrings()
 	return beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"error": common.MapStr{
+		Fields: mapstr.M{
+			"error": mapstr.M{
 				"code":    code,
 				"message": msg,
 			},
-			"event": common.MapStr{
+			"event": mapstr.M{
 				"kind": "pipeline_error",
 			},
 		},

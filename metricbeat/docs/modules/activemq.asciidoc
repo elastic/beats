@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: activemq
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/activemq/_meta/docs.asciidoc
+
 
 [[metricbeat-module-activemq]]
 [role="xpack"]
@@ -18,6 +20,8 @@ The module has been tested with ActiveMQ 5.13.0 and 5.15.9. Other versions are e
 === Usage
 The ActiveMQ module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -54,3 +58,4 @@ include::activemq/queue.asciidoc[]
 
 include::activemq/topic.asciidoc[]
 
+:edit_url!:

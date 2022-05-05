@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const paginationNamespace = "pagination"
@@ -45,11 +45,11 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
 
-	body := func() *common.MapStr {
+	body := func() *mapstr.M {
 		if config.Response.RequestBodyOnPagination {
 			return config.Request.Body
 		}
-		return &common.MapStr{}
+		return &mapstr.M{}
 	}()
 
 	requestFactory := newPaginationRequestFactory(
@@ -65,7 +65,7 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	return pagination
 }
 
-func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *common.MapStr, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
 		url:        url,

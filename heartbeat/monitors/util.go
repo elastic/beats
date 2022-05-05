@@ -28,8 +28,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+const IP = "ip"
+const IPv4 = "ip4"
+const IPv6 = "ip6"
 
 // IPSettings provides common configuration settings for IP resolution and ping
 // mode.
@@ -49,26 +53,23 @@ const (
 )
 
 // DefaultIPSettings provides an instance of default IPSettings to be copied
-// when unpacking settings from a common.Config object.
+// when unpacking settings from a config.C object.
 var DefaultIPSettings = IPSettings{
 	IPv4: true,
 	IPv6: true,
 	Mode: PingAny,
 }
 
-// emptyTask is a helper value for a Noop.
-var emptyTask = MakeSimpleCont(func(*beat.Event) error { return nil })
-
 // Network determines the Network type used for IP pluginName resolution, based on the
 // provided settings.
 func (s IPSettings) Network() string {
 	switch {
 	case s.IPv4 && !s.IPv6:
-		return "ip4"
+		return IPv4
 	case !s.IPv4 && s.IPv6:
-		return "ip6"
+		return IPv6
 	case s.IPv4 && s.IPv6:
-		return "ip"
+		return IP
 	}
 	return ""
 }
@@ -109,8 +110,8 @@ func MakeByIPJob(
 		return nil, err
 	}
 
-	fields := common.MapStr{
-		"monitor": common.MapStr{"ip": addr.String()},
+	fields := mapstr.M{
+		"monitor": mapstr.M{"ip": addr.String()},
 	}
 
 	return wrappers.WithFields(fields, pingFactory(addr)), nil
@@ -171,13 +172,14 @@ func makeByHostAnyIPJob(
 func makeByHostAllIPJob(
 	host string,
 	ipSettings IPSettings,
-	resolver Resolver,
+	_ Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) jobs.Job {
 	network := ipSettings.Network()
 	filter := makeIPFilter(network)
 
 	return func(event *beat.Event) ([]jobs.Job, error) {
+		//nolint:godox // this todo is quite old
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -214,12 +216,12 @@ func makeByHostAllIPJob(
 	}
 }
 
-func resolveIPEvent(ip string, rtt time.Duration) common.MapStr {
-	return common.MapStr{
-		"monitor": common.MapStr{
+func resolveIPEvent(ip string, rtt time.Duration) mapstr.M {
+	return mapstr.M{
+		"monitor": mapstr.M{
 			"ip": ip,
 		},
-		"resolve": common.MapStr{
+		"resolve": mapstr.M{
 			"ip":  ip,
 			"rtt": look.RTT(rtt),
 		},
@@ -242,9 +244,9 @@ func (p *PingMode) Unpack(s string) error {
 
 func makeIPFilter(network string) func(net.IP) bool {
 	switch network {
-	case "ip4":
+	case IPv4:
 		return func(i net.IP) bool { return i.To4() != nil }
-	case "ip6":
+	case IPv6:
 		return func(i net.IP) bool { return i.To4() == nil && i.To16() != nil }
 	}
 	return nil

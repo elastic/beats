@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -44,7 +44,7 @@ func TestFetch(t *testing.T) {
 		t.FailNow()
 	}
 
-	testConn := common.MapStr{
+	testConn := mapstr.M{
 		"drop":           uint64(0),
 		"early_drop":     uint64(0),
 		"entries":        uint64(16),
@@ -55,7 +55,7 @@ func TestFetch(t *testing.T) {
 		"search_restart": uint64(3),
 	}
 
-	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(common.MapStr)["conntrack"].(common.MapStr)["summary"]
+	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"]
 
 	assert.Equal(t, testConn, rawEvent)
 }

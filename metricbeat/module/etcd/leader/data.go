@@ -20,7 +20,7 @@ package leader
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Counts struct {
@@ -46,10 +46,10 @@ type Leader struct {
 	Leader    string                 `json:"leader"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) mapstr.M {
 	var data Leader
 	json.Unmarshal(content, &data)
-	event := common.MapStr{
+	event := mapstr.M{
 		"followers": data.Followers,
 		"leader":    data.Leader,
 	}

@@ -27,9 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -163,11 +163,11 @@ var eventV0Tests = []testCase{
 
 func testEvent() *beat.Event {
 	return &beat.Event{
-		Meta: common.MapStr{
+		Meta: mapstr.M{
 			"pipeline": "beat-1.2.3-module",
 		},
-		Fields: common.MapStr{
-			"source": common.MapStr{
+		Fields: mapstr.M{
+			"source": mapstr.M{
 				"ip": "192.0.2.1",
 			},
 		},

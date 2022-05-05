@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-structform/cborl"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
@@ -54,8 +54,8 @@ type eventDecoder struct {
 type entry struct {
 	Timestamp int64
 	Flags     uint8
-	Meta      common.MapStr
-	Fields    common.MapStr
+	Meta      mapstr.M
+	Fields    mapstr.M
 }
 
 func newEventEncoder() *eventEncoder {

@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/awsfargate/_meta/docs.asciidoc
+
 [[filebeat-module-awsfargate]]
 [role="xpack"]
 
@@ -137,3 +139,4 @@ include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-awsfargate,exported fields>> section.
 
+edit_url!:

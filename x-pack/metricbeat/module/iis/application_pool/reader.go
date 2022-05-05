@@ -10,8 +10,8 @@ package application_pool
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/pkg/errors"
@@ -163,10 +163,10 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 	events := make(map[string]mb.Event)
 	for _, appPool := range r.applicationPools {
 		events[appPool.name] = mb.Event{
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"name": appPool.name,
 			},
-			RootFields: common.MapStr{},
+			RootFields: mapstr.M{},
 		}
 		for counterPath, value := range values {
 			for _, val := range value {

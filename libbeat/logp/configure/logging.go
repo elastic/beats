@@ -24,8 +24,8 @@ import (
 
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // CLI flags for configuring logging.
@@ -41,13 +41,13 @@ type environmentVar logp.Environment
 func init() {
 	flag.BoolVar(&verbose, "v", false, "Log at INFO level")
 	flag.BoolVar(&toStderr, "e", false, "Log to stderr and disable syslog/file output")
-	common.StringArrVarFlag(nil, &debugSelectors, "d", "Enable certain debug selectors")
+	config.StringArrVarFlag(nil, &debugSelectors, "d", "Enable certain debug selectors")
 	flag.Var((*environmentVar)(&environment), "environment", "set environment being ran in")
 }
 
-// Logging builds a logp.Config based on the given common.Config and the specified
+// Logging builds a logp.Config based on the given config.C and the specified
 // CLI flags.
-func Logging(beatName string, cfg *common.Config) error {
+func Logging(beatName string, cfg *config.C) error {
 	config := logp.DefaultConfig(environment)
 	config.Beat = beatName
 	if cfg != nil {
@@ -60,9 +60,9 @@ func Logging(beatName string, cfg *common.Config) error {
 	return logp.Configure(config)
 }
 
-// LoggingWithOutputs builds a logp.Config based on the given common.Config and the specified
+// LoggingWithOutputs builds a logp.Config based on the given config.C and the specified
 // CLI flags along with the given outputs.
-func LoggingWithOutputs(beatName string, cfg *common.Config, outputs ...zapcore.Core) error {
+func LoggingWithOutputs(beatName string, cfg *config.C, outputs ...zapcore.Core) error {
 	config := logp.DefaultConfig(environment)
 	config.Beat = beatName
 	if cfg != nil {

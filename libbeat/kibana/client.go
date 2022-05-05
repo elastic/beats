@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -128,7 +129,7 @@ func extractMessage(result []byte) error {
 }
 
 // NewKibanaClient builds and returns a new Kibana client
-func NewKibanaClient(cfg *common.Config, beatname string) (*Client, error) {
+func NewKibanaClient(cfg *config.C, beatname string) (*Client, error) {
 	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

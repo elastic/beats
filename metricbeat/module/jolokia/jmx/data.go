@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -39,7 +40,7 @@ type Entry struct {
 	Value interface{}
 }
 
-// Map responseBody to common.MapStr
+// Map responseBody to mapstr.M
 //
 // A response has the following structure
 //  [
@@ -111,11 +112,11 @@ type eventKey struct {
 	mbean, event string
 }
 
-func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, error) {
+func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error) {
 
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined
-	mbeanEvents := make(map[eventKey]common.MapStr)
+	mbeanEvents := make(map[eventKey]mapstr.M)
 	var errs multierror.Errors
 
 	for _, v := range entries {
@@ -140,7 +141,7 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, e
 		}
 	}
 
-	var events []common.MapStr
+	var events []mapstr.M
 	for _, event := range mbeanEvents {
 		events = append(events, event)
 	}
@@ -148,7 +149,7 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, e
 	return events, errs.Err()
 }
 
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]common.MapStr, mapping AttributeMapping, errs multierror.Errors) {
+func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs multierror.Errors) {
 	hasWildcard := strings.Contains(v.Request.Mbean, "*")
 	for attribute, value := range entryValues {
 		if !hasWildcard {
@@ -178,10 +179,10 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 	}
 }
 
-func selectEvent(events map[eventKey]common.MapStr, key eventKey) common.MapStr {
+func selectEvent(events map[eventKey]mapstr.M, key eventKey) mapstr.M {
 	event, found := events[key]
 	if !found {
-		event = common.MapStr{}
+		event = mapstr.M{}
 		if key.mbean != "" {
 			event.Put(mbeanEventKey, key.mbean)
 		}
@@ -195,7 +196,7 @@ func parseResponseEntry(
 	responseMbeanName string,
 	attributeName string,
 	attributeValue interface{},
-	events map[eventKey]common.MapStr,
+	events map[eventKey]mapstr.M,
 	mapping AttributeMapping,
 ) error {
 	field, exists := mapping.Get(requestMbeanName, attributeName)

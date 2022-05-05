@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
@@ -125,20 +125,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	for _, vm := range vmt {
 		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
 		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": vm.Summary.Config.Name,
 			"os":   vm.Summary.Config.GuestFullName,
-			"cpu": common.MapStr{
-				"used": common.MapStr{
+			"cpu": mapstr.M{
+				"used": mapstr.M{
 					"mhz": usedCPU,
 				},
 			},
-			"memory": common.MapStr{
-				"used": common.MapStr{
-					"guest": common.MapStr{
+			"memory": mapstr.M{
+				"used": mapstr.M{
+					"guest": mapstr.M{
 						"bytes": usedMemory,
 					},
-					"host": common.MapStr{
+					"host": mapstr.M{
 						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
 					},
 				},
@@ -213,8 +213,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	return nil
 }
 
-func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap map[int32]string) common.MapStr {
-	outputFields := common.MapStr{}
+func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap map[int32]string) mapstr.M {
+	outputFields := mapstr.M{}
 	for _, v := range customFields {
 		customFieldString := v.(*types.CustomFieldStringValue)
 		key, ok := customFieldsMap[v.GetCustomFieldValue().Key]

@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -36,8 +36,8 @@ func TestDecodeXML(t *testing.T) {
 	var testCases = []struct {
 		description  string
 		config       decodeXMLConfig
-		Input        common.MapStr
-		Output       common.MapStr
+		Input        mapstr.M
+		Output       mapstr.M
 		error        bool
 		errorMessage string
 	}{
@@ -47,7 +47,7 @@ func TestDecodeXML(t *testing.T) {
 				Field:  "message",
 				Target: &testXMLTargetField,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<catalog>
 					<book seq="1">
 						<author>William H. Gaddis</author>
@@ -56,8 +56,8 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			Output: common.MapStr{
-				"xml": common.MapStr{
+			Output: mapstr.M{
+				"xml": mapstr.M{
 					"catalog": map[string]interface{}{
 						"book": map[string]interface{}{
 							"author": "William H. Gaddis",
@@ -82,7 +82,7 @@ func TestDecodeXML(t *testing.T) {
 				Field:  "message",
 				Target: &testRootTargetField,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<catalog>
 					<book seq="1">
 						<author>William H. Gaddis</author>
@@ -91,8 +91,8 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			Output: common.MapStr{
-				"catalog": common.MapStr{
+			Output: mapstr.M{
+				"catalog": mapstr.M{
 					"book": map[string]interface{}{
 						"author": "William H. Gaddis",
 						"review": "One of the great seminal American novels of the 20th century.",
@@ -114,7 +114,7 @@ func TestDecodeXML(t *testing.T) {
 			config: decodeXMLConfig{
 				Field: "message",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book seq="1">
@@ -124,8 +124,8 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			Output: common.MapStr{
-				"message": common.MapStr{
+			Output: mapstr.M{
+				"message": mapstr.M{
 					"catalog": map[string]interface{}{
 						"book": map[string]interface{}{
 							"author": "William H. Gaddis",
@@ -142,7 +142,7 @@ func TestDecodeXML(t *testing.T) {
 			config: decodeXMLConfig{
 				Field: "message",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -157,8 +157,8 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			Output: common.MapStr{
-				"message": common.MapStr{
+			Output: mapstr.M{
+				"message": mapstr.M{
 					"catalog": map[string]interface{}{
 						"book": []interface{}{
 							map[string]interface{}{
@@ -182,7 +182,7 @@ func TestDecodeXML(t *testing.T) {
 				Field:   "message",
 				ToLower: true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<AuditBase>
 				  <ContextComponents>
 					<Component>
@@ -194,8 +194,8 @@ func TestDecodeXML(t *testing.T) {
 				  </ContextComponents>
 				</AuditBase>`,
 			},
-			Output: common.MapStr{
-				"message": common.MapStr{
+			Output: mapstr.M{
+				"message": mapstr.M{
 					"auditbase": map[string]interface{}{
 						"contextcomponents": map[string]interface{}{
 							"component": []interface{}{
@@ -216,7 +216,7 @@ func TestDecodeXML(t *testing.T) {
 			config: decodeXMLConfig{
 				Field: "message",
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -237,8 +237,8 @@ func TestDecodeXML(t *testing.T) {
 				</secondcategory>
 				</catalog>`,
 			},
-			Output: common.MapStr{
-				"message": common.MapStr{
+			Output: mapstr.M{
+				"message": mapstr.M{
 					"catalog": map[string]interface{}{
 						"book": []interface{}{
 							map[string]interface{}{
@@ -269,7 +269,7 @@ func TestDecodeXML(t *testing.T) {
 				Field:         "message",
 				IgnoreFailure: false,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -279,7 +279,7 @@ func TestDecodeXML(t *testing.T) {
 				</ook>
 				catalog>`,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -288,7 +288,7 @@ func TestDecodeXML(t *testing.T) {
 						<review>One of the great seminal American novels of the 20th century.</review>
 				</ook>
 				catalog>`,
-				"error": common.MapStr{"message": "failed in decode_xml on the \"message\" field: error decoding XML field: XML syntax error on line 7: element <book> closed by </ook>"},
+				"error": mapstr.M{"message": "failed in decode_xml on the \"message\" field: error decoding XML field: XML syntax error on line 7: element <book> closed by </ook>"},
 			},
 			error:        true,
 			errorMessage: "error decoding XML field:",
@@ -299,7 +299,7 @@ func TestDecodeXML(t *testing.T) {
 				Field:         "message",
 				IgnoreFailure: true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -309,7 +309,7 @@ func TestDecodeXML(t *testing.T) {
 				</ook>
 				catalog>`,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
@@ -326,12 +326,12 @@ func TestDecodeXML(t *testing.T) {
 				Field:         "message2",
 				IgnoreMissing: false,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": "testing message",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": "testing message",
-				"error":   common.MapStr{"message": "failed in decode_xml on the \"message2\" field: key not found"},
+				"error":   mapstr.M{"message": "failed in decode_xml on the \"message2\" field: key not found"},
 			},
 			error:        true,
 			errorMessage: "key not found",
@@ -342,10 +342,10 @@ func TestDecodeXML(t *testing.T) {
 				Field:         "message2",
 				IgnoreMissing: true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": "testing message",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": "testing message",
 			},
 		},
@@ -355,12 +355,12 @@ func TestDecodeXML(t *testing.T) {
 				Field:         "message",
 				IgnoreFailure: false,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": 1,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": 1,
-				"error":   common.MapStr{"message": "failed in decode_xml on the \"message\" field: field value is not a string"},
+				"error":   mapstr.M{"message": "failed in decode_xml on the \"message\" field: field value is not a string"},
 			},
 			error:        true,
 			errorMessage: "field value is not a string",
@@ -371,10 +371,10 @@ func TestDecodeXML(t *testing.T) {
 				Field:         "message",
 				IgnoreFailure: true,
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"message": 1,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"message": 1,
 			},
 		},
@@ -415,7 +415,7 @@ func TestDecodeXML(t *testing.T) {
 		require.NoError(t, err)
 
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"message": `<catalog>
 					<book seq="1">
 						<author>William H. Gaddis</author>
@@ -425,8 +425,8 @@ func TestDecodeXML(t *testing.T) {
 				</catalog>`,
 			},
 		}
-		expMeta := common.MapStr{
-			"xml": common.MapStr{
+		expMeta := mapstr.M{
+			"xml": mapstr.M{
 				"catalog": map[string]interface{}{
 					"book": map[string]interface{}{
 						"author": "William H. Gaddis",
@@ -518,7 +518,7 @@ func TestXMLToDocumentID(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"message": `<catalog>
 						<book seq="10">
 							<author>William H. Gaddis</author>
@@ -530,8 +530,8 @@ func TestXMLToDocumentID(t *testing.T) {
 	actual, err := p.Run(&beat.Event{Fields: input})
 	require.NoError(t, err)
 
-	wantFields := common.MapStr{
-		"message": common.MapStr{
+	wantFields := mapstr.M{
+		"message": mapstr.M{
 			"catalog": map[string]interface{}{
 				"book": map[string]interface{}{
 					"author": "William H. Gaddis",
@@ -541,7 +541,7 @@ func TestXMLToDocumentID(t *testing.T) {
 			},
 		},
 	}
-	wantMeta := common.MapStr{
+	wantMeta := mapstr.M{
 		"_id": "10",
 	}
 

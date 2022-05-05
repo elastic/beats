@@ -30,8 +30,9 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNode_Generate(t *testing.T) {
@@ -40,7 +41,7 @@ func TestNode_Generate(t *testing.T) {
 	name := "obj"
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -65,23 +66,23 @@ func TestNode_Generate(t *testing.T) {
 					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"node": common.MapStr{
+			output: mapstr.M{"kubernetes": mapstr.M{
+				"node": mapstr.M{
 					"name":     "obj",
 					"uid":      uid,
 					"hostname": "node1",
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
-				"annotations": common.MapStr{
+				"annotations": mapstr.M{
 					"key2": "value2",
 				},
 			}},
 		},
 	}
 
-	cfg, _ := common.NewConfigFrom(Config{
+	cfg, _ := config.NewConfigFrom(Config{
 		IncludeAnnotations: []string{"key2"},
 	})
 	metagen := NewNodeMetadataGenerator(cfg, nil, client)
@@ -98,7 +99,7 @@ func TestNode_GenerateFromName(t *testing.T) {
 	name := "obj"
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -122,16 +123,16 @@ func TestNode_GenerateFromName(t *testing.T) {
 					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
 				},
 			},
-			output: common.MapStr{
-				"node": common.MapStr{
+			output: mapstr.M{
+				"node": mapstr.M{
 					"name":     "obj",
 					"uid":      uid,
 					"hostname": "node1",
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
-				"annotations": common.MapStr{
+				"annotations": mapstr.M{
 					"key": "value",
 				},
 			},
@@ -139,7 +140,7 @@ func TestNode_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := common.NewConfigFrom(Config{
+		cfg, _ := config.NewConfigFrom(Config{
 			IncludeAnnotations: []string{"key"},
 		})
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)

@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type valueConverter interface {
@@ -86,14 +86,14 @@ var (
 	allowedDetailedValues = map[string]inputConverter{}
 )
 
-func eventMapping(content []byte) ([]common.MapStr, error) {
+func eventMapping(content []byte) ([]mapstr.M, error) {
 	var agent agent
 
 	if err := json.Unmarshal(content, &agent); err != nil {
 		return nil, err
 	}
 
-	labels := map[string]common.MapStr{}
+	labels := map[string]mapstr.M{}
 
 	for _, gauge := range agent.Gauges {
 		metricApply(labels, gauge.consulMetric, gauge.Value)
@@ -111,7 +111,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		metricApply(labels, sample.consulMetric, consulDetailedValue(sample))
 	}
 
-	data := make([]common.MapStr, 0)
+	data := make([]mapstr.M, 0)
 	for _, v := range labels {
 		data = append(data, v)
 	}
@@ -119,7 +119,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 	return data, nil
 }
 
-func metricApply(labels map[string]common.MapStr, m consulMetric, v interface{}) {
+func metricApply(labels map[string]mapstr.M, m consulMetric, v interface{}) {
 	prettyName := prettyName(m.Name)
 	if prettyName == nil {
 		//omitting unwanted metric
@@ -128,7 +128,7 @@ func metricApply(labels map[string]common.MapStr, m consulMetric, v interface{})
 
 	labelsCombination := uniqueKeyForLabelMap(m.Labels)
 
-	temp := common.MapStr{}
+	temp := mapstr.M{}
 	if len(m.Labels) != 0 {
 		temp.Put("labels", m.Labels)
 	}
@@ -169,7 +169,7 @@ func prettyName(s string) inputConverter {
 
 // Create a simple unique value for a map of labels without using a hash function
 func uniqueKeyForLabelMap(m map[string]string) string {
-	mm := common.MapStr{}
+	mm := mapstr.M{}
 	for k, v := range m {
 		mm[k] = v
 	}

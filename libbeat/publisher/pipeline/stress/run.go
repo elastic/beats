@@ -23,17 +23,17 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
-	Generate generateConfig         `config:"generate"`
-	Pipeline pipeline.Config        `config:"pipeline"`
-	Output   common.ConfigNamespace `config:"output"`
+	Generate generateConfig  `config:"generate"`
+	Pipeline pipeline.Config `config:"pipeline"`
+	Output   conf.Namespace  `config:"output"`
 }
 
 var defaultConfig = config{
@@ -51,7 +51,7 @@ var defaultConfig = config{
 func RunTests(
 	info beat.Info,
 	duration time.Duration,
-	cfg *common.Config,
+	cfg *conf.C,
 	errors func(err error),
 ) error {
 	config := defaultConfig

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestPreserveOriginalEvent(t *testing.T) {
@@ -20,7 +20,7 @@ func TestPreserveOriginalEvent(t *testing.T) {
 	}
 
 	raw := json.RawMessage(`{"field1":"val1"}`)
-	doc := common.MapStr{
+	doc := mapstr.M{
 		"field1": "val1",
 	}
 

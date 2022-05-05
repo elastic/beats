@@ -1,7 +1,6 @@
 type: azure-eventhub
 {{ if .eventhub }}
 eventhub: {{ .eventhub }}
-storage_account_container: filebeat-auditlogs-{{ .eventhub }}
 {{ end }}
 
 {{ if .connection_string }}
@@ -18,6 +17,14 @@ storage_account: {{ .storage_account }}
 
 {{ if .storage_account_key }}
 storage_account_key: {{ .storage_account_key }}
+{{ end }}
+
+{{ if .storage_account_container }}
+storage_account_container: {{ .storage_account_container }}
+{{ else }}
+{{ if .eventhub }}
+storage_account_container: filebeat-auditlogs-{{ .eventhub }}
+{{ end }}
 {{ end }}
 
 {{ if .resource_manager_endpoint }}

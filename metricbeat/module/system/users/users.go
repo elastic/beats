@@ -27,9 +27,9 @@ import (
 	"github.com/godbus/dbus"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -91,7 +91,7 @@ func eventMapping(conn *dbus.Conn, sessions []loginSession, report mb.ReporterV2
 			return errors.Wrap(err, "error getting properties")
 		}
 
-		event := common.MapStr{
+		event := mapstr.M{
 			"id":      session.ID,
 			"seat":    session.Seat,
 			"path":    session.Path,
@@ -103,11 +103,11 @@ func eventMapping(conn *dbus.Conn, sessions []loginSession, report mb.ReporterV2
 			"leader":  props.Leader,
 		}
 
-		rootEvents := common.MapStr{
-			"process": common.MapStr{
+		rootEvents := mapstr.M{
+			"process": mapstr.M{
 				"pid": props.Leader,
 			},
-			"user": common.MapStr{
+			"user": mapstr.M{
 				"name": session.User,
 				"id":   strconv.Itoa(int(session.UID)),
 			},
@@ -116,7 +116,7 @@ func eventMapping(conn *dbus.Conn, sessions []loginSession, report mb.ReporterV2
 		if props.Remote {
 			event["remote_host"] = props.RemoteHost
 			if ipAddr := net.ParseIP(props.RemoteHost); ipAddr != nil {
-				rootEvents["source"] = common.MapStr{
+				rootEvents["source"] = mapstr.M{
 					"ip": ipAddr,
 				}
 			}

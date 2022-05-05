@@ -23,10 +23,10 @@ package diskio
 import (
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 )
@@ -84,14 +84,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	var diskReadBytes, diskWriteBytes uint64
 	for _, counters := range stats {
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": counters.Name,
-			"read": common.MapStr{
+			"read": mapstr.M{
 				"count": counters.ReadCount,
 				"time":  counters.ReadTime,
 				"bytes": counters.ReadBytes,
 			},
-			"write": common.MapStr{
+			"write": mapstr.M{
 				"count": counters.WriteCount,
 				"time":  counters.WriteTime,
 				"bytes": counters.WriteBytes,
@@ -126,9 +126,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if m.prevCounters != (diskCounter{}) {
 		// convert network metrics from counters to gauges
 		r.Event(mb.Event{
-			RootFields: common.MapStr{
-				"host": common.MapStr{
-					"disk": common.MapStr{
+			RootFields: mapstr.M{
+				"host": mapstr.M{
+					"disk": mapstr.M{
 						"read.bytes":  diskReadBytes - m.prevCounters.prevDiskReadBytes,
 						"write.bytes": diskWriteBytes - m.prevCounters.prevDiskWriteBytes,
 					},

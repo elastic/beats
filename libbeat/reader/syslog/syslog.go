@@ -22,10 +22,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 //go:generate ragel -Z -G2 -o rfc3164_gen.go parser/parser_rfc3164.rl
@@ -97,7 +97,7 @@ func DefaultConfig() Config {
 
 // ParseMessage will parse syslog message data formatted as format into fields. loc is used to enrich
 // timestamps that lack a time zone.
-func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr, time.Time, error) {
+func ParseMessage(data string, format Format, loc *time.Location) (mapstr.M, time.Time, error) {
 	var m message
 	var err error
 
@@ -114,7 +114,7 @@ func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr
 		m, err = parseRFC5424(data)
 	}
 	if err != nil {
-		return common.MapStr{}, time.Time{}, err
+		return mapstr.M{}, time.Time{}, err
 	}
 
 	return m.fields(), m.timestamp, nil

@@ -20,12 +20,12 @@ package monitoring
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // BeatConfig represents the part of the $BEAT.yml to do with monitoring settings
 type BeatConfig struct {
-	Monitoring *common.Config `config:"monitoring"`
+	Monitoring *config.C `config:"monitoring"`
 }
 
 type Mode uint8
@@ -78,7 +78,7 @@ func Clear() error {
 }
 
 // GetClusterUUID returns the value of the monitoring.cluster_uuid setting, if it is set.
-func GetClusterUUID(monitoringCfg *common.Config) (string, error) {
+func GetClusterUUID(monitoringCfg *config.C) (string, error) {
 	if monitoringCfg == nil {
 		return "", nil
 	}
@@ -94,7 +94,7 @@ func GetClusterUUID(monitoringCfg *common.Config) (string, error) {
 }
 
 // IsEnabled returns whether the monitoring reporter is enabled or not.
-func IsEnabled(monitoringCfg *common.Config) bool {
+func IsEnabled(monitoringCfg *config.C) bool {
 	if monitoringCfg == nil {
 		return false
 	}
@@ -110,7 +110,7 @@ func IsEnabled(monitoringCfg *common.Config) bool {
 }
 
 // IsBufferEnabled will check if the monitoring buffer is explicitly enabled.
-func IsBufferEnabled(monitoringCfg *common.Config) bool {
+func IsBufferEnabled(monitoringCfg *config.C) bool {
 	if monitoringCfg == nil {
 		return false
 	}

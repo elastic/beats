@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -40,15 +40,15 @@ func TestGenerateHints(t *testing.T) {
 		// Docker meta must be present in the hints
 		{
 			event: bus.Event{
-				"docker": common.MapStr{
-					"container": common.MapStr{
+				"docker": mapstr.M{
+					"container": mapstr.M{
 						"id":   "abc",
 						"name": "foobar",
 					},
 				},
 			},
 			result: bus.Event{
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id":   "abc",
 					"name": "foobar",
 				},
@@ -59,11 +59,11 @@ func TestGenerateHints(t *testing.T) {
 		// logs/disable should be present in hints.logs.disable=true
 		{
 			event: bus.Event{
-				"docker": common.MapStr{
-					"container": common.MapStr{
+				"docker": mapstr.M{
+					"container": mapstr.M{
 						"id":   "abc",
 						"name": "foobar",
-						"labels": getNestedAnnotations(common.MapStr{
+						"labels": getNestedAnnotations(mapstr.M{
 							"do.not.include":          "true",
 							"co.elastic.logs/disable": "true",
 						}),
@@ -71,16 +71,16 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			result: bus.Event{
-				"container": common.MapStr{
+				"container": mapstr.M{
 					"id":   "abc",
 					"name": "foobar",
-					"labels": getNestedAnnotations(common.MapStr{
+					"labels": getNestedAnnotations(mapstr.M{
 						"do.not.include":          "true",
 						"co.elastic.logs/disable": "true",
 					}),
 				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
+				"hints": mapstr.M{
+					"logs": mapstr.M{
 						"disable": "true",
 					},
 				},
@@ -98,8 +98,8 @@ func TestGenerateHints(t *testing.T) {
 	}
 }
 
-func getNestedAnnotations(in common.MapStr) common.MapStr {
-	out := common.MapStr{}
+func getNestedAnnotations(in mapstr.M) mapstr.M {
+	out := mapstr.M{}
 
 	for k, v := range in {
 		out.Put(k, v)
@@ -126,41 +126,41 @@ func TestGenerateMetaDockerNoDedot(t *testing.T) {
 	}
 	_, meta := p.generateMetaDocker(event)
 	expectedMeta := &dockerMetadata{
-		Docker: common.MapStr{
-			"container": common.MapStr{
+		Docker: mapstr.M{
+			"container": mapstr.M{
 				"id":    "abc",
 				"name":  "foobar",
 				"image": "",
-				"labels": common.MapStr{
-					"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-					"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+				"labels": mapstr.M{
+					"do": mapstr.M{"not": mapstr.M{"include": "true"}},
+					"co": mapstr.M{"elastic": mapstr.M{"logs/disable": "true"}},
 				},
 			},
 		},
-		Container: common.MapStr{
+		Container: mapstr.M{
 			"id":   "abc",
 			"name": "foobar",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "",
 			},
-			"labels": common.MapStr{
-				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			"labels": mapstr.M{
+				"do": mapstr.M{"not": mapstr.M{"include": "true"}},
+				"co": mapstr.M{"elastic": mapstr.M{"logs/disable": "true"}},
 			},
 		},
-		Metadata: common.MapStr{
-			"container": common.MapStr{
+		Metadata: mapstr.M{
+			"container": mapstr.M{
 				"id":   "abc",
 				"name": "foobar",
-				"image": common.MapStr{
+				"image": mapstr.M{
 					"name": "",
 				},
 			},
-			"docker": common.MapStr{
-				"container": common.MapStr{
-					"labels": common.MapStr{
-						"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-						"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			"docker": mapstr.M{
+				"container": mapstr.M{
+					"labels": mapstr.M{
+						"do": mapstr.M{"not": mapstr.M{"include": "true"}},
+						"co": mapstr.M{"elastic": mapstr.M{"logs/disable": "true"}},
 					},
 				},
 			},
@@ -190,39 +190,39 @@ func TestGenerateMetaDockerWithDedot(t *testing.T) {
 	}
 	_, meta := p.generateMetaDocker(event)
 	expectedMeta := &dockerMetadata{
-		Docker: common.MapStr{
-			"container": common.MapStr{
+		Docker: mapstr.M{
+			"container": mapstr.M{
 				"id":    "abc",
 				"name":  "foobar",
 				"image": "",
-				"labels": common.MapStr{
-					"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-					"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+				"labels": mapstr.M{
+					"do": mapstr.M{"not": mapstr.M{"include": "true"}},
+					"co": mapstr.M{"elastic": mapstr.M{"logs/disable": "true"}},
 				},
 			},
 		},
-		Container: common.MapStr{
+		Container: mapstr.M{
 			"id":   "abc",
 			"name": "foobar",
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": "",
 			},
-			"labels": common.MapStr{
-				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			"labels": mapstr.M{
+				"do": mapstr.M{"not": mapstr.M{"include": "true"}},
+				"co": mapstr.M{"elastic": mapstr.M{"logs/disable": "true"}},
 			},
 		},
-		Metadata: common.MapStr{
-			"container": common.MapStr{
+		Metadata: mapstr.M{
+			"container": mapstr.M{
 				"id":   "abc",
 				"name": "foobar",
-				"image": common.MapStr{
+				"image": mapstr.M{
 					"name": "",
 				},
 			},
-			"docker": common.MapStr{
-				"container": common.MapStr{
-					"labels": common.MapStr{
+			"docker": mapstr.M{
+				"container": mapstr.M{
+					"labels": mapstr.M{
 						"do_not_include":          "true",
 						"co_elastic_logs/disable": "true",
 					},

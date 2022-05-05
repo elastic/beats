@@ -26,8 +26,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // configuredJob represents a job combined with its config and any
@@ -40,12 +40,12 @@ type configuredJob struct {
 	client   *WrappedClient
 }
 
-func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) *configuredJob {
 	return &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
-	}, nil
+	}
 }
 
 // jobConfig represents fields needed to execute a single job.
@@ -97,13 +97,13 @@ func (t *configuredJob) Stop() {
 		t.cancelFn()
 	}
 	if t.client != nil {
-		t.client.Close()
+		_ = t.client.Close()
 	}
 }
 
 func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
 	event := &beat.Event{
-		Fields: common.MapStr{},
+		Fields: mapstr.M{},
 	}
 
 	conts, err := job(event)

@@ -12,10 +12,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestValueTpl(t *testing.T) {
@@ -34,9 +34,9 @@ func TestValueTpl(t *testing.T) {
 			name:  "can access Go types in context",
 			value: `[[.last_response.header.Get "foo"]] [[.last_response.url.params.Get "foo"]] [[.url.Host]] [[.url.Query.Get "bar"]]`,
 			paramCtx: &transformContext{
-				firstEvent:   &common.MapStr{},
-				lastEvent:    &common.MapStr{},
-				lastResponse: newTestResponse(common.MapStr{"param": 25}, http.Header{"Foo": []string{"bar"}}, "http://localhost?foo=bar"),
+				firstEvent:   &mapstr.M{},
+				lastEvent:    &mapstr.M{},
+				lastResponse: newTestResponse(mapstr.M{"param": 25}, http.Header{"Foo": []string{"bar"}}, "http://localhost?foo=bar"),
 			},
 			paramTr:     transformable{"url": newURL("http://localhost?bar=bazz")},
 			paramDefVal: "",
@@ -46,9 +46,9 @@ func TestValueTpl(t *testing.T) {
 			name:  "can render values from ctx",
 			value: "[[.last_response.body.param]]",
 			paramCtx: &transformContext{
-				firstEvent:   &common.MapStr{},
-				lastEvent:    &common.MapStr{},
-				lastResponse: newTestResponse(common.MapStr{"param": 25}, nil, ""),
+				firstEvent:   &mapstr.M{},
+				lastEvent:    &mapstr.M{},
+				lastResponse: newTestResponse(mapstr.M{"param": 25}, nil, ""),
 			},
 			paramTr:     transformable{},
 			paramDefVal: "",
@@ -58,7 +58,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "can render default value if execute fails",
 			value: "[[.last_response.body.does_not_exist]]",
 			paramCtx: &transformContext{
-				lastEvent: &common.MapStr{},
+				lastEvent: &mapstr.M{},
 			},
 			paramTr:     transformable{},
 			paramDefVal: "25",
@@ -192,8 +192,8 @@ func TestValueTpl(t *testing.T) {
 			name:  "func getRFC5988Link",
 			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
 			paramCtx: &transformContext{
-				firstEvent: &common.MapStr{},
-				lastEvent:  &common.MapStr{},
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
 				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
@@ -312,10 +312,10 @@ func TestValueTpl(t *testing.T) {
 				`[[join .last_response.body.narr ","]] [[join .last_response.body.singlevalstr ","]] ` +
 				`[[join .last_response.body.singlevalint ","]]`,
 			paramCtx: &transformContext{
-				firstEvent: &common.MapStr{},
-				lastEvent:  &common.MapStr{},
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
 				lastResponse: newTestResponse(
-					common.MapStr{
+					mapstr.M{
 						"strarr": []string{
 							"foo",
 							"bar",
@@ -342,10 +342,10 @@ func TestValueTpl(t *testing.T) {
 			name:  "func sprintf",
 			value: `[[sprintf "%q:%d" (join .last_response.body.arr ",") 1]]`,
 			paramCtx: &transformContext{
-				firstEvent: &common.MapStr{},
-				lastEvent:  &common.MapStr{},
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
 				lastResponse: newTestResponse(
-					common.MapStr{
+					mapstr.M{
 						"arr": []string{
 							"foo",
 							"bar",
@@ -513,7 +513,7 @@ func TestValueTpl(t *testing.T) {
 	}
 }
 
-func newTestResponse(body common.MapStr, header http.Header, url string) *response {
+func newTestResponse(body mapstr.M, header http.Header, url string) *response {
 	resp := &response{
 		header: http.Header{},
 	}

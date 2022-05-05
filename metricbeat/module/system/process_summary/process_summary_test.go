@@ -26,11 +26,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -69,7 +69,7 @@ func TestStateNames(t *testing.T) {
 	summary, err := event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
-	event, ok := summary.(common.MapStr)
+	event, ok := summary.(mapstr.M)
 	require.True(t, ok)
 
 	// if there's nothing marked as sleeping or idle, something weird is happening

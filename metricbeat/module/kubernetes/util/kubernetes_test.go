@@ -30,9 +30,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -66,36 +66,36 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	assert.Equal(t, resource, funcs.updated)
 
 	// Test enricher
-	events := []common.MapStr{
+	events := []mapstr.M{
 		{"name": "unknown"},
 		{"name": "enrich"},
 	}
 	enricher.Enrich(events)
 
-	assert.Equal(t, []common.MapStr{
+	assert.Equal(t, []mapstr.M{
 		{"name": "unknown"},
 		{
 			"name":    "enrich",
-			"_module": common.MapStr{"label": "value", "pod": common.MapStr{"name": "enrich", "uid": "mockuid"}},
-			"meta":    common.MapStr{"orchestrator": common.MapStr{"cluster": common.MapStr{"name": "gke-4242"}}},
+			"_module": mapstr.M{"label": "value", "pod": mapstr.M{"name": "enrich", "uid": "mockuid"}},
+			"meta":    mapstr.M{"orchestrator": mapstr.M{"cluster": mapstr.M{"name": "gke-4242"}}},
 		},
 	}, events)
 
 	// Enrich a pod (metadata goes in root level)
-	events = []common.MapStr{
+	events = []mapstr.M{
 		{"name": "unknown"},
 		{"name": "enrich"},
 	}
 	enricher.isPod = true
 	enricher.Enrich(events)
 
-	assert.Equal(t, []common.MapStr{
+	assert.Equal(t, []mapstr.M{
 		{"name": "unknown"},
 		{
 			"name":    "enrich",
 			"uid":     "mockuid",
-			"_module": common.MapStr{"label": "value"},
-			"meta":    common.MapStr{"orchestrator": common.MapStr{"cluster": common.MapStr{"name": "gke-4242"}}},
+			"_module": mapstr.M{"label": "value"},
+			"meta":    mapstr.M{"orchestrator": mapstr.M{"cluster": mapstr.M{"name": "gke-4242"}}},
 		},
 	}, events)
 
@@ -103,13 +103,13 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	watcher.handler.OnDelete(resource)
 	assert.Equal(t, resource, funcs.deleted)
 
-	events = []common.MapStr{
+	events = []mapstr.M{
 		{"name": "unknown"},
 		{"name": "enrich"},
 	}
 	enricher.Enrich(events)
 
-	assert.Equal(t, []common.MapStr{
+	assert.Equal(t, []mapstr.M{
 		{"name": "unknown"},
 		{"name": "enrich"},
 	}, events)
@@ -118,15 +118,15 @@ func TestBuildMetadataEnricher(t *testing.T) {
 type mockFuncs struct {
 	updated kubernetes.Resource
 	deleted kubernetes.Resource
-	indexed common.MapStr
+	indexed mapstr.M
 }
 
-func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) {
+func (f *mockFuncs) update(m map[string]mapstr.M, obj kubernetes.Resource) {
 	accessor, _ := meta.Accessor(obj)
 	f.updated = obj
-	meta := common.MapStr{
-		"kubernetes": common.MapStr{
-			"pod": common.MapStr{
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{
 				"name": accessor.GetName(),
 				"uid":  string(accessor.GetUID()),
 			},
@@ -139,13 +139,13 @@ func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) 
 	m[accessor.GetName()] = meta
 }
 
-func (f *mockFuncs) delete(m map[string]common.MapStr, obj kubernetes.Resource) {
+func (f *mockFuncs) delete(m map[string]mapstr.M, obj kubernetes.Resource) {
 	accessor, _ := meta.Accessor(obj)
 	f.deleted = obj
 	delete(m, accessor.GetName())
 }
 
-func (f *mockFuncs) index(m common.MapStr) string {
+func (f *mockFuncs) index(m mapstr.M) string {
 	f.indexed = m
 	return m["name"].(string)
 }

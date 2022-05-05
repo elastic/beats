@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool, logger *logp.Logger) {
@@ -36,21 +37,21 @@ func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool
 }
 
 func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool, logger *logp.Logger) {
-	event := common.MapStr{
-		"container": common.MapStr{
+	event := mapstr.M{
+		"container": mapstr.M{
 			"id": cont.ID,
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": cont.Image,
 			},
 			"name":    docker.ExtractContainerName(cont.Names),
 			"runtime": "docker",
 		},
-		"docker": common.MapStr{
-			"container": common.MapStr{
+		"docker": mapstr.M{
+			"container": mapstr.M{
 				"created":      common.Time(time.Unix(cont.Created, 0)),
 				"command":      cont.Command,
 				"ip_addresses": extractIPAddresses(cont.NetworkSettings),
-				"size": common.MapStr{
+				"size": mapstr.M{
 					"root_fs": cont.SizeRootFs,
 					"rw":      cont.SizeRw,
 				},

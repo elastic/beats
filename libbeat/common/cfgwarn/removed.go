@@ -23,10 +23,10 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
-func checkRemovedSettings(cfg *common.Config, settings ...string) error {
+func checkRemovedSettings(cfg *config.C, settings ...string) error {
 	var errs multierror.Errors
 	for _, setting := range settings {
 		if err := checkRemovedSetting(cfg, setting); err != nil {
@@ -37,7 +37,7 @@ func checkRemovedSettings(cfg *common.Config, settings ...string) error {
 	return errs.Err()
 }
 
-func checkRemovedSetting(cfg *common.Config, setting string) error {
+func checkRemovedSetting(cfg *config.C, setting string) error {
 	segments := strings.Split(setting, ".")
 
 	L := len(segments)
@@ -67,11 +67,11 @@ func checkRemovedSetting(cfg *common.Config, setting string) error {
 }
 
 // CheckRemoved6xSettings prints a warning if the obsolete setting is used.
-func CheckRemoved6xSettings(cfg *common.Config, settings ...string) error {
+func CheckRemoved6xSettings(cfg *config.C, settings ...string) error {
 	return checkRemovedSettings(cfg, settings...)
 }
 
 // CheckRemoved6xSetting prints a warning if the obsolete setting is used.
-func CheckRemoved6xSetting(cfg *common.Config, setting string) error {
+func CheckRemoved6xSetting(cfg *config.C, setting string) error {
 	return checkRemovedSetting(cfg, setting)
 }

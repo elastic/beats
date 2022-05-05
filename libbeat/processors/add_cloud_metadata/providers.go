@@ -25,7 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type provider struct {
@@ -36,7 +37,7 @@ type provider struct {
 	Local bool
 
 	// Create returns an actual metadataFetcher
-	Create func(string, *common.Config) (metadataFetcher, error)
+	Create func(string, *conf.C) (metadataFetcher, error)
 }
 
 type metadataFetcher interface {
@@ -45,9 +46,9 @@ type metadataFetcher interface {
 
 // result is the result of a query for a specific hosting provider's metadata.
 type result struct {
-	provider string        // Hosting provider type.
-	err      error         // Error that occurred while fetching (if any).
-	metadata common.MapStr // A specific subset of the metadata received from the hosting provider.
+	provider string   // Hosting provider type.
+	err      error    // Error that occurred while fetching (if any).
+	metadata mapstr.M // A specific subset of the metadata received from the hosting provider.
 }
 
 var cloudMetaProviders = map[string]provider{
@@ -96,7 +97,7 @@ func filterMetaProviders(filter func(string) bool, fetchers map[string]provider)
 	return out
 }
 
-func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataFetcher, error) {
+func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher, error) {
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 

@@ -23,7 +23,7 @@ import (
 	errw "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type cloudConfig struct {
@@ -41,7 +41,7 @@ var errCloudCfgIncomplete = errors.New("monitoring.cloud.auth specified but moni
 
 // OverrideWithCloudSettings overrides monitoring.elasticsearch.* with
 // monitoring.cloud.* if the latter are set.
-func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
+func OverrideWithCloudSettings(monitoringCfg *config.C) error {
 	var config cloudConfig
 	if err := monitoringCfg.Unpack(&config); err != nil {
 		return cfgError(err)
@@ -80,8 +80,8 @@ func OverrideWithCloudSettings(monitoringCfg *common.Config) error {
 	return nil
 }
 
-func overwriteWithCloudID(monitoringCfg *common.Config, cid *cloudid.CloudID) error {
-	esURLConfig, err := common.NewConfigFrom([]string{cid.ElasticsearchURL()})
+func overwriteWithCloudID(monitoringCfg *config.C, cid *cloudid.CloudID) error {
+	esURLConfig, err := config.NewConfigFrom([]string{cid.ElasticsearchURL()})
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func overwriteWithCloudID(monitoringCfg *common.Config, cid *cloudid.CloudID) er
 	return nil
 }
 
-func overwriteWithCloudAuth(monitoringCfg *common.Config, cid *cloudid.CloudID) error {
+func overwriteWithCloudAuth(monitoringCfg *config.C, cid *cloudid.CloudID) error {
 	if err := monitoringCfg.SetString("elasticsearch.username", -1, cid.Username()); err != nil {
 		return err
 	}

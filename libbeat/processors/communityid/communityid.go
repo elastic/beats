@@ -27,11 +27,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 const logName = "processor.community_id"
@@ -58,7 +58,7 @@ type processor struct {
 //
 // Other IP-borne protocols:
 //   IP src / IP dst / IP proto
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *cfg.C) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")

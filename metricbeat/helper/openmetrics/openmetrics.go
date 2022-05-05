@@ -39,10 +39,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const acceptHeader = `application/openmetrics-text; version=1.0.0; charset=utf-8,text/plain`
@@ -330,9 +330,9 @@ type OpenMetrics interface {
 	// GetFamilies requests metric families from openmetrics endpoint and returns them
 	GetFamilies() ([]*OpenMetricFamily, error)
 
-	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
+	GetProcessedMetrics(mapping *MetricsMapping) ([]mapstr.M, error)
 
-	ProcessMetrics(families []*OpenMetricFamily, mapping *MetricsMapping) ([]common.MapStr, error)
+	ProcessMetrics(families []*OpenMetricFamily, mapping *MetricsMapping) ([]mapstr.M, error)
 
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
@@ -766,9 +766,9 @@ type MetricsMapping struct {
 	ExtraFields map[string]string
 }
 
-func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *MetricsMapping) ([]common.MapStr, error) {
+func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
 
-	eventsMap := map[string]common.MapStr{}
+	eventsMap := map[string]mapstr.M{}
 	infoMetrics := []*infoMetricData{}
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
@@ -788,7 +788,7 @@ func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *Metr
 
 			storeAllLabels := false
 			labelsLocation := ""
-			var extraFields common.MapStr
+			var extraFields mapstr.M
 			if m != nil {
 				c := m.GetConfiguration()
 				storeAllLabels = c.StoreNonMappedLabels
@@ -803,8 +803,8 @@ func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *Metr
 			}
 
 			// Convert labels
-			labels := common.MapStr{}
-			keyLabels := common.MapStr{}
+			labels := mapstr.M{}
+			keyLabels := mapstr.M{}
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
@@ -840,7 +840,7 @@ func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *Metr
 
 			if field != "" {
 				event := getEvent(eventsMap, keyLabels)
-				update := common.MapStr{}
+				update := mapstr.M{}
 				update.Put(field, value)
 				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				event.DeepUpdate(update)
@@ -851,7 +851,7 @@ func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *Metr
 	}
 
 	// populate events array from values in eventsMap
-	events := make([]common.MapStr, 0, len(eventsMap))
+	events := make([]mapstr.M, 0, len(eventsMap))
 	for _, event := range eventsMap {
 		// Add extra fields
 		for k, v := range mapping.ExtraFields {
@@ -882,7 +882,7 @@ func (p *openmetrics) ProcessMetrics(families []*OpenMetricFamily, mapping *Metr
 	return events, nil
 }
 
-func (p *openmetrics) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error) {
+func (p *openmetrics) GetProcessedMetrics(mapping *MetricsMapping) ([]mapstr.M, error) {
 	families, err := p.GetFamilies()
 	if err != nil {
 		return nil, err
@@ -892,8 +892,8 @@ func (p *openmetrics) GetProcessedMetrics(mapping *MetricsMapping) ([]common.Map
 
 // infoMetricData keeps data about an infoMetric
 type infoMetricData struct {
-	Labels common.MapStr
-	Meta   common.MapStr
+	Labels mapstr.M
+	Meta   mapstr.M
 }
 
 func (p *openmetrics) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
@@ -911,7 +911,7 @@ func (p *openmetrics) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Repor
 	return nil
 }
 
-func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {
+func getEvent(m map[string]mapstr.M, labels mapstr.M) mapstr.M {
 	hash := labels.String()
 	res, ok := m[hash]
 	if !ok {
@@ -921,8 +921,8 @@ func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {
 	return res
 }
 
-func getLabels(metric *OpenMetric) common.MapStr {
-	labels := common.MapStr{}
+func getLabels(metric *OpenMetric) mapstr.M {
+	labels := mapstr.M{}
 	for _, label := range metric.GetLabel() {
 		if label.Name != "" && label.Value != "" {
 			labels.Put(label.Name, label.Value)

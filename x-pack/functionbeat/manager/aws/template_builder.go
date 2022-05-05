@@ -16,12 +16,12 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/logs"
 	"github.com/awslabs/goformation/v4/cloudformation/tags"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core/bundle"
 	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // zipData stores the data on the zip to be deployed
@@ -57,7 +57,7 @@ const (
 	packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 )
 
-func NewTemplateBuilder(log *logp.Logger, cfg *common.Config, p provider.Provider) (provider.TemplateBuilder, error) {
+func NewTemplateBuilder(log *logp.Logger, cfg *conf.C, p provider.Provider) (provider.TemplateBuilder, error) {
 	config := &fnaws.Config{}
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err

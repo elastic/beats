@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-seccomp-bpf"
 )
 
@@ -73,7 +73,7 @@ func MustRegisterPolicy(p *seccomp.Policy) {
 // - Policy values from config
 // - Application registered policy
 // - Default policy (a simple blacklist)
-func LoadFilter(c *common.Config) error {
+func LoadFilter(c *config.C) error {
 	// Bail out if seccomp.enabled=false.
 	if c != nil && !c.Enabled() {
 		return nil
@@ -124,7 +124,7 @@ func loadFilter(p *seccomp.Policy) {
 	log.Infow("Syscall filter successfully installed")
 }
 
-func getPolicy(c *common.Config) (*seccomp.Policy, error) {
+func getPolicy(c *config.C) (*seccomp.Policy, error) {
 	policy := defaultPolicy
 	if registeredPolicy != nil {
 		policy = registeredPolicy

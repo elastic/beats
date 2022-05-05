@@ -27,11 +27,12 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	c "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
@@ -57,7 +58,7 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *common.Config) (processors.Processor, error) {
+func new(cfg *c.C) (processors.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "could not unpack processor configuration")
@@ -131,7 +132,7 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			if err != common.ErrKeyNotFound {
+			if err != mapstr.ErrKeyNotFound {
 				return 0, errors.Wrapf(err, "error getting value of field: %v", field)
 			}
 

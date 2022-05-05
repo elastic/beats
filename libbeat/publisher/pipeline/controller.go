@@ -19,12 +19,12 @@ package pipeline
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // outputController manages the pipelines output capabilities, like:
@@ -127,9 +127,9 @@ func (c *outputController) Set(outGrp outputs.Group) {
 // Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
-	outFactory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+	outFactory func(outputs.Observer, config.Namespace) (outputs.Group, error),
 ) error {
-	outCfg := common.ConfigNamespace{}
+	outCfg := config.Namespace{}
 	if cfg != nil {
 		if err := cfg.Config.Unpack(&outCfg); err != nil {
 			return err

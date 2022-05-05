@@ -10,8 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCursorUpdate(t *testing.T) {
@@ -19,8 +20,8 @@ func TestCursorUpdate(t *testing.T) {
 		name          string
 		baseConfig    map[string]interface{}
 		trCtx         *transformContext
-		initialState  common.MapStr
-		expectedState common.MapStr
+		initialState  mapstr.M
+		expectedState mapstr.M
 	}{
 		{
 			name: "update an unexisting value",
@@ -30,8 +31,8 @@ func TestCursorUpdate(t *testing.T) {
 				},
 			},
 			trCtx:        emptyTransformContext(),
-			initialState: common.MapStr{},
-			expectedState: common.MapStr{
+			initialState: mapstr.M{},
+			expectedState: mapstr.M{
 				"entry1": "v1",
 			},
 		},
@@ -44,15 +45,15 @@ func TestCursorUpdate(t *testing.T) {
 			},
 			trCtx: func() *transformContext {
 				trCtx := emptyTransformContext()
-				trCtx.lastResponse.body = common.MapStr{
+				trCtx.lastResponse.body = mapstr.M{
 					"foo": "v2",
 				}
 				return trCtx
 			}(),
-			initialState: common.MapStr{
+			initialState: mapstr.M{
 				"entry1": "v1",
 			},
-			expectedState: common.MapStr{
+			expectedState: mapstr.M{
 				"entry1": "v2",
 			},
 		},
@@ -72,12 +73,12 @@ func TestCursorUpdate(t *testing.T) {
 				},
 			},
 			trCtx: emptyTransformContext(),
-			initialState: common.MapStr{
+			initialState: mapstr.M{
 				"entry1": "v1",
 				"entry2": "v2",
 				"entry3": "v3",
 			},
-			expectedState: common.MapStr{
+			expectedState: mapstr.M{
 				"entry1": "v1",
 				"entry2": "v2",
 				"entry3": "v3",
@@ -92,10 +93,10 @@ func TestCursorUpdate(t *testing.T) {
 				},
 			},
 			trCtx: emptyTransformContext(),
-			initialState: common.MapStr{
+			initialState: mapstr.M{
 				"entry1": "v1",
 			},
-			expectedState: common.MapStr{
+			expectedState: mapstr.M{
 				"entry1": "",
 			},
 		},
@@ -104,7 +105,7 @@ func TestCursorUpdate(t *testing.T) {
 	for _, testCase := range testCases {
 		tc := testCase
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.baseConfig)
+			cfg := conf.MustNewConfigFrom(tc.baseConfig)
 
 			conf := cursorConfig{}
 			require.NoError(t, cfg.Unpack(&conf))

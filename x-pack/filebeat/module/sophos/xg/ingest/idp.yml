@@ -1,3 +1,4 @@
+---
 description: Pipeline for parsing sophos firewall logs (ipd pipeline)
 processors:
 #######################
@@ -19,18 +20,13 @@ processors:
     value:
       - intrusion_detection
       - network
-    if: '["06001", "06002", "07001", "07002"].contains(ctx.sophos?.xg?.message_id)'
+    if: '["06001", "06002", "07001", "07002"].contains(ctx.event?.code)'
 - append:
     field: event.type
     value:
       - denied
       - connection
-    if: '["06001", "06002", "07001", "07002"].contains(ctx.sophos?.xg?.message_id)'
-- rename:
-    field: sophos.xg.log_id
-    target_field: event.code
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.log_id != null"
+    if: '["06001", "06002", "07001", "07002"].contains(ctx.event?.code)'
 
 ####################################
 ## ECS Server/Destination Mapping ##
@@ -40,10 +36,6 @@ processors:
     target_field: destination.ip
     ignore_missing: true
     if: "ctx.sophos?.xg?.dst_ip != null"
-- set:
-    field: server.ip
-    value: '{{destination.ip}}'
-    if: "ctx.destination?.ip != null"
 - convert:
     field: sophos.xg.dst_port
     target_field: destination.port
@@ -51,17 +43,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophos?.xg?.dst_port != null"
-- set:
-    field: server.port
-    value: '{{destination.port}}'
-    if: "ctx.destination?.port != null"
-- convert:
-    field: server.port
-    target_field: server.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.server?.port != null"
 
 ###############################
 ## ECS Client/Source Mapping ##
@@ -71,10 +52,6 @@ processors:
     target_field: source.ip
     ignore_missing: true
     if: "ctx.sophos?.xg?.src_ip != null"
-- set:
-    field: client.ip
-    value: '{{source.ip}}'
-    if: "ctx.source?.ip != null"
 - convert:
     field: sophos.xg.src_port
     target_field: source.port
@@ -82,17 +59,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophos?.xg?.src_port != null"
-- set:
-    field: client.port
-    value: '{{source.port}}'
-    if: "ctx.source?.port != null"
-- convert:
-    field: client.port
-    target_field: client.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.client?.port != null"
 - rename:
     field: sophos.xg.user_name
     target_field: source.user.name
@@ -118,103 +84,13 @@ processors:
     ignore_missing: true
     if: "ctx.sophos?.xg?.classification != null"
 
-#############################
-## ECS Network/Geo Mapping ##
-#############################
+######################
+## ECS Network Mapping
+######################
 - rename:
     field: sophos.xg.protocol
     target_field: network.transport
     ignore_missing: true
-    if: "ctx.sophos?.xg?.protocol != null"
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
-    if: "ctx.source?.geo == null"
-- geoip:
-    field: destination.ip
-    target_field: destination.geo
-    ignore_missing: true
-    if: "ctx.destination?.geo == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: destination.ip
-    target_field: destination.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- geoip:
-    field: source.nat.ip
-    target_field: source.geo
-    ignore_missing: true
-    if: "ctx.source?.geo == null"
-- geoip:
-    field: destination.nat.ip
-    target_field: destination.geo
-    ignore_missing: true
-    if: "ctx.destination?.geo == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.nat.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-    if: "ctx.source?.as == null"
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: destination.nat.ip
-    target_field: destination.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-    if: "ctx.destination?.as == null"
-- rename:
-    field: source.as.asn
-    target_field: source.as.number
-    ignore_missing: true
-- rename:
-    field: source.as.organization_name
-    target_field: source.as.organization.name
-    ignore_missing: true
-- rename:
-    field: destination.as.asn
-    target_field: destination.as.number
-    ignore_missing: true
-- rename:
-    field: destination.as.organization_name
-    target_field: destination.as.organization.name
-    ignore_missing: true
-
-#########################
-## ECS Related Mapping ##
-#########################
-- append:
-    if: 'ctx?.source?.ip != null'
-    field: related.ip
-    value: '{{source.ip}}'
-    allow_duplicates: false
-- append:
-    if: 'ctx?.destination?.ip != null'
-    field: related.ip
-    value: '{{destination.ip}}'
-    allow_duplicates: false
-- append:
-    field: related.user
-    value: "{{source.user.name}}"
-    allow_duplicates: false
-    if: "ctx.source?.user?.name != null"
 
 #############
 ## Cleanup ##

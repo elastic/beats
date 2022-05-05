@@ -24,9 +24,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Product supported by X-Pack Monitoring
@@ -118,9 +120,9 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // int, so that it is not serialized in scientific notation in the event. This is because
 // Elasticsearch cannot accepts scientific notation to represent millis-since-epoch values
 // for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
-func FixTimestampField(m common.MapStr, field string) error {
+func FixTimestampField(m mapstr.M, field string) error {
 	v, err := m.GetValue(field)
-	if err == common.ErrKeyNotFound {
+	if err == mapstr.ErrKeyNotFound {
 		return nil
 	}
 	if err != nil {
@@ -151,7 +153,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 		return base, nil
 	}
 
-	var raw common.MapStr
+	var raw mapstr.M
 	if err := base.UnpackConfig(&raw); err != nil {
 		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
@@ -159,7 +161,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 	// These metricsets are exactly the ones required if xpack.enabled == true
 	raw["metricsets"] = xpackEnabledMetricsets
 
-	newConfig, err := common.NewConfigFrom(raw)
+	newConfig, err := conf.NewConfigFrom(raw)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
 	}

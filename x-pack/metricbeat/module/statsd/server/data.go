@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var errInvalidPacket = errors.New("invalid statsd packet")
@@ -100,7 +101,7 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func eventMapping(metricName string, metricValue interface{}, metricSetFields common.MapStr, mappings map[string]StatsdMapping) {
+func eventMapping(metricName string, metricValue interface{}, metricSetFields mapstr.M, mappings map[string]StatsdMapping) {
 	if len(mappings) == 0 {
 		metricSetFields[common.DeDot(metricName)] = metricValue
 		return

@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/traefik/_meta/docs.asciidoc
+
 [[filebeat-module-traefik]]
 :modulename: traefik
 :has-dashboards: true
@@ -73,3 +75,4 @@ image::./images/kibana-traefik.png[]
 For a description of each field in the module, see the
 <<exported-fields-traefik,exported fields>> section.
 
+edit_url!:

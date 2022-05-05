@@ -24,11 +24,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type HttpServer struct {
@@ -40,11 +40,11 @@ type HttpServer struct {
 }
 
 type HttpEvent struct {
-	event common.MapStr
+	event mapstr.M
 	meta  server.Meta
 }
 
-func (h *HttpEvent) GetEvent() common.MapStr {
+func (h *HttpEvent) GetEvent() mapstr.M {
 	return h.event
 }
 
@@ -154,7 +154,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		payload := common.MapStr{
+		payload := mapstr.M{
 			server.EventDataKey: body,
 		}
 

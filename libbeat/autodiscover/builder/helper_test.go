@@ -22,15 +22,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGetProcessors(t *testing.T) {
-	hints := common.MapStr{
-		"co": common.MapStr{
-			"elastic": common.MapStr{
-				"logs": common.MapStr{
-					"processors": common.MapStr{
+	hints := mapstr.M{
+		"co": mapstr.M{
+			"elastic": mapstr.M{
+				"logs": mapstr.M{
+					"processors": mapstr.M{
 						"add_fields": `{"fields": {"foo": "bar"}}`,
 					},
 				},
@@ -38,9 +38,9 @@ func TestGetProcessors(t *testing.T) {
 		},
 	}
 	procs := GetProcessors(hints, "co.elastic.logs")
-	assert.Equal(t, []common.MapStr{
-		common.MapStr{
-			"add_fields": common.MapStr{
+	assert.Equal(t, []mapstr.M{
+		mapstr.M{
+			"add_fields": mapstr.M{
 				"fields": map[string]interface{}{
 					"foo": "bar",
 				},
@@ -52,18 +52,18 @@ func TestGetProcessors(t *testing.T) {
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
 		annotations map[string]string
-		result      common.MapStr
+		result      mapstr.M
 	}{
 		// Empty annotations should return empty hints
 		{
 			annotations: map[string]string{},
-			result:      common.MapStr{},
+			result:      mapstr.M{},
 		},
 
 		// Scenarios being tested:
-		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
-		// logs/processors.add_fields must be nested common.MapStr under hints.logs
-		// logs/json.keys_under_root must be a nested common.MapStr under hints.logs
+		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
+		// logs/processors.add_fields must be nested mapstr.M under hints.logs
+		// logs/json.keys_under_root must be a nested mapstr.M under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
@@ -77,23 +77,23 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar1/period":    "15s",
 				"not.to.include":                       "true",
 			},
-			result: common.MapStr{
-				"logs": common.MapStr{
-					"multiline": common.MapStr{
+			result: mapstr.M{
+				"logs": mapstr.M{
+					"multiline": mapstr.M{
 						"pattern": "^test",
 					},
-					"json": common.MapStr{
+					"json": mapstr.M{
 						"keys_under_root": "true",
 					},
 				},
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"module": "prometheus",
 					"period": "15s",
 				},
 			},
 		},
 		// Scenarios being tested:
-		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// metrics/metrics_path must be found in hints.metrics
@@ -109,13 +109,13 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
 			},
-			result: common.MapStr{
-				"logs": common.MapStr{
-					"multiline": common.MapStr{
+			result: mapstr.M{
+				"logs": mapstr.M{
+					"multiline": mapstr.M{
 						"pattern": "^test",
 					},
 				},
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"module":       "prometheus",
 					"period":       "15s",
 					"metrics_path": "/metrics/prometheus",
@@ -126,7 +126,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Scenarios being tested:
 		// have co.elastic.logs/disable set to false.
-		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
@@ -139,13 +139,13 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
 			},
-			result: common.MapStr{
-				"logs": common.MapStr{
-					"multiline": common.MapStr{
+			result: mapstr.M{
+				"logs": mapstr.M{
+					"multiline": mapstr.M{
 						"pattern": "^test",
 					},
 				},
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"module": "prometheus",
 					"period": "15s",
 				},
@@ -153,7 +153,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Scenarios being tested:
 		// have co.elastic.logs/disable set to false.
-		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
@@ -167,14 +167,14 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
 			},
-			result: common.MapStr{
-				"logs": common.MapStr{
-					"multiline": common.MapStr{
+			result: mapstr.M{
+				"logs": mapstr.M{
+					"multiline": mapstr.M{
 						"pattern": "^test",
 					},
 					"disable": "false",
 				},
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"module": "prometheus",
 					"period": "15s",
 				},
@@ -182,7 +182,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Scenarios being tested:
 		// have co.elastic.logs/disable set to true.
-		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
@@ -196,14 +196,14 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
 			},
-			result: common.MapStr{
-				"logs": common.MapStr{
-					"multiline": common.MapStr{
+			result: mapstr.M{
+				"logs": mapstr.M{
+					"multiline": mapstr.M{
 						"pattern": "^test",
 					},
 					"disable": "true",
 				},
-				"metrics": common.MapStr{
+				"metrics": mapstr.M{
 					"module": "prometheus",
 					"period": "15s",
 				},
@@ -212,7 +212,7 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		annMap := common.MapStr{}
+		annMap := mapstr.M{}
 		for k, v := range test.annotations {
 			annMap.Put(k, v)
 		}
@@ -221,18 +221,18 @@ func TestGenerateHints(t *testing.T) {
 }
 func TestGetHintsAsList(t *testing.T) {
 	tests := []struct {
-		input   common.MapStr
-		output  []common.MapStr
+		input   mapstr.M
+		output  []mapstr.M
 		message string
 	}{
 		{
-			input: common.MapStr{
-				"metrics": common.MapStr{
+			input: mapstr.M{
+				"metrics": mapstr.M{
 					"module": "prometheus",
 					"period": "15s",
 				},
 			},
-			output: []common.MapStr{
+			output: []mapstr.M{
 				{
 					"module": "prometheus",
 					"period": "15s",
@@ -241,15 +241,15 @@ func TestGetHintsAsList(t *testing.T) {
 			message: "Single hint should return a single set of configs",
 		},
 		{
-			input: common.MapStr{
-				"metrics": common.MapStr{
-					"1": common.MapStr{
+			input: mapstr.M{
+				"metrics": mapstr.M{
+					"1": mapstr.M{
 						"module": "prometheus",
 						"period": "15s",
 					},
 				},
 			},
-			output: []common.MapStr{
+			output: []mapstr.M{
 				{
 					"module": "prometheus",
 					"period": "15s",
@@ -258,19 +258,19 @@ func TestGetHintsAsList(t *testing.T) {
 			message: "Single hint with numeric prefix should return a single set of configs",
 		},
 		{
-			input: common.MapStr{
-				"metrics": common.MapStr{
-					"1": common.MapStr{
+			input: mapstr.M{
+				"metrics": mapstr.M{
+					"1": mapstr.M{
 						"module": "prometheus",
 						"period": "15s",
 					},
-					"2": common.MapStr{
+					"2": mapstr.M{
 						"module": "dropwizard",
 						"period": "20s",
 					},
 				},
 			},
-			output: []common.MapStr{
+			output: []mapstr.M{
 				{
 					"module": "prometheus",
 					"period": "15s",
@@ -283,9 +283,9 @@ func TestGetHintsAsList(t *testing.T) {
 			message: "Multiple hints with numeric prefix should return configs in numeric ordering",
 		},
 		{
-			input: common.MapStr{
-				"metrics": common.MapStr{
-					"1": common.MapStr{
+			input: mapstr.M{
+				"metrics": mapstr.M{
+					"1": mapstr.M{
 						"module": "prometheus",
 						"period": "15s",
 					},
@@ -293,7 +293,7 @@ func TestGetHintsAsList(t *testing.T) {
 					"period": "20s",
 				},
 			},
-			output: []common.MapStr{
+			output: []mapstr.M{
 				{
 					"module": "prometheus",
 					"period": "15s",

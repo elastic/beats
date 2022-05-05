@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config for docker autodiscover provider
@@ -33,9 +33,9 @@ type Config struct {
 	Host           string                  `config:"host"`
 	TLS            *docker.TLSConfig       `config:"ssl"`
 	Prefix         string                  `config:"prefix"`
-	Hints          *common.Config          `config:"hints"`
-	Builders       []*common.Config        `config:"builders"`
-	Appenders      []*common.Config        `config:"appenders"`
+	Hints          *config.C               `config:"hints"`
+	Builders       []*config.C             `config:"builders"`
+	Appenders      []*config.C             `config:"appenders"`
 	Templates      template.MapperSettings `config:"templates"`
 	Dedot          bool                    `config:"labels.dedot"`
 	CleanupTimeout time.Duration           `config:"cleanup_timeout" validate:"positive"`

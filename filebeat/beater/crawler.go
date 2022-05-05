@@ -26,14 +26,14 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type crawler struct {
 	log             *logp.Logger
 	inputs          map[uint64]cfgfile.Runner
-	inputConfigs    []*common.Config
+	inputConfigs    []*conf.C
 	wg              sync.WaitGroup
 	inputsFactory   cfgfile.RunnerFactory
 	modulesFactory  cfgfile.RunnerFactory
@@ -45,7 +45,7 @@ type crawler struct {
 
 func newCrawler(
 	inputFactory, module cfgfile.RunnerFactory,
-	inputConfigs []*common.Config,
+	inputConfigs []*conf.C,
 	beatDone chan struct{},
 	once bool,
 ) (*crawler, error) {
@@ -63,8 +63,8 @@ func newCrawler(
 // Start starts the crawler with all inputs
 func (c *crawler) Start(
 	pipeline beat.PipelineConnector,
-	configInputs *common.Config,
-	configModules *common.Config,
+	configInputs *conf.C,
+	configModules *conf.C,
 ) error {
 	log := c.log
 
@@ -110,7 +110,7 @@ func (c *crawler) Start(
 
 func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
-	config *common.Config,
+	config *conf.C,
 ) error {
 	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
 	// is fixed.

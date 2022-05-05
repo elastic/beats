@@ -15,42 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package shipper
 
 import (
-	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-func TestMapStrPointer(t *testing.T) {
-	data := MapStr{
-		"foo": "bar",
-	}
-
-	p := NewMapStrPointer(data)
-	assert.Equal(t, p.Get(), data)
-
-	newData := MapStr{
-		"new": "data",
-	}
-	p.Set(newData)
-	assert.Equal(t, p.Get(), newData)
+type Config struct {
+	// Server address in the format of host:port, e.g. `localhost:50051`
+	Server string `config:"server"`
+	// TLS/SSL configurationf or secure connection
+	TLS *tlscommon.Config `config:"ssl"`
+	// Timeout of a single batch publishing request
+	Timeout time.Duration `config:"timeout"             validate:"min=1"`
+	// MaxRetries is how many times the same batch is attempted to be sent
+	MaxRetries int `config:"max_retries"         validate:"min=-1,nonzero"`
+	// BulkMaxSize max amount of events in a single batch
+	BulkMaxSize int `config:"bulk_max_size"`
 }
 
-func BenchmarkMapStrPointer(b *testing.B) {
-	p := NewMapStrPointer(MapStr{"counter": 0})
-	go func() {
-		counter := 0
-		for {
-			counter++
-			p.Set(MapStr{"counter": counter})
-			time.Sleep(10 * time.Millisecond)
-		}
-	}()
-
-	for n := 0; n < b.N; n++ {
-		_ = p.Get()
+func defaultConfig() Config {
+	return Config{
+		TLS:         nil,
+		Timeout:     30 * time.Second,
+		MaxRetries:  3,
+		BulkMaxSize: 50,
 	}
 }

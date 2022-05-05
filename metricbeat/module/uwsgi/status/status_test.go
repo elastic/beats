@@ -28,9 +28,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func testData(t *testing.T) (data []byte) {
@@ -48,11 +48,11 @@ func testData(t *testing.T) (data []byte) {
 	return
 }
 
-func findItems(mp []mb.Event, key string) []common.MapStr {
-	result := make([]common.MapStr, 0, 1)
+func findItems(mp []mb.Event, key string) []mapstr.M {
+	result := make([]mapstr.M, 0, 1)
 	for _, v := range mp {
 		if el, ok := v.MetricSetFields[key]; ok {
-			result = append(result, el.(common.MapStr))
+			result = append(result, el.(mapstr.M))
 		}
 	}
 
