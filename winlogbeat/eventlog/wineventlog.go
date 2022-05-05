@@ -462,6 +462,7 @@ func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 		s = win.NewEmptyPublisherMetadataStore(provider, c.logger)
 		logp.Warn("failed to load publisher metadata for %v (returning an empty metadata store): %v", provider, err)
 	}
+	s.Close()
 	m = &s.WinMeta
 	c.cache[provider] = m
 	return m
