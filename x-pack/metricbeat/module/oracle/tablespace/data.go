@@ -7,6 +7,7 @@ package tablespace
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
@@ -128,7 +129,8 @@ func (m *MetricSet) addDataFileData(d *dataFile, output map[string]mapstr.M) {
 
 // ServiceName extracts ip address from host.
 func ServiceNameExtractor(host string) string {
-	address := host[strings.LastIndex(host, `connectString="`) : len(host)-1]
+	re := regexp.MustCompile(`connectString="([a-zA-Z0-9_\-\.:/+;|_!@~#$%-^&*'(){}\[\]\?-]+)`)
+	address := re.FindString(host)
 	address = strings.TrimPrefix(address, `connectString="`)
 	return address
 }

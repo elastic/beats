@@ -7,6 +7,7 @@ package performance
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -74,7 +75,8 @@ func (m *MetricSet) transform(in *extractedData) []mb.Event {
 
 // ServiceName extracts ip address from host.
 func ServiceNameExtractor(host string) string {
-	address := host[strings.LastIndex(host, `connectString="`) : len(host)-1]
+	re := regexp.MustCompile(`connectString="([a-zA-Z0-9_\-\.:/+;|_!@~#$%-^&*'(){}\[\]\?-]+)`)
+	address := re.FindString(host)
 	address = strings.TrimPrefix(address, `connectString="`)
 
 	return address
