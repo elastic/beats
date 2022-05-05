@@ -25,10 +25,10 @@ import (
 func init() {
 	// Register deny-by-default based policy for ARM platforms
 	defaultPolicy := &seccomp_types.Policy{
-		DefaultAction: seccomp.ActionErrno,
+		DefaultAction: seccomp_types.ActionErrno,
 		Syscalls: []seccomp_types.SyscallGroup{
 			{
-				Action: seccomp.ActionAllow,
+				Action: seccomp_types.ActionAllow,
 				Names: []string{
 					"execve",
 					"execveat",
