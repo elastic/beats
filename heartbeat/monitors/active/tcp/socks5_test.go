@@ -54,15 +54,11 @@ func TestSocks5Job(t *testing.T) {
 		t.Run(scenario.name, func(t *testing.T) {
 			host, port, ip, closeEcho, err := startEchoServer(t)
 			require.NoError(t, err)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			defer closeEcho()
+			defer closeEcho() //nolint:errcheck // intentional discard
 
 			_, proxyPort, proxyIp, closeProxy, err := startSocks5Server(t)
 			require.NoError(t, err)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			defer closeProxy()
+			defer closeProxy() //nolint:errcheck // intentional discard
 
 			proxyURL := &url.URL{Scheme: "socks5", Host: net.JoinHostPort(proxyIp, fmt.Sprint(proxyPort))}
 			configMap := mapstr.M{
@@ -74,7 +70,7 @@ func TestSocks5Job(t *testing.T) {
 				"check.receive":            "echo123",
 				"check.send":               "echo123",
 			}
-			event := testTCPConfigCheck(t, configMap, host, port)
+			event := testTCPConfigCheck(t, configMap)
 
 			testslike.Test(
 				t,
@@ -112,7 +108,10 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 		return "", 0, "", nil, err
 	}
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
-	require.NoError(t, err)
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	require.NoError(t, err)
 	if err != nil {

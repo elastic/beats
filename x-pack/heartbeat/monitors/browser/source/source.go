@@ -31,7 +31,7 @@ func (s *Source) Active() ISource {
 	return s.ActiveMemo
 }
 
-var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor.")
+var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor")
 
 func (s *Source) Validate() error {
 	if s.Active() == nil {

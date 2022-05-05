@@ -130,15 +130,13 @@ func mockEventCustomFields() map[string]interface{} {
 	return mapstr.M{"foo": "bar"}
 }
 
-//nolint:unparam // There are no new changes to this line but
-// linter has been activated in the meantime. We'll cleanup separately.
-func createMockJob() ([]jobs.Job, error) {
+func createMockJob() []jobs.Job {
 	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
 		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
 	})
 
-	return []jobs.Job{j}, nil
+	return []jobs.Job{j}
 }
 
 func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
@@ -167,9 +165,9 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 				if err != nil {
 					return plugin.Plugin{DoClose: closer}, err
 				}
-				j, err := createMockJob()
+				j := createMockJob()
 
-				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, err
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, nil
 			},
 			Stats: plugin.NewPluginCountersRecorder("test", reg)},
 		built,
@@ -179,9 +177,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
 	reg := plugin.NewPluginsReg()
 	builder, built, closed := mockPluginBuilder()
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	reg.Add(builder)
+	_ = reg.Add(builder)
 	return reg, built, closed
 }
 
@@ -206,9 +202,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
-//nolint:unparam // There are no new changes to this line but
-// linter has been activated in the meantime. We'll cleanup separately.
-func mockBadPluginConf(t *testing.T, id string, schedule string) *conf.C {
+func mockBadPluginConf(t *testing.T, id string) *conf.C {
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},
