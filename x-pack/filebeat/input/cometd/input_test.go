@@ -28,9 +28,9 @@ import (
 )
 
 var (
-	serverURL string
-	inputType int
-	called    uint64
+	serverURL              string
+	expectedHTTPEventCount int
+	called                 uint64
 )
 
 func TestInputDone(t *testing.T) {
@@ -64,7 +64,7 @@ func TestMakeEventFailure(t *testing.T) {
 }
 
 func TestSingleInput(t *testing.T) {
-	inputType = 1
+	expectedHTTPEventCount = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
@@ -114,7 +114,7 @@ func TestSingleInput(t *testing.T) {
 }
 
 func TestInputStop_Wait(t *testing.T) {
-	inputType = 1
+	expectedHTTPEventCount = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
@@ -241,7 +241,7 @@ func TestWait(t *testing.T) {
 }
 
 func TestMultiInput(t *testing.T) {
-	inputType = 2
+	expectedHTTPEventCount = 2
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
@@ -329,7 +329,7 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
 	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
-		if called < uint64(inputType) {
+		if called < uint64(expectedHTTPEventCount) {
 			atomic.AddUint64(&called, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
 		} else {
