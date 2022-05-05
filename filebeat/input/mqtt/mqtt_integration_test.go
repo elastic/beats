@@ -46,7 +46,7 @@ const (
 
 var (
 	hostPort = fmt.Sprintf("tcp://%s:%s",
-		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "mosquitto"),
+		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"),
 		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))
 	topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
 )
