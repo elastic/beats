@@ -55,8 +55,7 @@ func (in *cometdInput) run() error {
 	for e := range in.msgCh {
 		if e.Failed() {
 			return fmt.Errorf("error collecting events: %w", e.Err)
-		}
-		if !e.Msg.Successful {
+		} else if !e.Msg.Successful {
 			var event event
 			// To handle the last response where the object received was empty
 			if e.Msg.Data.Payload == nil {

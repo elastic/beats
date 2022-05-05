@@ -168,7 +168,9 @@ func TestInputStop_Wait(t *testing.T) {
 	require.Equal(t, 1, bay.GetConnectedCount())
 
 	var wg sync.WaitGroup
+	var waitForConnections sync.WaitGroup
 	wg.Add(1)
+	waitForConnections.Add(1)
 	go func() {
 		require.Equal(t, 1, bay.GetConnectedCount()) // current open channels count should be 1
 		event := <-eventsCh
@@ -176,12 +178,12 @@ func TestInputStop_Wait(t *testing.T) {
 		wg.Done()
 		time.Sleep(100 * time.Millisecond)           // let input.Stop() be executed.
 		require.Equal(t, 0, bay.GetConnectedCount()) // current open channels count should be 0
+		waitForConnections.Done()
 	}()
-
-	time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
 
 	wg.Wait()
 	input.Wait()
+	waitForConnections.Wait()
 }
 
 func TestStop(t *testing.T) {
@@ -290,22 +292,23 @@ func TestMultiInput(t *testing.T) {
 	require.NotNil(t, input2)
 
 	require.Equal(t, 0, bay.GetConnectedCount())
-	// run input
-	input1.Run()
-	defer input1.Stop()
-
-	// run input
-	input2.Run()
-	defer input2.Stop()
 
 	got := 0
 	go func() {
+		// run input
+		input1.Run()
+		defer input1.Stop()
+
+		// run input
+		input2.Run()
+		defer input2.Stop()
+
 		for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
 			assertEventMatches(t, expected1, event)
 			got++
 		}
 	}()
-	time.Sleep(2 * time.Second)
+	time.Sleep(time.Second)
 	if got < 2 {
 		require.NoError(t, fmt.Errorf("not able to get events."))
 	}
@@ -329,6 +332,8 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		if called < uint64(inputType) {
 			atomic.AddUint64(&called, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
+		} else {
+			_, _ = w.Write([]byte(`{}`))
 		}
 		return
 	case `{
