@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2022-05-04T09:13:07.676Z",
+    "event": {
+        "dataset": "oracle.sysmetric",
+        "module": "oracle",
+        "duration": 99066790
+    },
+    "metricset": {
+        "name": "sysmetric",
+        "period": 10000
+    },
+    "oracle": {
+        "sysmetric": {
+            "metrics": {
+                "metric_id": 2143,
+                "end_time": "2022-05-04T09:12:30Z",
+                "group_id": 2,
+                "metric_unit": "Sessions",
+                "container_id": 0,
+                "begin_time": "2022-05-04T09:11:30Z",
+                "interval_size_csec": 6001,
+                "name": "Session Count",
+                "value": 76
+            }
+        }
+    },
+    "service": {
+        "type": "oracle",
+        "address": "oracle://localhost:1521/ORCLCDB.localdomain"
+    }
+}
