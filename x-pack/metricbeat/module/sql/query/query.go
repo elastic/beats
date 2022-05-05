@@ -128,8 +128,6 @@ func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2) {
 	} else {
 		reporter.Event(*getUserEvent(ms, m.config.Driver, m.config.Query))
 	}
-
-	return
 }
 
 // composeEventFromRoot using the provided metrics and organizing their position in the event by using the rootLevelName
@@ -205,7 +203,8 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	if len(boolMetrics) > 0 {
 		ret["bool"] = boolMetrics
 	}
-	return nil
+
+	return ret
 }
 
 // Close closes the connection pool releasing its resources
