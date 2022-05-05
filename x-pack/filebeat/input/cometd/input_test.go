@@ -167,21 +167,21 @@ func TestInputStop_Wait(t *testing.T) {
 	eventProcessing.Wait()
 	require.Equal(t, 1, bay.GetConnectedCount())
 
-	var wg sync.WaitGroup
+	var waitForEventCollection sync.WaitGroup
 	var waitForConnections sync.WaitGroup
-	wg.Add(1)
+	waitForEventCollection.Add(1)
 	waitForConnections.Add(1)
 	go func() {
 		require.Equal(t, 1, bay.GetConnectedCount()) // current open channels count should be 1
 		event := <-eventsCh
 		assertEventMatches(t, expected, event) // wait for single event
-		wg.Done()
+		waitForEventCollection.Done()
 		time.Sleep(100 * time.Millisecond)           // let input.Stop() be executed.
 		require.Equal(t, 0, bay.GetConnectedCount()) // current open channels count should be 0
 		waitForConnections.Done()
 	}()
 
-	wg.Wait()
+	waitForEventCollection.Wait()
 	input.Wait()
 	waitForConnections.Wait()
 }
