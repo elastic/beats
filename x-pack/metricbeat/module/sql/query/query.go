@@ -7,14 +7,11 @@ package query
 import (
 	"context"
 	"fmt"
-
-	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/jmoiron/sqlx"
 )
 
 // represents the response format of the query
@@ -39,11 +36,20 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Driver         string
-	Query          string
-	ResponseFormat string
+	config config
 
 	db *sqlx.DB
+}
+
+type config struct {
+	Driver         string `config:"driver" validate:"nonzero,required"`
+	Query          string `config:"sql_query" validate:"nonzero,required"`
+	ResponseFormat string `config:"sql_response_format"`
+	RawData        struct {
+		Enabled       bool   `config:"enabled"`
+		RootLevelName string `config:"root_level_name"`
+		DataLevelName string `config:"data_level_name"`
+	} `config:"raw_data"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -51,25 +57,19 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
-	config := struct {
-		Driver         string `config:"driver" validate:"nonzero,required"`
-		Query          string `config:"sql_query" validate:"nonzero,required"`
-		ResponseFormat string `config:"sql_response_format"`
-	}{ResponseFormat: tableResponseFormat}
+	cfg := config{ResponseFormat: tableResponseFormat}
 
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	if err := base.Module().UnpackConfig(&cfg); err != nil {
 		return nil, err
 	}
 
-	if config.ResponseFormat != variableResponseFormat && config.ResponseFormat != tableResponseFormat {
-		return nil, fmt.Errorf("invalid sql_response_format value: %s", config.ResponseFormat)
+	if cfg.ResponseFormat != variableResponseFormat && cfg.ResponseFormat != tableResponseFormat {
+		return nil, fmt.Errorf("invalid sql_response_format value: %s", cfg.ResponseFormat)
 	}
 
 	return &MetricSet{
-		BaseMetricSet:  base,
-		Driver:         config.Driver,
-		Query:          config.Query,
-		ResponseFormat: config.ResponseFormat,
+		BaseMetricSet: base,
+		config:        cfg,
 	}, nil
 }
 
@@ -79,52 +79,80 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
 func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
-	db, err := sql.NewDBClient(m.Driver, m.HostData().URI, m.Logger())
+	db, err := sql.NewDBClient(m.config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error opening connection")
+		return fmt.Errorf("could not open connection: %s", err.Error())
 	}
 	defer db.Close()
 
-	if m.ResponseFormat == tableResponseFormat {
-		mss, err := db.FetchTableMode(ctx, m.Query)
+	if m.config.ResponseFormat == tableResponseFormat {
+		mss, err := db.FetchTableMode(ctx, m.config.Query)
 		if err != nil {
 			return err
 		}
 
 		for _, ms := range mss {
-			report.Event(m.getEvent(ms))
+			m.Report(ms, report)
 		}
 
 		return nil
 	}
 
-	ms, err := db.FetchVariableMode(ctx, m.Query)
+	ms, err := db.FetchVariableMode(ctx, m.config.Query)
 	if err != nil {
 		return err
 	}
-	report.Event(m.getEvent(ms))
+
+	m.Report(ms, report)
 
 	return nil
 }
 
-func (m *MetricSet) getEvent(ms mapstr.M) mb.Event {
+func (m *MetricSet) Report(ms common.MapStr, report mb.ReporterV2) {
+	if !m.config.RawData.Enabled {
+		report.Event(m.getEvent(ms))
+	} else {
+		// Check that we have every we need
+		if m.config.RawData.RootLevelName == "" {
+			m.Logger().Errorf("'raw_data.root_level_name' field is required in sql config file if raw_data is enabled")
+			return
+		}
+
+		if m.config.RawData.DataLevelName == "" {
+			m.Logger().Errorf("'raw_data.data_level_name' field is required in sql config file if raw_data is enabled")
+			return
+		}
+
+		report.Event(mb.Event{
+			RootFields: common.MapStr{
+				m.config.RawData.RootLevelName: common.MapStr{
+					m.config.RawData.DataLevelName: ms,
+				},
+			},
+			Namespace: m.config.RawData.DataLevelName,
+			Service:   m.config.RawData.RootLevelName,
+		})
+	}
+}
+
+func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
 	return mb.Event{
-		RootFields: mapstr.M{
-			"sql": mapstr.M{
-				"driver":  m.Driver,
-				"query":   m.Query,
+		RootFields: common.MapStr{
+			"sql": common.MapStr{
+				"driver":  m.config.Driver,
+				"query":   m.config.Query,
 				"metrics": getMetrics(ms),
 			},
 		},
 	}
 }
 
-func getMetrics(ms mapstr.M) (ret mapstr.M) {
-	ret = mapstr.M{}
+func getMetrics(ms common.MapStr) (ret common.MapStr) {
+	ret = common.MapStr{}
 
-	numericMetrics := mapstr.M{}
-	stringMetrics := mapstr.M{}
-	boolMetrics := mapstr.M{}
+	numericMetrics := common.MapStr{}
+	stringMetrics := common.MapStr{}
+	boolMetrics := common.MapStr{}
 
 	for k, v := range ms {
 		switch v.(type) {
@@ -157,9 +185,9 @@ func getMetrics(ms mapstr.M) (ret mapstr.M) {
 }
 
 // Close closes the connection pool releasing its resources
-func (m *MetricSet) Close() error {
+func (m *MetricSet) Close() (err error) {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "closing connection")
+	return m.db.Close()
 }
