@@ -46,8 +46,8 @@ import (
 )
 
 const (
-	kafkaDefaultHost     = "kafka"
-	kafkaDefaultPort     = "9092"
+	kafkaDefaultHost     = "localhost"
+	kafkaDefaultPort     = "9094"
 	kafkaDefaultSASLPort = "9093"
 )
 
@@ -204,6 +204,8 @@ func TestKafkaPublish(t *testing.T) {
 				"hosts":          []string{getTestSASLKafkaHost()},
 				"protocol":       "https",
 				"sasl.mechanism": "SCRAM-SHA-512",
+				// Disable hostname verification since we are likely writing to localhost.
+				"ssl.verification_mode": "certificate",
 				"ssl.certificate_authorities": []string{
 					"../../../testing/environments/docker/kafka/certs/ca-cert",
 				},

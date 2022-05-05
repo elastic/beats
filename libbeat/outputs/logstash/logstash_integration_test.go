@@ -151,7 +151,8 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	}
 	if tls {
 		config["hosts"] = []string{getLogstashTLSHost()}
-		config["ssl.verification_mode"] = "full"
+		// Disable hostname verification as we are writing to localhost.
+		config["ssl.verification_mode"] = "certificate"
 		config["ssl.certificate_authorities"] = []string{
 			"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
 		}

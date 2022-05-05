@@ -10,8 +10,6 @@ services:
     #   test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
     #   retries: 300
     #   interval: 1s
-    ports:
-      - 9200:9200
     environment:
     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     - "transport.host=127.0.0.1"
@@ -41,6 +39,9 @@ services:
     volumes:
       - ./docker/logstash/pipeline-xpack:/usr/share/logstash/pipeline:ro
       - ./docker/logstash/pki:/etc/pki:ro
+    ports:
+      - 5044:5044
+      - 5055:5055
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.3.0-d380914f-SNAPSHOT
