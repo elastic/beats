@@ -3,9 +3,6 @@
   description: >
     Fields from AWS CloudWatch logs.
   fields:
-<<<<<<< HEAD
-    - name: aws-cloudwatch
-=======
     - name: awscloudwatch
       deprecated: 9.0.0
       default_field: true
@@ -30,7 +27,6 @@
             The time the event was ingested in AWS CloudWatch.
             Deprecated: Use aws.cloudwatch.ingestion_time instead
     - name: aws.cloudwatch
->>>>>>> c0b3d5bf10 (Rename awscloudwatch.* fields to aws.cloudwatch.* (#31488))
       default_field: true
       type: group
       description: >
