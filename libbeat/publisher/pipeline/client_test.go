@@ -83,7 +83,8 @@ func TestClient(t *testing.T) {
 			},
 		}
 
-		logp.TestingSetup()
+		err := logp.TestingSetup()
+		assert.Nil(t, err)
 
 		for name, test := range cases {
 			t.Run(name, func(t *testing.T) {
@@ -138,7 +139,8 @@ func TestClientWaitClose(t *testing.T) {
 
 		return p
 	}
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
 	pipeline := makePipeline(Settings{}, q)

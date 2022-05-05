@@ -167,12 +167,13 @@ func DevelopmentSetup(options ...Option) error {
 
 // TestingSetup configures logging by calling DevelopmentSetup if and only if
 // verbose testing is enabled (as in 'go test -v').
-func TestingSetup(options ...Option) {
+func TestingSetup(options ...Option) error {
 	// Use the flag to avoid a dependency on the testing package.
 	f := flag.Lookup("test.v")
 	if f != nil && f.Value.String() == "true" {
-		_ = DevelopmentSetup(options...)
+		return DevelopmentSetup(options...)
 	}
+	return nil
 }
 
 // ObserverLogs provides the list of logs generated during the observation
