@@ -3,36 +3,14 @@
         "description": "",
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [
-                    {
-                        "$state": {
-                            "store": "appState"
-                        },
-                        "meta": {
-                            "alias": null,
-                            "disabled": false,
-                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "event.dataset",
-                            "negate": false,
-                            "params": {
-                                "query": "salesforce.login"
-                            },
-                            "type": "phrase"
-                        },
-                        "query": {
-                            "match_phrase": {
-                                "event.dataset": "salesforce.login"
-                            }
-                        }
-                    }
-                ],
+                "filter": [],
                 "query": {
                     "language": "kuery",
                     "query": ""
                 }
             }
         },
-        "title": "Login over time [Filebeat Salesforce]",
+        "title": "[Logout] Logout Over Time [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -44,13 +22,12 @@
                 "drop_last_bucket": 0,
                 "filter": {
                     "language": "kuery",
-                    "query": "event.dataset : \"salesforce.login\" "
+                    "query": "event.dataset : \"salesforce.logout\""
                 },
-                "id": "ad12785a-5d43-469d-9114-6a83add168c3",
+                "id": "9b373d2d-abc7-4c3e-a45a-b3fed48fa34f",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
                 "isModelInvalid": false,
-                "max_bars": 50,
                 "max_lines_legend": 1,
                 "series": [
                     {
@@ -58,12 +35,12 @@
                         "chart_type": "line",
                         "color": "#68BC00",
                         "fill": 0.5,
-                        "formatter": "default",
-                        "id": "24098913-4cc2-4304-ab59-1003aa7a9655",
+                        "formatter": "number",
+                        "id": "0e7dc0ec-81a5-437b-a632-ff8b9a3f84d2",
                         "line_width": 1,
                         "metrics": [
                             {
-                                "id": "434e8b7d-76b7-4947-95d1-aabedd41f524",
+                                "id": "df05f5a6-0774-43b7-ae50-1f4ce8cdbbdd",
                                 "type": "count"
                             }
                         ],
@@ -74,34 +51,28 @@
                         "point_size": 1,
                         "separate_axis": 0,
                         "split_mode": "everything",
-                        "stacked": "none",
-                        "time_range_mode": "entire_time_range"
+                        "stacked": "none"
                     }
                 ],
                 "show_grid": 1,
                 "show_legend": 1,
-                "time_field": "",
+                "time_field": "@timestamp",
                 "time_range_mode": "entire_time_range",
                 "tooltip_mode": "show_all",
                 "truncate_legend": 1,
                 "type": "timeseries",
                 "use_kibana_indexes": true
             },
-            "title": "Login over time [Filebeat Salesforce]",
+            "title": "[Logout] Logout Over Time [Filebeat Salesforce]",
             "type": "metrics"
         }
     },
     "coreMigrationVersion": "7.15.0",
-    "id": "fbb560f0-5d8e-11ec-9523-d1b667ac64c0",
+    "id": "2a11e7a0-cd35-11ec-83d5-7f8e1b7a2529",
     "migrationVersion": {
         "visualization": "7.14.0"
     },
     "references": [
-        {
-            "id": "filebeat-*",
-            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-            "type": "index-pattern"
-        },
         {
             "id": "filebeat-*",
             "name": "metrics_0_index_pattern",
@@ -109,6 +80,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-06T11:57:27.761Z",
-    "version": "WzMzODI0LDNd"
+    "updated_at": "2022-05-06T12:07:56.442Z",
+    "version": "WzMzOTQxLDNd"
 }

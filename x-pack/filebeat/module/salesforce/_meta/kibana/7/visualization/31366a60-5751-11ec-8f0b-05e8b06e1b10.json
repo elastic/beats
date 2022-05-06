@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][ApexExecution] Apex Performance over time",
+        "title": "[ApexExecution] Apex Performance over time [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -156,7 +156,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][ApexExecution] Apex Performance over time",
+            "title": "[ApexExecution] Apex Performance over time [Filebeat Salesforce]",
             "type": "line"
         }
     },
@@ -178,6 +178,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDgwLDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDc0LDNd"
 }

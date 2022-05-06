@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Login] Login type [Filebeat Salesforce]",
+        "title": "[Login] Application type [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -49,7 +49,8 @@
                     "enabled": true,
                     "id": "2",
                     "params": {
-                        "field": "salesforce.login.login_type",
+                        "customLabel": "Application Type",
+                        "field": "salesforce.login.application",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -149,12 +150,12 @@
                     }
                 ]
             },
-            "title": "[Login] Login type [Filebeat Salesforce]",
+            "title": "[Login] Application type [Filebeat Salesforce]",
             "type": "horizontal_bar"
         }
     },
     "coreMigrationVersion": "7.15.0",
-    "id": "ab958760-5d90-11ec-9523-d1b667ac64c0",
+    "id": "baeaca80-cd2b-11ec-83d5-7f8e1b7a2529",
     "migrationVersion": {
         "visualization": "7.14.0"
     },
@@ -172,5 +173,5 @@
     ],
     "type": "visualization",
     "updated_at": "2022-05-06T11:14:54.091Z",
-    "version": "WzMzNDYxLDNd"
+    "version": "WzMzNDY0LDNd"
 }

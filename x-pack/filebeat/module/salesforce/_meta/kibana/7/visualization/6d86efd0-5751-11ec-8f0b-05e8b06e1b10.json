@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][ApexExecution] Number of SOQL Queries per Entry Point",
+        "title": "[ApexExecution] Number of SOQL Queries per Entry Point [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -170,7 +170,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][ApexExecution] Number of SOQL Queries per Entry Point",
+            "title": "[ApexExecution] Number of SOQL Queries per Entry Point [Filebeat Salesforce]",
             "type": "histogram"
         }
     },
@@ -192,6 +192,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDgzLDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDc3LDNd"
 }

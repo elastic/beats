@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce] Categorization by User type",
+        "title": "Categorization by User type [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -93,7 +93,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce] Categorization by User type",
+            "title": "Categorization by User type [Filebeat Salesforce]",
             "type": "heatmap"
         }
     },
@@ -115,6 +115,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDc4LDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDcyLDNd"
 }

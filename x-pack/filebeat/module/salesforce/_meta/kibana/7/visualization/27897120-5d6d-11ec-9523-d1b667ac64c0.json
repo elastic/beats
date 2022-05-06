@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][Logout] Top 10 IP addresses over time",
+        "title": "[Logout] Top 10 IP addresses over time [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -151,7 +151,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][Logout] Top 10 IP addresses over time",
+            "title": "[Logout] Top 10 IP addresses over time [Filebeat Salesforce]",
             "type": "area"
         }
     },
@@ -173,6 +173,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:10.754Z",
-    "version": "WzIzNDg4LDJd"
+    "updated_at": "2022-05-06T11:14:56.119Z",
+    "version": "WzMzNDgyLDNd"
 }

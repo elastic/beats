@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce] Response categorization by user agent",
+        "title": "Response categorization by user agent [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -149,7 +149,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce] Response categorization by user agent",
+            "title": "Response categorization by user agent [Filebeat Salesforce]",
             "type": "histogram"
         }
     },
@@ -171,6 +171,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDgyLDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDc2LDNd"
 }

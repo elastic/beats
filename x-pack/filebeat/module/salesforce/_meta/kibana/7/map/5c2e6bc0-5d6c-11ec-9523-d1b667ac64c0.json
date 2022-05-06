@@ -118,7 +118,7 @@
             },
             "zoom": 1.25
         },
-        "title": "[Filebeat Salesforce][Login] Salesforce activity by region",
+        "title": "[Login] Salesforce activity by region [Filebeat Salesforce]",
         "uiStateJSON": {
             "isLayerTOCOpen": true,
             "openTOCDetails": []
@@ -137,6 +137,6 @@
         }
     ],
     "type": "map",
-    "updated_at": "2021-12-17T10:39:08.695Z",
-    "version": "WzIzNDYyLDJd"
+    "updated_at": "2022-05-06T11:14:54.091Z",
+    "version": "WzMzNDU2LDNd"
 }

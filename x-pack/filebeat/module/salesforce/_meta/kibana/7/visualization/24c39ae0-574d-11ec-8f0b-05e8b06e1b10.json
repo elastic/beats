@@ -11,7 +11,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][ApexTrigger] Trigger-Entity categorisation",
+        "title": "[ApexTrigger] Trigger-Entity categorisation [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -144,7 +144,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][ApexTrigger] Trigger-Entity categorisation",
+            "title": "[ApexTrigger] Trigger-Entity categorisation [Filebeat Salesforce]",
             "type": "horizontal_bar"
         }
     },
@@ -161,6 +161,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDc3LDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDcxLDNd"
 }

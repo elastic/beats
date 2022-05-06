@@ -54,7 +54,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce] Failed requests",
+        "title": "Failed requests [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -95,7 +95,7 @@
                 },
                 "type": "metric"
             },
-            "title": "[Filebeat Salesforce] Failed requests",
+            "title": "Failed requests [Filebeat Salesforce]",
             "type": "metric"
         }
     },
@@ -122,6 +122,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDc1LDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDY5LDNd"
 }

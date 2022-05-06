@@ -51,7 +51,8 @@
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -62,6 +63,7 @@
                 },
                 "panelIndex": "ae31f75c-4943-48ee-8177-f7ad58a91553",
                 "panelRefName": "panel_ae31f75c-4943-48ee-8177-f7ad58a91553",
+                "title": "Failed login attempts [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
@@ -93,7 +95,7 @@
                 },
                 "panelIndex": "9caaed64-6c42-40af-a6af-ae58cce576e3",
                 "panelRefName": "panel_9caaed64-6c42-40af-a6af-ae58cce576e3",
-                "title": "[Filebeat Salesforce][Login] Salesforce activity by region",
+                "title": "Salesforce activity by region [Filebeat Salesforce]",
                 "type": "map",
                 "version": "7.15.0"
             },
@@ -127,13 +129,14 @@
                 },
                 "panelIndex": "a2a1513d-f5fb-4d1d-a7ce-d7a3903d55ca",
                 "panelRefName": "panel_a2a1513d-f5fb-4d1d-a7ce-d7a3903d55ca",
-                "title": "[Filebeat Salesforce][Login] User ID",
+                "title": "User ID [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -144,12 +147,14 @@
                 },
                 "panelIndex": "eb23e36d-9001-4fd2-ad9f-aacf62811beb",
                 "panelRefName": "panel_eb23e36d-9001-4fd2-ad9f-aacf62811beb",
+                "title": "Success rate [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -160,12 +165,14 @@
                 },
                 "panelIndex": "1436e9ad-013d-4416-a616-9a3c134af834",
                 "panelRefName": "panel_1436e9ad-013d-4416-a616-9a3c134af834",
+                "title": "Top IP addresses by request count [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -176,12 +183,14 @@
                 },
                 "panelIndex": "83337583-735d-44c1-8dc9-8e4f032d42fb",
                 "panelRefName": "panel_83337583-735d-44c1-8dc9-8e4f032d42fb",
+                "title": "Login type [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -192,182 +201,14 @@
                 },
                 "panelIndex": "20a81ce2-6345-4cad-936e-4337ac6bb3b0",
                 "panelRefName": "panel_20a81ce2-6345-4cad-936e-4337ac6bb3b0",
+                "title": "Activity segmentation by browser/client [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "enhancements": {},
-                    "hidePanelTitles": false,
-                    "savedVis": {
-                        "data": {
-                            "aggs": [
-                                {
-                                    "enabled": true,
-                                    "id": "1",
-                                    "params": {},
-                                    "schema": "metric",
-                                    "type": "count"
-                                },
-                                {
-                                    "enabled": true,
-                                    "id": "2",
-                                    "params": {
-                                        "customLabel": "Application Type",
-                                        "field": "salesforce.login.application",
-                                        "missingBucket": false,
-                                        "missingBucketLabel": "Missing",
-                                        "order": "desc",
-                                        "orderBy": "1",
-                                        "otherBucket": false,
-                                        "otherBucketLabel": "Other",
-                                        "size": 5
-                                    },
-                                    "schema": "segment",
-                                    "type": "terms"
-                                }
-                            ],
-                            "searchSource": {
-                                "filter": [
-                                    {
-                                        "$state": {
-                                            "store": "appState"
-                                        },
-                                        "meta": {
-                                            "alias": null,
-                                            "disabled": false,
-                                            "index": "filebeat-*",
-                                            "key": "event.dataset",
-                                            "negate": false,
-                                            "params": {
-                                                "query": "salesforce.login"
-                                            },
-                                            "type": "phrase"
-                                        },
-                                        "query": {
-                                            "match_phrase": {
-                                                "event.dataset": "salesforce.login"
-                                            }
-                                        }
-                                    }
-                                ],
-                                "index": "filebeat-*",
-                                "query": {
-                                    "language": "kuery",
-                                    "query": ""
-                                }
-                            }
-                        },
-                        "description": "",
-                        "id": "",
-                        "params": {
-                            "addLegend": true,
-                            "addTimeMarker": false,
-                            "addTooltip": true,
-                            "categoryAxes": [
-                                {
-                                    "id": "CategoryAxis-1",
-                                    "labels": {
-                                        "filter": false,
-                                        "rotate": 0,
-                                        "show": true,
-                                        "truncate": 200
-                                    },
-                                    "position": "left",
-                                    "scale": {
-                                        "type": "linear"
-                                    },
-                                    "show": true,
-                                    "style": {},
-                                    "title": {},
-                                    "type": "category"
-                                }
-                            ],
-                            "detailedTooltip": true,
-                            "grid": {
-                                "categoryLines": true,
-                                "valueAxis": "ValueAxis-1"
-                            },
-                            "labels": {},
-                            "legendPosition": "right",
-                            "maxLegendLines": 1,
-                            "palette": {
-                                "name": "default",
-                                "type": "palette"
-                            },
-                            "radiusRatio": 0,
-                            "seriesParams": [
-                                {
-                                    "circlesRadius": 1,
-                                    "data": {
-                                        "id": "1",
-                                        "label": "Count"
-                                    },
-                                    "drawLinesBetweenPoints": true,
-                                    "interpolate": "linear",
-                                    "lineWidth": 2,
-                                    "mode": "normal",
-                                    "show": true,
-                                    "showCircles": true,
-                                    "type": "histogram",
-                                    "valueAxis": "ValueAxis-1"
-                                }
-                            ],
-                            "thresholdLine": {
-                                "color": "#E7664C",
-                                "show": false,
-                                "style": "full",
-                                "value": 10,
-                                "width": 1
-                            },
-                            "times": [],
-                            "truncateLegend": true,
-                            "type": "histogram",
-                            "valueAxes": [
-                                {
-                                    "id": "ValueAxis-1",
-                                    "labels": {
-                                        "filter": true,
-                                        "rotate": 75,
-                                        "show": true,
-                                        "truncate": 100
-                                    },
-                                    "name": "LeftAxis-1",
-                                    "position": "bottom",
-                                    "scale": {
-                                        "mode": "normal",
-                                        "type": "linear"
-                                    },
-                                    "show": true,
-                                    "style": {},
-                                    "title": {
-                                        "text": ""
-                                    },
-                                    "type": "value"
-                                }
-                            ]
-                        },
-                        "title": "",
-                        "type": "horizontal_bar",
-                        "uiState": {}
-                    },
-                    "type": "visualization"
-                },
-                "gridData": {
-                    "h": 15,
-                    "i": "c36f7834-49af-49af-87e9-8d1b77a47446",
-                    "w": 24,
-                    "x": 24,
-                    "y": 64
-                },
-                "panelIndex": "c36f7834-49af-49af-87e9-8d1b77a47446",
-                "title": "[Filebeat Salesforce][Login] Application type",
-                "type": "visualization",
-                "version": "7.15.0"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {}
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 28,
@@ -378,7 +219,26 @@
                 },
                 "panelIndex": "8b648987-21fb-4b71-8d63-0e406180f168",
                 "panelRefName": "panel_8b648987-21fb-4b71-8d63-0e406180f168",
+                "title": "Login events table [Filebeat Salesforce]",
                 "type": "search",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4d6fa731-c3b5-4ec5-b604-f30b32d9ac5d",
+                    "w": 24,
+                    "x": 24,
+                    "y": 64
+                },
+                "panelIndex": "4d6fa731-c3b5-4ec5-b604-f30b32d9ac5d",
+                "panelRefName": "panel_4d6fa731-c3b5-4ec5-b604-f30b32d9ac5d",
+                "title": "Application type [Filebeat Salesforce]",
+                "type": "visualization",
                 "version": "7.15.0"
             }
         ],
@@ -449,19 +309,14 @@
             "type": "visualization"
         },
         {
-            "id": "filebeat-*",
-            "name": "c36f7834-49af-49af-87e9-8d1b77a47446:kibanaSavedObjectMeta.searchSourceJSON.index",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "c36f7834-49af-49af-87e9-8d1b77a47446:kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-            "type": "index-pattern"
-        },
-        {
             "id": "51d23250-5d8b-11ec-9523-d1b667ac64c0",
             "name": "8b648987-21fb-4b71-8d63-0e406180f168:panel_8b648987-21fb-4b71-8d63-0e406180f168",
             "type": "search"
+        },
+        {
+            "id": "baeaca80-cd2b-11ec-83d5-7f8e1b7a2529",
+            "name": "4d6fa731-c3b5-4ec5-b604-f30b32d9ac5d:panel_4d6fa731-c3b5-4ec5-b604-f30b32d9ac5d",
+            "type": "visualization"
         },
         {
             "id": "50e50c20-5749-11ec-8f0b-05e8b06e1b10",
@@ -470,6 +325,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-12-17T10:39:08.695Z",
-    "version": "WzIzNDcxLDJd"
+    "updated_at": "2022-05-06T11:14:54.091Z",
+    "version": "WzMzNDY2LDNd"
 }

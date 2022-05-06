@@ -36,6 +36,7 @@
             {
                 "embeddableConfig": {
                     "enhancements": {},
+                    "hidePanelTitles": false,
                     "vis": {
                         "legendOpen": false
                     }
@@ -49,6 +50,7 @@
                 },
                 "panelIndex": "cd348728-bab4-44b0-96cb-6f29b1095701",
                 "panelRefName": "panel_cd348728-bab4-44b0-96cb-6f29b1095701",
+                "title": "Top 10 Section Over Time [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
@@ -69,13 +71,14 @@
                 },
                 "panelIndex": "ecb2c974-d2ed-4256-a467-451be88465a7",
                 "panelRefName": "panel_ecb2c974-d2ed-4256-a467-451be88465a7",
-                "title": "[Filebeat Salesforce][SetupAuditTrail] Number of Actions performed over URLs",
+                "title": "Number of Actions performed over URLs [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 27,
@@ -86,12 +89,14 @@
                 },
                 "panelIndex": "fcd86baf-07ec-4c31-b1f6-054bbab0152c",
                 "panelRefName": "panel_fcd86baf-07ec-4c31-b1f6-054bbab0152c",
+                "title": "SetupAuditTrail evnets data [Filebeat Salesforce]",
                 "type": "search",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 13,
@@ -102,6 +107,7 @@
                 },
                 "panelIndex": "701cda8c-8a8a-4e39-ac16-52397b712b87",
                 "panelRefName": "panel_701cda8c-8a8a-4e39-ac16-52397b712b87",
+                "title": "Top 10 Actions Performed [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             }
@@ -110,7 +116,7 @@
             "pause": true,
             "value": 0
         },
-        "timeFrom": "now-7d/d",
+        "timeFrom": "now-30d/d",
         "timeRestore": true,
         "timeTo": "now",
         "title": "[Filebeat Salesforce] Setup Audit Trail Dashboard",
@@ -154,6 +160,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-12-17T10:39:11.743Z",
-    "version": "WzIzNDk3LDJd"
+    "updated_at": "2022-05-06T12:16:51.077Z",
+    "version": "WzM0MDA4LDNd"
 }

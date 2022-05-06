@@ -42,7 +42,7 @@
                 "desc"
             ]
         ],
-        "title": "[Filebeat Salesforce][Login] Search"
+        "title": "[Login] Search [Filebeat Salesforce]"
     },
     "coreMigrationVersion": "7.15.0",
     "id": "ef8b6070-5d6d-11ec-9523-d1b667ac64c0",
@@ -62,6 +62,6 @@
         }
     ],
     "type": "search",
-    "updated_at": "2021-12-17T10:39:08.695Z",
-    "version": "WzIzNDU5LDJd"
+    "updated_at": "2022-05-06T11:14:54.091Z",
+    "version": "WzMzNDUzLDNd"
 }

@@ -33,7 +33,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "[Filebeat Salesforce][Login] Failed login attempts",
+        "title": "[Login] Failed login attempts [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -74,7 +74,7 @@
                 },
                 "type": "metric"
             },
-            "title": "[Filebeat Salesforce][Login] Failed login attempts",
+            "title": "[Login] Failed login attempts [Filebeat Salesforce]",
             "type": "metric"
         }
     },
@@ -96,6 +96,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:08.695Z",
-    "version": "WzIzNDYxLDJd"
+    "updated_at": "2022-05-06T11:14:54.091Z",
+    "version": "WzMzNDU1LDNd"
 }

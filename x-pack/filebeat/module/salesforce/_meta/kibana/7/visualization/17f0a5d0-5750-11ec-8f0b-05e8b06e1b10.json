@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce] Response by Media type",
+        "title": "Response by Media type [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -86,7 +86,7 @@
                 "truncateLegend": true,
                 "type": "pie"
             },
-            "title": "[Filebeat Salesforce] Response by Media type",
+            "title": "Response by Media type [Filebeat Salesforce]",
             "type": "pie"
         }
     },
@@ -108,6 +108,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDgxLDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDc1LDNd"
 }

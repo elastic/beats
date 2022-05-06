@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][SetupAuditTrail] Top 10 Section Over Time",
+        "title": "[SetupAuditTrail] Top 10 Section Over Time [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -151,7 +151,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][SetupAuditTrail] Top 10 Section Over Time",
+            "title": "[SetupAuditTrail] Top 10 Section Over Time [Filebeat Salesforce]",
             "type": "area"
         }
     },
@@ -173,6 +173,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:11.743Z",
-    "version": "WzIzNDkzLDJd"
+    "updated_at": "2022-05-06T11:14:57.093Z",
+    "version": "WzMzNDg2LDNd"
 }

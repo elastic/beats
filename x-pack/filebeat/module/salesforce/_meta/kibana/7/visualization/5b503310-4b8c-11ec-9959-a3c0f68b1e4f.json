@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][SetupAuditTrail] Number of Actions performed by Top 10 Delegated Users",
+        "title": "[SetupAuditTrail] Number of Actions performed by Top 10 Delegated Users [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -167,7 +167,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][SetupAuditTrail] Number of Actions performed by Top 10 Delegated Users",
+            "title": "[SetupAuditTrail] Number of Actions performed by Top 10 Delegated Users [Filebeat Salesforce]",
             "type": "histogram"
         }
     },
@@ -189,6 +189,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:11.743Z",
-    "version": "WzIzNDk0LDJd"
+    "updated_at": "2022-05-06T11:14:57.093Z",
+    "version": "WzMzNDg3LDNd"
 }

@@ -47,7 +47,6 @@
                 },
                 "panelIndex": "f7680bb8-ec0c-4bd5-8ace-140d023384dc",
                 "panelRefName": "panel_f7680bb8-ec0c-4bd5-8ace-140d023384dc",
-                "title": "[Filebeat Salesforce][Apex] Successful requests",
                 "type": "visualization",
                 "version": "7.15.0"
             },
@@ -65,13 +64,13 @@
                 },
                 "panelIndex": "5b18dcde-0147-462b-85eb-154fcb9abffd",
                 "panelRefName": "panel_5b18dcde-0147-462b-85eb-154fcb9abffd",
-                "title": "[Filebeat Salesforce][Apex] Failed requests",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -82,12 +81,14 @@
                 },
                 "panelIndex": "b9d36aa1-9cb3-4a1a-a010-413d72a57dd0",
                 "panelRefName": "panel_b9d36aa1-9cb3-4a1a-a010-413d72a57dd0",
+                "title": "DB_TOTAL_TIME-CPU_TIME comparision [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 16,
@@ -98,6 +99,7 @@
                 },
                 "panelIndex": "97595594-bd12-4341-9287-aba4ee2642c3",
                 "panelRefName": "panel_97595594-bd12-4341-9287-aba4ee2642c3",
+                "title": "Trigger-Entity categorisation [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
@@ -116,13 +118,13 @@
                 },
                 "panelIndex": "1aef58f1-8aca-4225-bc5c-c1a6ceda4a8b",
                 "panelRefName": "panel_1aef58f1-8aca-4225-bc5c-c1a6ceda4a8b",
-                "title": "[Filebeat Salesforce][Apex] Categorization by User type",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -133,12 +135,14 @@
                 },
                 "panelIndex": "b2885132-edfc-4c17-99f9-31b56ca2f109",
                 "panelRefName": "panel_b2885132-edfc-4c17-99f9-31b56ca2f109",
+                "title": "Top Entrypoints by Request Count [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -149,6 +153,7 @@
                 },
                 "panelIndex": "4f5803fa-0c1e-4bd6-84ca-b8710f52c0a7",
                 "panelRefName": "panel_4f5803fa-0c1e-4bd6-84ca-b8710f52c0a7",
+                "title": "Apex Performance over time [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             },
@@ -169,7 +174,6 @@
                 },
                 "panelIndex": "58a8cf54-9a2e-4b7d-a579-5b01e656030e",
                 "panelRefName": "panel_58a8cf54-9a2e-4b7d-a579-5b01e656030e",
-                "title": "[Filebeat Salesforce][Apex] Response by Media type",
                 "type": "visualization",
                 "version": "7.15.0"
             },
@@ -187,13 +191,13 @@
                 },
                 "panelIndex": "03390f0c-c585-4cf0-8a93-06479965a0e9",
                 "panelRefName": "panel_03390f0c-c585-4cf0-8a93-06479965a0e9",
-                "title": "[Filebeat Salesforce][Apex] Response categorization by user agent",
                 "type": "visualization",
                 "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 15,
@@ -204,6 +208,7 @@
                 },
                 "panelIndex": "60adaf8e-785f-4c89-9ff8-c842b2a64f73",
                 "panelRefName": "panel_60adaf8e-785f-4c89-9ff8-c842b2a64f73",
+                "title": "Number of SOQL Queries per Entry Point [Filebeat Salesforce]",
                 "type": "visualization",
                 "version": "7.15.0"
             }
@@ -215,7 +220,7 @@
         "timeFrom": "now-7d/d",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[Filebeat Salesforce] Apex Dashboards",
+        "title": "[Filebeat Salesforce] Apex Dashboard",
         "version": 1
     },
     "coreMigrationVersion": "7.15.0",
@@ -286,6 +291,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDg0LDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDc4LDNd"
 }

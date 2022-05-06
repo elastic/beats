@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][Apex] DB_TOTAL_TIME-CPU_TIME comparision",
+        "title": "[Apex] DB_TOTAL_TIME-CPU_TIME comparision [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -185,7 +185,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][Apex] DB_TOTAL_TIME-CPU_TIME comparision",
+            "title": "[Apex] DB_TOTAL_TIME-CPU_TIME comparision [Filebeat Salesforce]",
             "type": "area"
         }
     },
@@ -207,6 +207,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:09.725Z",
-    "version": "WzIzNDc2LDJd"
+    "updated_at": "2022-05-06T11:14:55.111Z",
+    "version": "WzMzNDcwLDNd"
 }

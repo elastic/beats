@@ -33,7 +33,7 @@
                 }
             }
         },
-        "title": "[Filebeat Salesforce][Login] Top IP addresses by request count",
+        "title": "[Login] Top IP addresses by request count [Filebeat Salesforce]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -151,7 +151,7 @@
                     }
                 ]
             },
-            "title": "[Filebeat Salesforce][Login] Top IP addresses by request count",
+            "title": "[Login] Top IP addresses by request count [Filebeat Salesforce]",
             "type": "histogram"
         }
     },
@@ -173,6 +173,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-12-17T10:39:08.695Z",
-    "version": "WzIzNDY2LDJd"
+    "updated_at": "2022-05-06T11:14:54.091Z",
+    "version": "WzMzNDYwLDNd"
 }

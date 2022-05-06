@@ -46,7 +46,7 @@
                 "desc"
             ]
         ],
-        "title": "[Filebeat Salesforce][Logout] Logout Logs Table"
+        "title": "Logout Logs Table [Filebeat Salesforce]"
     },
     "coreMigrationVersion": "7.15.0",
     "id": "b3b98110-5d92-11ec-9523-d1b667ac64c0",
@@ -66,6 +66,6 @@
         }
     ],
     "type": "search",
-    "updated_at": "2021-12-17T10:39:10.754Z",
-    "version": "WzIzNDg5LDJd"
+    "updated_at": "2022-05-06T11:14:56.119Z",
+    "version": "WzMzNDgzLDNd"
 }
