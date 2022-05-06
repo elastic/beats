@@ -40,7 +40,7 @@ func CancelEvent(event *beat.Event) {
 		if event.Meta == nil {
 			event.Meta = mapstr.M{}
 		}
-		event.Meta.Put(EventCancelledMetaKey, true)
+		_, _ = event.Meta.Put(EventCancelledMetaKey, true)
 	}
 }
 

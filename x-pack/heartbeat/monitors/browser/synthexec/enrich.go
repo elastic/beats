@@ -156,9 +156,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		event.SetID(se.Id)
 		// This is only relevant for screenshots, which have a specific ID
 		// In that case we always want to issue an update op
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+		_, _ = event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())
