@@ -60,7 +60,14 @@ func (sj *schedJob) run() (startedAt time.Time) {
 	sj.wg.Add(1)
 	sj.activeTasks.Inc()
 	if sj.jobLimitSem != nil {
+<<<<<<< HEAD
 		sj.jobLimitSem.Acquire(sj.ctx, 1)
+=======
+		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
+		if err != nil {
+			logp.L().Errorf("could not acquire semaphore: %w", err)
+		}
+>>>>>>> d3cc24a460 ([Heartbeat] Fix unintentional use of no-op logger (#31543))
 	}
 
 	startedAt = sj.runTask(sj.entrypoint)

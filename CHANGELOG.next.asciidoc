@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 
 *Heartbeat*
+- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 
 *Metricbeat*

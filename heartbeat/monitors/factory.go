@@ -75,7 +75,7 @@ func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.Pl
 		byId:       map[string]*Monitor{},
 		mtx:        &sync.Mutex{},
 		pluginsReg: pluginsReg,
-		logger:     logp.NewLogger("monitor-factory"),
+		logger:     logp.L(),
 		runOnce:    runOnce,
 	}
 }

@@ -161,7 +161,15 @@ func newICMPLoop() (*stdICMPLoop, error) {
 func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 	for {
 		bytes := make([]byte, 512)
+<<<<<<< HEAD
 		conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+=======
+		err := conn.SetReadDeadline(time.Now().Add(time.Second))
+		if err != nil {
+			logp.L().Error("could not set read deadline for ICMP: %w", err)
+			return
+		}
+>>>>>>> d3cc24a460 ([Heartbeat] Fix unintentional use of no-op logger (#31543))
 		_, addr, err := conn.ReadFrom(bytes)
 		if err != nil {
 			if neterr, ok := err.(*net.OpError); ok {
