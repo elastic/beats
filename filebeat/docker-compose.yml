@@ -47,3 +47,5 @@ services:
 
   redis:
     build: ${PWD}/input/redis/_meta
+    ports:
+      - 6379:6379
