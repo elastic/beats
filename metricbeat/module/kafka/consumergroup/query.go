@@ -20,9 +20,9 @@ package consumergroup
 import (
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type client interface {
@@ -33,7 +33,7 @@ type client interface {
 }
 
 func fetchGroupInfo(
-	emit func(common.MapStr),
+	emit func(mapstr.M),
 	b client,
 	groupsFilter, topicsFilter func(string) bool,
 ) error {
@@ -120,21 +120,21 @@ func fetchGroupInfo(
 					continue
 				}
 				consumerLag := partitionOffset - info.Offset
-				event := common.MapStr{
+				event := mapstr.M{
 					"id":           ret.group,
 					"topic":        topic,
 					"partition":    partition,
 					"offset":       info.Offset,
 					"meta":         info.Metadata,
 					"consumer_lag": consumerLag,
-					"error": common.MapStr{
+					"error": mapstr.M{
 						"code": info.Err,
 					},
 				}
 
 				if asgnTopic, ok := ret.assign[topic]; ok {
 					if assignment, found := asgnTopic[partition]; found {
-						event["client"] = common.MapStr{
+						event["client"] = mapstr.M{
 							"id":        assignment.clientID,
 							"host":      assignment.clientHost,
 							"member_id": assignment.memberID,

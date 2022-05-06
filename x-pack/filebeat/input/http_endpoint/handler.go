@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const headerContentEncoding = "Content-Encoding"
@@ -76,13 +77,13 @@ func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message st
 	}
 }
 
-func (h *httpHandler) publishEvent(obj, headers common.MapStr) error {
+func (h *httpHandler) publishEvent(obj, headers mapstr.M) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 	}
 	if h.preserveOriginalEvent {
-		event.Fields["event"] = common.MapStr{
+		event.Fields["event"] = mapstr.M{
 			"original": obj.String(),
 		}
 	}
@@ -98,7 +99,7 @@ func (h *httpHandler) publishEvent(obj, headers common.MapStr) error {
 	return nil
 }
 
-func httpReadJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, status int, err error) {
+func httpReadJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, status int, err error) {
 	if body == http.NoBody {
 		return nil, nil, http.StatusNotAcceptable, errBodyEmpty
 	}
@@ -109,7 +110,7 @@ func httpReadJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawM
 	return obj, rawMessage, http.StatusOK, err
 }
 
-func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, err error) {
+func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
 	decoder := json.NewDecoder(body)
 	for decoder.More() {
 		var raw json.RawMessage
@@ -145,7 +146,7 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 	return objs, rawMessages, nil
 }
 
-func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, err error) {
+func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
 	dec := newJSONDecoder(raw)
 	token, err := dec.Token()
 	if err != nil {
@@ -181,8 +182,8 @@ func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []jso
 	return objs, rawMessages, nil
 }
 
-func getIncludedHeaders(r *http.Request, headerConf []string) (includedHeaders common.MapStr) {
-	includedHeaders = common.MapStr{}
+func getIncludedHeaders(r *http.Request, headerConf []string) (includedHeaders mapstr.M) {
+	includedHeaders = mapstr.M{}
 	for _, header := range headerConf {
 		if value, found := r.Header[header]; found {
 			includedHeaders[common.DeDot(header)] = value

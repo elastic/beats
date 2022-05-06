@@ -21,8 +21,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // QueueFactory is used to create a per test queue instance.
@@ -258,7 +258,7 @@ func multiple(
 func makeProducer(
 	maxEvents int,
 	waitACK bool,
-	makeFields func(int) common.MapStr,
+	makeFields func(int) mapstr.M,
 ) func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func() {
 	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
 		wg.Add(1)
@@ -354,8 +354,8 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 	}
 }
 
-func countEvent(i int) common.MapStr {
-	return common.MapStr{
+func countEvent(i int) mapstr.M {
+	return mapstr.M{
 		"count": i,
 	}
 }

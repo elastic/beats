@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestErrorJson(t *testing.T) {
@@ -125,7 +125,7 @@ func TestNewKibanaClientWithSpace(t *testing.T) {
 	defer kibanaTs.Close()
 
 	// Configure an arbitrary test space to ensure the space URL prefix is added.
-	client, err := NewKibanaClient(common.MustNewConfigFrom(fmt.Sprintf(`
+	client, err := NewKibanaClient(config.MustNewConfigFrom(fmt.Sprintf(`
 protocol: http
 host: %s
 space.id: test-space
@@ -170,7 +170,7 @@ func TestNewKibanaClientWithMultipartData(t *testing.T) {
 	defer kibanaTs.Close()
 
 	// Don't configure a space to ensure the space URL prefix is not added.
-	client, err := NewKibanaClient(common.MustNewConfigFrom(fmt.Sprintf(`
+	client, err := NewKibanaClient(config.MustNewConfigFrom(fmt.Sprintf(`
 protocol: http
 host: %s
 headers:

@@ -20,9 +20,9 @@ package v2
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -79,7 +79,7 @@ func (l *Loader) Init(group unison.Group, mode Mode) error {
 // Returns a LoadError if the input name can not be read from the config or if
 // the type does not exist. Error values for Ccnfiguration errors do depend on
 // the InputManager.
-func (l *Loader) Configure(cfg *common.Config) (Input, error) {
+func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 	name, err := cfg.String(l.typeField, -1)
 	if err != nil {
 		if l.defaultType == "" {

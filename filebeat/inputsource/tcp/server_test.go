@@ -32,8 +32,8 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var defaultConfig = Config{
@@ -47,7 +47,7 @@ type info struct {
 }
 
 func TestErrorOnEmptyLineDelimiter(t *testing.T) {
-	c := common.NewConfig()
+	c := conf.NewConfig()
 	config := defaultConfig
 	err := c.Unpack(&config)
 	assert.Error(t, err)
@@ -214,7 +214,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				ch <- &info{message: string(message), mt: mt}
 			}
 			test.cfg["host"] = "localhost:0"
-			cfg, _ := common.NewConfigFrom(test.cfg)
+			cfg, _ := conf.NewConfigFrom(test.cfg)
 			config := defaultConfig
 			err := cfg.Unpack(&config)
 			if !assert.NoError(t, err) {
@@ -268,7 +268,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": "127.0.0.1:0"})
+	cfg, err := conf.NewConfigFrom(map[string]interface{}{"host": "127.0.0.1:0"})
 	if !assert.NoError(t, err) {
 		return
 	}

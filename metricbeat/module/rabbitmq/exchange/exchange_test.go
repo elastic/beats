@@ -20,9 +20,9 @@ package exchange
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -41,16 +41,16 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 
 	ee, _ := e.Fields.GetValue("rabbitmq.exchange")
-	event := ee.(common.MapStr)
+	event := ee.(mapstr.M)
 
-	messagesExpected := common.MapStr{
-		"publish_in": common.MapStr{
+	messagesExpected := mapstr.M{
+		"publish_in": mapstr.M{
 			"count":   int64(100),
-			"details": common.MapStr{"rate": float64(0.5)},
+			"details": mapstr.M{"rate": float64(0.5)},
 		},
-		"publish_out": common.MapStr{
+		"publish_out": mapstr.M{
 			"count":   int64(99),
-			"details": common.MapStr{"rate": float64(0.9)},
+			"details": mapstr.M{"rate": float64(0.9)},
 		},
 	}
 
@@ -66,7 +66,7 @@ func TestData(t *testing.T) {
 	defer server.Close()
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2ErrorCond(ms, t, "", func(e common.MapStr) bool {
+	err := mbtest.WriteEventsReporterV2ErrorCond(ms, t, "", func(e mapstr.M) bool {
 		hasIn, _ := e.HasKey("rabbitmq.exchange.messages.publish_in")
 		hasOut, _ := e.HasKey("rabbitmq.exchange.messages.publish_out")
 		return hasIn && hasOut

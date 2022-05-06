@@ -18,12 +18,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -86,7 +86,7 @@ func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
 
 // NewInput creates a new Netflow input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {

@@ -24,11 +24,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the partition MetricSet with the central registry.
@@ -91,19 +91,19 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	evtBroker := common.MapStr{
+	evtBroker := mapstr.M{
 		"id":      broker.ID(),
 		"address": broker.AdvertisedAddr(),
 	}
 
 	for _, topic := range topics {
 		debugf("fetch events for topic: ", topic.Name)
-		evtTopic := common.MapStr{
+		evtTopic := mapstr.M{
 			"name": topic.Name,
 		}
 
 		if topic.Err != 0 {
-			evtTopic["error"] = common.MapStr{
+			evtTopic["error"] = mapstr.M{
 				"code": topic.Err,
 			}
 		}
@@ -133,7 +133,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 					continue
 				}
 
-				partitionEvent := common.MapStr{
+				partitionEvent := mapstr.M{
 					"leader":         partition.Leader,
 					"replica":        id,
 					"is_leader":      partition.Leader == id,
@@ -141,7 +141,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				}
 
 				if partition.Err != 0 {
-					partitionEvent["error"] = common.MapStr{
+					partitionEvent["error"] = mapstr.M{
 						"code": partition.Err,
 					}
 				}
@@ -151,21 +151,21 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, id)
 
 				// create event
-				event := common.MapStr{
+				event := mapstr.M{
 					// Common `kafka.partition` fields
 					"id":              partition.ID,
 					"topic_id":        partitionTopicID,
 					"topic_broker_id": partitionTopicBrokerID,
 
 					"partition": partitionEvent,
-					"offset": common.MapStr{
+					"offset": mapstr.M{
 						"newest": offNewest,
 						"oldest": offOldest,
 					},
 				}
 
 				sent := r.Event(mb.Event{
-					ModuleFields: common.MapStr{
+					ModuleFields: mapstr.M{
 						"broker": evtBroker,
 						"topic":  evtTopic,
 					},

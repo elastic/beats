@@ -18,16 +18,16 @@
 package beat
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
 // the beat's run-loop.
-type Creator func(*Beat, *common.Config) (Beater, error)
+type Creator func(*Beat, *config.C) (Beater, error)
 
 // Beater is the interface that must be implemented by every Beat. A Beater
 // provides the main Run-loop and a Stop method to break the Run-loop.
@@ -70,7 +70,7 @@ type Beat struct {
 	// is responsible for reconfiguring Publisher.
 	OutputConfigReloader reload.Reloadable
 
-	BeatConfig *common.Config // The beat's own configuration section
+	BeatConfig *config.C // The beat's own configuration section
 
 	Fields []byte // Data from fields.yml
 
@@ -84,9 +84,9 @@ type Beat struct {
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
 	// output/publishing related configurations
-	Output common.ConfigNamespace `config:"output"`
+	Output config.Namespace `config:"output"`
 }
 
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.
-type OverwritePipelinesCallback func(*common.Config) error
+type OverwritePipelinesCallback func(*config.C) error

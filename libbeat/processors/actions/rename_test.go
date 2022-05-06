@@ -22,11 +22,11 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestRenameRun(t *testing.T) {
@@ -36,8 +36,8 @@ func TestRenameRun(t *testing.T) {
 		Fields        []fromTo
 		IgnoreMissing bool
 		FailOnError   bool
-		Input         common.MapStr
-		Output        common.MapStr
+		Input         mapstr.M
+		Output        mapstr.M
 		error         bool
 	}{
 		{
@@ -48,10 +48,10 @@ func TestRenameRun(t *testing.T) {
 					To:   "b",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": "c",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"b": "c",
 			},
 			IgnoreMissing: false,
@@ -66,12 +66,12 @@ func TestRenameRun(t *testing.T) {
 					To:   "a.b.c",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a.b": 1,
 			},
-			Output: common.MapStr{
-				"a": common.MapStr{
-					"b": common.MapStr{
+			Output: mapstr.M{
+				"a": mapstr.M{
+					"b": mapstr.M{
 						"c": 1,
 					},
 				},
@@ -88,14 +88,14 @@ func TestRenameRun(t *testing.T) {
 					To:   "b",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": 2,
 				"b": "q",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"a": 2,
 				"b": "q",
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
 				},
 			},
@@ -115,11 +115,11 @@ func TestRenameRun(t *testing.T) {
 					To:   "b",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": 2,
 				"b": "q",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"b": 2,
 				"c": "q",
 			},
@@ -135,13 +135,13 @@ func TestRenameRun(t *testing.T) {
 					To:   "a.value",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a":   5,
 				"a.b": 6,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"a.b": 6,
-				"a": common.MapStr{
+				"a": mapstr.M{
 					"value": 5,
 				},
 			},
@@ -161,12 +161,12 @@ func TestRenameRun(t *testing.T) {
 					To:   "a.c",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": 7,
 				"c": 8,
 			},
-			Output: common.MapStr{
-				"a": common.MapStr{
+			Output: mapstr.M{
+				"a": mapstr.M{
 					"value": 7,
 					"c":     8,
 				},
@@ -187,14 +187,14 @@ func TestRenameRun(t *testing.T) {
 					To:   "a.value",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": 9,
 				"c": 10,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"a": 9,
 				"c": 10,
-				"error": common.MapStr{
+				"error": mapstr.M{
 					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
 				},
 			},
@@ -214,12 +214,12 @@ func TestRenameRun(t *testing.T) {
 					To:   "a.value",
 				},
 			},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": 9,
 				"c": 10,
 			},
-			Output: common.MapStr{
-				"a": common.MapStr{
+			Output: mapstr.M{
+				"a": mapstr.M{
 					"value": 9,
 				},
 			},
@@ -261,8 +261,8 @@ func TestRenameField(t *testing.T) {
 		To            string
 		ignoreMissing bool
 		failOnError   bool
-		Input         common.MapStr
-		Output        common.MapStr
+		Input         mapstr.M
+		Output        mapstr.M
 		error         bool
 		description   string
 	}{
@@ -270,10 +270,10 @@ func TestRenameField(t *testing.T) {
 			description: "simple rename of field",
 			From:        "a",
 			To:          "c",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": "b",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"c": "b",
 			},
 			error:         false,
@@ -284,12 +284,12 @@ func TestRenameField(t *testing.T) {
 			description: "Add hierarchy to event",
 			From:        "a.b",
 			To:          "a.b.c",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a.b": 1,
 			},
-			Output: common.MapStr{
-				"a": common.MapStr{
-					"b": common.MapStr{
+			Output: mapstr.M{
+				"a": mapstr.M{
+					"b": mapstr.M{
 						"c": 1,
 					},
 				},
@@ -302,11 +302,11 @@ func TestRenameField(t *testing.T) {
 			description: "overwrite an existing field that should lead to an error",
 			From:        "a",
 			To:          "b",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a": 2,
 				"b": "q",
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"a": 2,
 				"b": "q",
 			},
@@ -318,13 +318,13 @@ func TestRenameField(t *testing.T) {
 			description: "resolve dotted event conflict",
 			From:        "a",
 			To:          "a.value",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a":   5,
 				"a.b": 6,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"a.b": 6,
-				"a": common.MapStr{
+				"a": mapstr.M{
 					"value": 5,
 				},
 			},
@@ -336,10 +336,10 @@ func TestRenameField(t *testing.T) {
 			description: "try to rename no existing field with failOnError true",
 			From:        "a",
 			To:          "b",
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"c": 5,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"c": 5,
 			},
 			failOnError:   true,
@@ -369,12 +369,12 @@ func TestRenameField(t *testing.T) {
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"a": "c",
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"b": "c",
 		}
 

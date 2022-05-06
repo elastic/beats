@@ -8,9 +8,10 @@
 package proc
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"testing/fstest"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var cmdData = `/usr/bin/processName --config=/etc/conf/config.conf`

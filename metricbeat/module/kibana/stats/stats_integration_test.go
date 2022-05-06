@@ -30,6 +30,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
@@ -93,7 +94,7 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, err
 		return nil, err
 	}
 
-	var data common.MapStr
+	var data mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err

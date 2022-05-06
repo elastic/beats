@@ -23,9 +23,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -59,7 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
+func calculateConnStats(conns []net.ConnectionStat) mapstr.M {
 	var (
 		allConns       = len(conns)
 		allListening   = 0
@@ -119,13 +119,13 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		}
 	}
 
-	return common.MapStr{
-		"all": common.MapStr{
+	return mapstr.M{
+		"all": mapstr.M{
 			"count":     allConns,
 			"listening": allListening,
 		},
-		"tcp": common.MapStr{
-			"all": common.MapStr{
+		"tcp": mapstr.M{
+			"all": mapstr.M{
 				"count":       tcpConns,
 				"listening":   tcpListening,
 				"established": tcpEstablished,
@@ -139,8 +139,8 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 				"closing":     tcpClosing,
 			},
 		},
-		"udp": common.MapStr{
-			"all": common.MapStr{
+		"udp": mapstr.M{
+			"all": mapstr.M{
 				"count": udpConns,
 			},
 		},

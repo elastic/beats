@@ -33,17 +33,17 @@ into metricbeat events. For example, given this input object:
 
 And the requirement to transform it into this one:
 
-	common.MapStr{
+	mapstr.M{
 		"test_string":         "hello",
 		"test_int":            int64(42),
 		"test_int_from_float": int64(42),
 		"test_int_from_int64": int64(42),
 		"test_bool":           true,
 		"test_time":           common.Time(ts),
-		"test_obj_1": common.MapStr{
+		"test_obj_1": mapstr.M{
 			"test": "hello from top level",
 		},
-		"test_obj_2": common.MapStr{
+		"test_obj_2": mapstr.M{
 			"test": "hello, object",
 		},
 	}
@@ -80,6 +80,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type ConvMap struct {
@@ -90,8 +91,8 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) multierror.Errors {
-	d, err := common.MapStr(data).GetValue(convMap.Key)
+func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors {
+	d, err := mapstr.M(data).GetValue(convMap.Key)
 	if err != nil {
 		err := schema.NewKeyNotFoundError(convMap.Key)
 		err.Optional = convMap.Optional
@@ -99,8 +100,8 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		return multierror.Errors{err}
 	}
 	switch subData := d.(type) {
-	case map[string]interface{}, common.MapStr:
-		subEvent := common.MapStr{}
+	case map[string]interface{}, mapstr.M:
+		subEvent := mapstr.M{}
 		_, errors := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
 		for _, err := range errors {
 			if err, ok := err.(schema.KeyError); ok {
@@ -130,7 +131,7 @@ func Dict(key string, s schema.Schema, opts ...DictSchemaOption) ConvMap {
 }
 
 func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, err := common.MapStr(data).GetValue(key)
+	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
 	}
@@ -151,7 +152,7 @@ func StrFromNum(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toStr(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, err := common.MapStr(data).GetValue(key)
+	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
 	}
@@ -169,7 +170,7 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toIfc(key string, data map[string]interface{}) (interface{}, error) {
-	intf, err := common.MapStr(data).GetValue(key)
+	intf, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		e := schema.NewKeyNotFoundError(key)
 		e.Err = err
@@ -184,7 +185,7 @@ func Ifc(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, err := common.MapStr(data).GetValue(key)
+	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return false, schema.NewKeyNotFoundError(key)
 	}
@@ -202,7 +203,7 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toInteger(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, err := common.MapStr(data).GetValue(key)
+	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
@@ -238,7 +239,7 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toFloat(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, err := common.MapStr(data).GetValue(key)
+	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return 0.0, schema.NewKeyNotFoundError(key)
 	}
@@ -274,7 +275,7 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 }
 
 func toTime(key string, data map[string]interface{}) (interface{}, error) {
-	emptyIface, err := common.MapStr(data).GetValue(key)
+	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return common.Time(time.Unix(0, 0)), schema.NewKeyNotFoundError(key)
 	}

@@ -25,10 +25,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -47,20 +46,20 @@ func TestFetch(t *testing.T) {
 	for i := range events {
 		resource := resources[i]
 
-		testEvent := common.MapStr{
-			resource: common.MapStr{
-				"some": common.MapStr{
-					"10": common.MapStr{
+		testEvent := mapstr.M{
+			resource: mapstr.M{
+				"some": mapstr.M{
+					"10": mapstr.M{
 						"pct": 5.86,
 					},
-					"60": common.MapStr{
+					"60": mapstr.M{
 						"pct": 1.10,
 					},
-					"300": common.MapStr{
+					"300": mapstr.M{
 						"pct": 0.23,
 					},
-					"total": common.MapStr{
-						"time": common.MapStr{
+					"total": mapstr.M{
+						"time": mapstr.M{
 							"us": uint64(9895236),
 						},
 					},
@@ -75,7 +74,7 @@ func TestFetch(t *testing.T) {
 			testEvent.Put(resource+".full.total.time.us", uint64(10895236))
 		}
 
-		rawEvent := events[i].BeatEvent("linux", "pressure").Fields["linux"].(common.MapStr)["pressure"]
+		rawEvent := events[i].BeatEvent("linux", "pressure").Fields["linux"].(mapstr.M)["pressure"]
 		assert.Equal(t, testEvent, rawEvent)
 	}
 }

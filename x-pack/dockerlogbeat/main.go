@@ -11,7 +11,6 @@ import (
 
 	"github.com/docker/go-plugins-helpers/sdk"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	logpcfg "github.com/elastic/beats/v7/libbeat/logp/configure"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -22,10 +21,11 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // genNewMonitoringConfig is a hacked-in function to enable a debug stderr logger
-func genNewMonitoringConfig() (*common.Config, error) {
+func genNewMonitoringConfig() (*config.C, error) {
 	lvl, isSet := os.LookupEnv("LOG_DRIVER_LEVEL")
 	if !isSet {
 		lvl = "info"
@@ -34,7 +34,7 @@ func genNewMonitoringConfig() (*common.Config, error) {
 	cfgObject["level"] = lvl
 	cfgObject["to_stderr"] = "true"
 
-	cfg, err := common.NewConfigFrom(cfgObject)
+	cfg, err := config.NewConfigFrom(cfgObject)
 	if err != nil {
 		return nil, err
 	}

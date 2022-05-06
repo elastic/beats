@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -350,7 +351,7 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
-		if err == common.ErrKeyNotFound {
+		if err == mapstr.ErrKeyNotFound {
 			return "", nil
 		}
 		if err != nil {
@@ -412,13 +413,13 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				} else if client.NonIndexableAction == dead_letter_index {
 					client.log.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
-						data[i].Content.Meta = common.MapStr{
+						data[i].Content.Meta = mapstr.M{
 							dead_letter_marker_field: true,
 						}
 					} else {
 						data[i].Content.Meta.Put(dead_letter_marker_field, true)
 					}
-					data[i].Content.Fields = common.MapStr{
+					data[i].Content.Fields = mapstr.M{
 						"message":       data[i].Content.Fields.String(),
 						"error.type":    status,
 						"error.message": string(msg),

@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -130,7 +131,7 @@ func SaveToFolder(dashboard []byte, root string, version common.Version) error {
 }
 
 func saveAsset(line []byte, assetRoot string) error {
-	var a common.MapStr
+	var a mapstr.M
 	err := json.Unmarshal(line, &a)
 	if err != nil {
 		return fmt.Errorf("failed to decode dashboard asset: %+v", err)

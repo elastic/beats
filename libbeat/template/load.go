@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Loader interface for loading templates.
@@ -239,7 +240,7 @@ func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVers
 	return tmpl, nil
 }
 
-func (b *templateBuilder) buildBody(tmpl *Template, config TemplateConfig, fields []byte) (common.MapStr, error) {
+func (b *templateBuilder) buildBody(tmpl *Template, config TemplateConfig, fields []byte) (mapstr.M, error) {
 	if config.Overwrite {
 		b.log.Info("Existing template will be overwritten, as overwrite is enabled.")
 	}
@@ -257,7 +258,7 @@ func (b *templateBuilder) buildBody(tmpl *Template, config TemplateConfig, field
 	return b.buildBodyFromFields(tmpl, fields)
 }
 
-func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (common.MapStr, error) {
+func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, error) {
 	jsonPath := paths.Resolve(paths.Config, config.JSON.Path)
 	if _, err := os.Stat(jsonPath); err != nil {
 		return nil, fmt.Errorf("error checking json file %s for template: %w", jsonPath, err)
@@ -276,7 +277,7 @@ func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (common.MapSt
 	return body, nil
 }
 
-func (b *templateBuilder) buildBodyFromFile(tmpl *Template, config TemplateConfig) (common.MapStr, error) {
+func (b *templateBuilder) buildBodyFromFile(tmpl *Template, config TemplateConfig) (mapstr.M, error) {
 	b.log.Debugf("Load fields.yml from file: %s", config.Fields)
 	fieldsPath := paths.Resolve(paths.Config, config.Fields)
 	body, err := tmpl.LoadFile(fieldsPath)
@@ -286,7 +287,7 @@ func (b *templateBuilder) buildBodyFromFile(tmpl *Template, config TemplateConfi
 	return body, nil
 }
 
-func (b *templateBuilder) buildBodyFromFields(tmpl *Template, fields []byte) (common.MapStr, error) {
+func (b *templateBuilder) buildBodyFromFields(tmpl *Template, fields []byte) (mapstr.M, error) {
 	b.log.Debug("Load default fields")
 	body, err := tmpl.LoadBytes(fields)
 	if err != nil {

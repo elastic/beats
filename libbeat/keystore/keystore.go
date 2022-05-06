@@ -20,8 +20,8 @@ package keystore
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 )
@@ -49,7 +49,7 @@ type Keystore interface {
 	Retrieve(key string) (*SecureString, error)
 
 	// GetConfig returns the key value pair in the config format to be merged with other configuration.
-	GetConfig() (*common.Config, error)
+	GetConfig() (*config.C, error)
 
 	// IsPersisted check if the current keystore is persisted.
 	IsPersisted() bool

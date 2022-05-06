@@ -29,9 +29,9 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -193,7 +193,7 @@ func (procStats *Stats) Init() error {
 }
 
 // Get fetches the configured processes and returns a list of formatted events and root ECS fields
-func (procStats *Stats) Get() ([]common.MapStr, []common.MapStr, error) {
+func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	//If the user hasn't configured any kind of process glob, return
 	if len(procStats.Procs) == 0 {
 		return nil, nil, nil
@@ -225,15 +225,15 @@ func (procStats *Stats) Get() ([]common.MapStr, []common.MapStr, error) {
 	}
 
 	//Format the list to the MapStr type used by the outputs
-	procs := []common.MapStr{}
-	rootEvents := []common.MapStr{}
+	procs := []mapstr.M{}
+	rootEvents := []mapstr.M{}
 
 	for _, process := range plist {
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
 		//Create the root event
 		root := process.FormatForRoot()
-		rootMap := common.MapStr{}
+		rootMap := mapstr.M{}
 		err := typeconv.Convert(&rootMap, root)
 
 		proc, err := procStats.getProcessEvent(&process)
@@ -249,7 +249,7 @@ func (procStats *Stats) Get() ([]common.MapStr, []common.MapStr, error) {
 }
 
 // GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
-func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
+func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 	pidStat, _, err := procStats.pidFill(pid, false)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error fetching PID %d", pid)
@@ -359,7 +359,7 @@ func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 }
 
 // return a formatted MapStr of the process metrics
-func (procStats *Stats) getProcessEvent(process *ProcState) (common.MapStr, error) {
+func (procStats *Stats) getProcessEvent(process *ProcState) (mapstr.M, error) {
 
 	// Remove CPUTicks if needed
 	if !procStats.CPUTicks {
@@ -368,7 +368,7 @@ func (procStats *Stats) getProcessEvent(process *ProcState) (common.MapStr, erro
 		process.CPU.Total.Ticks = opt.NewUintNone()
 	}
 
-	proc := common.MapStr{}
+	proc := mapstr.M{}
 	err := typeconv.Convert(&proc, process)
 
 	return proc, err

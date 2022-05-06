@@ -25,7 +25,10 @@ import (
 	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
+
+var logger = logp.NewLogger("schedjob")
 
 type schedJob struct {
 	id          string
@@ -60,7 +63,10 @@ func (sj *schedJob) run() (startedAt time.Time) {
 	sj.wg.Add(1)
 	sj.activeTasks.Inc()
 	if sj.jobLimitSem != nil {
-		sj.jobLimitSem.Acquire(sj.ctx, 1)
+		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
+		if err != nil {
+			logger.Errorf("could not acquire semaphore: %w", err)
+		}
 	}
 
 	startedAt = sj.runTask(sj.entrypoint)

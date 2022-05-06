@@ -5,12 +5,59 @@
 package httpjson
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
 	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestDecodeZip(t *testing.T) {
+	buf := new(bytes.Buffer)
+	w := zip.NewWriter(buf)
+	var files = []struct {
+		Name, Body string
+	}{
+		{
+			"a.json",
+			`{"a":"b"}`,
+		},
+		{
+			"b.ndjson",
+			`{"a":"b"}` + "\n" + `{"c":"d"}`,
+		},
+		{
+			"c.ndjson",
+			"{\n\t" + `"a":"b"` + "\n}\n{\n\t" + `"c":"d"` + "\n}",
+		},
+	}
+	for _, file := range files {
+		f, err := w.Create(file.Name)
+		require.NoError(t, err)
+		_, err = f.Write([]byte(file.Body))
+		require.NoError(t, err)
+	}
+
+	// Make sure to check the error on Close.
+	require.NoError(t, w.Close())
+
+	const expected = `[{"a":"b"},{"a":"b"},{"c":"d"},{"a":"b"},{"c":"d"}]`
+
+	resp := &response{}
+	if err := decodeAsZip(buf.Bytes(), resp); err != nil {
+		t.Fatalf("decodeAsZip failed: %v", err)
+	}
+
+	j, err := json.Marshal(resp.body)
+	if err != nil {
+		t.Fatalf("Marshal failed: %v", err)
+	}
+
+	assert.Equal(t, expected, string(j))
+}
 
 func TestDecodeNdjson(t *testing.T) {
 	tests := []struct {

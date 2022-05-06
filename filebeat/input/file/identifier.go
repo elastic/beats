@@ -24,7 +24,7 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -42,7 +42,7 @@ var identifierFactories = map[string]IdentifierFactory{
 	inodeMarkerName: newINodeMarkerIdentifier,
 }
 
-type IdentifierFactory func(*common.Config) (StateIdentifier, error)
+type IdentifierFactory func(*conf.C) (StateIdentifier, error)
 
 // StateIdentifier generates an ID for a State.
 type StateIdentifier interface {
@@ -51,7 +51,7 @@ type StateIdentifier interface {
 }
 
 // NewStateIdentifier creates a new state identifier for a log input.
-func NewStateIdentifier(ns *common.ConfigNamespace) (StateIdentifier, error) {
+func NewStateIdentifier(ns *conf.Namespace) (StateIdentifier, error) {
 	if ns == nil {
 		return newINodeDeviceIdentifier(nil)
 	}
@@ -69,7 +69,7 @@ type inodeDeviceIdentifier struct {
 	name string
 }
 
-func newINodeDeviceIdentifier(_ *common.Config) (StateIdentifier, error) {
+func newINodeDeviceIdentifier(_ *conf.C) (StateIdentifier, error) {
 	return &inodeDeviceIdentifier{
 		name: nativeName,
 	}, nil
@@ -84,7 +84,7 @@ type pathIdentifier struct {
 	name string
 }
 
-func newPathIdentifier(_ *common.Config) (StateIdentifier, error) {
+func newPathIdentifier(_ *conf.C) (StateIdentifier, error) {
 	return &pathIdentifier{
 		name: pathName,
 	}, nil

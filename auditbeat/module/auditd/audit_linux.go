@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 	"github.com/elastic/go-libaudit/v2/auparse"
@@ -514,7 +515,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	auditEvent, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		// Add messages on error so that it's possible to debug the problem.
-		out := mb.Event{RootFields: common.MapStr{}, Error: err}
+		out := mb.Event{RootFields: mapstr.M{}, Error: err}
 		addEventOriginal(msgs, out.RootFields)
 		return out
 	}
@@ -529,14 +530,14 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	}
 	out := mb.Event{
 		Timestamp: auditEvent.Timestamp,
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"category": auditEvent.Category.String(),
 				"action":   auditEvent.Summary.Action,
 				"outcome":  eventOutcome,
 			},
 		},
-		ModuleFields: common.MapStr{
+		ModuleFields: mapstr.M{
 			"message_type": strings.ToLower(auditEvent.Type.String()),
 			"sequence":     auditEvent.Sequence,
 			"result":       auditEvent.Result,
@@ -602,7 +603,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	}
 
 	// Copy user.*/group.* fields from event
-	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root common.MapStr, set common.StringSet) {
+	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root mapstr.M, set common.StringSet) {
 		if ent.ID == "" && ent.Name == "" {
 			return
 		}
@@ -637,7 +638,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 			out.RootFields.Put("related.user", userSet.ToSlice())
 		}
 	}
-	getStringField := func(key string, m common.MapStr) (str string) {
+	getStringField := func(key string, m mapstr.M) (str string) {
 		if asIf, _ := m.GetValue(key); asIf != nil {
 			str, _ = asIf.(string)
 		}
@@ -645,7 +646,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	}
 
 	// Remove redundant user.effective.* when it's the same as user.*
-	removeRedundantEntity := func(target, original string, m common.MapStr) bool {
+	removeRedundantEntity := func(target, original string, m mapstr.M) bool {
 		for _, suffix := range []string{".id", ".name"} {
 			if value := getStringField(original+suffix, m); value != "" && getStringField(target+suffix, m) == value {
 				m.Delete(target)
@@ -658,7 +659,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	return out
 }
 
-func normalizeEventFields(event *aucoalesce.Event, m common.MapStr) {
+func normalizeEventFields(event *aucoalesce.Event, m mapstr.M) {
 	m.Put("event.kind", "event")
 	if len(event.ECS.Event.Category) > 0 {
 		m.Put("event.category", event.ECS.Event.Category)
@@ -671,8 +672,8 @@ func normalizeEventFields(event *aucoalesce.Event, m common.MapStr) {
 	}
 }
 
-func addUser(u aucoalesce.User, m common.MapStr) {
-	user := common.MapStr{}
+func addUser(u aucoalesce.User, m mapstr.M) {
+	user := mapstr.M{}
 	m.Put("user", user)
 
 	for id, value := range u.IDs {
@@ -733,12 +734,12 @@ func addUser(u aucoalesce.User, m common.MapStr) {
 	}
 }
 
-func addProcess(p aucoalesce.Process, m common.MapStr) {
+func addProcess(p aucoalesce.Process, m mapstr.M) {
 	if p.IsEmpty() {
 		return
 	}
 
-	process := common.MapStr{}
+	process := mapstr.M{}
 	m.Put("process", process)
 	if p.PID != "" {
 		if pid, err := strconv.Atoi(p.PID); err == nil {
@@ -747,7 +748,7 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 	}
 	if p.PPID != "" {
 		if ppid, err := strconv.Atoi(p.PPID); err == nil {
-			process["parent"] = common.MapStr{
+			process["parent"] = mapstr.M{
 				"pid": ppid,
 			}
 		}
@@ -769,12 +770,12 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 	}
 }
 
-func addFile(f *aucoalesce.File, m common.MapStr) {
+func addFile(f *aucoalesce.File, m mapstr.M) {
 	if f == nil {
 		return
 	}
 
-	file := common.MapStr{}
+	file := mapstr.M{}
 	m.Put("file", file)
 	if f.Path != "" {
 		file["path"] = f.Path
@@ -805,12 +806,12 @@ func addFile(f *aucoalesce.File, m common.MapStr) {
 	}
 }
 
-func addAddress(addr *aucoalesce.Address, key string, m common.MapStr) {
+func addAddress(addr *aucoalesce.Address, key string, m mapstr.M) {
 	if addr == nil {
 		return
 	}
 
-	address := common.MapStr{}
+	address := mapstr.M{}
 	m.Put(key, address)
 	if addr.Hostname != "" {
 		address["domain"] = addr.Hostname
@@ -826,18 +827,18 @@ func addAddress(addr *aucoalesce.Address, key string, m common.MapStr) {
 	}
 }
 
-func addNetwork(net *aucoalesce.Network, m common.MapStr) {
+func addNetwork(net *aucoalesce.Network, m mapstr.M) {
 	if net == nil {
 		return
 	}
 
-	network := common.MapStr{
+	network := mapstr.M{
 		"direction": net.Direction,
 	}
 	m.Put("network", network)
 }
 
-func addEventOriginal(msgs []*auparse.AuditMessage, m common.MapStr) {
+func addEventOriginal(msgs []*auparse.AuditMessage, m mapstr.M) {
 	const key = "event.original"
 	if len(msgs) == 0 {
 		return
@@ -853,8 +854,8 @@ func addEventOriginal(msgs []*auparse.AuditMessage, m common.MapStr) {
 	m.Put(key, rawMsgs)
 }
 
-func createAuditdData(data map[string]string) common.MapStr {
-	out := make(common.MapStr, len(data))
+func createAuditdData(data map[string]string) mapstr.M {
+	out := make(mapstr.M, len(data))
 	for key, v := range data {
 		if strings.HasPrefix(key, "socket_") {
 			out.Put("socket."+key[7:], v)

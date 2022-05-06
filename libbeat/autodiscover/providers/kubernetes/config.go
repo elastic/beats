@@ -26,9 +26,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -51,9 +51,9 @@ type Config struct {
 	LeaderLease string `config:"leader_lease"`
 
 	Prefix    string                  `config:"prefix"`
-	Hints     *common.Config          `config:"hints"`
-	Builders  []*common.Config        `config:"builders"`
-	Appenders []*common.Config        `config:"appenders"`
+	Hints     *config.C               `config:"hints"`
+	Builders  []*config.C             `config:"builders"`
+	Appenders []*config.C             `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`

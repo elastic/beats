@@ -21,9 +21,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type loaderConfig struct {
@@ -162,7 +162,7 @@ func TestLoader_Configure(t *testing.T) {
 			setup: defaultSetup.WithPlugins(Plugin{
 				Name:      "a",
 				Stability: feature.Beta,
-				Manager: ConfigureWith(func(_ *common.Config) (Input, error) {
+				Manager: ConfigureWith(func(_ *conf.C) (Input, error) {
 					return nil, errors.New("oops")
 				}),
 			}),
@@ -174,7 +174,7 @@ func TestLoader_Configure(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			loader := test.setup.MustNewLoader()
-			input, err := loader.Configure(common.MustNewConfigFrom(test.config))
+			input, err := loader.Configure(conf.MustNewConfigFrom(test.config))
 			test.check(t, input, err)
 		})
 	}

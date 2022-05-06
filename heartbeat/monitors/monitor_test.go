@@ -25,8 +25,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -50,8 +51,8 @@ func TestMonitorCfgError(t *testing.T) {
 		mockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
 		lookslike.Compose(
 			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
-			lookslike.MustCompile(common.MapStr{
-				"error": common.MapStr{
+			lookslike.MustCompile(mapstr.M{
+				"error": mapstr.M{
 					"message": isdef.IsStringContaining("missing required field"),
 					"type":    "io",
 				},
@@ -60,7 +61,7 @@ func TestMonitorCfgError(t *testing.T) {
 	)
 }
 
-func testMonitorConfig(t *testing.T, conf *common.Config, eventValidator validator.Validator) {
+func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Validator) {
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 

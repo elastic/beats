@@ -24,8 +24,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestQueryFetchEventContentInstantVector(t *testing.T) {
@@ -52,11 +52,11 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "up",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "up",
 				},
 			},
@@ -101,11 +101,11 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "up_range",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "up",
 					"start": "2019-12-20T23:30:30.000Z",
 					"end":   "2019-12-21T23:31:00.000Z",
@@ -147,11 +147,11 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "scalar",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "100",
 				},
 			},
@@ -190,11 +190,11 @@ func TestQueryFetchEventContentString(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "string",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "some",
 				},
 			},

@@ -28,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -46,7 +48,7 @@ type fingerprint struct {
 }
 
 // New constructs a new fingerprint processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *config.C) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
@@ -99,7 +101,7 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		}
 
 		switch vv := v.(type) {
-		case map[string]interface{}, []interface{}, common.MapStr:
+		case map[string]interface{}, []interface{}, mapstr.M:
 			return makeErrNonScalarField(k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.

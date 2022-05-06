@@ -29,8 +29,8 @@ import (
 	"github.com/google/gopacket/layers"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -62,7 +62,7 @@ func TestIcmpDirection(t *testing.T) {
 func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 	logp.TestingSetup(logp.WithSelectors("icmp", "icmpdetailed"))
 
-	icmp, err := New(true, func(beat.Event) {}, procs.ProcessesWatcher{}, common.NewConfig())
+	icmp, err := New(true, func(beat.Event) {}, procs.ProcessesWatcher{}, conf.NewConfig())
 	if err != nil {
 		b.Error("Failed to create ICMP processor")
 		return

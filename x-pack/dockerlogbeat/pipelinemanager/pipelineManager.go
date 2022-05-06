@@ -15,6 +15,7 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/pkg/errors"
 
@@ -24,15 +25,14 @@ import (
 
 	protoio "github.com/gogo/protobuf/io"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
-// containerConfig is the common.Config unpacking type
+// containerConfig is the config.C unpacking type
 type containerConfig struct {
-	Pipeline pipeline.Config        `config:"pipeline"`
-	Output   common.ConfigNamespace `config:"output"`
+	Pipeline pipeline.Config  `config:"pipeline"`
+	Output   config.Namespace `config:"output"`
 }
 
 // Pipeline represents a single pipeline and the count of associated clients

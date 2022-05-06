@@ -26,22 +26,22 @@ import (
 	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConversion(t *testing.T) {
 	tests := map[string]struct {
 		fields map[string]string
-		want   common.MapStr
+		want   mapstr.M
 	}{
 		"field name from fields.go": {
 			fields: map[string]string{
 				sdjournal.SD_JOURNAL_FIELD_BOOT_ID: "123456",
 			},
-			want: common.MapStr{
-				"journald": common.MapStr{
-					"host": common.MapStr{
+			want: mapstr.M{
+				"journald": mapstr.M{
+					"host": mapstr.M{
 						"boot_id": "123456",
 					},
 				},
@@ -51,8 +51,8 @@ func TestConversion(t *testing.T) {
 			fields: map[string]string{
 				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456",
 			},
-			want: common.MapStr{
-				"syslog": common.MapStr{
+			want: mapstr.M{
+				"syslog": mapstr.M{
 					"pid": int64(123456),
 				},
 			},
@@ -61,12 +61,12 @@ func TestConversion(t *testing.T) {
 			fields: map[string]string{
 				sdjournal.SD_JOURNAL_FIELD_PRIORITY: "123456, ",
 			},
-			want: common.MapStr{
-				"syslog": common.MapStr{
+			want: mapstr.M{
+				"syslog": mapstr.M{
 					"priority": int64(123456),
 				},
-				"log": common.MapStr{
-					"syslog": common.MapStr{
+				"log": mapstr.M{
+					"syslog": mapstr.M{
 						"priority": int64(123456),
 					},
 				},
@@ -76,8 +76,8 @@ func TestConversion(t *testing.T) {
 			fields: map[string]string{
 				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456,root",
 			},
-			want: common.MapStr{
-				"syslog": common.MapStr{
+			want: mapstr.M{
+				"syslog": mapstr.M{
 					"pid": int64(123456),
 				},
 			},
@@ -86,8 +86,8 @@ func TestConversion(t *testing.T) {
 			fields: map[string]string{
 				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "",
 			},
-			want: common.MapStr{
-				"syslog": common.MapStr{
+			want: mapstr.M{
+				"syslog": mapstr.M{
 					"pid": "",
 				},
 			},
@@ -96,9 +96,9 @@ func TestConversion(t *testing.T) {
 			fields: map[string]string{
 				"my_custom_field": "value",
 			},
-			want: common.MapStr{
-				"journald": common.MapStr{
-					"custom": common.MapStr{
+			want: mapstr.M{
+				"journald": mapstr.M{
+					"custom": mapstr.M{
 						"my_custom_field": "value",
 					},
 				},
@@ -108,7 +108,7 @@ func TestConversion(t *testing.T) {
 			fields: map[string]string{
 				"_SOURCE_MONOTONIC_TIMESTAMP": "value",
 			},
-			want: common.MapStr{},
+			want: mapstr.M{},
 		},
 	}
 

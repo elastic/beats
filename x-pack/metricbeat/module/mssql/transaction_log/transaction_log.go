@@ -10,10 +10,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type dbInfo struct {
@@ -79,13 +79,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	}
 
 	for _, db := range dbs {
-		moduleFields := common.MapStr{
-			"database": common.MapStr{
+		moduleFields := mapstr.M{
+			"database": mapstr.M{
 				"id":   db.id,
 				"name": db.name,
 			},
 		}
-		metricsetFields := common.MapStr{}
+		metricsetFields := mapstr.M{}
 
 		spaceUsage, err := m.getLogSpaceUsageForDb(db.name)
 		if err != nil {
@@ -122,7 +122,7 @@ func (m *MetricSet) Close() error {
 	return m.db.Close()
 }
 
-func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (common.MapStr, error) {
+func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (mapstr.M, error) {
 	// According to MS docs a single result is always returned for this query
 	row := m.db.QueryRow(fmt.Sprintf(`USE [%s]; SELECT * FROM sys.dm_db_log_space_usage;`, dbName))
 
@@ -135,20 +135,20 @@ func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (common.MapStr, error) 
 		return nil, err
 	}
 
-	return common.MapStr{
-		"total": common.MapStr{
+	return mapstr.M{
+		"total": mapstr.M{
 			"bytes": res.totalLogSizeInBytes,
 		},
-		"used": common.MapStr{
+		"used": mapstr.M{
 			"bytes": res.usedLogSpaceInBytes,
 			"pct":   res.usedLogSpaceInPercent,
 		},
-		"since_last_backup": common.MapStr{
+		"since_last_backup": mapstr.M{
 			"bytes": res.logSpaceInBytesSinceLastBackup,
 		},
 	}, nil
 }
-func (m *MetricSet) getLogStats(db dbInfo) (common.MapStr, error) {
+func (m *MetricSet) getLogStats(db dbInfo) (mapstr.M, error) {
 	// According to MS docs a single result is always returned for this query
 	row := m.db.QueryRow(fmt.Sprintf(`USE [%s]; SELECT database_id,total_log_size_mb,active_log_size_mb,log_backup_time,log_since_last_log_backup_mb,log_since_last_checkpoint_mb,log_recovery_size_mb FROM sys.dm_db_log_stats(%d);`, db.name, db.id))
 
@@ -160,18 +160,18 @@ func (m *MetricSet) getLogStats(db dbInfo) (common.MapStr, error) {
 		return nil, err
 	}
 
-	result := common.MapStr{
-		"total_size": common.MapStr{
+	result := mapstr.M{
+		"total_size": mapstr.M{
 			"bytes": res.sizeMB * 1048576,
 		},
-		"active_size": common.MapStr{
+		"active_size": mapstr.M{
 			"bytes": res.activeSizeMB * 1048576,
 		},
 		"backup_time": res.backupTime,
-		"since_last_checkpoint": common.MapStr{
+		"since_last_checkpoint": mapstr.M{
 			"bytes": res.sinceLastCheckpointMB * 1048576,
 		},
-		"recovery_size": common.MapStr{
+		"recovery_size": mapstr.M{
 			"bytes": res.recoverySizeMB,
 		},
 	}

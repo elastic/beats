@@ -23,12 +23,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type CPUStats struct {
 	Time                                  common.Time
 	Container                             *docker.Container
-	PerCPUUsage                           common.MapStr
+	PerCPUUsage                           mapstr.M
 	TotalUsage                            float64
 	TotalUsageNormalized                  float64
 	UsageInKernelmode                     uint64
@@ -127,17 +128,17 @@ func (u *CPUUsage) SystemDelta() uint64 {
 }
 
 // PerCPU calculates per CPU usage.
-func (u *CPUUsage) PerCPU() common.MapStr {
-	var output common.MapStr
+func (u *CPUUsage) PerCPU() mapstr.M {
+	var output mapstr.M
 	if len(u.Stats.CPUStats.CPUUsage.PercpuUsage) == len(u.Stats.PreCPUStats.CPUUsage.PercpuUsage) {
-		output = common.MapStr{}
+		output = mapstr.M{}
 		for index := range u.Stats.CPUStats.CPUUsage.PercpuUsage {
-			cpu := common.MapStr{}
+			cpu := mapstr.M{}
 			cpu["pct"] = u.calculatePercentage(
 				u.Stats.CPUStats.CPUUsage.PercpuUsage[index],
 				u.Stats.PreCPUStats.CPUUsage.PercpuUsage[index],
 				u.CPUs())
-			cpu["norm"] = common.MapStr{
+			cpu["norm"] = mapstr.M{
 				"pct": u.calculatePercentage(
 					u.Stats.CPUStats.CPUUsage.PercpuUsage[index],
 					u.Stats.PreCPUStats.CPUUsage.PercpuUsage[index],

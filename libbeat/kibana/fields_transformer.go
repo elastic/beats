@@ -23,14 +23,15 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var v640 = common.MustNewVersion("6.4.0")
 
 type fieldsTransformer struct {
 	fields                    mapping.Fields
-	transformedFields         []common.MapStr
-	transformedFieldFormatMap common.MapStr
+	transformedFields         []mapstr.M
+	transformedFieldFormatMap mapstr.M
 	version                   *common.Version
 	keys                      map[string]int
 	migration                 bool
@@ -43,14 +44,14 @@ func newFieldsTransformer(version *common.Version, fields mapping.Fields, migrat
 	return &fieldsTransformer{
 		fields:                    fields,
 		version:                   version,
-		transformedFields:         []common.MapStr{},
-		transformedFieldFormatMap: common.MapStr{},
+		transformedFields:         []mapstr.M{},
+		transformedFieldFormatMap: mapstr.M{},
 		keys:                      map[string]int{},
 		migration:                 migration,
 	}, nil
 }
 
-func (t *fieldsTransformer) transform() (transformed common.MapStr, err error) {
+func (t *fieldsTransformer) transform() (transformed mapstr.M, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			var ok bool
@@ -70,7 +71,7 @@ func (t *fieldsTransformer) transform() (transformed common.MapStr, err error) {
 	t.add(mapping.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 	t.add(mapping.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 
-	transformed = common.MapStr{
+	transformed = mapstr.M{
 		"fields":         t.transformedFields,
 		"fieldFormatMap": t.transformedFieldFormatMap,
 	}
@@ -120,7 +121,7 @@ func (t *fieldsTransformer) transformFields(commonFields mapping.Fields, path st
 	}
 }
 
-func (t *fieldsTransformer) update(target *common.MapStr, override mapping.Field) error {
+func (t *fieldsTransformer) update(target *mapstr.M, override mapping.Field) error {
 	field, _ := transformField(t.version, override)
 	if override.Type == "" || (*target)["type"] == field["type"] {
 		target.Update(field)
@@ -151,8 +152,8 @@ func (t *fieldsTransformer) add(f mapping.Field) {
 	}
 }
 
-func transformField(version *common.Version, f mapping.Field) (common.MapStr, common.MapStr) {
-	field := common.MapStr{
+func transformField(version *common.Version, f mapping.Field) (mapstr.M, mapstr.M) {
+	field := mapstr.M{
 		"name":         f.Path,
 		"count":        f.Count,
 		"scripted":     false,
@@ -198,9 +199,9 @@ func transformField(version *common.Version, f mapping.Field) (common.MapStr, co
 		field["doc_values"] = false
 	}
 
-	var format common.MapStr
+	var format mapstr.M
 	if f.Format != "" || f.Pattern != "" {
-		format = common.MapStr{}
+		format = mapstr.M{}
 
 		if f.Format != "" {
 			format["id"] = f.Format
@@ -218,7 +219,7 @@ func getVal(valP *bool, def bool) bool {
 	return def
 }
 
-func addParams(format *common.MapStr, version *common.Version, f mapping.Field) {
+func addParams(format *mapstr.M, version *common.Version, f mapping.Field) {
 	addFormatParam(format, "pattern", f.Pattern)
 	addFormatParam(format, "inputFormat", f.InputFormat)
 	addFormatParam(format, "outputFormat", f.OutputFormat)
@@ -228,28 +229,28 @@ func addParams(format *common.MapStr, version *common.Version, f mapping.Field) 
 	addVersionedFormatParam(format, version, "urlTemplate", f.UrlTemplate)
 }
 
-func addFormatParam(f *common.MapStr, key string, val interface{}) {
+func addFormatParam(f *mapstr.M, key string, val interface{}) {
 	switch val.(type) {
 	case string:
 		if v := val.(string); v != "" {
 			createParam(f)
-			(*f)["params"].(common.MapStr)[key] = v
+			(*f)["params"].(mapstr.M)[key] = v
 		}
 	case *int:
 		if v := val.(*int); v != nil {
 			createParam(f)
-			(*f)["params"].(common.MapStr)[key] = *v
+			(*f)["params"].(mapstr.M)[key] = *v
 		}
 	case *bool:
 		if v := val.(*bool); v != nil {
 			createParam(f)
-			(*f)["params"].(common.MapStr)[key] = *v
+			(*f)["params"].(mapstr.M)[key] = *v
 		}
 	}
 }
 
 // takes the highest version where major version <= given version
-func addVersionedFormatParam(f *common.MapStr, version *common.Version, key string, val []mapping.VersionizedString) {
+func addVersionedFormatParam(f *mapstr.M, version *common.Version, key string, val []mapping.VersionizedString) {
 	if len(val) == 0 {
 		return
 	}
@@ -271,9 +272,9 @@ func addVersionedFormatParam(f *common.MapStr, version *common.Version, key stri
 	}
 }
 
-func createParam(f *common.MapStr) {
+func createParam(f *mapstr.M) {
 	if (*f)["params"] == nil {
-		(*f)["params"] = common.MapStr{}
+		(*f)["params"] = mapstr.M{}
 	}
 }
 

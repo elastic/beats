@@ -26,10 +26,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
 )
@@ -41,14 +42,14 @@ func init() {
 
 func testEvent() *beat.Event {
 	return &beat.Event{
-		Fields: common.MapStr{
-			"source": common.MapStr{
+		Fields: mapstr.M{
+			"source": mapstr.M{
 				"ip": "192.0.2.1",
 			},
-			"destination": common.MapStr{
+			"destination": mapstr.M{
 				"ip": "192.0.2.1",
 			},
-			"network": common.MapStr{
+			"network": mapstr.M{
 				"transport": "igmp",
 			},
 			"message": "key=hello",
@@ -146,12 +147,12 @@ func checkEvent(t *testing.T, evt *beat.Event, key, value string) {
 }
 
 type mockProcessor struct {
-	fields common.MapStr
+	fields mapstr.M
 }
 
-func newMock(c *common.Config) (processors.Processor, error) {
+func newMock(c *config.C) (processors.Processor, error) {
 	config := struct {
-		Fields common.MapStr `config:"fields" validate:"required"`
+		Fields mapstr.M `config:"fields" validate:"required"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -175,7 +176,7 @@ func (m *mockProcessor) String() string {
 
 type mockProcessorWithCloser struct{}
 
-func newMockWithCloser(c *common.Config) (processors.Processor, error) {
+func newMockWithCloser(c *config.C) (processors.Processor, error) {
 	return &mockProcessorWithCloser{}, nil
 }
 

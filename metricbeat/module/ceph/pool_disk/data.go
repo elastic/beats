@@ -20,8 +20,8 @@ package pool_disk
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Stats represents the statistics for a pool
@@ -50,25 +50,25 @@ type DfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) []common.MapStr {
+func eventsMapping(content []byte) []mapstr.M {
 	var d DfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: %+v", err)
 	}
 
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 
 	for _, Pool := range d.Output.Pools {
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": Pool.Name,
 			"id":   Pool.ID,
-			"stats": common.MapStr{
-				"used": common.MapStr{
+			"stats": mapstr.M{
+				"used": mapstr.M{
 					"bytes": Pool.Stats.BytesUsed,
 					"kb":    Pool.Stats.KbUsed,
 				},
-				"available": common.MapStr{
+				"available": mapstr.M{
 					"bytes": Pool.Stats.MaxAvail,
 				},
 				"objects": Pool.Stats.Objects,

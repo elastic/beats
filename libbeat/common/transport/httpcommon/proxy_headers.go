@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // ProxyHeaders is a headers for proxy serialized as a map[string]string.
@@ -39,7 +39,7 @@ func (p ProxyHeaders) MarshalJSON() ([]byte, error) {
 }
 
 // Unpack unpacks string into an proxy URI.
-func (p *ProxyHeaders) Unpack(cfg *common.Config) error {
+func (p *ProxyHeaders) Unpack(cfg *config.C) error {
 	m := make(map[string]string)
 	if err := cfg.Unpack(&m); err != nil {
 		return err

@@ -23,10 +23,10 @@ package network
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
@@ -119,14 +119,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if m.prevCounters != (networkCounter{}) {
 		// convert network metrics from counters to gauges
 		r.Event(mb.Event{
-			RootFields: common.MapStr{
-				"host": common.MapStr{
-					"network": common.MapStr{
-						"ingress": common.MapStr{
+			RootFields: mapstr.M{
+				"host": mapstr.M{
+					"network": mapstr.M{
+						"ingress": mapstr.M{
 							"bytes":   networkInBytes - m.prevCounters.prevNetworkInBytes,
 							"packets": networkInPackets - m.prevCounters.prevNetworkInPackets,
 						},
-						"egress": common.MapStr{
+						"egress": mapstr.M{
 							"bytes":   networkOutBytes - m.prevCounters.prevNetworkOutBytes,
 							"packets": networkOutPackets - m.prevCounters.prevNetworkOutPackets,
 						},
@@ -145,16 +145,16 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
-	return common.MapStr{
+func ioCountersToMapStr(counters net.IOCountersStat) mapstr.M {
+	return mapstr.M{
 		"name": counters.Name,
-		"in": common.MapStr{
+		"in": mapstr.M{
 			"errors":  counters.Errin,
 			"dropped": counters.Dropin,
 			"bytes":   counters.BytesRecv,
 			"packets": counters.PacketsRecv,
 		},
-		"out": common.MapStr{
+		"out": mapstr.M{
 			"errors":  counters.Errout,
 			"dropped": counters.Dropout,
 			"packets": counters.PacketsSent,

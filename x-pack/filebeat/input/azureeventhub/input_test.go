@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var config = azureInputConfig{
@@ -113,7 +114,7 @@ func TestParseMultipleMessages(t *testing.T) {
 }
 
 func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
+	config := mapstr.M{
 		"connection_string":   "Endpoint=sb://something",
 		"eventhub":            "insights-operational-logs",
 		"storage_account":     "someaccount",
@@ -157,7 +158,7 @@ func newStubOutlet(stub *stubOutleter) (channel.Outleter, error) {
 	stub.cond = sync.NewCond(stub)
 	defer stub.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return stub, nil
 	})
 	return connector.ConnectWith(nil, beat.ClientConfig{

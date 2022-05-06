@@ -50,6 +50,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var metricSets = []string{
@@ -535,7 +536,7 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 		return 0, err
 	}
 
-	var data []common.MapStr
+	var data []mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return 0, err
@@ -572,7 +573,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, err
 		return nil, err
 	}
 
-	var data common.MapStr
+	var data mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err

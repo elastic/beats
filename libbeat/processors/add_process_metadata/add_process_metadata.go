@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -64,7 +66,7 @@ type addProcessMetadata struct {
 	cgroupsCache *common.Cache
 	cidProvider  cidProvider
 	log          *logp.Logger
-	mappings     common.MapStr
+	mappings     mapstr.M
 }
 
 type processMetadata struct {
@@ -74,7 +76,7 @@ type processMetadata struct {
 	startTime                          time.Time
 	pid, ppid                          int
 	//
-	fields common.MapStr
+	fields mapstr.M
 }
 
 type processMetadataProvider interface {
@@ -91,17 +93,17 @@ func init() {
 }
 
 // New constructs a new add_process_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (processors.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, false)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
-func NewWithCache(cfg *common.Config) (processors.Processor, error) {
+func NewWithCache(cfg *conf.C) (processors.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider, withCache bool) (proc processors.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetadataProvider, withCache bool) (proc processors.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
@@ -148,7 +150,7 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 }
 
 // check if the value exist in mapping
-func containsValue(m common.MapStr, v string) bool {
+func containsValue(m mapstr.M, v string) bool {
 	for _, x := range m {
 		if x == v {
 			return true
@@ -163,7 +165,7 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		result, err := p.enrich(event, pidField)
 		if err != nil {
 			switch err {
-			case common.ErrKeyNotFound:
+			case mapstr.ErrKeyNotFound:
 				continue
 			case ErrNoProcess:
 				return event, err
@@ -218,13 +220,13 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 		return nil, errors.Wrapf(err, "cannot parse pid field '%s'", pidField)
 	}
 
-	var meta common.MapStr
+	var meta mapstr.M
 
 	metaPtr, err := p.provider.GetProcessMetadata(pid)
 	if err != nil || metaPtr == nil {
 		// no process metadata, lets still try to get container id
 		p.log.Debugf("failed to get process metadata for PID=%d: %v", pid, err)
-		meta = common.MapStr{}
+		meta = mapstr.M{}
 	} else {
 		meta = metaPtr.fields
 	}
@@ -233,7 +235,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 	if cid == "" || err != nil {
 		p.log.Debugf("failed to get container id for PID=%d: %v", pid, err)
 	} else {
-		if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
+		if _, err = meta.Put("container", mapstr.M{"id": cid}); err != nil {
 			return nil, err
 		}
 	}
@@ -299,21 +301,21 @@ func (p *addProcessMetadata) String() string {
 		p.config.OverwriteKeys, p.config.RestrictedFields, p.config.HostPath, p.config.CgroupPrefixes)
 }
 
-func (p *processMetadata) toMap() common.MapStr {
-	process := common.MapStr{
+func (p *processMetadata) toMap() mapstr.M {
+	process := mapstr.M{
 		"name":       p.name,
 		"title":      p.title,
 		"executable": p.exe,
 		"args":       p.args,
 		"env":        p.env,
 		"pid":        p.pid,
-		"parent": common.MapStr{
+		"parent": mapstr.M{
 			"pid": p.ppid,
 		},
 		"start_time": p.startTime,
 	}
 	if p.username != "" || p.userid != "" {
-		user := common.MapStr{}
+		user := mapstr.M{}
 		if p.username != "" {
 			user["name"] = p.username
 		}
@@ -323,7 +325,7 @@ func (p *processMetadata) toMap() common.MapStr {
 		process["owner"] = user
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"process": process,
 	}
 }

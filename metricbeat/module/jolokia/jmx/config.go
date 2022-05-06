@@ -26,8 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type JMXMapping struct {
@@ -245,8 +245,8 @@ type JolokiaHTTPRequestFetcher interface {
 	// BuildRequestsAndMappings builds the request information and mappings needed to fetch information from Jolokia server
 	BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error)
 	// Fetches the information from Jolokia server regarding MBeans
-	Fetch(m *MetricSet) ([]common.MapStr, error)
-	EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error)
+	Fetch(m *MetricSet) ([]mapstr.M, error)
+	EventMapping(content []byte, mapping AttributeMapping) ([]mapstr.M, error)
 }
 
 // JolokiaHTTPGetFetcher constructs and executes an HTTP GET request
@@ -341,9 +341,9 @@ func (pc *JolokiaHTTPGetFetcher) buildGetRequestURIs(mappings []JMXMapping) ([]s
 }
 
 // Fetch perfrorms one or more GET requests to Jolokia server and gets information about MBeans.
-func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 
-	var allEvents []common.MapStr
+	var allEvents []mapstr.M
 
 	// Prepare Http request objects and attribute mappings according to selected Http method
 	httpReqs, mapping, err := pc.BuildRequestsAndMappings(m.mapping)
@@ -387,7 +387,7 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 }
 
 // EventMapping maps a Jolokia response from a GET request is to one or more Metricbeat events
-func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]mapstr.M, error) {
 
 	var singleEntry Entry
 
@@ -470,7 +470,7 @@ func (pc *JolokiaHTTPPostFetcher) buildRequestBodyAndMapping(mappings []JMXMappi
 }
 
 // Fetch perfrorms a POST request to Jolokia server and gets information about MBeans.
-func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 
 	// Prepare Http POST request object and attribute mappings according to selected Http method
 	httpReqs, mapping, err := pc.BuildRequestsAndMappings(m.mapping)
@@ -509,7 +509,7 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 }
 
 // EventMapping maps a Jolokia response from a POST request is to one or more Metricbeat events
-func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]mapstr.M, error) {
 
 	var entries []Entry
 

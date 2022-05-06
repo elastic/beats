@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: statsd
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/statsd/_meta/docs.asciidoc
+
 
 [[metricbeat-module-statsd]]
 [role="xpack"]
@@ -66,6 +68,8 @@ Currently, there is only `server` metricset in `statsd` module.
 The metricset collects metric data sent using UDP and publishes them under the `statsd` prefix.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -91,3 +95,4 @@ The following metricsets are available:
 
 include::statsd/server.asciidoc[]
 
+:edit_url!:

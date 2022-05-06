@@ -20,11 +20,12 @@ package channel
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type onCreateFactory struct {
@@ -32,13 +33,13 @@ type onCreateFactory struct {
 	create  onCreateWrapper
 }
 
-type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common.Config) (cfgfile.Runner, error)
+type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
 
 // commonInputConfig defines common input settings
 // for the publisher pipeline.
 type commonInputConfig struct {
 	// event processing
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
 	KeepNull             bool                    `config:"keep_null"`
 
@@ -59,11 +60,11 @@ type commonInputConfig struct {
 	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
 }
 
-func (f *onCreateFactory) CheckConfig(cfg *common.Config) error {
+func (f *onCreateFactory) CheckConfig(cfg *conf.C) error {
 	return f.factory.CheckConfig(cfg)
 }
 
-func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *common.Config) (cfgfile.Runner, error) {
+func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	return f.create(f.factory, pipeline, cfg)
 }
 
@@ -88,7 +89,7 @@ func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactor
 		func(
 			f cfgfile.RunnerFactory,
 			pipeline beat.PipelineConnector,
-			cfg *common.Config,
+			cfg *conf.C,
 		) (runner cfgfile.Runner, err error) {
 			pipeline, err = withClientConfig(info, pipeline, cfg)
 			if err != nil {
@@ -108,7 +109,7 @@ func wrapRunnerCreate(f cfgfile.RunnerFactory, edit onCreateWrapper) cfgfile.Run
 func withClientConfig(
 	beatInfo beat.Info,
 	pipeline beat.PipelineConnector,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (beat.PipelineConnector, error) {
 	editor, err := newCommonConfigEditor(beatInfo, cfg)
 	if err != nil {
@@ -119,7 +120,7 @@ func withClientConfig(
 
 func newCommonConfigEditor(
 	beatInfo beat.Info,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (pipetool.ConfigEditor, error) {
 	config := commonInputConfig{}
 	if err := cfg.Unpack(&config); err != nil {
@@ -155,7 +156,7 @@ func newCommonConfigEditor(
 		setOptional(fields, "service.type", serviceType)
 		setOptional(fields, "input.type", config.Type)
 		if config.Module != "" {
-			event := common.MapStr{"module": config.Module}
+			event := mapstr.M{"module": config.Module}
 			if config.Fileset != "" {
 				event["dataset"] = config.Module + "." + config.Fileset
 			}
@@ -188,7 +189,7 @@ func newCommonConfigEditor(
 	}, nil
 }
 
-func setOptional(to common.MapStr, key string, value string) {
+func setOptional(to mapstr.M, key string, value string) {
 	if value != "" {
 		to.Put(key, value)
 	}

@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const allXML = `
@@ -83,7 +83,7 @@ func TestXML(t *testing.T) {
 	tests := []struct {
 		xml    string
 		event  Event
-		mapstr common.MapStr
+		mapstr mapstr.M
 	}{
 		{
 			xml: allXML,
@@ -153,10 +153,10 @@ func TestXML(t *testing.T) {
 					},
 				},
 			},
-			mapstr: common.MapStr{
+			mapstr: mapstr.M{
 				"event_id":     "0",
 				"time_created": time.Time{},
-				"user_data": common.MapStr{
+				"user_data": mapstr.M{
 					"Id":       "{00000000-0000-0000-0000-000000000000}",
 					"xml_name": "Operation_ClientFailure",
 				},

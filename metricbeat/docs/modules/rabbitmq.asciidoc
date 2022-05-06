@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: rabbitmq
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/rabbitmq/_meta/docs.asciidoc
+
 
 [[metricbeat-module-rabbitmq]]
 == RabbitMQ module
@@ -22,6 +24,8 @@ If `management.path_prefix` is set in RabbitMQ configuration, `management_path_p
 
 The rabbitmq module is fully tested with RabbitMQ 3.7.4 and it should be compatible with any version supporting the management plugin (which needs to be installed and enabled). Exchange metricset is also tested with 3.6.0, 3.6.5 and 3.7.14
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -70,3 +74,4 @@ include::rabbitmq/node.asciidoc[]
 
 include::rabbitmq/queue.asciidoc[]
 
+:edit_url!:

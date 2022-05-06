@@ -22,8 +22,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 ///*** Mock Beat Setup ***///
@@ -39,7 +40,7 @@ type Mockbeat struct {
 }
 
 // Creates beater
-func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, _ *config.C) (beat.Beater, error) {
 	return &Mockbeat{
 		done:   make(chan struct{}),
 		logger: logp.NewLogger("mock"),
@@ -61,7 +62,7 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 			case <-ticker.C:
 				client.Publish(beat.Event{
 					Timestamp: time.Now(),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"type":    "mock",
 						"message": "Mockbeat is alive!",
 					},
