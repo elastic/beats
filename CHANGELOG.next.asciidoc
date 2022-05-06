@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Fix group write permissions on runtime directories. {pull}30869[30869]
 - Store syslog version as string. {pull}31446[31446]
+- Accept XML that declares non-UTF-8 encoding. {issue}31395[31395] {pull}[]
 
 *Auditbeat*
 

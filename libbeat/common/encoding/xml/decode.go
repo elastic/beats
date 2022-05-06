@@ -33,7 +33,10 @@ type Decoder struct {
 
 // NewDecoder returns a new decoder that reads from r.
 func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{xmlDec: xml.NewDecoder(r)}
+	dec := xml.NewDecoder(r)
+	// Assume all text has already been converted to UTF-8, so ignore encoding declarations.
+	dec.CharsetReader = func(_ string, input io.Reader) (io.Reader, error) { return input, nil }
+	return &Decoder{xmlDec: dec}
 }
 
 // PrependHyphenToAttr causes the Decoder to prepend a hyphen ('-') to to all
