@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Supporting the double digit date parsing in ingest pipeline for oracle logs {pull}31514[31514]
 
 *Heartbeat*
+- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 
 *Metricbeat*
