@@ -49,7 +49,7 @@ type Leader struct {
 
 func eventsMapping(r mb.ReporterV2, content []byte) {
 	var data Leader
-	json.Unmarshal(content, &data)
+	_ = json.Unmarshal(content, &data)
 
 	for id, follower := range data.Followers {
 		event := mb.Event{
