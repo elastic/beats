@@ -30,7 +30,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb34")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -57,7 +57,7 @@ func TestData(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
+		t.Fatal("error trying to create data.json file:", err)
 	}
 }
 
