@@ -36,8 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var logger = logp.NewLogger("ICMP-Stdloop")
-
 type stdICMPLoop struct {
 	conn4, conn6 *icmp.PacketConn
 	recv         chan packet
@@ -167,7 +165,7 @@ func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 		bytes := make([]byte, 512)
 		err := conn.SetReadDeadline(time.Now().Add(time.Second))
 		if err != nil {
-			logger.Error("could not set read deadline for ICMP: %w", err)
+			logp.L().Error("could not set read deadline for ICMP: %w", err)
 			return
 		}
 		_, addr, err := conn.ReadFrom(bytes)
