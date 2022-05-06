@@ -3,9 +3,11 @@ module github.com/elastic/elastic-agent-system-metrics
 go 1.17
 
 require (
-	github.com/elastic/elastic-agent-libs v0.1.3-0.20220413130536-4b45f2742994
+	github.com/elastic/elastic-agent-libs v0.2.2
+	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.1
 	github.com/elastic/gosigar v0.14.2
+	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/magefile/mage v1.13.0
 	github.com/shirou/gopsutil/v3 v3.21.12
 	github.com/stretchr/testify v1.7.0
@@ -14,19 +16,17 @@ require (
 )
 
 require (
-	github.com/cyphar/filepath-securejoin v0.2.2 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/elastic/go-structform v0.0.9 // indirect
 	github.com/elastic/go-ucfg v0.8.4 // indirect
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
-	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/google/licenseclassifier v0.0.0-20200402202327-879cb1424de0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
-	github.com/karrick/godirwalk v1.15.6 // indirect
+	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
