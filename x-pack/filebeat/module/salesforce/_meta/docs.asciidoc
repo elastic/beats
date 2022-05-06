@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :modulename: salesforce
-:has-dashboards: false
+:has-dashboards: true
 
 == Salesforce module
 
