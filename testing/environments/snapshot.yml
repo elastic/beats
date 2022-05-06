@@ -50,9 +50,10 @@ services:
     - "ELASTICSEARCH_PASSWORD=testing"
     - "XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=gwaXhuYzE6l3r1wh5ZdSkJvtK6uSw11d"
     - "XPACK_SECURITY_ENCRYPTIONKEY=wZSVeczkXAmebqNgfcKEzNMmQCBZKkSH"
-#    - "XPACK_XPACK_MAIN_TELEMETRY_ENABLED=false"
     - "XPACK_REPORTING_ENCRYPTIONKEY=xCyqJUFqrUJJKxjZVGfnhrRkyqqaKeAG"
     - "LOGGING_ROOT_LEVEL=all"
+    ports:
+      - 5601:5601
     # When extend is used it merges healthcheck.tests, see:
     # https://github.com/docker/compose/issues/8962
     # healthcheck:
