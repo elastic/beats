@@ -41,6 +41,8 @@ var (
 	// to use (like snapshot (default), latest, 5x). Formerly known as
 	// TESTING_ENVIRONMENT.
 	StackEnvironment = EnvOr("STACK_ENVIRONMENT", "snapshot")
+
+	buildContainersOnce sync.Once
 )
 
 func init() {
@@ -48,7 +50,6 @@ func init() {
 }
 
 type DockerIntegrationTester struct {
-	buildImagesOnce sync.Once
 }
 
 // Name returns docker name.
@@ -84,7 +85,7 @@ func (d *DockerIntegrationTester) StepRequirements() IntegrationTestSteps {
 // Test performs the tests with docker-compose.
 func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[string]string) error {
 	var err error
-	d.buildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
 	if err != nil {
 		return err
 	}
@@ -101,8 +102,8 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	dockerGoPkgCache := "/gocache"
 
 	// Execute the inside of docker-compose.
-	args := []string{"-p", dockerComposeProjectName(), "run",
-		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
+	args := []string{"-p", DockerComposeProjectName(), "run",
+		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + DockerComposeProjectName(),
 		// Disable strict.perms because we mount host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
@@ -140,30 +141,18 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		args...,
 	)
 
-	err = saveDockerComposeLogs(dir, mageTarget, composeEnv)
+	err = saveDockerComposeLogs(dir, mageTarget)
+	if err != nil {
+		// Just log the error, need to make sure the containers are stopped.
+		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
+	}
+
+	err = StopIntegTestContainers()
 	if err != nil && testErr == nil {
-		// saving docker-compose logs failed but the test didn't.
+		// Stopping containers failed but the test didn't
 		return err
 	}
 
-	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
-	out := ioutil.Discard
-	if mg.Verbose() {
-		out = os.Stderr
-	}
-
-	_, err = sh.Exec(
-		composeEnv,
-		ioutil.Discard,
-		out,
-		"docker-compose",
-		"-p", dockerComposeProjectName(),
-		"rm", "--stop", "--force",
-	)
-	if err != nil && testErr == nil {
-		// docker-compose rm failed but the test didn't
-		return err
-	}
 	return testErr
 }
 
@@ -183,16 +172,13 @@ func (d *DockerIntegrationTester) InsideTest(test func() error) error {
 	return test()
 }
 
-// TODO: Share this with the
-var buildImagesOnce sync.Once
-
 // Test performs the tests with docker-compose.
 // GoTest invokes "go test" and reports the results to stdout. It returns an
 // error if there was any failure executing the tests or if there were any
 // test failures.
 func GoIntegTest(ctx context.Context, params GoTestArgs) error {
 	var err error
-	buildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
 	if err != nil {
 		return err
 	}
@@ -202,64 +188,32 @@ func GoIntegTest(ctx context.Context, params GoTestArgs) error {
 		return fmt.Errorf("getting cwd: %w", err)
 	}
 
-	// Start the docker-compose services and wait for them to become healthy.
-	// Using --detach causes the command to exit succesfully only if the proxy_dep for health
-	// completed successfully.
-	args := []string{"-p", dockerComposeProjectName(),
-		"up",
-		"--detach",
-	}
-
-	composeEnv, err := integTestDockerComposeEnvVars()
+	err = StartIntegTestContainers()
 	if err != nil {
-		return err
-	}
-
-	_, err = sh.Exec(
-		composeEnv,
-		os.Stdout,
-		os.Stderr,
-		"docker-compose",
-		args...,
-	)
-	if err != nil {
-		return fmt.Errorf("docker-compose up: %w", err)
+		return fmt.Errorf("starting containers: %w", err)
 	}
 
 	// Run Go test from the host machine. Do not immediately exit on error to allow cleanup to occur.
 	testErr := GoTest(ctx, params)
 
-	err = saveDockerComposeLogs(cwd, "goIntegTest", composeEnv)
+	err = saveDockerComposeLogs(cwd, "goIntegTest")
+	if err != nil {
+		// Just log the error, need to make sure the containers are stopped.
+		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
+	}
+
+	err = StopIntegTestContainers()
 	if err != nil && testErr == nil {
-		// saving docker-compose logs failed but the test didn't.
+		// Stopping containers failed but the test didn't
 		return err
 	}
 
-	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
-	out := ioutil.Discard
-	if mg.Verbose() {
-		out = os.Stderr
-	}
-
-	_, err = sh.Exec(
-		composeEnv,
-		ioutil.Discard,
-		out,
-		"docker-compose",
-		"-p", dockerComposeProjectName(),
-		"rm", "--stop", "--force",
-	)
-	if err != nil && testErr == nil {
-		// docker-compose rm failed but the test didn't
-		return err
-	}
 	return testErr
 }
 
-// TODO: Don't duplicate all this code...
 func PythonIntegTest(params PythonTestArgs) error {
 	var err error
-	buildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
 	if err != nil {
 		return err
 	}
@@ -269,10 +223,78 @@ func PythonIntegTest(params PythonTestArgs) error {
 		return fmt.Errorf("getting cwd: %w", err)
 	}
 
+	err = StartIntegTestContainers()
+	if err != nil {
+		return fmt.Errorf("starting containers: %w", err)
+	}
+
+	// Run pytest from the host machine. Do not immediately exit on error to allow cleanup to occur.
+	testErr := PythonTest(params)
+
+	err = saveDockerComposeLogs(cwd, "goIntegTest")
+	if err != nil {
+		// Just log the error, need to make sure the containers are stopped.
+		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
+	}
+
+	err = StopIntegTestContainers()
+	if err != nil && testErr == nil {
+		// Stopping containers failed but the test didn't
+		return err
+	}
+
+	return testErr
+}
+
+// dockerComposeBuildImages builds all images in the docker-compose.yml file.
+func BuildIntegTestContainers() error {
+	fmt.Println(">> Building docker images")
+
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
+	}
+
+	args := []string{"-p", DockerComposeProjectName(), "build", "--force-rm"}
+	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
+		args = append(args, "--no-cache")
+	}
+
+	if _, forcePull := os.LookupEnv("DOCKER_PULL"); forcePull {
+		args = append(args, "--pull")
+	}
+
+	out := ioutil.Discard
+	if mg.Verbose() {
+		out = os.Stderr
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		out,
+		os.Stderr,
+		"docker-compose", args...,
+	)
+
+	// This sleep is to avoid hitting the docker build issues when resources are not available.
+	if err != nil {
+		fmt.Println(">> Building docker images again")
+		time.Sleep(10 * time.Nanosecond)
+		_, err = sh.Exec(
+			composeEnv,
+			out,
+			os.Stderr,
+			"docker-compose", args...,
+		)
+	}
+	return err
+}
+
+func StartIntegTestContainers() error {
 	// Start the docker-compose services and wait for them to become healthy.
 	// Using --detach causes the command to exit succesfully only if the proxy_dep for health
 	// completed successfully.
-	args := []string{"-p", dockerComposeProjectName(),
+	args := []string{"-p", DockerComposeProjectName(),
 		"up",
 		"--detach",
 	}
@@ -289,23 +311,19 @@ func PythonIntegTest(params PythonTestArgs) error {
 		"docker-compose",
 		args...,
 	)
-	if err != nil {
-		return fmt.Errorf("docker-compose up: %w", err)
-	}
+	return err
+}
 
-	// Run pytest from the host machine. Do not immediately exit on error to allow cleanup to occur.
-	testErr := PythonTest(params)
-
-	err = saveDockerComposeLogs(cwd, "goIntegTest", composeEnv)
-	if err != nil && testErr == nil {
-		// saving docker-compose logs failed but the test didn't.
-		return err
-	}
-
+func StopIntegTestContainers() error {
 	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
 	out := ioutil.Discard
 	if mg.Verbose() {
 		out = os.Stderr
+	}
+
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
 	}
 
 	_, err = sh.Exec(
@@ -313,23 +331,50 @@ func PythonIntegTest(params PythonTestArgs) error {
 		ioutil.Discard,
 		out,
 		"docker-compose",
-		"-p", dockerComposeProjectName(),
+		"-p", DockerComposeProjectName(),
 		"rm", "--stop", "--force",
 	)
-	if err != nil && testErr == nil {
-		// docker-compose rm failed but the test didn't
-		return err
-	}
-	return testErr
+
+	return err
 }
 
-func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[string]string) error {
+// DockerComposeProjectName returns the project name to use with docker-compose.
+// It is passed to docker-compose using the `-p` flag. And is passed to our
+// Go and Python testing libraries through the DOCKER_COMPOSE_PROJECT_NAME
+// environment variable.
+func DockerComposeProjectName() string {
+	commit, err := CommitHash()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+	}
+
+	version, err := BeatQualifiedVersion()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+	}
+	version = strings.NewReplacer(".", "_").Replace(version)
+
+	projectName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
+	projectName = MustExpand(projectName, map[string]interface{}{
+		"StackEnvironment": StackEnvironment,
+		"ShortCommit":      commit[:10],
+		"Version":          version,
+	})
+	return projectName
+}
+
+func saveDockerComposeLogs(rootDir string, mageTarget string) error {
 	var (
 		composeLogDir      = filepath.Join(rootDir, "build", "system-tests", "docker-logs")
 		composeLogFileName = filepath.Join(composeLogDir, "TEST-docker-compose-"+mageTarget+".log")
 	)
 
-	if err := os.MkdirAll(composeLogDir, os.ModeDir|os.ModePerm); err != nil {
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
+	}
+
+	if err = os.MkdirAll(composeLogDir, os.ModeDir|os.ModePerm); err != nil {
 		return fmt.Errorf("creating docker log dir: %w", err)
 	}
 
@@ -344,7 +389,7 @@ func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[str
 		composeLogFile, // stdout
 		composeLogFile, // stderr
 		"docker-compose",
-		"-p", dockerComposeProjectName(),
+		"-p", DockerComposeProjectName(),
 		"logs",
 		"--no-color",
 	)
@@ -370,73 +415,4 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 		// Deprecated use STACK_ENVIRONMENT instead (it's more descriptive).
 		"TESTING_ENVIRONMENT": StackEnvironment,
 	}, nil
-}
-
-// dockerComposeProjectName returns the project name to use with docker-compose.
-// It is passed to docker-compose using the `-p` flag. And is passed to our
-// Go and Python testing libraries through the DOCKER_COMPOSE_PROJECT_NAME
-// environment variable.
-func dockerComposeProjectName() string {
-	commit, err := CommitHash()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to construct docker compose project name"))
-	}
-
-	version, err := BeatQualifiedVersion()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to construct docker compose project name"))
-	}
-	version = strings.NewReplacer(".", "_").Replace(version)
-
-	projectName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
-	projectName = MustExpand(projectName, map[string]interface{}{
-		"StackEnvironment": StackEnvironment,
-		"ShortCommit":      commit[:10],
-		"Version":          version,
-	})
-	return projectName
-}
-
-// dockerComposeBuildImages builds all images in the docker-compose.yml file.
-func dockerComposeBuildImages() error {
-	fmt.Println(">> Building docker images")
-
-	composeEnv, err := integTestDockerComposeEnvVars()
-	if err != nil {
-		return err
-	}
-
-	args := []string{"-p", dockerComposeProjectName(), "build", "--force-rm"}
-	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
-		args = append(args, "--no-cache")
-	}
-
-	if _, forcePull := os.LookupEnv("DOCKER_PULL"); forcePull {
-		args = append(args, "--pull")
-	}
-
-	out := ioutil.Discard
-	if mg.Verbose() {
-		out = os.Stderr
-	}
-
-	_, err = sh.Exec(
-		composeEnv,
-		out,
-		os.Stderr,
-		"docker-compose", args...,
-	)
-
-	// This sleep is to avoid hitting the docker build issues when resources are not available.
-	if err != nil {
-		fmt.Println(">> Building docker images again")
-		time.Sleep(10)
-		_, err = sh.Exec(
-			composeEnv,
-			out,
-			os.Stderr,
-			"docker-compose", args...,
-		)
-	}
-	return err
 }

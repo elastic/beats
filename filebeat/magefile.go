@@ -194,6 +194,27 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
+// BuildDockerComposeImages builds the integration test containers.
+func BuildIntegTestContainers() error {
+	return devtools.BuildIntegTestContainers()
+}
+
+// StartIntegTestContainers starts the integration test containers, waits until they are healthy, and leaves them in the background.
+func StartIntegTestContainers() error {
+	return devtools.StartIntegTestContainers()
+}
+
+// StopIntegTestContainers stops the containers started by StartIntegTestContainers.
+func StopIntegTestContainers() error {
+	return devtools.StopIntegTestContainers()
+}
+
+// PrintIntegTestComposeProject prints the compose project name used by the integ test docker-compose project.
+// Pass this to docker-compose with the -p option to interact with running containers.
+func PrintIntegTestComposeProject() {
+	fmt.Println(devtools.DockerComposeProjectName())
+}
+
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	args := devtools.DefaultGoTestIntegrationArgs()
@@ -213,6 +234,7 @@ func GoIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, BuildSystemTestBinary)
 	args := devtools.DefaultPythonTestIntegrationArgs()
+	// TODO: Tidy these up?
 	args.Env["INTEGRATION_TESTS"] = "1"
 	args.Env["MODULES_PATH"] = devtools.CWD("module")
 	args.Env["ES_HOST"] = "localhost"
