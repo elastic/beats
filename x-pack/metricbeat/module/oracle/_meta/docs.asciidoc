@@ -15,6 +15,8 @@ image::./images/metricbeat-oracle-overview.png[]
 
 == Requirements
 
+Connectivity to Oracle can be facilitated in two ways either by using official Oracle libraries or by using a JDBC driver. Facilitation of the connectivity using JDBC is not supported currently with Metricbeat. Connectivity can be facilitated using Oracle libraries and the detailed steps to do the same are mentioned below.
+
 *Oracle Database Connection Pre-requisites*
 
 To get connected with the Oracle Database ORACLE_SID, ORACLE_BASE, ORACLE_HOME environment variables should be set.
