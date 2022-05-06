@@ -11,6 +11,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/cometd"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/activemq"
