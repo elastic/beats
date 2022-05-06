@@ -64,6 +64,7 @@ func makeGoTestArgs(name string) GoTestArgs {
 		TestName:        name,
 		Race:            RaceDetector,
 		Packages:        []string{"./..."},
+		Env:             make(map[string]string),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -106,6 +107,9 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 func DefaultGoTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
+	// Use the non-cachable -count=1 flag to disable test caching when running integration tests.
+	// There are reasons to re-run tests even if the code is unchanged (e.g. Dockerfile changes).
+	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
 	return args
 }
 

@@ -190,16 +190,15 @@ func IntegTest() {
 }
 
 // GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	runner, err := devtools.NewDockerIntegrationRunner()
-	if err != nil {
-		return err
-	}
-	return runner.Test("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	})
+	args := devtools.DefaultGoTestIntegrationArgs()
+	// TODO: Tidy these up, put them in the default args?
+	args.Env["ES_HOST"] = "localhost"
+	args.Env["ES_USER"] = "beats"
+	args.Env["ES_PASS"] = "testing"
+	args.Env["KIBANA_HOST"] = "localhost"
+	args.Env["MOSQUITTO_HOST"] = "localhost"
+	return devtools.GoIntegTest(ctx, args)
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).

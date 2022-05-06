@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"context"
 	"fmt"
 	"go/build"
 	"io/ioutil"
@@ -112,17 +113,13 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		// Use the host machine's pkg cache to minimize external downloads.
 		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
 		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
-		// Do not set ES_USER or ES_PATH in this file unless you intend to override
-		// values set in all individual docker-compose files
-		//		"-e", "ES_USER=admin",
-		//		"-e", "ES_PASS=testing",
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
 		return err
 	}
-	for envVame, envVal := range env {
-		args = append(args, "-e", fmt.Sprintf("%s=%s", envVame, envVal))
+	for envName, envVal := range env {
+		args = append(args, "-e", fmt.Sprintf("%s=%s", envName, envVal))
 	}
 	args = append(args,
 		"beat", // Docker compose container name.
@@ -144,6 +141,95 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	)
 
 	err = saveDockerComposeLogs(dir, mageTarget, composeEnv)
+	if err != nil && testErr == nil {
+		// saving docker-compose logs failed but the test didn't.
+		return err
+	}
+
+	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
+	out := ioutil.Discard
+	if mg.Verbose() {
+		out = os.Stderr
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		ioutil.Discard,
+		out,
+		"docker-compose",
+		"-p", dockerComposeProjectName(),
+		"rm", "--stop", "--force",
+	)
+	if err != nil && testErr == nil {
+		// docker-compose rm failed but the test didn't
+		return err
+	}
+	return testErr
+}
+
+// InsideTest performs the tests inside of environment.
+func (d *DockerIntegrationTester) InsideTest(test func() error) error {
+	// Fix file permissions after test is done writing files as root.
+	if runtime.GOOS != "windows" {
+		repo, err := GetProjectRepoInfo()
+		if err != nil {
+			return err
+		}
+
+		// Handle virtualenv and the current project dir.
+		defer DockerChown(path.Join(repo.RootDir, "build"))
+		defer DockerChown(".")
+	}
+	return test()
+}
+
+// TODO: Share this with the
+var buildImagesOnce sync.Once
+
+// Test performs the tests with docker-compose.
+// GoTest invokes "go test" and reports the results to stdout. It returns an
+// error if there was any failure executing the tests or if there were any
+// test failures.
+func GoIntegTest(ctx context.Context, params GoTestArgs) error {
+	var err error
+	buildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	if err != nil {
+		return err
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("getting cwd: %w", err)
+	}
+
+	// Start the docker-compose services and wait for them to become healthy.
+	// Using --detach causes the command to exit succesfully only if the proxy_dep for health
+	// completed successfully.
+	args := []string{"-p", dockerComposeProjectName(),
+		"up",
+		"--detach",
+	}
+
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		os.Stdout,
+		os.Stderr,
+		"docker-compose",
+		args...,
+	)
+	if err != nil {
+		return fmt.Errorf("docker-compose up: %w", err)
+	}
+
+	// Run Go test from the host machine. Do not immediately exit on error to allow cleanup to occur.
+	testErr := GoTest(ctx, params)
+
+	err = saveDockerComposeLogs(cwd, "goIntegTest", composeEnv)
 	if err != nil && testErr == nil {
 		// saving docker-compose logs failed but the test didn't.
 		return err
@@ -200,22 +286,6 @@ func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[str
 	}
 
 	return nil
-}
-
-// InsideTest performs the tests inside of environment.
-func (d *DockerIntegrationTester) InsideTest(test func() error) error {
-	// Fix file permissions after test is done writing files as root.
-	if runtime.GOOS != "windows" {
-		repo, err := GetProjectRepoInfo()
-		if err != nil {
-			return err
-		}
-
-		// Handle virtualenv and the current project dir.
-		defer DockerChown(path.Join(repo.RootDir, "build"))
-		defer DockerChown(".")
-	}
-	return test()
 }
 
 // integTestDockerComposeEnvVars returns the environment variables used for
