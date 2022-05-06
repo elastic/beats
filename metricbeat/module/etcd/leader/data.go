@@ -20,8 +20,8 @@ package leader
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Counts struct {
@@ -53,10 +53,10 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 
 	for id, follower := range data.Followers {
 		event := mb.Event{
-			MetricSetFields: common.MapStr{
-				"follower": common.MapStr{
+			MetricSetFields: mapstr.M{
+				"follower": mapstr.M{
 					"id": id,
-					"latency": common.MapStr{
+					"latency": mapstr.M{
 						"ms": follower.Latency.Current,
 					},
 					"success_operations": follower.Counts.Success,
@@ -64,7 +64,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 					"leader":             data.Leader,
 				},
 			},
-			ModuleFields: common.MapStr{"api_version": apiVersion},
+			ModuleFields: mapstr.M{"api_version": apiVersion},
 		}
 
 		r.Event(event)
