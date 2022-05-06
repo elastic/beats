@@ -64,10 +64,10 @@ func (m *MetricSet) transform(in *extractedData) []mb.Event {
 		events = append(events, mb.Event{MetricSetFields: v, Host: ServiceNameExtractor(m.BaseMetricSet.HostData().URI)})
 	}
 
-	events = append(events, mb.Event{MetricSetFields: cursorEvent})
+	events = append(events, mb.Event{MetricSetFields: cursorEvent, Host: ServiceNameExtractor(m.BaseMetricSet.HostData().URI)})
 
 	for _, v := range cursorByUsernameAndMachineEvents {
-		events = append(events, mb.Event{MetricSetFields: v})
+		events = append(events, mb.Event{MetricSetFields: v, Host: ServiceNameExtractor(m.BaseMetricSet.HostData().URI)})
 	}
 
 	return events
