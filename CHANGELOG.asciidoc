@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.1.3...v8.2.0[View commits]
 - Populate new container ECS fields in Docker module. {pull}30399[30399]
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
+- Add new metricset shovel to RabbitMQ module {pull}31534[31534]
 
 *Winlogbeat*
 
