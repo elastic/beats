@@ -42,9 +42,7 @@ func TestMySQL(t *testing.T) {
 			Query:          "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
 			ResponseFormat: "",
 			RawData: struct {
-				Enabled       bool   `config:"enabled"`
-				RootLevelName string `config:"root_level_name"`
-				DataLevelName string `config:"data_level_name"`
+				Enabled bool `config:"enabled"`
 			}{},
 		},
 		Host:      mysql.GetMySQLEnvDSN(service.Host()),
@@ -144,14 +142,12 @@ func TestPostgreSQL(t *testing.T) {
 					Query:          "select name, setting from pg_settings",
 					ResponseFormat: variableResponseFormat,
 					RawData: rawData{
-						Enabled:       true,
-						RootLevelName: "postgres",
-						DataLevelName: "settings",
+						Enabled: true,
 					},
 				},
 				Host: fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
 				Assertion: func(t *testing.T, event beat.Event) {
-					value, err := event.GetValue("postgres.settings")
+					value, err := event.GetValue("sql.query")
 					assert.NoError(t, err)
 					require.NotEmpty(t, value.(map[string]interface{}))
 				},
@@ -166,14 +162,12 @@ func TestPostgreSQL(t *testing.T) {
 					Query:          "select * from pg_settings",
 					ResponseFormat: tableResponseFormat,
 					RawData: rawData{
-						Enabled:       true,
-						RootLevelName: "postgres",
-						DataLevelName: "settings",
+						Enabled: true,
 					},
 				},
 				Host: fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
 				Assertion: func(t *testing.T, event beat.Event) {
-					value, err := event.GetValue("postgres.settings")
+					value, err := event.GetValue("sql.query")
 					assert.NoError(t, err)
 					require.NotEmpty(t, value.(map[string]interface{}))
 				},

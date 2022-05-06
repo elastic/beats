@@ -53,9 +53,7 @@ type config struct {
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
 // and their own metricset key space.
 type rawData struct {
-	Enabled       bool   `config:"enabled"`
-	RootLevelName string `config:"root_level_name"`
-	DataLevelName string `config:"data_level_name"`
+	Enabled bool `config:"enabled"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -118,53 +116,17 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 // provided by the user)
 func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2) {
 	if m.config.RawData.Enabled {
-		evt, err := composeEventFromRoot(ms, m.config.RawData.RootLevelName, m.config.RawData.DataLevelName)
-		if err != nil {
-			m.Logger().Errorf("could not send event: '%w'", err)
-			return
-		}
-
-		reporter.Event(*evt)
+		reporter.Event(mb.Event{
+			ModuleFields: ms,
+		})
 	} else {
-		reporter.Event(*getUserEvent(ms, m.config.Driver, m.config.Query))
-	}
-}
-
-// composeEventFromRoot using the provided metrics and organizing their position in the event by using the rootLevelName
-// as the 'module' and the dataLevelName as the 'metricset'
-func composeEventFromRoot(ms mapstr.M, rootLevelName, dataLevelName string) (*mb.Event, error) {
-	// Check that we have every we need
-	if rootLevelName == "" {
-		return nil, fmt.Errorf("'raw_data.root_level_name' field is required in sql config file if raw_data is enabled")
-	}
-
-	if dataLevelName == "" {
-		return nil, fmt.Errorf("'raw_data.data_level_name' field is required in sql config file if raw_data is enabled")
-	}
-
-	return &mb.Event{
-		RootFields: mapstr.M{
-			rootLevelName: mapstr.M{
-				dataLevelName: ms,
-			},
-		},
-		Namespace: dataLevelName,
-		Service:   rootLevelName,
-	}, nil
-}
-
-// getUserEvent from some metrics, organizing them into known "spaces" inside the event to map them without knowing
-// their mapping in advance. To achieve this, all numeric values will go into `sql.metrics.numeric.*`, all string
-// values into `sql.metrics.strings.*`, etc.
-func getUserEvent(ms mapstr.M, driver, query string) *mb.Event {
-	return &mb.Event{
-		RootFields: mapstr.M{
-			"sql": mapstr.M{
-				"driver":  driver,
-				"query":   query,
+		reporter.Event(mb.Event{
+			ModuleFields: mapstr.M{
+				"driver":  m.config.Driver,
+				"query":   m.config.Query,
 				"metrics": inferTypeFromMetrics(ms),
 			},
-		},
+		})
 	}
 }
 
