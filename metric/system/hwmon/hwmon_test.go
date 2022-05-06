@@ -21,6 +21,7 @@
 package hwmon
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -67,6 +68,12 @@ func TestExamples(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	// This is meant to test how this library would be used by a metricset.
+
+	_, err := os.Stat(baseDir)
+	if os.IsNotExist(err) {
+		t.Logf("No hwerr devices on system, skipping")
+		return
+	}
 
 	// This would be called in New() and not Fetch(), as the results are not expected to change.
 	results, err := DetectHwmon(resolve.NewTestResolver(""))
