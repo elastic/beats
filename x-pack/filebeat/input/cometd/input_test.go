@@ -27,21 +27,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const (
-	firstChannel  = "channel_name1"
-	secondChannel = "channel_name2"
-)
-
 var (
-	serverURL string
-	called1   uint64
-	called2   uint64
-	clientId  uint64
+	serverURL              string
+	expectedHTTPEventCount int
+	called                 uint64
 )
 
 func TestInputDone(t *testing.T) {
 	config := mapstr.M{
-		"channel_name":              firstChannel,
+		"channel_name":              "channel_channel",
 		"auth.oauth2.client.id":     "DEMOCLIENTID",
 		"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
 		"auth.oauth2.user":          "salesforce_user",
@@ -70,9 +64,8 @@ func TestMakeEventFailure(t *testing.T) {
 }
 
 func TestSingleInput(t *testing.T) {
-	defer atomic.StoreUint64(&called1, 0)
-	defer atomic.StoreUint64(&called2, 0)
-	defer atomic.StoreUint64(&clientId, 0)
+	expectedHTTPEventCount = 1
+	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
@@ -90,10 +83,10 @@ func TestSingleInput(t *testing.T) {
 	var expected bay.MaybeMsg
 	expected.Msg.Data.Event.ReplayID = 1234
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected.Msg.Channel = firstChannel
+	expected.Msg.Channel = "channel_name"
 
 	config := map[string]interface{}{
-		"channel_name":              firstChannel,
+		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
@@ -121,9 +114,8 @@ func TestSingleInput(t *testing.T) {
 }
 
 func TestInputStop_Wait(t *testing.T) {
-	defer atomic.StoreUint64(&called1, 0)
-	defer atomic.StoreUint64(&called2, 0)
-	defer atomic.StoreUint64(&clientId, 0)
+	expectedHTTPEventCount = 1
+	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
 	defer close(eventsCh)
 
@@ -147,10 +139,10 @@ func TestInputStop_Wait(t *testing.T) {
 	var expected bay.MaybeMsg
 	expected.Msg.Data.Event.ReplayID = 1234
 	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected.Msg.Channel = firstChannel
+	expected.Msg.Channel = "channel_name"
 
 	config := map[string]interface{}{
-		"channel_name":              firstChannel,
+		"channel_name":              "channel_name",
 		"auth.oauth2.client.id":     "client.id",
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
@@ -175,115 +167,23 @@ func TestInputStop_Wait(t *testing.T) {
 	eventProcessing.Wait()
 	require.Equal(t, 1, bay.GetConnectedCount())
 
-	var wg sync.WaitGroup
-	wg.Add(1)
+	var waitForEventCollection sync.WaitGroup
+	var waitForConnections sync.WaitGroup
+	waitForEventCollection.Add(1)
+	waitForConnections.Add(1)
 	go func() {
 		require.Equal(t, 1, bay.GetConnectedCount()) // current open channels count should be 1
 		event := <-eventsCh
 		assertEventMatches(t, expected, event) // wait for single event
-		wg.Done()
+		waitForEventCollection.Done()
 		time.Sleep(100 * time.Millisecond)           // let input.Stop() be executed.
 		require.Equal(t, 0, bay.GetConnectedCount()) // current open channels count should be 0
+		waitForConnections.Done()
 	}()
 
-	time.Sleep(100 * time.Millisecond) // let input.Stop() be executed.
-
-	wg.Wait()
+	waitForEventCollection.Wait()
 	input.Wait()
-}
-
-func TestMultiInput(t *testing.T) {
-	defer atomic.StoreUint64(&called1, 0)
-	defer atomic.StoreUint64(&called2, 0)
-	defer atomic.StoreUint64(&clientId, 0)
-	eventsCh := make(chan beat.Event)
-	defer close(eventsCh)
-
-	const numMessages = 2
-
-	var eventProcessing sync.WaitGroup
-	eventProcessing.Add(numMessages)
-
-	outlet := &mockedOutleter{
-		onEventHandler: func(event beat.Event) bool {
-			eventProcessing.Done()
-			eventsCh <- event
-			return true
-		},
-	}
-	connector := &mockedConnector{
-		outlet: outlet,
-	}
-
-	var expected1 bay.MaybeMsg
-	expected1.Msg.Data.Event.ReplayID = 1234
-	expected1.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
-	expected1.Msg.Channel = firstChannel
-
-	var expected2 bay.MaybeMsg
-	expected2.Msg.Data.Event.ReplayID = 1234
-	expected2.Msg.Data.Payload = []byte(`{"CountryIso": "US"}`)
-	expected2.Msg.Channel = secondChannel
-
-	config1 := map[string]interface{}{
-		"channel_name":              firstChannel,
-		"auth.oauth2.client.id":     "client.id",
-		"auth.oauth2.client.secret": "client.secret",
-		"auth.oauth2.user":          "user",
-		"auth.oauth2.password":      "password",
-	}
-	config2 := map[string]interface{}{
-		"channel_name":              secondChannel,
-		"auth.oauth2.client.id":     "client.id",
-		"auth.oauth2.client.secret": "client.secret",
-		"auth.oauth2.user":          "user",
-		"auth.oauth2.password":      "password",
-	}
-
-	// create Server
-	r := http.HandlerFunc(oauth2Handler)
-	server := httptest.NewServer(r)
-	defer server.Close()
-	serverURL = server.URL
-	config1["auth.oauth2.token_url"] = serverURL + "/token"
-	config2["auth.oauth2.token_url"] = serverURL + "/token"
-
-	// get common config
-	cfg1 := conf.MustNewConfigFrom(config1)
-	cfg2 := conf.MustNewConfigFrom(config2)
-
-	var inputContext finput.Context
-
-	// initialize inputs
-	input1, err := NewInput(cfg1, connector, inputContext)
-	require.NoError(t, err)
-	require.NotNil(t, input1)
-
-	input2, err := NewInput(cfg2, connector, inputContext)
-	require.NoError(t, err)
-	require.NotNil(t, input2)
-
-	require.Equal(t, 0, bay.GetConnectedCount())
-	// run input
-	input1.Run()
-	defer input1.Stop()
-
-	// run input
-	input2.Run()
-	defer input2.Stop()
-
-	eventProcessing.Wait()
-
-	for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
-		channel, err := event.GetValue("cometd.channel_name")
-		require.NoError(t, err)
-
-		if channel == "channel_name1" {
-			assertEventMatches(t, expected1, event)
-		} else {
-			assertEventMatches(t, expected2, event)
-		}
-	}
+	waitForConnections.Wait()
 }
 
 func TestStop(t *testing.T) {
@@ -340,128 +240,113 @@ func TestWait(t *testing.T) {
 	}
 }
 
-func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		response := `{"instance_url": "` + serverURL + `", "expires_in": "60", "access_token": "abcd"}`
-		_, _ = w.Write([]byte(response))
-	}
-}
+func TestMultiInput(t *testing.T) {
+	expectedHTTPEventCount = 2
+	defer atomic.StoreUint64(&called, 0)
+	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
 
-func oauth2ClientIdHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		switch clientId {
-		case 0:
-			atomic.StoreUint64(&clientId, 1)
-			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id1","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
-		case 1:
-			atomic.StoreUint64(&clientId, 0)
-			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id2","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
-		default:
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+
+	var expected1 bay.MaybeMsg
+	expected1.Msg.Data.Event.ReplayID = 1234
+	expected1.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	expected1.Msg.Channel = "channel_name"
+
+	config := map[string]interface{}{
+		"channel_name":              "channel_name",
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	// create Server
+	r := http.HandlerFunc(oauth2Handler)
+	server := httptest.NewServer(r)
+	defer server.Close()
+	serverURL = server.URL
+	config["auth.oauth2.token_url"] = serverURL + "/token"
+
+	// get common config
+	cfg1 := conf.MustNewConfigFrom(config)
+	cfg2 := conf.MustNewConfigFrom(config)
+
+	var inputContext finput.Context
+
+	// initialize inputs
+	input1, err := NewInput(cfg1, connector, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input1)
+
+	input2, err := NewInput(cfg2, connector, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input2)
+
+	require.Equal(t, 0, bay.GetConnectedCount())
+
+	got := 0
+	go func() {
+		// run input
+		input1.Run()
+		defer input1.Stop()
+
+		// run input
+		input2.Run()
+		defer input2.Stop()
+
+		for _, event := range []beat.Event{<-eventsCh, <-eventsCh} {
+			assertEventMatches(t, expected1, event)
+			got++
 		}
-	}
-}
-
-func oauth2SubscribeHandlerChannel1(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id1", "channel": "/meta/subscribe", "subscription": "channel_name1", "successful":true}]`))
-	}
-}
-
-func oauth2SubscribeHandlerChannel2(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		_, _ = w.Write([]byte(`[{"clientId": "client_id2", "channel": "/meta/subscribe", "subscription": "channel_name2", "successful":true}]`))
-	}
-}
-
-func oauth2EventHandlerChannel1(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		if called1 < 1 {
-			atomic.AddUint64(&called1, 1)
-			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name1"}]`))
-		}
-	}
-}
-
-func oauth2EventHandlerChannel2(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-	_ = r.ParseForm()
-	switch {
-	case r.Method != http.MethodPost:
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
-	default:
-		if called2 < 1 {
-			atomic.AddUint64(&called2, 1)
-			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "US"}, "event": {"replayId":1234}}, "channel": "channel_name2"}]`))
-		}
+	}()
+	time.Sleep(time.Second)
+	if got < 2 {
+		require.NoError(t, fmt.Errorf("not able to get events."))
 	}
 }
 
 func oauth2Handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	_ = r.ParseForm()
 	if r.URL.Path == "/token" {
-		oauth2TokenHandler(w, r)
+		response := `{"instance_url": "` + serverURL + `", "expires_in": "60", "access_token": "abcd"}`
+		_, _ = w.Write([]byte(response))
 		return
 	}
 	body, _ := ioutil.ReadAll(r.Body)
-	if string(body) == `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}` {
-		oauth2ClientIdHandler(w, r)
+
+	switch string(body) {
+	case `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`:
+		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
-	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id1"} ` {
-		oauth2EventHandlerChannel1(w, r)
+	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
+		if called < uint64(expectedHTTPEventCount) {
+			atomic.AddUint64(&called, 1)
+			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
+		} else {
+			_, _ = w.Write([]byte(`{}`))
+		}
 		return
-	} else if string(body) == `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id2"} ` {
-		oauth2EventHandlerChannel2(w, r)
-		return
-	} else if string(body) == `{
+	case `{
 								"channel": "/meta/subscribe",
-								"subscription": "channel_name1",
-								"clientId": "client_id1",
+								"subscription": "channel_name",
+								"clientId": "client_id",
 								"ext": {
-									"replay": {"channel_name1": "-1"}
+									"replay": {"channel_name": "-1"}
 									}
-								}` {
-		oauth2SubscribeHandlerChannel1(w, r)
+								}`:
+		_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
 		return
-	} else if string(body) == `{
-								"channel": "/meta/subscribe",
-								"subscription": "channel_name2",
-								"clientId": "client_id2",
-								"ext": {
-									"replay": {"channel_name2": "-1"}
-									}
-								}` {
-		oauth2SubscribeHandlerChannel2(w, r)
-		return
+	default:
 	}
 }
 

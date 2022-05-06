@@ -36,13 +36,13 @@ func TestParse(t *testing.T) {
 		{
 			"every second",
 			"@every 1s",
-			&Schedule{intervalScheduler{time.Duration(1 * time.Second)}},
+			&Schedule{intervalScheduler{time.Second}},
 			false,
 		},
 		{
 			"every year",
 			"@every 1m",
-			&Schedule{intervalScheduler{time.Duration(1 * time.Minute)}},
+			&Schedule{intervalScheduler{time.Minute}},
 			false,
 		},
 		{
@@ -93,12 +93,12 @@ func Test_intervalScheduler_Next(t *testing.T) {
 	}{
 		{
 			"one second",
-			intervalScheduler{time.Duration(time.Second)},
+			intervalScheduler{time.Second},
 			now.Add(time.Second),
 		},
 		{
 			"one minute",
-			intervalScheduler{time.Duration(time.Minute)},
+			intervalScheduler{time.Minute},
 			now.Add(time.Minute),
 		},
 	}

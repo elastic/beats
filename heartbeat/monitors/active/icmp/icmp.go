@@ -94,7 +94,7 @@ func (jf *jobFactory) checkConfig() error {
 func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 	pingFactory := jf.pingIPFactory(&jf.config)
 
-	var j []jobs.Job
+	j := make([]jobs.Job, 0, len(jf.config.Hosts))
 	for _, host := range jf.config.Hosts {
 		job, err := monitors.MakeByHostJob(host, jf.config.Mode, monitors.NewStdResolver(), pingFactory)
 
