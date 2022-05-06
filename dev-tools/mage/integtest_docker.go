@@ -256,6 +256,73 @@ func GoIntegTest(ctx context.Context, params GoTestArgs) error {
 	return testErr
 }
 
+// TODO: Don't duplicate all this code...
+func PythonIntegTest(params PythonTestArgs) error {
+	var err error
+	buildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	if err != nil {
+		return err
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("getting cwd: %w", err)
+	}
+
+	// Start the docker-compose services and wait for them to become healthy.
+	// Using --detach causes the command to exit succesfully only if the proxy_dep for health
+	// completed successfully.
+	args := []string{"-p", dockerComposeProjectName(),
+		"up",
+		"--detach",
+	}
+
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		os.Stdout,
+		os.Stderr,
+		"docker-compose",
+		args...,
+	)
+	if err != nil {
+		return fmt.Errorf("docker-compose up: %w", err)
+	}
+
+	// Run pytest from the host machine. Do not immediately exit on error to allow cleanup to occur.
+	testErr := PythonTest(params)
+
+	err = saveDockerComposeLogs(cwd, "goIntegTest", composeEnv)
+	if err != nil && testErr == nil {
+		// saving docker-compose logs failed but the test didn't.
+		return err
+	}
+
+	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
+	out := ioutil.Discard
+	if mg.Verbose() {
+		out = os.Stderr
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		ioutil.Discard,
+		out,
+		"docker-compose",
+		"-p", dockerComposeProjectName(),
+		"rm", "--stop", "--force",
+	)
+	if err != nil && testErr == nil {
+		// docker-compose rm failed but the test didn't
+		return err
+	}
+	return testErr
+}
+
 func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[string]string) error {
 	var (
 		composeLogDir      = filepath.Join(rootDir, "build", "system-tests", "docker-logs")

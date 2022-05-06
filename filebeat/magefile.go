@@ -53,6 +53,11 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
+// Builds the system test binary.
+func BuildSystemTestBinary() {
+	mg.Deps(devtools.BuildSystemTestBinary)
+}
+
 // GolangCrossBuild builds the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -189,7 +194,7 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
-// GoIntegTest executes the Go integration tests.
+// GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	args := devtools.DefaultGoTestIntegrationArgs()
 	// TODO: Tidy these up, put them in the default args?
@@ -201,22 +206,18 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTest(ctx, args)
 }
 
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest starts the docker containers and executes the Python integration tests.
 // Use GENERATE=true to generate expected log files.
 // Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.
 // Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
-	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields, Dashboards)
-	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
-	if err != nil {
-		return err
-	}
-	return runner.Test("pythonIntegTest", func() error {
-		mg.Deps(devtools.BuildSystemTestBinary)
-		args := devtools.DefaultPythonTestIntegrationArgs()
-		args.Env["MODULES_PATH"] = devtools.CWD("module")
-		return devtools.PythonTest(args)
-	})
+	mg.Deps(Fields, Dashboards, BuildSystemTestBinary)
+	args := devtools.DefaultPythonTestIntegrationArgs()
+	args.Env["INTEGRATION_TESTS"] = "1"
+	args.Env["MODULES_PATH"] = devtools.CWD("module")
+	args.Env["ES_HOST"] = "localhost"
+	args.Env["ES_USER"] = "beats"
+	args.Env["ES_PASS"] = "testing"
+	args.Env["KIBANA_HOST"] = "localhost"
+	return devtools.PythonIntegTest(args)
 }
