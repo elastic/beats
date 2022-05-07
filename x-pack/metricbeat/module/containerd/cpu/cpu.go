@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -122,9 +122,9 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 
 	for _, event := range events {
 		// setting ECS container.id and module field containerd.namespace
-		containerFields := common.MapStr{}
-		moduleFields := common.MapStr{}
-		rootFields := common.MapStr{}
+		containerFields := mapstr.M{}
+		moduleFields := mapstr.M{}
+		rootFields := mapstr.M{}
 
 		cID := containerd.GetAndDeleteCid(event)
 		namespace := containerd.GetAndDeleteNamespace(event)
@@ -201,7 +201,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func setContCpus(event common.MapStr, perContainerCpus map[string]int) {
+func setContCpus(event mapstr.M, perContainerCpus map[string]int) {
 	val, err := event.GetValue("id")
 	if err != nil {
 		return

@@ -17,11 +17,11 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -274,7 +274,7 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 
 func createEvents(rowItems []bigquery.Value, projectID string) mb.Event {
 	event := mb.Event{}
-	event.MetricSetFields = common.MapStr{
+	event.MetricSetFields = mapstr.M{
 		"invoice_month":      rowItems[0],
 		"project_id":         rowItems[1],
 		"project_name":       rowItems[2],
@@ -283,7 +283,7 @@ func createEvents(rowItems []bigquery.Value, projectID string) mb.Event {
 		"total":              rowItems[5],
 	}
 
-	event.RootFields = common.MapStr{
+	event.RootFields = mapstr.M{
 		"cloud.provider":     "gcp",
 		"cloud.project.id":   projectID,
 		"cloud.project.name": rowItems[2],

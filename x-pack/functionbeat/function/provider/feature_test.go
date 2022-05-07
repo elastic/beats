@@ -9,19 +9,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestBuilder(t *testing.T) {
 	provider := "myprovider"
-	providerFactory := func(_ *logp.Logger, _ *Registry, _ *common.Config) (Provider, error) {
+	providerFactory := func(_ *logp.Logger, _ *Registry, _ *conf.C) (Provider, error) {
 		return nil, nil
 	}
 
-	fnFactory1 := func(_ Provider, _ *common.Config) (Function, error) { return nil, nil }
-	fnFactory2 := func(_ Provider, _ *common.Config) (Function, error) { return nil, nil }
+	fnFactory1 := func(_ Provider, _ *conf.C) (Function, error) { return nil, nil }
+	fnFactory2 := func(_ Provider, _ *conf.C) (Function, error) { return nil, nil }
 
 	b := MustCreate(
 		provider,

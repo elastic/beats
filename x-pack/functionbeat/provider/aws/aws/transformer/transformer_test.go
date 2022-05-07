@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCloudwatch(t *testing.T) {
@@ -47,11 +47,11 @@ func TestCloudwatch(t *testing.T) {
 
 	expectedEvent := beat.Event{
 		Timestamp: expectedTime,
-		Fields: common.MapStr{
-			"event": common.MapStr{
+		Fields: mapstr.M{
+			"event": mapstr.M{
 				"kind": "event",
 			},
-			"cloud": common.MapStr{
+			"cloud": mapstr.M{
 				"provider": "aws",
 			},
 			"message":              "my interesting message",
@@ -94,12 +94,12 @@ func TestKinesis(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(events))
 
-		fields := common.MapStr{
-			"cloud": common.MapStr{
+		fields := mapstr.M{
+			"cloud": mapstr.M{
 				"provider": "aws",
 				"region":   "us-east-1",
 			},
-			"event": common.MapStr{
+			"event": mapstr.M{
 				"kind": "event",
 			},
 			"event_id":                "1234",
@@ -148,12 +148,12 @@ func TestKinesis(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, numRecords, len(events))
 
-		envelopeFields := common.MapStr{
-			"cloud": common.MapStr{
+		envelopeFields := mapstr.M{
+			"cloud": mapstr.M{
 				"provider": "aws",
 				"region":   "us-east-1",
 			},
-			"event": common.MapStr{
+			"event": mapstr.M{
 				"kind": "event",
 			},
 			"event_id":                "1234",
@@ -167,9 +167,9 @@ func TestKinesis(t *testing.T) {
 			"kinesis_encryption_type": "test",
 		}
 
-		var expectedInnerFields []common.MapStr
+		var expectedInnerFields []mapstr.M
 		for i := 0; i < numRecords; i++ {
-			expectedInnerFields = append(expectedInnerFields, common.MapStr{
+			expectedInnerFields = append(expectedInnerFields, mapstr.M{
 				"message":               fmt.Sprintf("%s %d", "hello world", i),
 				"kinesis_partition_key": fmt.Sprintf("%s %d", "partKey", i),
 			})
@@ -242,12 +242,12 @@ func TestKinesis(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, numRecords, len(events))
 
-		envelopeFields := common.MapStr{
-			"cloud": common.MapStr{
+		envelopeFields := mapstr.M{
+			"cloud": mapstr.M{
 				"provider": "aws",
 				"region":   "us-east-1",
 			},
-			"event": common.MapStr{
+			"event": mapstr.M{
 				"kind": "event",
 			},
 			"event_id":                "1234",
@@ -303,12 +303,12 @@ ciJ9XX0=`),
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(events))
 
-	envelopeFields := common.MapStr{
-		"cloud": common.MapStr{
+	envelopeFields := mapstr.M{
+		"cloud": mapstr.M{
 			"provider": "aws",
 			"region":   "us-east-1",
 		},
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"kind": "event",
 		},
 		"event_id":                "1234",
@@ -323,8 +323,8 @@ ciJ9XX0=`),
 		"kinesis_encryption_type": "test",
 	}
 
-	expectedInnerFields := []common.MapStr{
-		common.MapStr{
+	expectedInnerFields := []mapstr.M{
+		mapstr.M{
 			"id":           "34933589873972040308280302318523185960554189168873242624",
 			"log_group":    "testem",
 			"log_stream":   "folyomany",
@@ -335,7 +335,7 @@ ciJ9XX0=`),
 				"Minden",
 			},
 		},
-		common.MapStr{
+		mapstr.M{
 			"id":           "34933589873994341053478832941664721678826837530379223041",
 			"log_group":    "testem",
 			"log_stream":   "folyomany",
@@ -346,7 +346,7 @@ ciJ9XX0=`),
 				"Minden",
 			},
 		},
-		common.MapStr{
+		mapstr.M{
 			"id":           "34933589874016641798677363564806257397099485891885203458",
 			"log_group":    "testem",
 			"log_stream":   "folyomany",

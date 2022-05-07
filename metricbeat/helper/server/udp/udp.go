@@ -23,10 +23,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type UdpServer struct {
@@ -38,11 +38,11 @@ type UdpServer struct {
 }
 
 type UdpEvent struct {
-	event common.MapStr
+	event mapstr.M
 	meta  server.Meta
 }
 
-func (u *UdpEvent) GetEvent() common.MapStr {
+func (u *UdpEvent) GetEvent() mapstr.M {
 	return u.event
 }
 
@@ -107,7 +107,7 @@ func (g *UdpServer) watchMetrics() {
 		copy(bufCopy, buffer)
 
 		g.eventQueue <- &UdpEvent{
-			event: common.MapStr{
+			event: mapstr.M{
 				server.EventDataKey: bufCopy,
 			},
 			meta: server.Meta{

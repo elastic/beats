@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 )
@@ -32,7 +32,7 @@ import (
 // Builder provides an interface by which configs can be built from provider metadata
 type Builder interface {
 	// CreateConfig creates a config from hints passed from providers
-	CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config
+	CreateConfig(event bus.Event, options ...ucfg.Option) []*config.C
 }
 
 // builders is a struct of Builder list objects and a `keystoreProvider`, which
@@ -43,7 +43,7 @@ type Builders struct {
 }
 
 // BuilderConstructor is a func used to generate a Builder object
-type BuilderConstructor func(*common.Config) (Builder, error)
+type BuilderConstructor func(*config.C) (Builder, error)
 
 // AddBuilder registers a new BuilderConstructor
 func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
@@ -78,7 +78,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 }
 
 // BuildBuilder reads provider configuration and instantiate one
-func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
+func (r *registry) BuildBuilder(c *config.C) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -94,8 +94,8 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 }
 
 // GetConfig creates configs for all builders initialized.
-func (b Builders) GetConfig(event bus.Event) []*common.Config {
-	configs := []*common.Config{}
+func (b Builders) GetConfig(event bus.Event) []*config.C {
+	configs := []*config.C{}
 	var opts []ucfg.Option
 
 	if b.keystoreProvider != nil {
@@ -118,8 +118,8 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 // NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
 // for simplified mode (single 'hints' builder), `keystoreProvider` has access to keystore registry
 func NewBuilders(
-	bConfigs []*common.Config,
-	hintsCfg *common.Config,
+	bConfigs []*config.C,
+	hintsCfg *config.C,
 	keystoreProvider keystore.Provider,
 ) (Builders, error) {
 	var builders Builders

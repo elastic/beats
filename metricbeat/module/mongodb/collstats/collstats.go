@@ -19,12 +19,12 @@ package collstats
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -69,7 +69,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	}()
 
 	if err != nil {
-		return errors.Wrap(err, "could not get a list of databases")
+		return fmt.Errorf("could not get a list of databases: %w", err)
 	}
 
 	// This info is only stored in 'admin' database
@@ -81,7 +81,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 	var result map[string]interface{}
 	if err = res.Decode(&result); err != nil {
-		return errors.Wrap(err, "could not decode mongo response")
+		return fmt.Errorf("could not decode mongo response: %w", err)
 	}
 
 	if _, ok := result["totals"]; !ok {
@@ -100,13 +100,13 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 		infoMap, ok := info.(map[string]interface{})
 		if !ok {
-			reporter.Error(errors.New("Unexpected data returned by mongodb"))
+			reporter.Error(errors.New("unexpected data returned by mongodb"))
 			continue
 		}
 
 		event, err := eventMapping(group, infoMap)
 		if err != nil {
-			reporter.Error(errors.Wrap(err, "Mapping of the event data filed"))
+			reporter.Error(fmt.Errorf("mapping of the event data filed: %w", err))
 			continue
 		}
 

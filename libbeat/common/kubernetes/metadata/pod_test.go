@@ -32,8 +32,9 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var addResourceMetadata = GetDefaultResourceMetadataConfig()
@@ -96,7 +97,7 @@ func TestPod_Generate(t *testing.T) {
 
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -122,21 +123,21 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"annotations": common.MapStr{
+					"annotations": mapstr.M{
 						"app": "production",
 					},
 					"namespace": "default",
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "testnode",
 					},
 				},
@@ -174,24 +175,24 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
 					"namespace": "default",
-					"deployment": common.MapStr{
+					"deployment": mapstr.M{
 						"name": "owner",
 					},
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "testnode",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"annotations": common.MapStr{
+					"annotations": mapstr.M{
 						"app": "production",
 					},
 				},
@@ -229,24 +230,24 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
 					"namespace": "default",
-					"daemonset": common.MapStr{
+					"daemonset": mapstr.M{
 						"name": "owner",
 					},
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "testnode",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"annotations": common.MapStr{
+					"annotations": mapstr.M{
 						"app": "production",
 					},
 				},
@@ -284,24 +285,24 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
 					"namespace": "default",
-					"job": common.MapStr{
+					"job": mapstr.M{
 						"name": "owner",
 					},
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "testnode",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"annotations": common.MapStr{
+					"annotations": mapstr.M{
 						"app": "production",
 					},
 				},
@@ -339,27 +340,27 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
 					"namespace": "default",
-					"deployment": common.MapStr{
+					"deployment": mapstr.M{
 						"name": "nginx-deployment",
 					},
-					"replicaset": common.MapStr{
+					"replicaset": mapstr.M{
 						"name": "nginx-rs",
 					},
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "testnode",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"annotations": common.MapStr{
+					"annotations": mapstr.M{
 						"app": "production",
 					},
 				},
@@ -397,35 +398,35 @@ func TestPod_Generate(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
 					"namespace": "default",
-					"deployment": common.MapStr{
+					"deployment": mapstr.M{
 						"name": "nginx-deployment",
 					},
-					"replicaset": common.MapStr{
+					"replicaset": mapstr.M{
 						"name": "nginx-rs",
 					},
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": "testnode",
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
-					"annotations": common.MapStr{
-						"k8s": common.MapStr{"app": "production"},
+					"annotations": mapstr.M{
+						"k8s": mapstr.M{"app": "production"},
 					},
 				},
 			},
 		},
 	}
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"include_annotations": []string{"app", "k8s.app"},
 		"annotations.dedot":   false,
 	})
@@ -447,7 +448,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 	boolean := true
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -473,20 +474,20 @@ func TestPod_GenerateFromName(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"pod": common.MapStr{
+			output: mapstr.M{
+				"pod": mapstr.M{
 					"name": "obj",
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
-				"node": common.MapStr{
+				"node": mapstr.M{
 					"name": "testnode",
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
-				"annotations": common.MapStr{
+				"annotations": mapstr.M{
 					"k8s_app": "production",
 				},
 			},
@@ -523,23 +524,23 @@ func TestPod_GenerateFromName(t *testing.T) {
 				},
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
-			output: common.MapStr{
-				"pod": common.MapStr{
+			output: mapstr.M{
+				"pod": mapstr.M{
 					"name": "obj",
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
 				"namespace": "default",
-				"deployment": common.MapStr{
+				"deployment": mapstr.M{
 					"name": "owner",
 				},
-				"node": common.MapStr{
+				"node": mapstr.M{
 					"name": "testnode",
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
-				"annotations": common.MapStr{
+				"annotations": mapstr.M{
 					"app": "production",
 				},
 			},
@@ -547,7 +548,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		config, err := common.NewConfigFrom(map[string]interface{}{
+		config, err := conf.NewConfigFrom(map[string]interface{}{
 			"include_annotations": []string{"app", "k8s.app"},
 		})
 		assert.NoError(t, err)
@@ -573,7 +574,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		input     kubernetes.Resource
 		node      kubernetes.Resource
 		namespace kubernetes.Resource
-		output    common.MapStr
+		output    mapstr.M
 		name      string
 	}{
 		{
@@ -630,29 +631,29 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
+			output: mapstr.M{"kubernetes": mapstr.M{
+				"pod": mapstr.M{
 					"name": "obj",
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
 				"namespace":     "default",
 				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
+				"namespace_labels": mapstr.M{
 					"nskey": "nsvalue",
 				},
-				"node": common.MapStr{
+				"node": mapstr.M{
 					"name": "testnode",
 					"uid":  uid,
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"nodekey": "nodevalue",
 					},
 					"hostname": "node1",
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"foo": "bar",
 				},
-				"annotations": common.MapStr{
+				"annotations": mapstr.M{
 					"app": "production",
 				},
 			}},
@@ -660,7 +661,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		config, err := common.NewConfigFrom(map[string]interface{}{
+		config, err := conf.NewConfigFrom(map[string]interface{}{
 			"include_annotations": []string{"app"},
 		})
 		assert.NoError(t, err)
@@ -693,7 +694,7 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 		input     kubernetes.Resource
 		node      kubernetes.Resource
 		namespace kubernetes.Resource
-		output    common.MapStr
+		output    mapstr.M
 		name      string
 	}{
 		{
@@ -766,38 +767,38 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"pod": common.MapStr{
+			output: mapstr.M{"kubernetes": mapstr.M{
+				"pod": mapstr.M{
 					"name": "obj",
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
 				"namespace":     "default",
 				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
+				"namespace_labels": mapstr.M{
 					"app_kubernetes_io/name": "kube-state-metrics",
 				},
-				"namespace_annotations": common.MapStr{
+				"namespace_annotations": mapstr.M{
 					"ns_annotation": "ns.value",
 				},
-				"node": common.MapStr{
+				"node": mapstr.M{
 					"name": "testnode",
 					"uid":  uid,
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"nodekey2": "nodevalue2",
 					},
 					"hostname": "node1",
-					"annotations": common.MapStr{
+					"annotations": mapstr.M{
 						"node_annotation": "node.value",
 					},
 				},
-				"labels": common.MapStr{
+				"labels": mapstr.M{
 					"app_kubernetes_io/component": "exporter",
 				},
-				"annotations": common.MapStr{
+				"annotations": mapstr.M{
 					"app": "production",
 				},
-				"replicaset": common.MapStr{
+				"replicaset": mapstr.M{
 					"name": "nginx-rs",
 				},
 			}},
@@ -805,17 +806,17 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		config, err := common.NewConfigFrom(map[string]interface{}{
+		config, err := conf.NewConfigFrom(map[string]interface{}{
 			"include_annotations": []string{"app"},
 		})
 
 		assert.NoError(t, err)
 
-		namespaceConfig, _ := common.NewConfigFrom(map[string]interface{}{
+		namespaceConfig, _ := conf.NewConfigFrom(map[string]interface{}{
 			"include_labels":      []string{"app.kubernetes.io/name"},
 			"include_annotations": []string{"ns.annotation"},
 		})
-		nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
+		nodeConfig, _ := conf.NewConfigFrom(map[string]interface{}{
 			"include_labels":      []string{"nodekey2"},
 			"include_annotations": []string{"node.annotation"},
 		})

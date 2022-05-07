@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -65,7 +66,7 @@ func init() {
 
 // Input contains the input and its config
 type Input struct {
-	cfg                 *common.Config
+	cfg                 *conf.C
 	logger              *logp.Logger
 	config              config
 	states              *file.States
@@ -81,7 +82,7 @@ type Input struct {
 
 // NewInput instantiates a new Log
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {

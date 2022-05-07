@@ -26,9 +26,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // DockerJSONReader processor renames a given field
@@ -157,7 +157,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	}
 
 	msg.Partial = partial
-	message.AddFields(common.MapStr{
+	message.AddFields(mapstr.M{
 		"stream": msg.Stream,
 	})
 	// Remove \n ending for partial messages
@@ -186,13 +186,13 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 	}
 	message.Ts = ts
 
-	message.AddFields(common.MapStr{
+	message.AddFields(mapstr.M{
 		"stream": msg.Stream,
 	})
 
 	if len(msg.Attrs) > 0 {
-		message.AddFields(common.MapStr{
-			"docker": common.MapStr{
+		message.AddFields(mapstr.M{
+			"docker": mapstr.M{
 				"attrs": msg.Attrs,
 			},
 		})

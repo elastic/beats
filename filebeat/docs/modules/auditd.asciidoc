@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/auditd/_meta/docs.asciidoc
+
 [[filebeat-module-auditd]]
 :modulename: auditd
 :has-dashboards: true
@@ -86,3 +88,4 @@ image::./images/kibana-audit-auditd.png[]
 For a description of each field in the module, see the
 <<exported-fields-auditd,exported fields>> section.
 
+edit_url!:

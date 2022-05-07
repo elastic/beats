@@ -86,7 +86,6 @@ services:
       start_period: 60s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=true"
@@ -150,7 +149,6 @@ services:
   #     - "TERM=linux"
   #     - "ELASTIC_PASSWORD=changeme"
   #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.security.krb5.conf=/etc/krb5.conf"
-  #     - "network.host="
   #     - "transport.host=127.0.0.1"
   #     - "http.host=0.0.0.0"
   #     - "xpack.security.enabled=true"

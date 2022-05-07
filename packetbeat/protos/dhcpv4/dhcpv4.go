@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -47,12 +49,12 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	return newPlugin(testMode, results, watcher, cfg)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*dhcpv4Plugin, error) {
+func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {
@@ -124,7 +126,7 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	fields["type"] = pbf.Event.Dataset
 	fields["status"] = "OK"
 
-	dhcpData := common.MapStr{
+	dhcpData := mapstr.M{
 		"op_code":        strings.ToLower(v4.OpcodeToString()),
 		"hardware_type":  v4.HwTypeToString(),
 		"hops":           v4.HopCount(), // Set to non-zero by relays.

@@ -13,8 +13,8 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -47,11 +47,11 @@ func newSession(p *goja.Program, conf scriptConfig, test bool) (*session, error)
 		timeout: conf.Timeout,
 	}
 
-	// Register common.MapStr as being a simple map[string]interface{} for
+	// Register mapstr.M as being a simple map[string]interface{} for
 	// treatment within the JS VM.
-	s.vm.RegisterSimpleMapType(reflect.TypeOf(common.MapStr(nil)),
+	s.vm.RegisterSimpleMapType(reflect.TypeOf(mapstr.M(nil)),
 		func(i interface{}) map[string]interface{} {
-			return map[string]interface{}(i.(common.MapStr))
+			return map[string]interface{}(i.(mapstr.M))
 		},
 	)
 
@@ -144,7 +144,7 @@ func (s *session) runParseFunc(n string) (out []s3EventV2, err error) {
 		if r := recover(); r != nil {
 			s.log.Errorw("The javascript script caused an unexpected panic "+
 				"while parsing a notification. Recovering, but please report this.",
-				"notification", common.MapStr{"original": n},
+				"notification", mapstr.M{"original": n},
 				"panic", r,
 				zap.Stack("stack"))
 			err = fmt.Errorf("unexpected panic in javascript script: %v", r)

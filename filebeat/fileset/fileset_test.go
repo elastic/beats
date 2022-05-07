@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -205,7 +206,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				"close_eof": true,
 			},
 			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
-				c, ok := cfg.(*common.Config)
+				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
 				}
@@ -225,7 +226,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				"pipeline": "foobar",
 			},
 			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
-				c, ok := cfg.(*common.Config)
+				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
 				}

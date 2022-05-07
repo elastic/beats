@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
@@ -96,6 +97,9 @@ func registerDecoders() {
 
 	log.Debugf("registering decoder 'text/csv': returned error: %#v",
 		registerDecoder("text/csv", decodeAsCSV))
+
+	log.Debugf("registering decoder 'application/zip': returned error: %#v",
+		registerDecoder("application/zip", decodeAsZip))
 }
 
 func encodeAsJSON(trReq transformable) ([]byte, error) {
@@ -170,6 +174,36 @@ func decodeAsCSV(p []byte, dst *response) error {
 		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
 			return err
 		}
+	}
+
+	dst.body = results
+
+	return nil
+}
+
+func decodeAsZip(p []byte, dst *response) error {
+	var results []interface{}
+	r, err := zip.NewReader(bytes.NewReader(p), int64(len(p)))
+	if err != nil {
+		return err
+	}
+
+	for _, f := range r.File {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+
+		dec := json.NewDecoder(rc)
+		for dec.More() {
+			var o interface{}
+			if err := dec.Decode(&o); err != nil {
+				rc.Close()
+				return err
+			}
+			results = append(results, o)
+		}
+		rc.Close()
 	}
 
 	dst.body = results

@@ -22,8 +22,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type phpFpmStatus struct {
@@ -56,28 +55,28 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	//remapping process details to match the naming format
 	for _, process := range status.Processes {
 		event := mb.Event{
-			RootFields: common.MapStr{
-				"http": common.MapStr{
-					"request": common.MapStr{
+			RootFields: mapstr.M{
+				"http": mapstr.M{
+					"request": mapstr.M{
 						"method": strings.ToLower(process.RequestMethod),
 					},
-					"response": common.MapStr{
-						"body": common.MapStr{
+					"response": mapstr.M{
+						"body": mapstr.M{
 							"bytes": process.ContentLength,
 						},
 					},
 				},
-				"user": common.MapStr{
+				"user": mapstr.M{
 					"name": process.User,
 				},
-				"process": common.MapStr{
+				"process": mapstr.M{
 					"pid": process.PID,
 				},
-				"url": common.MapStr{
+				"url": mapstr.M{
 					"original": process.RequestURI,
 				},
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"state":               process.State,
 				"start_time":          process.StartTime,
 				"start_since":         process.StartSince,
@@ -89,7 +88,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			},
 		}
 
-		event.ModuleFields = common.MapStr{}
+		event.ModuleFields = mapstr.M{}
 		event.ModuleFields.Put("pool.name", status.Name)
 		r.Event(event)
 	}

@@ -23,10 +23,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Settings contains the configuration fields to create a new disk queue
@@ -134,7 +134,7 @@ func DefaultSettings() Settings {
 
 // SettingsForUserConfig returns a Settings struct initialized with the
 // end-user-configurable settings in the given config tree.
-func SettingsForUserConfig(config *common.Config) (Settings, error) {
+func SettingsForUserConfig(config *config.C) (Settings, error) {
 	userConfig := userConfig{}
 	if err := config.Unpack(&userConfig); err != nil {
 		return Settings{}, fmt.Errorf("parsing user config: %w", err)

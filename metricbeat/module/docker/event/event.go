@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -131,13 +132,13 @@ func (m *MetricSet) reportEvent(reporter mb.ReporterV2, event events.Message) {
 
 	reporter.Event(mb.Event{
 		Timestamp: time,
-		MetricSetFields: common.MapStr{
+		MetricSetFields: mapstr.M{
 			"id":     event.ID,
 			"type":   event.Type,
 			"action": event.Action,
 			"status": event.Status,
 			"from":   event.From,
-			"actor": common.MapStr{
+			"actor": mapstr.M{
 				"id":         event.Actor.ID,
 				"attributes": attributes,
 			},

@@ -20,8 +20,8 @@ package cluster
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type StorageTotals_Ram struct {
@@ -57,7 +57,7 @@ type Data struct {
 	MaxBucketCount       int64         `json:"maxBucketCount"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) mapstr.M {
 	var d Data
 	err := json.Unmarshal(content, &d)
 	if err != nil {
@@ -65,64 +65,64 @@ func eventMapping(content []byte) common.MapStr {
 	}
 
 	logp.Info("Printing Data:")
-	event := common.MapStr{
-		"hdd": common.MapStr{
-			"quota": common.MapStr{
-				"total": common.MapStr{
+	event := mapstr.M{
+		"hdd": mapstr.M{
+			"quota": mapstr.M{
+				"total": mapstr.M{
 					"bytes": d.StorageTotals.Hdd.QuotaTotal,
 				},
 			},
-			"free": common.MapStr{
+			"free": mapstr.M{
 				"bytes": d.StorageTotals.Hdd.Free,
 			},
-			"total": common.MapStr{
+			"total": mapstr.M{
 				"bytes": d.StorageTotals.Hdd.Total,
 			},
-			"used": common.MapStr{
-				"value": common.MapStr{
+			"used": mapstr.M{
+				"value": mapstr.M{
 					"bytes": d.StorageTotals.Hdd.Used,
 				},
-				"by_data": common.MapStr{
+				"by_data": mapstr.M{
 					"bytes": d.StorageTotals.Hdd.UsedByData,
 				},
 			},
 		},
 		"max_bucket_count": d.MaxBucketCount,
-		"quota": common.MapStr{
-			"index_memory": common.MapStr{
+		"quota": mapstr.M{
+			"index_memory": mapstr.M{
 				"mb": d.IndexMemoryQuota,
 			},
-			"memory": common.MapStr{
+			"memory": mapstr.M{
 				"mb": d.MemoryQuota,
 			},
 		},
-		"ram": common.MapStr{
-			"quota": common.MapStr{
-				"total": common.MapStr{
-					"value": common.MapStr{
+		"ram": mapstr.M{
+			"quota": mapstr.M{
+				"total": mapstr.M{
+					"value": mapstr.M{
 						"bytes": d.StorageTotals.RAM.QuotaTotal,
 					},
-					"per_node": common.MapStr{
+					"per_node": mapstr.M{
 						"bytes": d.StorageTotals.RAM.QuotaTotalPerNode,
 					},
 				},
-				"used": common.MapStr{
-					"value": common.MapStr{
+				"used": mapstr.M{
+					"value": mapstr.M{
 						"bytes": d.StorageTotals.RAM.QuotaUsed,
 					},
-					"per_node": common.MapStr{
+					"per_node": mapstr.M{
 						"bytes": d.StorageTotals.RAM.QuotaUsedPerNode,
 					},
 				},
 			},
-			"total": common.MapStr{
+			"total": mapstr.M{
 				"bytes": d.StorageTotals.RAM.Total,
 			},
-			"used": common.MapStr{
-				"value": common.MapStr{
+			"used": mapstr.M{
+				"value": mapstr.M{
 					"bytes": d.StorageTotals.RAM.Used,
 				},
-				"by_data": common.MapStr{
+				"by_data": mapstr.M{
 					"bytes": d.StorageTotals.RAM.UsedByData,
 				},
 			},

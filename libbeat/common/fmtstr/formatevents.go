@@ -153,7 +153,7 @@ func CompileEvent(in string) (*EventFormatString, error) {
 
 // Unpack tries to initialize the EventFormatString from provided value
 // (which must be a string). Unpack method satisfies go-ucfg.Unpacker interface
-// required by common.Config, in order to use EventFormatString with
+// required by config.C, in order to use EventFormatString with
 // `common.(*Config).Unpack()`.
 func (fs *EventFormatString) Unpack(v interface{}) error {
 	s, err := tryConvString(v)

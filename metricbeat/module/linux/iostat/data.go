@@ -18,37 +18,37 @@
 package iostat
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // AddLinuxIOStat adds the linux iostat data to the provided map
-func AddLinuxIOStat(extraMetrics diskio.IOMetric) common.MapStr {
-	return common.MapStr{
-		"read": common.MapStr{
-			"request": common.MapStr{
+func AddLinuxIOStat(extraMetrics diskio.IOMetric) mapstr.M {
+	return mapstr.M{
+		"read": mapstr.M{
+			"request": mapstr.M{
 				"merges_per_sec": extraMetrics.ReadRequestMergeCountPerSec,
 				"per_sec":        extraMetrics.ReadRequestCountPerSec,
 			},
-			"per_sec": common.MapStr{
+			"per_sec": mapstr.M{
 				"bytes": extraMetrics.ReadBytesPerSec,
 			},
 			"await": extraMetrics.AvgReadAwaitTime,
 		},
-		"write": common.MapStr{
-			"request": common.MapStr{
+		"write": mapstr.M{
+			"request": mapstr.M{
 				"merges_per_sec": extraMetrics.WriteRequestMergeCountPerSec,
 				"per_sec":        extraMetrics.WriteRequestCountPerSec,
 			},
-			"per_sec": common.MapStr{
+			"per_sec": mapstr.M{
 				"bytes": extraMetrics.WriteBytesPerSec,
 			},
 			"await": extraMetrics.AvgWriteAwaitTime,
 		},
-		"queue": common.MapStr{
+		"queue": mapstr.M{
 			"avg_size": extraMetrics.AvgQueueSize,
 		},
-		"request": common.MapStr{
+		"request": mapstr.M{
 			"avg_size": extraMetrics.AvgRequestSize,
 		},
 		"await":        extraMetrics.AvgAwaitTime,

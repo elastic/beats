@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"net/url"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -71,6 +72,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"uuid":                uuidString,
 			"userAgent":           userAgentString,
 			"beatInfo":            beatInfo,
+			"urlEncode":           urlEncode,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -378,4 +380,11 @@ func beatInfo() map[string]string {
 		"buildtime": version.BuildTime().String(),
 		"version":   version.GetDefaultVersion(),
 	}
+}
+
+func urlEncode(value string) string {
+	if value == "" {
+		return ""
+	}
+	return url.QueryEscape(value)
 }

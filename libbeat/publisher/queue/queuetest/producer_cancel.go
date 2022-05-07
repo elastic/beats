@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestSingleProducerConsumer tests buffered events for a producer getting
@@ -53,7 +53,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 
 		for ; i < N1; i++ {
 			log.Debugf("send event %v to first producer", i)
-			producer.Publish(makeEvent(common.MapStr{
+			producer.Publish(makeEvent(mapstr.M{
 				"value": i,
 			}))
 		}
@@ -67,7 +67,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		producer = b.Producer(queue.ProducerConfig{})
 		for ; i < N2; i++ {
 			log.Debugf("send event %v to new producer", i)
-			producer.Publish(makeEvent(common.MapStr{
+			producer.Publish(makeEvent(mapstr.M{
 				"value": i,
 			}))
 		}

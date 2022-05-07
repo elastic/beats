@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // JSONReader parses JSON inputs
@@ -65,7 +66,7 @@ func NewJSONParser(r reader.Reader, cfg *ParserConfig) *JSONParser {
 
 // decodeJSON unmarshals the text parameter into a MapStr and
 // returns the new text column if one was requested.
-func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
+func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 	var jsonFields map[string]interface{}
 
 	err := unmarshal(text, &jsonFields)
@@ -74,7 +75,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 			r.logger.Errorf("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
-			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
+			jsonFields = mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
 		return text, jsonFields
 	}
@@ -122,9 +123,9 @@ func (r *JSONReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
-	var fields common.MapStr
+	var fields mapstr.M
 	message.Content, fields = r.decode(message.Content)
-	message.AddFields(common.MapStr{"json": fields})
+	message.AddFields(mapstr.M{"json": fields})
 	return message, nil
 }
 
@@ -132,8 +133,8 @@ func (r *JSONReader) Close() error {
 	return r.reader.Close()
 }
 
-func createJSONError(message string) common.MapStr {
-	return common.MapStr{"message": message, "type": "json"}
+func createJSONError(message string) mapstr.M {
+	return mapstr.M{"message": message, "type": "json"}
 }
 
 // Next decodes JSON and returns the filled Line object.
@@ -151,7 +152,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 			return message, fmt.Errorf("cannot decode JSON message, missing key: %s", p.field)
 		}
 	}
-	var jsonFields common.MapStr
+	var jsonFields mapstr.M
 	message.Content, jsonFields = p.JSONReader.decode(from)
 
 	if len(jsonFields) == 0 {
@@ -176,7 +177,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 				jsonFields.Delete(key)
 
 				if message.Meta == nil {
-					message.Meta = common.MapStr{}
+					message.Meta = mapstr.M{}
 				}
 				message.Meta["_id"] = id
 			}
@@ -194,7 +195,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		message.Fields = event.Fields
 		message.Meta = event.Meta
 	} else {
-		message.AddFields(common.MapStr{p.target: jsonFields})
+		message.AddFields(mapstr.M{p.target: jsonFields})
 	}
 
 	return message, err
@@ -204,7 +205,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 // respecting the KeysUnderRoot, ExpandKeys, and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
-func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) (string, time.Time) {
+func MergeJSONFields(data mapstr.M, jsonFields mapstr.M, text *string, config Config) (string, time.Time) {
 	// The message key might have been modified by multiline
 	if len(config.MessageKey) > 0 && text != nil {
 		jsonFields[config.MessageKey] = *text

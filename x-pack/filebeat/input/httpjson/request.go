@@ -17,8 +17,8 @@ import (
 	"github.com/PaesslerAG/jsonpath"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const requestNamespace = "request"
@@ -94,7 +94,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 type requestFactory struct {
 	url        url.URL
 	method     string
-	body       *common.MapStr
+	body       *mapstr.M
 	transforms []basicTransform
 	user       string
 	password   string

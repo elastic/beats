@@ -20,12 +20,12 @@ package bus
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Event sent to the bus
-type Event common.MapStr
+type Event mapstr.M
 
 // Bus provides a common channel to emit and listen for Events
 type Bus interface {

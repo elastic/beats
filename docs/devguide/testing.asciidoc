@@ -21,6 +21,15 @@ To run all non integration tests for a beat run `make unit`. This will execute a
 
 All Go tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
 
+===== Generate sample events
+
+Go tests support generating sample events to be used as fixtures.
+
+This generation can be perfomed running `go test --data`. This functionality is supported by packetbeat and Metricbeat.
+
+In Metricbeat, run the command from within a module like this: `go test --tags integration,azure --data --run "TestData"`. Make sure to add the relevant tags (`integration` is common then add module and metricset specific tags).
+
+A note about tags: the `--data` flag is a custom flag added by Metricbeat and Packetbeat frameworks. It will not be present in case tags do not match, as the relevant code will not be run and silently skipped (without the tag the test file is ignored by Go compiler so the framework doesn't load). This may happen if there are different tags in the build tags of the metricset under test (i.e. the GCP billing metricset requires the `billing` tag too).
 
 ==== Running Python Tests
 

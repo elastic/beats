@@ -27,8 +27,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const defaultCloudPort = "443"
@@ -147,7 +147,7 @@ func (c *CloudID) decodeCloudAuth() error {
 // output.elasticsearch.hosts, output.elasticsearch.username, output.elasticsearch.password,
 // setup.kibana.host settings based on values derived from the cloud.id and cloud.auth
 // settings.
-func OverwriteSettings(cfg *common.Config) error {
+func OverwriteSettings(cfg *config.C) error {
 
 	logger := logp.NewLogger("cloudid")
 	cloudID, _ := cfg.String("cloud.id", -1)
@@ -171,14 +171,14 @@ func OverwriteSettings(cfg *common.Config) error {
 
 	logger.Infof("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", cid.esURL, cid.kibURL)
 
-	esURLConfig, err := common.NewConfigFrom([]string{cid.ElasticsearchURL()})
+	esURLConfig, err := config.NewConfigFrom([]string{cid.ElasticsearchURL()})
 	if err != nil {
 		return err
 	}
 
 	// Before enabling the ES output, check that no other output is enabled
 	tmp := struct {
-		Output common.ConfigNamespace `config:"output"`
+		Output config.Namespace `config:"output"`
 	}{}
 	if err := cfg.Unpack(&tmp); err != nil {
 		return err

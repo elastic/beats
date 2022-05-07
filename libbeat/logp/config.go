@@ -22,7 +22,7 @@ import (
 )
 
 // Config contains the configuration options for the logger. To create a Config
-// from a common.Config use logp/config.Build.
+// from a config.C use logp/config.Build.
 type Config struct {
 	Beat      string   `config:",ignore"`   // Name of the Beat (for default file name).
 	Level     Level    `config:"level"`     // Logging level (error, warning, info, debug).

@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -62,7 +63,7 @@ func testTCPTuple() *common.TCPTuple {
 	return t
 }
 
-func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
+func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 	if len(e.events) == 0 {
 		t.Error("No transaction")
 		return nil
@@ -176,7 +177,7 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 	assert.Equal(t, false, m.fields["exclusive"])
 	assert.Equal(t, true, m.fields["auto-delete"])
 	assert.Equal(t, true, m.fields["no-wait"])
-	_, exists := m.fields["arguments"].(common.MapStr)
+	_, exists := m.fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -209,7 +210,7 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 	assert.Equal(t, false, m.fields["passive"])
 	assert.Equal(t, false, m.fields["no-wait"])
 	assert.Equal(t, "topic", m.fields["exchange-type"])
-	_, exists := m.fields["arguments"].(common.MapStr)
+	_, exists := m.fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -242,7 +243,7 @@ func TestAmqp_BasicConsume(t *testing.T) {
 	assert.Equal(t, false, m.fields["exclusive"])
 	assert.Equal(t, true, m.fields["no-local"])
 	assert.Equal(t, false, m.fields["no-wait"])
-	_, exists := m.fields["arguments"].(common.MapStr)
+	_, exists := m.fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -302,7 +303,7 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 	assert.Equal(t, "MSFT", m.fields["routing-key"])
 	assert.Equal(t, "test2 test1", m.request)
 	assert.Equal(t, false, m.fields["no-wait"])
-	_, exists := m.fields["arguments"].(common.MapStr)
+	_, exists := m.fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -334,7 +335,7 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	assert.Equal(t, "exchange.unbind test2 test1", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -382,7 +383,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, body, trans["request"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -429,7 +430,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, "kikoo", trans["response"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -474,7 +475,7 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 	} else if ok && priority != 6 {
 		t.Errorf("Wrong argument")
 	}
-	headers, ok := m.fields["headers"].(common.MapStr)
+	headers, ok := m.fields["headers"].(mapstr.M)
 	if !ok {
 		t.Errorf("Headers should be present")
 	}
@@ -552,7 +553,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 	assert.Equal(t, "queue.delete", trans["method"])
 	assert.Equal(t, "queue.delete TestThomas", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -585,7 +586,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 	assert.Equal(t, "basic.reject 1", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, common.ERROR_STATUS, trans["status"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -677,7 +678,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, "I'm a very [...]", trans["request"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -708,7 +709,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, "65 65 65 65 65 65 65 65 65 65 [...]", trans["request"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
-	fields, ok = trans["amqp"].(common.MapStr)
+	fields, ok = trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -742,13 +743,13 @@ func TestAmqp_HideArguments(t *testing.T) {
 	assert.Equal(t, "queue.declare", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, "queue.declare TestHeader", trans["request"])
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
 	assert.Equal(t, false, fields["durable"])
 	assert.Equal(t, true, fields["auto-delete"])
-	_, exists := fields["arguments"].(common.MapStr)
+	_, exists := fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Arguments field should not be present")
 	}
@@ -766,7 +767,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	trans = expectTransaction(t, results)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
-	fields, ok = trans["amqp"].(common.MapStr)
+	fields, ok = trans["amqp"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -805,7 +806,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	assert.Equal(t, "basic.recover", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
-	assert.Equal(t, common.MapStr{"requeue": true}, trans["amqp"])
+	assert.Equal(t, mapstr.M{"requeue": true}, trans["amqp"])
 }
 
 // this is a specific rabbitMQ method
@@ -854,7 +855,7 @@ func TestAmqp_GetTable(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	args, ok := m.fields["arguments"].(common.MapStr)
+	args, ok := m.fields["arguments"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -916,7 +917,7 @@ func TestAmqp_TableInception(t *testing.T) {
 	assert.Equal(t, "exchange.declare", m.method)
 	assert.Equal(t, "test1", m.fields["exchange"])
 
-	args, ok := m.fields["arguments"].(common.MapStr)
+	args, ok := m.fields["arguments"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -928,14 +929,14 @@ func TestAmqp_TableInception(t *testing.T) {
 	} else if ok && bigInt != 2000000000000000 {
 		t.Errorf("Wrong argument")
 	}
-	inception, ok := args["inception"].(common.MapStr)
+	inception, ok := args["inception"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
 	assert.Equal(t, "DREAMS", inception["incep1"])
 	assert.Equal(t, "MARION", inception["incep2"])
 
-	limbo, ok := inception["limbo"].(common.MapStr)
+	limbo, ok := inception["limbo"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -963,7 +964,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	args, ok := m.fields["arguments"].(common.MapStr)
+	args, ok := m.fields["arguments"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -987,13 +988,13 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	args, ok = m.fields["arguments"].(common.MapStr)
+	args, ok = m.fields["arguments"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
 
 	assert.Equal(t, "a lot of arrays!", args["test"])
-	arrayFloat, ok := args["arrayfloat"].(common.MapStr)
+	arrayFloat, ok := args["arrayfloat"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -1001,7 +1002,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	assert.Equal(t, 28.8, arrayFloat["1"])
 	assert.Equal(t, 33.3, arrayFloat["2"])
 
-	arrayBool, ok := args["arraybool"].(common.MapStr)
+	arrayBool, ok := args["arraybool"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -1011,7 +1012,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	assert.Equal(t, true, arrayBool["3"])
 	assert.Equal(t, true, arrayBool["4"])
 
-	arrayString, ok := args["arraystring"].(common.MapStr)
+	arrayString, ok := args["arraystring"].(mapstr.M)
 	if !ok {
 		t.Errorf("Field should be present")
 	}
@@ -1042,7 +1043,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	_, exists := m.fields["arguments"].(common.MapStr)
+	_, exists := m.fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Field should not exist")
 	}
@@ -1065,7 +1066,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 	if !complete {
 		t.Errorf("Message should be complete")
 	}
-	_, exists = m.fields["arguments"].(common.MapStr)
+	_, exists = m.fields["arguments"].(mapstr.M)
 	if exists {
 		t.Errorf("Field should not exist")
 	}
@@ -1075,7 +1076,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 func TestAmqp_isError(t *testing.T) {
 	trans := &amqpTransaction{
 		method: "channel.close",
-		amqp: common.MapStr{
+		amqp: mapstr.M{
 			"reply-code": 200,
 		},
 	}
@@ -1146,7 +1147,7 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 	assert.Equal(t, common.OK_STATUS, trans["status"])
 	assert.Nil(t, trans["notes"])
 
-	fields, ok := trans["amqp"].(common.MapStr)
+	fields, ok := trans["amqp"].(mapstr.M)
 	assert.True(t, ok)
 	code, ok := fields["reply-code"].(uint16)
 	assert.True(t, ok)

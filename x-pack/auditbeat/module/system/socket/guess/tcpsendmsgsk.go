@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Guess how to get a struct sock* from tcp_sendmsg parameters. It can be:
@@ -103,7 +103,7 @@ func (g *guessTcpSendmsgSock) Trigger() (err error) {
 
 // Extract checks which of the arguments to tcp_sendmsg contains the expected
 // value (address of destination).
-func (g *guessTcpSendmsgSock) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessTcpSendmsgSock) Extract(ev interface{}) (mapstr.M, bool) {
 	event := ev.(*tcpSendMsgSockGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")
@@ -125,7 +125,7 @@ func (g *guessTcpSendmsgSock) Extract(ev interface{}) (common.MapStr, bool) {
 	default:
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"TCP_SENDMSG_SOCK": param,
 	}, true
 }

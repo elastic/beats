@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: elasticsearch
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/elasticsearch/_meta/docs.asciidoc
+
 
 [[metricbeat-module-elasticsearch]]
 == Elasticsearch module
@@ -39,6 +41,8 @@ the `hosts` list is interpreted by the module.
 * If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct
   {es} cluster (for example, a load-balancing proxy fronting the cluster).
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -121,3 +125,4 @@ include::elasticsearch/pending_tasks.asciidoc[]
 
 include::elasticsearch/shard.asciidoc[]
 
+:edit_url!:

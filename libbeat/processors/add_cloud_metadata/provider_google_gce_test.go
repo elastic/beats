@@ -25,8 +25,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const gceMetadataV1 = `{
@@ -312,7 +313,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 	server := initGCETestServer(gceMetadataV1)
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -324,29 +325,29 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
-			"account": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
+			"account": mapstr.M{
 				"id": "test-dev",
 			},
 			"provider": "gcp",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id":   "3910564293633576924",
 				"name": "test-gce-dev",
 			},
-			"machine": common.MapStr{
+			"machine": mapstr.M{
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
-			"project": common.MapStr{
+			"project": mapstr.M{
 				"id": "test-dev",
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "GCE",
 			},
 		},
@@ -360,7 +361,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -372,34 +373,34 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
-			"account": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
+			"account": mapstr.M{
 				"id": "test-dev",
 			},
 			"provider": "gcp",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id":   "3910564293633576924",
 				"name": "test-gce-dev",
 			},
-			"machine": common.MapStr{
+			"machine": mapstr.M{
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
-			"project": common.MapStr{
+			"project": mapstr.M{
 				"id": "test-dev",
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "GCE",
 			},
 		},
-		"orchestrator": common.MapStr{
-			"cluster": common.MapStr{
+		"orchestrator": mapstr.M{
+			"cluster": mapstr.M{
 				"name": "staging-marketing-k8s",
 				"url":  "https://35.223.150.34",
 			},
@@ -414,7 +415,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -428,9 +429,9 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 
 	actual, err := p.Run(
 		&beat.Event{
-			Fields: common.MapStr{
-				"orchestrator": common.MapStr{
-					"cluster": common.MapStr{
+			Fields: mapstr.M{
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
 						"name": "production-marketing-k8s",
 						"url":  "https://35.223.150.35",
 					},
@@ -442,29 +443,29 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
-			"account": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
+			"account": mapstr.M{
 				"id": "test-dev",
 			},
 			"provider": "gcp",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id":   "3910564293633576924",
 				"name": "test-gce-dev",
 			},
-			"machine": common.MapStr{
+			"machine": mapstr.M{
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
-			"project": common.MapStr{
+			"project": mapstr.M{
 				"id": "test-dev",
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "GCE",
 			},
 		},
-		"orchestrator": common.MapStr{
-			"cluster": common.MapStr{
+		"orchestrator": mapstr.M{
+			"cluster": mapstr.M{
 				"name": "production-marketing-k8s",
 				"url":  "https://35.223.150.35",
 			},
@@ -479,7 +480,7 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 	server := initGCETestServer(gceK8sPartialMetadataV1)
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -491,29 +492,29 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
-			"account": common.MapStr{
+	expected := mapstr.M{
+		"cloud": mapstr.M{
+			"account": mapstr.M{
 				"id": "test-dev",
 			},
 			"provider": "gcp",
-			"instance": common.MapStr{
+			"instance": mapstr.M{
 				"id":   "3910564293633576924",
 				"name": "test-gce-dev",
 			},
-			"machine": common.MapStr{
+			"machine": mapstr.M{
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
-			"project": common.MapStr{
+			"project": mapstr.M{
 				"id": "test-dev",
 			},
-			"service": common.MapStr{
+			"service": mapstr.M{
 				"name": "GCE",
 			},
 		},

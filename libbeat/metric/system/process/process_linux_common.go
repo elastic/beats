@@ -33,10 +33,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Indulging in one non-const global variable for the sake of storing boot time
@@ -226,13 +226,13 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 	return userFinal, nil
 }
 
-func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (common.MapStr, error) {
+func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (mapstr.M, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
 	}
-	env := common.MapStr{}
+	env := mapstr.M{}
 
 	pairs := bytes.Split(data, []byte{0})
 	for _, kv := range pairs {

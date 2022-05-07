@@ -32,10 +32,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -57,21 +58,21 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 
 	// Check event fields
-	oplog := event["oplog"].(common.MapStr)
-	allocated := oplog["size"].(common.MapStr)["allocated"].(int64)
+	oplog := event["oplog"].(mapstr.M)
+	allocated := oplog["size"].(mapstr.M)["allocated"].(int64)
 	assert.True(t, allocated >= 0)
 
-	used := oplog["size"].(common.MapStr)["used"].(float64)
+	used := oplog["size"].(mapstr.M)["used"].(float64)
 	assert.True(t, used > 0)
 
-	firstTs := oplog["first"].(common.MapStr)["timestamp"].(uint32)
+	firstTs := oplog["first"].(mapstr.M)["timestamp"].(uint32)
 	assert.True(t, firstTs >= 0)
 
 	window := oplog["window"].(uint32)
 	assert.True(t, window >= 0)
 
-	members := event["members"].(common.MapStr)
-	primary := members["primary"].(common.MapStr)
+	members := event["members"].(mapstr.M)
+	primary := members["primary"].(mapstr.M)
 	assert.NotEmpty(t, primary["host"].(string))
 	assert.True(t, primary["optime"].(int64) > 0)
 

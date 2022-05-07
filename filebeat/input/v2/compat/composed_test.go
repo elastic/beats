@@ -24,12 +24,12 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type fakeRunnerFactory struct {
-	OnCheck  func(*common.Config) error
-	OnCreate func(beat.PipelineConnector, *common.Config) (cfgfile.Runner, error)
+	OnCheck  func(*conf.C) error
+	OnCreate func(beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
 }
 
 type fakeRunner struct {
@@ -71,7 +71,7 @@ func TestCombine_CheckConfig(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			factory := Combine(test.factory, test.fallback)
-			cfg := common.MustNewConfigFrom(struct{ Type string }{"test"})
+			cfg := conf.MustNewConfigFrom(struct{ Type string }{"test"})
 			err := factory.CheckConfig(cfg)
 			if test.want != err {
 				t.Fatalf("Failed. Want: %v, Got: %v", test.want, err)
@@ -144,7 +144,7 @@ func TestCombine_Create(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			factory := Combine(test.factory, test.fallback)
-			cfg := common.MustNewConfigFrom(struct{ Type string }{test.Type})
+			cfg := conf.MustNewConfigFrom(struct{ Type string }{test.Type})
 			runner, err := factory.Create(nil, cfg)
 			test.check(t, runner, err)
 		})
@@ -152,7 +152,7 @@ func TestCombine_Create(t *testing.T) {
 }
 
 // Create creates a new Runner based on the given configuration.
-func (f *fakeRunnerFactory) Create(p beat.PipelineConnector, config *common.Config) (cfgfile.Runner, error) {
+func (f *fakeRunnerFactory) Create(p beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
 	if f.OnCreate == nil {
 		return nil, errors.New("not implemented")
 	}
@@ -162,7 +162,7 @@ func (f *fakeRunnerFactory) Create(p beat.PipelineConnector, config *common.Conf
 // CheckConfig tests if a confiugation can be used to create an input. If it
 // is not possible to create an input using the configuration, an error must
 // be returned.
-func (f *fakeRunnerFactory) CheckConfig(config *common.Config) error {
+func (f *fakeRunnerFactory) CheckConfig(config *conf.C) error {
 	if f.OnCheck == nil {
 		return errors.New("not implemented")
 	}
@@ -184,7 +184,7 @@ func (f *fakeRunner) Stop() {
 
 func constRunnerFactory(runner cfgfile.Runner) cfgfile.RunnerFactory {
 	return &fakeRunnerFactory{
-		OnCreate: func(_ beat.PipelineConnector, _ *common.Config) (cfgfile.Runner, error) {
+		OnCreate: func(_ beat.PipelineConnector, _ *conf.C) (cfgfile.Runner, error) {
 			return runner, nil
 		},
 	}
@@ -192,9 +192,9 @@ func constRunnerFactory(runner cfgfile.Runner) cfgfile.RunnerFactory {
 
 func failingRunnerFactory(err error) cfgfile.RunnerFactory {
 	return &fakeRunnerFactory{
-		OnCheck: func(_ *common.Config) error { return err },
+		OnCheck: func(_ *conf.C) error { return err },
 
-		OnCreate: func(_ beat.PipelineConnector, _ *common.Config) (cfgfile.Runner, error) {
+		OnCreate: func(_ beat.PipelineConnector, _ *conf.C) (cfgfile.Runner, error) {
 			return nil, err
 		},
 	}

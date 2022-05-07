@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type eventStore struct {
@@ -136,7 +137,7 @@ func TestAlert(t *testing.T) {
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
-	alerts := alertsIf.([]common.MapStr)
+	alerts := alertsIf.([]mapstr.M)
 	assert.True(t, ok)
 	assert.Len(t, alerts, 1)
 	severity, ok := alerts[0]["severity"]
@@ -252,12 +253,12 @@ func TestOCSPStatus(t *testing.T) {
 		t.Fatalf("unexected number of results: got:%d want:1", len(results.events))
 	}
 
-	want := common.MapStr{
-		"client": common.MapStr{
+	want := mapstr.M{
+		"client": mapstr.M{
 			"ip":   "192.168.0.1",
 			"port": int64(6512),
 		},
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"dataset": "tls",
 			"kind":    "event",
 			"category": []string{
@@ -268,40 +269,40 @@ func TestOCSPStatus(t *testing.T) {
 				"protocol",
 			},
 		},
-		"destination": common.MapStr{
+		"destination": mapstr.M{
 			"ip":   "192.168.0.2",
 			"port": int64(27017),
 		},
-		"network": common.MapStr{
+		"network": mapstr.M{
 			"type":         "ipv4",
 			"transport":    "tcp",
 			"protocol":     "tls",
 			"direction":    "unknown",
 			"community_id": "1:jKfewJN/czjTuEpVvsKdYXXiMzs=",
 		},
-		"related": common.MapStr{
+		"related": mapstr.M{
 			"ip": []string{
 				"192.168.0.1",
 				"192.168.0.2",
 			},
 		},
-		"server": common.MapStr{
+		"server": mapstr.M{
 			"ip":   "192.168.0.2",
 			"port": int64(27017),
 		},
-		"source": common.MapStr{
+		"source": mapstr.M{
 			"port": int64(6512),
 			"ip":   "192.168.0.1",
 		},
 		"status": "Error",
-		"tls": common.MapStr{
+		"tls": mapstr.M{
 			"cipher": "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-			"detailed": common.MapStr{
+			"detailed": mapstr.M{
 				"client_certificate_requested": false,
 				"ocsp_response":                "successful",
-				"server_certificate_chain": []common.MapStr{
+				"server_certificate_chain": []mapstr.M{
 					{
-						"issuer": common.MapStr{
+						"issuer": mapstr.M{
 							"common_name":         "Orange Devices Root LAB CA",
 							"country":             "FR",
 							"distinguished_name":  "CN=Orange Devices Root LAB CA,OU=FOR LAB USE ONLY,O=Orange,C=FR",
@@ -314,7 +315,7 @@ func TestOCSPStatus(t *testing.T) {
 						"public_key_size":      4096,
 						"serial_number":        "1492448539999078269498416841973088004758827",
 						"signature_algorithm":  "SHA256-RSA",
-						"subject": common.MapStr{
+						"subject": mapstr.M{
 							"common_name":         "Orange Devices PKI TV LAB CA",
 							"country":             "FR",
 							"distinguished_name":  "CN=Orange Devices PKI TV LAB CA,OU=FOR LAB USE ONLY,O=Orange,C=FR",
@@ -324,7 +325,7 @@ func TestOCSPStatus(t *testing.T) {
 						"version_number": 3,
 					},
 					{
-						"issuer": common.MapStr{
+						"issuer": mapstr.M{
 							"common_name":         "Orange Devices Root LAB CA",
 							"country":             "FR",
 							"distinguished_name":  "CN=Orange Devices Root LAB CA,OU=FOR LAB USE ONLY,O=Orange,C=FR",
@@ -337,7 +338,7 @@ func TestOCSPStatus(t *testing.T) {
 						"public_key_size":      4096,
 						"serial_number":        "1492246295378596931754418352553114016724120",
 						"signature_algorithm":  "SHA256-RSA",
-						"subject": common.MapStr{
+						"subject": mapstr.M{
 							"common_name":         "Orange Devices Root LAB CA",
 							"country":             "FR",
 							"distinguished_name":  "CN=Orange Devices Root LAB CA,OU=FOR LAB USE ONLY,O=Orange,C=FR",
@@ -347,15 +348,15 @@ func TestOCSPStatus(t *testing.T) {
 						"version_number": 3,
 					},
 				},
-				"server_hello": common.MapStr{
-					"extensions": common.MapStr{
+				"server_hello": mapstr.M{
+					"extensions": mapstr.M{
 						"_unparsed_": []string{
 							"renegotiation_info",
 						},
 						"ec_points_formats": []string{
 							"uncompressed",
 						},
-						"status_request": common.MapStr{
+						"status_request": mapstr.M{
 							"response": true,
 						},
 					},
@@ -368,14 +369,14 @@ func TestOCSPStatus(t *testing.T) {
 			},
 			"established": false,
 			"resumed":     false,
-			"server": common.MapStr{
+			"server": mapstr.M{
 				"issuer": "CN=Orange Devices PKI TV LAB CA,OU=FOR LAB USE ONLY,O=Orange,C=FR",
-				"hash": common.MapStr{
+				"hash": mapstr.M{
 					"sha1": "D8A11028DAD7E34F5D7F6D41DE01743D8B3CE553",
 				},
 				"not_after":  time.Date(2022, 6, 3, 13, 38, 16, 0, time.UTC),
 				"not_before": time.Date(2021, 6, 3, 13, 38, 16, 0, time.UTC),
-				"x509": common.MapStr{
+				"x509": mapstr.M{
 					"alternative_names": []string{
 						"*.ena1.orange.fr",
 						"*.itv.orange.fr",
@@ -391,7 +392,7 @@ func TestOCSPStatus(t *testing.T) {
 						"*.pp-ntv1.orange.fr",
 						"*.pp-ntv2.orange.fr",
 					},
-					"issuer": common.MapStr{
+					"issuer": mapstr.M{
 						"common_name":         "Orange Devices PKI TV LAB CA",
 						"country":             "FR",
 						"distinguished_name":  "CN=Orange Devices PKI TV LAB CA,OU=FOR LAB USE ONLY,O=Orange,C=FR",
@@ -404,7 +405,7 @@ func TestOCSPStatus(t *testing.T) {
 					"public_key_size":      256,
 					"serial_number":        "189790697042017246339292011338547986350262673379",
 					"signature_algorithm":  "SHA256-RSA",
-					"subject": common.MapStr{
+					"subject": mapstr.M{
 						"common_name":         "server2 test PKI TV LAB",
 						"country":             "FR",
 						"distinguished_name":  "CN=server2 test PKI TV LAB,OU=Orange,C=FR",
@@ -523,7 +524,7 @@ func TestInterleavedRecords(t *testing.T) {
 	alerts, err := event.GetValue("tls.detailed.alerts")
 	assert.NoError(t, err)
 
-	assert.Len(t, alerts.([]common.MapStr), 2)
+	assert.Len(t, alerts.([]mapstr.M), 2)
 }
 
 func TestCompletedHandshake(t *testing.T) {

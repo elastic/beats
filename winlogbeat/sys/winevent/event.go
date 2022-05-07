@@ -24,10 +24,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	libxml "github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Debug selectors used in this package.
@@ -88,9 +88,9 @@ type Event struct {
 	RenderErr               []string
 }
 
-func (e Event) Fields() common.MapStr {
+func (e Event) Fields() mapstr.M {
 	// Windows Log Specific data
-	win := common.MapStr{}
+	win := mapstr.M{}
 
 	AddOptional(win, "channel", e.Channel)
 	AddOptional(win, "event_id", fmt.Sprint(e.EventIdentifier.ID))
@@ -114,7 +114,7 @@ func (e Event) Fields() common.MapStr {
 	AddOptional(win, "message", sys.RemoveWindowsLineEndings(e.Message))
 
 	if e.User.Identifier != "" {
-		user := common.MapStr{
+		user := mapstr.M{
 			"identifier": e.User.Identifier,
 		}
 		win["user"] = user

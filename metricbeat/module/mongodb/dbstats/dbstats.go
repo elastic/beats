@@ -24,12 +24,11 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
-)
 
-var logger = logp.NewLogger("mongodb.dbstats")
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
@@ -83,7 +82,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, dbName := range dbNames {
 		db := client.Database(dbName)
 
-		var result map[string]interface{}
+		var result mapstr.M
 
 		res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "dbStats"}})
 		if err = res.Err(); err != nil {

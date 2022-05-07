@@ -29,11 +29,11 @@ import (
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -263,7 +263,7 @@ func (l *winEventLogExp) Close() error {
 
 // newWinEventLogExp creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLogExp(options *common.Config) (EventLog, error) {
+func newWinEventLogExp(options *conf.C) (EventLog, error) {
 	var xmlQuery string
 	var err error
 	var isFile bool

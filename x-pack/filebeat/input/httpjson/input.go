@@ -19,11 +19,11 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -207,14 +207,14 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 	}
 }
 
-func makeEvent(body common.MapStr) (beat.Event, error) {
+func makeEvent(body mapstr.M) (beat.Event, error) {
 	bodyBytes, err := json.Marshal(body)
 	if err != nil {
 		return beat.Event{}, err
 	}
 	now := timeNow()
-	fields := common.MapStr{
-		"event": common.MapStr{
+	fields := mapstr.M{
+		"event": mapstr.M{
 			"created": now,
 		},
 		"message": string(bodyBytes),

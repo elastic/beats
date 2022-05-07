@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 // reporter is a struct that will fill a ring buffer for each monitored registry.
@@ -41,7 +41,7 @@ type reporter struct {
 }
 
 // MakeReporter creates and starts a reporter with the given config.
-func MakeReporter(beat beat.Info, cfg *common.Config) (*reporter, error) {
+func MakeReporter(beat beat.Info, cfg *cfg.C) (*reporter, error) {
 	config := defaultConfig()
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {

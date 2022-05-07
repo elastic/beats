@@ -25,8 +25,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Server takes cares of correctly starting the HTTP component of the API
@@ -39,7 +39,7 @@ type Server struct {
 }
 
 // New creates a new API Server.
-func New(log *logp.Logger, mux *http.ServeMux, config *common.Config) (*Server, error) {
+func New(log *logp.Logger, mux *http.ServeMux, config *config.C) (*Server, error) {
 	if log == nil {
 		log = logp.NewLogger("")
 	}

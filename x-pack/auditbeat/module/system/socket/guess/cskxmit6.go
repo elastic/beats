@@ -13,9 +13,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -163,7 +163,7 @@ func (g *guessInet6CskXmit) Trigger() error {
 
 // Extract receives first the sock* from inet_csk_accept, then the arguments
 // from inet6_csk_xmit.
-func (g *guessInet6CskXmit) Extract(event interface{}) (common.MapStr, bool) {
+func (g *guessInet6CskXmit) Extract(event interface{}) (mapstr.M, bool) {
 	switch msg := event.(type) {
 	case *sockArgumentGuess:
 		g.sock = msg.Sock
@@ -175,7 +175,7 @@ func (g *guessInet6CskXmit) Extract(event interface{}) (common.MapStr, bool) {
 		}
 		if msg.Arg == g.sock {
 			// struct sock * is the first argument
-			return common.MapStr{
+			return mapstr.M{
 				"INET6_CSK_XMIT_SOCK":   g.ctx.Vars["P1"],
 				"INET6_CSK_XMIT_SKBUFF": g.ctx.Vars["P2"],
 			}, true
@@ -183,7 +183,7 @@ func (g *guessInet6CskXmit) Extract(event interface{}) (common.MapStr, bool) {
 		// struct sk_buff* is the first argument. Obtain sock* from sk_buff
 		off := indexAligned(msg.Dump[:], ((*[sizeOfPtr]byte)(unsafe.Pointer(&g.sock)))[:], 0, int(sizeOfPtr))
 		if off != -1 {
-			return common.MapStr{
+			return mapstr.M{
 				"INET6_CSK_XMIT_SOCK":   fmt.Sprintf("+%d(%s)", off, g.ctx.Vars["P1"]),
 				"INET6_CSK_XMIT_SKBUFF": g.ctx.Vars["P1"],
 			}, true

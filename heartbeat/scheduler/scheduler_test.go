@@ -86,7 +86,7 @@ func TestSchedulerRun(t *testing.T) {
 	executed := make(chan string)
 
 	initialEvents := uint32(10)
-	s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
 		executed <- "initial"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "initialCont"
@@ -94,6 +94,7 @@ func TestSchedulerRun(t *testing.T) {
 		}
 		return []TaskFunc{cont}
 	}), "http", nil)
+	require.NoError(t, err)
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
@@ -108,13 +109,13 @@ func TestSchedulerRun(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http", nil)
+	remove, err = s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http", nil)
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
 	postRemoveEvents := uint32(10)
-	s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
+	_, err = s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
 		executed <- "postRemove"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "postRemoveCont"
@@ -122,6 +123,7 @@ func TestSchedulerRun(t *testing.T) {
 		}
 		return []TaskFunc{cont}
 	}), "http", nil)
+	require.NoError(t, err)
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
@@ -160,7 +162,7 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 	executed := new(uint32)
 	waits := new(uint32)
 
-	s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
 		cont := func(_ context.Context) []TaskFunc {
 			// Make sure we actually wait for the task!
 			time.Sleep(time.Millisecond * 250)
@@ -169,6 +171,7 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 		}
 		return []TaskFunc{cont}
 	}, "http", func() { atomic.AddUint32(waits, 1) })
+	require.NoError(t, err)
 
 	s.WaitForRunOnce()
 	require.Equal(t, uint32(1), atomic.LoadUint32(executed))

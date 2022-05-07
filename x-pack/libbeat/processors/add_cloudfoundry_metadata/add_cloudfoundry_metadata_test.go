@@ -15,9 +15,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNoClient(t *testing.T) {
@@ -35,9 +35,9 @@ func TestNoCFApp(t *testing.T) {
 	}
 
 	evt := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{},
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{},
 			},
 		},
 	}
@@ -52,9 +52,9 @@ func TestCFAppIdInvalid(t *testing.T) {
 	}
 
 	evt := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{
 					"id": 1,
 				},
 			},
@@ -72,9 +72,9 @@ func TestCFAppNotFound(t *testing.T) {
 	}
 
 	evt := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{
 					"id": mustCreateFakeGuid(),
 				},
 			},
@@ -101,17 +101,17 @@ func TestCFAppMetadataAlreadyPresent(t *testing.T) {
 	}
 
 	evt := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{
 					"id":   guid,
 					"name": "Other App Name",
 				},
-				"space": common.MapStr{
+				"space": mapstr.M{
 					"id":   app.SpaceGuid,
 					"name": app.SpaceName,
 				},
-				"org": common.MapStr{
+				"org": mapstr.M{
 					"id":   app.OrgGuid,
 					"name": app.OrgName,
 				},
@@ -119,17 +119,17 @@ func TestCFAppMetadataAlreadyPresent(t *testing.T) {
 		},
 	}
 	expected := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{
 					"id":   guid,
 					"name": "Other App Name",
 				},
-				"space": common.MapStr{
+				"space": mapstr.M{
 					"id":   app.SpaceGuid,
 					"name": app.SpaceName,
 				},
-				"org": common.MapStr{
+				"org": mapstr.M{
 					"id":   app.OrgGuid,
 					"name": app.OrgName,
 				},
@@ -157,26 +157,26 @@ func TestCFAppUpdated(t *testing.T) {
 	}
 
 	evt := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{
 					"id": guid,
 				},
 			},
 		},
 	}
 	expected := beat.Event{
-		Fields: common.MapStr{
-			"cloudfoundry": common.MapStr{
-				"app": common.MapStr{
+		Fields: mapstr.M{
+			"cloudfoundry": mapstr.M{
+				"app": mapstr.M{
 					"id":   guid,
 					"name": app.Name,
 				},
-				"space": common.MapStr{
+				"space": mapstr.M{
 					"id":   app.SpaceGuid,
 					"name": app.SpaceName,
 				},
-				"org": common.MapStr{
+				"org": mapstr.M{
 					"id":   app.OrgGuid,
 					"name": app.OrgName,
 				},

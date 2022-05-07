@@ -22,7 +22,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // ServerConfig defines the user configurable tls options for any TCP based service.
@@ -94,7 +94,7 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 }
 
 // Unpack unpacks the TLS Server configuration.
-func (c *ServerConfig) Unpack(cfg common.Config) error {
+func (c *ServerConfig) Unpack(cfg config.C) error {
 	const clientAuthKey = "client_authentication"
 	const ca = "certificate_authorities"
 

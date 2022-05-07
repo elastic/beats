@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: http
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/http/_meta/docs.asciidoc
+
 
 [[metricbeat-module-http]]
 == HTTP module
@@ -17,6 +19,8 @@ This is often necessary in security restricted network setups, where Logstash is
 
 NOTE: As the HTTP metricsets also fetch headers, this can lead to lots of fields in Elasticsearch in case there are many different headers. If this is the case for you and you don't need the headers, we recommend to use processors to filter out the header field.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -72,3 +76,4 @@ include::http/json.asciidoc[]
 
 include::http/server.asciidoc[]
 
+:edit_url!:
