@@ -40,9 +40,9 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 	result["set_name"] = replStatus.Set
 	result["server_date"] = replStatus.Date
 	result["optimes"] = common.MapStr{
-		"last_committed": replStatus.OpTimes.LastCommitted.getTimeStamp(),
-		"applied":        replStatus.OpTimes.Applied.getTimeStamp(),
-		"durable":        replStatus.OpTimes.Durable.getTimeStamp(),
+		"last_committed": replStatus.OpTimes.LastCommitted.Ts.T,
+		"applied":        replStatus.OpTimes.Applied.Ts.T,
+		"durable":        replStatus.OpTimes.Durable.Ts.T,
 	}
 
 	// find lag and headroom
@@ -54,8 +54,8 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) common.MapStr
 		}
 
 		result["headroom"] = common.MapStr{
-			"max": oplogInfo.diff - minLag,
-			"min": oplogInfo.diff - maxLag,
+			"max": int64(oplogInfo.diff) - minLag,
+			"min": int64(oplogInfo.diff) - maxLag,
 		}
 	} else {
 		result["lag"] = common.MapStr{
