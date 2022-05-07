@@ -1,43 +1,5 @@
 version: '2.3'
 services:
-  beat:
-    build: ${PWD}/.
-    depends_on:
-      - proxy_dep
-    environment:
-      - BEAT_STRICT_PERMS=false
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - SREDIS_HOST=sredis
-      - SREDIS_PORT=6380
-      - LS_HOST=logstash
-      - LS_TCP_PORT=5044
-      - LS_TLS_PORT=5055
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9092
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
-      - KIBANA_USER=beats
-      - KIBANA_PASS=testing
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-      # ES_USER must be admin in order for the Go Integration tests to
-      # function because they require indices:data/read/search
-      - ES_USER=admin
-      - ES_PASS=testing
-      - ES_MONITORING_HOST=elasticsearch_monitoring
-      - ES_MONITORING_PORT=9200
-      - ES_HOST_SSL=elasticsearchssl
-      - ES_PORT_SSL=9200
-      - ES_SUPERUSER_USER=admin
-      - ES_SUPERUSER_PASS=testing
-    volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
-      # Used for docker integration tests:
-      - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /go/src/github.com/elastic/beats/libbeat
-    command: make
-
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
