@@ -20,6 +20,7 @@ package collstats
 import (
 	"context"
 	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 

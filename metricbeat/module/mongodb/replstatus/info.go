@@ -109,7 +109,7 @@ func getOpTimestamp(collection *mongo.Collection, sort string) (uint32, error) {
 	}
 
 	ts, ok := opTime["ts"].(primitive.Timestamp)
-	if !ok{
+	if !ok {
 		return 0, errors.New("an expected timestamp was not found")
 	}
 
