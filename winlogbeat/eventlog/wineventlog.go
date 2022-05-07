@@ -54,6 +54,9 @@ const (
 	// eventLoggingAPIName is the name used to identify the Event Logging API
 	// as both an event type and an API.
 	eventLoggingAPIName = "eventlogging"
+
+	// metaTTL is the length of time a WinMeta value is valid in the cache.
+	metaTTL = time.Hour
 )
 
 func init() {
@@ -429,21 +432,28 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 // winMetaCache retrieves and caches WinMeta tables by provider name.
 // It is a cut down version of the PublisherMetadataStore caching in wineventlog.Renderer.
 type winMetaCache struct {
-	mu     sync.RWMutex
-	cache  map[string]*winevent.WinMeta
+	ttl    time.Duration
 	logger *logp.Logger
+
+	mu    sync.RWMutex
+	cache map[string]winMetaCacheEntry
 }
 
-func newWinMetaCache() winMetaCache {
-	return winMetaCache{cache: make(map[string]*winevent.WinMeta), logger: logp.L()}
+type winMetaCacheEntry struct {
+	expire time.Time
+	*winevent.WinMeta
+}
+
+func newWinMetaCache(ttl time.Duration) winMetaCache {
+	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
 }
 
 func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 	c.mu.RLock()
-	m, ok := c.cache[provider]
+	e, ok := c.cache[provider]
 	c.mu.RUnlock()
-	if ok {
-		return m
+	if ok && time.Until(e.expire) > 0 {
+		return e.WinMeta
 	}
 
 	// Upgrade lock.
@@ -451,8 +461,10 @@ func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 	c.mu.Lock()
 
 	// Did the cache get updated during lock upgrade?
-	if m, ok := c.cache[provider]; ok {
-		return m
+	// No need to check expiry here since we must have a new entry
+	// if there is an entry at all.
+	if e, ok := c.cache[provider]; ok {
+		return e.WinMeta
 	}
 
 	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
@@ -463,9 +475,8 @@ func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 		logp.Warn("failed to load publisher metadata for %v (returning an empty metadata store): %v", provider, err)
 	}
 	s.Close()
-	m = &s.WinMeta
-	c.cache[provider] = m
-	return m
+	c.cache[provider] = winMetaCacheEntry{expire: time.Now().Add(c.ttl), WinMeta: &s.WinMeta}
+	return &s.WinMeta
 }
 
 func newEventLogging(options *conf.C) (EventLog, error) {
@@ -534,7 +545,7 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		renderBuf:    make([]byte, renderBufferSize),
 		outputBuf:    sys.NewByteBuffer(renderBufferSize),
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
-		winMetaCache: newWinMetaCache(),
+		winMetaCache: newWinMetaCache(metaTTL),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
 	}
 
