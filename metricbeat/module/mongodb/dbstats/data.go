@@ -24,8 +24,8 @@ import (
 
 var schema = s.Schema{
 	"db":          c.Str("db"),
-	"collections": c.Int("collections"),
-	"objects":     c.Int("objects"),
+	"collections": c.Ifc("collections"),
+	"objects":     c.Ifc("objects"),
 	"avg_obj_size": s.Object{
 		"bytes": c.Int("avgObjSize"),
 	},
@@ -35,8 +35,8 @@ var schema = s.Schema{
 	"storage_size": s.Object{
 		"bytes": c.Int("storageSize"),
 	},
-	"num_extents": c.Int("numExtents"),
-	"indexes":     c.Int("indexes"),
+	"num_extents": c.Int("numExtents", s.Optional),
+	"indexes":     c.Ifc("indexes"),
 	"index_size": s.Object{
 		"bytes": c.Int("indexSize"),
 	},
