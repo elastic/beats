@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"net/url"
 	"strings"
 	"time"
@@ -116,10 +117,11 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 		AuthMechanism:           c.Credentials.AuthMechanism,
 		AuthMechanismProperties: c.Credentials.AuthMechanismProperties,
 		AuthSource:              c.Credentials.AuthSource,
+		PasswordSet:             c.Credentials.PasswordSet,
 		Username:                c.Username,
 		Password:                c.Password,
-		PasswordSet:             false,
 	}
+	clientOptions.SetDirect(true)
 	clientOptions.ApplyURI(host)
 
 	// https://docs.mongodb.com/manual/reference/connection-string/
@@ -131,28 +133,55 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	return parse.NewHostDataFromURL(u), nil
 }
 
-// NewDirectSession estbalishes direct connections with a list of hosts. It uses the supplied
-// dialInfo parameter as a template for establishing more direct connections
-func NewDirectSession(uri string) (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI(uri)
-	isDirectConnection := true
-	clientOptions.Direct = &isDirectConnection
-
-	return mongo.Connect(context.TODO(), clientOptions)
-}
-
-func NewClient(config ModuleConfig, timeout time.Duration) (*mongo.Client, error) {
+func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (*mongo.Client, error) {
 	clientOptions := options.Client()
-	clientOptions.Auth = &options.Credential{
-		// TODO Support more auth mechanisms
-		AuthMechanism: "",
-		Username:      config.Username,
-		Password:      config.Password,
-		PasswordSet:   false,
-	}
-	directConnection := true
-	clientOptions.Direct = &directConnection
-	clientOptions.ConnectTimeout = &timeout
 
-	return mongo.NewClient(clientOptions)
+	// options.Credentials must be nil for the driver to work properly if no auth is provided. Zero values breaks
+	// the connnection
+	if config.Username != "" && config.Password != "" {
+		clientOptions.Auth = &options.Credential{
+			AuthMechanism: config.Credentials.AuthMechanism,
+			AuthSource:    config.Credentials.AuthSource,
+			Username:      config.Username,
+			Password:      config.Password,
+			PasswordSet:   config.Credentials.PasswordSet,
+		}
+
+		// clientOptions.Auth.AuthMechanismProperties is the only field here that might be nil, be empty or filled.
+		if config.Credentials.AuthMechanismProperties != nil {
+			clientOptions.Auth.AuthMechanismProperties = config.Credentials.AuthMechanismProperties
+		}
+	}
+	clientOptions.SetHosts(config.Hosts)
+
+	if mode == 0 {
+		mode = readpref.NearestMode
+	}
+
+	readPreference, err := readpref.New(mode)
+	if err != nil {
+		return nil, err
+	}
+	clientOptions.SetReadPreference(readPreference)
+	clientOptions.SetDirect(true)
+	clientOptions.SetConnectTimeout(timeout)
+
+	if config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+
+		clientOptions.SetTLSConfig(tlsConfig.ToConfig())
+	}
+
+	client, err := mongo.NewClient(clientOptions)
+	if err != nil {
+		return nil, fmt.Errorf("could not create mongodb client: %w", err)
+	}
+
+	if err = client.Connect(context.Background()); err != nil {
+		return client, fmt.Errorf("could not connect to mongodb: %w", err)
+	}
+	return client, nil
 }
