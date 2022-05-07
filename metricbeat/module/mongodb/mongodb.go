@@ -108,7 +108,7 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	// multiple hosts separated by commas (mongodb://host1,host2,host3?options).
 	u, err := url.Parse(host)
 	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	parse.SetURLUser(u, c.Username, c.Password)
@@ -128,7 +128,7 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	// https://docs.mongodb.com/manual/reference/connection-string/
 	_, err = url.Parse(clientOptions.GetURI())
 	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	return parse.NewHostDataFromURL(u), nil

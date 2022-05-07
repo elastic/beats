@@ -67,7 +67,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	defer func() {
-		client.Disconnect(context.Background())
+		_ = client.Disconnect(context.Background())
 	}()
 
 	db := client.Database("admin")
@@ -96,12 +96,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	event.MetricSetFields, _ = schema.Apply(result)
 
 	if v, err := event.MetricSetFields.GetValue("version"); err == nil {
-		event.RootFields.Put("service.version", v)
-		event.MetricSetFields.Delete("version")
+		_, _ = event.RootFields.Put("service.version", v)
+		_ = event.MetricSetFields.Delete("version")
 	}
 	if v, err := event.MetricSetFields.GetValue("process"); err == nil {
-		event.RootFields.Put("process.name", v)
-		event.MetricSetFields.Delete("process")
+		_, _ = event.RootFields.Put("process.name", v)
+		_ = event.MetricSetFields.Delete("process")
 	}
 	r.Event(event)
 

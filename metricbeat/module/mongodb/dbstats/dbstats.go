@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	defer func() {
-		client.Disconnect(context.Background())
+		_ = client.Disconnect(context.Background())
 	}()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each

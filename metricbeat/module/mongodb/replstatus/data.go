@@ -22,7 +22,7 @@ import (
 )
 
 func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
-	var result mapstr.M = make(mapstr.M)
+	var result = make(mapstr.M)
 
 	result["oplog"] = mapstr.M{
 		"size": mapstr.M{

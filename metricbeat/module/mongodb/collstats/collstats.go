@@ -65,7 +65,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	defer func() {
-		client.Disconnect(context.Background())
+		_ = client.Disconnect(context.Background())
 	}()
 
 	if err != nil {

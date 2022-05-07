@@ -114,7 +114,7 @@ func findUnhealthyHosts(members []Member) []string {
 	var hosts []string
 
 	for _, member := range members {
-		if member.Health == false {
+		if !member.Health {
 			hosts = append(hosts, member.Name)
 		}
 	}
