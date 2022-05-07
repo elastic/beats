@@ -1,6 +1,6 @@
 version: '2.3'
 services:
-  # This is a proxy used to block beats until all services are healthy.
+  # This is a proxy used to block "docker-compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
     image: busybox
