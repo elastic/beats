@@ -59,7 +59,7 @@ func (d *Decoder) decode(attrs []xml.Attr) (string, map[string]interface{}, erro
 	for {
 		t, err := d.xmlDec.Token()
 		if err != nil {
-			if err == io.EOF {
+			if err == io.EOF { //nolint:errorlint // io.EOF should never be wrapped and is not by xml.Decoder.
 				return "", elements, nil
 			}
 			return "", nil, err
