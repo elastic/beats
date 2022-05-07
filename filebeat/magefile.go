@@ -39,6 +39,8 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/containers"
 )
 
 func init() {
@@ -192,27 +194,6 @@ func ExportDashboard() error {
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
-}
-
-// BuildDockerComposeImages builds the integration test containers.
-func BuildIntegTestContainers() error {
-	return devtools.BuildIntegTestContainers()
-}
-
-// StartIntegTestContainers starts the integration test containers, waits until they are healthy, and leaves them in the background.
-func StartIntegTestContainers() error {
-	return devtools.StartIntegTestContainers()
-}
-
-// StopIntegTestContainers stops the containers started by StartIntegTestContainers.
-func StopIntegTestContainers() error {
-	return devtools.StopIntegTestContainers()
-}
-
-// PrintIntegTestComposeProject prints the compose project name used by the integ test docker-compose project.
-// Pass this to docker-compose with the -p option to interact with running containers.
-func PrintIntegTestComposeProject() {
-	fmt.Println(devtools.DockerComposeProjectName())
 }
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
