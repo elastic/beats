@@ -25,9 +25,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -90,7 +91,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	event := mb.Event{
-		RootFields: common.MapStr{},
+		RootFields: mapstr.M{},
 	}
 	event.MetricSetFields, _ = schema.Apply(result)
 
