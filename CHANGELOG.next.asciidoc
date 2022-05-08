@@ -32,6 +32,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
+- Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
 
 *Auditbeat*
 
