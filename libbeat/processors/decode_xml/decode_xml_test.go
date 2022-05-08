@@ -33,7 +33,7 @@ var (
 )
 
 func TestDecodeXML(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		description  string
 		config       decodeXMLConfig
 		Input        common.MapStr
@@ -268,7 +268,7 @@ func TestDecodeXML(t *testing.T) {
 			config: decodeXMLConfig{
 				Field: "message",
 			},
-			Input: mapstr.M{
+			Input: common.MapStr{
 				"message": `<?xml version="1.0" encoding="UTF-16"?>
 				<catalog>
 					<book>
@@ -278,8 +278,8 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			Output: mapstr.M{
-				"message": mapstr.M{
+			Output: common.MapStr{
+				"message": common.MapStr{
 					"catalog": map[string]interface{}{
 						"book": map[string]interface{}{
 							"author": "William H. Gaddis",
