@@ -264,6 +264,33 @@ func TestDecodeXML(t *testing.T) {
 			},
 		},
 		{
+			description: "Decoding with utf-16 proc inst utf-8 encoding",
+			config: decodeXMLConfig{
+				Field: "message",
+			},
+			Input: mapstr.M{
+				"message": `<?xml version="1.0" encoding="UTF-16"?>
+				<catalog>
+					<book>
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+					</book>
+				</catalog>`,
+			},
+			Output: mapstr.M{
+				"message": mapstr.M{
+					"catalog": map[string]interface{}{
+						"book": map[string]interface{}{
+							"author": "William H. Gaddis",
+							"review": "One of the great seminal American novels of the 20th century.",
+							"title":  "The Recognitions",
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "Decoding with broken XML format, with IgnoreFailure false",
 			config: decodeXMLConfig{
 				Field:         "message",
