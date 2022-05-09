@@ -108,7 +108,7 @@ filebeat.inputs:
     match: after
   close_removed: true
   close_renamed: true
-  exclude_files: java-exceptions.[4-5].log
+  exclude_files: java-exceptions[4-5]{1}.log
 
 - type: log
   enabled: true
@@ -123,14 +123,14 @@ filebeat.inputs:
   id: my-java-collector
   paths:
     - /var/log/java-exceptions*.log
-  prospector.scanner.exclude_files: java-exceptions.[1-3].log
+  prospector.scanner.exclude_files: java-exceptions[1-3]{1}.log
 
 - type: filestream
   enabled: true
   id: my-application-input
   paths:
     - /var/log/my-application*.json
-  prospector.scanner.exclude_files: my-application.[1-2].log
+  prospector.scanner.exclude_files: my-application[1-2]{1}.log
 
 - type: filestream
   enabled: true
