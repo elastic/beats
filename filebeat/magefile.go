@@ -204,7 +204,6 @@ func GoIntegTest(ctx context.Context) error {
 	args.Env["ES_USER"] = "beats"
 	args.Env["ES_PASS"] = "testing"
 	args.Env["KIBANA_HOST"] = "localhost"
-	args.Env["MOSQUITTO_HOST"] = "localhost"
 	return devtools.GoIntegTest(ctx, args)
 }
 

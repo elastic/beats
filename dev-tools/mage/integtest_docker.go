@@ -416,3 +416,35 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 		"TESTING_ENVIRONMENT": StackEnvironment,
 	}, nil
 }
+
+// WriteDockerComposeEnvFile generates a docker-compose environment variable file.
+func WriteDockerComposeEnvFile() (string, error) {
+	envFileContent := []string{
+		"# Environment variable file to pass to docker-compose with the --env-file option.",
+	}
+	envVarMap, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return "", err
+	}
+
+	for k, v := range envVarMap {
+		envFileContent = append(envFileContent, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	esBeatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return "", err
+	}
+
+	envFile := path.Join(esBeatsDir, "docker.env")
+	err = os.WriteFile(
+		envFile,
+		[]byte(strings.Join(envFileContent, "\n")),
+		0644,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	return envFile, nil
+}
