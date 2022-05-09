@@ -27,21 +27,32 @@ type prog struct {
 }
 
 const (
-	opNone         byte = iota
-	opCopy1             // copy next byte
-	opCopy2             // copy next 2 bytes
-	opCopy3             // copy next 3 bytes
-	opCopy4             // copy next 4 bytes
-	opCopyShort         // [op, len, content[len]]
-	opCopyLong          // [op, len1, len, content[len1<<8 + len]]
-	opNum               // [op, ft]
-	opNumPadded         // [op, ft, digits]
-	opExtNumPadded      // [op, ft, div, digits]
-	opZeros             // [op, count]
-	opTwoDigit          // [op, ft]
-	opTextShort         // [op, ft]
-	opTextLong          // [op, ft]
+	opNone              byte = iota
+	opCopy1                  // copy next byte
+	opCopy2                  // copy next 2 bytes
+	opCopy3                  // copy next 3 bytes
+	opCopy4                  // copy next 4 bytes
+	opCopyShort              // [op, len, content[len]]
+	opCopyLong               // [op, len1, len, content[len1<<8 + len]]
+	opNum                    // [op, ft]
+	opNumPadded              // [op, ft, digits]
+	opExtNumPadded           // [op, ft, divExp, digits]
+	opExtNumFractPadded      // [op, ft, divExp, digits, fractDigits]
+	opZeros                  // [op, count]
+	opTwoDigit               // [op, ft]
+	opTextShort              // [op, ft]
+	opTextLong               // [op, ft]
 )
+
+var pow10Table [10]int
+
+func init() {
+	x := 1
+	for i := range pow10Table {
+		pow10Table[i] = x
+		x *= 10
+	}
+}
 
 func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 	for i := 0; i < len(p.p); {
@@ -90,13 +101,23 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 			}
 			bytes = appendPadded(bytes, v, digits)
 		case opExtNumPadded:
-			ft, div, digits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2])
+			ft, divExp, digits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2])
+			div := pow10Table[divExp]
 			i += 3
 			v, err := getIntField(ft, ctx, t)
 			if err != nil {
 				return bytes, err
 			}
 			bytes = appendPadded(bytes, v/div, digits)
+		case opExtNumFractPadded:
+			ft, divExp, digits, fractDigits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2]), int(p.p[i+3])
+			div := pow10Table[divExp]
+			i += 4
+			v, err := getIntField(ft, ctx, t)
+			if err != nil {
+				return bytes, err
+			}
+			bytes = appendFractPadded(bytes, v/div, digits, fractDigits)
 		case opZeros:
 			digits := int(p.p[i])
 			i++
