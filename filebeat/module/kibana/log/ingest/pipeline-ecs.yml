@@ -11,6 +11,14 @@ processors:
     inline: 'ctx.json.keySet().each (key -> ctx[key] = ctx.json.get(key))'
 - remove:
     field: json
+- rename:
+    field: http.request.headers
+    target_field: kibana.log.meta.req.headers
+    ignore_missing: true
+- rename:
+    field: http.response.headers
+    target_field: kibana.log.meta.res.headers
+    ignore_missing: true
 - set:
     field: event.outcome
     value: success
