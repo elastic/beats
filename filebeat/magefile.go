@@ -36,7 +36,7 @@ import (
 	// mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
@@ -53,11 +53,6 @@ func init() {
 // Build builds the Beat binary.
 func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
-}
-
-// Builds the system test binary.
-func BuildSystemTestBinary() {
-	mg.Deps(devtools.BuildSystemTestBinary)
 }
 
 // GolangCrossBuild builds the Beat binary inside the golang-builder.
@@ -203,6 +198,6 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, Dashboards, BuildSystemTestBinary)
+	mg.Deps(Fields, Dashboards, unittest.BuildSystemTestBinary)
 	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
 }

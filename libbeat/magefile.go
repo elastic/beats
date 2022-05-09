@@ -45,11 +45,6 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// Builds the system test binary.
-func BuildSystemTestBinary() {
-	mg.Deps(devtools.BuildSystemTestBinary)
-}
-
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML("processors")
@@ -80,6 +75,6 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, BuildSystemTestBinary)
+	mg.Deps(Fields, unittest.BuildSystemTestBinary)
 	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
 }
