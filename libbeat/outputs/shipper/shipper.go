@@ -28,9 +28,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
@@ -40,6 +43,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+const fieldShipperID = "shipper.eventId"
 
 type shipper struct {
 	log      *logp.Logger
@@ -124,19 +129,36 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		meta, err := convertMapStr(e.Content.Meta)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
-			c.log.Errorf("%d/%d failed to convert event metadata to protobuf: %w", i+1, len(events), err)
+			c.log.Errorf("%d/%d failed to convert event metadata to protobuf, dropped: %w", i+1, len(events), err)
 			dropped++
 			continue
 		}
 
 		fields, err := convertMapStr(e.Content.Fields)
 		if err != nil {
-			c.log.Errorf("%d/%d failed to convert event fields to protobuf: %w", i+1, len(events), err)
+			c.log.Errorf("%d/%d failed to convert event fields to protobuf, dropped: %w", i+1, len(events), err)
+			dropped++
+			continue
+		}
+
+		uuid, err := uuid.DefaultGenerator.NewV4()
+		if err != nil {
+			// this is unrecoverable and happens only when the random generator fails
+			batch.Cancelled()
+			return fmt.Errorf("failed to generate an event UUID: %w", err)
+		}
+		eventID := uuid.String()
+
+		// storing for fast access when confirming the results
+		_, err = e.Content.Meta.Put(fieldShipperID, eventID)
+		if err != nil {
+			c.log.Errorf("%d/%d failed to set shipper event ID, dropped: %w", i+1, len(events), err)
 			dropped++
 			continue
 		}
 
 		grpcEvents = append(grpcEvents, &sc.Event{
+			EventId:   eventID,
 			Timestamp: timestamppb.New(e.Content.Timestamp),
 			Metadata:  meta.GetStructValue(),
 			Fields:    fields.GetStructValue(),
@@ -156,28 +178,41 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		})
 	}
 
+	st.Dropped(dropped)
 	c.log.Debugf("%d events converted to protobuf, %d dropped", len(grpcEvents), dropped)
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
-	_, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
+	resp, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
 		Events: grpcEvents,
 	})
 
-	if err != nil {
-		if status.Code(err) == codes.ResourceExhausted {
-			c.log.Warn("shipper's queue is full, more events cannot be accepted")
-			batch.Cancelled()
-		} else {
-			batch.Retry()
-		}
-		return fmt.Errorf("failed to publish the batch to the shipper: %w", err)
+	switch {
+
+	case resp == nil:
+		// if the response is nil, it means none of the events made it through due to a severe failure
+		batch.Cancelled()
+		st.Cancelled(len(events))
+		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(grpcEvents), err)
+		return nil
+
+	case status.Code(err) == codes.ResourceExhausted:
+		c.log.Warnf("shipper's queue is full, %d/%d events were accepted: %w", len(resp.Results), len(grpcEvents), err)
+
+	case status.Code(err) != codes.OK:
+		c.log.Errorf("failed to publish the full batch to the shipper, %d/%d events were accepted: %w", len(resp.Results), len(grpcEvents), err)
 	}
 
-	batch.ACK()
-
-	st.Dropped(dropped)
-	st.Acked(len(events) - dropped)
+	retries := c.findRetries(resp, events)
+	if len(retries) == 0 {
+		batch.ACK()
+		st.Acked(len(grpcEvents))
+		c.log.Debugf("%d events have been acknowledged, %d dropped", len(grpcEvents), dropped)
+	} else {
+		batch.RetryEvents(retries)
+		st.Failed(len(retries))
+		c.log.Debugf("%d events have been acknowledged, %d sent for retry, %d dropped", len(grpcEvents), len(retries), dropped)
+	}
 
 	return nil
 }
@@ -188,6 +223,39 @@ func (c *shipper) Close() error {
 
 func (c *shipper) String() string {
 	return "shipper"
+}
+
+func (c *shipper) findRetries(resp *sc.PublishReply, events []publisher.Event) []publisher.Event {
+	// build a set of IDs for fast access below
+	acceptedIDs := make(map[string]struct{}, len(resp.Results))
+	for _, r := range resp.Results {
+		acceptedIDs[r.EventId] = struct{}{}
+	}
+
+	retries := make([]publisher.Event, 0, len(events)-len(acceptedIDs))
+
+	// we must range the original event list to retain the order
+	for _, e := range events {
+		// if the event has no shipper it was dropped, we just skip it
+		eventID, err := e.Content.Meta.GetValue(fieldShipperID)
+		if err != nil {
+			continue
+		}
+
+		eventIDStr, ok := eventID.(string)
+		if !ok {
+			continue
+		}
+
+		_, ok = acceptedIDs[eventIDStr]
+		if ok {
+			continue
+		}
+
+		retries = append(retries, e)
+	}
+
+	return retries
 }
 
 func convertMapStr(m mapstr.M) (*structpb.Value, error) {
