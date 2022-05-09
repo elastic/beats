@@ -429,9 +429,6 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	return r
 }
 
-<<<<<<< HEAD
-func newEventLogging(options *common.Config) (EventLog, error) {
-=======
 // winMetaCache retrieves and caches WinMeta tables by provider name.
 // It is a cut down version of the PublisherMetadataStore caching in wineventlog.Renderer.
 type winMetaCache struct {
@@ -482,8 +479,7 @@ func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 	return &s.WinMeta
 }
 
-func newEventLogging(options *conf.C) (EventLog, error) {
->>>>>>> 9fc1c71e58 (winlogbeat/eventlog: cache winevent.WinMeta values (#31504))
+func newEventLogging(options *common.Config) (EventLog, error) {
 	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
 	return newWinEventLog(options)
 }
