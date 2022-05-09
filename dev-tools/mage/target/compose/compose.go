@@ -59,7 +59,7 @@ func (c Compose) composeForEachVariant(action, message string) error {
 		return errors.Wrap(err, "finding supported versions files")
 	}
 
-	virtualenv, err := devtools.PythonVirtualenv()
+	virtualenv, err := devtools.PythonVirtualenv(false)
 	if err != nil {
 		return errors.Wrap(err, "configuring Python virtual environment")
 	}
