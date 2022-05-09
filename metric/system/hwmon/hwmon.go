@@ -128,7 +128,7 @@ func (s Sensor) Fetch(path string) (SensorMetrics, error) {
 	// Not sure if we want this to be an error, since a lot of OSes, particularly stuff running inside a VM,
 	// will just have this invalid hwmon entries with labels but no values. We may want this to be a log-level error instead.
 	inputName := s.getName("input")
-	input, err := getAndDiv(inputName, path, s.DevType)
+	input, err := getValueForSensor(inputName, path, s.DevType)
 	if os.IsNotExist(err) {
 		return SensorMetrics{}, ErrNoMetric
 	} else if err != nil {
@@ -144,19 +144,19 @@ func (s Sensor) Fetch(path string) (SensorMetrics, error) {
 	// Other special metrics for some sensors
 	// We don't want to bulk fetch these with a glob or something, we'll just end up picking up a bunch of garbage
 	critName := s.getName("crit")
-	critVal, _ := getAndDiv(critName, path, s.DevType)
+	critVal, _ := getValueForSensor(critName, path, s.DevType)
 	sensorData.Critical = critVal
 
 	maxName := s.getName("max")
-	maxVal, _ := getAndDiv(maxName, path, s.DevType)
+	maxVal, _ := getValueForSensor(maxName, path, s.DevType)
 	sensorData.Max = maxVal
 
 	lowestName := s.getName("lowest")
-	lowestVal, _ := getAndDiv(lowestName, path, s.DevType)
+	lowestVal, _ := getValueForSensor(lowestName, path, s.DevType)
 	sensorData.Lowest = lowestVal
 
 	avgName := s.getName("average")
-	avgVal, _ := getAndDiv(avgName, path, s.DevType)
+	avgVal, _ := getValueForSensor(avgName, path, s.DevType)
 	sensorData.Average = avgVal
 
 	return sensorData, nil
@@ -230,31 +230,36 @@ func stringStrip(name, path string) (string, error) {
 }
 
 // another helper that adds strconv
-func stringStripInt(name, path string) (int64, error) {
+func stringStripInt(name, path string) (opt.Uint, error) {
 	raw, err := stringStrip(name, path)
 	//passthrough errors for file-not-found
 	if err != nil {
-		return 0, err
+		return opt.NewUintNone(), err
 	}
 	conv, err := strconv.ParseInt(raw, 10, 64)
 	if err != nil {
-		return 0, fmt.Errorf("error converting value %s: %w", raw, err)
+		return opt.NewUintNone(), fmt.Errorf("error converting value %s: %w", raw, err)
 	}
-	return conv, nil
+	return opt.UintWith(uint64(conv)), nil
 }
 
-// Another helper that's used for float64 metrics where celsius values get divided from millidegrees.
-func getAndDiv(name, path string, st SensorType) (opt.Uint, error) {
+// Another helper that's used for float64 metrics/
+// This will also convert millicelsius values to celsius.
+func getValueForSensor(name, path string, st SensorType) (opt.Uint, error) {
 	intval, err := stringStripInt(name, path)
 	if err != nil {
 		return opt.NewUintNone(), fmt.Errorf("error fetching int val %s: %w", name, err)
 	}
 
 	if st == TempSensor {
-		intval = intval / 1000
+		intval = millicelsiusToCelsius(intval)
 	}
 
-	return opt.UintWith(uint64(intval)), nil
+	return intval, nil
+}
+
+func millicelsiusToCelsius(in opt.Uint) opt.Uint {
+	return opt.UintWith(in.ValueOr(0) / 1000)
 }
 
 func getSensorType(in string) (SensorType, bool) {

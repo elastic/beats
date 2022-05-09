@@ -69,6 +69,43 @@ func TestExamples(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	// This is meant to test how this library would be used by a metricset.
+	/*
+			Example output:
+			Sensor coretemp: {
+		          "core_0": {
+		            "critical": {
+		              "celsius": 91
+		            },
+		            "max": {
+		              "celsius": 81
+		            },
+		            "temp": {
+		              "celsius": 49
+		            }
+		          "core_3": {
+		            "critical": {
+		              "celsius": 91
+		            },
+		            "max": {
+		              "celsius": 81
+		            },
+		            "temp": {
+		              "celsius": 52
+		            }
+		          },
+		          "package_id_0": {
+		            "critical": {
+		              "celsius": 91
+		            },
+		            "max": {
+		              "celsius": 81
+		            },
+		            "temp": {
+		              "celsius": 53
+		            }
+		          }
+		        }
+	*/
 
 	_, err := os.Stat(filepath.Join(baseDir, "hwmon0"))
 	if os.IsNotExist(err) {
