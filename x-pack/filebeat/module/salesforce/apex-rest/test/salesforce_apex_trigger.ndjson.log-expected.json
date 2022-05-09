@@ -1,50 +1,31 @@
-{
-  "docs": [
+[
     {
-      "doc": {
-        "_index": "_index",
-        "_type": "_doc",
-        "_id": "_id",
-        "_source": {
-          "salesforce": {
-            "access_mode": "rest",
-            "apex": {
-              "request_status": "",
-              "cpu_time": 3,
-              "login_key": "",
-              "run_time": "",
-              "entity_name": "Book__c",
-              "trigger_type": "BeforeInsert",
-              "db_total_time": "",
-              "uri_id_derived": "",
-              "trigger_name": "HelloWorldTrigger",
-              "user_id_derived": "0055j000000utlPAAQ",
-              "event_type": "ApexTrigger",
-              "organization_id": "00D5j000000VI3n",
-              "request_id": "4fDkS1iz2_p5i-l1cJOqAV",
-              "trgger_id": "01q5j000000ClvF"
-            }
-          },
-          "@timestamp": "2021-11-02T09:25:02.894Z",
-          "event": {
-            "duration": 4,
-            "ingested": "2021-12-09T11:55:32.584460538Z",
-            "kind": "event",
-            "module": "salesforce",
-            "action": "apex-trigger",
-            "type": "connection",
-            "dataset": "salesforce.apex",
-            "url": ""
-          },
-          "user": {
-            "roles": "",
-            "id": "0055j000000utlP"
-          }
-        },
-        "_ingest": {
-          "timestamp": "2021-12-09T11:55:32.584460538Z"
-        }
-      }
+        "@timestamp": "2021-11-02T09:25:02.894Z",
+        "event.action": "apex-trigger",
+        "event.dataset": "salesforce.apex",
+        "event.duration": 4,
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.timezone": "-02:00",
+        "event.type": "connection",
+        "fileset.name": "apex-rest",
+        "input.type": "log",
+        "log.offset": 0,
+        "salesforce.access_mode": "rest",
+        "salesforce.apex.cpu_time": 3,
+        "salesforce.apex.entity_name": "Book__c",
+        "salesforce.apex.event_type": "ApexTrigger",
+        "salesforce.apex.organization_id": "00D5j000000VI3n",
+        "salesforce.apex.request.id": "4fDkS1iz2_p5i-l1cJOqAV",
+        "salesforce.apex.trigger.id": "01q5j000000ClvF",
+        "salesforce.apex.trigger.name": "HelloWorldTrigger",
+        "salesforce.apex.trigger.type": "BeforeInsert",
+        "salesforce.apex.user_id_derived": "0055j000000utlPAAQ",
+        "service.type": "salesforce",
+        "tags": [
+            "forwarded",
+            "salesforce-apex-rest"
+        ],
+        "user.id": "0055j000000utlP"
     }
-  ]
-}
+]

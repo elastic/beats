@@ -29,7 +29,7 @@
         - name: client_name
           type: keyword
           description: >
-            The name of the client that’s using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didnt specify a client in the CallOptions header.
+            The name of the client that's using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didnt specify a client in the CallOptions header.
         - name: cpu_time
           type: keyword
           description: >
@@ -77,7 +77,7 @@
         - name: is_long_running_request
           type: keyword
           description: >
-            Indicates whether the request is counted against your org’s concurrent long-running Apex request limit (true) or not (false).
+            Indicates whether the request is counted against your org's concurrent long-running Apex request limit (true) or not (false).
         - name: limit
           type: keyword
           description: >
@@ -85,11 +85,11 @@
         - name: limit_usage_percent
           type: keyword
           description: >
-            The percentage of Apex SOAP calls that were made against the organization’s limit.
+            The percentage of Apex SOAP calls that were made against the organization's limit.
         - name: login_key
           type: keyword
           description: >
-            The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+            The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
         - name: media_type
           type: keyword
           description: >
@@ -141,7 +141,7 @@
         - name: rows.total
           type: keyword
           description: >
-            Total number of records in the result set. The value is always -1 if the custom adapter’s DataSource.Provider class doesn’t declare the QUERY_TOTAL_SIZE capability.
+            Total number of records in the result set. The value is always -1 if the custom adapter's DataSource.Provider class doesn't declare the QUERY_TOTAL_SIZE capability.
         - name: rows.fetched
           type: keyword
           description: >
@@ -166,18 +166,21 @@
           type: keyword
           description: >
             Number of records retrieved in one second.
-        - name: triggerid
-          type: keyword
-          description: >
-            The 15-character ID of the trigger that was fired.
-        - name: trigger.name
-          type: keyword
-          description: >
-            For triggers coming from managed packages, TRIGGER_NAME includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
-        - name: trigger.type
-          type: keyword
-          description: >
-            The type of this trigger.
+        - name: trigger
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                The 15-character ID of the trigger that was fired.
+            - name: name
+              type: keyword
+              description: >
+                For triggers coming from managed packages, TRIGGER_NAME includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
+            - name: type
+              type: keyword
+              description: >
+                The type of this trigger.
         - name: type
           type: keyword
           description: >
@@ -185,11 +188,11 @@
         - name: uri
           type: keyword
           description: >
-            The URI of the page that’s receiving the request.
+            The URI of the page that's receiving the request.
         - name: uri_id_derived
           type: keyword
           description: >
-            The 18-character case-safe ID of the URI of the page that’s receiving the request.
+            The 18-character case-safe ID of the URI of the page that's receiving the request.
         - name: user_agent
           type: keyword
           description: >
@@ -197,4 +200,4 @@
         - name: user_id_derived
           type: keyword
           description: >
-            The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.
+            The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
