@@ -91,7 +91,7 @@ func PythonAutopep8() error {
 	}
 
 	fmt.Println(">> fmt - autopep8: Formatting Python code")
-	ve, err := PythonVirtualenv()
+	ve, err := PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}

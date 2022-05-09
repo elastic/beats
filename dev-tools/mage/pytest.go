@@ -114,7 +114,8 @@ func DefaultPythonTestIntegrationArgs() PythonTestArgs { return makePythonTestAr
 func PythonTest(params PythonTestArgs) error {
 	fmt.Println(">> python test:", params.TestName, "Testing")
 
-	ve, err := PythonVirtualenv()
+	// Only activate the virtualenv if necessary.
+	ve, err := PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}
@@ -204,7 +205,7 @@ func PythonTestForModule(params PythonTestArgs) error {
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
 // defined in the requirements file pointed to by requirementsTxt. It returns
 // the path to the virtualenv.
-func PythonVirtualenv() (string, error) {
+func PythonVirtualenv(forceActivate bool) (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
 
@@ -226,7 +227,7 @@ func PythonVirtualenv() (string, error) {
 	// Only execute if requirements.txt is newer than the virtualenv activate
 	// script.
 	activate := virtualenvPath(ve, "activate")
-	if IsUpToDate(activate, reqs...) {
+	if !forceActivate && IsUpToDate(activate, reqs...) {
 		return pythonVirtualenvDir, nil
 	}
 

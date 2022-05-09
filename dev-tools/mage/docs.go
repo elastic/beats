@@ -70,7 +70,7 @@ var Docs = docsBuilder{}
 // FieldDocs generates docs/fields.asciidoc from the specified fields.yml file.
 func (docsBuilder) FieldDocs(fieldsYML string) error {
 	// Run the docs_collector.py script.
-	ve, err := PythonVirtualenv()
+	ve, err := PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}
