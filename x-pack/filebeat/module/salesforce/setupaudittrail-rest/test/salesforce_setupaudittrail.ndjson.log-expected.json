@@ -1,45 +1,29 @@
-{
-  "docs": [
+[
     {
-      "doc": {
-        "_index": "_index",
-        "_type": "_doc",
-        "_id": "_id",
-        "_source": {
-          "salesforce": {
-            "access_mode": "rest",
-            "setup_audit_trail": {
-              "section": "Manage Users",
-              "event_type": "SetupAuditTrail",
-              "created_by_id": "1234j000000q9s7ABC",
-              "display": "For user abc.def@mail.com, the User Verified Email status changed to verified"
-            }
-          },
-          "@timestamp": "2021-10-06T07:13:07.000Z",
-          "event": {
-            "ingested": "2021-12-10T09:40:12.878386514Z",
-            "created": "2021-10-06T07:13:07.000Z",
-            "kind": "event",
-            "module": "salesforce",
-            "action": "changedUserEmailVerifiedStatusVerified",
-            "id": "0Ym5j12345BJKvABCD",
-            "type": "admin",
-            "dataset": "salesforce.setupaudittrail",
-            "url": "/services/data/v52.0/sobjects/SetupAuditTrail/0Ym5j12345BJKvZCAX"
-          },
-          "user": {
-            "id": "1234j000000q9s7ABC",
-            "target": {
-              "user": {
-                "name": "abc.def@mail.com"
-              }
-            }
-          }
-        },
-        "_ingest": {
-          "timestamp": "2021-12-14T09:45:04.174461015Z"
-        }
-      }
+        "@timestamp": "2021-10-06T07:13:07.000Z",
+        "event.action": "changedUserEmailVerifiedStatusVerified",
+        "event.dataset": "salesforce.setupaudittrail",
+        "event.id": "0Ym5j12345BJKvABCD",
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.original": "{\"attributes\":{\"type\":\"SetupAuditTrail\",\"url\":\"/services/data/v52.0/sobjects/SetupAuditTrail/0Ym5j12345BJKvZCAX\"},\"Action\":\"changedUserEmailVerifiedStatusVerified\",\"CreatedByContext\":null,\"CreatedById\":\"1234j000000q9s7ABC\",\"CreatedByIssuer\":null,\"CreatedDate\":\"2021-10-06T07:13:07.000+0000\",\"DelegateUser\":null,\"Display\":\"For user abc.def@mail.com, the User Verified Email status changed to verified\",\"Id\":\"0Ym5j12345BJKvABCD\",\"ResponsibleNamespacePrefix\":null,\"Section\":\"Manage Users\"}",
+        "event.timezone": "-02:00",
+        "event.type": "admin",
+        "event.url": "/services/data/v52.0/sobjects/SetupAuditTrail/0Ym5j12345BJKvZCAX",
+        "fileset.name": "setupaudittrail-rest",
+        "input.type": "log",
+        "log.offset": 0,
+        "salesforce.access_mode": "rest",
+        "salesforce.setup_audit_trail.created_by_id": "1234j000000q9s7ABC",
+        "salesforce.setup_audit_trail.display": "For user abc.def@mail.com, the User Verified Email status changed to verified",
+        "salesforce.setup_audit_trail.event_type": "SetupAuditTrail",
+        "salesforce.setup_audit_trail.section": "Manage Users",
+        "service.type": "salesforce",
+        "tags": [
+            "forwarded",
+            "salesforce-setupaudittrail-rest"
+        ],
+        "user.id": "1234j000000q9s7ABC",
+        "user.name": "abc.def@mail.com"
     }
-  ]
-}
+]

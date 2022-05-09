@@ -107,7 +107,7 @@ processors:
     ignore_failure: true
 - dissect:
     field: temp_setup_audit_trail_display
-    pattern: "For user %{user.target.user.name}, %{?}"
+    pattern: "For user %{user.name}, %{?}"
     ignore_failure: true
 
 #############
