@@ -33,22 +33,27 @@ func init() {
 	)
 }
 
+type query struct {
+	Query          string `config:"query" validate:"nonzero,required"`
+	ResponseFormat string `config:"response_format" validate:"nonzero,required"`
+}
+
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config config
-
+	Config struct {
+		Driver         string `config:"driver" validate:"nonzero,required"`
+		ResponseFormat string `config:"sql_response_format"`
+		// New flag
+		RawData rawData `config:"raw_data"`
+		// Support either the previous query / or the new list of queries.
+		Query   string  `config:"sql_query" `
+		Queries []query `config:"sql_queries" `
+	}
 	db *sqlx.DB
-}
-
-type config struct {
-	Driver         string  `config:"driver" validate:"nonzero,required"`
-	Query          string  `config:"sql_query" validate:"nonzero,required"`
-	ResponseFormat string  `config:"sql_response_format"`
-	RawData        rawData `config:"raw_data"`
 }
 
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
@@ -62,20 +67,21 @@ type rawData struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
-	cfg := config{ResponseFormat: tableResponseFormat}
+	b := &MetricSet{BaseMetricSet: base}
 
-	if err := base.Module().UnpackConfig(&cfg); err != nil {
+	if err := base.Module().UnpackConfig(&b.Config); err != nil {
 		return nil, err
 	}
 
-	if cfg.ResponseFormat != variableResponseFormat && cfg.ResponseFormat != tableResponseFormat {
-		return nil, fmt.Errorf("invalid sql_response_format value: %s", cfg.ResponseFormat)
+	if b.Config.ResponseFormat != "" && b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
+		return nil, fmt.Errorf("invalid sql_response_format value: %s", b.Config.ResponseFormat)
 	}
 
-	return &MetricSet{
-		BaseMetricSet: base,
-		config:        cfg,
-	}, nil
+	if b.Config.Query == "" && len(b.Config.Queries) == 0 {
+		return nil, fmt.Errorf("No query input provided.")
+	}
+
+	return b, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -84,39 +90,51 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
-	db, err := sql.NewDBClient(m.config.Driver, m.HostData().URI, m.Logger())
+	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return fmt.Errorf("could not open connection: %w", err)
 	}
 	defer db.Close()
 
-	if m.config.ResponseFormat == tableResponseFormat {
-		mss, err := db.FetchTableMode(ctx, m.config.Query)
-		if err != nil {
-			return err
-		}
-
-		for _, ms := range mss {
-			m.reportEvent(ms, reporter)
-		}
-
-		return nil
+	var queries []query
+	if len(m.Config.Queries) > 0 {
+		queries = m.Config.Queries
+	} else {
+		var one_query query
+		one_query.Query = m.Config.Query
+		one_query.ResponseFormat = m.Config.ResponseFormat
+		queries = append(queries, one_query)
 	}
 
-	ms, err := db.FetchVariableMode(ctx, m.config.Query)
-	if err != nil {
-		return err
-	}
+	for _, q := range queries {
+		if q.ResponseFormat == tableResponseFormat {
+			// Table format
+			mss, err := db.FetchTableMode(ctx, q.Query)
+			if err != nil {
+				return err
+			}
 
-	m.reportEvent(ms, reporter)
+			for _, ms := range mss {
+				m.reportEvent(ms, reporter, q.Query)
+			}
+		} else {
+			// Variable format
+			ms, err := db.FetchVariableMode(ctx, q.Query)
+			if err != nil {
+				return err
+			}
+
+			m.reportEvent(ms, reporter, q.Query)
+		}
+	}
 
 	return nil
 }
 
 // reportEvent using 'user' mode with keys under `sql.metrics.*` or using Raw data mode (module and metricset key spaces
 // provided by the user)
-func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2) {
-	if m.config.RawData.Enabled {
+func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) {
+	if m.Config.RawData.Enabled {
 
 		// Provide results as text mapping.
 		jsonString, _ := json.Marshal(ms)
@@ -124,18 +142,18 @@ func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2) {
 		reporter.Event(mb.Event{
 			// New usage
 			ModuleFields: mapstr.M{
-				"metrics": ms, // Individual result metric
+				"metrics": ms, // Individual metric
 				"results": string(jsonString),
-				"driver":  m.config.Driver,
-				"query":   m.config.Query,
+				"driver":  m.Config.Driver,
+				"query":   qry,
 			},
 		})
 	} else {
 		reporter.Event(mb.Event{
 			// Previous usage
 			ModuleFields: mapstr.M{
-				"driver":  m.config.Driver,
-				"query":   m.config.Query,
+				"driver":  m.Config.Driver,
+				"query":   qry,
 				"metrics": inferTypeFromMetrics(ms),
 			},
 		})
