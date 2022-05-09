@@ -187,20 +187,12 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		Events: grpcEvents,
 	})
 
-	switch {
-
-	case resp == nil:
+	if status.Code(err) != codes.OK {
 		// if the response is nil, it means none of the events made it through due to a severe failure
 		batch.Cancelled()
 		st.Cancelled(len(events))
 		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(grpcEvents), err)
 		return nil
-
-	case status.Code(err) == codes.ResourceExhausted:
-		c.log.Warnf("shipper's queue is full, %d/%d events were accepted: %w", len(resp.Results), len(grpcEvents), err)
-
-	case status.Code(err) != codes.OK:
-		c.log.Errorf("failed to publish the full batch to the shipper, %d/%d events were accepted: %w", len(resp.Results), len(grpcEvents), err)
 	}
 
 	retries := c.findRetries(resp, events)

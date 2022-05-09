@@ -2,9 +2,6 @@ package api
 
 import (
 	context "context"
-
-	"google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 func NewProducerMock(cap int) *ProducerMock {
@@ -25,7 +22,7 @@ func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*P
 
 	for _, e := range r.Events {
 		if len(p.Q) == cap(p.Q) {
-			return resp, status.Errorf(codes.ResourceExhausted, "queue capacity reached")
+			return resp, nil
 		}
 
 		p.Q = append(p.Q, e)

@@ -140,9 +140,6 @@ func TestPublish(t *testing.T) {
 					Tag:    outest.BatchRetryEvents,
 					Events: toPublisherEvents(events[1:]),
 				},
-				{
-					Tag: outest.BatchACK,
-				},
 			},
 			qSize: 1,
 		},
