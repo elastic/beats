@@ -154,9 +154,18 @@ func TestExtraArgs(t *testing.T) {
 			[]string{"--no-throttling"},
 		},
 		{
-			"override throttling",
+			"override throttling - text format",
 			&Config{Throttling: "10d/3u/20l"},
 			[]string{"--throttling", "10d/3u/20l"},
+		},
+		{
+			"override throttling - JSON format",
+			&Config{Throttling: map[string]interface{}{
+				"download": 10,
+				"upload":   3,
+				"latency":  20,
+			}},
+			[]string{"--throttling", `{"download":10,"latency":20,"upload":3}`},
 		},
 		{
 			"ignore_https_errors",
