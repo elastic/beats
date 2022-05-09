@@ -6,6 +6,12 @@ var:
   - name: tags
     default: [salesforce-login-rest, forwarded]
   - name: proxy_url
+  - name: client_id
+  - name: client_secret
+  - name: token_url
+  - name: user
+  - name: password
+  - name: url
   
 ingest_pipeline:
   - ingest/pipeline.yml
