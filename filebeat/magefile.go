@@ -40,7 +40,7 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/containers"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 )
 
 func init() {

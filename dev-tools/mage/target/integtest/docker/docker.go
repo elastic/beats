@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package containers
+package docker
 
 import (
 	"fmt"
@@ -24,25 +24,25 @@ import (
 	"github.com/magefile/mage/mg"
 )
 
-type IntegTest mg.Namespace
+type Docker mg.Namespace
 
-// BuildDockerComposeImages builds the integration test containers.
-func (IntegTest) BuildContainers() error {
+// ComposeBuild builds the docker-compose containers.
+func (Docker) ComposeBuild() error {
 	return devtools.BuildIntegTestContainers()
 }
 
-// StartIntegTestContainers starts the integration test containers, waits until they are healthy, and leaves them in the background.
-func (IntegTest) StartContainers() error {
+// ComposeUp starts the docker-compose containers, waits until they are healthy, and leaves them in the background.
+func (Docker) ComposeUp() error {
 	return devtools.StartIntegTestContainers()
 }
 
-// StopIntegTestContainers stops the containers started by StartIntegTestContainers.
-func (IntegTest) StopContainers() error {
+// ComposeDown stops the docker-compose containers started by ComposeUp.
+func (Docker) ComposeDown() error {
 	return devtools.StopIntegTestContainers()
 }
 
-// PrintIntegTestComposeProject prints the compose project name used by the integ test docker-compose project.
+// ComposeProject prints the docker-compose project name used when starting containers.
 // Pass this to docker-compose with the -p option to interact with running containers.
-func (IntegTest) PrintComposeProject() {
+func (Docker) ComposeProject() {
 	fmt.Println(devtools.DockerComposeProjectName())
 }
