@@ -15,8 +15,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type PushedSource struct {
@@ -70,23 +71,28 @@ func (p *PushedSource) Fetch() error {
 }
 
 type PackageJSON struct {
-	Name         string        `json:"name"`
-	Private      bool          `json:"private"`
-	Dependencies common.MapStr `json:"dependencies"`
+	Name         string   `json:"name"`
+	Private      bool     `json:"private"`
+	Dependencies mapstr.M `json:"dependencies"`
 }
 
+// setupProjectDir sets ups the required package.json file and
+// links the synthetics dependency to the globally installed one that is
+// baked in to the HB to maintain compatability and allows us to control the
+// agent version
 func setupProjectDir(workdir string) error {
-	// TODO: Link to the globally installed synthetics version
 	fname, err := exec.LookPath("elastic-synthetics")
 	if err == nil {
 		fname, err = filepath.Abs(fname)
 	}
 
+	globalPath := strings.Replace(fname, "bin/elastic-synthetics", "lib/node_modules/@elastic/synthetics", 1)
+	symlinkPath := fmt.Sprintf("file:%s", globalPath)
 	pkgJson := PackageJSON{
 		Name:    "pushed-journey",
 		Private: true,
-		Dependencies: common.MapStr{
-			"@elastic/synthetics": "",
+		Dependencies: mapstr.M{
+			"@elastic/synthetics": symlinkPath,
 		},
 	}
 	pkgJsonContent, err := json.MarshalIndent(pkgJson, "", "  ")
