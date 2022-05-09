@@ -20,22 +20,22 @@ package shovel
 import (
 	"encoding/json"
 
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
 	schema = s.Schema{
-		"name":        c.Str("name"),
-		"vhost":       c.Str("vhost"),
-		"type":        c.Str("type"),
-		"node":        c.Str("node"),
-		"state":       c.Str("state"),
+		"name":  c.Str("name"),
+		"vhost": c.Str("vhost"),
+		"type":  c.Str("type"),
+		"node":  c.Str("node"),
+		"state": c.Str("state"),
 	}
 )
 
@@ -43,7 +43,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var shovels []map[string]interface{}
 	err := json.Unmarshal(content, &shovels)
 	if err != nil {
-		return errors.Wrap(err, "error in mapping")
+		return fmt.Errorf("error in mapping: %w", err)
 	}
 
 	for _, shovel := range shovels {
@@ -59,13 +59,13 @@ func eventMapping(shovel map[string]interface{}) mb.Event {
 
 	moduleFields := mapstr.M{}
 	if v, err := fields.GetValue("vhost"); err == nil {
-		moduleFields.Put("vhost", v)
-		fields.Delete("vhost")
+		_, _ = moduleFields.Put("vhost", v)
+		_ = fields.Delete("vhost")
 	}
 
 	if v, err := fields.GetValue("node"); err == nil {
-		moduleFields.Put("node.name", v)
-		fields.Delete("node")
+		_, _ = moduleFields.Put("node.name", v)
+		_ = fields.Delete("node")
 	}
 
 	event := mb.Event{

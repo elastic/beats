@@ -20,10 +20,11 @@ package shovel
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -40,7 +41,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 
 	ee, _ := e.Fields.GetValue("rabbitmq.shovel")
-	event := ee.(mapstr.M)
+	event, _ := ee.(mapstr.M)
 
 	assert.Equal(t, "testshovel", event["name"])
 	assert.Equal(t, "running", event["state"])

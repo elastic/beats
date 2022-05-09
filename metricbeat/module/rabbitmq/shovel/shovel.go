@@ -18,9 +18,10 @@
 package shovel
 
 import (
-	"github.com/pkg/errors"
-	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq"
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq"
 )
 
 func init() {
@@ -49,7 +50,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	return eventsMapping(content, report)
