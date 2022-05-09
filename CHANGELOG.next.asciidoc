@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
+- Fix resource handle leak during event log enrichment. {pull}31504[31504]
 
 *Functionbeat*
 
