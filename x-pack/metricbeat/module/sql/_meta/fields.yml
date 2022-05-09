@@ -15,9 +15,6 @@
           type: text
           description: >
             Text output of the executed query.
-        - name: metrics.*
-          description: >
-            Metrics of the executed query.
         - name: query
           type: keyword
           description: >
