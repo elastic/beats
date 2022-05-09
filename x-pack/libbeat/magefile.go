@@ -8,15 +8,18 @@
 package main
 
 import (
+	"context"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/magefile/mage/mg"
 
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -40,4 +43,21 @@ func Fields() error {
 // were built and only performs the merge.
 func AssembleDarwinUniversal() error {
 	return build.AssembleDarwinUniversal()
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// GoIntegTest starts the docker containers and executes the Go integration tests.
+func GoIntegTest(ctx context.Context) error {
+	mg.Deps(Fields)
+	return devtools.GoIntegTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+}
+
+// PythonIntegTest starts the docker containers and executes the Python integration tests.
+func PythonIntegTest(ctx context.Context) error {
+	mg.Deps(Fields, unittest.BuildSystemTestBinary)
+	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
 }
