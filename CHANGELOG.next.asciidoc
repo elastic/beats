@@ -54,7 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Duplicate awscloudwatch.* fields to aws.cloudwatch.* in aws-cloudwatch input. {pull}31488[31488]
 - aws-s3 input: Stop SQS keep-alive routine on InvalidParameterValue error. {issue}30675[30675] {pull}31499[31499]
-- Supporting the double digit date parsing in ingest pipeline for oracle logs {pull}31514[31514]
+- Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
+- Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}[]
 
 *Heartbeat*
 - Fix unintentional use of no-op logger. {pull}31543[31543]
