@@ -110,6 +110,7 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	// Use the non-cachable -count=1 flag to disable test caching when running integration tests.
 	// There are reasons to re-run tests even if the code is unchanged (e.g. Dockerfile changes).
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.Env = WithDefaultGoIntegTestEnv(args.Env)
 	return args
 }
 

@@ -108,7 +108,11 @@ func DefaultPythonTestUnitArgs() PythonTestArgs { return makePythonTestArgs("Uni
 // DefaultPythonTestIntegrationArgs returns a default set of arguments for
 // running all integration tests. Integration tests are made conditional by
 // checking for INTEGRATION_TEST=1 in the test code.
-func DefaultPythonTestIntegrationArgs() PythonTestArgs { return makePythonTestArgs("Integration") }
+func DefaultPythonTestIntegrationArgs() PythonTestArgs {
+	args := makePythonTestArgs("Integration")
+	args.Env = WithDefaultPythonIntegTestEnv(args.Env)
+	return args
+}
 
 // PythonTest executes python tests via a Python virtualenv.
 func PythonTest(params PythonTestArgs) error {

@@ -75,42 +75,11 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(Fields)
-	args := devtools.DefaultGoTestIntegrationArgs()
-	// TODO: Tidy these up, put them in the default args?
-	args.Env["ES_HOST"] = "localhost"
-	args.Env["ES_USER"] = "admin"
-	args.Env["ES_PASS"] = "testing"
-	args.Env["ES_SUPERUSER_USER"] = "admin"
-	args.Env["ES_SUPERUSER_PASS"] = "testing"
-	args.Env["KIBANA_HOST"] = "localhost"
-	args.Env["KIBANA_USER"] = "beats"
-	args.Env["KIBANA_PASS"] = "testing"
-	args.Env["REDIS_HOST"] = "localhost"
-	args.Env["SREDIS_HOST"] = "localhost"
-	args.Env["LS_HOST"] = "localhost"
-	return devtools.GoIntegTest(ctx, args)
+	return devtools.GoIntegTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
-// Use GENERATE=true to generate expected log files.
-// Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.
-// Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, BuildSystemTestBinary)
-	args := devtools.DefaultPythonTestIntegrationArgs()
-	// TODO: Tidy these up?
-	args.Env["INTEGRATION_TESTS"] = "1"
-	args.Env["MODULES_PATH"] = devtools.CWD("module")
-	args.Env["ES_HOST"] = "localhost"
-	args.Env["ES_USER"] = "admin"
-	args.Env["ES_PASS"] = "testing"
-	args.Env["ES_SUPERUSER_USER"] = "admin"
-	args.Env["ES_SUPERUSER_PASS"] = "testing"
-	args.Env["KIBANA_HOST"] = "localhost"
-	args.Env["KIBANA_USER"] = "beats"
-	args.Env["KIBANA_PASS"] = "testing"
-	args.Env["REDIS_HOST"] = "localhost"
-	args.Env["SREDIS_HOST"] = "localhost"
-	args.Env["LS_HOST"] = "localhost"
-	return devtools.PythonIntegTest(args)
+	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
 }

@@ -49,6 +49,10 @@ func init() {
 	RegisterIntegrationTester(&DockerIntegrationTester{})
 }
 
+// DockerIntegrationTester is an integration tester that executes integration tests
+// using docker-compose. The tests are run from inside a special beat container.
+// Prefer using GoIntegTest and PythonIntegTest below which run the tests directly
+// from the host system, avoiding the need to compile beats inside a test container.
 type DockerIntegrationTester struct {
 }
 
@@ -82,7 +86,8 @@ func (d *DockerIntegrationTester) StepRequirements() IntegrationTestSteps {
 	return IntegrationTestSteps{&MageIntegrationTestStep{}}
 }
 
-// Test performs the tests with docker-compose.
+// Test performs the tests with docker-compose. The compose file must define a "beat" container,
+// containing the beats development environment. The tests are executed from within this container.
 func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[string]string) error {
 	var err error
 	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
@@ -172,10 +177,34 @@ func (d *DockerIntegrationTester) InsideTest(test func() error) error {
 	return test()
 }
 
-// Test performs the tests with docker-compose.
-// GoTest invokes "go test" and reports the results to stdout. It returns an
-// error if there was any failure executing the tests or if there were any
-// test failures.
+// WithDefaultGoIntegTestEnv defines the default set of environment variables to use for Go integration testing.
+func WithDefaultGoIntegTestEnv(env map[string]string) map[string]string {
+	env["ES_HOST"] = "localhost"
+	env["ES_USER"] = "beats"
+	env["ES_PASS"] = "testing"
+	env["ES_SUPERUSER_USER"] = "admin"
+	env["ES_SUPERUSER_PASS"] = "testing"
+
+	env["KIBANA_HOST"] = "localhost"
+	env["KIBANA_USER"] = "beats"
+	env["KIBANA_PASS"] = "testing"
+
+	env["REDIS_HOST"] = "localhost"
+	env["SREDIS_HOST"] = "localhost"
+	env["LS_HOST"] = "localhost"
+	return env
+}
+
+// WithDefaultPythonIntegTestEnv defines the default set of environment variables to use for Python integration testing.
+func WithDefaultPythonIntegTestEnv(env map[string]string) map[string]string {
+	env["INTEGRATION_TESTS"] = "1"
+	env["MODULES_PATH"] = CWD("module")
+	return WithDefaultGoIntegTestEnv(env)
+}
+
+// GoIntegTest starts docker-compose, waits for services to be healthy, and then runs "go test" on
+// the host system with the arguments set to enable integration tests. The test results are printed
+// to stdout and the container logs are saved in the build/system-test directory.
 func GoIntegTest(ctx context.Context, params GoTestArgs) error {
 	var err error
 	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
@@ -211,6 +240,9 @@ func GoIntegTest(ctx context.Context, params GoTestArgs) error {
 	return testErr
 }
 
+// PythonIntegTest starts docker-compose, waits for services to be healthy, and then runs "pytest" on
+// the host system with the arguments set to enable integration tests. The test results are printed
+// to stdout and the container logs are saved in the build/system-test directory.
 func PythonIntegTest(params PythonTestArgs) error {
 	var err error
 	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
