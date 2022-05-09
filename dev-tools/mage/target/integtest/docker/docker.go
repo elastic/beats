@@ -19,6 +19,9 @@ package docker
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"strings"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/magefile/mage/mg"
@@ -45,4 +48,32 @@ func (Docker) ComposeDown() error {
 // Pass this to docker-compose with the -p option to interact with running containers.
 func (Docker) ComposeProject() {
 	fmt.Println(devtools.DockerComposeProjectName())
+}
+
+// ComposeEnvFile generates the environment variable file to pass to docker-compose with --env-file.
+func (Docker) ComposeEnvFile() error {
+	esBeatsDir, err := devtools.ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	envFile := path.Join(esBeatsDir, "docker.env")
+	envVars := []string{
+		"# Environment variable file to pass to docker-compose with the --env-file option.",
+		fmt.Sprintf("ES_BEATS=%s", esBeatsDir),
+		fmt.Sprintf("STACK_ENVIRONMENT=%s", devtools.StackEnvironment),
+		fmt.Sprintf("TESTING_ENVIRONMENT=%s", devtools.StackEnvironment),
+	}
+
+	err = os.WriteFile(
+		envFile,
+		[]byte(strings.Join(envVars, "\n")),
+		0644,
+	)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Created: %s\n", envFile)
+	return nil
 }
