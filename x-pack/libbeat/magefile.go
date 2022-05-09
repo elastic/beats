@@ -17,7 +17,8 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	// mage:import
@@ -58,6 +59,6 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, unittest.BuildSystemTestBinary)
+	mg.Deps(Fields, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
 }

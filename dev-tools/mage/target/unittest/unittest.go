@@ -58,11 +58,6 @@ func GoUnitTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
-// Builds the system test binary required by some python tests.
-func BuildSystemTestBinary() {
-	mg.Deps(devtools.BuildSystemTestBinary)
-}
-
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.SerialDeps(pythonTestDeps...)

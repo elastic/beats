@@ -77,6 +77,6 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, unittest.BuildSystemTestBinary)
+	mg.Deps(Fields, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
 }
