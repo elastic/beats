@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -72,8 +73,8 @@ func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) map[string]mapstr.M {
 
 		out[key] = mapstr.M{}
 
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.begin_time", &oracle.StringValue{NullString: sysmetricMetric.beginTime})
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.end_time", &oracle.StringValue{NullString: sysmetricMetric.endTime})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.begin_time", &oracle.StringValue{NullString: ParseDate(sysmetricMetric.beginTime)})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.end_time", &oracle.StringValue{NullString: ParseDate(sysmetricMetric.endTime)})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.interval_size_csec", &oracle.Float64Value{NullFloat64: sysmetricMetric.intsizeCsec})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.group_id", &oracle.Int64Value{NullInt64: sysmetricMetric.groupId})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.metric_id", &oracle.Int64Value{NullInt64: sysmetricMetric.metricId})
@@ -83,4 +84,12 @@ func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) map[string]mapstr.M {
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.container_id", &oracle.Float64Value{NullFloat64: sysmetricMetric.conId})
 	}
 	return out
+}
+
+// ParseDate function formats date according to Elastic convention
+func ParseDate(date sql.NullString) sql.NullString {
+	layout := "2006-01-02T15:04:05-07:00"
+	t, _ := time.Parse(layout, date.String)
+
+	return sql.NullString{String: t.UTC().Format(time.RFC3339), Valid: date.Valid}
 }
