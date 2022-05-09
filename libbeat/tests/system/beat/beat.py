@@ -861,7 +861,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         return "https://{host}:{port}".format(
             host=os.getenv("ES_HOST_SSL", "localhost"),
-            port=os.getenv("ES_PORT_SSL", "9205"),
+            port=os.getenv("ES_PORT_SSL", "9201"),
         )
 
     def get_kibana_url(self):
