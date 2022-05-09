@@ -55,7 +55,7 @@ func SetLogger(l *logp.Logger) *logp.Logger {
 
 func getLogger() *logp.Logger {
 	if eventLogger == nil {
-		return SetLogger(logp.NewLogger("heartbeat.events"))
+		return SetLogger(logp.L())
 	}
 
 	return eventLogger
