@@ -86,36 +86,24 @@ func (p prog) eval(bytes []byte, ctx *ctx) ([]byte, error) {
 		case opNum:
 			ft := fieldType(p.p[i])
 			i++
-			v, err := getIntField(ft, ctx)
-			if err != nil {
-				return bytes, err
-			}
+			v := getIntField(ft, ctx)
 			bytes = appendUnpadded(bytes, v)
 		case opNumPadded:
 			ft, digits := fieldType(p.p[i]), int(p.p[i+1])
 			i += 2
-			v, err := getIntField(ft, ctx)
-			if err != nil {
-				return bytes, err
-			}
+			v := getIntField(ft, ctx)
 			bytes = appendPadded(bytes, v, digits)
 		case opExtNumPadded:
 			ft, divExp, digits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2])
 			div := pow10Table[divExp]
 			i += 3
-			v, err := getIntField(ft, ctx)
-			if err != nil {
-				return bytes, err
-			}
+			v := getIntField(ft, ctx)
 			bytes = appendPadded(bytes, v/div, digits)
 		case opExtNumFractPadded:
 			ft, divExp, digits, fractDigits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2]), int(p.p[i+3])
 			div := pow10Table[divExp]
 			i += 4
-			v, err := getIntField(ft, ctx)
-			if err != nil {
-				return bytes, err
-			}
+			v := getIntField(ft, ctx)
 			bytes = appendFractPadded(bytes, v/div, digits, fractDigits)
 		case opZeros:
 			digits := int(p.p[i])
@@ -126,10 +114,7 @@ func (p prog) eval(bytes []byte, ctx *ctx) ([]byte, error) {
 		case opTwoDigit:
 			ft := fieldType(p.p[i])
 			i++
-			v, err := getIntField(ft, ctx)
-			if err != nil {
-				return bytes, err
-			}
+			v := getIntField(ft, ctx)
 			bytes = appendPadded(bytes, v%100, 2)
 		case opTextShort:
 			ft := fieldType(p.p[i])

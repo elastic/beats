@@ -44,70 +44,70 @@ const (
 	ftNanoOfSecond
 )
 
-func getIntField(ft fieldType, ctx *ctx) (int, error) {
+func getIntField(ft fieldType, ctx *ctx) int {
 	switch ft {
 	case ftYear:
-		return ctx.year, nil
+		return ctx.year
 
 	case ftDayOfYear:
-		return ctx.yearday, nil
+		return ctx.yearday
 
 	case ftMonthOfYear:
-		return int(ctx.month), nil
+		return int(ctx.month)
 
 	case ftDayOfMonth:
-		return ctx.day, nil
+		return ctx.day
 
 	case ftWeekyear:
-		return ctx.isoYear, nil
+		return ctx.isoYear
 
 	case ftWeekOfWeekyear:
-		return ctx.isoWeek, nil
+		return ctx.isoWeek
 
 	case ftDayOfWeek:
-		return int(ctx.weekday), nil
+		return int(ctx.weekday)
 
 	case ftHalfdayOfDay:
 		if ctx.hour < 12 {
-			return 0, nil // AM
+			return 0 // AM
 		}
-		return 1, nil // PM
+		return 1 // PM
 
 	case ftHourOfHalfday:
 		if ctx.hour < 12 {
-			return ctx.hour, nil
+			return ctx.hour
 		}
-		return ctx.hour - 12, nil
+		return ctx.hour - 12
 
 	case ftClockhourOfHalfday:
 		if ctx.hour < 12 {
-			return ctx.hour + 1, nil
+			return ctx.hour + 1
 		}
-		return ctx.hour - 12 + 1, nil
+		return ctx.hour - 12 + 1
 
 	case ftClockhourOfDay:
-		return ctx.hour + 1, nil
+		return ctx.hour + 1
 
 	case ftHourOfDay:
-		return ctx.hour, nil
+		return ctx.hour
 
 	case ftMinuteOfDay:
-		return ctx.hour*60 + ctx.min, nil
+		return ctx.hour*60 + ctx.min
 
 	case ftMinuteOfHour:
-		return ctx.min, nil
+		return ctx.min
 
 	case ftSecondOfDay:
-		return (ctx.hour*60+ctx.min)*60 + ctx.sec, nil
+		return (ctx.hour*60+ctx.min)*60 + ctx.sec
 
 	case ftSecondOfMinute:
-		return ctx.sec, nil
+		return ctx.sec
 
 	case ftNanoOfSecond:
-		return ctx.nano, nil
+		return ctx.nano
 	}
 
-	return 0, nil
+	return 0
 
 }
 
