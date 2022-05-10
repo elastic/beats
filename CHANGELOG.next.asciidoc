@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
+- Fix resource handle leak during event log enrichment. {pull}31504[31504]
+- Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
 
 *Functionbeat*
 
@@ -130,7 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Winlogbeat*
 
 - Add parent process ID to new process creation events. {issue}29237[29237] {pull}31102[31102]
-
+- Sysmon: Support for Sysmon Registry non-QWORD/DWORD events. {pull}31556[31556]
 
 *Elastic Log Driver*
 
