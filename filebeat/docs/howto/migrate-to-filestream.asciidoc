@@ -53,7 +53,7 @@ For this example, let's assume that the `log` input is used to collect logs from
 /var/log/my-old-files1.json (0%)
 ----
 
-=== 1. Set an identifier for each filestream input
+=== Step 1: Set an identifier for each `filestream` input
 
 All filestream inputs require an ID. So make sure you set a unique identifier for every input. 
 
