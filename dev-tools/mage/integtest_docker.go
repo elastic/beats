@@ -474,7 +474,7 @@ func WriteDockerComposeEnvFile() (string, error) {
 	err = os.WriteFile(
 		envFile,
 		[]byte(strings.Join(envFileContent, "\n")),
-		0644,
+		0644, //nolint:gosec // Intentionally readable by others.
 	)
 	if err != nil {
 		return "", err
