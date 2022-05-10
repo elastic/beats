@@ -62,7 +62,7 @@ func TestMySQL(t *testing.T) {
 		Assertion:      assertFieldNotContains("service.address", ":test@"),
 	}
 
-	fmt.Printf("config sql %#v\n", config)
+	//fmt.Printf("config sql %#v\n", config)
 
 	t.Run("fetch", func(t *testing.T) {
 		testFetch(t, config)
@@ -117,7 +117,7 @@ func TestPostgreSQL(t *testing.T) {
 		Assertion:      assertFieldNotContains("service.address", ":"+password+"@"),
 	}
 
-	fmt.Printf("config postsql %#v\n", config)
+	//fmt.Printf("config postsql %#v\n", config)
 
 	t.Run("fetch with URL", func(t *testing.T) {
 		testFetch(t, config)
@@ -160,7 +160,7 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 		values["sql_response_format"] = cfg.ResponseFormat
 	}
 
-	fmt.Printf("values %#v\n", values)
+	//fmt.Printf("values %#v\n", values)
 	return values
 }
 
