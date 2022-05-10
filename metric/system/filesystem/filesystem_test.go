@@ -32,9 +32,13 @@ func TestFileSystemList(t *testing.T) {
 	if runtime.GOOS == "darwin" && os.Getenv("TRAVIS") == "true" {
 		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
 	}
+	skipTypes := []string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}
+	if runtime.GOOS == "windows" {
+		skipTypes = []string{"cdrom"}
+	}
 	hostfs := resolve.NewTestResolver("/")
 	//Exclude FS types that will give us a permission error
-	fss, err := GetFilesystems(hostfs, BuildFilterWithList([]string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}))
+	fss, err := GetFilesystems(hostfs, BuildFilterWithList(skipTypes))
 	if err != nil {
 		t.Fatal("GetFileSystemList", err)
 	}
@@ -48,9 +52,9 @@ func TestFileSystemList(t *testing.T) {
 }
 
 func TestFileSystemListFiltering(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("These cases don't need to work on Windows")
-	}
+	// if runtime.GOOS == "windows" {
+	// 	t.Skip("These cases don't need to work on Windows")
+	// }
 
 	fakeDevDir, err := ioutil.TempDir(os.TempDir(), "dir")
 	assert.Empty(t, err)
