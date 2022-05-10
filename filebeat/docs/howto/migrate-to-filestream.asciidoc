@@ -84,8 +84,8 @@ filebeat.inputs:
 === Step 2: Exclude all processed files
 
 Filebeat does not provide access to the state information of different inputs.
-Hence, filestream cannot access the state information of a log input in the
-registry of Filebeat. You have to exclude the files the log input has processed
+Hence, the `filestream` input cannot access the state information of a `log` input in the
+Filebeat registry. You must exclude the files the `log` input has processed
 or is processing. If you do not exclude those files, you will end up with
 duplicate events in the output.
 
