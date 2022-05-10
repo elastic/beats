@@ -77,8 +77,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("invalid sql_response_format value: %s", b.Config.ResponseFormat)
 	}
 
+	for _, q := range b.Config.Queries {
+		if q.ResponseFormat != variableResponseFormat && q.ResponseFormat != tableResponseFormat {
+			return nil, fmt.Errorf("invalid sql_response_format value: %s", q.ResponseFormat)
+		}
+	}
+
 	if b.Config.Query == "" && len(b.Config.Queries) == 0 {
-		return nil, fmt.Errorf("No query input provided.")
+		return nil, fmt.Errorf("No query input provided, Must provide either sql_query or sql_queries.")
+	}
+
+	if b.Config.Query != "" && len(b.Config.Queries) > 0 {
+		return nil, fmt.Errorf("Both query inputs provided, Must provide either sql_query or sql_queries.")
 	}
 
 	return b, nil
@@ -96,13 +106,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 	defer db.Close()
 
-	var queries []query
-	if len(m.Config.Queries) > 0 {
-		queries = m.Config.Queries
-	} else {
-		var one_query query
-		one_query.Query = m.Config.Query
-		one_query.ResponseFormat = m.Config.ResponseFormat
+	queries := m.Config.Queries
+	if len(queries) == 0 {
+		one_query := query{Query: m.Config.Query, ResponseFormat: m.Config.ResponseFormat}
 		queries = append(queries, one_query)
 	}
 
@@ -140,7 +146,9 @@ func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string)
 		jsonString, _ := json.Marshal(ms)
 
 		reporter.Event(mb.Event{
-			// New usage
+			// New usage.
+			// Only results, driver & query filed mapped.
+			// metrics to be mapped by end user.
 			ModuleFields: mapstr.M{
 				"metrics": ms, // Individual metric
 				"results": string(jsonString),
@@ -150,7 +158,8 @@ func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string)
 		})
 	} else {
 		reporter.Event(mb.Event{
-			// Previous usage
+			// Previous usage. Backword compartibility.
+			// Supports field mapping.
 			ModuleFields: mapstr.M{
 				"driver":  m.Config.Driver,
 				"query":   qry,
