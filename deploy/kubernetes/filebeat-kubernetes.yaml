@@ -17,7 +17,7 @@ data:
             host: ${NODE_NAME}
             matchers:
             - logs_path:
-                logs_path: "/var/log/containers/"
+                logs_path: "/var/log/containers42/"
 
     # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
     #filebeat.autodiscover:
