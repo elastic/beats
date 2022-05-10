@@ -42,7 +42,7 @@ func parseMounts(_ string, filter func(FSStat) bool) ([]FSStat, error) {
 			Type:      fsType,
 		}
 		if fsType != "" && filter(fs) {
-			driveList = append(driveList)
+			driveList = append(driveList, fs)
 		}
 	}
 
