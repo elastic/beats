@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -179,7 +180,6 @@ func filterDuplicates(fsList []FSStat) []FSStat {
 func avoidFileSystem(fs FSStat) bool {
 	// Ignore relative mount points, which are present for example
 	// in /proc/mounts on Linux with network namespaces.
-	debugf("filtering: %#v", fs)
 	if !filepath.IsAbs(fs.Directory) {
 		debugf("Filtering filesystem with relative mountpoint %+v", fs)
 		return false
@@ -190,13 +190,18 @@ func avoidFileSystem(fs FSStat) bool {
 		return true
 	}
 
-	// If the device name is a directory, this is a bind mount or nullfs,
-	// don't count it as it'd be counting again its parent filesystem.
-	devFileInfo, err := os.Stat(fs.Device)
-	debugf("error stating filesystem: %s", err)
-	if devFileInfo != nil && devFileInfo.IsDir() {
-		debugf("device %s is dir", fs.Device)
-		return false
+	// This logic only applies on non-windows machines, the device path logic seems to be different on windows.
+	if runtime.GOOS != "windows" { //nolint:goconst // Not needed here
+		// If the device name is a directory, this is a bind mount or nullfs,
+		// don't count it as it'd be counting again its parent filesystem.
+		devFileInfo, err := os.Stat(fs.Device)
+		if err != nil {
+			debugf("error stating filesystem: %s", err)
+		}
+		if devFileInfo != nil && devFileInfo.IsDir() {
+			return false
+		}
 	}
+
 	return true
 }

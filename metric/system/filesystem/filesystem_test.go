@@ -35,9 +35,6 @@ func TestFileSystemList(t *testing.T) {
 		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
 	}
 	skipTypes := []string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}
-	if runtime.GOOS == "windows" {
-		skipTypes = []string{"cdrom"}
-	}
 	hostfs := resolve.NewTestResolver("/")
 	//Exclude FS types that will give us a permission error
 	fss, err := GetFilesystems(hostfs, BuildFilterWithList(skipTypes))
@@ -54,9 +51,10 @@ func TestFileSystemList(t *testing.T) {
 }
 
 func TestFileSystemListFiltering(t *testing.T) {
-	// if runtime.GOOS == "windows" {
-	// 	t.Skip("These cases don't need to work on Windows")
-	// }
+	if runtime.GOOS == "windows" {
+		// Windows doesn't like these unix paths, the OS-specific code in stdlib will return different results.
+		t.Skip("These cases don't need to work on Windows")
+	}
 	_ = logp.DevelopmentSetup()
 	fakeDevDir, err := ioutil.TempDir(os.TempDir(), "dir")
 	assert.Empty(t, err)
