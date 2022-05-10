@@ -25,8 +25,8 @@ import (
 	"github.com/google/gopacket/afpacket"
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	parent "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var udpSrcPort53Filter = []bpf.RawInstruction{
