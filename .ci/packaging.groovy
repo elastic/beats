@@ -323,6 +323,18 @@ def runE2ETests(){
            gitHubCheckRepo: env.REPO,
            gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
+<<<<<<< HEAD
+=======
+  echo 'runE2E will run now in a sync mode to validate packages can be published.'
+  runE2E(runTestsSuites: suites,
+         testMatrixFile: '.ci/e2e-tests-beats.yaml',
+         beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+         gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+         gitHubCheckRepo: env.REPO,
+         gitHubCheckSha1: env.GIT_BASE_COMMIT,
+         propagate: true,
+         wait: true)
+>>>>>>> 03b013e63c (chore: use a different e2e profile for running them from Beats (#31531))
 }
 
 /**
