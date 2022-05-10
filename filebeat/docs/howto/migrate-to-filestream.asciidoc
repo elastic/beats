@@ -55,7 +55,7 @@ For this example, let's assume that the `log` input is used to collect logs from
 
 === Step 1: Set an identifier for each `filestream` input
 
-All filestream inputs require an ID. So make sure you set a unique identifier for every input. 
+All `filestream` inputs require an ID. So make sure you set a unique identifier for every input. 
 
 Warning: Never change the ID of an input otherwise you will end up with duplicate events.
 
