@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-11-12T12:35:17.214Z",
+        "@timestamp": "2019-11-12T12:35:17.214711274Z",
         "destination.address": "175.16.199.1",
         "destination.geo.city_name": "Changchun",
         "destination.geo.continent_name": "Asia",
@@ -67,7 +67,7 @@
         ]
     },
     {
-        "@timestamp": "2019-10-30T13:52:42.191Z",
+        "@timestamp": "2019-10-30T13:52:42.191988835Z",
         "destination.address": "10.42.0.2",
         "destination.domain": "test-windows",
         "destination.ip": "10.42.0.2",
@@ -131,7 +131,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:31:19.421Z",
+        "@timestamp": "2019-11-11T12:31:19.421478847Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -198,7 +198,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:41:31.079Z",
+        "@timestamp": "2019-11-11T12:41:31.079508196Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -263,7 +263,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:41:34.190Z",
+        "@timestamp": "2019-11-11T12:41:34.190831607Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -328,7 +328,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:48:41.449Z",
+        "@timestamp": "2019-11-11T12:48:41.449552758Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -395,7 +395,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T13:10:24.214Z",
+        "@timestamp": "2019-11-11T13:10:24.214995318Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -462,7 +462,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T13:35:23.504Z",
+        "@timestamp": "2019-11-11T13:35:23.504719962Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -529,7 +529,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T13:36:52.135Z",
+        "@timestamp": "2019-11-11T13:36:52.135887769Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -596,7 +596,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T14:06:16.593Z",
+        "@timestamp": "2019-11-11T14:06:16.593531820Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -663,7 +663,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T14:06:22.930Z",
+        "@timestamp": "2019-11-11T14:06:22.930570324Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -730,7 +730,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T14:32:07.407Z",
+        "@timestamp": "2019-11-11T14:32:07.407039908Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
@@ -797,7 +797,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-12T12:41:20.972Z",
+        "@timestamp": "2019-11-12T12:41:20.972747063Z",
         "destination.address": "175.16.199.1",
         "destination.geo.city_name": "Changchun",
         "destination.geo.continent_name": "Asia",
@@ -864,7 +864,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-12T12:42:26.505Z",
+        "@timestamp": "2019-11-12T12:42:26.505329210Z",
         "destination.address": "175.16.199.1",
         "destination.geo.city_name": "Changchun",
         "destination.geo.continent_name": "Asia",
@@ -931,7 +931,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:54:13.531Z",
+        "@timestamp": "2019-11-11T12:54:13.531819246Z",
         "destination.address": "10.42.0.10",
         "destination.domain": "test-es",
         "destination.ip": "10.42.0.10",
@@ -1002,7 +1002,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:54:13.551Z",
+        "@timestamp": "2019-11-11T12:54:13.551617516Z",
         "destination.address": "10.42.0.10",
         "destination.domain": "test-es",
         "destination.ip": "10.42.0.10",
@@ -1073,7 +1073,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:54:15.771Z",
+        "@timestamp": "2019-11-11T12:54:15.771161946Z",
         "destination.address": "10.42.0.2",
         "destination.domain": "test-windows",
         "destination.ip": "10.42.0.2",
@@ -1139,7 +1139,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:54:35.850Z",
+        "@timestamp": "2019-11-11T12:54:35.850729583Z",
         "destination.address": "10.42.0.10",
         "destination.domain": "test-es",
         "destination.ip": "10.42.0.10",
@@ -1210,7 +1210,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-11T12:54:35.850Z",
+        "@timestamp": "2019-11-11T12:54:35.850234650Z",
         "destination.address": "10.42.0.10",
         "destination.domain": "test-es",
         "destination.ip": "10.42.0.10",
@@ -1281,7 +1281,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-06T16:41:38.394Z",
+        "@timestamp": "2019-11-06T16:41:38.394575419Z",
         "destination.address": "10.28.0.16",
         "destination.domain": "adrian-test",
         "destination.ip": "10.28.0.16",
