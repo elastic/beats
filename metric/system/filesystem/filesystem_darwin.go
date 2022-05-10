@@ -56,7 +56,10 @@ func parseMounts(path string, filter func(FSStat) bool) ([]FSStat, error) {
 		fs.Device = byteListToString(buf[i].Mntfromname[:])
 		fs.Type = byteListToString(buf[i].Fstypename[:])
 
-		fslist = append(fslist, fs)
+		if filter(fs) {
+			fslist = append(fslist, fs)
+		}
+
 	}
 	return fslist, nil
 }

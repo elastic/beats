@@ -62,7 +62,7 @@ func TestFileSystemList(t *testing.T) {
 
 	for _, fs := range fss {
 		err := fs.GetUsage()
-		assert.NoError(t, err, "filesystem=%v: %v", fs, err)
+		assert.NoError(t, err, "filesystem=%#v: %v", fs, err)
 
 	}
 }

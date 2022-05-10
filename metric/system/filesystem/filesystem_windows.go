@@ -36,7 +36,7 @@ func parseMounts(_ string, filter func(FSStat) bool) ([]FSStat, error) {
 		if err != nil {
 			return nil, fmt.Errorf("GetFilesystemType failed: %w", err)
 		}
-		if fsType != "" {
+		if fsType != "" && filter(fs) {
 			driveList = append(driveList, FSStat{
 				Directory: drive,
 				Device:    drive,
