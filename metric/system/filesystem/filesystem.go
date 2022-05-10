@@ -192,8 +192,10 @@ func avoidFileSystem(fs FSStat) bool {
 
 	// If the device name is a directory, this is a bind mount or nullfs,
 	// don't count it as it'd be counting again its parent filesystem.
-	devFileInfo, _ := os.Stat(fs.Device)
+	devFileInfo, err := os.Stat(fs.Device)
+	debugf("error stating filesystem: %s", err)
 	if devFileInfo != nil && devFileInfo.IsDir() {
+		debugf("device %s is dir", fs.Device)
 		return false
 	}
 	return true
