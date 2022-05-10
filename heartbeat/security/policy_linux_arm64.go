@@ -76,7 +76,6 @@ func init() {
 					"getgroups",
 					"getpeername",
 					"getpgid",
-					"getpgrp",
 					"getpid",
 					"getppid",
 					"getpriority",
