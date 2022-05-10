@@ -147,7 +147,7 @@ func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string)
 
 		reporter.Event(mb.Event{
 			// New usage.
-			// Only results, driver & query filed mapped.
+			// Only results, driver & query field mapped.
 			// metrics to be mapped by end user.
 			ModuleFields: mapstr.M{
 				"metrics": ms, // Individual metric
