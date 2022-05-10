@@ -1,0 +1,185 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "28060f62-4880-4b1c-aef2-fe42f9df0c64": {
+                            "columnOrder": [
+                                "6efc3318-f2d7-4e8b-ad3c-138a8cf9522d",
+                                "b0d6d768-94b4-4a60-8703-d4e2f7a04df2",
+                                "7ccec911-2e78-4c28-ade7-94447ebb88b2",
+                                "802c8bea-aecf-4d1b-9b54-84d527d1fc18",
+                                "370e0d18-2e9c-46ae-9174-9fed8a48bf49"
+                            ],
+                            "columns": {
+                                "370e0d18-2e9c-46ae-9174-9fed8a48bf49": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.node-role_kubernetes_io/control-plane: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Control Plane",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.node-role_kubernetes_io/control-plane"
+                                },
+                                "6efc3318-f2d7-4e8b-ad3c-138a8cf9522d": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Node",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.name"
+                                },
+                                "7ccec911-2e78-4c28-ade7-94447ebb88b2": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.kubernetes_io/os: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Operating System",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.kubernetes_io/os"
+                                },
+                                "802c8bea-aecf-4d1b-9b54-84d527d1fc18": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.kubernetes_io/hostname: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Hostname",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.kubernetes_io/hostname"
+                                },
+                                "b0d6d768-94b4-4a60-8703-d4e2f7a04df2": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.kubernetes_io/arch: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Architecture",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.kubernetes_io/arch"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "369ad33d-cbfa-43a6-b73b-d174da76457c",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "node"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "node"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "6efc3318-f2d7-4e8b-ad3c-138a8cf9522d",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "b0d6d768-94b4-4a60-8703-d4e2f7a04df2",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "7ccec911-2e78-4c28-ade7-94447ebb88b2",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "370e0d18-2e9c-46ae-9174-9fed8a48bf49",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "802c8bea-aecf-4d1b-9b54-84d527d1fc18",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "28060f62-4880-4b1c-aef2-fe42f9df0c64",
+                "layerType": "data"
+            }
+        },
+        "title": "Node Informations by Labels [Metrics Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-4eba56e0-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-28060f62-4880-4b1c-aef2-fe42f9df0c64",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "369ad33d-cbfa-43a6-b73b-d174da76457c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-10T10:59:29.315Z",
+    "version": "WzcyMCwxXQ=="
+}
