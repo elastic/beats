@@ -84,11 +84,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if b.Config.Query == "" && len(b.Config.Queries) == 0 {
-		return nil, fmt.Errorf("No query input provided, Must provide either sql_query or sql_queries")
+		return nil, fmt.Errorf("no query input provided, must provide either sql_query or sql_queries")
 	}
 
 	if b.Config.Query != "" && len(b.Config.Queries) > 0 {
-		return nil, fmt.Errorf("Both query inputs provided, Must provide either sql_query or sql_queries")
+		return nil, fmt.Errorf("both query inputs provided, must provide either sql_query or sql_queries")
 	}
 
 	return b, nil
