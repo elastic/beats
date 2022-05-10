@@ -10,17 +10,17 @@
         "period": 10000
     },
     "service": {
-        "address": "172.21.0.2:3306",
+        "address": "localhost:49915",
         "type": "sql"
     },
     "sql": {
         "driver": "mysql",
         "metrics": {
             "numeric": {
-                "table_rows": 1
+                "table_rows": 2
             },
             "string": {
-                "engine": "MyISAM",
+                "engine": "InnoDB",
                 "table_name": "db",
                 "table_schema": "mysql"
             }

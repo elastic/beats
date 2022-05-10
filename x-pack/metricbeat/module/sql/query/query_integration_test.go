@@ -39,10 +39,11 @@ type testFetchConfig struct {
 func TestMySQL(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
 	config := testFetchConfig{
-		Driver:    "mysql",
-		Query:     "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
-		Host:      mysql.GetMySQLEnvDSN(service.Host()),
-		Assertion: assertFieldNotContains("service.address", ":test@"),
+		Driver:         "mysql",
+		Query:          "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
+		Host:           mysql.GetMySQLEnvDSN(service.Host()),
+		ResponseFormat: tableResponseFormat,
+		Assertion:      assertFieldNotContains("service.address", ":test@"),
 	}
 
 	t.Run("fetch", func(t *testing.T) {
@@ -60,6 +61,8 @@ func TestMySQL(t *testing.T) {
 		ResponseFormat: variableResponseFormat,
 		Assertion:      assertFieldNotContains("service.address", ":test@"),
 	}
+
+	fmt.Printf("config sql %#v\n", config)
 
 	t.Run("fetch", func(t *testing.T) {
 		testFetch(t, config)
@@ -79,10 +82,11 @@ func TestPostgreSQL(t *testing.T) {
 	password := postgresql.GetEnvPassword()
 
 	config := testFetchConfig{
-		Driver:    "postgres",
-		Query:     "select * from pg_stat_database",
-		Host:      fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
-		Assertion: assertFieldNotContains("service.address", "password="+password),
+		Driver:         "postgres",
+		Query:          "select * from pg_stat_database",
+		Host:           fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
+		Assertion:      assertFieldNotContains("service.address", "password="+password),
+		ResponseFormat: tableResponseFormat,
 	}
 
 	t.Run("fetch", func(t *testing.T) {
@@ -90,10 +94,11 @@ func TestPostgreSQL(t *testing.T) {
 	})
 
 	config = testFetchConfig{
-		Driver:    "postgres",
-		Query:     "select * from pg_stat_database where datname='postgres'",
-		Host:      fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
-		Assertion: assertFieldNotContains("service.address", ":"+password+"@"),
+		Driver:         "postgres",
+		Query:          "select * from pg_stat_database where datname='postgres'",
+		Host:           fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+		Assertion:      assertFieldNotContains("service.address", ":"+password+"@"),
+		ResponseFormat: tableResponseFormat,
 	}
 
 	t.Run("fetch with URL", func(t *testing.T) {
@@ -111,6 +116,8 @@ func TestPostgreSQL(t *testing.T) {
 		ResponseFormat: variableResponseFormat,
 		Assertion:      assertFieldNotContains("service.address", ":"+password+"@"),
 	}
+
+	fmt.Printf("config postsql %#v\n", config)
 
 	t.Run("fetch with URL", func(t *testing.T) {
 		testFetch(t, config)
@@ -153,6 +160,7 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 		values["sql_response_format"] = cfg.ResponseFormat
 	}
 
+	fmt.Printf("values %#v\n", values)
 	return values
 }
 
