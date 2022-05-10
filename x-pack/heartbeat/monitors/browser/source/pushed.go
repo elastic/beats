@@ -104,8 +104,9 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-	err = runSimpleCommand(exec.Command("npm", "install"), workdir)
-	return err
+
+	// setup the project linking to the global synthetics library
+	return runSimpleCommand(exec.Command("npm", "link"), workdir)
 }
 
 func (p *PushedSource) Workdir() string {
