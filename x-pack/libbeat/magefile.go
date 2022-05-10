@@ -10,9 +10,10 @@ package main
 import (
 	"context"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	"github.com/magefile/mage/mg"
 
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
