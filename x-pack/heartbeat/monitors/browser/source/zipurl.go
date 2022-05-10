@@ -148,6 +148,8 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 		sansFolder := splitZipFileName[folderDepth:]
 		destPath = filepath.Join(workdir, filepath.Join(sansFolder...))
 	} else {
+		//nolint:gosec // zip slip vulnerability, but we control the zipping when
+		//pushing the monitors
 		destPath = filepath.Join(workdir, f.Name)
 	}
 

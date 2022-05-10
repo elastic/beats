@@ -28,7 +28,7 @@ type PushedSource struct {
 var ErrNoContent = fmt.Errorf("no 'content' value specified for pushed monitor source")
 
 func (p *PushedSource) Validate() error {
-	if !regexp.MustCompile("\\S").MatchString(p.Content) {
+	if !regexp.MustCompile(`\S`).MatchString(p.Content) {
 		return ErrNoContent
 	}
 
@@ -48,7 +48,10 @@ func (p *PushedSource) Fetch() error {
 	defer os.Remove(tf.Name())
 
 	// copy the encoded contents in to a temp file for unzipping later
-	io.Copy(tf, bytes.NewReader(decodedBytes))
+	_, err = io.Copy(tf, bytes.NewReader(decodedBytes))
+	if err != nil {
+		return err
+	}
 
 	p.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
 	if err != nil {
@@ -78,12 +81,15 @@ type PackageJSON struct {
 
 // setupProjectDir sets ups the required package.json file and
 // links the synthetics dependency to the globally installed one that is
-// baked in to the HB to maintain compatability and allows us to control the
+// baked in to the HB to maintain compatibility and allows us to control the
 // agent version
 func setupProjectDir(workdir string) error {
 	fname, err := exec.LookPath("elastic-synthetics")
 	if err == nil {
 		fname, err = filepath.Abs(fname)
+	}
+	if err != nil {
+		return fmt.Errorf("cannot resolve global synthetics library: %w", err)
 	}
 
 	globalPath := strings.Replace(fname, "bin/elastic-synthetics", "lib/node_modules/@elastic/synthetics", 1)
@@ -99,7 +105,7 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-
+	//nolint:gosec //for permission
 	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, 0755)
 	if err != nil {
 		return err
