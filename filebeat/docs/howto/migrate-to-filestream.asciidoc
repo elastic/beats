@@ -39,7 +39,7 @@ filebeat.inputs:
   tail_files: true
 ----
 
-The list of the collected files and the progress of data collection with the log input:
+For this example, let's assume that the `log` input is used to collect logs from the following files. The progress of data collection is shown for each file.
 ["source","sh",subs="attributes"]
 ----
 /var/log/java-exceptions1.log (100%)
