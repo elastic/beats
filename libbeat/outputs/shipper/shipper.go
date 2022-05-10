@@ -85,7 +85,8 @@ func makeShipper(
 
 	opts := []grpc.DialOption{
 		grpc.WithConnectParams(grpc.ConnectParams{
-			Backoff: backoff.DefaultConfig,
+			Backoff:           backoff.DefaultConfig,
+			MinConnectTimeout: config.Timeout,
 		}),
 		grpc.WithTransportCredentials(creds),
 	}
@@ -195,7 +196,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		return nil
 	}
 
-	retries := c.findRetries(resp, events)
+	retries := findRetries(resp, events)
 	if len(retries) == 0 {
 		batch.ACK()
 		st.Acked(len(grpcEvents))
@@ -217,7 +218,11 @@ func (c *shipper) String() string {
 	return "shipper"
 }
 
-func (c *shipper) findRetries(resp *sc.PublishReply, events []publisher.Event) []publisher.Event {
+func findRetries(resp *sc.PublishReply, events []publisher.Event) []publisher.Event {
+	if resp == nil || len(events) == 0 {
+		return nil
+	}
+
 	// build a set of IDs for fast access below
 	acceptedIDs := make(map[string]struct{}, len(resp.Results))
 	for _, r := range resp.Results {

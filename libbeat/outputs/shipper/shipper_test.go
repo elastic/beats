@@ -102,6 +102,91 @@ func TestConvertMapStr(t *testing.T) {
 	}
 }
 
+func TestFindRetries(t *testing.T) {
+	events := toPublisherEvents([]beat.Event{
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{fieldShipperID: "first"},
+			Fields:    mapstr.M{"foo": "bar"},
+		},
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{"dropped": true}, // just to mark for the test
+			Fields:    mapstr.M{"a": "b"},
+		},
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{fieldShipperID: 42, "dropped": true}, // just to mark for the test
+			Fields:    mapstr.M{"x": "y"},
+		},
+
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{fieldShipperID: "second"},
+			Fields:    mapstr.M{"c": "d"},
+		},
+	})
+
+	cases := []struct {
+		name   string
+		resp   *sc.PublishReply
+		events []publisher.Event
+		exp    []publisher.Event
+	}{
+		{
+			name:   "nil response returns nil",
+			events: events,
+			exp:    nil,
+		},
+		{
+			name: "empty events return nil",
+			resp: &sc.PublishReply{
+				Results: []*sc.EventResult{
+					{
+						EventId: "first",
+					},
+				},
+			},
+			events: nil,
+			exp:    nil,
+		},
+		{
+			name: "all accepted events return empty retries",
+			resp: &sc.PublishReply{
+				Results: []*sc.EventResult{
+					{
+						EventId: "first",
+					},
+					{
+						EventId: "second",
+					},
+				},
+			},
+			events: events,
+			exp:    []publisher.Event{},
+		},
+		{
+			name: "partially accepted events return retries",
+			resp: &sc.PublishReply{
+				Results: []*sc.EventResult{
+					{
+						EventId: "second",
+					},
+				},
+			},
+			events: events,
+			exp:    events[:1],
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			retries := findRetries(tc.resp, tc.events)
+			require.Equal(t, tc.exp, retries)
+		})
+	}
+}
+
 func TestPublish(t *testing.T) {
 	events := []beat.Event{
 		{
@@ -185,6 +270,66 @@ func TestPublish(t *testing.T) {
 			require.Equal(t, tc.expSignals, batch.Signals)
 		})
 	}
+
+	t.Run("cancel the batch when the server is not available", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		producer := sc.NewProducerMock(5)
+		grpcServer := grpc.NewServer()
+		sc.RegisterProducerServer(grpcServer, producer)
+
+		listener, err := net.Listen("tcp", "localhost:0") // random available port
+		require.NoError(t, err)
+
+		defer grpcServer.Stop()
+		// run with a 2 second delay
+		go func() {
+			<-time.After(2 * time.Second)
+			_ = grpcServer.Serve(listener)
+		}()
+
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server":  listener.Addr().String(),
+			"timeout": 1, // 1 sec
+		})
+		require.NoError(t, err)
+
+		group, err := makeShipper(
+			nil,
+			beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
+			outputs.NewNilObserver(),
+			cfg,
+		)
+		require.NoError(t, err)
+		require.Len(t, group.Clients, 1)
+
+		batch := outest.NewBatch(events...)
+
+		// try to publish without the server running
+		err = group.Clients[0].Publish(ctx, batch)
+		require.NoError(t, err)
+
+		expSignals := []outest.BatchSignal{
+			{
+				Tag: outest.BatchCancelled, // "cancelled" means there will be a retry without decreasing the TTL
+			},
+		}
+		require.Equal(t, expSignals, batch.Signals)
+
+		<-time.After(2 * time.Second)
+
+		batch = outest.NewBatch(events...)
+		err = group.Clients[0].Publish(ctx, batch)
+		require.NoError(t, err)
+
+		expSignals = []outest.BatchSignal{
+			{
+				Tag: outest.BatchACK,
+			},
+		}
+		require.Equal(t, expSignals, batch.Signals)
+	})
 }
 
 func protoStruct(t *testing.T, values map[string]interface{}) *structpb.Value {
