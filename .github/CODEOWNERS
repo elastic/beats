@@ -36,9 +36,15 @@ CHANGELOG*
 
 # Filebeat is owned by the data plane team
 /filebeat @elastic/elastic-agent-data-plane
+<<<<<<< HEAD
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 
 # Modules are by default owned by the integrations team
+=======
+/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/filebeat/input/syslog/ @elastic/security-external-integrations
+/filebeat/input/winlog/ @elastic/security-external-integrations
+>>>>>>> 5e93d5f0c2 (List individual beat docs without a CODEOWNER. (#31557))
 /filebeat/module/ @elastic/integrations
 /x-pack/filebeat/module/ @elastic/integrations
 
@@ -59,7 +65,44 @@ CHANGELOG*
 /filebeat/module/postgresql @elastic/integrations
 /filebeat/module/redis @elastic/integrations
 /filebeat/module/traefik @elastic/integrations
+<<<<<<< HEAD
 
+=======
+/heartbeat/ @elastic/uptime
+/journalbeat @elastic/elastic-agent-data-plane
+/libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/community_id/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml_wineventlog/ @elastic/security-external-integrations
+/libbeat/processors/dns/ @elastic/security-external-integrations
+/libbeat/processors/registered_domain/ @elastic/security-external-integrations
+/libbeat/processors/translate_sid/ @elastic/security-external-integrations
+/licenses/ @elastic/elastic-agent-data-plane
+/metricbeat/ @elastic/elastic-agent-data-plane
+/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/metricbeat/module/ @elastic/integrations
+/metricbeat/module/beat/ @elastic/infra-monitoring-ui
+/metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
+/metricbeat/module/kibana/ @elastic/infra-monitoring-ui
+/metricbeat/module/logstash/ @elastic/infra-monitoring-ui
+/metricbeat/module/system/ @elastic/elastic-agent-data-plane
+/packetbeat/ @elastic/security-external-integrations
+/script/ @elastic/elastic-agent-data-plane
+/testing/ @elastic/elastic-agent-data-plane
+/tools/ @elastic/elastic-agent-data-plane
+/winlogbeat/ @elastic/security-external-integrations
+/x-pack/auditbeat/ @elastic/security-external-integrations
+/x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
+/x-pack/filebeat @elastic/elastic-agent-data-plane
+/x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
+/x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
+/x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
+/x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
+/x-pack/filebeat/module/ @elastic/integrations
+>>>>>>> 5e93d5f0c2 (List individual beat docs without a CODEOWNER. (#31557))
 /x-pack/filebeat/module/activemq @elastic/integrations
 /x-pack/filebeat/module/ibmmq @elastic/integrations
 /x-pack/filebeat/module/mssql @elastic/integrations
@@ -167,9 +210,13 @@ CHANGELOG*
 # The core of metricbeat is owned by the data plane team. Bits inside are owned by different teams.
 /metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
+<<<<<<< HEAD
 
 # Modules are owned by the integrations team by default
 /metricbeat/module/ @elastic/integrations
+=======
+/x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+>>>>>>> 5e93d5f0c2 (List individual beat docs without a CODEOWNER. (#31557))
 /x-pack/metricbeat/module/ @elastic/integrations
 
 # Modules owned by the data plane team
