@@ -127,7 +127,7 @@ func (h *httpHandler) publishEvent(event beat.Event, headers mapstr.M) error {
 		event.Fields["headers"] = headers
 	}
 
-	if _, err := event.PutValue(h.messageField, obj); err != nil {
+	if _, err := event.PutValue(h.messageField, event.Fields["message"]); err != nil {
 		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
 	}
 

@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -46,7 +46,7 @@ type split struct {
 }
 type maybeMsg struct {
 	err error
-	Msg common.MapStr
+	Msg mapstr.M
 }
 
 func (e maybeMsg) Failed() bool { return e.err != nil }
@@ -78,7 +78,7 @@ func NewSplit(c *SplitConfig, log *logp.Logger) (*split, error) {
 
 func (s *split) StartSplit(raw json.RawMessage) (<-chan maybeMsg, error) {
 	ch := make(chan maybeMsg)
-	var jsonObject common.MapStr
+	var jsonObject mapstr.M
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
 		return nil, err
 	}
@@ -109,8 +109,8 @@ func (s *split) StartSplit(raw json.RawMessage) (<-chan maybeMsg, error) {
 // run runs the split operation on the contents of resp, sending successive
 // split results on ch. ctx is passed to transforms that are called during
 // the split.
-func (s *split) run(jsonObject common.MapStr, ch chan<- maybeMsg) error {
-	// var jsonObject common.MapStr
+func (s *split) run(jsonObject mapstr.M, ch chan<- maybeMsg) error {
+	// var jsonObject mapstr.M
 	// if err := json.Unmarshal(raw, &jsonObject); err != nil {
 	// 	return err
 	// }
@@ -118,11 +118,11 @@ func (s *split) run(jsonObject common.MapStr, ch chan<- maybeMsg) error {
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(root common.MapStr, ch chan<- maybeMsg) error {
+func (s *split) split(root mapstr.M, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.target)
 	s.log.Info(s.target)
 	s.log.Info(v)
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != mapstr.ErrKeyNotFound {
 		return err
 	}
 
@@ -172,7 +172,7 @@ func (s *split) split(root common.MapStr, ch chan<- maybeMsg) error {
 
 // sendMessage sends an array or map split result value, v, on ch after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(root common.MapStr, v interface{}, ch chan<- maybeMsg) error {
+func (s *split) sendMessage(root mapstr.M, v interface{}, ch chan<- maybeMsg) error {
 	obj, ok := toInterfaceStr(v)
 	if !ok {
 		return errExpectedSplitObj
@@ -199,34 +199,34 @@ func (s *split) sendMessage(root common.MapStr, v interface{}, ch chan<- maybeMs
 	return nil
 }
 
-func toMapStr(v interface{}) (common.MapStr, bool) {
+func toMapStr(v interface{}) (mapstr.M, bool) {
 	if v == nil {
-		return common.MapStr{}, false
+		return mapstr.M{}, false
 	}
 	switch t := v.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return t, true
 	case map[string]interface{}:
-		return common.MapStr(t), true
+		return mapstr.M(t), true
 	case string:
 		temp := make(map[string]interface{})
 		temp["data"] = t
-		return common.MapStr(temp), true
+		return mapstr.M(temp), true
 	}
-	return common.MapStr{}, false
+	return mapstr.M{}, false
 }
 
 func toInterfaceStr(v interface{}) (interface{}, bool) {
 	if v == nil {
-		return common.MapStr{}, false
+		return mapstr.M{}, false
 	}
 	switch t := v.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return t, true
 	case map[string]interface{}:
-		return common.MapStr(t), true
+		return mapstr.M(t), true
 	case string:
 		return t, true
 	}
-	return common.MapStr{}, false
+	return mapstr.M{}, false
 }
