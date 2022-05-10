@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
