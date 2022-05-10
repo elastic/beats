@@ -76,7 +76,7 @@ func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.Pl
 		byId:       map[string]*Monitor{},
 		mtx:        &sync.Mutex{},
 		pluginsReg: pluginsReg,
-		logger:     logp.NewLogger("monitor-factory"),
+		logger:     logp.L(),
 		runOnce:    runOnce,
 	}
 }
@@ -167,7 +167,7 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 
 		meta := clientCfg.Processing.Meta.Clone()
 		if settings.Pipeline != "" {
-			meta.Put("pipeline", settings.Pipeline)
+			_, _ = meta.Put("pipeline", settings.Pipeline)
 		}
 
 		procs := processors.NewList(nil)

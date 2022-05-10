@@ -60,34 +60,22 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		},
 	})
 	if len(se.Payload) > 0 {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		m.Put("synthetics.payload", se.Payload)
+		_, _ = m.Put("synthetics.payload", se.Payload)
 	}
 	if se.Blob != "" {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		m.Put("synthetics.blob", se.Blob)
+		_, _ = m.Put("synthetics.blob", se.Blob)
 	}
 	if se.BlobMime != "" {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		m.Put("synthetics.blob_mime", se.BlobMime)
+		_, _ = m.Put("synthetics.blob_mime", se.BlobMime)
 	}
 	if se.Step != nil {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		m.Put("synthetics.step", se.Step.ToMap())
+		_, _ = m.Put("synthetics.step", se.Step.ToMap())
 	}
 	if se.Journey != nil {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		m.Put("synthetics.journey", se.Journey.ToMap())
+		_, _ = m.Put("synthetics.journey", se.Journey.ToMap())
 	}
 	if se.Error != nil {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		m.Put("synthetics.error", se.Error.toMap())
+		_, _ = m.Put("synthetics.error", se.Error.toMap())
 	}
 
 	if se.URL != "" {
@@ -95,9 +83,7 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		if e != nil {
 			logp.Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			m.Put("url", wrappers.URLFields(u))
+			_, _ = m.Put("url", wrappers.URLFields(u))
 		}
 	}
 

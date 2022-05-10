@@ -69,7 +69,7 @@ func UDPDialer(to time.Duration) NetDialer {
 func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
 		return makeDialer(func(network, address string) (net.Conn, error) {
-			namespace := ""
+			var namespace string
 
 			switch network {
 			case "tcp", "tcp4", "tcp6":

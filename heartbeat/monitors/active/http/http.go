@@ -30,14 +30,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
 	plugin.Register("http", create, "synthetics/http")
 }
-
-var debugf = logp.MakeDebug("http")
 
 var userAgent = useragent.UserAgent("Heartbeat")
 

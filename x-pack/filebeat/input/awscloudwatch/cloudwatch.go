@@ -6,13 +6,14 @@ package awscloudwatch
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -93,15 +94,11 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.Cl
 		p.log.Debug("done sleeping")
 
 		p.log.Debugf("Processing #%v events", len(logEvents))
-		err := logProcessor.processLogEvents(logEvents, logGroup, p.region)
-		if err != nil {
-			err = errors.Wrap(err, "processLogEvents failed")
-			p.log.Error(err)
-		}
+		logProcessor.processLogEvents(logEvents, logGroup, p.region)
 	}
 
 	if err := paginator.Err(); err != nil {
-		return errors.Wrap(err, "error FilterLogEvents with Paginator")
+		return fmt.Errorf("error FilterLogEvents with Paginator: %w", err)
 	}
 	return nil
 }

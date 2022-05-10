@@ -34,11 +34,10 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
 }
 
 const (
-	montype    = "type"
 	schedule   = "schedule"
 	hosts      = "hosts"
 	processors = "processors"
@@ -55,10 +54,10 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 	err := cfg.Unpack(config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.NewLogger("hints.builder")}, nil
+	return &heartbeatHints{config, logp.L()}, nil
 }
 
 // Create config based on input hints in the bus event
@@ -99,7 +98,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	tempCfg := mapstr.M{}
 	monitors := builder.GetHintsAsList(hints, hb.config.Key)
 
-	var configs []*conf.C
+	configs := make([]*conf.C, 0, len(monitors))
 	for _, monitor := range monitors {
 		// If a monitor doesn't have a schedule associated with it then default it.
 		if _, ok := monitor[schedule]; !ok {
@@ -124,14 +123,6 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 
 	// Apply information in event to the template to generate the final config
 	return template.ApplyConfigTemplate(event, configs)
-}
-
-func (hb *heartbeatHints) getType(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, hb.config.Key, montype)
-}
-
-func (hb *heartbeatHints) getSchedule(hints mapstr.M) []string {
-	return builder.GetHintAsList(hints, hb.config.Key, schedule)
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {

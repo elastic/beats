@@ -2,18 +2,11 @@
   {
     "@timestamp": "2019-05-17T11:06:58.210768Z",
     "event": {
-      "action": "logged-out",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logoff",
       "code": "4634",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -21,14 +14,7 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "user": "audittest"
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-1000",
-      "name": "audittest"
-    },
+    "message": "An account was logged off.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1000\n\tAccount Name:\t\taudittest\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x767A77\n\nLogon Type:\t\t\t3\n\nThis event is generated when a logon session is destroyed. It may be positively correlated with a logon event using the Logon ID value. Logon IDs are only unique between reboots on the same computer.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
@@ -44,10 +30,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x767a77",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 776,
@@ -64,18 +46,11 @@
   {
     "@timestamp": "2019-05-19T16:15:38.542273Z",
     "event": {
-      "action": "logged-out",
-      "category": [
-        "authentication"
-      ],
+      "action": "Logoff",
       "code": "4634",
       "kind": "event",
-      "module": "security",
       "outcome": "success",
-      "provider": "Microsoft-Windows-Security-Auditing",
-      "type": [
-        "end"
-      ]
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -83,14 +58,7 @@
     "log": {
       "level": "information"
     },
-    "related": {
-      "user": "Administrator"
-    },
-    "user": {
-      "domain": "WIN-41OB2LO92CR",
-      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
-      "name": "Administrator"
-    },
+    "message": "An account was logged off.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x104A4A6\n\nLogon Type:\t\t\t3\n\nThis event is generated when a logon session is destroyed. It may be positively correlated with a logon event using the Logon ID value. Logon IDs are only unique between reboots on the same computer.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",
@@ -106,10 +74,6 @@
       "keywords": [
         "Audit Success"
       ],
-      "logon": {
-        "id": "0x104a4a6",
-        "type": "Network"
-      },
       "opcode": "Info",
       "process": {
         "pid": 780,
