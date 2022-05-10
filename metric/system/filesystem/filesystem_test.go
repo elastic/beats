@@ -25,28 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
-
-func TestMountList(t *testing.T) {
-	hostfs := resolve.NewTestResolver("/")
-
-	result, err := GetFilesystems(hostfs, nil)
-	assert.NoError(t, err, "GetFilesystems")
-
-	t.Logf("Usage:")
-
-	for _, res := range result {
-		err := res.GetUsage()
-		assert.NoError(t, err, "getUsage")
-		out := mapstr.M{}
-		err = typeconv.Convert(&out, res)
-		assert.NoError(t, err, "typeconv")
-		t.Logf("Usage: %s", out.StringToPrint())
-	}
-}
 
 func TestFileSystemList(t *testing.T) {
 	if runtime.GOOS == "darwin" && os.Getenv("TRAVIS") == "true" {
