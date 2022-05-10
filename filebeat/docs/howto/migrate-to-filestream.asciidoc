@@ -81,7 +81,7 @@ filebeat.inputs:
     - /var/log/my-old-files*.log
 ----
 
-=== 2. Exclude all processed files
+=== Step 2: Exclude all processed files
 
 Filebeat does not provide access to the state information of different inputs.
 Hence, filestream cannot access the state information of a log input in the
