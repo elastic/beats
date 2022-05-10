@@ -20,6 +20,7 @@ CHANGELOG*
 /dev-tools/ @elastic/elastic-agent-data-plane
 /docs/ @elastic/elastic-agent-data-plane
 /filebeat @elastic/elastic-agent-data-plane
+/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/security-external-integrations
 /filebeat/input/winlog/ @elastic/security-external-integrations
 /filebeat/module/ @elastic/integrations
@@ -57,6 +58,7 @@ CHANGELOG*
 /libbeat/processors/translate_sid/ @elastic/security-external-integrations
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
+/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/module/ @elastic/integrations
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
@@ -71,6 +73,7 @@ CHANGELOG*
 /x-pack/auditbeat/ @elastic/security-external-integrations
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
+/x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
 /x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
@@ -128,6 +131,7 @@ CHANGELOG*
 /x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
 /x-pack/heartbeat/ @elastic/uptime
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
+/x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/ @elastic/integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
 /x-pack/packetbeat/ @elastic/security-external-integrations
