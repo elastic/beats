@@ -558,7 +558,8 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 	lsTimestamp := mustParseTs(lsEvent["@timestamp"].(string))
 	esTimestamp := mustParseTs(esEvent["@timestamp"].(string))
 	nanos := time.Duration(esTimestamp.Nanosecond())
-	esTimestamp = esTimestamp.Add(-(nanos % time.Millisecond))
+	delta := nanos % time.Millisecond
+	esTimestamp = esTimestamp.Add(-delta)
 	assert.Equal(t, lsTimestamp, esTimestamp)
 
 	commonFields := []string{"host", "type", "message"}
