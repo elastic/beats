@@ -32,7 +32,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -545,24 +544,7 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 	lsEvent := ls["_source"].(map[string]interface{})
 	esEvent := es["_source"].(map[string]interface{})
 
-	mustParseTs := func(spec string) time.Time {
-		ts, err := common.ParseTime(spec)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return time.Time(ts)
-	}
-
-	// XXX: Logstash only support millsecond precisions. We assume that is still the case
-	// and round esTimestamp to millseconds as well
-	lsTimestamp := mustParseTs(lsEvent["@timestamp"].(string))
-	esTimestamp := mustParseTs(esEvent["@timestamp"].(string))
-	nanos := time.Duration(esTimestamp.Nanosecond())
-	delta := nanos % time.Millisecond
-	esTimestamp = esTimestamp.Add(-delta)
-	assert.Equal(t, lsTimestamp, esTimestamp)
-
-	commonFields := []string{"host", "type", "message"}
+	commonFields := []string{"@timestamp", "host", "type", "message"}
 	for _, field := range commonFields {
 		assert.NotNil(t, lsEvent[field])
 		assert.NotNil(t, esEvent[field])
