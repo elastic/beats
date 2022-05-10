@@ -165,21 +165,17 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 
 	// Load the overall steps to use (skipped inside of test environment, as they are never ran on the inside).
 	// These steps are duplicated per scenario.
-	var steps IntegrationTestSteps
 	if !IsInIntegTestEnv() {
 		for _, step := range globalIntegrationTestSetupSteps {
-			use, err := step.Use(dir)
+			_, err := step.Use(dir)
 			if err != nil {
 				return nil, errors.Wrapf(err, "%s step failed on Use", step.Name())
-			}
-			if use {
-				steps = append(steps, step)
 			}
 		}
 	}
 
 	// Create the runners (can only be multiple).
-	var runners IntegrationRunners
+	runners := make(IntegrationRunners, 0, len(globalIntegrationTesters))
 	for _, t := range globalIntegrationTesters {
 		use, err := t.Use(dir)
 		if err != nil {
@@ -295,7 +291,7 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 	inTeardown := false
 	defer func() {
 		if recoverErr := recover(); recoverErr != nil {
-			err = recoverErr.(error)
+			err = recoverErr.(error) //nolint:errcheck // Assignment to named err return value.
 			if !inTeardown {
 				// ignore errors
 				_ = r.steps.Teardown(r.env)
@@ -320,7 +316,7 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 			err = teardownErr
 		}
 	}
-	return
+	return err
 }
 
 // Test runs the test on each runner and collects the errors.

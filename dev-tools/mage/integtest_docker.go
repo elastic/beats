@@ -177,21 +177,23 @@ func (d *DockerIntegrationTester) InsideTest(test func() error) error {
 	return test()
 }
 
+const dockerServiceHostname = "localhost"
+
 // WithDefaultGoIntegTestEnv defines the default set of environment variables to use for Go integration testing.
 func WithDefaultGoIntegTestEnv(env map[string]string) map[string]string {
-	env["ES_HOST"] = "localhost"
+	env["ES_HOST"] = dockerServiceHostname
 	env["ES_USER"] = "beats"
 	env["ES_PASS"] = "testing"
 	env["ES_SUPERUSER_USER"] = "admin"
 	env["ES_SUPERUSER_PASS"] = "testing"
 
-	env["KIBANA_HOST"] = "localhost"
+	env["KIBANA_HOST"] = dockerServiceHostname
 	env["KIBANA_USER"] = "beats"
 	env["KIBANA_PASS"] = "testing"
 
-	env["REDIS_HOST"] = "localhost"
-	env["SREDIS_HOST"] = "localhost"
-	env["LS_HOST"] = "localhost"
+	env["REDIS_HOST"] = dockerServiceHostname
+	env["SREDIS_HOST"] = dockerServiceHostname
+	env["LS_HOST"] = dockerServiceHostname
 	return env
 }
 
@@ -324,7 +326,7 @@ func BuildIntegTestContainers() error {
 
 func StartIntegTestContainers() error {
 	// Start the docker-compose services and wait for them to become healthy.
-	// Using --detach causes the command to exit succesfully only if the proxy_dep for health
+	// Using --detach causes the command to exit successfully only if the proxy_dep for health
 	// completed successfully.
 	args := []string{"-p", DockerComposeProjectName(),
 		"up",

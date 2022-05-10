@@ -19,6 +19,7 @@ package mage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -32,7 +33,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -163,7 +163,7 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 		passThroughEnvs(env, IntegrationTestEnvVars()...)
 		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()), env)
 		if err != nil {
-			return errors.Wrapf(err, "test setup failed for module %s", fi.Name())
+			return fmt.Errorf("test setup failed for module %s: %w", fi.Name(), err)
 		}
 		err = runners.Test("goIntegTest", func() error {
 			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
@@ -187,8 +187,8 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 }
 
 // InstallGoTestTools installs additional tools that are required to run unit and integration tests.
-func InstallGoTestTools() {
-	gotool.Install(
+func InstallGoTestTools() error {
+	return gotool.Install(
 		gotool.Install.Package("gotest.tools/gotestsum"),
 	)
 }
@@ -264,7 +264,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	if params.OutputFile != "" {
 		fileOutput, err := os.Create(createDir(params.OutputFile))
 		if err != nil {
-			return errors.Wrap(err, "failed to create go test output file")
+			return fmt.Errorf("failed to create go test output file: %w", err)
 		}
 		defer fileOutput.Close()
 		outputs = append(outputs, fileOutput)
@@ -283,9 +283,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	var goTestErr *exec.ExitError
 	if err != nil {
 		// Command ran.
-		exitErr, ok := err.(*exec.ExitError)
-		if !ok {
-			return errors.Wrap(err, "failed to execute go")
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			return fmt.Errorf("failed to execute go: %w", err)
 		}
 
 		// Command ran but failed. Process the output.
@@ -294,7 +294,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	if goTestErr != nil {
 		// No packages were tested. Probably the code didn't compile.
-		return errors.Wrap(goTestErr, "go test returned a non-zero value")
+		return fmt.Errorf("go test returned a non-zero value: %w", goTestErr)
 	}
 
 	// Generate a HTML code coverage report.
@@ -306,14 +306,14 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 			"-html="+params.CoverageProfileFile,
 			"-o", htmlCoverReport)
 		if err = coverToHTML(); err != nil {
-			return errors.Wrap(err, "failed to write HTML code coverage report")
+			return fmt.Errorf("failed to write HTML code coverage report: %w", err)
 		}
 	}
 
 	// Return an error indicating that testing failed.
 	if goTestErr != nil {
 		fmt.Println(">> go test:", params.TestName, "Test Failed")
-		return errors.Wrap(goTestErr, "go test returned a non-zero value")
+		return fmt.Errorf("go test returned a non-zero value: %w", goTestErr)
 	}
 
 	fmt.Println(">> go test:", params.TestName, "Test Passed")
