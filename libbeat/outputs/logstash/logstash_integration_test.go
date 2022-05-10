@@ -543,7 +543,6 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 	lsEvent := ls["_source"].(map[string]interface{})
 	esEvent := es["_source"].(map[string]interface{})
-
 	commonFields := []string{"@timestamp", "host", "type", "message"}
 	for _, field := range commonFields {
 		assert.NotNil(t, lsEvent[field])
