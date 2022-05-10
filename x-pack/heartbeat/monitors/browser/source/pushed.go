@@ -64,10 +64,14 @@ func (p *PushedSource) Fetch() error {
 		return err
 	}
 
-	// set up npm project and ensure synthetics is installed
-	err = setupProjectDir(p.Workdir())
-	if err != nil {
-		return fmt.Errorf("setting up project dir failed: %w", err)
+	// Offline is not required for pushed resources as we are only linking
+	// to the globally installed agent, but useful for testing purposes
+	if !Offline() {
+		// set up npm project and ensure synthetics is installed
+		err = setupProjectDir(p.Workdir())
+		if err != nil {
+			return fmt.Errorf("setting up project dir failed: %w", err)
+		}
 	}
 
 	return nil
@@ -81,8 +85,8 @@ type PackageJSON struct {
 
 // setupProjectDir sets ups the required package.json file and
 // links the synthetics dependency to the globally installed one that is
-// baked in to the HB to maintain compatibility and allows us to control the
-// agent version
+// baked in to the Heartbeat image to maintain compatibility and
+// allows us to control the synthetics agent version
 func setupProjectDir(workdir string) error {
 	fname, err := exec.LookPath("elastic-synthetics")
 	if err == nil {

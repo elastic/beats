@@ -17,7 +17,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func setUpTests() func() {
+	GoOffline()
+	return func() {
+		GoOnline()
+	}
+}
+
 func TestPushedSource(t *testing.T) {
+	teardown := setUpTests()
+	defer teardown()
+
 	type testCase struct {
 		name    string
 		cfg     mapstr.M
@@ -56,7 +66,6 @@ func TestPushedSource(t *testing.T) {
 
 func validateFileContents(t *testing.T, dir string) {
 	expected := []string{
-		"package.json",
 		"examples/todos/helpers.ts",
 		"examples/todos/advanced.journey.ts",
 	}
