@@ -164,7 +164,7 @@ environment. If you're using a different output, such as {ls}, see:
 * <<load-ingest-pipelines>>
 =====
 
-NOTE: Filebeat should not be used to ingest its own log as it may lead to indefinite loop.
+NOTE: Filebeat should not be used to ingest its own log as this may lead to an infinite loop.
 
 [float]
 [[start]]
