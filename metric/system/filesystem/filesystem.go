@@ -135,8 +135,6 @@ func DefaultIgnoredTypes(sys resolve.Resolver) []string {
 func BuildFilterWithList(ignored []string) func(FSStat) bool {
 	return func(fs FSStat) bool {
 		for _, fsType := range ignored {
-			// XXX (andrewkroh): SystemType appears to be used for non-Windows
-			// and Type is used exclusively for Windows.
 			if fs.Type == fsType {
 				return false
 			}
@@ -181,6 +179,7 @@ func filterDuplicates(fsList []FSStat) []FSStat {
 func avoidFileSystem(fs FSStat) bool {
 	// Ignore relative mount points, which are present for example
 	// in /proc/mounts on Linux with network namespaces.
+	debugf("filtering: %#v", fs)
 	if !filepath.IsAbs(fs.Directory) {
 		debugf("Filtering filesystem with relative mountpoint %+v", fs)
 		return false

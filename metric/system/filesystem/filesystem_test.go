@@ -25,10 +25,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestFileSystemList(t *testing.T) {
+	_ = logp.DevelopmentSetup()
 	if runtime.GOOS == "darwin" && os.Getenv("TRAVIS") == "true" {
 		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
 	}
@@ -55,7 +57,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 	// if runtime.GOOS == "windows" {
 	// 	t.Skip("These cases don't need to work on Windows")
 	// }
-
+	_ = logp.DevelopmentSetup()
 	fakeDevDir, err := ioutil.TempDir(os.TempDir(), "dir")
 	assert.Empty(t, err)
 	defer os.RemoveAll(fakeDevDir)
@@ -65,6 +67,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 		fss, expected []FSStat
 	}{
 		{
+			description: "basic filter test to remove duplicates",
 			fss: []FSStat{
 				{Directory: "/", Device: "/dev/sda1"},
 				{Directory: "/", Device: "/dev/sda1"},
