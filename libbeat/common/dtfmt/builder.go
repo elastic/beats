@@ -134,16 +134,8 @@ func (b *builder) secondOfMinute(digits int) {
 	b.appendDecimal(ftSecondOfMinute, digits, 2)
 }
 
-func (b *builder) secondOfDay(digits int) {
-	b.appendDecimal(ftSecondOfDay, digits, 5)
-}
-
 func (b *builder) minuteOfHour(digits int) {
 	b.appendDecimal(ftMinuteOfHour, digits, 2)
-}
-
-func (b *builder) minuteOfDay(digits int) {
-	b.appendDecimal(ftMinuteOfDay, digits, 4)
 }
 
 func (b *builder) hourOfDay(digits int) {

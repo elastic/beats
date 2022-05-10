@@ -60,10 +60,10 @@ func (t Time) MarshalJSON() ([]byte, error) {
 // format.
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	if data[0] != []byte(`"`)[0] || data[len(data)-1] != []byte(`"`)[0] {
-		return errors.New("Not quoted")
+		return errors.New("not quoted")
 	}
 	*t, err = ParseTime(string(data[1 : len(data)-1]))
-	return
+	return err
 }
 
 func (t Time) Hash32(h hash.Hash32) error {

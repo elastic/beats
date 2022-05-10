@@ -105,7 +105,7 @@ func (f *Formatter) EstimateSize() int {
 
 func (f *Formatter) appendTo(ctx *ctx, b []byte, t time.Time) ([]byte, error) {
 	ctx.initTime(&f.config, t)
-	return f.prog.eval(b, ctx, t)
+	return f.prog.eval(b, ctx)
 }
 
 // AppendTo appends the formatted time value to the given byte buffer.

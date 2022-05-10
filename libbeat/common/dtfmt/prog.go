@@ -19,7 +19,6 @@ package dtfmt
 
 import (
 	"errors"
-	"time"
 )
 
 type prog struct {
@@ -54,7 +53,7 @@ func init() {
 	}
 }
 
-func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
+func (p prog) eval(bytes []byte, ctx *ctx) ([]byte, error) {
 	for i := 0; i < len(p.p); {
 		op := p.p[i]
 		i++
@@ -87,7 +86,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 		case opNum:
 			ft := fieldType(p.p[i])
 			i++
-			v, err := getIntField(ft, ctx, t)
+			v, err := getIntField(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}
@@ -95,7 +94,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 		case opNumPadded:
 			ft, digits := fieldType(p.p[i]), int(p.p[i+1])
 			i += 2
-			v, err := getIntField(ft, ctx, t)
+			v, err := getIntField(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}
@@ -104,7 +103,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 			ft, divExp, digits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2])
 			div := pow10Table[divExp]
 			i += 3
-			v, err := getIntField(ft, ctx, t)
+			v, err := getIntField(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}
@@ -113,7 +112,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 			ft, divExp, digits, fractDigits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2]), int(p.p[i+3])
 			div := pow10Table[divExp]
 			i += 4
-			v, err := getIntField(ft, ctx, t)
+			v, err := getIntField(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}
@@ -127,7 +126,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 		case opTwoDigit:
 			ft := fieldType(p.p[i])
 			i++
-			v, err := getIntField(ft, ctx, t)
+			v, err := getIntField(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}
@@ -135,7 +134,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 		case opTextShort:
 			ft := fieldType(p.p[i])
 			i++
-			s, err := getTextFieldShort(ft, ctx, t)
+			s, err := getTextFieldShort(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}
@@ -143,7 +142,7 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 		case opTextLong:
 			ft := fieldType(p.p[i])
 			i++
-			s, err := getTextField(ft, ctx, t)
+			s, err := getTextField(ft, ctx)
 			if err != nil {
 				return bytes, err
 			}

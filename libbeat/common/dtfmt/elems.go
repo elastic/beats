@@ -179,7 +179,7 @@ func (r runeLiteral) compile() (prog, error) {
 }
 
 func (s stringLiteral) compile() (prog, error) {
-	return makeCopy([]byte(s.s))
+	return makeCopy(s.s)
 }
 
 func (n unpaddedNumber) compile() (prog, error) {

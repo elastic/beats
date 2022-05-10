@@ -19,7 +19,6 @@ package dtfmt
 
 import (
 	"errors"
-	"time"
 )
 
 type fieldType uint8
@@ -45,7 +44,7 @@ const (
 	ftNanoOfSecond
 )
 
-func getIntField(ft fieldType, ctx *ctx, t time.Time) (int, error) {
+func getIntField(ft fieldType, ctx *ctx) (int, error) {
 	switch ft {
 	case ftYear:
 		return ctx.year, nil
@@ -112,7 +111,7 @@ func getIntField(ft fieldType, ctx *ctx, t time.Time) (int, error) {
 
 }
 
-func getTextField(ft fieldType, ctx *ctx, t time.Time) (string, error) {
+func getTextField(ft fieldType, ctx *ctx) (string, error) {
 	switch ft {
 	case ftHalfdayOfDay:
 		if ctx.hour < 12 {
@@ -151,7 +150,7 @@ func tzOffsetString(ctx *ctx) (string, error) {
 	return string(buf), nil
 }
 
-func getTextFieldShort(ft fieldType, ctx *ctx, t time.Time) (string, error) {
+func getTextFieldShort(ft fieldType, ctx *ctx) (string, error) {
 	switch ft {
 	case ftHalfdayOfDay:
 		if ctx.hour < 12 {

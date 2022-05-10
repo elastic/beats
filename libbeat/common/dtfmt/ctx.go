@@ -103,7 +103,3 @@ func (c *ctxConfig) enableISO() {
 func (c *ctxConfig) enableTimeZoneOffset() {
 	c.tzOffset = true
 }
-
-func isLeap(year int) bool {
-	return year%4 == 0 && (year%100 != 0 || year%400 == 0)
-}
