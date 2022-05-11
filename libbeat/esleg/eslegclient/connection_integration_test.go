@@ -34,10 +34,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConnect(t *testing.T) {
@@ -79,13 +79,13 @@ func TestConnectWithProxy(t *testing.T) {
 }
 
 func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"username": eslegtest.GetUser(),
 		"password": eslegtest.GetPass(),
 	})
 	require.NoError(t, err)
 
-	tmp, err := common.NewConfigFrom(cfg)
+	tmp, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
 
 	err = config.Merge(tmp)

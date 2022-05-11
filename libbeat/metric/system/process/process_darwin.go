@@ -42,9 +42,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // FetchPids returns a map and array of pids
@@ -151,7 +151,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 	return state, nil
 }
 
-func getProcArgs(pid int, filter func(string) bool) ([]string, string, common.MapStr, error) {
+func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M, error) {
 
 	exeName := ""
 
@@ -203,7 +203,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, common.Ma
 
 	delim := []byte{61} // "=" for key value pairs
 
-	envVars := common.MapStr{}
+	envVars := mapstr.M{}
 	for {
 		line, err := bbuf.ReadBytes(0)
 		if err == io.EOF || line[0] == 0 {

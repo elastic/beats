@@ -23,10 +23,10 @@ package status
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -45,7 +45,7 @@ func TestFetch(t *testing.T) {
 
 	// Check event fields
 	connections := event["connections"].(int64)
-	open := event["open"].(common.MapStr)
+	open := event["open"].(mapstr.M)
 	openTables := open["tables"].(int64)
 	openFiles := open["files"].(int64)
 	openStreams := open["streams"].(int64)
@@ -69,10 +69,10 @@ func TestFetchRaw(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
-	cachedThreads := event["threads"].(common.MapStr)["cached"].(int64)
+	cachedThreads := event["threads"].(mapstr.M)["cached"].(int64)
 	assert.True(t, cachedThreads >= 0)
 
-	rawData := event["raw"].(common.MapStr)
+	rawData := event["raw"].(mapstr.M)
 
 	// Make sure field was removed from raw fields as in schema
 	_, exists := rawData["Threads_cached"]

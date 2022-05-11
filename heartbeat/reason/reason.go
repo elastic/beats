@@ -17,7 +17,7 @@
 
 package reason
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
 type Reason interface {
 	error
@@ -55,21 +55,21 @@ func (e IOError) Error() string { return e.err.Error() }
 func (e IOError) Unwrap() error { return e.err }
 func (IOError) Type() string    { return "io" }
 
-func FailError(typ string, err error) common.MapStr {
-	return common.MapStr{
+func FailError(typ string, err error) mapstr.M {
+	return mapstr.M{
 		"type":    typ,
 		"message": err.Error(),
 	}
 }
 
-func Fail(r Reason) common.MapStr {
-	return common.MapStr{
+func Fail(r Reason) mapstr.M {
+	return mapstr.M{
 		"type":    r.Type(),
 		"message": r.Error(),
 	}
 }
 
-func FailIO(err error) common.MapStr { return Fail(IOError{err}) }
+func FailIO(err error) mapstr.M { return Fail(IOError{err}) }
 
 // MakeValidateError creates an instance of ValidateError from the given error.
 func MakeValidateError(err error) ValidateError {

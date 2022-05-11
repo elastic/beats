@@ -22,8 +22,8 @@ import (
 	stdjson "encoding/json"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
 )
@@ -51,7 +51,7 @@ var defaultConfig = Config{
 }
 
 func init() {
-	codec.RegisterType("json", func(info beat.Info, cfg *common.Config) (codec.Codec, error) {
+	codec.RegisterType("json", func(info beat.Info, cfg *config.C) (codec.Codec, error) {
 		config := defaultConfig
 		if cfg != nil {
 			if err := cfg.Unpack(&config); err != nil {

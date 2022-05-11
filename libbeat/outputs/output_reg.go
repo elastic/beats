@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var outputReg = map[string]Factory{}
@@ -31,7 +31,7 @@ type Factory func(
 	im IndexManager,
 	beat beat.Info,
 	stats Observer,
-	cfg *common.Config) (Group, error)
+	cfg *config.C) (Group, error)
 
 // IndexManager provides additional index related services to the outputs.
 type IndexManager interface {
@@ -39,7 +39,7 @@ type IndexManager interface {
 	// the outputs configuration.
 	// The defaultIndex is interpreted as format string and used as default fallback
 	// if no index is configured or all indices are guarded using conditionals.
-	BuildSelector(cfg *common.Config) (IndexSelector, error)
+	BuildSelector(cfg *config.C) (IndexSelector, error)
 }
 
 // IndexSelector is used to find the index name an event shall be indexed to.
@@ -74,7 +74,7 @@ func Load(
 	info beat.Info,
 	stats Observer,
 	name string,
-	config *common.Config,
+	config *config.C,
 ) (Group, error) {
 	factory := FindFactory(name)
 	if factory == nil {

@@ -20,8 +20,8 @@ package host
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/simulator"
@@ -50,26 +50,26 @@ func TestFetchEventContents(t *testing.T) {
 
 	assert.EqualValues(t, "localhost.localdomain", event["name"])
 
-	cpu := event["cpu"].(common.MapStr)
+	cpu := event["cpu"].(mapstr.M)
 
-	cpuUsed := cpu["used"].(common.MapStr)
+	cpuUsed := cpu["used"].(mapstr.M)
 	assert.EqualValues(t, 67, cpuUsed["mhz"])
 
-	cpuTotal := cpu["total"].(common.MapStr)
+	cpuTotal := cpu["total"].(mapstr.M)
 	assert.EqualValues(t, 4588, cpuTotal["mhz"])
 
-	cpuFree := cpu["free"].(common.MapStr)
+	cpuFree := cpu["free"].(mapstr.M)
 	assert.EqualValues(t, 4521, cpuFree["mhz"])
 
-	memory := event["memory"].(common.MapStr)
+	memory := event["memory"].(mapstr.M)
 
-	memoryUsed := memory["used"].(common.MapStr)
+	memoryUsed := memory["used"].(mapstr.M)
 	assert.EqualValues(t, uint64(1472200704), memoryUsed["bytes"])
 
-	memoryTotal := memory["total"].(common.MapStr)
+	memoryTotal := memory["total"].(mapstr.M)
 	assert.EqualValues(t, uint64(4294430720), memoryTotal["bytes"])
 
-	memoryFree := memory["free"].(common.MapStr)
+	memoryFree := memory["free"].(mapstr.M)
 	assert.EqualValues(t, uint64(2822230016), memoryFree["bytes"])
 }
 

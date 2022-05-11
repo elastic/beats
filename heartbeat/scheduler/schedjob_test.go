@@ -66,7 +66,8 @@ func TestSchedJobRun(t *testing.T) {
 			s := Create(limit, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 			if testCase.overLimit {
-				s.limitSem.Acquire(context.Background(), limit)
+				err := s.limitSem.Acquire(context.Background(), limit)
+				require.NoError(t, err)
 			}
 
 			wg := &sync.WaitGroup{}

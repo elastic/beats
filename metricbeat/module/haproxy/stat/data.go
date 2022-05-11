@@ -20,11 +20,11 @@ package stat
 import (
 	"reflect"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -187,7 +187,7 @@ func eventMapping(info []*haproxy.Stat, r mb.ReporterV2) {
 
 		fields, _ := schema.Apply(source)
 		event := mb.Event{
-			RootFields: common.MapStr{},
+			RootFields: mapstr.M{},
 		}
 
 		if processID, err := fields.GetValue("process_id"); err == nil {

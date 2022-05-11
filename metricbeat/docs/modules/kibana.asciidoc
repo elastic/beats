@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: kibana
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/kibana/_meta/docs.asciidoc
+
 
 [[metricbeat-module-kibana]]
 == Kibana module
@@ -27,6 +29,8 @@ monitoring index instead of the default index typically used by {metricbeat}.
 For more details about the monitoring index, see
 {ref}/config-monitoring-indices.html[Configuring indices for monitoring].
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -69,3 +73,4 @@ include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
 
+:edit_url!:

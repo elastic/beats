@@ -23,12 +23,12 @@ package memory
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -58,7 +58,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}
 
-	memory := common.MapStr{}
+	memory := mapstr.M{}
 	err = typeconv.Convert(&memory, &eventRaw)
 	if err != nil {
 		return err

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: redis
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/redis/_meta/docs.asciidoc
+
 
 [[metricbeat-module-redis]]
 == Redis module
@@ -42,6 +44,8 @@ redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
 The redis metricsets `info`, `key` and `keyspace` are compatible with all distributions of Redis (OSS and enterprise).
 They were tested with Redis 3.2.12, 4.0.11, 5.0-rc4 and 6.2.6, and are expected to work with all versions >= 3.0.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -101,3 +105,4 @@ include::redis/key.asciidoc[]
 
 include::redis/keyspace.asciidoc[]
 
+:edit_url!:

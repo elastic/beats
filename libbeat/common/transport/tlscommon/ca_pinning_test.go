@@ -36,7 +36,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var ser int64 = 1
@@ -45,7 +45,7 @@ func TestCAPinning(t *testing.T) {
 	host := "127.0.0.1"
 
 	t.Run("when the ca_sha256 field is not defined we use normal certificate validation", func(t *testing.T) {
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"verification_mode":       "strict",
 			"certificate_authorities": []string{"ca_test.pem"},
 		})
@@ -62,7 +62,7 @@ func TestCAPinning(t *testing.T) {
 	})
 
 	t.Run("when the ca_sha256 field is defined we use CA cert pinning", func(t *testing.T) {
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"ca_sha256": "hello",
 		})
 

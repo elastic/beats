@@ -21,7 +21,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 // ExtractContainerName strips the `/` characters that frequently appear in container names
@@ -38,11 +39,11 @@ func ExtractContainerName(names []string) string {
 	return strings.Trim(output, "/")
 }
 
-// DeDotLabels returns a new common.MapStr containing a copy of the labels
+// DeDotLabels returns a new mapstr.M containing a copy of the labels
 // where the dots have been converted into nested structure, avoiding
 // possible mapping errors
-func DeDotLabels(labels map[string]string, dedot bool) common.MapStr {
-	outputLabels := common.MapStr{}
+func DeDotLabels(labels map[string]string, dedot bool) mapstr.M {
+	outputLabels := mapstr.M{}
 	for k, v := range labels {
 		if dedot {
 			// This is necessary so that ES does not interpret '.' fields as new

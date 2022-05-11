@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/microsoft/_meta/docs.asciidoc
+
 [[filebeat-module-microsoft]]
 [role="xpack"]
 
@@ -270,3 +272,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-microsoft,exported fields>> section.
 
+edit_url!:

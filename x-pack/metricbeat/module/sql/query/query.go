@@ -11,10 +11,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // represents the response format of the query
@@ -107,10 +107,10 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
+func (m *MetricSet) getEvent(ms mapstr.M) mb.Event {
 	return mb.Event{
-		RootFields: common.MapStr{
-			"sql": common.MapStr{
+		RootFields: mapstr.M{
+			"sql": mapstr.M{
 				"driver":  m.Driver,
 				"query":   m.Query,
 				"metrics": getMetrics(ms),
@@ -119,12 +119,12 @@ func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
 	}
 }
 
-func getMetrics(ms common.MapStr) (ret common.MapStr) {
-	ret = common.MapStr{}
+func getMetrics(ms mapstr.M) (ret mapstr.M) {
+	ret = mapstr.M{}
 
-	numericMetrics := common.MapStr{}
-	stringMetrics := common.MapStr{}
-	boolMetrics := common.MapStr{}
+	numericMetrics := mapstr.M{}
+	stringMetrics := mapstr.M{}
+	boolMetrics := mapstr.M{}
 
 	for k, v := range ms {
 		switch v.(type) {

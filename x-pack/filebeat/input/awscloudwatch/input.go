@@ -6,6 +6,7 @@ package awscloudwatch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -14,16 +15,15 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -49,7 +49,7 @@ func (im *cloudwatchInputManager) Init(grp unison.Group, mode v2.Mode) error {
 	return nil
 }
 
-func (im *cloudwatchInputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) 
 	if config.LogGroupARN != "" {
 		logGroupName, regionName, err := parseARN(config.LogGroupARN)
 		if err != nil {
-			return nil, errors.Wrap(err, "parse log group ARN failed")
+			return nil, fmt.Errorf("parse log group ARN failed: %w", err)
 		}
 
 		config.LogGroupName = logGroupName
@@ -167,7 +167,7 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 	workerWg := new(sync.WaitGroup)
 	lastLogGroupOffset := 0
 	for ctx.Err() == nil {
-		if start == false {
+		if !start {
 			cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
 			time.Sleep(in.config.ScanFrequency)
 			cwPoller.log.Debug("done sleeping")
@@ -231,7 +231,7 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 func parseARN(logGroupARN string) (string, string, error) {
 	arnParsed, err := arn.Parse(logGroupARN)
 	if err != nil {
-		return "", "", errors.Errorf("error Parse arn %s: %v", logGroupARN, err)
+		return "", "", fmt.Errorf("error Parse arn %s: %w", logGroupARN, err)
 	}
 
 	if strings.Contains(arnParsed.Resource, ":") {
@@ -240,7 +240,7 @@ func parseARN(logGroupARN string) (string, string, error) {
 			return resourceARNSplit[1], arnParsed.Region, nil
 		}
 	}
-	return "", "", errors.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
+	return "", "", fmt.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
 }
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names

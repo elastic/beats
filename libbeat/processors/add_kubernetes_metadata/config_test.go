@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -49,7 +49,7 @@ func TestConfigValidate(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg := common.MustNewConfigFrom(test.cfg)
+		cfg := config.MustNewConfigFrom(test.cfg)
 		c := defaultKubernetesAnnotatorConfig()
 
 		err := cfg.Unpack(&c)
@@ -114,7 +114,7 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := common.NewConfigFrom(test.matcherConfig)
+		cfg, _ := config.NewConfigFrom(test.matcherConfig)
 
 		c := defaultKubernetesAnnotatorConfig()
 		c.DefaultMatchers = Enabled{false}

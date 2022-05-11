@@ -23,7 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // expandFields de-dots the keys in m by expanding them in-place into a
@@ -33,7 +33,7 @@ import (
 //
 // Note that expandFields is destructive, and in the case of an error the
 // map may be left in a semi-expanded state.
-func expandFields(m common.MapStr) error {
+func expandFields(m mapstr.M) error {
 	for k, v := range m {
 		newMap, newIsMap := getMap(v)
 		if newIsMap {
@@ -81,7 +81,7 @@ func expandFields(m common.MapStr) error {
 // objects with the same key in each object. If there exist
 // two entries with the same key in each object which
 // are not both objects, then an error will result.
-func mergeObjects(lhs, rhs common.MapStr) error {
+func mergeObjects(lhs, rhs mapstr.M) error {
 	for k, rhsValue := range rhs {
 		lhsValue, ok := lhs[k]
 		if !ok {
@@ -107,7 +107,7 @@ func getMap(v interface{}) (map[string]interface{}, bool) {
 	switch v := v.(type) {
 	case map[string]interface{}:
 		return v, true
-	case common.MapStr:
+	case mapstr.M:
 		return v, true
 	}
 	return nil, false

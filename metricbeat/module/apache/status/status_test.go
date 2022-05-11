@@ -32,8 +32,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
@@ -102,18 +102,18 @@ func TestFetchEventContents(t *testing.T) {
 	assert.Equal(t, 386.299, event["bytes_per_request"])
 	assert.Equal(t, .0628293, event["bytes_per_sec"])
 
-	workers := event["workers"].(common.MapStr)
+	workers := event["workers"].(mapstr.M)
 	assert.EqualValues(t, 1, workers["busy"])
 	assert.EqualValues(t, 99, workers["idle"])
 
-	connections := event["connections"].(common.MapStr)
-	async := connections["async"].(common.MapStr)
+	connections := event["connections"].(mapstr.M)
+	async := connections["async"].(mapstr.M)
 	assert.EqualValues(t, 3, async["closing"])
 	assert.EqualValues(t, 2, async["keep_alive"])
 	assert.EqualValues(t, 1, async["writing"])
 	assert.EqualValues(t, 6, connections["total"])
 
-	cpu := event["cpu"].(common.MapStr)
+	cpu := event["cpu"].(mapstr.M)
 	assert.Equal(t, 11.2, cpu["children_system"])
 	assert.Equal(t, 10.1, cpu["children_user"])
 	assert.Equal(t, 2.02841, cpu["load"])
@@ -122,14 +122,14 @@ func TestFetchEventContents(t *testing.T) {
 
 	assert.Equal(t, server.URL[7:], event["hostname"])
 
-	load := event["load"].(common.MapStr)
+	load := event["load"].(mapstr.M)
 	assert.Equal(t, .02, load["1"])
 	assert.Equal(t, .05, load["15"])
 	assert.Equal(t, .01, load["5"])
 
 	assert.Equal(t, .000162644, event["requests_per_sec"])
 
-	scoreboard := event["scoreboard"].(common.MapStr)
+	scoreboard := event["scoreboard"].(mapstr.M)
 	assert.Equal(t, 0, scoreboard["closing_connection"])
 	assert.Equal(t, 0, scoreboard["dns_lookup"])
 	assert.Equal(t, 0, scoreboard["gracefully_finishing"])
@@ -145,7 +145,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 167, event["total_accesses"])
 	assert.EqualValues(t, 63, event["total_kbytes"])
 
-	uptime := event["uptime"].(common.MapStr)
+	uptime := event["uptime"].(mapstr.M)
 	assert.EqualValues(t, 1026782, uptime["uptime"])
 	assert.EqualValues(t, 1026782, uptime["server_uptime"])
 }

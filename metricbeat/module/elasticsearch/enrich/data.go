@@ -21,11 +21,11 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -81,7 +81,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 		event := mb.Event{}
 
-		event.ModuleFields = common.MapStr{}
+		event.ModuleFields = mapstr.M{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
@@ -110,10 +110,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	for _, policy := range data.ExecutingPolicies {
 		event := mb.Event{}
 
-		event.ModuleFields = common.MapStr{}
+		event.ModuleFields = mapstr.M{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
-		event.MetricSetFields = common.MapStr{}
+		event.MetricSetFields = mapstr.M{}
 
 		policyName, ok := policy["name"]
 		if !ok {

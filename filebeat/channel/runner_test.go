@@ -27,9 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -84,8 +85,8 @@ func TestProcessorsForConfig(t *testing.T) {
 		"Set field in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
-						"fields": common.MapStr{"testField": "clientConfig"},
+					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
 			},
@@ -97,8 +98,8 @@ func TestProcessorsForConfig(t *testing.T) {
 			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
-						"fields": common.MapStr{"testField": "clientConfig"},
+					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
 			},
@@ -109,9 +110,9 @@ func TestProcessorsForConfig(t *testing.T) {
 	}
 	for description, test := range testCases {
 		if test.event.Fields == nil {
-			test.event.Fields = common.MapStr{}
+			test.event.Fields = mapstr.M{}
 		}
-		config, err := common.NewConfigFrom(test.configStr)
+		config, err := conf.NewConfigFrom(test.configStr)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
@@ -168,7 +169,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	configStr := `processors:
 - add_fields: {fields: {testField: value}}
 - add_fields: {fields: {testField2: stuff}}`
-	config, err := common.NewConfigFrom(configStr)
+	config, err := conf.NewConfigFrom(configStr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +195,7 @@ type setRawIndex struct {
 
 func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Meta == nil {
-		event.Meta = common.MapStr{}
+		event.Meta = mapstr.M{}
 	}
 	event.Meta[events.FieldMetaRawIndex] = p.indexStr
 	return event, nil

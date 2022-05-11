@@ -20,8 +20,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const debugSelector = "synthexec"
@@ -39,7 +39,7 @@ type FilterJourneyConfig struct {
 }
 
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, extraArgs ...string) (jobs.Job, error) {
+func SuiteJob(ctx context.Context, suitePath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields StdSuiteFields, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
 	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
@@ -71,9 +71,9 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StdSuiteFields, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields StdSuiteFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...) //nolint:gosec // we are safely building a command here, users can add args at their own risk
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
@@ -82,7 +82,7 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, fields StdSuiteFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
@@ -113,7 +113,7 @@ func runCmd(
 	ctx context.Context,
 	cmd *exec.Cmd,
 	stdinStr *string,
-	params common.MapStr,
+	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
 	mpx = NewExecMultiplexer()
@@ -136,7 +136,7 @@ func runCmd(
 	}
 
 	// Variant of the command with no params, which could contain sensitive stuff
-	loggableCmd := exec.Command(cmd.Path, cmd.Args...)
+	loggableCmd := exec.Command(cmd.Path, cmd.Args...) //nolint:gosec // we are safely building a command here...
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
@@ -166,7 +166,10 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan stdout events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 
@@ -176,14 +179,20 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan stderr events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan JSON events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 	err = cmd.Start()
@@ -195,7 +204,10 @@ func runCmd(
 	// Kill the process if the context ends
 	go func() {
 		<-ctx.Done()
-		cmd.Process.Kill()
+		err := cmd.Process.Kill()
+		if err != nil {
+			logp.Warn("could not kill synthetics process: %s", err)
+		}
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
@@ -261,7 +273,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
-			Payload: common.MapStr{
+			Payload: mapstr.M{
 				"message": text,
 			},
 		}, nil
@@ -288,7 +300,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	if res.Type == "" {
 		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
 	}
-	return
+	return res, err
 }
 
 // getNpmRoot gets the closest ancestor path that contains package.json.

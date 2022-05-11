@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestWriteJSONKeys(t *testing.T) {
@@ -32,15 +32,15 @@ func TestWriteJSONKeys(t *testing.T) {
 	now = now.Round(time.Second)
 
 	eventTimestamp := time.Date(2020, 01, 01, 01, 01, 00, 0, time.UTC)
-	eventMetadata := common.MapStr{
+	eventMetadata := mapstr.M{
 		"foo": "bar",
-		"baz": common.MapStr{
+		"baz": mapstr.M{
 			"qux": 17,
 		},
 	}
-	eventFields := common.MapStr{
+	eventFields := mapstr.M{
 		"top_a": 23,
-		"top_b": common.MapStr{
+		"top_b": mapstr.M{
 			"inner_c": "see",
 			"inner_d": "dee",
 		},
@@ -50,9 +50,9 @@ func TestWriteJSONKeys(t *testing.T) {
 		keys              map[string]interface{}
 		expandKeys        bool
 		overwriteKeys     bool
-		expectedMetadata  common.MapStr
+		expectedMetadata  mapstr.M
 		expectedTimestamp time.Time
-		expectedFields    common.MapStr
+		expectedFields    mapstr.M
 	}{
 		"overwrite_true": {
 			overwriteKeys: true,
@@ -71,17 +71,17 @@ func TestWriteJSONKeys(t *testing.T) {
 				},
 				"top_c": "COMPLETELY_NEW_c",
 			},
-			expectedMetadata: common.MapStr{
+			expectedMetadata: mapstr.M{
 				"foo": "NEW_bar",
-				"baz": common.MapStr{
+				"baz": mapstr.M{
 					"qux":   "NEW_qux",
 					"durrr": "COMPLETELY_NEW",
 				},
 			},
 			expectedTimestamp: now,
-			expectedFields: common.MapStr{
+			expectedFields: mapstr.M{
 				"top_a": 23,
-				"top_b": common.MapStr{
+				"top_b": mapstr.M{
 					"inner_c": "see",
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
@@ -106,17 +106,17 @@ func TestWriteJSONKeys(t *testing.T) {
 				},
 				"top_c": "COMPLETELY_NEW_c",
 			},
-			expectedMetadata: common.MapStr{
+			expectedMetadata: mapstr.M{
 				"foo": "NEW_bar",
-				"baz": common.MapStr{
+				"baz": mapstr.M{
 					"qux":   "NEW_qux",
 					"durrr": "COMPLETELY_NEW",
 				},
 			},
 			expectedTimestamp: now,
-			expectedFields: common.MapStr{
+			expectedFields: mapstr.M{
 				"top_a": 23,
-				"top_b": common.MapStr{
+				"top_b": mapstr.M{
 					"inner_c": "see",
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
@@ -143,9 +143,9 @@ func TestWriteJSONKeys(t *testing.T) {
 			},
 			expectedMetadata:  eventMetadata.Clone(),
 			expectedTimestamp: eventTimestamp,
-			expectedFields: common.MapStr{
+			expectedFields: mapstr.M{
 				"top_a": 23,
-				"top_b": common.MapStr{
+				"top_b": mapstr.M{
 					"inner_c": "see",
 					"inner_d": "dee",
 					"inner_e": "COMPLETELY_NEW_e",
@@ -163,11 +163,11 @@ func TestWriteJSONKeys(t *testing.T) {
 			},
 			expectedMetadata:  eventMetadata.Clone(),
 			expectedTimestamp: eventTimestamp,
-			expectedFields: common.MapStr{
+			expectedFields: mapstr.M{
 				"top_a": 23,
-				"top_b": common.MapStr{
+				"top_b": mapstr.M{
 					"inner_c": "see",
-					"inner_d": common.MapStr{
+					"inner_d": mapstr.M{
 						"inner_e": "COMPLETELY_NEW_e",
 					},
 				},
@@ -183,9 +183,9 @@ func TestWriteJSONKeys(t *testing.T) {
 			},
 			expectedMetadata:  eventMetadata.Clone(),
 			expectedTimestamp: eventTimestamp,
-			expectedFields: common.MapStr{
+			expectedFields: mapstr.M{
 				"top_a": 23,
-				"top_b": common.MapStr{
+				"top_b": mapstr.M{
 					"inner_c":         "see",
 					"inner_d":         "dee",
 					"inner_d.inner_e": "COMPLETELY_NEW_e",

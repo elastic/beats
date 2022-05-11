@@ -23,13 +23,13 @@ package socket_summary
 import (
 	"github.com/shirou/gopsutil/v3/net"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 //a stub function for non-linux systems
 //get a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr, sys resolve.Resolver) (common.MapStr, error) {
+func applyEnhancements(data mapstr.M, sys resolve.Resolver) (mapstr.M, error) {
 	return data, nil
 }
 

@@ -19,9 +19,9 @@ import (
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Config defines all required and optional parameters for aws metricsets
@@ -200,9 +200,9 @@ func StringInSlice(str string, list []string) (bool, int) {
 func InitEvent(regionName string, accountName string, accountID string, timestamp time.Time) mb.Event {
 	event := mb.Event{
 		Timestamp:       timestamp,
-		MetricSetFields: common.MapStr{},
-		ModuleFields:    common.MapStr{},
-		RootFields:      common.MapStr{},
+		MetricSetFields: mapstr.M{},
+		ModuleFields:    mapstr.M{},
+		RootFields:      mapstr.M{},
 	}
 
 	event.RootFields.Put("cloud.provider", "aws")

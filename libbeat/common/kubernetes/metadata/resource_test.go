@@ -25,9 +25,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
@@ -38,7 +38,7 @@ func TestResource_Generate(t *testing.T) {
 	boolean := true
 	tests := []struct {
 		input  kubernetes.Resource
-		output common.MapStr
+		output mapstr.M
 		name   string
 	}{
 		{
@@ -58,13 +58,13 @@ func TestResource_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
 					"namespace": "default",
@@ -97,17 +97,17 @@ func TestResource_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"pod": common.MapStr{
+			output: mapstr.M{
+				"kubernetes": mapstr.M{
+					"pod": mapstr.M{
 						"name": "obj",
 						"uid":  uid,
 					},
-					"labels": common.MapStr{
+					"labels": mapstr.M{
 						"foo": "bar",
 					},
 					"namespace": "default",
-					"deployment": common.MapStr{
+					"deployment": mapstr.M{
 						"name": "owner",
 					},
 				},

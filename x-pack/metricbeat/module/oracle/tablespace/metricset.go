@@ -6,8 +6,8 @@ package tablespace
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
@@ -37,7 +37,12 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := oracle.ConnectionDetails{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error parsing config file")
+		return nil, fmt.Errorf("error parsing config file: %w", err)
+	}
+
+	// Warn the user if the collection period value is less than 1 minute.
+	if CheckCollectionPeriod(base.Module().Config().Period) {
+		base.Logger().Warn("The current value of period is significantly low and might waste cycles and resources. Please set the period value to at least 1 minute or more.")
 	}
 
 	return &MetricSet{
@@ -46,13 +51,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// CheckCollectionPeriod method returns true if the period is less than 1 minute.
+func CheckCollectionPeriod(period time.Duration) bool {
+	return period < time.Minute
+}
+
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
 	db, err := oracle.NewConnection(&m.connectionDetails)
 	if err != nil {
-		return errors.Wrap(err, "error creating connection to Oracle")
+		return fmt.Errorf("error creating connection to Oracle: %w", err)
 	}
 	defer db.Close()
 
@@ -60,12 +70,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 
 	events, err := m.extractAndTransform(ctx)
 	if err != nil {
-		return errors.Wrap(err, "error getting or interpreting data from Oracle")
+		return fmt.Errorf("error getting or interpreting data from Oracle: %w", err)
 	}
 
 	m.Load(ctx, events, reporter)
 
-	return
+	return err
 }
 
 //Load is the L of an ETL. In this case, takes the events and sends them to Elasticseach

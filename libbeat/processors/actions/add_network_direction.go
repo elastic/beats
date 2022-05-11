@@ -24,11 +24,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -54,7 +54,7 @@ type networkDirectionProcessor struct {
 }
 
 // NewAddNetworkDirection constructs a new network direction processor.
-func NewAddNetworkDirection(cfg *common.Config) (processors.Processor, error) {
+func NewAddNetworkDirection(cfg *conf.C) (processors.Processor, error) {
 	networkDirection := &networkDirectionProcessor{}
 	if err := cfg.Unpack(networkDirection); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the add_network_direction configuration")

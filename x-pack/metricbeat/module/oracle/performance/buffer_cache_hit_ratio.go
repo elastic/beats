@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type bufferCacheHitRatio struct {
@@ -53,12 +53,12 @@ FROM V$BUFFER_POOL_STATISTICS`)
 }
 
 // addTempFreeSpaceData is specific to the TEMP Tablespace.
-func (m *MetricSet) addBufferCacheRatioData(bs []bufferCacheHitRatio) map[string]common.MapStr {
-	out := make(map[string]common.MapStr)
+func (m *MetricSet) addBufferCacheRatioData(bs []bufferCacheHitRatio) map[string]mapstr.M {
+	out := make(map[string]mapstr.M)
 
 	for _, bufferCacheHitRatio := range bs {
 		if _, found := out[bufferCacheHitRatio.name.String]; !found {
-			out[bufferCacheHitRatio.name.String] = common.MapStr{}
+			out[bufferCacheHitRatio.name.String] = mapstr.M{}
 		}
 
 		_, _ = out[bufferCacheHitRatio.name.String].Put("buffer_pool", bufferCacheHitRatio.name.String)

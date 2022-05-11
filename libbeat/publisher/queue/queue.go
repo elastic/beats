@@ -18,21 +18,42 @@
 package queue
 
 import (
+	"errors"
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *common.Config, int) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *config.C, int) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {
 	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
+
+//Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
+type Metrics struct {
+	//EventCount is the total events currently in the queue
+	EventCount opt.Uint
+	//ByteCount is the total byte size of the queue
+	ByteCount opt.Uint
+	//ByteLimit is the user-configured byte limit of the queue
+	ByteLimit opt.Uint
+	//EventLimit is the user-configured event limit of the queue
+	EventLimit opt.Uint
+
+	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
+	OldestActiveTimestamp common.Time
+}
+
+// ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented
+var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
@@ -50,6 +71,8 @@ type Queue interface {
 
 	Producer(cfg ProducerConfig) Producer
 	Consumer() Consumer
+
+	Metrics() (Metrics, error)
 }
 
 // BufferConfig returns the pipelines buffering settings,

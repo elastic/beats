@@ -22,26 +22,27 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateAppender(t *testing.T) {
 	tests := []struct {
 		name        string
-		eventConfig common.MapStr
+		eventConfig mapstr.M
 		event       bus.Event
-		result      common.MapStr
+		result      mapstr.M
 		config      string
 	}{
 		{
 			name:  "Appender without a condition should apply the config regardless",
 			event: bus.Event{},
-			result: common.MapStr{
+			result: mapstr.M{
 				"test":  "bar",
 				"test1": "foo",
 			},
-			eventConfig: common.MapStr{
+			eventConfig: mapstr.M{
 				"test": "bar",
 			},
 			config: `
@@ -53,10 +54,10 @@ config:
 			event: bus.Event{
 				"field": "notbar",
 			},
-			result: common.MapStr{
+			result: mapstr.M{
 				"test": "bar",
 			},
-			eventConfig: common.MapStr{
+			eventConfig: mapstr.M{
 				"test": "bar",
 			},
 			config: `
@@ -70,11 +71,11 @@ condition.equals:
 			event: bus.Event{
 				"field": "bar",
 			},
-			result: common.MapStr{
+			result: mapstr.M{
 				"test":  "bar",
 				"test2": "foo",
 			},
-			eventConfig: common.MapStr{
+			eventConfig: mapstr.M{
 				"test": "bar",
 			},
 			config: `
@@ -86,7 +87,7 @@ condition.equals:
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config, err := common.NewConfigWithYAML([]byte(test.config), "")
+			config, err := conf.NewConfigWithYAML([]byte(test.config), "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -95,16 +96,16 @@ condition.equals:
 			assert.NoError(t, err)
 			assert.NotNil(t, appender)
 
-			eveConfig, err := common.NewConfigFrom(&test.eventConfig)
+			eveConfig, err := conf.NewConfigFrom(&test.eventConfig)
 			assert.NoError(t, err)
 
-			test.event["config"] = []*common.Config{eveConfig}
+			test.event["config"] = []*conf.C{eveConfig}
 			appender.Append(test.event)
 
-			cfgs, _ := test.event["config"].([]*common.Config)
+			cfgs, _ := test.event["config"].([]*conf.C)
 			assert.Equal(t, len(cfgs), 1)
 
-			out := common.MapStr{}
+			out := mapstr.M{}
 			cfgs[0].Unpack(&out)
 
 			assert.Equal(t, out, test.result)

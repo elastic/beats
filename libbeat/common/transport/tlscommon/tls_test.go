@@ -30,14 +30,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // test TLS config loading
 
 func load(yamlStr string) (*Config, error) {
 	var cfg Config
-	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	config, err := config.NewConfigWithYAML([]byte(yamlStr), "")
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func TestApplyWithConfig(t *testing.T) {
 func TestServerConfigDefaults(t *testing.T) {
 	t.Run("when CA is not explicitly set", func(t *testing.T) {
 		var c ServerConfig
-		config := common.MustNewConfigFrom(`
+		config := config.MustNewConfigFrom(`
 certificate: mycert.pem
 key: mykey.pem
 `)
@@ -207,7 +207,7 @@ key: mykey.pem
     key: mykey.pem
 `
 		var c ServerConfig
-		config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+		config, err := config.NewConfigWithYAML([]byte(yamlStr), "")
 		err = config.Unpack(&c)
 		c.Certificate = CertificateConfig{} // prevent reading non-existent files
 		require.NoError(t, err)
@@ -243,7 +243,7 @@ func TestApplyWithServerConfig(t *testing.T) {
     curve_types: [P-384]
   `
 	var c ServerConfig
-	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	config, err := config.NewConfigWithYAML([]byte(yamlStr), "")
 	for i, ver := range TLSDefaultVersions {
 		config.SetString("supported_protocols", i, ver.String())
 	}
@@ -306,7 +306,7 @@ func TestCertificateFails(t *testing.T) {
 
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("run test (%v): %v", i, test.title), func(t *testing.T) {
-			config, err := common.NewConfigWithYAML([]byte(test.yaml), "")
+			config, err := config.NewConfigWithYAML([]byte(test.yaml), "")
 			if err != nil {
 				t.Error(err)
 				return

@@ -18,8 +18,8 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // queueReader is a standalone stateless helper goroutine to dispatch
