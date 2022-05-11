@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -57,7 +57,7 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.NewLogger("hints.builder")}, nil
+	return &heartbeatHints{config, logp.L()}, nil
 }
 
 // Create config based on input hints in the bus event

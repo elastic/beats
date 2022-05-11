@@ -6,6 +6,7 @@ package browser
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -13,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -104,6 +106,13 @@ func (s *Suite) extraArgs() []string {
 			}
 		case string:
 			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", s.suiteCfg.Throttling))
+		case map[string]interface{}:
+			j, err := json.Marshal(t)
+			if err != nil {
+				logp.L().Warnf("could not serialize throttling config to JSON: %s", err)
+			} else {
+				extraArgs = append(extraArgs, "--throttling", string(j))
+			}
 		}
 	}
 

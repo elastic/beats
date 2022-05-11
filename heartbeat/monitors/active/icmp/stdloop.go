@@ -33,10 +33,8 @@ import (
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-var logger = logp.NewLogger("ICMP-Stdloop")
 
 type stdICMPLoop struct {
 	conn4, conn6 *icmp.PacketConn
@@ -167,7 +165,7 @@ func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 		bytes := make([]byte, 512)
 		err := conn.SetReadDeadline(time.Now().Add(time.Second))
 		if err != nil {
-			logger.Error("could not set read deadline for ICMP: %w", err)
+			logp.L().Error("could not set read deadline for ICMP: %w", err)
 			return
 		}
 		_, addr, err := conn.ReadFrom(bytes)

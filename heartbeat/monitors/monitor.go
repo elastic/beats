@@ -29,9 +29,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
@@ -174,6 +174,8 @@ func newMonitorUnsafe(
 		// Note, needed to hoist err to this scope, not just to add a prefix
 		fullErr := fmt.Errorf("job could not be initialized: %w", err)
 		// A placeholder job that always returns an error
+
+		logp.L().Error(fullErr)
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			return nil, fullErr
 		}}
@@ -226,9 +228,9 @@ func (m *Monitor) Start() {
 
 	for _, t := range m.configuredJobs {
 		if m.runOnce {
-			client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+			client, err := pipeline.NewSyncClient(logp.L(), t.monitor.pipelineConnector, beat.ClientConfig{})
 			if err != nil {
-				logp.Err("could not start monitor: %v", err)
+				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
@@ -241,7 +243,7 @@ func (m *Monitor) Start() {
 		} else {
 			client, err := m.pipelineConnector.Connect()
 			if err != nil {
-				logp.Err("could not start monitor: %v", err)
+				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
@@ -273,7 +275,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.Error(fmt.Errorf("error closing monitor %s: %w", m.String(), err))
+			logp.L().Error("error closing monitor %s: %w", m.String(), err)
 		}
 	}
 
