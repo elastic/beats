@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"reflect"
 	"testing"
 	"time"
 
@@ -281,13 +282,7 @@ func TestPublish(t *testing.T) {
 
 		listener, err := net.Listen("tcp", "localhost:0") // random available port
 		require.NoError(t, err)
-
 		defer grpcServer.Stop()
-		// run with a 2 second delay
-		go func() {
-			<-time.After(2 * time.Second)
-			_ = grpcServer.Serve(listener)
-		}()
 
 		cfg, err := config.NewConfigFrom(map[string]interface{}{
 			"server":  listener.Addr().String(),
@@ -317,18 +312,32 @@ func TestPublish(t *testing.T) {
 		}
 		require.Equal(t, expSignals, batch.Signals)
 
-		<-time.After(2 * time.Second)
+		// Start the server
+		go func() {
+			_ = grpcServer.Serve(listener)
+		}()
 
-		batch = outest.NewBatch(events...)
-		err = group.Clients[0].Publish(ctx, batch)
-		require.NoError(t, err)
-
+		var actSignals []outest.BatchSignal
 		expSignals = []outest.BatchSignal{
 			{
 				Tag: outest.BatchACK,
 			},
 		}
-		require.Equal(t, expSignals, batch.Signals)
+
+		// Poll for the batch to be acknowledged. The gRPC server takes a variable amount
+		// of time to start, so some retries are necessary.
+		require.Eventually(t, func() bool {
+			batch = outest.NewBatch(events...)
+			err = group.Clients[0].Publish(ctx, batch)
+			require.NoError(t, err)
+
+			actSignals = batch.Signals
+			return reflect.DeepEqual(expSignals, batch.Signals)
+		}, 5*time.Second, 500*time.Millisecond)
+
+		// Use require.Equal() on the final signal set. If the Eventually() loop above
+		// failed this will print the difference between the signal sets.
+		require.Equal(t, expSignals, actSignals)
 	})
 }
 
