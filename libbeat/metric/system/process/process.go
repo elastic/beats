@@ -131,7 +131,7 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	}
 
 	// actually fetch the PIDs from the OS-specific code
-	_, plist, err := init.FetchPids()
+	_, plist, err := init.FetchPids() //nolint:typecheck // platform-specific code
 	if err != nil {
 		return nil, fmt.Errorf("error gathering PIDs: %w", err)
 	}
@@ -199,7 +199,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	}
 
 	// actually fetch the PIDs from the OS-specific code
-	pidMap, plist, err := procStats.FetchPids()
+	pidMap, plist, err := procStats.FetchPids() //nolint:typecheck // platform-specific code
 
 	if err != nil {
 		return nil, nil, fmt.Errorf("error gathering PIDs: %w", err)
@@ -302,7 +302,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// Fetch proc state so we can get the name for filtering based on user's filter.
 
 	// OS-specific entrypoint, get basic info so we can at least run matchProcess
-	status, err := GetInfoForPid(procStats.Hostfs, pid)
+	status, err := GetInfoForPid(procStats.Hostfs, pid) //nolint:typecheck // platform-specific code
 	if err != nil {
 		return status, true, fmt.Errorf("GetInfoForPid: %w", err)
 	}
@@ -319,7 +319,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	}
 
 	//If we've passed the filter, continue to fill out the rest of the metrics
-	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
+	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar) //nolint:typecheck // platform-specific code
 	if err != nil {
 		return status, true, fmt.Errorf("FillPidMetrics: %w", err)
 	}
