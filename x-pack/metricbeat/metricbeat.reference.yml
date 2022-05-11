@@ -1371,7 +1371,7 @@ metricbeat.modules:
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
-  metricsets: ["node", "queue", "connection","shovel"]
+  metricsets: ["node", "queue", "connection", "exchange", "shovel"]
   enabled: true
   period: 10s
   hosts: ["localhost:15672"]
