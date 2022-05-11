@@ -56,9 +56,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/metric/system/host"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
-	"github.com/elastic/beats/v7/libbeat/monitoring/report/buffer"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -72,6 +70,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/configure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
 	"github.com/elastic/elastic-agent-libs/paths"
 	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -483,7 +483,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// only collect into a ring buffer if HTTP, and the ring buffer are explicitly enabled
 	if b.Config.HTTP.Enabled() && monitoring.IsBufferEnabled(b.Config.BufferConfig) {
-		buffReporter, err := buffer.MakeReporter(b.Info, b.Config.BufferConfig)
+		buffReporter, err := buffer.MakeReporter(b.Config.BufferConfig)
 		if err != nil {
 			return err
 		}
