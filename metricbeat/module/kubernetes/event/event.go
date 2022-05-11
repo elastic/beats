@@ -24,10 +24,10 @@ import (
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -118,8 +118,8 @@ func getClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
 	}
 	ecsClusterMeta := mapstr.M{}
-	if clusterInfo.Url != "" {
-		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
+	if clusterInfo.URL != "" {
+		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
 	}
 	if clusterInfo.Name != "" {
 		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
