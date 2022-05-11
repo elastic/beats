@@ -54,7 +54,7 @@ func makeEvent() publisher.Event {
 		Content: beat.Event{
 			Timestamp: eventTime,
 			Fields: mapstr.M{
-				"message": msgs[rand.Intn(len(msgs))],
+				"message": msgs[rand.Intn(len(msgs))], //nolint:gosec // crypto rand not required
 			},
 		},
 	}
@@ -110,7 +110,7 @@ func produceAndConsume(p queue.Producer, c queue.Consumer, num_events int, batch
 
 //benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
-func benchmarkQueue(num_events int, batch_size int, b *testing.B) {
+func benchmarkQueue(num_events int, batch_size int, b *testing.B) { //nolint:unparam // num_events likely to change in future
 	var err error
 	q, p, c := setup()
 	b.ResetTimer()
