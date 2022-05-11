@@ -109,8 +109,14 @@ func DefaultPythonTestUnitArgs() PythonTestArgs { return makePythonTestArgs("Uni
 // running all integration tests. Integration tests are made conditional by
 // checking for INTEGRATION_TEST=1 in the test code.
 func DefaultPythonTestIntegrationArgs() PythonTestArgs {
+	return makePythonTestArgs("Integration")
+}
+
+// DefaultPythonTestIntegrationFromHostArgs returns a default set of arguments for running
+// all integration tests from the host system (outside the docker network).
+func DefaultPythonTestIntegrationFromHostArgs() PythonTestArgs {
 	args := makePythonTestArgs("Integration")
-	args.Env = WithDefaultPythonIntegTestEnv(args.Env)
+	args.Env = WithPythonIntegTestHostEnv(args.Env)
 	return args
 }
 

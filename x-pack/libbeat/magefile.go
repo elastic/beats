@@ -55,11 +55,11 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(Fields)
-	return devtools.GoIntegTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, devtools.BuildSystemTestBinary)
-	return devtools.PythonIntegTest(devtools.DefaultPythonTestIntegrationArgs())
+	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }

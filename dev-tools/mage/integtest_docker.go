@@ -177,8 +177,9 @@ func (d *DockerIntegrationTester) InsideTest(test func() error) error {
 
 const dockerServiceHostname = "localhost"
 
-// WithDefaultGoIntegTestEnv defines the default set of environment variables to use for Go integration testing.
-func WithDefaultGoIntegTestEnv(env map[string]string) map[string]string {
+// WithGoIntegTestHostEnv adds the integeration testing environment variables needed when running Go
+// test from the host system with GoIntegTestFromHost().
+func WithGoIntegTestHostEnv(env map[string]string) map[string]string {
 	env["ES_HOST"] = dockerServiceHostname
 	env["ES_USER"] = "beats"
 	env["ES_PASS"] = "testing"
@@ -195,17 +196,18 @@ func WithDefaultGoIntegTestEnv(env map[string]string) map[string]string {
 	return env
 }
 
-// WithDefaultPythonIntegTestEnv defines the default set of environment variables to use for Python integration testing.
-func WithDefaultPythonIntegTestEnv(env map[string]string) map[string]string {
+// WithPythonIntegTestHostEnv adds the integeration testing environment variables needed when running
+// pytest from the host system with PythonIntegTestFromHost().
+func WithPythonIntegTestHostEnv(env map[string]string) map[string]string {
 	env["INTEGRATION_TESTS"] = "1"
 	env["MODULES_PATH"] = CWD("module")
-	return WithDefaultGoIntegTestEnv(env)
+	return WithGoIntegTestHostEnv(env)
 }
 
-// GoIntegTest starts docker-compose, waits for services to be healthy, and then runs "go test" on
+// GoIntegTestFromHost starts docker-compose, waits for services to be healthy, and then runs "go test" on
 // the host system with the arguments set to enable integration tests. The test results are printed
 // to stdout and the container logs are saved in the build/system-test directory.
-func GoIntegTest(ctx context.Context, params GoTestArgs) error {
+func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
 	var err error
 	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
 	if err != nil {
@@ -243,7 +245,7 @@ func GoIntegTest(ctx context.Context, params GoTestArgs) error {
 // PythonIntegTest starts docker-compose, waits for services to be healthy, and then runs "pytest" on
 // the host system with the arguments set to enable integration tests. The test results are printed
 // to stdout and the container logs are saved in the build/system-test directory.
-func PythonIntegTest(params PythonTestArgs) error {
+func PythonIntegTestFromHost(params PythonTestArgs) error {
 	var err error
 	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
 	if err != nil {

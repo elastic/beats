@@ -24,6 +24,8 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
+	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 

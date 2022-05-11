@@ -72,21 +72,21 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(Fields)
-	args := devtools.DefaultGoTestIntegrationArgs()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
 	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
-	return devtools.GoIntegTest(ctx, args)
+	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, devtools.BuildSystemTestBinary)
-	args := devtools.DefaultPythonTestIntegrationArgs()
+	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
 	// ES_USER must be admin in order for the integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
 	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
-	return devtools.PythonIntegTest(args)
+	return devtools.PythonIntegTestFromHost(args)
 }
