@@ -30,8 +30,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -379,12 +377,12 @@ func StopIntegTestContainers() error {
 func DockerComposeProjectName() string {
 	commit, err := CommitHash()
 	if err != nil {
-		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+		panic(fmt.Errorf("failed to construct docker compose project name: %w", err))
 	}
 
 	version, err := BeatQualifiedVersion()
 	if err != nil {
-		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+		panic(fmt.Errorf("failed to construct docker compose project name: %w", err))
 	}
 	version = strings.NewReplacer(".", "_").Replace(version)
 
@@ -471,10 +469,10 @@ func WriteDockerComposeEnvFile() (string, error) {
 	}
 
 	envFile := path.Join(esBeatsDir, "docker.env")
-	err = os.WriteFile(
+	err = os.WriteFile( //nolint:gosec // File permissions are not a security risk.
 		envFile,
 		[]byte(strings.Join(envFileContent, "\n")),
-		0644, //nolint:gosec // Intentionally readable by others.
+		0644,
 	)
 	if err != nil {
 		return "", err
