@@ -99,13 +99,18 @@ func (m *PersistentVolumeMetricSet) Fetch(reporter mb.ReporterV2) {
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		event[mb.NamespaceKey] = "persistentvolume"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
+
+		e, err := util.CreateEvent(event, "kubernetes.persistentvolume")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}
 	}
+
 	return
 }
 
