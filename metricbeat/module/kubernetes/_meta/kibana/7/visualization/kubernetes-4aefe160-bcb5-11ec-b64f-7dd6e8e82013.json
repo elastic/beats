@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Select Node [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "kubernetes.node.name",
+                        "id": "1649341934441",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Node name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": true
+            },
+            "title": "Select Node [Metricbeat Kubernetes]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-4aefe160-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-05-10T10:59:29.315Z",
+    "version": "WzcxOSwxXQ=="
+}
