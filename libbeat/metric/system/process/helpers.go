@@ -18,6 +18,7 @@
 package process
 
 import (
+	"math"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -82,11 +83,12 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 	timeDeltaMillis := float64(timeDelta / time.Millisecond)
 	totalCPUDeltaMillis := int64(s1.CPU.Total.Ticks.ValueOr(0) - s0.CPU.Total.Ticks.ValueOr(0))
 
+	pct := float64(totalCPUDeltaMillis) / timeDeltaMillis
 	// In theory this can only happen if the time delta is 0, which is unlikely but possible.
-	if timeDeltaMillis == 0 {
+	// With all the type conversion and non-integer math, this is probably the safest way to check.
+	if math.IsNaN(pct) {
 		return s1
 	}
-	pct := float64(totalCPUDeltaMillis) / timeDeltaMillis
 	normalizedPct := pct / float64(numcpu.NumCPU())
 
 	s1.CPU.Total.Norm.Pct = opt.FloatWith(common.Round(normalizedPct, common.DefaultDecimalPlacesCount))

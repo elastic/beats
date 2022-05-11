@@ -28,9 +28,6 @@ import (
 )
 
 var (
-	// version is Windows version of the host OS.
-	version = windows.GetWindowsVersion()
-
 	processQueryLimitedInfoAccess = windows.PROCESS_QUERY_LIMITED_INFORMATION
 )
 
@@ -81,6 +78,9 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string)
 	state.Username = user
 
 	ppid, err := getParentPid(pid)
+	if err != nil {
+		return state, fmt.Errorf("error fetching parent pid: %w", err)
+	}
 	state.Ppid = opt.IntWith(ppid)
 
 	wss, size, err := procMem(pid)
@@ -115,7 +115,9 @@ func getProcArgs(pid int) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("openProcess failed: %w", err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 	pbi, err := windows.NtQueryProcessBasicInformation(handle)
 	if err != nil {
 		return nil, fmt.Errorf("ntQueryProcessBasicInformation failed: %w", err)
@@ -142,7 +144,9 @@ func getProcTimes(pid int) (uint64, uint64, uint64, error) {
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("openProcess failed for pid=%v: %w", pid, err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 
 	var cpu syscall.Rusage
 	if err := syscall.GetProcessTimes(handle, &cpu.CreationTime, &cpu.ExitTime, &cpu.KernelTime, &cpu.UserTime); err != nil {
@@ -158,7 +162,9 @@ func procMem(pid int) (uint64, uint64, error) {
 	if err != nil {
 		return 0, 0, fmt.Errorf("openProcess failed for pid=%v: %w", pid, err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 
 	counters, err := windows.GetProcessMemoryInfo(handle)
 	if err != nil {
@@ -173,7 +179,9 @@ func getProcName(pid int) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("openProcess failed for pid=%v: %w", pid, err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 
 	filename, err := windows.GetProcessImageFileName(handle)
 	if err != nil {
@@ -189,7 +197,9 @@ func getPidStatus(pid int) (PidState, error) {
 	if err != nil {
 		return Unknown, fmt.Errorf("openProcess failed for pid=%v: %w", pid, err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 
 	var exitCode uint32
 	err = syscall.GetExitCodeProcess(handle, &exitCode)
@@ -209,7 +219,9 @@ func getParentPid(pid int) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("openProcess failed for pid=%v: %w", pid, err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 
 	procInfo, err := windows.NtQueryProcessBasicInformation(handle)
 	if err != nil {
@@ -224,7 +236,9 @@ func getProcCredName(pid int) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("openProcess failed for pid=%v: %w", pid, err)
 	}
-	defer syscall.CloseHandle(handle)
+	defer func() {
+		_ = syscall.CloseHandle(handle)
+	}()
 
 	// Find process token via win32.
 	var token syscall.Token
