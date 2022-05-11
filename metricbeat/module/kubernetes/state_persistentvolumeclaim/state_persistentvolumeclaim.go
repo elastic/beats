@@ -115,7 +115,6 @@ func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 
-	return
 }
 
 // Close stops this metricset
