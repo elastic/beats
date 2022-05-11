@@ -23,8 +23,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var hostfsCLI = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")

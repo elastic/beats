@@ -126,7 +126,7 @@ require (
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
-	go.elastic.co/ecszap v1.0.0
+	go.elastic.co/ecszap v1.0.0 // indirect
 	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.9.0

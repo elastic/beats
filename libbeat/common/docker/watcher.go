@@ -33,7 +33,7 @@ import (
 	"github.com/docker/go-connections/tlsconfig"
 
 	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Select Docker API version

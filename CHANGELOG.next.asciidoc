@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Fix group write permissions on runtime directories. {pull}30869[30869]
 - Store syslog version as string. {pull}31446[31446]
+- Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
 
 *Auditbeat*
 
@@ -65,9 +66,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
+- Use /proc/<pid>/comm for linux process names where possible. {pull}31527[31527]
 
 *Winlogbeat*
 
+- Fix resource handle leak during event log enrichment. {pull}31504[31504]
+- Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
 
 *Functionbeat*
 
@@ -83,6 +87,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
+- Add `backlog_wait_time_actual` to the output of the `auditbeat auditd show-status` command. {pull}31535[31535]
 
 *Filebeat*
 
@@ -127,7 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Winlogbeat*
 
 - Add parent process ID to new process creation events. {issue}29237[29237] {pull}31102[31102]
-
+- Sysmon: Support for Sysmon Registry non-QWORD/DWORD events. {pull}31556[31556]
 
 *Elastic Log Driver*
 
