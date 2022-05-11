@@ -5,8 +5,8 @@ on_failure:
     value: '{{ _ingest.on_failure_message }}'
 processors:
 - pipeline:
-    if: '!(ctx.containsKey("json") && ctx.json.containsKey("ecs") && ctx.json.ecs.containsKey("version"))'
+    if: 'ctx?.json?.ecs?.version == null'
     name: '{< IngestPipeline "pipeline-7" >}'
 - pipeline:
-    if: 'ctx.containsKey("json") && ctx.json.containsKey("ecs") && ctx.json.ecs.containsKey("version")'
+    if: 'ctx?.json?.ecs?.version != null'
     name: '{< IngestPipeline "pipeline-ecs" >}'
