@@ -152163,7 +152163,7 @@ type: long
 Code signing information for the sample.
 
 
-type: keyword
+type: nested
 
 --
 
