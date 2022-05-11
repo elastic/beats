@@ -57917,16 +57917,6 @@ type: keyword
 
 --
 
-*`sql.results`*::
-+
---
-Text output of the executed query.
-
-
-type: text
-
---
-
 *`sql.query`*::
 +
 --

@@ -11,10 +11,6 @@
           type: keyword
           description: >
             Driver used to execute the query.
-        - name: results
-          type: text
-          description: >
-            Text output of the executed query.
         - name: query
           type: keyword
           description: >

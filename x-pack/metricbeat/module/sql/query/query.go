@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -142,16 +141,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) {
 	if m.Config.RawData.Enabled {
 
-		// Provide results as text mapping.
-		jsonString, _ := json.Marshal(ms)
-
 		reporter.Event(mb.Event{
 			// New usage.
-			// Only results, driver & query field mapped.
+			// Only driver & query field mapped.
 			// metrics to be mapped by end user.
 			ModuleFields: mapstr.M{
 				"metrics": ms, // Individual metric
-				"results": string(jsonString),
 				"driver":  m.Config.Driver,
 				"query":   qry,
 			},
