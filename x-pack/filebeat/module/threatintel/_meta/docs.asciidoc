@@ -601,7 +601,7 @@ Optional URL to use as HTTP proxy.
 Optional value to override the default HTTP timeout of 30 seconds.
 
 
-Recorded Future fields are mapped to the following ECS fields:
+ThreatQ fields are mapped to the following ECS fields:
 
 [options="header"]
 |=============================================================
