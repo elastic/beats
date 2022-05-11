@@ -19,6 +19,7 @@ package shipper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
@@ -103,120 +104,41 @@ func TestConvertMapStr(t *testing.T) {
 	}
 }
 
-func TestFindRetries(t *testing.T) {
-	events := toPublisherEvents([]beat.Event{
-		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{fieldShipperID: "first"},
-			Fields:    mapstr.M{"foo": "bar"},
-		},
-		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{"dropped": true}, // just to mark for the test
-			Fields:    mapstr.M{"a": "b"},
-		},
-		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{fieldShipperID: 42, "dropped": true}, // just to mark for the test
-			Fields:    mapstr.M{"x": "y"},
-		},
-
-		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{fieldShipperID: "second"},
-			Fields:    mapstr.M{"c": "d"},
-		},
-	})
-
-	cases := []struct {
-		name   string
-		resp   *sc.PublishReply
-		events []publisher.Event
-		exp    []publisher.Event
-	}{
-		{
-			name:   "nil response returns nil",
-			events: events,
-			exp:    nil,
-		},
-		{
-			name: "empty events return nil",
-			resp: &sc.PublishReply{
-				Results: []*sc.EventResult{
-					{
-						EventId: "first",
-					},
-				},
-			},
-			events: nil,
-			exp:    nil,
-		},
-		{
-			name: "all accepted events return empty retries",
-			resp: &sc.PublishReply{
-				Results: []*sc.EventResult{
-					{
-						EventId: "first",
-					},
-					{
-						EventId: "second",
-					},
-				},
-			},
-			events: events,
-			exp:    []publisher.Event{},
-		},
-		{
-			name: "partially accepted events return retries",
-			resp: &sc.PublishReply{
-				Results: []*sc.EventResult{
-					{
-						EventId: "second",
-					},
-				},
-			},
-			events: events,
-			exp:    events[:1],
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			retries := findRetries(tc.resp, tc.events)
-			require.Equal(t, tc.exp, retries)
-		})
-	}
-}
-
 func TestPublish(t *testing.T) {
 	events := []beat.Event{
 		{
 			Timestamp: time.Now(),
 			Meta:      mapstr.M{"event": "first"},
-			Fields:    mapstr.M{"foo": "bar"},
+			Fields:    mapstr.M{"a": "b"},
 		},
 		{
 			Timestamp: time.Now(),
-			Meta:      mapstr.M{"event": "second"},
-			Fields:    mapstr.M{"a": "b"},
+			Meta:      mapstr.M{"event": "second", "dropped": true, "invalid": struct{}{}}, // this event is always dropped
+			Fields:    mapstr.M{"c": "d"},
+		},
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{"event": "third"},
+			Fields:    mapstr.M{"e": "f"},
 		},
 	}
 
 	cases := []struct {
-		name       string
-		events     []beat.Event
-		expSignals []outest.BatchSignal
-		qSize      int
+		name        string
+		events      []beat.Event
+		expSignals  []outest.BatchSignal
+		serverError error
+		qSize       int
 	}{
 		{
-			name:   "sends a batch",
+			name:   "sends a batch excluding dropped",
 			events: events[:1],
 			expSignals: []outest.BatchSignal{
 				{
 					Tag: outest.BatchACK,
 				},
 			},
-			qSize: 5,
+			qSize: 2,
 		},
 		{
 			name:   "retries not accepted events",
@@ -224,10 +146,21 @@ func TestPublish(t *testing.T) {
 			expSignals: []outest.BatchSignal{
 				{
 					Tag:    outest.BatchRetryEvents,
-					Events: toPublisherEvents(events[1:]),
+					Events: toPublisherEvents(events[2:]),
 				},
 			},
 			qSize: 1,
+		},
+		{
+			name:   "cancels the batch if server error",
+			events: events,
+			expSignals: []outest.BatchSignal{
+				{
+					Tag: outest.BatchCancelled,
+				},
+			},
+			qSize:       3,
+			serverError: errors.New("some error"),
 		},
 	}
 
@@ -239,6 +172,7 @@ func TestPublish(t *testing.T) {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 			producer := sc.NewProducerMock(tc.qSize)
+			producer.Error = tc.serverError
 			grpcServer := grpc.NewServer()
 			sc.RegisterProducerServer(grpcServer, producer)
 

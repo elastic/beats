@@ -29,10 +29,15 @@ func NewProducerMock(cap int) *ProducerMock {
 
 type ProducerMock struct {
 	UnimplementedProducerServer
-	Q []*Event
+	Q     []*Event
+	Error error
 }
 
 func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*PublishReply, error) {
+	if p.Error != nil {
+		return nil, p.Error
+	}
+
 	resp := &PublishReply{
 		Results: make([]*EventResult, 0, len(r.Events)),
 	}

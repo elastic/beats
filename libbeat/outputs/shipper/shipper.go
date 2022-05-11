@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
@@ -42,8 +41,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-const fieldShipperID = "shipper.eventId"
 
 type shipper struct {
 	log      *logp.Logger
@@ -118,9 +115,8 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	st.NewBatch(len(events))
 
-	dropped := 0
-
-	grpcEvents := make([]*sc.Event, 0, len(events))
+	nonDroppedEvents := make([]publisher.Event, 0, len(events))
+	convertedEvents := make([]*sc.Event, 0, len(events))
 
 	c.log.Debugf("converting %d events to protobuf...", len(events))
 
@@ -130,35 +126,16 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
 			c.log.Errorf("%d/%d failed to convert event metadata to protobuf, dropped: %w", i+1, len(events), err)
-			dropped++
 			continue
 		}
 
 		fields, err := convertMapStr(e.Content.Fields)
 		if err != nil {
 			c.log.Errorf("%d/%d failed to convert event fields to protobuf, dropped: %w", i+1, len(events), err)
-			dropped++
 			continue
 		}
 
-		uuid, err := uuid.DefaultGenerator.NewV4()
-		if err != nil {
-			// this is unrecoverable and happens only when the random generator fails
-			batch.Cancelled()
-			return fmt.Errorf("failed to generate an event UUID: %w", err)
-		}
-		eventID := uuid.String()
-
-		// storing for fast access when confirming the results
-		_, err = e.Content.Meta.Put(fieldShipperID, eventID)
-		if err != nil {
-			c.log.Errorf("%d/%d failed to set shipper event ID, dropped: %w", i+1, len(events), err)
-			dropped++
-			continue
-		}
-
-		grpcEvents = append(grpcEvents, &sc.Event{
-			EventId:   eventID,
+		convertedEvents = append(convertedEvents, &sc.Event{
 			Timestamp: timestamppb.New(e.Content.Timestamp),
 			Metadata:  meta.GetStructValue(),
 			Fields:    fields.GetStructValue(),
@@ -176,34 +153,49 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 				Namespace: "default",
 			},
 		})
+
+		nonDroppedEvents = append(nonDroppedEvents, e)
 	}
 
-	st.Dropped(dropped)
-	c.log.Debugf("%d events converted to protobuf, %d dropped", len(grpcEvents), dropped)
+	droppedCount := len(events) - len(nonDroppedEvents)
+
+	st.Dropped(droppedCount)
+	c.log.Debugf("%d events converted to protobuf, %d dropped", len(nonDroppedEvents), droppedCount)
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 	resp, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
-		Events: grpcEvents,
+		Events: convertedEvents,
 	})
 
-	if status.Code(err) != codes.OK {
-		// if the response is nil, it means none of the events made it through due to a severe failure
-		batch.Cancelled()
-		st.Cancelled(len(events))
-		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(grpcEvents), err)
+	if status.Code(err) != codes.OK || resp == nil {
+		batch.Cancelled()         // does not decrease the TTL
+		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
+		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
 		return nil
 	}
 
-	retries := findRetries(resp, events)
+	// with a correct server implementation should never happen, this error is not recoverable
+	if len(resp.Results) > len(nonDroppedEvents) {
+		return fmt.Errorf(
+			"server returned unexpected results, expected maximum %d items, got %d",
+			len(nonDroppedEvents),
+			len(resp.Results),
+		)
+	}
+
+	// the server is supposed to retain the order of the initial events in the response
+	// judging by the size of the result list we can determine what part of the initial
+	// list was accepted and we can send the rest of the list for a retry
+	retries := nonDroppedEvents[len(resp.Results):]
 	if len(retries) == 0 {
 		batch.ACK()
-		st.Acked(len(grpcEvents))
-		c.log.Debugf("%d events have been acknowledged, %d dropped", len(grpcEvents), dropped)
+		st.Acked(len(nonDroppedEvents))
+		c.log.Debugf("%d events have been acknowledged, %d dropped", len(nonDroppedEvents), droppedCount)
 	} else {
-		batch.RetryEvents(retries)
+		batch.RetryEvents(retries) // decreases TTL unless guaranteed delivery
 		st.Failed(len(retries))
-		c.log.Debugf("%d events have been acknowledged, %d sent for retry, %d dropped", len(grpcEvents), len(retries), dropped)
+		c.log.Debugf("%d events have been acknowledged, %d sent for retry, %d dropped", len(resp.Results), len(retries), droppedCount)
 	}
 
 	return nil
@@ -215,43 +207,6 @@ func (c *shipper) Close() error {
 
 func (c *shipper) String() string {
 	return "shipper"
-}
-
-func findRetries(resp *sc.PublishReply, events []publisher.Event) []publisher.Event {
-	if resp == nil || len(events) == 0 {
-		return nil
-	}
-
-	// build a set of IDs for fast access below
-	acceptedIDs := make(map[string]struct{}, len(resp.Results))
-	for _, r := range resp.Results {
-		acceptedIDs[r.EventId] = struct{}{}
-	}
-
-	retries := make([]publisher.Event, 0, len(events)-len(acceptedIDs))
-
-	// we must range the original event list to retain the order
-	for _, e := range events {
-		// if the event has no shipper it was dropped, we just skip it
-		eventID, err := e.Content.Meta.GetValue(fieldShipperID)
-		if err != nil {
-			continue
-		}
-
-		eventIDStr, ok := eventID.(string)
-		if !ok {
-			continue
-		}
-
-		_, ok = acceptedIDs[eventIDStr]
-		if ok {
-			continue
-		}
-
-		retries = append(retries, e)
-	}
-
-	return retries
 }
 
 func convertMapStr(m mapstr.M) (*structpb.Value, error) {
