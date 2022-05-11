@@ -92,8 +92,8 @@ duplicate events in the output.
 Given the file list and ingestion progress shown earlier, 
 you should run the `log` and `filestream` inputs simultaneously until everything
 collected by the `log` input has made it to the output.
-After the files collected by the `log` input are shipped, you can delete the `log`
-inputs and the `exlude_files` settings from `filestream` input.
+After the files collected by the `log` input are shipped and the files are deleted,
+you can delete the `log` inputs and the `exlude_files` settings from `filestream` input.
 
 [source,yaml]
 ----
