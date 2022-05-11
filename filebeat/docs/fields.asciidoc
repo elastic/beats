@@ -86862,6 +86862,7 @@ type: keyword
 
 --
 
+<<<<<<< HEAD
 *`rsa.time.gmttime`*::
 +
 --
@@ -86910,6 +86911,19 @@ type: keyword
 This key is used to capture incomplete timestamp that explicitly refers to an expiration.
 
 type: keyword
+=======
+*`kibana.log.meta.req.headers`*::
++
+--
+type: flattened
+
+--
+
+*`kibana.log.meta.res.headers`*::
++
+--
+type: flattened
+>>>>>>> 47777ec1dc ([filebeat] add 8.x kibana logs ingest pipeline (#31286))
 
 --
 
