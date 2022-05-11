@@ -20,6 +20,9 @@ package state_persistentvolume
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -38,6 +41,7 @@ type PersistentVolumeMetricSet struct {
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
 	mod        k8smod.Module
+	enricher   util.Enricher
 }
 
 // NewPersistentVolumeMetricSet returns a prometheus based metricset for Persistent Volumes
@@ -54,6 +58,7 @@ func NewPersistentVolumeMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.PersistentVolume{}, false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_persistentvolume_capacity_bytes": p.Metric("capacity.bytes"),
@@ -77,6 +82,8 @@ func NewPersistentVolumeMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
 func (m *PersistentVolumeMetricSet) Fetch(reporter mb.ReporterV2) {
+	m.enricher.Start()
+
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
@@ -90,6 +97,7 @@ func (m *PersistentVolumeMetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
+	m.enricher.Enrich(events)
 	for _, event := range events {
 		event[mb.NamespaceKey] = "persistentvolume"
 		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
@@ -99,4 +107,10 @@ func (m *PersistentVolumeMetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 	return
+}
+
+// Close stops this metricset
+func (m *PersistentVolumeMetricSet) Close() error {
+	m.enricher.Stop()
+	return nil
 }
