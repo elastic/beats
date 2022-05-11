@@ -31,11 +31,11 @@ func unixTimeMsToTime(unixTimeMs uint64) string {
 	return common.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
 }
 
-func stripNullByte(buf []byte) string {
+func stripNullByte(buf []byte) string { //nolint:deadcode,unused // used by platform-specific code
 	return string(buf[0 : len(buf)-1])
 }
 
-func stripNullByteRaw(buf []byte) []byte {
+func stripNullByteRaw(buf []byte) []byte { //nolint:deadcode,unused // used by platform-specific code
 	return buf[0 : len(buf)-1]
 }
 
@@ -52,7 +52,7 @@ func GetProcMemPercentage(proc ProcState, totalPhyMem uint64) opt.Float {
 
 // isProcessInSlice looks up proc in the processes slice and returns if
 // found or not
-func isProcessInSlice(processes []ProcState, proc *ProcState) bool {
+func isProcessInSlice(processes []ProcState, proc ProcState) bool {
 	for _, p := range processes {
 		if p.Pid == proc.Pid {
 			return true
@@ -79,10 +79,14 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 	}
 
 	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
-	timeDeltaMillis := timeDelta / time.Millisecond
+	timeDeltaMillis := float64(timeDelta / time.Millisecond)
 	totalCPUDeltaMillis := int64(s1.CPU.Total.Ticks.ValueOr(0) - s0.CPU.Total.Ticks.ValueOr(0))
 
-	pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
+	// In theory this can only happen if the time delta is 0, which is unlikely but possible.
+	if timeDeltaMillis == 0 {
+		return s1
+	}
+	pct := float64(totalCPUDeltaMillis) / timeDeltaMillis
 	normalizedPct := pct / float64(numcpu.NumCPU())
 
 	s1.CPU.Total.Norm.Pct = opt.FloatWith(common.Round(normalizedPct, common.DefaultDecimalPlacesCount))

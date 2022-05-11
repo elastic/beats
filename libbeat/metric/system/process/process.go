@@ -21,13 +21,12 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
@@ -128,13 +127,13 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	}
 	err := init.Init()
 	if err != nil {
-		return nil, errors.Wrap(err, "error initializing process collectors")
+		return nil, fmt.Errorf("error initializing process collectors: %w", err)
 	}
 
 	// actually fetch the PIDs from the OS-specific code
 	_, plist, err := init.FetchPids()
 	if err != nil {
-		return nil, errors.Wrap(err, "error gathering PIDs")
+		return nil, fmt.Errorf("error gathering PIDs: %w", err)
 	}
 
 	return plist, nil
@@ -166,7 +165,7 @@ func (procStats *Stats) Init() error {
 	for _, pattern := range procStats.Procs {
 		reg, err := match.Compile(pattern)
 		if err != nil {
-			return fmt.Errorf("Failed to compile regexp [%s]: %v", pattern, err)
+			return fmt.Errorf("failed to compile regexp [%s]: %w", pattern, err)
 		}
 		procStats.procRegexps = append(procStats.procRegexps, reg)
 	}
@@ -175,17 +174,17 @@ func (procStats *Stats) Init() error {
 	for _, pattern := range procStats.EnvWhitelist {
 		reg, err := match.Compile(pattern)
 		if err != nil {
-			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %v", pattern, err)
+			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %w", pattern, err)
 		}
 		procStats.envRegexps = append(procStats.envRegexps, reg)
 	}
 
 	if procStats.EnableCgroups {
 		cgReader, err := cgroup.NewReaderOptions(procStats.CgroupOpts)
-		if err == cgroup.ErrCgroupsMissing {
+		if errors.Is(err, cgroup.ErrCgroupsMissing) {
 			logp.Warn("cgroup data collection will be disabled: %v", err)
 		} else if err != nil {
-			return errors.Wrap(err, "error initializing cgroup reader")
+			return fmt.Errorf("error initializing cgroup reader: %w", err)
 		}
 		procStats.cgroups = cgReader
 	}
@@ -203,13 +202,13 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	pidMap, plist, err := procStats.FetchPids()
 
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error gathering PIDs")
+		return nil, nil, fmt.Errorf("error gathering PIDs: %w", err)
 	}
 	// We use this to track processes over time.
 	procStats.ProcsMap = pidMap
 
 	// filter the process list that will be passed down to users
-	procStats.includeTopProcesses(plist)
+	plist = procStats.includeTopProcesses(plist)
 
 	// This is a holdover until we migrate this library to metricbeat/internal
 	// At which point we'll use the memory code there.
@@ -228,6 +227,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	procs := []mapstr.M{}
 	rootEvents := []mapstr.M{}
 
+	// bulk of data collection done, now convert to the various data formats expected by the output
 	for _, process := range plist {
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
@@ -235,10 +235,13 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		root := process.FormatForRoot()
 		rootMap := mapstr.M{}
 		err := typeconv.Convert(&rootMap, root)
-
-		proc, err := procStats.getProcessEvent(&process)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "error converting process for pid %d", process.Pid.ValueOr(0))
+			return nil, nil, fmt.Errorf("error converting process for pid %d: %w", process.Pid.ValueOr(0), err)
+		}
+
+		proc, err := procStats.getProcessEvent(process)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error fetching process event for pid %d: %w", process.Pid.ValueOr(0), err)
 		}
 
 		procs = append(procs, proc)
@@ -252,13 +255,13 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 	pidStat, _, err := procStats.pidFill(pid, false)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error fetching PID %d", pid)
+		return nil, fmt.Errorf("error fetching PID %d: %w", pid, err)
 	}
 	newMap := make(ProcsMap)
 	newMap[pid] = pidStat
 	procStats.ProcsMap = newMap
 
-	return procStats.getProcessEvent(&pidStat)
+	return procStats.getProcessEvent(pidStat)
 }
 
 // GetSelf gets process info for the beat itself
@@ -267,7 +270,7 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 
 	pidStat, _, err := procStats.pidFill(self, false)
 	if err != nil {
-		return ProcState{}, errors.Wrapf(err, "error fetching PID %d", self)
+		return ProcState{}, fmt.Errorf("error fetching PID %d: %w", self, err)
 	}
 
 	return pidStat, nil
@@ -301,7 +304,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// OS-specific entrypoint, get basic info so we can at least run matchProcess
 	status, err := GetInfoForPid(procStats.Hostfs, pid)
 	if err != nil {
-		return status, true, errors.Wrap(err, "GetInfoForPid")
+		return status, true, fmt.Errorf("GetInfoForPid: %w", err)
 	}
 	if procStats.skipExtended {
 		return status, true, nil
@@ -318,7 +321,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	//If we've passed the filter, continue to fill out the rest of the metrics
 	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
 	if err != nil {
-		return status, true, errors.Wrap(err, "FillPidMetrics")
+		return status, true, fmt.Errorf("FillPidMetrics: %w", err)
 	}
 	if len(status.Args) > 0 && status.Cmdline == "" {
 		status.Cmdline = strings.Join(status.Args, " ")
@@ -330,7 +333,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
-			return status, true, errors.Wrap(err, "cgroups.GetStatsForPid")
+			return status, true, fmt.Errorf("cgroups.GetStatsForPid: %w", err)
 		}
 		status.Cgroup = cgStats
 		if ok {
@@ -359,7 +362,7 @@ func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 }
 
 // return a formatted MapStr of the process metrics
-func (procStats *Stats) getProcessEvent(process *ProcState) (mapstr.M, error) {
+func (procStats *Stats) getProcessEvent(process ProcState) (mapstr.M, error) {
 
 	// Remove CPUTicks if needed
 	if !procStats.CPUTicks {
@@ -415,7 +418,7 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 			return processes[i].Memory.Rss.Bytes.ValueOr(0) > processes[j].Memory.Rss.Bytes.ValueOr(0)
 		})
 		for _, proc := range processes[:numProcs] {
-			if !isProcessInSlice(result, &proc) {
+			if !isProcessInSlice(result, proc) {
 				result = append(result, proc)
 			}
 		}
