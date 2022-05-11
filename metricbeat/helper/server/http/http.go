@@ -24,11 +24,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type HttpServer struct {
@@ -106,7 +107,7 @@ func (h *HttpServer) Start() error {
 	go func() {
 		if h.server.TLSConfig != nil {
 			logp.Info("Starting HTTPS server on %s", h.server.Addr)
-			//certificate is already loaded. That's why the parameters are empty
+			// certificate is already loaded. That's why the parameters are empty
 			err := h.server.ListenAndServeTLS("", "")
 			if err != nil && err != http.ErrServerClosed {
 				logp.Critical("Unable to start HTTPS server due to error: %v", err)
@@ -136,7 +137,7 @@ func (h *HttpServer) GetEvents() chan server.Event {
 
 func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	switch req.Method {
-	case "POST":
+	case http.MethodPost:
 		meta := server.Meta{
 			"path":    req.URL.String(),
 			"address": req.RemoteAddr,
@@ -165,7 +166,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		h.eventQueue <- event
 		writer.WriteHeader(http.StatusAccepted)
 
-	case "GET":
+	case http.MethodGet:
 		writer.WriteHeader(http.StatusOK)
 		if req.TLS != nil {
 			writer.Write([]byte("HTTPS Server accepts data via POST"))
@@ -173,5 +174,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			writer.Write([]byte("HTTP Server accepts data via POST"))
 		}
 
+	case "PANIC":
+		panic("HTTP PANIC INVOKED!")
 	}
 }
