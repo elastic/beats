@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 
 *Packetbeat*
 
