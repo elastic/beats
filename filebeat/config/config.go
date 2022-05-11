@@ -107,9 +107,10 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		tmpConfig := struct {
 			Filebeat Config
 		}{}
+		//nolint:staticcheck // Let's keep the logic here
 		err := cfgfile.Read(&tmpConfig, file)
 		if err != nil {
-			return fmt.Errorf("Failed to read %s: %w", file, err)
+			return fmt.Errorf("failed to read %s: %w", file, err)
 		}
 
 		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
