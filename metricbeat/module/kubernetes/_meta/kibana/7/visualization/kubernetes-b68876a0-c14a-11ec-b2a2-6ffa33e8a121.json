@@ -129,7 +129,7 @@
     "coreMigrationVersion": "8.3.0",
     "id": "kubernetes-b68876a0-c14a-11ec-b2a2-6ffa33e8a121",
     "migrationVersion": {
-        "visualization": "8.1.0"
+        "visualization": "8.3.0"
     },
     "references": [
         {
@@ -139,6 +139,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-10T10:59:29.315Z",
-    "version": "WzY5MiwxXQ=="
+    "updated_at": "2022-05-11T10:05:19.182Z",
+    "version": "WzE3MCwxXQ=="
 }

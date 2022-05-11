@@ -31,7 +31,7 @@
                 "panelIndex": "ba968df2-1d4c-4edb-a9fd-1a40803778b4",
                 "panelRefName": "panel_ba968df2-1d4c-4edb-a9fd-1a40803778b4",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -47,7 +47,7 @@
                 "panelIndex": "79761ec0-48c7-40a0-aa1a-e5a902864b94",
                 "panelRefName": "panel_79761ec0-48c7-40a0-aa1a-e5a902864b94",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -63,7 +63,7 @@
                 "panelIndex": "c02fc878-cc8a-4b42-b84b-68480327e535",
                 "panelRefName": "panel_c02fc878-cc8a-4b42-b84b-68480327e535",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -79,11 +79,31 @@
                 "panelIndex": "be4176ad-2a17-4731-a988-ceedee49e775",
                 "panelRefName": "panel_be4176ad-2a17-4731-a988-ceedee49e775",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "956ecb9f-0e4b-46bd-957f-35b5b33b49ff",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -96,11 +116,31 @@
                 "panelIndex": "bbf9c49b-6a08-47f2-b8d9-ed6442e806e3",
                 "panelRefName": "panel_bbf9c49b-6a08-47f2-b8d9-ed6442e806e3",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "e94307cb-7d0a-42e4-bfe6-5e1640342de7",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -113,11 +153,31 @@
                 "panelIndex": "9bbafae4-4bbf-4aeb-8bcb-796d6091a0bb",
                 "panelRefName": "panel_9bbafae4-4bbf-4aeb-8bcb-796d6091a0bb",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "9872df1d-b2e6-4533-93a4-4c40bcf4501b",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -130,11 +190,31 @@
                 "panelIndex": "5c9a77ea-a8c9-4270-a923-b189ddcbac24",
                 "panelRefName": "panel_5c9a77ea-a8c9-4270-a923-b189ddcbac24",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "5c539228-b679-4617-987a-7afd8541278f",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -147,11 +227,31 @@
                 "panelIndex": "6ee8a570-24f5-4375-8b91-c3e3463b528f",
                 "panelRefName": "panel_6ee8a570-24f5-4375-8b91-c3e3463b528f",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "235bb596-c53c-48f2-9dab-73ce1f2f42a4",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -164,7 +264,7 @@
                 "panelIndex": "9bff8f1d-6bd3-42d1-88bd-766885fba026",
                 "panelRefName": "panel_9bff8f1d-6bd3-42d1-88bd-766885fba026",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -311,7 +411,7 @@
                 "panelIndex": "f05ed38e-333c-4a45-a441-da0be70b097c",
                 "title": "Memory Reserved [Metricbeat Kubernetes]",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -470,7 +570,7 @@
                 "panelIndex": "0ef47305-ecb8-413c-ba38-f08a34885b82",
                 "title": "Cores Used [Metricbeat Kubernetes]",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -487,11 +587,31 @@
                 "panelIndex": "b2783e87-ee42-47b3-92ed-51cce68ed3b8",
                 "panelRefName": "panel_b2783e87-ee42-47b3-92ed-51cce68ed3b8",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "ef100f52-b4ad-4363-8e19-124b8863f15c",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -504,11 +624,31 @@
                 "panelIndex": "fde29758-f1f1-4899-becc-7e39d9e9e1b8",
                 "panelRefName": "panel_fde29758-f1f1-4899-becc-7e39d9e9e1b8",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "86806f25-3c90-46da-84db-bc516866e86b",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -521,11 +661,31 @@
                 "panelIndex": "83cfe800-4992-428f-a389-856387a2a051",
                 "panelRefName": "panel_83cfe800-4992-428f-a389-856387a2a051",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "fecb4742-d8ef-4ee6-954d-63c57e5486ac",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -538,11 +698,31 @@
                 "panelIndex": "1f360dd8-43c0-49b5-b973-d934adc73416",
                 "panelRefName": "panel_1f360dd8-43c0-49b5-b973-d934adc73416",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "391b4a2e-3328-42d8-825d-ae4d9acb8a7b",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -555,11 +735,31 @@
                 "panelIndex": "251105b8-8516-414f-8ab5-b8f95219771d",
                 "panelRefName": "panel_251105b8-8516-414f-8ab5-b8f95219771d",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "3d235a66-1457-4c72-9ef6-3d5ce974ae34",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -572,11 +772,31 @@
                 "panelIndex": "e6cab9d7-093e-4cef-9d78-4ff90a999dcb",
                 "panelRefName": "panel_e6cab9d7-093e-4cef-9d78-4ff90a999dcb",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {},
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": false,
+                                            "useCurrentFilters": false
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Detailed Dashboard"
+                                    },
+                                    "eventId": "729ff46a-03b6-4ad0-b54c-b113b8844f7a",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
                     "hidePanelTitles": false
                 },
                 "gridData": {
@@ -589,7 +809,7 @@
                 "panelIndex": "cb735401-c01b-4633-aeff-30f7c49821f2",
                 "panelRefName": "panel_cb735401-c01b-4633-aeff-30f7c49821f2",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             },
             {
                 "embeddableConfig": {
@@ -605,7 +825,7 @@
                 "panelIndex": "e24207cb-0171-4122-bbdc-ca631f8dcc95",
                 "panelRefName": "panel_e24207cb-0171-4122-bbdc-ca631f8dcc95",
                 "type": "search",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.3.0"
             }
         ],
         "timeRestore": false,
@@ -644,9 +864,19 @@
             "type": "lens"
         },
         {
+            "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "bbf9c49b-6a08-47f2-b8d9-ed6442e806e3:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:956ecb9f-0e4b-46bd-957f-35b5b33b49ff:dashboardId",
+            "type": "dashboard"
+        },
+        {
             "id": "kubernetes-aa6ac830-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "9bbafae4-4bbf-4aeb-8bcb-796d6091a0bb:panel_9bbafae4-4bbf-4aeb-8bcb-796d6091a0bb",
             "type": "lens"
+        },
+        {
+            "id": "kubernetes-b945b7b0-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "9bbafae4-4bbf-4aeb-8bcb-796d6091a0bb:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:e94307cb-7d0a-42e4-bfe6-5e1640342de7:dashboardId",
+            "type": "dashboard"
         },
         {
             "id": "kubernetes-bad6e230-bcb5-11ec-b64f-7dd6e8e82013",
@@ -654,14 +884,29 @@
             "type": "lens"
         },
         {
+            "id": "kubernetes-5be46210-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "5c9a77ea-a8c9-4270-a923-b189ddcbac24:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:9872df1d-b2e6-4533-93a4-4c40bcf4501b:dashboardId",
+            "type": "dashboard"
+        },
+        {
             "id": "kubernetes-cf44d560-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "6ee8a570-24f5-4375-8b91-c3e3463b528f:panel_6ee8a570-24f5-4375-8b91-c3e3463b528f",
             "type": "lens"
         },
         {
+            "id": "kubernetes-21694370-bcb2-11ec-b64f-7dd6e8e82013",
+            "name": "6ee8a570-24f5-4375-8b91-c3e3463b528f:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:5c539228-b679-4617-987a-7afd8541278f:dashboardId",
+            "type": "dashboard"
+        },
+        {
             "id": "kubernetes-c0314680-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "9bff8f1d-6bd3-42d1-88bd-766885fba026:panel_9bff8f1d-6bd3-42d1-88bd-766885fba026",
             "type": "lens"
+        },
+        {
+            "id": "kubernetes-85879010-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "9bff8f1d-6bd3-42d1-88bd-766885fba026:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:235bb596-c53c-48f2-9dab-73ce1f2f42a4:dashboardId",
+            "type": "dashboard"
         },
         {
             "id": "metricbeat-*",
@@ -684,9 +929,19 @@
             "type": "lens"
         },
         {
+            "id": "kubernetes-3912d9a0-bcb2-11ec-b64f-7dd6e8e82013",
+            "name": "fde29758-f1f1-4899-becc-7e39d9e9e1b8:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:ef100f52-b4ad-4363-8e19-124b8863f15c:dashboardId",
+            "type": "dashboard"
+        },
+        {
             "id": "kubernetes-da2a4af0-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "83cfe800-4992-428f-a389-856387a2a051:panel_83cfe800-4992-428f-a389-856387a2a051",
             "type": "lens"
+        },
+        {
+            "id": "kubernetes-9bf990a0-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "83cfe800-4992-428f-a389-856387a2a051:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:86806f25-3c90-46da-84db-bc516866e86b:dashboardId",
+            "type": "dashboard"
         },
         {
             "id": "kubernetes-d466eba0-bcb5-11ec-b64f-7dd6e8e82013",
@@ -694,9 +949,19 @@
             "type": "lens"
         },
         {
+            "id": "kubernetes-0a672d50-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "1f360dd8-43c0-49b5-b973-d934adc73416:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:fecb4742-d8ef-4ee6-954d-63c57e5486ac:dashboardId",
+            "type": "dashboard"
+        },
+        {
             "id": "kubernetes-c5053cc0-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "251105b8-8516-414f-8ab5-b8f95219771d:panel_251105b8-8516-414f-8ab5-b8f95219771d",
             "type": "lens"
+        },
+        {
+            "id": "kubernetes-ff1b3850-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "251105b8-8516-414f-8ab5-b8f95219771d:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:391b4a2e-3328-42d8-825d-ae4d9acb8a7b:dashboardId",
+            "type": "dashboard"
         },
         {
             "id": "kubernetes-e3beaf70-bcb5-11ec-b64f-7dd6e8e82013",
@@ -704,9 +969,19 @@
             "type": "lens"
         },
         {
+            "id": "kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "e6cab9d7-093e-4cef-9d78-4ff90a999dcb:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:3d235a66-1457-4c72-9ef6-3d5ce974ae34:dashboardId",
+            "type": "dashboard"
+        },
+        {
             "id": "kubernetes-dee9f5e0-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "cb735401-c01b-4633-aeff-30f7c49821f2:panel_cb735401-c01b-4633-aeff-30f7c49821f2",
             "type": "lens"
+        },
+        {
+            "id": "kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "cb735401-c01b-4633-aeff-30f7c49821f2:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:729ff46a-03b6-4ad0-b54c-b113b8844f7a:dashboardId",
+            "type": "dashboard"
         },
         {
             "id": "kubernetes-06b6fa00-cf9e-11ec-8018-1ddbb9494775",
@@ -715,6 +990,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-10T10:59:29.315Z",
-    "version": "WzcwOCwxXQ=="
+    "updated_at": "2022-05-11T10:28:29.799Z",
+    "version": "Wzg4MywxXQ=="
 }
