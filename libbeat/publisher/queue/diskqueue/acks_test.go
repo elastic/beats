@@ -66,7 +66,7 @@ func TestAddFrames(t *testing.T) {
 						rf(0, 0, true, 100),
 					},
 					frameID(1),
-					&queuePosition{0, segmentHeaderSize + 100, 1},
+					&queuePosition{0, segmentHeaderSizeV1 + 100, 1},
 					nil,
 				},
 				{
@@ -85,7 +85,7 @@ func TestAddFrames(t *testing.T) {
 						rf(0, 1, false, 75),
 					},
 					frameID(2),
-					&queuePosition{0, segmentHeaderSize + 175, 2},
+					&queuePosition{0, segmentHeaderSizeV1 + 175, 2},
 					nil,
 				},
 				{
@@ -94,7 +94,7 @@ func TestAddFrames(t *testing.T) {
 						rf(0, 2, false, 100),
 					},
 					frameID(5),
-					&queuePosition{1, segmentHeaderSize + 150, 2},
+					&queuePosition{1, segmentHeaderSizeV1 + 150, 2},
 					// This time we crossed a boundary so we should get an ACK for segment
 					// 0 on the notification channel.
 					segmentIDRef(0),
@@ -122,7 +122,7 @@ func TestAddFrames(t *testing.T) {
 						rf(0, 0, true, 100),
 					},
 					frameID(2),
-					&queuePosition{0, segmentHeaderSize + 150, 2},
+					&queuePosition{0, segmentHeaderSizeV1 + 150, 2},
 					nil,
 				},
 				{
@@ -131,7 +131,7 @@ func TestAddFrames(t *testing.T) {
 						rf(0, 2, false, 75),
 					},
 					frameID(3),
-					&queuePosition{0, segmentHeaderSize + 225, 3},
+					&queuePosition{0, segmentHeaderSizeV1 + 225, 3},
 					nil,
 				},
 				{
@@ -140,7 +140,7 @@ func TestAddFrames(t *testing.T) {
 						rf(1, 3, false, 100),
 					},
 					frameID(7),
-					&queuePosition{2, segmentHeaderSize + 100, 1},
+					&queuePosition{2, segmentHeaderSizeV1 + 100, 1},
 					segmentIDRef(1),
 				},
 				{
@@ -149,7 +149,7 @@ func TestAddFrames(t *testing.T) {
 						rf(2, 7, false, 100),
 					},
 					frameID(9),
-					&queuePosition{2, segmentHeaderSize + 300, 3},
+					&queuePosition{2, segmentHeaderSizeV1 + 300, 3},
 					nil,
 				},
 			},
@@ -165,7 +165,7 @@ func TestAddFrames(t *testing.T) {
 						rf(0, 0, true, 100),
 					},
 					frameID(4),
-					&queuePosition{3, segmentHeaderSize + 100, 1},
+					&queuePosition{3, segmentHeaderSizeV1 + 100, 1},
 					// We advanced from segment 0 to segment 3, so we expect
 					// segmentID 2 on the ACK channel.
 					segmentIDRef(2),
@@ -182,7 +182,7 @@ func TestAddFrames(t *testing.T) {
 						rf(10, 35, true, 100),
 					},
 					frameID(36),
-					&queuePosition{10, segmentHeaderSize + 100, 1},
+					&queuePosition{10, segmentHeaderSizeV1 + 100, 1},
 					// We advanced to segment 10, so we expect segmentID 9 on
 					// the ACK channel.
 					segmentIDRef(9),
@@ -218,7 +218,7 @@ func TestAddFrames(t *testing.T) {
 					[]*readFrame{
 						{
 							segment: &queueSegment{
-								schemaVersion: uint32Ref(0),
+								schemaVersion: 0,
 							},
 							bytesOnDisk: 100,
 						},
@@ -299,15 +299,11 @@ func (dqa *diskQueueACKs) assertACKedSegment(
 	}
 }
 
-func uint32Ref(v uint32) *uint32 {
-	return &v
-}
-
 // rf assembles a readFrame with the given parameters and a spoofed
 // queue segment, whose firstFrameID field is set to match the given frame
 // if "first" is true.
 func rf(seg segmentID, frame frameID, first bool, size uint64) *readFrame {
-	s := &queueSegment{id: seg}
+	s := &queueSegment{id: seg, schemaVersion: 1}
 	if first {
 		s.firstFrameID = frame
 	}

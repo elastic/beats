@@ -29,6 +29,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+//defaultSchemaVersion specifies which on disk schema (0,1,2) is the default.
+const defaultSchemaVersion = 1
+
 // Settings contains the configuration fields to create a new disk queue
 // or open an existing one.
 type Settings struct {
@@ -68,6 +71,16 @@ type Settings struct {
 	// use exponential backoff up to the specified limit.
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
+
+	// Schema Version specifies which on-disk format, serialization, and encryption to use.
+	// 0, 1, or 2 are valid options
+	SchemaVersion uint32
+
+	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
+	EncryptionKey []byte
+
+	// UseCompression controls compression if SchemaVersion 2 is used.
+	UseCompression bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable
@@ -129,6 +142,8 @@ func DefaultSettings() Settings {
 
 		RetryInterval:    1 * time.Second,
 		MaxRetryInterval: 30 * time.Second,
+
+		SchemaVersion: defaultSchemaVersion,
 	}
 }
 
@@ -192,7 +207,16 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 // maxValidFrameSize returns the size of the largest possible frame that
 // can be stored with the current queue settings.
 func (settings Settings) maxValidFrameSize() uint64 {
-	return settings.MaxSegmentSize - segmentHeaderSize
+	switch settings.SchemaVersion {
+	case 0:
+		return settings.MaxSegmentSize - segmentHeaderSizeV0
+	case 1:
+		return settings.MaxSegmentSize - segmentHeaderSizeV1
+	case 2:
+		return settings.MaxSegmentSize - segmentHeaderSizeV2
+	default:
+		return uint64(0)
+	}
 }
 
 // Given a retry interval, nextRetryInterval returns the next higher level

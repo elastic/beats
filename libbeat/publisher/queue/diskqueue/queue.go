@@ -267,10 +267,12 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+	encoder := newEventEncoder()
+	encoder.SetCompression(dq.settings.UseCompression)
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(),
+		encoder: encoder,
 		done:    make(chan struct{}),
 	}
 }
