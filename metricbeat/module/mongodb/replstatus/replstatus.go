@@ -61,7 +61,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	defer func() {
-		_ = client.Disconnect(context.Background())
+		if disconnectErr := client.Disconnect(context.Background()); disconnectErr != nil {
+			m.Logger().Warn("client disconnection did not happen gracefully")
+		}
 	}()
 
 	oplogInfo, err := getReplicationInfo(client)
