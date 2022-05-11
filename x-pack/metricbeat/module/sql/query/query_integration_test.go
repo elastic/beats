@@ -27,49 +27,62 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 )
 
-type testFetchConfig struct {
+type config struct {
 	Driver         string
 	Query          string
-	Host           string
 	ResponseFormat string
+	RawData        rawData
+}
 
+type testFetchConfig struct {
+	config    config
+	Host      string
 	Assertion func(t *testing.T, event beat.Event)
 }
 
 func TestMySQL(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
-	config := testFetchConfig{
-		Driver:         "mysql",
-		Query:          "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
-		Host:           mysql.GetMySQLEnvDSN(service.Host()),
-		ResponseFormat: tableResponseFormat,
-		Assertion:      assertFieldNotContains("service.address", ":test@"),
+	cfg := testFetchConfig{
+		config: config{
+			Driver:         "mysql",
+			Query:          "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
+			ResponseFormat: tableResponseFormat,
+
+			RawData: rawData{
+				Enabled: true,
+			},
+		},
+		Host:      mysql.GetMySQLEnvDSN(service.Host()),
+		Assertion: assertFieldNotContains("service.address", ":test@"),
 	}
 
 	t.Run("fetch", func(t *testing.T) {
-		testFetch(t, config)
+		testFetch(t, cfg)
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "./_meta/data_mysql_tables.json")
+		testData(t, cfg, "./_meta/data_mysql_tables.json")
 	})
 
-	config = testFetchConfig{
-		Driver:         "mysql",
-		Query:          "show status;",
-		Host:           mysql.GetMySQLEnvDSN(service.Host()),
-		ResponseFormat: variableResponseFormat,
-		Assertion:      assertFieldNotContains("service.address", ":test@"),
+	cfg = testFetchConfig{
+		config: config{
+			Driver:         "mysql",
+			Query:          "show status;",
+			ResponseFormat: variableResponseFormat,
+			RawData: rawData{
+				Enabled: true,
+			},
+		},
+		Host:      mysql.GetMySQLEnvDSN(service.Host()),
+		Assertion: assertFieldNotContains("service.address", ":test@"),
 	}
 
-	//fmt.Printf("config sql %#v\n", config)
-
 	t.Run("fetch", func(t *testing.T) {
-		testFetch(t, config)
+		testFetch(t, cfg)
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "./_meta/data_mysql_variables.json")
+		testData(t, cfg, "./_meta/data_mysql_variables.json")
 	})
 }
 
@@ -81,50 +94,102 @@ func TestPostgreSQL(t *testing.T) {
 	user := postgresql.GetEnvUsername()
 	password := postgresql.GetEnvPassword()
 
-	config := testFetchConfig{
-		Driver:         "postgres",
-		Query:          "select * from pg_stat_database",
-		Host:           fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
-		Assertion:      assertFieldNotContains("service.address", "password="+password),
-		ResponseFormat: tableResponseFormat,
+	cfg := testFetchConfig{
+		config: config{
+			Driver:         "postgres",
+			Query:          "select * from pg_stat_database",
+			ResponseFormat: "",
+		},
+		Host:      fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
+		Assertion: assertFieldNotContains("service.address", "password="+password),
 	}
 
 	t.Run("fetch", func(t *testing.T) {
-		testFetch(t, config)
+		testFetch(t, cfg)
 	})
 
-	config = testFetchConfig{
-		Driver:         "postgres",
-		Query:          "select * from pg_stat_database where datname='postgres'",
-		Host:           fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
-		Assertion:      assertFieldNotContains("service.address", ":"+password+"@"),
-		ResponseFormat: tableResponseFormat,
+	cfg = testFetchConfig{
+		config: config{
+			Driver:         "postgres",
+			Query:          "select * from pg_stat_database where datname='postgres'",
+			ResponseFormat: tableResponseFormat,
+			RawData: rawData{
+				Enabled: true,
+			},
+		},
+		Host:      fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+		Assertion: assertFieldNotContains("service.address", ":"+password+"@"),
 	}
 
 	t.Run("fetch with URL", func(t *testing.T) {
-		testFetch(t, config)
+		testFetch(t, cfg)
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "./_meta/data_postgres_tables.json")
+		testData(t, cfg, "./_meta/data_postgres_tables.json")
 	})
 
-	config = testFetchConfig{
-		Driver:         "postgres",
-		Query:          "select name, setting from pg_settings",
-		Host:           fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
-		ResponseFormat: variableResponseFormat,
-		Assertion:      assertFieldNotContains("service.address", ":"+password+"@"),
+	cfg = testFetchConfig{
+		config: config{
+			Driver:         "postgres",
+			Query:          "select name, setting from pg_settings",
+			ResponseFormat: variableResponseFormat,
+			RawData: rawData{
+				Enabled: true,
+			},
+		},
+		Host:      fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+		Assertion: assertFieldNotContains("service.address", ":"+password+"@"),
 	}
 
-	//fmt.Printf("config postsql %#v\n", config)
-
 	t.Run("fetch with URL", func(t *testing.T) {
-		testFetch(t, config)
+		testFetch(t, cfg)
 	})
 
 	t.Run("data", func(t *testing.T) {
-		testData(t, config, "./_meta/data_postgres_variables.json")
+		testData(t, cfg, "./_meta/data_postgres_variables.json")
+	})
+
+	t.Run("raw_data", func(t *testing.T) {
+		t.Run("variable mode", func(t *testing.T) {
+			cfg = testFetchConfig{
+				config: config{
+					Driver:         "postgres",
+					Query:          "select name, setting from pg_settings",
+					ResponseFormat: variableResponseFormat,
+					RawData: rawData{
+						Enabled: true,
+					},
+				},
+				Host: fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+				Assertion: func(t *testing.T, event beat.Event) {
+					value, err := event.GetValue("sql.query")
+					assert.NoError(t, err)
+					require.NotEmpty(t, value.(map[string]interface{}))
+				},
+			}
+
+		})
+
+		t.Run("table mode", func(t *testing.T) {
+			cfg = testFetchConfig{
+				config: config{
+					Driver:         "postgres",
+					Query:          "select * from pg_settings",
+					ResponseFormat: tableResponseFormat,
+					RawData: rawData{
+						Enabled: true,
+					},
+				},
+				Host: fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+				Assertion: func(t *testing.T, event beat.Event) {
+					value, err := event.GetValue("sql.query")
+					assert.NoError(t, err)
+					require.NotEmpty(t, value.(map[string]interface{}))
+				},
+			}
+
+		})
 	})
 }
 
@@ -149,18 +214,18 @@ func testData(t *testing.T, cfg testFetchConfig, postfix string) {
 
 func getConfig(cfg testFetchConfig) map[string]interface{} {
 	values := map[string]interface{}{
-		"module":     "sql",
-		"metricsets": []string{"query"},
-		"hosts":      []string{cfg.Host},
-		"driver":     cfg.Driver,
-		"sql_query":  cfg.Query,
+		"module":           "sql",
+		"metricsets":       []string{"query"},
+		"hosts":            []string{cfg.Host},
+		"driver":           cfg.config.Driver,
+		"sql_query":        cfg.config.Query,
+		"raw_data.enabled": cfg.config.RawData.Enabled,
 	}
 
-	if cfg.ResponseFormat != "" {
-		values["sql_response_format"] = cfg.ResponseFormat
+	if cfg.config.ResponseFormat != "" {
+		values["sql_response_format"] = cfg.config.ResponseFormat
 	}
 
-	//fmt.Printf("values %#v\n", values)
 	return values
 }
 
