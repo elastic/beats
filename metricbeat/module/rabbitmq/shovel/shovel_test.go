@@ -48,6 +48,21 @@ func TestFetchEventContents(t *testing.T) {
 	assert.Equal(t, "dynamic", event["type"])
 }
 
+func TestData(t *testing.T) {
+	server := mtest.Server(t, mtest.DefaultServerConfig)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	err := mbtest.WriteEventsReporterV2ErrorCond(ms, t, "", func(e mapstr.M) bool {
+		hasType, _ := e.HasKey("rabbitmq.shovel.type")
+		hasState, _ := e.HasKey("rabbitmq.shovel.state")
+		return hasType && hasState
+	})
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
+
 func getConfig(url string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "rabbitmq",
