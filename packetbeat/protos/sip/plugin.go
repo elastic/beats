@@ -319,7 +319,7 @@ func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 
 func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields ProtocolFields) {
 	pbf.Event.Kind = "event"
-	pbf.Event.Type = []string{"info"}
+	pbf.Event.Type = []string{"info", "protocol"}
 	pbf.Event.Dataset = "sip"
 	pbf.Event.Sequence = int64(fields.CseqCode)
 
@@ -332,7 +332,7 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields Protocol
 		pbf.Event.Original = string(m.rawData)
 	}
 
-	pbf.Event.Category = []string{"network", "protocol"}
+	pbf.Event.Category = []string{"network"}
 	if _, found := m.headers["authorization"]; found {
 		pbf.Event.Category = append(pbf.Event.Category, "authentication")
 	}
