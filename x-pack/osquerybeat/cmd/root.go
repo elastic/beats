@@ -48,7 +48,7 @@ func Osquerybeat() *cmd.BeatsRootCmd {
 	return command
 }
 
-func genVerifyCmd(settings instance.Settings) *cobra.Command {
+func genVerifyCmd(_ instance.Settings) *cobra.Command {
 	return &cobra.Command{
 		Use:   "verify",
 		Short: "Verify installation",
