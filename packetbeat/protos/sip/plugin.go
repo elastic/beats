@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:goconst,godox // These passed the linters on tip.
 package sip
 
 import (
