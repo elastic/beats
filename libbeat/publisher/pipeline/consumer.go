@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -87,7 +88,9 @@ func newEventConsumer(
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
+		fmt.Printf("eventConsumer.run\n")
 		c.run()
+		fmt.Printf("eventConsumer.run done\n")
 	}()
 	return c
 }
@@ -98,11 +101,11 @@ func (c *eventConsumer) run() {
 	log.Debug("start pipeline event consumer")
 
 	// Create a queueReader to run our queue fetches in the background
-	c.wg.Add(1)
 	queueReader := makeQueueReader()
 	go func() {
-		defer c.wg.Done()
+		fmt.Printf("queueReader.run\n")
 		queueReader.run(log)
+		fmt.Printf("queueReader.run finished\n")
 	}()
 
 	var (
@@ -188,22 +191,14 @@ outerLoop:
 			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
+			fmt.Printf("eventConsumer.done was closed, ending run loop\n")
 			break outerLoop
 		}
 	}
 
 	// Close the queueReader request channel so it knows to shutdown.
 	close(queueReader.req)
-
-	// If there's an outstanding request, we need to read the response
-	// to unblock it, but we won't pass on the value.
-	if pendingRead {
-		batch := <-queueReader.resp
-		if batch != nil {
-			// Inform any listeners that we couldn't deliver this batch.
-			batch.Drop()
-		}
-	}
+	fmt.Printf("eventConsumer.run finished\n")
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {
@@ -224,6 +219,8 @@ func (c *eventConsumer) retry(batch *ttlBatch, decreaseTTL bool) {
 }
 
 func (c *eventConsumer) close() {
+	fmt.Printf("eventConsumer.close\n")
 	close(c.done)
 	c.wg.Wait()
+	fmt.Printf("eventConsumer.close done\n")
 }

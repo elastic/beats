@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -77,6 +78,7 @@ func (c *client) Publish(e beat.Event) {
 }
 
 func (c *client) publish(e beat.Event) {
+	fmt.Printf("client.publish\n")
 	var (
 		event   = &e
 		publish = true
@@ -86,6 +88,7 @@ func (c *client) publish(e beat.Event) {
 	c.onNewEvent()
 
 	if !c.isOpen.Load() {
+		fmt.Printf("not open, dropping\n")
 		// client is closing down -> report event as dropped and return
 		c.onDroppedOnPublish(e)
 		return
@@ -107,6 +110,7 @@ func (c *client) publish(e beat.Event) {
 		e = *event
 	}
 
+	fmt.Printf("sending event to acker\n")
 	c.acker.AddEvent(e, publish)
 	if !publish {
 		c.onFilteredOut(e)
@@ -125,14 +129,18 @@ func (c *client) publish(e beat.Event) {
 
 	var published bool
 	if c.canDrop {
+		fmt.Printf("calling producer TryPublish\n")
 		published = c.producer.TryPublish(pubEvent)
 	} else {
+		fmt.Printf("calling producer Publish\n")
 		published = c.producer.Publish(pubEvent)
 	}
 
 	if published {
+		fmt.Printf("published\n")
 		c.onPublished()
 	} else {
+		fmt.Printf("dropped\n")
 		c.onDroppedOnPublish(e)
 		if c.reportEvents {
 			c.pipeline.waitCloseGroup.Add(-1)

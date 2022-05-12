@@ -19,7 +19,6 @@ package queue
 
 import (
 	"errors"
-	"io"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -65,7 +64,7 @@ var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 // consumer or flush to some other intermediate storage), it will send an ACK signal
 // with the number of ACKed events to the Producer (ACK happens in batches).
 type Queue interface {
-	io.Closer
+	Close() error
 
 	BufferConfig() BufferConfig
 

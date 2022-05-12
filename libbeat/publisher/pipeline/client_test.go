@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -35,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestClient(t *testing.T) {
@@ -142,9 +142,14 @@ func TestClientWaitClose(t *testing.T) {
 	err := logp.TestingSetup()
 	assert.Nil(t, err)
 
+	fmt.Printf("hi there\n")
 	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
+	fmt.Printf("or something\n")
 	pipeline := makePipeline(Settings{}, q)
+	fmt.Printf("idk\n")
 	defer pipeline.Close()
+	//pipeline.Close()
+	fmt.Printf("closed\n")
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -186,15 +191,17 @@ func TestClientWaitClose(t *testing.T) {
 		}
 		defer client.Close()
 
-		// Send an event which gets acknowledged immediately.
-		client.Publish(beat.Event{})
 		output := newMockClient(func(batch publisher.Batch) error {
+			fmt.Printf("got batch, acking\n")
 			batch.ACK()
 			return nil
 		})
 		defer output.Close()
 		pipeline.output.Set(outputs.Group{Clients: []outputs.Client{output}})
 		defer pipeline.output.Set(outputs.Group{})
+		// Send an event which gets acknowledged immediately.
+		fmt.Printf("calling publish...\n")
+		client.Publish(beat.Event{})
 
 		closed := make(chan struct{})
 		go func() {
