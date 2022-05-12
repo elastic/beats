@@ -64,11 +64,8 @@ func (d *dummyPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) 
 
 func TestSyncClient(t *testing.T) {
 	receiver := func(c *dummyClient, sc *SyncClient) {
-		select {
-		case i := <-c.Received:
-			sc.onACK(i)
-			return
-		}
+		i := <-c.Received
+		sc.onACK(i)
 	}
 
 	t.Run("Publish", func(t *testing.T) {
@@ -109,7 +106,7 @@ func TestSyncClient(t *testing.T) {
 		sc.Wait()
 	})
 
-	t.Run("PublishAll multiple independant ACKs", func(t *testing.T) {
+	t.Run("PublishAll multiple independent ACKs", func(t *testing.T) {
 		c := newDummyClient()
 
 		pipeline := newDummyPipeline(c)
@@ -120,13 +117,10 @@ func TestSyncClient(t *testing.T) {
 		defer sc.Close()
 
 		go func(c *dummyClient, sc *SyncClient) {
-			select {
-			case <-c.Received:
-				// simulate multiple acks
-				sc.onACK(5)
-				sc.onACK(5)
-				return
-			}
+			<-c.Received
+			// simulate multiple acks
+			sc.onACK(5)
+			sc.onACK(5)
 		}(c, sc)
 
 		err = sc.PublishAll(make([]beat.Event, 10))
