@@ -148,7 +148,7 @@ func newParsingInfo(pkt *protos.Packet) *parsingInfo {
 	}
 }
 
-func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error) {
+func (p *plugin) buildEvent(m *message, _ *protos.Packet) (*beat.Event, error) {
 	status := common.OK_STATUS
 	if m.statusCode >= 400 {
 		status = common.ERROR_STATUS
@@ -260,6 +260,7 @@ func (p *plugin) populateHeadersFields(m *message, evt beat.Event, pbf *pb.Field
 	}
 }
 
+//nolint:dupl // These are not readily refactorable in the short term as the ProtocolFields is constrained to be flat.
 func populateFromFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if len(m.from) > 0 {
 		displayInfo, uri, params := parseFromToContact(m.from)
@@ -278,6 +279,7 @@ func populateFromFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	}
 }
 
+//nolint:dupl // These are not readily refactorable in the short term as the ProtocolFields is constrained to be flat.
 func populateToFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if len(m.to) > 0 {
 		displayInfo, uri, params := parseFromToContact(m.to)
