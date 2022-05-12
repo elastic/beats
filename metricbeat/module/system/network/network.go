@@ -21,6 +21,7 @@
 package network
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -28,7 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
 )
 
@@ -87,7 +87,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := net.IOCounters(true)
 	if err != nil {
-		return errors.Wrap(err, "network io counters")
+		return fmt.Errorf("network io counters: %w", err)
 	}
 
 	var networkInBytes, networkOutBytes, networkInPackets, networkOutPackets uint64

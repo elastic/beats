@@ -18,10 +18,10 @@
 package jmx
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -165,7 +165,7 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 		// to be actually the matching mbean name
 		values, ok := value.(map[string]interface{})
 		if !ok {
-			errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
+			errs = append(errs, fmt.Errorf("expected map of values for %s", v.Request.Mbean))
 			continue
 		}
 
@@ -204,7 +204,7 @@ func parseResponseEntry(
 		// This shouldn't ever happen, if it does it is probably that some of our
 		// assumptions when building the request and the mapping is wrong.
 		logp.Debug("jolokia.jmx", "mapping: %+v", mapping)
-		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
+		return fmt.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
 	}
 
 	var key eventKey

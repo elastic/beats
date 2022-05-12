@@ -20,6 +20,8 @@ package haproxy
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -28,7 +30,6 @@ import (
 
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -214,7 +215,7 @@ type Client struct {
 func NewHaproxyClient(address string, base mb.BaseMetricSet) (*Client, error) {
 	u, err := url.Parse(address)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid url")
+		return nil, fmt.Errorf("invalid url: %w", err)
 	}
 
 	switch u.Scheme {
@@ -229,7 +230,7 @@ func NewHaproxyClient(address string, base mb.BaseMetricSet) (*Client, error) {
 		}
 		return &Client{&httpProto{HTTP: http}}, nil
 	default:
-		return nil, errors.Errorf("invalid protocol scheme: %s", u.Scheme)
+		return nil, fmt.Errorf("invalid protocol scheme: %s", u.Scheme)
 	}
 }
 
@@ -246,7 +247,7 @@ func (c *Client) GetStat() ([]*Stat, error) {
 
 	err = gocsv.UnmarshalCSV(csvReader, &statRes)
 	if err != nil {
-		return nil, errors.Errorf("error parsing CSV: %s", err)
+		return nil, fmt.Errorf("error parsing CSV: %s", err)
 	}
 
 	return statRes, nil
@@ -301,25 +302,25 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 
 	conn, err := net.Dial(p.Network, p.Address)
 	if err != nil {
-		return response, errors.Wrapf(err, "error connecting to %s", p.Address)
+		return response, fmt.Errorf("error connecting to %s: %w", p.Address, err)
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(cmd + "\n"))
 	if err != nil {
-		return response, errors.Wrap(err, "error writing to connection")
+		return response, fmt.Errorf("error writing to connection: %w", err)
 	}
 
 	recv, err := io.Copy(response, conn)
 	if err != nil {
-		return response, errors.Wrap(err, "error reading response")
+		return response, fmt.Errorf("error reading response: %w", err)
 	}
 	if recv == 0 {
 		return response, errors.New("got empty response from HAProxy")
 	}
 
 	if strings.HasPrefix(response.String(), "Unknown command") {
-		return response, errors.Errorf("unknown command: %s", cmd)
+		return response, fmt.Errorf("unknown command: %s", cmd)
 	}
 
 	return response, nil

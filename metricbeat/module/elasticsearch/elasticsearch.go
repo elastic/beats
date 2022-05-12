@@ -19,14 +19,13 @@ package elasticsearch
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -390,7 +389,7 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 	content, err := fetchPath(http, resetURI, "*/_settings", "filter_path=*.settings.index.hidden&expand_wildcards=all")
 
 	if err != nil {
-		return nil, errors.Wrap(err, "could not fetch indices settings")
+		return nil, fmt.Errorf("could not fetch indices settings: %w", err)
 	}
 
 	var resp map[string]struct {
@@ -403,7 +402,7 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 
 	err = json.Unmarshal(content, &resp)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not parse indices settings response")
+		return nil, fmt.Errorf("could not parse indices settings response: %w", err)
 	}
 
 	ret := make(map[string]IndexSettings, len(resp))
@@ -604,7 +603,7 @@ func (l *License) ToMapStr() mapstr.M {
 func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 	hasSettingGroup, err := allSettings.HasKey(groupKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to determine if "+groupKey+" settings exist")
+		return nil, fmt.Errorf("failure to determine if "+groupKey+" settings exist"+": %w", err)
 	}
 
 	if !hasSettingGroup {
@@ -613,12 +612,12 @@ func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 
 	settings, err := allSettings.GetValue(groupKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to extract "+groupKey+" settings")
+		return nil, fmt.Errorf("failure to extract "+groupKey+" settings"+": %w", err)
 	}
 
 	v, ok := settings.(map[string]interface{})
 	if !ok {
-		return nil, errors.Wrap(err, groupKey+" settings are not a map")
+		return nil, fmt.Errorf(groupKey+" settings are not a map"+": %w", err)
 	}
 
 	return mapstr.M(v), nil

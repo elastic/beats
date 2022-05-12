@@ -18,7 +18,8 @@
 package cpu
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/shirou/gopsutil/v3/cpu"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -33,11 +34,11 @@ func Get(_ resolve.Resolver) (CPUMetrics, error) {
 	// For the sake of just reducing complexity,
 	sum, err := cpu.Times(false)
 	if err != nil {
-		return CPUMetrics{}, errors.Wrap(err, "error fetching CPU summary data")
+		return CPUMetrics{}, fmt.Errorf("error fetching CPU summary data: %w", err)
 	}
 	perCPU, err := cpu.Times(true)
 	if err != nil {
-		return CPUMetrics{}, errors.Wrap(err, "error fetching per-CPU data")
+		return CPUMetrics{}, fmt.Errorf("error fetching per-CPU data: %w", err)
 	}
 
 	cpulist := []CPU{}

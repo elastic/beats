@@ -21,13 +21,13 @@
 package perfmon
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"

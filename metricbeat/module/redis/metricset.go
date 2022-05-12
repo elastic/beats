@@ -18,13 +18,13 @@
 package redis
 
 import (
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
 	rd "github.com/gomodule/redigo/redis"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -49,12 +49,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read configuration")
+		return nil, fmt.Errorf("failed to read configuration: %w", err)
 	}
 
 	password, dbNumber, err := getPasswordDBNumber(base.HostData())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to getPasswordDBNumber from URI")
+		return nil, fmt.Errorf("failed to getPasswordDBNumber from URI: %w", err)
 	}
 
 	return &MetricSet{
@@ -84,7 +84,7 @@ func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
 	// If there are more than one place specified password/db-number, use password/db-number in query
 	uriParsed, err := url.Parse(hostData.URI)
 	if err != nil {
-		return "", 0, errors.Wrapf(err, "failed to parse URL '%s'", hostData.URI)
+		return "", 0, fmt.Errorf("failed to parse URL '%s': %w", hostData.URI, err)
 	}
 
 	// get db-number from URI if it exists
@@ -94,7 +94,7 @@ func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
 		if db != "" {
 			database, err = strconv.Atoi(db)
 			if err != nil {
-				return "", 0, errors.Wrapf(err, "redis database in url should be an integer, found: %s", db)
+				return "", 0, fmt.Errorf("redis database in url should be an integer, found: %s: %w", db, err)
 			}
 		}
 	}
@@ -104,7 +104,7 @@ func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
 	if uriParsed.RawQuery != "" {
 		queryParsed, err := url.ParseQuery(uriParsed.RawQuery)
 		if err != nil {
-			return "", 0, errors.Wrapf(err, "failed to parse query string in '%s'", hostData.URI)
+			return "", 0, fmt.Errorf("failed to parse query string in '%s': %w", hostData.URI, err)
 		}
 
 		pw := queryParsed.Get("password")
@@ -116,7 +116,7 @@ func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
 		if db != "" {
 			database, err = strconv.Atoi(db)
 			if err != nil {
-				return "", 0, errors.Wrapf(err, "redis database in query should be an integer, found: %s", db)
+				return "", 0, fmt.Errorf("redis database in query should be an integer, found: %s: %w", db, err)
 			}
 		}
 	}

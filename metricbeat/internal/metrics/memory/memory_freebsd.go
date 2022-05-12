@@ -18,9 +18,8 @@
 package memory
 
 import (
+	"fmt"
 	"unsafe"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -37,7 +36,9 @@ import (
 #include <unistd.h>
 #include <time.h>
 */
-import "C"
+import (
+	"C"
+)
 
 func get(_ resolve.Resolver) (Memory, error) {
 	val := C.uint32_t(0)
@@ -49,7 +50,7 @@ func get(_ resolve.Resolver) (Memory, error) {
 	_, err := C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
 	C.free(unsafe.Pointer(name))
 	if err != nil {
-		return memData, errors.Errorf("error in vm.stats.vm.v_page_count")
+		return memData, fmt.Errorf("error in vm.stats.vm.v_page_count")
 	}
 	pagecount := uint64(val)
 
@@ -57,7 +58,7 @@ func get(_ resolve.Resolver) (Memory, error) {
 	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
 	C.free(unsafe.Pointer(name))
 	if err != nil {
-		return memData, errors.Errorf("error in vm.stats.vm.v_page_size")
+		return memData, fmt.Errorf("error in vm.stats.vm.v_page_size")
 	}
 	pagesize := uint64(val)
 
@@ -65,7 +66,7 @@ func get(_ resolve.Resolver) (Memory, error) {
 	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
 	C.free(unsafe.Pointer(name))
 	if err != nil {
-		return memData, errors.Errorf("error in vm.stats.vm.v_free_count")
+		return memData, fmt.Errorf("error in vm.stats.vm.v_free_count")
 	}
 
 	memFree := uint64(val) * pagesize
@@ -75,7 +76,7 @@ func get(_ resolve.Resolver) (Memory, error) {
 	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
 	C.free(unsafe.Pointer(name))
 	if err != nil {
-		return memData, errors.Errorf("error in vm.stats.vm.v_inactive_count")
+		return memData, fmt.Errorf("error in vm.stats.vm.v_inactive_count")
 	}
 	kern := uint64(val)
 

@@ -30,7 +30,9 @@ package memory
 #include <sys/vmount.h>
 
 */
-import "C"
+import (
+	"C"
+)
 
 import (
 	"fmt"

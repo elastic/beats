@@ -26,8 +26,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -115,7 +113,7 @@ func (b *Broker) Close() error {
 // Connect connects the broker to the configured host
 func (b *Broker) Connect() error {
 	if err := b.broker.Open(b.cfg); err != nil {
-		return errors.Wrap(err, "broker.Open failed")
+		return fmt.Errorf("broker.Open failed: %w", err)
 	}
 
 	c, err := getClusterWideClient(b.Addr(), b.cfg)
@@ -133,7 +131,7 @@ func (b *Broker) Connect() error {
 	meta, err := queryMetadataWithRetry(b.broker, b.cfg, nil)
 	if err != nil {
 		closeBroker(b.broker)
-		return errors.Wrap(err, "failed to query metadata")
+		return fmt.Errorf("failed to query metadata: %w", err)
 	}
 
 	finder := brokerFinder{Net: &defaultNet{}}
@@ -189,12 +187,12 @@ func (b *Broker) PartitionOffset(
 	req.AddBlock(topic, partition, time, 1)
 	resp, err := b.broker.GetAvailableOffsets(req)
 	if err != nil {
-		return -1, errors.Wrap(err, "get available offsets failed")
+		return -1, fmt.Errorf("get available offsets failed: %w", err)
 	}
 
 	block := resp.GetBlock(topic, partition)
 	if len(block.Offsets) == 0 {
-		return -1, errors.Wrap(block.Err, "block offsets is empty")
+		return -1, fmt.Errorf("block offsets is empty: %w", block.Err)
 	}
 
 	return block.Offsets[0], nil

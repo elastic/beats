@@ -24,7 +24,9 @@ package service
 #include <windows.h>
 #cgo LDFLAGS: -ladvapi32
 */
-import "C"
+import (
+	"C"
+)
 
 type ServiceErrno uintptr
 

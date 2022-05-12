@@ -17,7 +17,9 @@
 
 package main
 
-import "flag"
+import (
+	"flag"
+)
 
 func main() {
 	cpus := flag.Int("cpus", 1, "Number of burning goroutines to start")

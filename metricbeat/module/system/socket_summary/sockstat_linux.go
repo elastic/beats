@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -67,7 +66,7 @@ func applyEnhancements(data mapstr.M, sys resolve.Resolver) (mapstr.M, error) {
 
 	stat, err := parseSockstat(dir)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting sockstat data")
+		return nil, fmt.Errorf("error getting sockstat data: %w", err)
 	}
 	data.Put("tcp.all.orphan", stat.TCPOrphan)
 	data.Put("tcp.memory", pageSize*stat.TCPMem)
@@ -114,7 +113,7 @@ func parseSockstat(path string) (SockStat, error) {
 		txt := scanner.Text()
 		count, err := fmt.Sscanf(txt, scanfLines[iter], scanfOut[iter]...)
 		if err != nil {
-			return ss, errors.Wrap(err, "error reading sockstat")
+			return ss, fmt.Errorf("error reading sockstat: %w", err)
 		}
 		if count != len(scanfOut[iter]) {
 			return ss, fmt.Errorf("did not match fields in line %s", scanfLines[iter])
@@ -124,7 +123,7 @@ func parseSockstat(path string) (SockStat, error) {
 	}
 
 	if err = scanner.Err(); err != nil {
-		return ss, errors.Wrap(err, "error in scan")
+		return ss, fmt.Errorf("error in scan: %w", err)
 	}
 
 	return ss, nil

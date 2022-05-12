@@ -18,7 +18,7 @@
 package status
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
@@ -61,13 +61,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("error creating new Session: %w", err)
 	}
 	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		return errors.Wrap(err, "failed to retrieve serverStatus")
+		return fmt.Errorf("failed to retrieve serverStatus: %w", err)
 	}
 
 	event := mb.Event{

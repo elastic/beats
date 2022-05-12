@@ -19,8 +19,7 @@ package settings
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -34,7 +33,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana API response")
+		return fmt.Errorf("failure parsing Kibana API response: %w", err)
 	}
 
 	schema := s.Schema{

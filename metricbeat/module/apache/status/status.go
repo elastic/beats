@@ -19,7 +19,7 @@
 package status
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -87,7 +87,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		return errors.Wrap(err, "error fetching data")
+		return fmt.Errorf("error fetching data: %w", err)
 	}
 
 	data, _ := eventMapping(scanner, m.Host())

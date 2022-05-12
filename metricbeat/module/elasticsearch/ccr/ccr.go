@@ -18,11 +18,10 @@
 package ccr
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -73,7 +72,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// the license first.
 	ccrUnavailableMessage, err := m.checkCCRAvailability(info.Version.Number)
 	if err != nil {
-		return errors.Wrap(err, "error determining if CCR is available")
+		return fmt.Errorf("error determining if CCR is available: %w", err)
 	}
 
 	if ccrUnavailableMessage != "" {
@@ -95,7 +94,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
 	license, err := elasticsearch.GetLicense(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		return "", errors.Wrap(err, "error determining Elasticsearch license")
+		return "", fmt.Errorf("error determining Elasticsearch license: %w", err)
 	}
 
 	if !license.IsOneOf("trial", "platinum") {
@@ -107,7 +106,7 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Ver
 
 	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		return "", errors.Wrap(err, "error determining xpack features")
+		return "", fmt.Errorf("error determining xpack features: %w", err)
 	}
 
 	if !xpack.Features.CCR.Enabled {

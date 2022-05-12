@@ -19,12 +19,11 @@ package jmx
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -393,7 +392,7 @@ func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeM
 
 	// When we use GET, the response is a single Entry
 	if err := json.Unmarshal(content, &singleEntry); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
 	return eventMapping([]Entry{singleEntry}, mapping)
@@ -516,7 +515,7 @@ func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping Attribute
 	// When we use POST, the response is an array of Entry objects
 	if err := json.Unmarshal(content, &entries); err != nil {
 
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
 	return eventMapping(entries, mapping)

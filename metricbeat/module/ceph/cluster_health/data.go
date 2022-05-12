@@ -19,8 +19,7 @@ package cluster_health
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -48,7 +47,7 @@ func eventMapping(content []byte) (mapstr.M, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting HealthRequest data")
+		return nil, fmt.Errorf("error getting HealthRequest data: %w", err)
 	}
 
 	return mapstr.M{

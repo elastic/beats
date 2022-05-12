@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
@@ -31,7 +30,7 @@ import (
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
 	cpuData, err := statScanner(scanner, parseCPULine)
 	if err != nil {
-		return CPUMetrics{}, errors.Wrap(err, "error scanning stat file")
+		return CPUMetrics{}, fmt.Errorf("error scanning stat file: %w", err)
 	}
 	return cpuData, nil
 }

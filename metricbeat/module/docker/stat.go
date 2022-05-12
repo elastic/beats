@@ -17,7 +17,9 @@
 
 package docker
 
-import "github.com/docker/docker/api/types"
+import (
+	"github.com/docker/docker/api/types"
+)
 
 // Types don't need build constraints, unlike the docker.Client code, which is linux-only.
 // Put this here for client code that's importing it on non-linux systems

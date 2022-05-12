@@ -18,7 +18,7 @@
 package info
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
@@ -174,7 +174,7 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 			// Convert this value to a float between 0.0 and 1.0
 			fval, err := strconv.ParseFloat(f.Interface().(string), 64)
 			if err != nil {
-				return mb.Event{}, errors.Wrap(err, "error getting IdlePct")
+				return mb.Event{}, fmt.Errorf("error getting IdlePct: %w", err)
 			}
 			source[typeOfT.Field(i).Name] = strconv.FormatFloat(fval/float64(100), 'f', 2, 64)
 		} else if typeOfT.Field(i).Name == "Memmax_MB" {
@@ -182,7 +182,7 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 			val, err := strconv.Atoi(strings.TrimSpace(f.Interface().(string)))
 			if err != nil {
 				r.Error(err)
-				return mb.Event{}, errors.Wrap(err, "error getting Memmax_MB")
+				return mb.Event{}, fmt.Errorf("error getting Memmax_MB: %w", err)
 			}
 			source[typeOfT.Field(i).Name] = strconv.Itoa((val * 1024 * 1024))
 		} else {
@@ -201,7 +201,7 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 
 	fields, err := schema.Apply(source)
 	if err != nil {
-		return event, errors.Wrap(err, "error applying schema")
+		return event, fmt.Errorf("error applying schema: %w", err)
 	}
 	if processID, err := fields.GetValue("pid"); err == nil {
 		event.RootFields.Put("process.pid", processID)

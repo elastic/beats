@@ -18,7 +18,7 @@
 package server
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/tcp"
@@ -80,7 +80,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Run(reporter mb.PushReporter) {
 	// Start event watcher
 	if err := m.server.Start(); err != nil {
-		err = errors.Wrap(err, "failed to start graphite server")
+		err = fmt.Errorf("failed to start graphite server: %w", err)
 		logp.Err("%v", err)
 		reporter.Error(err)
 		return

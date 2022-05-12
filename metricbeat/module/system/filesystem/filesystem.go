@@ -21,14 +21,13 @@
 package filesystem
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"github.com/pkg/errors"
 )
 
 var debugf = logp.MakeDebug("system.filesystem")
@@ -70,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	fss, err := GetFileSystemList()
 	if err != nil {
-		return errors.Wrap(err, "error getting filesystem list")
+		return fmt.Errorf("error getting filesystem list: %w", err)
 
 	}
 

@@ -18,9 +18,9 @@
 package replstatus
 
 import (
-	"gopkg.in/mgo.v2"
+	"fmt"
 
-	"github.com/pkg/errors"
+	"gopkg.in/mgo.v2"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
@@ -57,7 +57,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("error creating new Session: %w", err)
 	}
 	defer mongoSession.Close()
 
@@ -65,12 +65,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	oplogInfo, err := getReplicationInfo(mongoSession)
 	if err != nil {
-		return errors.Wrap(err, "error getting replication info")
+		return fmt.Errorf("error getting replication info: %w", err)
 	}
 
 	replStatus, err := getReplicationStatus(mongoSession)
 	if err != nil {
-		return errors.Wrap(err, "error getting replication status")
+		return fmt.Errorf("error getting replication status: %w", err)
 	}
 
 	event := eventMapping(*oplogInfo, *replStatus)

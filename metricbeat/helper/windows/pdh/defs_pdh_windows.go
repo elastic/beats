@@ -28,7 +28,9 @@ package pdh
 #include <pdhmsg.h>
 #cgo LDFLAGS: -lpdh
 */
-import "C"
+import (
+	"C"
+)
 
 type PdhErrno uintptr
 

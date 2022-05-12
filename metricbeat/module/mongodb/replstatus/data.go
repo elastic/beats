@@ -17,7 +17,9 @@
 
 package replstatus
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
 	var result mapstr.M = make(mapstr.M)

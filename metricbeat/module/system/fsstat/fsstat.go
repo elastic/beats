@@ -21,6 +21,7 @@
 package fsstat
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 
@@ -29,8 +30,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -70,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	fss, err := filesystem.GetFileSystemList()
 	if err != nil {
-		return errors.Wrap(err, "filesystem list")
+		return fmt.Errorf("filesystem list: %w", err)
 	}
 
 	if len(m.config.IgnoreTypes) > 0 {

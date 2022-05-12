@@ -21,10 +21,9 @@
 package dialer
 
 import (
+	"errors"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 )

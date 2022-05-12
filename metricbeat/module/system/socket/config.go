@@ -17,7 +17,9 @@
 
 package socket
 
-import "time"
+import (
+	"time"
+)
 
 // Config is the configuration specific to the socket MetricSet.
 type Config struct {

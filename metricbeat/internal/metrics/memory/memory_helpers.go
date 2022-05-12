@@ -20,12 +20,11 @@ package memory
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
@@ -61,7 +60,7 @@ func ParseMeminfo(rootfs resolve.Resolver) (map[string]uint64, error) {
 func readFile(file string, handler func(string) bool) error {
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
-		return errors.Wrapf(err, "error reading file %s", file)
+		return fmt.Errorf("error reading file %s: %w", file, err)
 	}
 
 	reader := bufio.NewReader(bytes.NewBuffer(contents))

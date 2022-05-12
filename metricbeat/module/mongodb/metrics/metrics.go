@@ -18,7 +18,8 @@
 package metrics
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/elastic/beats/v7/libbeat/common/schema"
@@ -59,18 +60,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("error creating new Session: %w", err)
 	}
 	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		return errors.Wrap(err, "failed to retrieve serverStatus")
+		return fmt.Errorf("failed to retrieve serverStatus: %w", err)
 	}
 
 	data, err := schemaMetrics.Apply(result, schema.FailOnRequired)
 	if err != nil {
-		return errors.Wrap(err, "failed to apply schema")
+		return fmt.Errorf("failed to apply schema: %w", err)
 	}
 	reporter.Event(mb.Event{MetricSetFields: data})
 

@@ -26,8 +26,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -48,14 +46,14 @@ type sqlRow interface {
 func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
 	dbx, err := sql.Open(switchDriverName(driver), uri)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening connection")
+		return nil, fmt.Errorf("opening connection: %w", err)
 	}
 	err = dbx.Ping()
 	if err != nil {
 		if closeErr := dbx.Close(); closeErr != nil {
-			return nil, errors.Wrapf(err, "failed to close with %s, after connection test failed", closeErr)
+			return nil, fmt.Errorf("failed to close with %s, after connection test failed: %w", closeErr, err)
 		}
-		return nil, errors.Wrap(err, "testing connection")
+		return nil, fmt.Errorf("testing connection: %w", err)
 	}
 
 	return &DbClient{DB: dbx, logger: l}, nil
@@ -76,7 +74,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	// https://stackoverflow.com/questions/23507531/is-golangs-sql-package-incapable-of-ad-hoc-exploratory-queries/23507765#23507765
 	cols, err := rows.Columns()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting columns")
+		return nil, fmt.Errorf("error getting columns: %w", err)
 	}
 
 	for k, v := range cols {
@@ -92,7 +90,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	for rows.Next() {
 		err = rows.Scan(vals...)
 		if err != nil {
-			d.logger.Debug(errors.Wrap(err, "error trying to scan rows"))
+			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
 			continue
 		}
 
@@ -107,7 +105,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	}
 
 	if err = rows.Err(); err != nil {
-		d.logger.Debug(errors.Wrap(err, "error trying to read rows"))
+		d.logger.Debug(fmt.Errorf("error trying to read rows: %w", err))
 	}
 
 	return rr, nil
@@ -131,7 +129,7 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 		var val interface{}
 		err := rows.Scan(&key, &val)
 		if err != nil {
-			d.logger.Debug(errors.Wrap(err, "error trying to scan rows"))
+			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
 			continue
 		}
 
@@ -140,7 +138,7 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		d.logger.Debug(errors.Wrap(err, "error trying to read rows"))
+		d.logger.Debug(fmt.Errorf("error trying to read rows: %w", err))
 	}
 
 	r := mapstr.M{}

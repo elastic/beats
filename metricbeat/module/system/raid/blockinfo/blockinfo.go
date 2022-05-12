@@ -17,7 +17,9 @@
 
 package blockinfo
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 // SyncStatus represents the status of a sync action as Complete/Total. Will be 0/0 if no sync action is going on
 type SyncStatus struct {

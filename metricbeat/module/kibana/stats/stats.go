@@ -20,8 +20,6 @@ package stats
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -73,7 +71,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	}
 
 	if err = m.fetchStats(r); err != nil {
-		return errors.Wrap(err, "error trying to get stats data from Kibana")
+		return fmt.Errorf("error trying to get stats data from Kibana: %w", err)
 	}
 
 	return

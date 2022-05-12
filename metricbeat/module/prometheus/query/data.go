@@ -19,12 +19,11 @@ package query
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -274,10 +273,10 @@ func getValueFromVector(vector []interface{}) (float64, error) {
 func getResultType(body []byte) (string, error) {
 	response := Response{}
 	if err := json.Unmarshal(body, &response); err != nil {
-		return "", errors.Wrap(err, "Failed to parse api response")
+		return "", fmt.Errorf("Failed to parse api response: %w", err)
 	}
 	if response.Status == "error" {
-		return "", errors.Errorf("Failed to query")
+		return "", fmt.Errorf("Failed to query")
 	}
 	return response.Data.ResultType, nil
 }
@@ -285,10 +284,10 @@ func getResultType(body []byte) (string, error) {
 func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 	arrayBody := ArrayResponse{}
 	if err := json.Unmarshal(body, &arrayBody); err != nil {
-		return arrayBody, errors.Wrap(err, "Failed to parse api response")
+		return arrayBody, fmt.Errorf("Failed to parse api response: %w", err)
 	}
 	if arrayBody.Status == "error" {
-		return arrayBody, errors.Errorf("Failed to query")
+		return arrayBody, fmt.Errorf("Failed to query")
 	}
 	return arrayBody, nil
 }
@@ -296,10 +295,10 @@ func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 func convertJSONToRangeVectorResponse(body []byte) (RangeVectorResponse, error) {
 	mapBody := RangeVectorResponse{}
 	if err := json.Unmarshal(body, &mapBody); err != nil {
-		return RangeVectorResponse{}, errors.Wrap(err, "Failed to parse api response")
+		return RangeVectorResponse{}, fmt.Errorf("Failed to parse api response: %w", err)
 	}
 	if mapBody.Status == "error" {
-		return mapBody, errors.Errorf("Failed to query")
+		return mapBody, fmt.Errorf("Failed to query")
 	}
 	return mapBody, nil
 }
@@ -307,10 +306,10 @@ func convertJSONToRangeVectorResponse(body []byte) (RangeVectorResponse, error) 
 func convertJSONToInstantVectorResponse(body []byte) (InstantVectorResponse, error) {
 	mapBody := InstantVectorResponse{}
 	if err := json.Unmarshal(body, &mapBody); err != nil {
-		return InstantVectorResponse{}, errors.Wrap(err, "Failed to parse api response")
+		return InstantVectorResponse{}, fmt.Errorf("Failed to parse api response: %w", err)
 	}
 	if mapBody.Status == "error" {
-		return mapBody, errors.Errorf("Failed to query")
+		return mapBody, fmt.Errorf("Failed to query")
 	}
 	return mapBody, nil
 }

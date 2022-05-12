@@ -21,11 +21,10 @@
 package entropy
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -69,11 +68,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	entropy, err := getEntropyData(m.mod.ResolveHostFS("/proc/sys/kernel/random/entropy_avail"))
 	if err != nil {
-		return errors.Wrap(err, "error getting entropy")
+		return fmt.Errorf("error getting entropy: %w", err)
 	}
 	poolsize, err := getEntropyData(m.mod.ResolveHostFS("/proc/sys/kernel/random/poolsize"))
 	if err != nil {
-		return errors.Wrap(err, "error getting poolsize")
+		return fmt.Errorf("error getting poolsize: %w", err)
 	}
 	report.Event(mb.Event{
 		MetricSetFields: mapstr.M{
@@ -89,12 +88,12 @@ func getEntropyData(path string) (int, error) {
 	//This will be a number in the range 0 to 4096.
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
-		return 0, errors.Wrap(err, "error reading from random")
+		return 0, fmt.Errorf("error reading from random: %w", err)
 	}
 
 	intval, err := strconv.ParseInt(strings.TrimSpace(string(raw)), 10, 64)
 	if err != nil {
-		return 0, errors.Wrap(err, "error parsing from random")
+		return 0, fmt.Errorf("error parsing from random: %w", err)
 	}
 
 	return int(intval), nil

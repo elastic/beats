@@ -19,14 +19,13 @@ package node_stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -149,7 +148,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
-		return errors.Wrap(err, "could not parse node stats response")
+		return fmt.Errorf("could not parse node stats response: %w", err)
 	}
 
 	timestamp := common.Time(time.Now())

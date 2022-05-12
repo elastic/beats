@@ -18,7 +18,8 @@
 package collstats
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
@@ -58,7 +59,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("error creating new Session: %w", err)
 	}
 	defer mongoSession.Close()
 
@@ -66,7 +67,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	err = mongoSession.Run("top", &result)
 	if err != nil {
-		return errors.Wrap(err, "Error retrieving collection totals from Mongo instance")
+		return fmt.Errorf("Error retrieving collection totals from Mongo instance: %w", err)
 	}
 
 	if _, ok := result["totals"]; !ok {
@@ -93,7 +94,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		event, err := eventMapping(group, infoMap)
 		if err != nil {
-			err = errors.Wrap(err, "Mapping of the event data filed")
+			err = fmt.Errorf("Mapping of the event data filed: %w", err)
 			reporter.Error(err)
 			m.Logger().Error(err)
 			continue

@@ -18,7 +18,8 @@
 package cpu
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -85,7 +86,7 @@ func New(hostfs resolve.Resolver) *Monitor {
 func (m *Monitor) Fetch() (Metrics, error) {
 	metric, err := Get(m.Hostfs)
 	if err != nil {
-		return Metrics{}, errors.Wrap(err, "Error fetching CPU metrics")
+		return Metrics{}, fmt.Errorf("Error fetching CPU metrics: %w", err)
 	}
 
 	oldLastSample := m.lastSample
@@ -100,7 +101,7 @@ func (m *Monitor) FetchCores() ([]Metrics, error) {
 
 	metric, err := Get(m.Hostfs)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error fetching CPU metrics")
+		return nil, fmt.Errorf("Error fetching CPU metrics: %w", err)
 	}
 
 	coreMetrics := make([]Metrics, len(metric.list))

@@ -18,9 +18,9 @@
 package collector
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -113,11 +113,11 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 		ms.host = ms.Host()
 		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+			return nil, fmt.Errorf("unable to compile exclude patterns: %w", err)
 		}
 		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile include patterns")
+			return nil, fmt.Errorf("unable to compile include patterns: %w", err)
 		}
 
 		return ms, nil
@@ -138,7 +138,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		families = append(families, m.upMetricFamily(0.0))
 
 		// set the error to report it after sending the up event
-		err = errors.Wrap(err, "unable to decode response from prometheus endpoint")
+		err = fmt.Errorf("unable to decode response from prometheus endpoint: %w", err)
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))

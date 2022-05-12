@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
@@ -117,7 +116,7 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 			if err == io.EOF {
 				break
 			}
-			return nil, errors.Wrap(err, "decoding of metric family failed")
+			return nil, fmt.Errorf("decoding of metric family failed: %w", err)
 		} else {
 			families = append(families, mf)
 		}
@@ -275,7 +274,7 @@ type infoMetricData struct {
 func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
 	events, err := p.GetProcessedMetrics(mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting processed metrics")
+		return fmt.Errorf("error getting processed metrics: %w", err)
 	}
 	for _, event := range events {
 		r.Event(mb.Event{
@@ -315,7 +314,7 @@ func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 		for _, pattern := range *patterns {
 			r, err := regexp.Compile(pattern)
 			if err != nil {
-				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+				return nil, fmt.Errorf("compiling pattern '%s': %w", pattern, err)
 			}
 			compiledPatterns = append(compiledPatterns, r)
 		}

@@ -18,10 +18,10 @@
 package helper
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 	"syscall"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/gosigar/sys/windows"
 
@@ -55,7 +55,7 @@ func enableSeDebugPrivilege() error {
 	}
 
 	if err = windows.EnableTokenPrivileges(token, windows.SeDebugPrivilege); err != nil {
-		return errors.Wrap(err, "EnableTokenPrivileges failed")
+		return fmt.Errorf("EnableTokenPrivileges failed: %w", err)
 	}
 
 	return nil
@@ -74,7 +74,7 @@ func CheckAndEnableSeDebugPrivilege() error {
 func checkAndEnableSeDebugPrivilege() error {
 	info, err := windows.GetDebugInfo()
 	if err != nil {
-		return errors.Wrap(err, "GetDebugInfo failed")
+		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
 	logp.Info("Metricbeat process and system info: %v", info)
 
@@ -94,7 +94,7 @@ func checkAndEnableSeDebugPrivilege() error {
 
 	info, err = windows.GetDebugInfo()
 	if err != nil {
-		return errors.Wrap(err, "GetDebugInfo failed")
+		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
 
 	seDebug, found = info.ProcessPrivs[windows.SeDebugPrivilege]
@@ -103,7 +103,7 @@ func checkAndEnableSeDebugPrivilege() error {
 	}
 
 	if !seDebug.Enabled {
-		return errors.Errorf("Metricbeat failed to enable the "+
+		return fmt.Errorf("Metricbeat failed to enable the "+
 			"SeDebugPrivilege, a Windows privilege that allows it to collect "+
 			"metrics from other processes. %v", seDebug)
 	}

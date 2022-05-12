@@ -17,7 +17,9 @@
 
 package server
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 type Meta mapstr.M
 

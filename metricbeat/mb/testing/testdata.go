@@ -19,6 +19,7 @@ package testing
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -26,8 +27,6 @@ import (
 	"sort"
 	"strings"
 	"testing"
-
-	"github.com/pkg/errors"
 
 	"github.com/mitchellh/hashstructure"
 	"gopkg.in/yaml.v2"
@@ -398,7 +397,7 @@ func documentedFieldCheck(foundKeys mapstr.M, knownKeys map[string]interface{}, 
 				}
 			}
 
-			return errors.Errorf("field missing '%s'", foundKey)
+			return fmt.Errorf("field missing '%s'", foundKey)
 		}
 	}
 

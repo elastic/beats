@@ -17,7 +17,9 @@
 
 package flags
 
-import "flag"
+import (
+	"flag"
+)
 
 var (
 	// DataFlag enables file updates (e.g. it dumps events to data.json file).

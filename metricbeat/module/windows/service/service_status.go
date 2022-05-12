@@ -22,6 +22,8 @@ package service
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"strconv"
 	"syscall"
 	"time"
@@ -30,7 +32,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -146,7 +147,7 @@ func GetServiceStates(handle Handle, state ServiceEnumState, protectedServices m
 				servicesBuffer = make([]byte, len(servicesBuffer)+int(bytesNeeded))
 				continue
 			}
-			return nil, errors.Wrap(ServiceErrno(err.(syscall.Errno)), "error while calling the _EnumServicesStatusEx api")
+			return nil, fmt.Errorf("error while calling the _EnumServicesStatusEx api: %w", ServiceErrno(err.(syscall.Errno)))
 		}
 
 		break
@@ -213,7 +214,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 
 	serviceHandle, err := openServiceHandle(handle, service.ServiceName, ServiceQueryConfig)
 	if err != nil {
-		return service, errors.Wrapf(err, "error while opening service %s", service.ServiceName)
+		return service, fmt.Errorf("error while opening service %s: %w", service.ServiceName, err)
 	}
 
 	defer closeHandle(serviceHandle)
@@ -279,7 +280,7 @@ func getAdditionalServiceInfo(serviceHandle Handle, service *Status) error {
 				buffer = make([]byte, len(buffer)+int(bytesNeeded))
 				continue
 			}
-			return errors.Wrapf(ServiceErrno(err.(syscall.Errno)), "error while querying the service configuration %s", service.ServiceName)
+			return fmt.Errorf("error while querying the service configuration %s: %w", service.ServiceName, ServiceErrno(err.(syscall.Errno)))
 		}
 		serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
 		service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
@@ -311,7 +312,7 @@ func getOptionalServiceInfo(serviceHandle Handle, service *Status) error {
 		if service.StartType == StartTypeAutomatic {
 			delayedInfoBuffer, err := queryServiceConfig2(serviceHandle, ConfigDelayedAutoStartInfo)
 			if err != nil {
-				return errors.Wrapf(err, "error while querying rhe service configuration %s", service.ServiceName)
+				return fmt.Errorf("error while querying rhe service configuration %s: %w", service.ServiceName, err)
 			}
 
 			delayedInfo = (*serviceDelayedAutoStartInfo)(unsafe.Pointer(&delayedInfoBuffer[0]))

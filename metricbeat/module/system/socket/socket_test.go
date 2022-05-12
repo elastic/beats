@@ -28,7 +28,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -154,7 +153,7 @@ func TestFetch(t *testing.T) {
 func getRequiredValue(t testing.TB, key string, m mapstr.M) interface{} {
 	v, err := m.GetValue(key)
 	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get value for key '%s'", key))
+		t.Fatal(fmt.Errorf("failed to get value for key '%s': %w", key, err))
 	}
 	if v == nil {
 		t.Fatalf("key %v not found in %v", key, m)

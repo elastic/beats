@@ -18,7 +18,7 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -69,7 +69,7 @@ type SwapMetrics struct {
 func Get(procfs resolve.Resolver) (Memory, error) {
 	base, err := get(procfs)
 	if err != nil {
-		return Memory{}, errors.Wrap(err, "error getting system memory info")
+		return Memory{}, fmt.Errorf("error getting system memory info: %w", err)
 	}
 	base.fillPercentages()
 	return base, nil

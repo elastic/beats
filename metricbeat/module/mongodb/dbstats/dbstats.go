@@ -18,7 +18,8 @@
 package dbstats
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
@@ -63,14 +64,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("error creating new Session: %w", err)
 	}
 	defer mongoSession.Close()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each
 	dbNames, err := mongoSession.DatabaseNames()
 	if err != nil {
-		return errors.Wrap(err, "Error retrieving database names from Mongo instance")
+		return fmt.Errorf("Error retrieving database names from Mongo instance: %w", err)
 	}
 
 	// for each database, call db.stats() and append to events
@@ -82,7 +83,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		err := db.Run("dbStats", &result)
 		if err != nil {
-			err = errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName)
+			err = fmt.Errorf("Failed to retrieve stats for db %s: %w", dbName, err)
 			reporter.Error(err)
 			m.Logger().Error(err)
 			continue

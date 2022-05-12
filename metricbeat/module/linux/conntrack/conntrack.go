@@ -18,7 +18,8 @@
 package conntrack
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -63,11 +64,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	newFS, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
 	if err != nil {
-		return errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+		return fmt.Errorf("error creating new Host FS at %s: %w", m.mod.ResolveHostFS("/proc"), err)
 	}
 	conntrackStats, err := newFS.ConntrackStat()
 	if err != nil {
-		return errors.Wrap(err, "error fetching conntrack stats")
+		return fmt.Errorf("error fetching conntrack stats: %w", err)
 	}
 
 	summedEvents := procfs.ConntrackStatEntry{}

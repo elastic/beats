@@ -37,8 +37,6 @@ import (
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/prometheus/prometheus/pkg/timestamp"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -899,7 +897,7 @@ type infoMetricData struct {
 func (p *openmetrics) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
 	events, err := p.GetProcessedMetrics(mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting processed metrics")
+		return fmt.Errorf("error getting processed metrics: %w", err)
 	}
 	for _, event := range events {
 		r.Event(mb.Event{
@@ -939,7 +937,7 @@ func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 		for _, pattern := range *patterns {
 			r, err := regexp.Compile(pattern)
 			if err != nil {
-				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+				return nil, fmt.Errorf("compiling pattern '%s': %w", pattern, err)
 			}
 			compiledPatterns = append(compiledPatterns, r)
 		}

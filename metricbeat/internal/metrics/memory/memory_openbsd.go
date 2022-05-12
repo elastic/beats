@@ -27,13 +27,14 @@ package memory
 #include <stdlib.h>
 #include <unistd.h>
 */
-import "C"
+import (
+	"C"
+)
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -169,12 +170,12 @@ func get(_ resolve.Resolver) (Memory, error) {
 	// First we determine how much memory we'll need to pass later on (via `n`)
 	_, _, errno := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), 2, 0, uintptr(unsafe.Pointer(&n)), 0, 0)
 	if errno != 0 || n == 0 {
-		return memData, errors.Errorf("Error in size VM_UVMEXP sysctl call, errno %d", errno)
+		return memData, fmt.Errorf("Error in size VM_UVMEXP sysctl call, errno %d", errno)
 	}
 
 	_, _, errno = syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), 2, uintptr(unsafe.Pointer(&uvmexp)), uintptr(unsafe.Pointer(&n)), 0, 0)
 	if errno != 0 || n == 0 {
-		return memData, errors.Errorf("Error in VM_UVMEXP sysctl call, errno %d", errno)
+		return memData, fmt.Errorf("Error in VM_UVMEXP sysctl call, errno %d", errno)
 	}
 
 	var bcachestats Bcachestats
@@ -182,11 +183,11 @@ func get(_ resolve.Resolver) (Memory, error) {
 	n = uintptr(0)
 	_, _, errno = syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib3[0])), 3, 0, uintptr(unsafe.Pointer(&n)), 0, 0)
 	if errno != 0 || n == 0 {
-		return memData, errors.Errorf("Error in size VFS_BCACHESTAT sysctl call, errno %d", errno)
+		return memData, fmt.Errorf("Error in size VFS_BCACHESTAT sysctl call, errno %d", errno)
 	}
 	_, _, errno = syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib3[0])), 3, uintptr(unsafe.Pointer(&bcachestats)), uintptr(unsafe.Pointer(&n)), 0, 0)
 	if errno != 0 || n == 0 {
-		return memData, errors.Errorf("Error in VFS_BCACHESTAT sysctl call, errno %d", errno)
+		return memData, fmt.Errorf("Error in VFS_BCACHESTAT sysctl call, errno %d", errno)
 	}
 
 	memFree := uint64(uvmexp.free) << uvmexp.pageshift
@@ -202,7 +203,7 @@ func get(_ resolve.Resolver) (Memory, error) {
 	var err error
 	memData.Swap, err = getSwap()
 	if err != nil {
-		return memData, errors.Wrap(err, "error getting swap data")
+		return memData, fmt.Errorf("error getting swap data: %w", err)
 	}
 
 	return memData, nil
@@ -221,7 +222,7 @@ func getSwap() (SwapMetrics, error) {
 
 	rnswap := C.swapctl(C.SWAP_STATS, unsafe.Pointer(&swdev[0]), nswap)
 	if rnswap == 0 {
-		return swapData, errors.Errorf("error in SWAP_STATS sysctl, swapctl returned %d", rnswap)
+		return swapData, fmt.Errorf("error in SWAP_STATS sysctl, swapctl returned %d", rnswap)
 	}
 
 	for i := 0; i < int(nswap); i++ {

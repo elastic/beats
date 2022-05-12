@@ -21,7 +21,7 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -55,7 +55,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	eventRaw, err := metrics.Get(m.mod)
 	if err != nil {
-		return errors.Wrap(err, "error fetching memory metrics")
+		return fmt.Errorf("error fetching memory metrics: %w", err)
 	}
 
 	memory := mapstr.M{}

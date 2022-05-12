@@ -19,14 +19,14 @@ package munin
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"io"
 	"net"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -88,7 +88,7 @@ func (n *Node) List() ([]string, error) {
 func (n *Node) Fetch(plugin string, sanitize bool) (mapstr.M, error) {
 	_, err := io.WriteString(n.writer, "fetch "+plugin+"\n")
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to fetch metrics for plugin '%s'", plugin)
+		return nil, fmt.Errorf("failed to fetch metrics for plugin '%s': %w", plugin, err)
 	}
 
 	event := mapstr.M{}

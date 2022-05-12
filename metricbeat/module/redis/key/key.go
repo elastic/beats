@@ -20,8 +20,6 @@ package key
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/redis"
@@ -55,12 +53,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}{}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read configuration for 'key' metricset")
+		return nil, fmt.Errorf("failed to read configuration for 'key' metricset: %w", err)
 	}
 
 	ms, err := redis.NewMetricSet(base)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create 'key' metricset")
+		return nil, fmt.Errorf("failed to create 'key' metricset: %w", err)
 	}
 
 	return &MetricSet{
@@ -74,7 +72,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+			m.Logger().Debug(fmt.Errorf("failed to release connection: %w", err))
 		}
 	}()
 
@@ -86,7 +84,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			keyspace = *p.Keyspace
 		}
 		if err := redis.Select(conn, keyspace); err != nil {
-			msg := errors.Wrapf(err, "Failed to select keyspace %d", keyspace)
+			msg := fmt.Errorf("Failed to select keyspace %d: %w", keyspace, err)
 			m.Logger().Error(msg)
 			r.Error(err)
 			continue
@@ -94,7 +92,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
-			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", keyspace, p.Pattern)
+			msg := fmt.Errorf("Failed to list keys in keyspace %d with pattern '%s': %w", keyspace, p.Pattern, err)
 			m.Logger().Error(msg)
 			r.Error(err)
 			continue

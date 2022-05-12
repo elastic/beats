@@ -18,7 +18,7 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -32,7 +32,7 @@ func get(_ resolve.Resolver) (Memory, error) {
 
 	memoryStatusEx, err := windows.GlobalMemoryStatusEx()
 	if err != nil {
-		return memData, errors.Wrap(err, "Error fetching global memory status")
+		return memData, fmt.Errorf("Error fetching global memory status: %w", err)
 	}
 	memData.Total = opt.UintWith(memoryStatusEx.TotalPhys)
 	memData.Free = opt.UintWith(memoryStatusEx.AvailPhys)

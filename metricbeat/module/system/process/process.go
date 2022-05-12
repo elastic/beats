@@ -21,10 +21,9 @@
 package process
 
 import (
+	"fmt"
 	"os"
 	"runtime"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
@@ -105,7 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	procs, roots, err := m.stats.Get()
 	if err != nil {
-		return errors.Wrap(err, "process stats")
+		return fmt.Errorf("process stats: %w", err)
 	}
 
 	for evtI := range procs {

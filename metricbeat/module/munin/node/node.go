@@ -18,9 +18,9 @@
 package node
 
 import (
+	"errors"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/munin"
@@ -70,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	node, err := munin.Connect(m.Host(), m.timeout)
 	if err != nil {
-		return errors.Wrap(err, "error in Connect")
+		return fmt.Errorf("error in Connect: %w", err)
 	}
 	defer node.Close()
 
@@ -78,14 +78,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if len(plugins) == 0 {
 		plugins, err = node.List()
 		if err != nil {
-			return errors.Wrap(err, "error getting plugin list")
+			return fmt.Errorf("error getting plugin list: %w", err)
 		}
 	}
 
 	for _, plugin := range plugins {
 		metrics, err := node.Fetch(plugin, m.sanitize)
 		if err != nil {
-			msg := errors.Wrap(err, "error fetching metrics")
+			msg := fmt.Errorf("error fetching metrics: %w", err)
 			r.Error(err)
 			m.Logger().Error(msg)
 			continue

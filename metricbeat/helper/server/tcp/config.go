@@ -17,7 +17,9 @@
 
 package tcp
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type TcpConfig struct {
 	Host              string `config:"host"`

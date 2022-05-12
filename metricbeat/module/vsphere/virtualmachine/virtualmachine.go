@@ -19,6 +19,7 @@ package virtualmachine
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -26,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/property"
@@ -80,12 +80,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return errors.Wrap(err, "error in NewClient")
+		return fmt.Errorf("error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
 		}
 	}()
 
@@ -97,7 +97,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var err error
 		customFieldsMap, err = setCustomFieldsMap(ctx, c)
 		if err != nil {
-			return errors.Wrap(err, "error in setCustomFieldsMap")
+			return fmt.Errorf("error in setCustomFieldsMap: %w", err)
 		}
 	}
 
@@ -106,12 +106,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
-		return errors.Wrap(err, "error in CreateContainerView")
+		return fmt.Errorf("error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
 		}
 	}()
 
@@ -119,7 +119,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	var vmt []mo.VirtualMachine
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
 	if err != nil {
-		return errors.Wrap(err, "error in Retrieve")
+		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
 	for _, vm := range vmt {
@@ -278,11 +278,11 @@ func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]st
 	customFieldsManager, err := object.GetCustomFieldsManager(client)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get custom fields manager")
+		return nil, fmt.Errorf("failed to get custom fields manager: %w", err)
 	}
 	field, err := customFieldsManager.Field(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get custom fields")
+		return nil, fmt.Errorf("failed to get custom fields: %w", err)
 	}
 
 	for _, def := range field {

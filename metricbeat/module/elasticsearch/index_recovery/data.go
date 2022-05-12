@@ -19,9 +19,9 @@ package index_recovery
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -89,7 +89,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
+		return fmt.Errorf("failure parsing Elasticsearch Recovery API response: %w", err)
 	}
 
 	var errs multierror.Errors
@@ -112,7 +112,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {
-				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+				errs = append(errs, fmt.Errorf("failure applying shard schema: %w", err))
 				continue
 			}
 			event.MetricSetFields.Put("name", indexName)

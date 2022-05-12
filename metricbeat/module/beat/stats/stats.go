@@ -18,7 +18,7 @@
 package stats
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -79,7 +79,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 func (m *MetricSet) getClusterUUID() (string, error) {
 	state, err := beat.GetState(m.MetricSet)
 	if err != nil {
-		return "", errors.Wrap(err, "could not get state information")
+		return "", fmt.Errorf("could not get state information: %w", err)
 	}
 
 	clusterUUID := state.Monitoring.ClusterUUID

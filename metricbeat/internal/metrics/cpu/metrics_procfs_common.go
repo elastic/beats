@@ -22,10 +22,9 @@ package cpu
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
@@ -36,7 +35,7 @@ func Get(procfs resolve.Resolver) (CPUMetrics, error) {
 	fd, err := os.Open(path)
 	defer fd.Close()
 	if err != nil {
-		return CPUMetrics{}, errors.Wrapf(err, "error opening file %s", path)
+		return CPUMetrics{}, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 
 	return scanStatFile(bufio.NewScanner(fd))
@@ -54,13 +53,13 @@ func statScanner(scanner *bufio.Scanner, lineReader func(string) (CPU, error)) (
 		if isCPUGlobalLine(text) {
 			cpuData.totals, err = lineReader(text)
 			if err != nil {
-				return CPUMetrics{}, errors.Wrap(err, "error parsing global CPU line")
+				return CPUMetrics{}, fmt.Errorf("error parsing global CPU line: %w", err)
 			}
 		}
 		if isCPULine(text) {
 			perCPU, err := lineReader(text)
 			if err != nil {
-				return CPUMetrics{}, errors.Wrap(err, "error parsing CPU line")
+				return CPUMetrics{}, fmt.Errorf("error parsing CPU line: %w", err)
 			}
 			cpuData.list = append(cpuData.list, perCPU)
 
