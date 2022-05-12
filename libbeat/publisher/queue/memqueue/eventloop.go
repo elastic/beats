@@ -22,6 +22,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -532,7 +533,11 @@ func reportCancelledState(log *logp.Logger, req *pushRequest) {
 
 	st := req.state
 	if cb := st.dropCB; cb != nil {
-		cb(req.event.Content)
+		// TODO(fae): should this cast be to `publisher.Event` or `*publisher.Event`?
+		// interface casts are strange...
+		if event, ok := req.event.(publisher.Event); ok {
+			cb(event.Content)
+		}
 	}
 
 }
