@@ -64,6 +64,11 @@ func init() {
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+func BuildSystemTestBinary() error {
+	return devtools.BuildSystemTestBinary()
+}
+
 // CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)

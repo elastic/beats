@@ -35,6 +35,11 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+func BuildSystemTestBinary() error {
+	return devtools.BuildSystemTestBinary()
+}
+
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML()
