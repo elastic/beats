@@ -16,7 +16,6 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
-	merrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"

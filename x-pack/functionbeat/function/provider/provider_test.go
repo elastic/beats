@@ -9,7 +9,6 @@ import (
 	"errors"
 	"testing"
 
-	e "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"

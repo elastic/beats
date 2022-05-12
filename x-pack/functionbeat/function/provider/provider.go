@@ -8,8 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
@@ -51,7 +49,7 @@ type Runnable struct {
 func (r *Runnable) Run(ctx context.Context, t telemetry.T) error {
 	client, err := r.makeClient(r.config)
 	if err != nil {
-		return errors.Wrap(err, "could not create a client for the function")
+		return fmt.Errorf("could not create a client for the function: %w", err)
 	}
 	defer client.Close()
 	return r.function.Run(ctx, client, t)
