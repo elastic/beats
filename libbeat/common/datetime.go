@@ -71,7 +71,7 @@ func (t Time) Hash32(h hash.Hash32) error {
 	return err
 }
 
-// ParseTime parses a time in the NanoTsLayout format first, then use millisTsLayout format
+// ParseTime parses a time in the MillisTsLayout, then micros and finally nanos.
 func ParseTime(timespec string) (Time, error) {
 	var err error
 	var t time.Time
