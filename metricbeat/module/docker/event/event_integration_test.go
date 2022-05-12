@@ -32,7 +32,7 @@ import (
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/tests/docker"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
