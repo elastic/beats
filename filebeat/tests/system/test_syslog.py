@@ -30,6 +30,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
 
@@ -72,6 +73,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
 
@@ -112,6 +114,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains("Started listening for UDP connection"))
 
@@ -172,6 +175,7 @@ class Test(BaseTest):
             )
 
             filebeat = self.start_beat()
+            self.addCleanup(filebeat.kill_and_wait)
 
             self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
 
@@ -232,6 +236,7 @@ class Test(BaseTest):
             )
 
             filebeat = self.start_beat()
+            self.addCleanup(filebeat.kill_and_wait)
 
             self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
 
