@@ -19,7 +19,7 @@
                 "container_id": 0,
                 "begin_time": "2022-05-04T09:11:30Z",
                 "interval_size_csec": 6001,
-                "name": "Session Count",
+                "name": "session_count",
                 "value": 76
             }
         }
