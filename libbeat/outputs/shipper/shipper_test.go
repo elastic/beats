@@ -18,14 +18,25 @@
 package shipper
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"net"
+	"reflect"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -93,6 +104,177 @@ func TestConvertMapStr(t *testing.T) {
 	}
 }
 
+func TestPublish(t *testing.T) {
+	events := []beat.Event{
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{"event": "first"},
+			Fields:    mapstr.M{"a": "b"},
+		},
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{"event": "second", "dropped": true, "invalid": struct{}{}}, // this event is always dropped
+			Fields:    mapstr.M{"c": "d"},
+		},
+		{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{"event": "third"},
+			Fields:    mapstr.M{"e": "f"},
+		},
+	}
+
+	cases := []struct {
+		name        string
+		events      []beat.Event
+		expSignals  []outest.BatchSignal
+		serverError error
+		qSize       int
+	}{
+		{
+			name:   "sends a batch excluding dropped",
+			events: events[:1],
+			expSignals: []outest.BatchSignal{
+				{
+					Tag: outest.BatchACK,
+				},
+			},
+			qSize: 2,
+		},
+		{
+			name:   "retries not accepted events",
+			events: events,
+			expSignals: []outest.BatchSignal{
+				{
+					Tag:    outest.BatchRetryEvents,
+					Events: toPublisherEvents(events[2:]),
+				},
+			},
+			qSize: 1,
+		},
+		{
+			name:   "cancels the batch if server error",
+			events: events,
+			expSignals: []outest.BatchSignal{
+				{
+					Tag: outest.BatchCancelled,
+				},
+			},
+			qSize:       3,
+			serverError: errors.New("some error"),
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+			producer := sc.NewProducerMock(tc.qSize)
+			producer.Error = tc.serverError
+			grpcServer := grpc.NewServer()
+			sc.RegisterProducerServer(grpcServer, producer)
+
+			listener, err := net.Listen("tcp", "localhost:0") // random available port
+			require.NoError(t, err)
+
+			defer grpcServer.Stop()
+			go func() {
+				_ = grpcServer.Serve(listener)
+			}()
+
+			cfg, err := config.NewConfigFrom(map[string]interface{}{
+				"server": listener.Addr().String(),
+			})
+			require.NoError(t, err)
+
+			group, err := makeShipper(
+				nil,
+				beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
+				outputs.NewNilObserver(),
+				cfg,
+			)
+			require.NoError(t, err)
+			require.Len(t, group.Clients, 1)
+
+			batch := outest.NewBatch(tc.events...)
+			err = group.Clients[0].Publish(ctx, batch)
+			require.NoError(t, err)
+
+			require.Equal(t, tc.expSignals, batch.Signals)
+		})
+	}
+
+	t.Run("cancel the batch when the server is not available", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		producer := sc.NewProducerMock(5)
+		grpcServer := grpc.NewServer()
+		sc.RegisterProducerServer(grpcServer, producer)
+
+		listener, err := net.Listen("tcp", "localhost:0") // random available port
+		require.NoError(t, err)
+		defer grpcServer.Stop()
+
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server":  listener.Addr().String(),
+			"timeout": 1, // 1 sec
+		})
+		require.NoError(t, err)
+
+		group, err := makeShipper(
+			nil,
+			beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
+			outputs.NewNilObserver(),
+			cfg,
+		)
+		require.NoError(t, err)
+		require.Len(t, group.Clients, 1)
+
+		batch := outest.NewBatch(events...)
+
+		// try to publish without the server running
+		err = group.Clients[0].Publish(ctx, batch)
+		require.NoError(t, err)
+
+		expSignals := []outest.BatchSignal{
+			{
+				Tag: outest.BatchCancelled, // "cancelled" means there will be a retry without decreasing the TTL
+			},
+		}
+		require.Equal(t, expSignals, batch.Signals)
+
+		// Start the server
+		go func() {
+			_ = grpcServer.Serve(listener)
+		}()
+
+		var actSignals []outest.BatchSignal
+		expSignals = []outest.BatchSignal{
+			{
+				Tag: outest.BatchACK,
+			},
+		}
+
+		// Poll for the batch to be acknowledged. The gRPC server takes a variable amount
+		// of time to start, so some retries are necessary.
+		require.Eventually(t, func() bool {
+			batch = outest.NewBatch(events...)
+			err = group.Clients[0].Publish(ctx, batch)
+			require.NoError(t, err)
+
+			actSignals = batch.Signals
+			return reflect.DeepEqual(expSignals, batch.Signals)
+		}, 5*time.Second, 500*time.Millisecond)
+
+		// Use require.Equal() on the final signal set. If the Eventually() loop above
+		// failed this will print the difference between the signal sets.
+		require.Equal(t, expSignals, actSignals)
+	})
+}
+
 func protoStruct(t *testing.T, values map[string]interface{}) *structpb.Value {
 	s, err := structpb.NewStruct(values)
 	require.NoError(t, err)
@@ -105,4 +287,12 @@ func requireEqualProto(t *testing.T, expected, actual proto.Message) {
 		proto.Equal(expected, actual),
 		fmt.Sprintf("These two protobuf messages are not equal:\nexpected: %v\nactual:  %v", expected, actual),
 	)
+}
+
+func toPublisherEvents(events []beat.Event) []publisher.Event {
+	converted := make([]publisher.Event, 0, len(events))
+	for _, e := range events {
+		converted = append(converted, publisher.Event{Content: e})
+	}
+	return converted
 }
