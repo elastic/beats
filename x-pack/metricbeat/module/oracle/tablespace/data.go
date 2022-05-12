@@ -6,11 +6,10 @@ package tablespace
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -21,15 +20,15 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 	out = &extractedData{}
 
 	if out.dataFiles, err = extractor.dataFilesData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting data_files")
+		return nil, fmt.Errorf("error getting data_files: %w", err)
 	}
 
 	if out.tempFreeSpace, err = extractor.tempFreeSpaceData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting temp_free_space")
+		return nil, fmt.Errorf("error getting temp_free_space: %w", err)
 	}
 
 	if out.freeSpace, err = extractor.usedAndFreeSpaceData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting free space data")
+		return nil, fmt.Errorf("error getting free space data: %w", err)
 	}
 
 	return
@@ -54,7 +53,7 @@ func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
 func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
 	extractedMetricsData, err := m.extract(ctx, m.extractor)
 	if err != nil {
-		return nil, errors.Wrap(err, "error extracting data")
+		return nil, fmt.Errorf("error extracting data: %w", err)
 	}
 
 	out := m.transform(extractedMetricsData)

@@ -7,8 +7,7 @@ package performance
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -36,7 +35,7 @@ func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache
 		UNION
 		SELECT 'io_reloads' "Ratio", (SUM(reloads) / SUM(pins)) FROM V$LIBRARYCACHE`)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]libraryCache, 0)

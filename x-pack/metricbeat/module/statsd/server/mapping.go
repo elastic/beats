@@ -4,7 +4,9 @@
 
 package server
 
-import "regexp"
+import (
+	"regexp"
+)
 
 type StatsdMapping struct {
 	Metric string

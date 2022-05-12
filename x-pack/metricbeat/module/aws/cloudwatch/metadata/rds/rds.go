@@ -11,7 +11,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -83,7 +82,7 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) (map[string]*rds.DBInstance
 	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
 	output, err := req.Send(context.TODO())
 	if err != nil {
-		return nil, errors.Wrap(err, "Error DescribeDBInstancesRequest")
+		return nil, fmt.Errorf("Error DescribeDBInstancesRequest: %w", err)
 	}
 
 	instancesOutputs := map[string]*rds.DBInstance{}

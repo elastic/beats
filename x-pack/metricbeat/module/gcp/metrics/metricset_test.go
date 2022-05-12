@@ -4,7 +4,9 @@
 
 package metrics
 
-import "testing"
+import (
+	"testing"
+)
 
 var fakeMetricsConfig = []metricsConfig{
 	{"billing", "", []string{}, ""},

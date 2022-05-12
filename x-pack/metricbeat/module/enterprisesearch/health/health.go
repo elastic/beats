@@ -5,7 +5,7 @@
 package health
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -71,12 +71,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	err = eventMapping(report, content, m.XPackEnabled)
 	if err != nil {
-		return errors.Wrap(err, "error converting event")
+		return fmt.Errorf("error converting event: %w", err)
 	}
 
 	return nil

@@ -4,7 +4,9 @@
 
 package testing
 
-import "os"
+import (
+	"os"
+)
 
 // GetConfig returns the required configuration options for testing a MSSQL
 // metricset.

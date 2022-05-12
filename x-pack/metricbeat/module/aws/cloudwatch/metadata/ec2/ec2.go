@@ -12,7 +12,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -112,7 +111,7 @@ func getInstancesPerRegion(svc ec2iface.ClientAPI) (map[string]*ec2.Instance, er
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
 		output, err := req.Send(context.Background())
 		if err != nil {
-			err = errors.Wrap(err, "Error DescribeInstances")
+			err = fmt.Errorf("Error DescribeInstances: %w", err)
 			return nil, err
 		}
 

@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 	"time"
@@ -15,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
-	"github.com/pkg/errors"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -59,7 +59,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	}
 
 	if err := paginator.Err(); err != nil {
-		return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+		return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region "+regionName+": %w", err)
 	}
 	return metricsTotal, nil
 }
@@ -92,7 +92,7 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 		}
 
 		if err := paginator.Err(); err != nil {
-			return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
+			return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
 		}
 	}
 	return getMetricDataOutput.MetricDataResults, nil
@@ -172,7 +172,7 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[shortIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing shortIdentifier")
+				err = fmt.Errorf("error occurs when processing shortIdentifier: %w", err)
 				return nil, err
 			}
 
@@ -180,14 +180,14 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[wholeIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing longIdentifier")
+				err = fmt.Errorf("error occurs when processing longIdentifier: %w", err)
 				return nil, err
 			}
 		}
 	}
 
 	if err := paginator.Err(); err != nil {
-		err = errors.Wrap(err, "error GetResources with Paginator")
+		err = fmt.Errorf("error GetResources with Paginator: %w", err)
 		return nil, err
 	}
 	return resourceTagMap, nil
@@ -197,7 +197,7 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 
@@ -218,7 +218,7 @@ func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 	return arnParsed.Resource, nil

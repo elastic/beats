@@ -9,7 +9,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
@@ -42,10 +41,10 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResourceExpan
 			// get all metric definitions supported by the namespace provided
 			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(resourceID, namespace)
 			if err != nil {
-				return nil, errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", resourceID, namespace)
+				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s.: %w", resourceID, namespace, err)
 			}
 			if len(*metricDefinitions.Value) == 0 {
-				return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", resourceID, namespace)
+				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s.", resourceID, namespace)
 			}
 			var filteredMetricDefinitions []insights.MetricDefinition
 			for _, metricDefinition := range *metricDefinitions.Value {

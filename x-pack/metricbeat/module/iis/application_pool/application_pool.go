@@ -8,7 +8,7 @@
 package application_pool
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -71,12 +71,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if m.reader.executed {
 		err := m.reader.initAppPools()
 		if err != nil {
-			return errors.Wrap(err, "failed retrieving counters")
+			return fmt.Errorf("failed retrieving counters: %w", err)
 		}
 	}
 	events, err := m.reader.read()
 	if err != nil {
-		return errors.Wrap(err, "failed reading counters")
+		return fmt.Errorf("failed reading counters: %w", err)
 	}
 
 	for _, event := range events {
@@ -92,7 +92,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func (m *MetricSet) Close() error {
 	err := m.reader.close()
 	if err != nil {
-		return errors.Wrap(err, "failed to close pdh query")
+		return fmt.Errorf("failed to close pdh query: %w", err)
 	}
 	return nil
 }

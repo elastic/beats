@@ -4,7 +4,9 @@
 
 package containerd
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 // GetAndDeleteCid deletes and returns container id from an event
 func GetAndDeleteCid(event mapstr.M) (cID string) {

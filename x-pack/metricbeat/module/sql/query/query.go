@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
@@ -81,7 +80,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	db, err := sql.NewDBClient(m.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error opening connection")
+		return fmt.Errorf("error opening connection: %w", err)
 	}
 	defer db.Close()
 
@@ -161,5 +160,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "closing connection")
+	return fmt.Errorf("closing connection: %w", m.db.Close())
 }

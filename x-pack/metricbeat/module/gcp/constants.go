@@ -4,7 +4,9 @@
 
 package gcp
 
-import monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+import (
+	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+)
 
 const (
 	// ModuleName in Metricbeat

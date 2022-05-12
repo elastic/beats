@@ -6,11 +6,11 @@ package compute
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -109,7 +109,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string) (*computeMetadata, error) {
 	instance, err := s.instance(ctx, instanceID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to get data from instance '%s'", instanceID)
+		return nil, fmt.Errorf("error trying to get data from instance '%s': %w", instanceID, err)
 	}
 
 	computeMetadata := &computeMetadata{

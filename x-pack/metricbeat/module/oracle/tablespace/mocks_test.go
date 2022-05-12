@@ -7,8 +7,7 @@ package tablespace
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // happyMockExtractor is a tablespaceExtractMethods implementor that follow and ideal happy path on the entire set of data

@@ -12,7 +12,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -52,7 +51,7 @@ func getQueueUrls(svc sqsiface.ClientAPI) ([]string, error) {
 	req := svc.ListQueuesRequest(listQueuesInput)
 	output, err := req.Send(context.TODO())
 	if err != nil {
-		err = errors.Wrap(err, "Error ListQueues")
+		err = fmt.Errorf("Error ListQueues: %w", err)
 		return nil, err
 	}
 	return output.QueueUrls, nil

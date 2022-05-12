@@ -5,7 +5,7 @@
 package billing
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
@@ -38,7 +38,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config azure.Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// instantiate monitor client
 	billingClient, err := NewClient(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the billing client: module azure - billing metricset")
+		return nil, fmt.Errorf("error initializing the billing client: module azure - billing metricset: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -60,7 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	results, err := m.client.GetMetrics()
 	if err != nil {
-		return errors.Wrap(err, "error retrieving usage information")
+		return fmt.Errorf("error retrieving usage information: %w", err)
 	}
 	events := EventsMapping(m.client.Config.SubscriptionId, results)
 	for _, event := range events {

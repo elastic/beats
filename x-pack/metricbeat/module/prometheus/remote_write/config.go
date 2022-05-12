@@ -4,7 +4,9 @@
 
 package remote_write
 
-import "errors"
+import (
+	"errors"
+)
 
 type config struct {
 	UseTypes      bool          `config:"use_types"`

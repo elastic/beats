@@ -5,13 +5,12 @@
 package remote_write
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/model"
@@ -57,11 +56,11 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 
 		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile counter patterns")
+			return nil, fmt.Errorf("unable to compile counter patterns: %w", err)
 		}
 		g.histogramPatterns, err = p.CompilePatternList(config.TypesPatterns.HistogramPatterns)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile histogram patterns")
+			return nil, fmt.Errorf("unable to compile histogram patterns: %w", err)
 		}
 
 		return &g, nil

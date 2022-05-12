@@ -4,7 +4,9 @@
 
 package task_stats
 
-import "github.com/docker/docker/api/types"
+import (
+	"github.com/docker/docker/api/types"
+)
 
 type networkStats struct {
 	NameInterface string

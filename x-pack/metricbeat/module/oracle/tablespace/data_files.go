@@ -8,8 +8,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 type dataFile struct {
@@ -34,7 +32,7 @@ func (d *dataFile) eventKey() string {
 func (e *tablespaceExtractor) dataFilesData(ctx context.Context) ([]dataFile, error) {
 	rows, err := e.db.QueryContext(ctx, "SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, MAXBYTES, USER_BYTES, ONLINE_STATUS FROM SYS.DBA_DATA_FILES UNION SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, MAXBYTES, USER_BYTES, STATUS AS ONLINE_STATUS FROM SYS.DBA_TEMP_FILES")
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]dataFile, 0)

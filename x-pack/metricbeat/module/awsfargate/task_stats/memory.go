@@ -4,7 +4,9 @@
 
 package task_stats
 
-import "github.com/docker/docker/api/types"
+import (
+	"github.com/docker/docker/api/types"
+)
 
 type memoryStats struct {
 	Failcnt   uint64

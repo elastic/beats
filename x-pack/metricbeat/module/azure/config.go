@@ -5,9 +5,9 @@
 package azure
 
 import (
+	"errors"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -81,12 +81,12 @@ func (conf *Config) Validate() error {
 	if conf.ActiveDirectoryEndpoint == "" {
 		ok, err := AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
 		if err != nil {
-			return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+			return fmt.Errorf("No active directory endpoint found for the resource manager endpoint selected.: %w", err)
 		}
 		if ok {
 			add, err := AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
 			if err != nil {
-				return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+				return fmt.Errorf("No active directory endpoint found for the resource manager endpoint selected.: %w", err)
 			}
 			conf.ActiveDirectoryEndpoint = add.(string)
 		}

@@ -6,10 +6,10 @@ package server
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"strconv"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
@@ -162,10 +162,10 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		var err error
 		sampleRate, err = strconv.ParseFloat(m.sampleRate, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process metric `%s` sample rate `%s`", m.name, m.sampleRate)
+			return fmt.Errorf("failed to process metric `%s` sample rate `%s`: %w", m.name, m.sampleRate, err)
 		}
 		if sampleRate <= 0.0 {
-			return errors.Errorf("sample rate of 0.0 is invalid for metric `%s`", m.name)
+			return fmt.Errorf("sample rate of 0.0 is invalid for metric `%s`", m.name)
 		}
 	}
 
@@ -174,7 +174,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewCounter(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process counter `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process counter `%s` with value `%s`: %w", m.name, m.value, err)
 		}
 		// apply sample rate
 		v = int64(float64(v) * (1.0 / sampleRate))
@@ -183,7 +183,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewGauge64(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process gauge `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process gauge `%s` with value `%s`: %w", m.name, m.value, err)
 		}
 
 		// inc/dec or set
@@ -196,14 +196,14 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewTimer(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process timer `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process timer `%s` with value `%s`: %w", m.name, m.value, err)
 		}
 		c.SampledUpdate(time.Duration(v), sampleRate)
 	case "h": // TODO: can these be floats?
 		c := p.registry.GetOrNewHistogram(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process histogram `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process histogram `%s` with value `%s`: %w", m.name, m.value, err)
 		}
 		c.Update(v)
 	case "s":

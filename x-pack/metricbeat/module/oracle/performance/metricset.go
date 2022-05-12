@@ -6,8 +6,7 @@ package performance
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
@@ -37,7 +36,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := oracle.ConnectionDetails{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error parsing config file")
+		return nil, fmt.Errorf("error parsing config file: %w", err)
 	}
 
 	return &MetricSet{
@@ -52,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	db, err := oracle.NewConnection(&m.connectionDetails)
 	if err != nil {
-		return errors.Wrap(err, "error creating connection to Oracle")
+		return fmt.Errorf("error creating connection to Oracle: %w", err)
 	}
 	defer db.Close()
 

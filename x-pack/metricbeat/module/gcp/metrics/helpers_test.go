@@ -4,7 +4,9 @@
 
 package metrics
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_withSuffix(t *testing.T) {
 	type args struct {
