@@ -89,7 +89,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.ReplicaSet{}, false),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.DaemonSet{}, false),
 		mod:           mod,
 	}, nil
 }
@@ -127,7 +127,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 
-	return
 }
 
 // Close stops this metricset
