@@ -148,14 +148,14 @@ func mergeHosts(merged, outCfg, reporterCfg *conf.C) error {
 	outputHosts := hostsCfg{}
 	if outCfg != nil {
 		if err := outCfg.Unpack(&outputHosts); err != nil {
-			return errw.Wrap(err, "unable to parse hosts from output config")
+			return fmt.Errorf("unable to parse hosts from output config: %w", err)
 		}
 	}
 
 	reporterHosts := hostsCfg{}
 	if reporterCfg != nil {
 		if err := reporterCfg.Unpack(&reporterHosts); err != nil {
-			return errw.Wrap(err, "unable to parse hosts from reporter config")
+			return fmt.Errorf("unable to parse hosts from reporter config: %w", err)
 		}
 	}
 
@@ -172,11 +172,11 @@ func mergeHosts(merged, outCfg, reporterCfg *conf.C) error {
 		newHostsCfg, err = conf.NewConfigFrom(outputHosts.Hosts)
 	}
 	if err != nil {
-		return errw.Wrap(err, "unable to make config from new hosts")
+		return fmt.Errorf("unable to make config from new hosts: %w", err)
 	}
 
 	if err := merged.SetChild("hosts", -1, newHostsCfg); err != nil {
-		return errw.Wrap(err, "unable to set new hosts into merged config")
+		return fmt.Errorf("unable to set new hosts into merged config: %w", err)
 	}
 	return nil
 }

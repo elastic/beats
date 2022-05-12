@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"strings"
 
-	"errors"
-
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
