@@ -312,5 +312,9 @@ func copyWithHeader(header, src, dst string, mode os.FileMode) error {
 	defer srcFile.Close()
 
 	_, err = io.Copy(dstFile, srcFile)
-	return fmt.Errorf("failed to copy file: %w", err)
+	if err != nil {
+		return fmt.Errorf("failed to copy file: %w", err)
+	}
+
+	return nil
 }
