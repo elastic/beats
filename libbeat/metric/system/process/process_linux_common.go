@@ -31,13 +31,8 @@ import (
 	"strings"
 	"syscall"
 
-<<<<<<< HEAD
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-=======
->>>>>>> 2a6624d1c3 (Fix bug in filtering, cleanup (#31595))
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )

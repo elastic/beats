@@ -28,12 +28,6 @@ import (
 	"strings"
 	"time"
 
-<<<<<<< HEAD
-	"github.com/pkg/errors"
-
-=======
-	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> 2a6624d1c3 (Fix bug in filtering, cleanup (#31595))
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -368,11 +362,7 @@ func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 }
 
 // return a formatted MapStr of the process metrics
-<<<<<<< HEAD
-func (procStats *Stats) getProcessEvent(process *ProcState) (common.MapStr, error) {
-=======
-func (procStats *Stats) getProcessEvent(process ProcState) (mapstr.M, error) {
->>>>>>> 2a6624d1c3 (Fix bug in filtering, cleanup (#31595))
+func (procStats *Stats) getProcessEvent(process ProcState) (common.MapStr, error) {
 
 	// Remove CPUTicks if needed
 	if !procStats.CPUTicks {
