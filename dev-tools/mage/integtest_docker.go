@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"go/build"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -265,7 +266,7 @@ func PythonIntegTestFromHost(params PythonTestArgs) error {
 	// Run pytest from the host machine. Do not immediately exit on error to allow cleanup to occur.
 	testErr := PythonTest(params)
 
-	err = saveDockerComposeLogs(cwd, "goIntegTest")
+	err = saveDockerComposeLogs(cwd, "pythonIntegTest")
 	if err != nil {
 		// Just log the error, need to make sure the containers are stopped.
 		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
@@ -298,7 +299,7 @@ func BuildIntegTestContainers() error {
 		args = append(args, "--pull")
 	}
 
-	out := ioutil.Discard
+	out := io.Discard
 	if mg.Verbose() {
 		out = os.Stderr
 	}
@@ -470,7 +471,7 @@ func WriteDockerComposeEnvFile() (string, error) {
 		return "", err
 	}
 
-	envFile := path.Join(esBeatsDir, "docker.env")
+	envFile := filepath.Join(esBeatsDir, "docker.env")
 	err = os.WriteFile( //nolint:gosec // File permissions are not a security risk.
 		envFile,
 		[]byte(strings.Join(envFileContent, "\n")),
