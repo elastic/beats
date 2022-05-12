@@ -12,6 +12,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,7 +24,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -135,15 +135,16 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get s3 object (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed to get s3 object (elasped_time_ns=%d): %w",
+			time.Since(start).Nanoseconds(), err)
+
 	}
 	defer body.Close()
 	p.s3Metadata = meta
 
 	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
 	if err != nil {
-		return errors.Wrap(err, "failed checking for gzip content")
+		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
@@ -159,8 +160,9 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed reading s3 object (elasped_time_ns=%d): %w",
+			time.Since(start).Nanoseconds(), err)
+
 	}
 
 	return nil

@@ -4,7 +4,9 @@
 
 package cometd
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type config struct {
 	ChannelName string      `config:"channel_name" validate:"required"`

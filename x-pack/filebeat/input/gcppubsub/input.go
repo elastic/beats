@@ -8,12 +8,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/pkg/errors"
+
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 
@@ -36,12 +37,12 @@ const (
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 
 	err = input.Register(oldInputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", oldInputName))
+		panic(fmt.Errorf("failed to register %v input: %w", oldInputName, err))
 	}
 }
 
@@ -159,7 +160,7 @@ func (in *pubsubInput) run() error {
 	// Setup our subscription to the topic.
 	sub, err := in.getOrCreateSubscription(ctx, client)
 	if err != nil {
-		return errors.Wrap(err, "failed to subscribe to pub/sub topic")
+		return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
 	}
 	sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
 	sub.ReceiveSettings.MaxOutstandingMessages = in.Subscription.MaxOutstandingMessages
@@ -225,7 +226,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 
 	exists, err := sub.Exists(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to check if subscription exists")
+		return nil, fmt.Errorf("failed to check if subscription exists: %w", err)
 	}
 	if exists {
 		return sub, nil
@@ -237,7 +238,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 			Topic: client.Topic(in.Topic),
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create subscription")
+			return nil, fmt.Errorf("failed to create subscription: %w", err)
 		}
 		in.log.Debug("Created new subscription.")
 		return sub, nil

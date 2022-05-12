@@ -4,7 +4,9 @@
 
 package fields
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var GlobalFields = FieldDict{}
 

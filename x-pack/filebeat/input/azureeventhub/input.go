@@ -15,8 +15,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -54,7 +52,7 @@ const (
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 }
 
@@ -66,7 +64,7 @@ func NewInput(
 ) (input.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "reading %s input config", inputName)
+		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())

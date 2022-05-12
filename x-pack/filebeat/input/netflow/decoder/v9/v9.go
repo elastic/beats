@@ -6,11 +6,10 @@ package v9
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -75,7 +74,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	header, payload, numFlowSets, err := p.decoder.ReadPacketHeader(buf)
 	if err != nil {
 		p.logger.Printf("Unable to read V9 header: %v", err)
-		return nil, errors.Wrapf(err, "error reading header")
+		return nil, fmt.Errorf("error reading header: %w", err)
 	}
 	buf = payload
 
@@ -104,7 +103,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 		f, err := p.parseSet(set.SetID, session, body)
 		if err != nil {
 			p.logger.Printf("Error parsing set %d: %v", set.SetID, err)
-			return nil, errors.Wrapf(err, "error parsing set")
+			return nil, fmt.Errorf("error parsing set: %w", err)
 		}
 		flows = append(flows, f...)
 	}

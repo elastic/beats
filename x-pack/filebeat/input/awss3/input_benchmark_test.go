@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -19,7 +20,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"

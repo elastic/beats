@@ -4,7 +4,9 @@
 
 package cometd
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type authConfig struct {
 	OAuth2 *oAuth2Config `config:"oauth2"`

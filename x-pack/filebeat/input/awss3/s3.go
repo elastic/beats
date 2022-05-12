@@ -6,12 +6,14 @@ package awss3
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/url"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
+
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -126,9 +128,9 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 
 		if err != nil {
 			event := s3ObjectPayload.s3ObjectEvent
-			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q",
-				event.S3.Object.Key, event.S3.Bucket.Name))
+			errs = append(errs, fmt.Errorf("failed processing S3 event for object key %q in bucket %q: %w",
+				event.S3.Object.Key, event.S3.Bucket.Name, err),
+			)
 
 			p.handlePurgingLock(info, false)
 			continue

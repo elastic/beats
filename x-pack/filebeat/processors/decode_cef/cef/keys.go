@@ -4,7 +4,9 @@
 
 package cef
 
-import "strings"
+import (
+	"strings"
+)
 
 type mappedField struct {
 	Target string

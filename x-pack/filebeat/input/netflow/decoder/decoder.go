@@ -7,13 +7,12 @@ package decoder
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -59,7 +58,7 @@ func (p *Decoder) Start() error {
 	for _, proto := range p.protos {
 		if err := proto.Start(); err != nil {
 			p.stop()
-			return errors.Wrapf(err, "failed to start protocol version %d", proto.Version())
+			return fmt.Errorf("failed to start protocol version %d: %w", proto.Version(), err)
 		}
 	}
 	p.started = true

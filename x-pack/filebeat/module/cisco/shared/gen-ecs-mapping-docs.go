@@ -9,13 +9,12 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"sort"
-
-	"github.com/pkg/errors"
 )
 
 var outputFile = flag.String("output", "ftd-ecs-mappings.asciidoc", "Output file")
@@ -115,7 +114,7 @@ func loadMappings(reader io.Reader) (m idMappings, err error) {
 			break
 		}
 		if err != nil {
-			return m, errors.Wrapf(err, "failed reading line %d", lineNum)
+			return m, fmt.Errorf("failed reading line %d: %w", lineNum, err)
 		}
 		if len(record) < 3 {
 			return m, fmt.Errorf("line %d has unexpected number of columns: %d", lineNum, len(record))
