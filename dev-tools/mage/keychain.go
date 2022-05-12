@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -25,7 +26,6 @@ import (
 	"sync"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 var _appleKeychain = &appleKeychain{}
@@ -138,19 +138,19 @@ func getAppleSigningInfo() (*AppleSigningInfo, error) {
 	}
 
 	if len(install) > 1 {
-		return nil, errors.Errorf("found multiple installer signing identities "+
+		return nil, fmt.Errorf("found multiple installer signing identities "+
 			"that match '%v'. Set a more specific APPLE_SIGNING_IDENTITY_INSTALLER "+
 			"value that will select one of %+v", identityInstaller, install)
 	}
 
 	if len(app) > 1 {
-		return nil, errors.Errorf("found multiple installer signing identities "+
+		return nil, fmt.Errorf("found multiple installer signing identities "+
 			"that match '%v'. Set a more specific APPLE_SIGNING_IDENTITY_APP "+
 			"value that will select one of %+v", identityApp, app)
 	}
 
 	if len(install) == 0 || len(app) == 0 {
-		return nil, errors.Errorf("apple signing was requested with " +
+		return nil, fmt.Errorf("apple signing was requested with " +
 			"APPLE_SIGNING_ENABLED=true, but the required signing identities " +
 			"for app and installer were not found")
 	}

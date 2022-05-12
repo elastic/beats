@@ -32,7 +32,6 @@ import (
 	"syscall"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -178,7 +177,7 @@ func (docsBuilder) servePreview(dir string) *http.Server {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			panic(errors.Wrap(err, "failed to start docs preview"))
+			panic(fmt.Errorf("failed to start docs preview: %w", err))
 		}
 	}()
 

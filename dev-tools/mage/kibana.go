@@ -18,10 +18,10 @@
 package mage
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 const kibanaBuildDir = "build/kibana"
@@ -80,7 +80,7 @@ func PackageKibanaDashboardsFromBuildDir() {
 			case Deb, RPM:
 				pkgArgs.Spec.ReplaceFile("/usr/share/{{.BeatName}}/kibana", kibanaDashboards)
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 			break
 		}

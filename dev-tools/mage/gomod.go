@@ -18,10 +18,9 @@
 package mage
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -38,7 +37,7 @@ func CopyFilesToVendor(vendorFolder string, modulesToCopy []CopyModule) error {
 	for _, p := range modulesToCopy {
 		path, err := gotool.ListModuleCacheDir(p.Name)
 		if err != nil {
-			return errors.Wrapf(err, "error while looking up cached dir of module: %s", p.Name)
+			return fmt.Errorf("error while looking up cached dir of module: %s: %w", p.Name, err)
 		}
 
 		for _, f := range p.FilesToCopy {
@@ -47,7 +46,7 @@ func CopyFilesToVendor(vendorFolder string, modulesToCopy []CopyModule) error {
 			copyTask := &CopyTask{Source: from, Dest: to, Mode: 0600, DirMode: os.ModeDir | 0750}
 			err = copyTask.Execute()
 			if err != nil {
-				return errors.Wrapf(err, "error while copying file from %s to %s", from, to)
+				return fmt.Errorf("error while copying file from %s to %s: %w", from, to, err)
 			}
 		}
 	}

@@ -17,7 +17,9 @@
 
 package test
 
-import "github.com/magefile/mage/mg"
+import (
+	"github.com/magefile/mage/mg"
+)
 
 var (
 	testDeps []interface{}

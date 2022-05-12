@@ -27,7 +27,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
+
 	"gopkg.in/yaml.v2"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -56,23 +56,23 @@ func (c Compose) PushSupportedVersions() error {
 func (c Compose) composeForEachVariant(action, message string) error {
 	files, err := findSupportedVersionsFiles()
 	if err != nil {
-		return errors.Wrap(err, "finding supported versions files")
+		return fmt.Errorf("finding supported versions files: %w", err)
 	}
 
 	virtualenv, err := devtools.PythonVirtualenv()
 	if err != nil {
-		return errors.Wrap(err, "configuring Python virtual environment")
+		return fmt.Errorf("configuring Python virtual environment: %w", err)
 	}
 
 	composePath, err := devtools.LookVirtualenvPath(virtualenv, "docker-compose")
 	if err != nil {
-		return errors.Wrapf(err, "looking up docker-compose in virtual environment %s", virtualenv)
+		return fmt.Errorf("looking up docker-compose in virtual environment %s: %w", virtualenv, err)
 	}
 
 	for _, f := range files {
 		err := forEachSupportedVersion(composePath, f, action, message)
 		if err != nil {
-			return errors.Wrapf(err, "executing action '%s' for supported versions defined in %s", action, f)
+			return fmt.Errorf("executing action '%s' for supported versions defined in %s: %w", action, f, err)
 		}
 	}
 
@@ -102,19 +102,19 @@ func findSupportedVersionsFiles() ([]string, error) {
 func forEachSupportedVersion(composePath, file string, action string, message string) error {
 	d, err := ioutil.ReadFile(file)
 	if err != nil {
-		return errors.Wrapf(err, "reading supported versions file %s", file)
+		return fmt.Errorf("reading supported versions file %s: %w", file, err)
 	}
 
 	var supportedVersions SupportedVersions
 
 	err = yaml.Unmarshal(d, &supportedVersions)
 	if err != nil {
-		return errors.Wrapf(err, "parsing supported versions file %s", file)
+		return fmt.Errorf("parsing supported versions file %s: %w", file, err)
 	}
 
 	composeYmlPath, err := findComposeYmlPath(filepath.Dir(file))
 	if err != nil {
-		return errors.Wrapf(err, "looking for docker-compose.yml")
+		return fmt.Errorf("looking for docker-compose.yml: %w", err)
 	}
 
 	fmt.Printf(">> compose: Using compose file %s\n", composeYmlPath)

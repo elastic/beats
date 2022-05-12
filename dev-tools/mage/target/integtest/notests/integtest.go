@@ -17,7 +17,9 @@
 
 package notests
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {

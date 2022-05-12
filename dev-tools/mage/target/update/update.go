@@ -17,7 +17,9 @@
 
 package update
 
-import "github.com/magefile/mage/sh"
+import (
+	"github.com/magefile/mage/sh"
+)
 
 // Update updates the generated files (aka make update).
 func Update() error {

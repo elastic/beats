@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 type PackageInstaller struct {
@@ -114,7 +113,7 @@ func installDependencies(arch string, pkgs ...string) error {
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
-			return errors.Wrap(err, "error while adding architecture")
+			return fmt.Errorf("error while adding architecture: %w", err)
 		}
 	}
 
