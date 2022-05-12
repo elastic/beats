@@ -17,7 +17,9 @@
 
 package beater
 
-import "expvar"
+import (
+	"expvar"
+)
 
 // Metrics that can retrieved through the expvar web interface. Metrics must be
 // enable through configuration in order for the web service to be started.

@@ -21,11 +21,12 @@
 package wineventlog
 
 import (
+	"errors"
 	"strconv"
 	"testing"
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
-	"github.com/pkg/errors"
+
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
 

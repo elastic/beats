@@ -17,7 +17,9 @@
 
 package winevent
 
-import "golang.org/x/sys/windows"
+import (
+	"golang.org/x/sys/windows"
+)
 
 // PopulateAccount lookups the account name and type associated with a SID.
 // The account name, domain, and type are added to the given sid.

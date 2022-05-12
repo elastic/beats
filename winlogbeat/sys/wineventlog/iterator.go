@@ -21,9 +21,10 @@
 package wineventlog
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 )
 
@@ -159,8 +160,9 @@ func (itr *EventIterator) moreHandles() bool {
 				itr.subscription.Close()
 				itr.subscription, err = itr.subscriptionFactory()
 				if err != nil {
-					itr.lastErr = errors.Wrap(err, "failed in EvtNext while trying to "+
-						"recover from RPC_S_INVALID_BOUND error")
+					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to "+
+						"recover from RPC_S_INVALID_BOUND error"+": %w", err)
+
 					return false
 				}
 
@@ -168,9 +170,10 @@ func (itr *EventIterator) moreHandles() bool {
 				batchSize = batchSize / 2
 				continue
 			} else {
-				itr.lastErr = errors.Wrap(err, "failed in EvtNext (try "+
+				itr.lastErr = fmt.Errorf("failed in EvtNext (try "+
 					"reducing the batch size or providing a subscription "+
-					"factory for automatic recovery)")
+					"factory for automatic recovery)"+": %w", err)
+
 			}
 		default:
 			itr.lastErr = err

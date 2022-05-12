@@ -21,9 +21,9 @@
 package wineventlog
 
 import (
+	"errors"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
 )
