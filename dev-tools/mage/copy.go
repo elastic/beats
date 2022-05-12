@@ -53,7 +53,11 @@ func (t *CopyTask) Execute() error {
 		return fmt.Errorf("copy failed: cannot stat source file %v: %w", t.Source, err)
 	}
 
-	return fmt.Errorf("copy failed: %w", t.recursiveCopy(t.Source, t.Dest, info))
+	if err := t.recursiveCopy(t.Source, t.Dest, info); err != nil {
+		return fmt.Errorf("copy failed: %w", err)
+	}
+
+	return nil
 }
 
 func (t *CopyTask) init() error {

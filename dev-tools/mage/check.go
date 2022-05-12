@@ -187,7 +187,10 @@ func CheckYAMLNotExecutable() error {
 // GoVet vets the .go source code using 'go vet'.
 func GoVet() error {
 	err := sh.RunV("go", "vet", "./...")
-	return fmt.Errorf("failed running go vet, please fix the issues reported: %w", err)
+	if err != nil {
+		return fmt.Errorf("failed running go vet, please fix the issues reported: %w", err)
+	}
+	return nil
 }
 
 // CheckLicenseHeaders checks license headers in .go files.

@@ -20,7 +20,6 @@
 package include
 
 import (
-
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/filebeat/input/container"
 	_ "github.com/elastic/beats/v7/filebeat/input/log"
