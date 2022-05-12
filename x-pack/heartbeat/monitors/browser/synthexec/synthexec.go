@@ -20,7 +20,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -73,7 +73,7 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 // InlineJourneyJob returns a job that runs the given source as a single journey.
 func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields StdSuiteFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...) //nolint:gosec // we are safely building a command here, users can add args at their own risk
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
@@ -136,7 +136,7 @@ func runCmd(
 	}
 
 	// Variant of the command with no params, which could contain sensitive stuff
-	loggableCmd := exec.Command(cmd.Path, cmd.Args...)
+	loggableCmd := exec.Command(cmd.Path, cmd.Args...) //nolint:gosec // we are safely building a command here...
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
@@ -166,7 +166,10 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan stdout events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 
@@ -176,14 +179,20 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan stderr events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan JSON events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 	err = cmd.Start()
@@ -195,7 +204,10 @@ func runCmd(
 	// Kill the process if the context ends
 	go func() {
 		<-ctx.Done()
-		cmd.Process.Kill()
+		err := cmd.Process.Kill()
+		if err != nil {
+			logp.Warn("could not kill synthetics process: %s", err)
+		}
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
@@ -288,7 +300,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	if res.Type == "" {
 		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
 	}
-	return
+	return res, err
 }
 
 // getNpmRoot gets the closest ancestor path that contains package.json.

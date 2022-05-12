@@ -18,9 +18,8 @@
 package pipeline
 
 import (
-	"fmt"
+	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -49,17 +48,13 @@ func makeQueueReader() queueReader {
 func (qr *queueReader) run(logger *logp.Logger) {
 	logger.Debug("pipeline event consumer queue reader: start")
 	for {
-		fmt.Printf("queueReader run loop\n")
 		req, ok := <-qr.req
 		if !ok {
-			fmt.Printf("queueReader.req closed, ending run loop\n")
 			// The request channel is closed, we're shutting down
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
-		fmt.Printf("queueReader got read request\n")
 		queueBatch, _ := req.queue.Get(req.batchSize)
-		fmt.Printf("queueReader finished reading queue\n")
 		var batch *ttlBatch
 		if queueBatch != nil {
 			batch = newBatch(req.retryer, queueBatch, req.timeToLive)
@@ -70,7 +65,6 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			// If the request channel unblocks before we've sent our response,
 			// it means we're shutting down and the pending request can be
 			// discarded.
-			fmt.Printf("queue shut down before sending read response\n")
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}

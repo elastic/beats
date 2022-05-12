@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var debugf = logp.MakeDebug("icmp")
@@ -94,7 +94,7 @@ func (jf *jobFactory) checkConfig() error {
 func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 	pingFactory := jf.pingIPFactory(&jf.config)
 
-	var j []jobs.Job
+	j := make([]jobs.Job, 0, len(jf.config.Hosts))
 	for _, host := range jf.config.Hosts {
 		job, err := monitors.MakeByHostJob(host, jf.config.Mode, monitors.NewStdResolver(), pingFactory)
 

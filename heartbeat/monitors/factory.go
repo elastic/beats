@@ -27,13 +27,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -76,7 +76,7 @@ func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.Pl
 		byId:       map[string]*Monitor{},
 		mtx:        &sync.Mutex{},
 		pluginsReg: pluginsReg,
-		logger:     logp.NewLogger("monitor-factory"),
+		logger:     logp.L(),
 		runOnce:    runOnce,
 	}
 }
@@ -167,7 +167,7 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 
 		meta := clientCfg.Processing.Meta.Clone()
 		if settings.Pipeline != "" {
-			meta.Put("pipeline", settings.Pipeline)
+			_, _ = meta.Put("pipeline", settings.Pipeline)
 		}
 
 		procs := processors.NewList(nil)
