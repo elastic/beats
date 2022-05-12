@@ -31,15 +31,15 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import generate
+	//mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 )
 
