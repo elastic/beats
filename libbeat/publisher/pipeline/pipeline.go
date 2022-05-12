@@ -21,7 +21,6 @@
 package pipeline
 
 import (
-	"fmt"
 	"reflect"
 	"sync"
 	"time"
@@ -182,7 +181,6 @@ func (p *Pipeline) Close() error {
 	log.Debug("close pipeline")
 
 	if p.waitOnClose {
-		fmt.Printf("wait on close\n")
 		ch := make(chan struct{})
 		go func() {
 			p.waitCloseGroup.Wait()
@@ -196,8 +194,6 @@ func (p *Pipeline) Close() error {
 		case <-time.After(p.waitCloseTimeout):
 			// timeout -> close pipeline with pending events
 		}
-	} else {
-		fmt.Printf("no wait on close\n")
 	}
 
 	// Note: active clients are not closed / disconnected.
@@ -205,10 +201,8 @@ func (p *Pipeline) Close() error {
 	// Closing the queue stops ACKs from propagating, so we close the output first
 	// to give it a chance to wait for any outstanding events to be acknowledged.
 	p.output.Close()
-	fmt.Printf("output closed\n")
 	// shutdown queue
 	err := p.queue.Close()
-	fmt.Printf("queue closed\n")
 	if err != nil {
 		log.Error("pipeline queue shutdown error: ", err)
 	}
@@ -217,7 +211,6 @@ func (p *Pipeline) Close() error {
 	if p.sigNewClient != nil {
 		close(p.sigNewClient)
 	}
-	fmt.Printf("finished observer cleanup\n")
 	return nil
 }
 
