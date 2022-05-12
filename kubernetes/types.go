@@ -73,6 +73,9 @@ type ReplicaSet = appsv1.ReplicaSet
 // StatefulSet data
 type StatefulSet = appsv1.StatefulSet
 
+// DaemonSet data
+type DaemonSet = appsv1.DaemonSet
+
 // Service data
 type Service = v1.Service
 
@@ -84,6 +87,12 @@ type Job = batchv1.Job
 
 // CronJob data
 type CronJob = batchv1.CronJob
+
+// PersistentVolume data
+type PersistentVolume = v1.PersistentVolume
+
+// PersistentVolumeClaim data
+type PersistentVolumeClaim = v1.PersistentVolumeClaim
 
 // Role data
 type Role = rbacv1.Role

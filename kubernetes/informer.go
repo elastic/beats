@@ -137,6 +137,18 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "statefulset"
+	case *DaemonSet:
+		ss := client.AppsV1().DaemonSets(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return ss.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return ss.Watch(ctx, options)
+			},
+		}
+
+		objType = "daemonset"
 	case *Service:
 		svc := client.CoreV1().Services(opts.Namespace)
 		listwatch = &cache.ListWatch{
@@ -185,7 +197,30 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "job"
+	case *PersistentVolume:
+		ss := client.CoreV1().PersistentVolumes()
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return ss.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return ss.Watch(ctx, options)
+			},
+		}
 
+		objType = "persistentvolume"
+	case *PersistentVolumeClaim:
+		ss := client.CoreV1().PersistentVolumeClaims(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return ss.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return ss.Watch(ctx, options)
+			},
+		}
+
+		objType = "persistentvolumeclaim"
 	case *Role:
 		r := client.RbacV1().Roles(opts.Namespace)
 		listwatch = &cache.ListWatch{
