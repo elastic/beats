@@ -113,7 +113,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
 		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
-			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+			return fmt.Errorf("could not rollback, error: %s: %w", rollbackErr, err)
 		}
 		return err
 	}
@@ -163,7 +163,7 @@ func (c *CLIManager) Remove(name string) error {
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
 		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
-			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+			return fmt.Errorf("could not rollback, error: %s: %w", rollbackErr, err)
 		}
 		return err
 	}
