@@ -212,8 +212,8 @@ The default is `10 MiB`.
 [float]
 ==== `max_number_of_messages`
 
-The maximum number of SQS messages that can be inflight at any time. Defaults
-to 5.
+The maximum number of SQS messages that can be inflight at any time, with a maximum of 10. Defaults
+to 5. 
 
 [id="input-{type}-parsers"]
 [float]
