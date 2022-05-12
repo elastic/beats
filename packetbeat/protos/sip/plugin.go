@@ -260,7 +260,6 @@ func (p *plugin) populateHeadersFields(m *message, evt beat.Event, pbf *pb.Field
 	}
 }
 
-//nolint:dupl // These are not readily refactorable in the short term as the ProtocolFields is constrained to be flat.
 func populateFromFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if len(m.from) > 0 {
 		displayInfo, uri, params := parseFromToContact(m.from)
@@ -279,7 +278,6 @@ func populateFromFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	}
 }
 
-//nolint:dupl // These are not readily refactorable in the short term as the ProtocolFields is constrained to be flat.
 func populateToFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if len(m.to) > 0 {
 		displayInfo, uri, params := parseFromToContact(m.to)
