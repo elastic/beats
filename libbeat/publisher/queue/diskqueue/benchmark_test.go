@@ -60,7 +60,10 @@ func makeEvent() publisher.Event {
 	}
 }
 
-//setup creates the disk queue, you must remove the directory it makes
+//setup creates the disk queue, including a temporary directory to
+// hold the queue.  Location of the temporary directory is stored in
+// the queue settings.  Call `cleanup` when done with the queue to
+// close the queue and remove the temp dir.
 func setup() (*diskQueue, queue.Producer, queue.Consumer) {
 	dir, err := os.MkdirTemp("", "benchmark")
 	if err != nil {
@@ -78,7 +81,8 @@ func setup() (*diskQueue, queue.Producer, queue.Consumer) {
 	return q, prod, cons
 }
 
-//clean closes the queue and deletes the directory
+//clean closes the queue and deletes the temporory directory that
+// holds the queue.
 func cleanup(q *diskQueue) {
 	q.Close()
 	os.RemoveAll(q.settings.directoryPath())
@@ -112,6 +116,7 @@ func produceAndConsume(p queue.Producer, c queue.Consumer, num_events int, batch
 // timers to just produceAndConsume
 func benchmarkQueue(num_events int, batch_size int, b *testing.B) { //nolint:unparam // num_events likely to change in future
 	var err error
+	rand.Seed(1)
 	q, p, c := setup()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
