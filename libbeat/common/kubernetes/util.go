@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -32,8 +33,6 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

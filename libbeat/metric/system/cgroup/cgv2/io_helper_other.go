@@ -20,7 +20,9 @@
 
 package cgv2
 
-import "errors"
+import (
+	"errors"
+)
 
 // getIOStats fetches and formats the io.stats object
 func fetchDeviceName(major, minor uint64) (bool, string, error) {

@@ -17,7 +17,9 @@
 
 package kafka
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 // common helpers used by unit+integration tests
 

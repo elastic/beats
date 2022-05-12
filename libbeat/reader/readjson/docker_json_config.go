@@ -17,7 +17,9 @@
 
 package readjson
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ContainerFormat uint8
 

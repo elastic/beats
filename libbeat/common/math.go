@@ -17,7 +17,9 @@
 
 package common
 
-import "math"
+import (
+	"math"
+)
 
 // DefaultDecimalPlacesCount is the default number of decimal places
 const DefaultDecimalPlacesCount = 4

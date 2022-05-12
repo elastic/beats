@@ -17,7 +17,9 @@
 
 package outputs
 
-import "github.com/elastic/elastic-agent-libs/config"
+import (
+	"github.com/elastic/elastic-agent-libs/config"
+)
 
 // ReadHostList reads a list of hosts to connect to from an configuration
 // object. If the `workers` settings is > 1, each host is duplicated in the final

@@ -17,7 +17,9 @@
 
 package licenser
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // LicenseType defines what kind of license is currently available.
 type LicenseType int

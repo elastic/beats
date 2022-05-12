@@ -17,7 +17,9 @@
 
 package pipeline
 
-import "github.com/elastic/elastic-agent-libs/monitoring"
+import (
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
 
 type observer interface {
 	pipelineObserver

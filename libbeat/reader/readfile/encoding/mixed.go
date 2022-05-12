@@ -17,7 +17,9 @@
 
 package encoding
 
-import "golang.org/x/text/encoding"
+import (
+	"golang.org/x/text/encoding"
+)
 
 // mixed encoder is a copy of encoding.Replacement
 // The difference between the two is that for the Decoder the Encoder is used

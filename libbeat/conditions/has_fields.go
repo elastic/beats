@@ -17,7 +17,9 @@
 
 package conditions
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // HasFields is a Condition for checking field existence.
 type HasFields []string

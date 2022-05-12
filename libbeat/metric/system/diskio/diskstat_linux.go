@@ -21,9 +21,9 @@
 package diskio
 
 import (
+	"errors"
 	"math"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 
 	"github.com/elastic/beats/v7/libbeat/common"

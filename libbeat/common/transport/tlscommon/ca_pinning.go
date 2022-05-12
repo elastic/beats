@@ -21,8 +21,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
-
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // ErrCAPinMissmatch is returned when no pin is matched in the verified chain.

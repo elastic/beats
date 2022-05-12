@@ -17,7 +17,9 @@
 
 package memlog
 
-import "os"
+import (
+	"os"
+)
 
 // syncFile implements the fsync operation for Windows. Internally
 // FlushFileBuffers will be used.

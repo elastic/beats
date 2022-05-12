@@ -17,7 +17,9 @@
 
 package metadata
 
-import "github.com/elastic/elastic-agent-libs/config"
+import (
+	"github.com/elastic/elastic-agent-libs/config"
+)
 
 // Config declares supported configuration for metadata generation
 type Config struct {

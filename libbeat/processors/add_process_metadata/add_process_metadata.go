@@ -18,12 +18,11 @@
 package add_process_metadata
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -112,12 +111,12 @@ func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetada
 
 	config := defaultConfig()
 	if err = cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	mappings, err := config.getMappings()
 	if err != nil {
-		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
+		return nil, fmt.Errorf("error unpacking %v.target_fields: %w", processorName, err)
 	}
 
 	p := addProcessMetadata{
@@ -170,7 +169,7 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 			case ErrNoProcess:
 				return event, err
 			default:
-				return event, errors.Wrapf(err, "error applying %s processor", processorName)
+				return event, fmt.Errorf("error applying %s processor: %w", processorName, err)
 			}
 		}
 		if result != nil {
@@ -189,22 +188,22 @@ func pidToInt(value interface{}) (pid int, err error) {
 	case string:
 		pid, err = strconv.Atoi(v)
 		if err != nil {
-			return 0, errors.Wrap(err, "error converting string to integer")
+			return 0, fmt.Errorf("error converting string to integer: %w", err)
 		}
 	case int:
 		pid = v
 	case int8, int16, int32, int64:
 		pid64 := reflect.ValueOf(v).Int()
 		if pid = int(pid64); int64(pid) != pid64 {
-			return 0, errors.Errorf("integer out of range: %d", pid64)
+			return 0, fmt.Errorf("integer out of range: %d", pid64)
 		}
 	case uint, uintptr, uint8, uint16, uint32, uint64:
 		pidu64 := reflect.ValueOf(v).Uint()
 		if pid = int(pidu64); pid < 0 || uint64(pid) != pidu64 {
-			return 0, errors.Errorf("integer out of range: %d", pidu64)
+			return 0, fmt.Errorf("integer out of range: %d", pidu64)
 		}
 	default:
-		return 0, errors.Errorf("not an integer or string, but %T", v)
+		return 0, fmt.Errorf("not an integer or string, but %T", v)
 	}
 	return pid, nil
 }
@@ -217,7 +216,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 
 	pid, err := pidToInt(pidIf)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot parse pid field '%s'", pidField)
+		return nil, fmt.Errorf("cannot parse pid field '%s': %w", pidField, err)
 	}
 
 	var meta mapstr.M
@@ -254,7 +253,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 		}
 		if !p.config.OverwriteKeys {
 			if _, err := result.GetValue(dest); err == nil {
-				return nil, errors.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
+				return nil, fmt.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
 			}
 		}
 

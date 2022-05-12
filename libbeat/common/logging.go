@@ -17,7 +17,9 @@
 
 package common
 
-import "strings"
+import (
+	"strings"
+)
 
 var maskList = MakeStringSet(
 	"password",

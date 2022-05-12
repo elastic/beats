@@ -17,7 +17,9 @@
 
 package api
 
-import "os"
+import (
+	"os"
+)
 
 // Config is the configuration for the API endpoint.
 type Config struct {

@@ -17,7 +17,9 @@
 
 package plugin
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type PluginLoader func(p interface{}) error
 

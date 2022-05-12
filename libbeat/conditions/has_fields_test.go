@@ -17,7 +17,9 @@
 
 package conditions
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHasFieldsMultiFieldPositiveMatch(t *testing.T) {
 	testConfig(t, true, secdTestEvent, &Config{

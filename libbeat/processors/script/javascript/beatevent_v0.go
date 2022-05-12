@@ -18,8 +18,10 @@
 package javascript
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -62,7 +64,7 @@ func newBeatEventV0Constructor(s Session) func(call goja.ConstructorCall) *goja.
 		case mapstr.M:
 			fields = v
 		default:
-			panic(errors.Errorf("Event constructor requires a "+
+			panic(fmt.Errorf("Event constructor requires a "+
 				"map[string]interface{} argument but got %T", a0))
 		}
 
@@ -295,7 +297,7 @@ func appendString(m mapstr.M, field, value string, alwaysArray bool) error {
 		}
 		m.Put(field, append(v, value))
 	default:
-		return errors.Errorf("unexpected type %T found for %v field", list, field)
+		return fmt.Errorf("unexpected type %T found for %v field", list, field)
 	}
 	return nil
 }

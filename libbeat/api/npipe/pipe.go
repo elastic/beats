@@ -17,7 +17,9 @@
 
 package npipe
 
-import "strings"
+import (
+	"strings"
+)
 
 // IsNPipe returns true if the string has a npipe scheme.
 func IsNPipe(s string) bool {

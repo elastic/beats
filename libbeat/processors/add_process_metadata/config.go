@@ -22,8 +22,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -131,13 +129,13 @@ func (pf *config) getMappings() (mappings mapstr.M, err error) {
 				key := dstField + "." + subField
 				val := docSrc + "." + subField
 				if _, err = mappings.Put(key, val); err != nil {
-					return nil, errors.Wrapf(err, "failed to set mapping '%v' -> '%v'", dstField, docSrc)
+					return nil, fmt.Errorf("failed to set mapping '%v' -> '%v': %w", dstField, docSrc, err)
 				}
 			}
 		} else {
 			prev, err := mappings.Put(dstField, docSrc)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to set mapping '%v' -> '%v'", dstField, docSrc)
+				return nil, fmt.Errorf("failed to set mapping '%v' -> '%v': %w", dstField, docSrc, err)
 			}
 			if prev != nil {
 				return nil, fmt.Errorf("field '%v' repeated", docSrc)

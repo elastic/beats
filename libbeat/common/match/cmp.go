@@ -17,7 +17,9 @@
 
 package match
 
-import "regexp/syntax"
+import (
+	"regexp/syntax"
+)
 
 // common predefined patterns
 var (

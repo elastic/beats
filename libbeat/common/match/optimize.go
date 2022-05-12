@@ -17,7 +17,9 @@
 
 package match
 
-import "regexp/syntax"
+import (
+	"regexp/syntax"
+)
 
 type trans func(*syntax.Regexp) (bool, *syntax.Regexp)
 

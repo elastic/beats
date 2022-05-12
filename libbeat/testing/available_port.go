@@ -17,7 +17,9 @@
 
 package testing
 
-import "net"
+import (
+	"net"
+)
 
 // AvailableTCP4Port returns an unused TCP port for 127.0.0.1.
 func AvailableTCP4Port() (uint16, error) {

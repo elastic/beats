@@ -17,7 +17,9 @@
 
 package outil
 
-import "strings"
+import (
+	"strings"
+)
 
 // Settings configures how BuildSelectorFromConfig creates a Selector from
 // a given configuration object.

@@ -20,8 +20,6 @@ package actions
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mime"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -45,7 +43,7 @@ type mimeTypeProcessor struct {
 func NewDetectMimeType(cfg *conf.C) (processors.Processor, error) {
 	mimeType := &mimeTypeProcessor{}
 	if err := cfg.Unpack(mimeType); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the detect_mime_type configuration")
+		return nil, fmt.Errorf("fail to unpack the detect_mime_type configuration: %w", err)
 	}
 
 	return mimeType, nil

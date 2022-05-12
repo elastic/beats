@@ -21,7 +21,7 @@
 package metrics
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -52,7 +52,7 @@ func getFDUsage() (open, hardLimit, softLimit uint64, err error) {
 
 	state, err := beatProcessStats.GetSelf()
 	if err != nil {
-		return 0, 0, 0, errors.Wrap(err, "error fetching self process")
+		return 0, 0, 0, fmt.Errorf("error fetching self process: %w", err)
 	}
 
 	open = state.FD.Open.ValueOr(0)

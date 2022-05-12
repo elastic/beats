@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -134,13 +133,13 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 
 	files, _, err := gw.Scan()
 	if err != nil {
-		return errors.Wrap(err, "fetching config files")
+		return fmt.Errorf("fetching config files: %w", err)
 	}
 
 	// Load all config objects
 	configs, err := rl.loadConfigs(files)
 	if err != nil {
-		return errors.Wrap(err, "loading configs")
+		return fmt.Errorf("loading configs: %w", err)
 	}
 
 	debugf("Number of module configs found: %v", len(configs))

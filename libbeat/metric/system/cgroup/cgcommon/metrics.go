@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -72,7 +70,7 @@ func GetPressure(path string) (map[string]Pressure, error) {
 		var total uint64
 		matched, err := fmt.Sscanf(sc.Text(), "%s avg10=%f avg60=%f avg300=%f total=%d", &stallTime, &data.Ten.Pct, &data.Sixty.Pct, &data.ThreeHundred.Pct, &total)
 		if err != nil {
-			return pressureData, errors.Wrapf(err, "error scanning file: %s", path)
+			return pressureData, fmt.Errorf("error scanning file: %s: %w", path, err)
 		}
 		// Assume that if we didn't match at least three numbers, something has gone wrong
 		if matched < 3 {

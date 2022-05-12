@@ -17,7 +17,9 @@
 
 package dashboards
 
-import "time"
+import (
+	"time"
+)
 
 // Config represents the config values for dashboards
 type Config struct {

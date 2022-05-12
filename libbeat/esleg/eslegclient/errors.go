@@ -17,7 +17,9 @@
 
 package eslegclient
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	// ErrNotConnected indicates failure due to client having no valid connection

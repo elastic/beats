@@ -21,10 +21,9 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 )
@@ -41,7 +40,7 @@ func makeListener(cfg Config) (net.Listener, error) {
 		if len(cfg.SecurityDescriptor) == 0 {
 			sd, err = npipe.DefaultSD(cfg.User)
 			if err != nil {
-				return nil, errors.Wrap(err, "cannot generate security descriptor for the named pipe")
+				return nil, fmt.Errorf("cannot generate security descriptor for the named pipe: %w", err)
 			}
 		} else {
 			sd = cfg.SecurityDescriptor

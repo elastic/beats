@@ -17,7 +17,9 @@
 
 package common
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // TryToInt tries to coerce the given interface to an int. On success it returns
 // the int value and true.

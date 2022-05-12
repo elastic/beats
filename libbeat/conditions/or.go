@@ -17,7 +17,9 @@
 
 package conditions
 
-import "strings"
+import (
+	"strings"
+)
 
 // Or is a compound condition that combines multiple conditions with logical OR.
 type Or []Condition

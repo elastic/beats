@@ -18,9 +18,8 @@
 package javascript
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // Config defines the Javascript source files to use for the processor.
@@ -46,10 +45,10 @@ func (c Config) Validate() error {
 
 	switch {
 	case numConfigured == 0:
-		return errors.Errorf("javascript must be defined via 'file', " +
+		return fmt.Errorf("javascript must be defined via 'file', " +
 			"'files', or inline as 'source'")
 	case numConfigured > 1:
-		return errors.Errorf("javascript can be defined in only one of " +
+		return fmt.Errorf("javascript can be defined in only one of " +
 			"'file', 'files', or inline as 'source'")
 	}
 

@@ -18,11 +18,11 @@
 package cfgfile
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -68,7 +68,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, errors.Wrap(err, "Unable to hash given config"))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
 			continue
 		}
 
@@ -99,7 +99,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
-			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
+			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 

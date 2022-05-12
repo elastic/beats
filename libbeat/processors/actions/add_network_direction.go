@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -57,7 +55,7 @@ type networkDirectionProcessor struct {
 func NewAddNetworkDirection(cfg *conf.C) (processors.Processor, error) {
 	networkDirection := &networkDirectionProcessor{}
 	if err := cfg.Unpack(networkDirection); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the add_network_direction configuration")
+		return nil, fmt.Errorf("fail to unpack the add_network_direction configuration: %w", err)
 	}
 
 	return networkDirection, nil

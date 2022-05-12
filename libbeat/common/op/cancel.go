@@ -17,7 +17,9 @@
 
 package op
 
-import "sync"
+import (
+	"sync"
+)
 
 type Canceler struct {
 	lock   sync.RWMutex

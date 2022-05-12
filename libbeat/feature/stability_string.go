@@ -19,7 +19,9 @@
 
 package feature
 
-import "strconv"
+import (
+	"strconv"
+)
 
 const _Stability_name = "UndefinedStableBetaExperimental"
 

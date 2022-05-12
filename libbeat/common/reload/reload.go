@@ -18,9 +18,9 @@
 package reload
 
 import (
+	"errors"
+	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -76,7 +76,7 @@ func (r *Registry) Register(name string, obj Reloadable) error {
 	}
 
 	if r.nameTaken(name) {
-		return errors.Errorf("%s configuration list is already registered", name)
+		return fmt.Errorf("%s configuration list is already registered", name)
 	}
 
 	r.confs[name] = obj
@@ -93,7 +93,7 @@ func (r *Registry) RegisterList(name string, list ReloadableList) error {
 	}
 
 	if r.nameTaken(name) {
-		return errors.Errorf("%s configuration is already registered", name)
+		return fmt.Errorf("%s configuration is already registered", name)
 	}
 
 	r.confsLists[name] = list

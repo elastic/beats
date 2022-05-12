@@ -18,12 +18,12 @@
 package cfgfile
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // GlobManager allows to manage a directory of conf files. Using a glob pattern
@@ -155,7 +155,7 @@ func (g *GlobManager) Enable(name string) error {
 			if !file.Enabled {
 				newPath := strings.TrimSuffix(file.Path, g.disabledExtension)
 				if err := os.Rename(file.Path, newPath); err != nil {
-					return errors.Wrap(err, "enable failed")
+					return fmt.Errorf("enable failed: %w", err)
 				}
 				file.Enabled = true
 				file.Path = newPath
@@ -164,7 +164,7 @@ func (g *GlobManager) Enable(name string) error {
 		}
 	}
 
-	return errors.Errorf("module %s not found", name)
+	return fmt.Errorf("module %s not found", name)
 }
 
 // Disable given conf file, does nothing if it's disabled already
@@ -174,7 +174,7 @@ func (g *GlobManager) Disable(name string) error {
 			if file.Enabled {
 				newPath := file.Path + g.disabledExtension
 				if err := os.Rename(file.Path, newPath); err != nil {
-					return errors.Wrap(err, "disable failed")
+					return fmt.Errorf("disable failed: %w", err)
 				}
 				file.Enabled = false
 				file.Path = newPath
@@ -183,7 +183,7 @@ func (g *GlobManager) Disable(name string) error {
 		}
 	}
 
-	return errors.Errorf("module %s not found", name)
+	return fmt.Errorf("module %s not found", name)
 }
 
 // For sorting config files in the desired order, so variants will

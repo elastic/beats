@@ -17,7 +17,9 @@
 
 package match
 
-import "regexp/syntax"
+import (
+	"regexp/syntax"
+)
 
 type Matcher struct {
 	stringMatcher

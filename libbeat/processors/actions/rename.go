@@ -18,9 +18,8 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"

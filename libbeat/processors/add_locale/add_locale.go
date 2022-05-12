@@ -22,8 +22,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -67,7 +65,7 @@ func New(c *config.C) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the add_locale configuration")
+		return nil, fmt.Errorf("fail to unpack the add_locale configuration: %w", err)
 	}
 
 	var loc addLocale
@@ -78,7 +76,7 @@ func New(c *config.C) (processors.Processor, error) {
 	case "offset":
 		loc.TimezoneFormat = Offset
 	default:
-		return nil, errors.Errorf("'%s' is not a valid format option for the "+
+		return nil, fmt.Errorf("'%s' is not a valid format option for the "+
 			"add_locale processor. Valid options are 'abbreviation' and 'offset'.",
 			config.Format)
 

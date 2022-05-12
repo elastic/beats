@@ -17,7 +17,9 @@
 
 package feature
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Details minimal information that you must provide when creating a feature.
 type Details struct {

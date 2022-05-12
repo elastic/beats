@@ -20,13 +20,13 @@ package cgv2
 import (
 	"bufio"
 	"bytes"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -151,17 +151,17 @@ func (mem *MemorySubsystem) Get(path string) error {
 	var err error
 	mem.Mem, err = memoryData(path, "memory")
 	if err != nil {
-		return errors.Wrap(err, "error reading memory stats")
+		return fmt.Errorf("error reading memory stats: %w", err)
 	}
 
 	mem.MemSwap, err = memoryData(path, "memory.swap")
 	if err != nil {
-		return errors.Wrap(err, "error reading memory.swap stats")
+		return fmt.Errorf("error reading memory.swap stats: %w", err)
 	}
 
 	mem.Stats, err = fillStatStruct(path)
 	if err != nil {
-		return errors.Wrap(err, "error fetching memory.stat")
+		return fmt.Errorf("error fetching memory.stat: %w", err)
 	}
 
 	return nil
@@ -181,22 +181,22 @@ func memoryData(path, file string) (MemoryData, error) {
 	// High and max can be set to "max", which means "off"
 	lowMetric, err := cgcommon.ParseUintFromFile(filepath.Join(path, file+".low"))
 	if err != nil {
-		return data, errors.Wrapf(err, "error reading %s.low file", file)
+		return data, fmt.Errorf("error reading %s.low file: %w", file, err)
 	}
 
 	highMetric, err := maxOrValue(path, file+".high")
 	if err != nil {
-		return data, errors.Wrapf(err, "error parsing %s.high file", file)
+		return data, fmt.Errorf("error parsing %s.high file: %w", file, err)
 	}
 
 	maxMetric, err := maxOrValue(path, file+".max")
 	if err != nil {
-		return data, errors.Wrapf(err, "error parsing %s.max file", file)
+		return data, fmt.Errorf("error parsing %s.max file: %w", file, err)
 	}
 
 	currentMetric, err := cgcommon.ParseUintFromFile(filepath.Join(path, file+".current"))
 	if err != nil {
-		return data, errors.Wrapf(err, "error reading %s.current file", file)
+		return data, fmt.Errorf("error reading %s.current file: %w", file, err)
 	}
 
 	data.Low.Bytes = lowMetric
@@ -205,7 +205,7 @@ func memoryData(path, file string) (MemoryData, error) {
 	data.Usage.Bytes = currentMetric
 	data.Events, err = fetchEventsFile(path, file+".events")
 	if err != nil {
-		return data, errors.Wrapf(err, "error fetching events file for %s", file)
+		return data, fmt.Errorf("error fetching events file for %s: %w", file, err)
 	}
 
 	return data, nil
@@ -217,7 +217,7 @@ func fetchEventsFile(path, file string) (Events, error) {
 	toRead := filepath.Join(path, file)
 	f, err := os.Open(toRead)
 	if err != nil {
-		return evt, errors.Wrapf(err, "error reading %s", toRead)
+		return evt, fmt.Errorf("error reading %s: %w", toRead, err)
 	}
 	defer f.Close()
 
@@ -225,7 +225,7 @@ func fetchEventsFile(path, file string) (Events, error) {
 	for sc.Scan() {
 		key, val, err := cgcommon.ParseCgroupParamKeyValue(sc.Text())
 		if err != nil {
-			return evt, errors.Wrap(err, "error parsing key from events")
+			return evt, fmt.Errorf("error parsing key from events: %w", err)
 		}
 		switch key {
 		case "low":
@@ -251,7 +251,7 @@ func maxOrValue(path, file string) (opt.Uint, error) {
 	var finalMetric opt.Uint
 	highRaw, err := ioutil.ReadFile(filepath.Join(path, file))
 	if err != nil {
-		return finalMetric, errors.Wrapf(err, "error reading %s.high file", path)
+		return finalMetric, fmt.Errorf("error reading %s.high file: %w", path, err)
 	}
 
 	if strings.TrimSpace(string(highRaw)) == "max" {
@@ -259,7 +259,7 @@ func maxOrValue(path, file string) (opt.Uint, error) {
 	} else {
 		highUint, err := cgcommon.ParseUint(highRaw)
 		if err != nil {
-			return finalMetric, errors.Wrapf(err, "error parsing raw high value: %v", highRaw)
+			return finalMetric, fmt.Errorf("error parsing raw high value: %v: %w", highRaw, err)
 		}
 		finalMetric = opt.UintWith(highUint)
 	}
@@ -274,7 +274,7 @@ func fillStatStruct(path string) (MemoryStat, error) {
 	statPath := filepath.Join(path, "memory.stat")
 	raw, err := ioutil.ReadFile(statPath)
 	if err != nil {
-		return MemoryStat{}, errors.Wrap(err, "error reading memory.stat")
+		return MemoryStat{}, fmt.Errorf("error reading memory.stat: %w", err)
 	}
 
 	stats := MemoryStat{}
@@ -290,7 +290,7 @@ func fillStatStruct(path string) (MemoryStat, error) {
 		}
 		intVal, err := cgcommon.ParseUint(parts[1])
 		if err != nil {
-			return stats, errors.Wrapf(err, "error parsing value %v", parts[1])
+			return stats, fmt.Errorf("error parsing value %v: %w", parts[1], err)
 		}
 		for i := 0; i < refValues.NumField(); i++ {
 			idxVal := refValues.Field(i)

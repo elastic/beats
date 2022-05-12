@@ -19,10 +19,9 @@ package cgv2
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -70,12 +69,12 @@ func (cpu *CPUSubsystem) Get(path string) error {
 		return nil
 	}
 	if err != nil {
-		return errors.Wrap(err, "error fetching Pressure data")
+		return fmt.Errorf("error fetching Pressure data: %w", err)
 	}
 
 	cpu.Stats, err = getStats(path)
 	if err != nil {
-		return errors.Wrap(err, "error fetching CPU stat data")
+		return fmt.Errorf("error fetching CPU stat data: %w", err)
 	}
 
 	return nil
@@ -88,7 +87,7 @@ func getStats(path string) (CPUStats, error) {
 		if os.IsNotExist(err) {
 			return CPUStats{}, nil
 		}
-		return CPUStats{}, errors.Wrap(err, "error reading cpu.stat")
+		return CPUStats{}, fmt.Errorf("error reading cpu.stat: %w", err)
 	}
 	defer f.Close()
 
@@ -97,7 +96,7 @@ func getStats(path string) (CPUStats, error) {
 	for sc.Scan() {
 		key, val, err := cgcommon.ParseCgroupParamKeyValue(sc.Text())
 		if err != nil {
-			return data, errors.Wrap(err, "error parsing cpu.stat file")
+			return data, fmt.Errorf("error parsing cpu.stat file: %w", err)
 		}
 		switch key {
 		case "usage_usec":

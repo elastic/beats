@@ -18,9 +18,8 @@
 package cgroup
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -46,7 +45,7 @@ func (stat StatsV1) Format() (mapstr.M, error) {
 	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
 	if err != nil {
-		return to, errors.Wrap(err, "error formatting statsV1 object")
+		return to, fmt.Errorf("error formatting statsV1 object: %w", err)
 	}
 
 	return to, nil
@@ -102,7 +101,7 @@ func (stat StatsV2) Format() (mapstr.M, error) {
 	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
 	if err != nil {
-		return to, errors.Wrap(err, "error formatting statsV2 object")
+		return to, fmt.Errorf("error formatting statsV2 object: %w", err)
 	}
 
 	return to, nil

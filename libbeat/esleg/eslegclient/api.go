@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -92,7 +90,7 @@ type CountResults struct {
 
 func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {
 	if err != nil {
-		return status, nil, errors.Wrapf(err, "Elasticsearch response: %s", resp)
+		return status, nil, fmt.Errorf("Elasticsearch response: %s: %w", resp, err)
 	}
 	result, err := readQueryResult(resp)
 	return status, result, err

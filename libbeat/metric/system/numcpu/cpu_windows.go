@@ -18,7 +18,7 @@
 package numcpu
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/gosigar/sys/windows"
 )
@@ -30,7 +30,7 @@ func getCPU() (int, bool, error) {
 	// get per-cpu data
 	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
 	if err != nil {
-		return -1, false, errors.Wrap(err, "NtQuerySystemProcessorPerformanceInformation failed")
+		return -1, false, fmt.Errorf("NtQuerySystemProcessorPerformanceInformation failed: %w", err)
 	}
 
 	return len(cpus), true, nil

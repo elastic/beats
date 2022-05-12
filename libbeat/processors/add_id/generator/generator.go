@@ -17,7 +17,9 @@
 
 package generator
 
-import "strings"
+import (
+	"strings"
+)
 
 var generators = map[string]IDGenerator{
 	"elasticsearch": ESTimeBasedUUIDGenerator(),

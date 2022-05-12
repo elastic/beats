@@ -19,6 +19,7 @@ package javascript
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,7 +28,7 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
+
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -115,12 +116,12 @@ func loadSources(files ...string) (string, []byte, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return errors.Wrapf(err, "failed to open file %v", path)
+			return fmt.Errorf("failed to open file %v: %w", path, err)
 		}
 		defer f.Close()
 
 		if _, err = io.Copy(buf, f); err != nil {
-			return errors.Wrapf(err, "failed to read file %v", path)
+			return fmt.Errorf("failed to read file %v: %w", path, err)
 		}
 		return nil
 	}
@@ -140,7 +141,7 @@ func loadSources(files ...string) (string, []byte, error) {
 	}
 
 	if len(sources) == 0 {
-		return "", nil, errors.Errorf("no sources were found in %v",
+		return "", nil, fmt.Errorf("no sources were found in %v",
 			strings.Join(files, ", "))
 	}
 
@@ -158,9 +159,9 @@ func annotateError(id string, err error) error {
 		return nil
 	}
 	if id != "" {
-		return errors.Wrapf(err, "failed in processor.javascript with id=%v", id)
+		return fmt.Errorf("failed in processor.javascript with id=%v: %w", id, err)
 	}
-	return errors.Wrap(err, "failed in processor.javascript")
+	return fmt.Errorf("failed in processor.javascript: %w", err)
 }
 
 // Run executes the processor on the given it event. It invokes the

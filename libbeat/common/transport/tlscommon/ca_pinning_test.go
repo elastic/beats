@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"fmt"
 	"io/ioutil"
 	"math/big"
 	"net"
@@ -32,7 +33,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -329,17 +329,17 @@ func genCA() (tls.Certificate, error) {
 
 	caKey, err := rsa.GenerateKey(rand.Reader, 2048) // less secure key for quicker testing.
 	if err != nil {
-		return tls.Certificate{}, errors.Wrap(err, "fail to generate RSA key")
+		return tls.Certificate{}, fmt.Errorf("fail to generate RSA key: %w", err)
 	}
 
 	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caKey.PublicKey, caKey)
 	if err != nil {
-		return tls.Certificate{}, errors.Wrap(err, "fail to create certificate")
+		return tls.Certificate{}, fmt.Errorf("fail to create certificate: %w", err)
 	}
 
 	leaf, err := x509.ParseCertificate(caBytes)
 	if err != nil {
-		return tls.Certificate{}, errors.Wrap(err, "fail to parse certificate")
+		return tls.Certificate{}, fmt.Errorf("fail to parse certificate: %w", err)
 	}
 
 	return tls.Certificate{
@@ -374,7 +374,7 @@ func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.C
 
 	certKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
-		return tls.Certificate{}, errors.Wrap(err, "fail to generate RSA key")
+		return tls.Certificate{}, fmt.Errorf("fail to generate RSA key: %w", err)
 	}
 
 	certBytes, err := x509.CreateCertificate(
@@ -386,12 +386,12 @@ func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.C
 	)
 
 	if err != nil {
-		return tls.Certificate{}, errors.Wrap(err, "fail to create signed certificate")
+		return tls.Certificate{}, fmt.Errorf("fail to create signed certificate: %w", err)
 	}
 
 	leaf, err := x509.ParseCertificate(certBytes)
 	if err != nil {
-		return tls.Certificate{}, errors.Wrap(err, "fail to parse the certificate")
+		return tls.Certificate{}, fmt.Errorf("fail to parse the certificate: %w", err)
 	}
 
 	return tls.Certificate{

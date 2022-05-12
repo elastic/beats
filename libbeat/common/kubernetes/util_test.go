@@ -19,11 +19,11 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 

@@ -18,12 +18,12 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -64,7 +64,7 @@ func stdin(p string) (string, error) {
 	fmt.Print("Enter password: ")
 	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
-		return "", errors.Wrap(err, "reading password input")
+		return "", fmt.Errorf("reading password input: %w", err)
 	}
 	fmt.Println()
 	return string(bytePassword), nil

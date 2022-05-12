@@ -24,8 +24,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -61,7 +59,7 @@ type processor struct {
 func New(cfg *cfg.C) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")
+		return nil, fmt.Errorf("fail to unpack the community_id configuration: %w", err)
 	}
 
 	return newFromConfig(c)

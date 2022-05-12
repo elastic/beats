@@ -23,11 +23,10 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

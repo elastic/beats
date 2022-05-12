@@ -21,13 +21,12 @@
 package add_docker_metadata
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -79,7 +78,7 @@ func New(cfg *conf.C) (processors.Processor, error) {
 func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	var dockerAvailable bool
@@ -92,7 +91,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		dockerAvailable = true
 		log.Debugf("%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
-			return nil, errors.Wrap(err, "failed to start watcher")
+			return nil, fmt.Errorf("failed to start watcher: %w", err)
 		}
 	}
 
@@ -161,7 +160,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if cid == "" && len(d.pidFields) > 0 {
 		id, err := d.lookupContainerIDByPID(event)
 		if err != nil {
-			return nil, errors.Wrap(err, "error reading container ID")
+			return nil, fmt.Errorf("error reading container ID: %w", err)
 		}
 		if id != "" {
 			cid = id
@@ -226,7 +225,7 @@ func (d *addDockerMetadata) Close() error {
 	}
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
-		return errors.Wrap(err, "closing source processor of add_docker_metadata")
+		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
 	}
 	return nil
 }
@@ -280,7 +279,7 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 
 	cgroups, err := processCgroupPaths(d.hostFS, pid)
 	if err != nil {
-		return cgroups, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
+		return cgroups, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
 
 	d.cgroups.Put(pid, cgroups)

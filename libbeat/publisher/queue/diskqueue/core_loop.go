@@ -17,7 +17,9 @@
 
 package diskqueue
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // This file contains the queue's "core loop" -- the central goroutine
 // that owns all queue state that is not encapsulated in one of the

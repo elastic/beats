@@ -19,11 +19,10 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 // ReadInput shows the text and ask the user to provide input.

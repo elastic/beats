@@ -20,7 +20,9 @@
 
 package tlscommon
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+)
 
 const (
 	TLSVersion10 TLSVersion = tls.VersionTLS10

@@ -28,7 +28,9 @@ package process
 #include <mach/processor_info.h>
 #include <mach/vm_map.h>
 */
-import "C"
+import (
+	"C"
+)
 import (
 	"bytes"
 	"encoding/binary"

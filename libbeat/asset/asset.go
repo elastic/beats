@@ -19,12 +19,11 @@ package asset
 
 import (
 	"bytes"
+	"fmt"
 	"go/format"
 	"math"
 	"strings"
 	"text/template"
-
-	"github.com/pkg/errors"
 )
 
 type Priority int32
@@ -80,7 +79,7 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 	// what leads to different results, remove them before encoding.
 	encData, err := EncodeData(strings.Replace(string(data), "\r", "", -1))
 	if err != nil {
-		return nil, errors.Wrap(err, "error encoding the data")
+		return nil, fmt.Errorf("error encoding the data: %w", err)
 	}
 
 	goTypeName := goTypeName(name)
@@ -96,12 +95,12 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 		GoTypeName: goTypeName,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating golang file from template")
+		return nil, fmt.Errorf("error creating golang file from template: %w", err)
 	}
 
 	bs, err := format.Source(buf.Bytes())
 	if err != nil {
-		return nil, errors.Wrap(err, "error formatting golang file from template")
+		return nil, fmt.Errorf("error formatting golang file from template: %w", err)
 	}
 
 	return bs, nil

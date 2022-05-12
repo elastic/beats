@@ -26,8 +26,6 @@ import (
 
 	"go.elastic.co/apm/v2"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -65,7 +63,7 @@ func (c *publishClient) Connect() error {
 
 	err := c.es.Connect()
 	if err != nil {
-		return errors.Wrap(err, "cannot connect underlying Elasticsearch client")
+		return fmt.Errorf("cannot connect underlying Elasticsearch client: %w", err)
 	}
 
 	params := map[string]string{
@@ -190,13 +188,13 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 
 	interval, err := event.Content.Meta.GetValue("interval_ms")
 	if err != nil {
-		return errors.Wrap(err, "could not determine interval_ms field")
+		return fmt.Errorf("could not determine interval_ms field: %w", err)
 	}
 	fields.Put("interval_ms", interval)
 
 	clusterUUID, err := event.Content.Meta.GetValue("cluster_uuid")
 	if err != nil && err != mapstr.ErrKeyNotFound {
-		return errors.Wrap(err, "could not determine cluster_uuid field")
+		return fmt.Errorf("could not determine cluster_uuid field: %w", err)
 	}
 	fields.Put("cluster_uuid", clusterUUID)
 

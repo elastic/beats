@@ -23,8 +23,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -55,7 +53,7 @@ type processor struct {
 func New(cfg *config.C) (processors.Processor, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the dns configuration")
+		return nil, fmt.Errorf("fail to unpack the dns configuration: %w", err)
 	}
 
 	// Logging and metrics (each processor instance has a unique ID).
@@ -130,7 +128,7 @@ func setFieldValue(action FieldAction, event *beat.Event, key string, value stri
 		}
 		return err
 	default:
-		panic(errors.Errorf("Unexpected dns field action value encountered: %v", action))
+		panic(fmt.Errorf("Unexpected dns field action value encountered: %v", action))
 	}
 }
 

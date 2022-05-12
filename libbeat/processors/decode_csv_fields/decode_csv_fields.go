@@ -20,10 +20,9 @@ package decode_csv_fields
 import (
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -85,14 +84,14 @@ func NewDecodeCSVField(c *config.C) (processors.Processor, error) {
 	case 1:
 		f.separator = runes[0]
 	default:
-		return nil, errors.Errorf("separator must be a single character, got %d in string '%s'", len(runes), config.Separator)
+		return nil, fmt.Errorf("separator must be a single character, got %d in string '%s'", len(runes), config.Separator)
 	}
 	// Set fields as string -> string
 	f.fields = make(map[string]string, len(config.Fields))
 	for src, dstIf := range config.Fields.Flatten() {
 		dst, ok := dstIf.(string)
 		if !ok {
-			return nil, errors.Errorf("bad destination mapping for %s: destination field must be string, not %T (got %v)", src, dstIf, dstIf)
+			return nil, fmt.Errorf("bad destination mapping for %s: destination field must be string, not %T (got %v)", src, dstIf, dstIf)
 		}
 		f.fields[src] = dst
 	}
@@ -119,12 +118,12 @@ func (f *decodeCSVFields) decodeCSVField(src, dest string, event *beat.Event) er
 		if f.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return nil
 		}
-		return errors.Wrapf(err, "could not fetch value for field %s", src)
+		return fmt.Errorf("could not fetch value for field %s: %w", src, err)
 	}
 
 	text, ok := data.(string)
 	if !ok {
-		return errors.Errorf("field %s is not of string type", src)
+		return fmt.Errorf("field %s is not of string type", src)
 	}
 
 	reader := csv.NewReader(strings.NewReader(text))
@@ -135,16 +134,16 @@ func (f *decodeCSVFields) decodeCSVField(src, dest string, event *beat.Event) er
 
 	record, err := reader.Read()
 	if err != nil {
-		return errors.Wrapf(err, "error decoding CSV from field %s", src)
+		return fmt.Errorf("error decoding CSV from field %s: %w", src, err)
 	}
 
 	if src != dest && !f.OverwriteKeys {
 		if _, err = event.GetValue(dest); err == nil {
-			return errors.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", dest)
+			return fmt.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", dest)
 		}
 	}
 	if _, err = event.PutValue(dest, record); err != nil {
-		return errors.Wrapf(err, "failed setting field %s", dest)
+		return fmt.Errorf("failed setting field %s: %w", dest, err)
 	}
 	return nil
 }

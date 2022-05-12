@@ -17,7 +17,9 @@
 
 package conditions
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Fields represents an arbitrary map in a config file.
 type Fields struct {

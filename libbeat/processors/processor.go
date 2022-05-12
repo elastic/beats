@@ -18,10 +18,10 @@
 package processors
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -78,14 +78,14 @@ func New(config PluginConfig) (*Processors, error) {
 		if procConfig.HasField("if") {
 			p, err := NewIfElseThenProcessor(procConfig)
 			if err != nil {
-				return nil, errors.Wrap(err, "failed to make if/then/else processor")
+				return nil, fmt.Errorf("failed to make if/then/else processor: %w", err)
 			}
 			procs.AddProcessor(p)
 			continue
 		}
 
 		if len(procConfig.GetFields()) != 1 {
-			return nil, errors.Errorf("each processor must have exactly one "+
+			return nil, fmt.Errorf("each processor must have exactly one "+
 				"action, but found %d actions (%v)",
 				len(procConfig.GetFields()),
 				strings.Join(procConfig.GetFields(), ","))
@@ -104,7 +104,7 @@ func New(config PluginConfig) (*Processors, error) {
 				validActions = append(validActions, k)
 
 			}
-			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
+			return nil, fmt.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
 		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
@@ -192,7 +192,7 @@ func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	for _, p := range procs.List {
 		event, err = p.Run(event)
 		if err != nil {
-			return event, errors.Wrapf(err, "failed applying processor %v", p)
+			return event, fmt.Errorf("failed applying processor %v: %w", p, err)
 		}
 		if event == nil {
 			// Drop.

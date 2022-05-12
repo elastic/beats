@@ -17,7 +17,9 @@
 
 package path
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	win32Separator = '\\'

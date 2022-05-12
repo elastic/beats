@@ -17,7 +17,9 @@
 
 package elasticsearch
 
-import "sync"
+import (
+	"sync"
+)
 
 type stopper struct {
 	once sync.Once

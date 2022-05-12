@@ -17,7 +17,9 @@
 
 package processors
 
-import "github.com/elastic/elastic-agent-libs/config"
+import (
+	"github.com/elastic/elastic-agent-libs/config"
+)
 
 // PluginConfig represents the list of processors.
 type PluginConfig []*config.C

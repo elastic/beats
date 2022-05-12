@@ -19,14 +19,13 @@ package cgroup
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -279,7 +278,7 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 
 			cgpaths, err := ioutil.ReadDir(controllerPath)
 			if err != nil {
-				return cPaths, errors.Wrapf(err, "error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s'", r.cgroupMountpoints.V2Loc, line)
+				return cPaths, fmt.Errorf("error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s': %w", r.cgroupMountpoints.V2Loc, line, err)
 			}
 			// In order to produce the same kind of data for cgroups V1 and V2 controllers,
 			// We iterate over the group, and look for controllers, since the V2 unified system doesn't list them under the PID
@@ -300,7 +299,7 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 	}
 
 	if sc.Err() != nil {
-		return cPaths, errors.Wrap(sc.Err(), "error scanning cgroup file")
+		return cPaths, fmt.Errorf("error scanning cgroup file: %w", sc.Err())
 	}
 
 	return cPaths, nil

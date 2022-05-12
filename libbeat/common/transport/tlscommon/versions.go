@@ -17,7 +17,9 @@
 
 package tlscommon
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // TLSVersion type for TLS version.
 type TLSVersion uint16

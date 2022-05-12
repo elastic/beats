@@ -31,7 +31,6 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -98,7 +97,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
+		return fmt.Errorf("error setting up kubernetes autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()

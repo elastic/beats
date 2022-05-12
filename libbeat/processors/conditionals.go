@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -69,7 +67,7 @@ func NewConditionRule(
 ) (Processor, error) {
 	cond, err := conditions.NewCondition(&c)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize condition")
+		return nil, fmt.Errorf("failed to initialize condition: %w", err)
 	}
 
 	if cond == nil {

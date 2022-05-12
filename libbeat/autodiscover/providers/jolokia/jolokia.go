@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -61,7 +60,7 @@ func AutodiscoverBuilder(
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
+		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()

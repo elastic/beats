@@ -17,7 +17,9 @@
 
 package memlog
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	errRegClosed   = errors.New("registry has been closed")

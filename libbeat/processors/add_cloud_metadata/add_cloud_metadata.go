@@ -22,8 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -63,12 +61,12 @@ type initData struct {
 func New(c *cfg.C) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
+		return nil, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, errors.Wrap(err, "TLS configuration load")
+		return nil, fmt.Errorf("TLS configuration load: %w", err)
 	}
 
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)

@@ -17,7 +17,9 @@
 
 package memlog
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 type (
 	op interface {

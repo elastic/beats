@@ -22,12 +22,12 @@ package npipe
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os/user"
 	"strings"
 
 	winio "github.com/Microsoft/go-winio"
-	"github.com/pkg/errors"
 )
 
 // NewListener creates a new Listener receiving events over a named pipe.
@@ -38,7 +38,7 @@ func NewListener(name, sd string) (net.Listener, error) {
 
 	l, err := winio.ListenPipe(name, c)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to listen on the named pipe %s", name)
+		return nil, fmt.Errorf("failed to listen on the named pipe %s: %w", name, err)
 	}
 
 	return l, nil
@@ -84,12 +84,12 @@ func DefaultSD(forUser string) (string, error) {
 	if len(forUser) == 0 {
 		u, err = user.Current()
 		if err != nil {
-			return "", errors.Wrap(err, "failed to retrieve the current user")
+			return "", fmt.Errorf("failed to retrieve the current user: %w", err)
 		}
 	} else {
 		u, err = user.Lookup(forUser)
 		if err != nil {
-			return "", errors.Wrapf(err, "failed to retrieve the user %s", forUser)
+			return "", fmt.Errorf("failed to retrieve the user %s: %w", forUser, err)
 		}
 	}
 

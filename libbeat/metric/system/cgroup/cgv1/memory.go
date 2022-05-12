@@ -19,10 +19,9 @@ package cgv1
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -94,23 +93,23 @@ type MemoryStat struct {
 // cgroup hierarchy to read.
 func (mem *MemorySubsystem) Get(path string) error {
 	if err := memoryData(path, "memory", &mem.Mem); err != nil {
-		return errors.Wrap(err, "error fetching memory stats")
+		return fmt.Errorf("error fetching memory stats: %w", err)
 	}
 
 	if err := memoryData(path, "memory.memsw", &mem.MemSwap); err != nil {
-		return errors.Wrap(err, "error fetching memsw stats")
+		return fmt.Errorf("error fetching memsw stats: %w", err)
 	}
 
 	if err := memoryData(path, "memory.kmem", &mem.Kernel); err != nil {
-		return errors.Wrap(err, "error fetching kmem stats")
+		return fmt.Errorf("error fetching kmem stats: %w", err)
 	}
 
 	if err := memoryData(path, "memory.kmem.tcp", &mem.KernelTCP); err != nil {
-		return errors.Wrap(err, "error fetching kmem.tcp stats")
+		return fmt.Errorf("error fetching kmem.tcp stats: %w", err)
 	}
 
 	if err := memoryStats(path, mem); err != nil {
-		return errors.Wrap(err, "error fetching memory.stat metrics")
+		return fmt.Errorf("error fetching memory.stat metrics: %w", err)
 	}
 
 	return nil
@@ -120,22 +119,22 @@ func memoryData(path, prefix string, data *MemoryData) error {
 	var err error
 	data.Usage.Bytes, err = cgcommon.ParseUintFromFile(path, prefix+".usage_in_bytes")
 	if err != nil {
-		return errors.Wrap(err, "error fetching usage_in_bytes")
+		return fmt.Errorf("error fetching usage_in_bytes: %w", err)
 	}
 
 	data.Usage.Max.Bytes, err = cgcommon.ParseUintFromFile(path, prefix+".max_usage_in_bytes")
 	if err != nil {
-		return errors.Wrap(err, "error fetching max_usage_in_bytes")
+		return fmt.Errorf("error fetching max_usage_in_bytes: %w", err)
 	}
 
 	data.Limit.Bytes, err = cgcommon.ParseUintFromFile(path, prefix+".limit_in_bytes")
 	if err != nil {
-		return errors.Wrap(err, "error fetching limit_in_bytes")
+		return fmt.Errorf("error fetching limit_in_bytes: %w", err)
 	}
 
 	data.Failures, err = cgcommon.ParseUintFromFile(path, prefix+".failcnt")
 	if err != nil {
-		return errors.Wrap(err, "error fetching failcnt")
+		return fmt.Errorf("error fetching failcnt: %w", err)
 	}
 
 	return nil

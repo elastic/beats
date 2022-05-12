@@ -19,11 +19,10 @@ package actions
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -108,7 +107,7 @@ func (f *truncateFields) truncateSingleField(field string, event *beat.Event) (*
 		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "could not fetch value for key: %s", field)
+		return event, fmt.Errorf("could not fetch value for key: %s: %w", field, err)
 	}
 
 	switch value := v.(type) {

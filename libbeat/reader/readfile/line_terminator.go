@@ -17,7 +17,9 @@
 
 package readfile
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // LineTerminator is the option storing the line terminator characters
 // Supported newline reference: https://en.wikipedia.org/wiki/Newline#Unicode

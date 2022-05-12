@@ -19,11 +19,10 @@ package add_cloud_metadata
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -114,7 +113,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 
 		fetcher, err := ff.Create(name, c)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to initialize the %v fetcher", name)
+			return nil, fmt.Errorf("failed to initialize the %v fetcher: %w", name, err)
 		}
 
 		mf = append(mf, fetcher)

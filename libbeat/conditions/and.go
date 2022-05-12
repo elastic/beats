@@ -17,7 +17,9 @@
 
 package conditions
 
-import "strings"
+import (
+	"strings"
+)
 
 // And is a compound condition that combines multiple conditions with logical AND.
 type And []Condition

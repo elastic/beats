@@ -17,7 +17,9 @@
 
 package outputs
 
-import "github.com/elastic/elastic-agent-libs/monitoring"
+import (
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
 
 // Stats implements the Observer interface, for collecting metrics on common
 // outputs events.

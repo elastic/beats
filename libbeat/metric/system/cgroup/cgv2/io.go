@@ -19,11 +19,10 @@ package cgv2
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -59,7 +58,7 @@ func (io *IOSubsystem) Get(path string, resolveDevIDs bool) error {
 	var err error
 	io.Stats, err = getIOStats(path, resolveDevIDs)
 	if err != nil {
-		return errors.Wrapf(err, "error getting io.stats for path %s", path)
+		return fmt.Errorf("error getting io.stats for path %s: %w", path, err)
 	}
 
 	//Pressure doesn't exist on certain V2 implementations.
@@ -71,7 +70,7 @@ func (io *IOSubsystem) Get(path string, resolveDevIDs bool) error {
 
 	io.Pressure, err = cgcommon.GetPressure(filepath.Join(path, "io.pressure"))
 	if err != nil {
-		return errors.Wrapf(err, "error fetching io.pressure for path %s:", path)
+		return fmt.Errorf("error fetching io.pressure for path %s:: %w", path, err)
 	}
 
 	return nil
@@ -83,7 +82,7 @@ func getIOStats(path string, resolveDevIDs bool) (map[string]IOStat, error) {
 	file := filepath.Join(path, "io.stat")
 	f, err := os.Open(file)
 	if err != nil {
-		return stats, errors.Wrap(err, "error reading cpu.stat")
+		return stats, fmt.Errorf("error reading cpu.stat: %w", err)
 	}
 	defer f.Close()
 
@@ -93,7 +92,7 @@ func getIOStats(path string, resolveDevIDs bool) (map[string]IOStat, error) {
 		var major, minor uint64
 		_, err := fmt.Sscanf(sc.Text(), "%d:%d rbytes=%d wbytes=%d rios=%d wios=%d dbytes=%d dios=%d", &major, &minor, &devMetric.Read.Bytes, &devMetric.Write.Bytes, &devMetric.Read.IOs, &devMetric.Write.IOs, &devMetric.Discarded.Bytes, &devMetric.Discarded.IOs)
 		if err != nil {
-			return stats, errors.Wrapf(err, "error scanning file: %s", file)
+			return stats, fmt.Errorf("error scanning file: %s: %w", file, err)
 		}
 
 		// try to find the device name associated with the major/minor pair
@@ -103,7 +102,7 @@ func getIOStats(path string, resolveDevIDs bool) (map[string]IOStat, error) {
 		if resolveDevIDs {
 			found, devName, err = fetchDeviceName(major, minor)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error looking up device ID %d:%d", major, minor)
+				return nil, fmt.Errorf("error looking up device ID %d:%d: %w", major, minor, err)
 			}
 		}
 

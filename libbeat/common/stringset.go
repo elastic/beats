@@ -17,7 +17,9 @@
 
 package common
 
-import "sort"
+import (
+	"sort"
+)
 
 type StringSet map[string]struct{}
 

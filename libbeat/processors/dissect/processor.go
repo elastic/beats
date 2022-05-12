@@ -20,8 +20,6 @@ package dissect
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -97,7 +95,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 			beat.FlagField,
 			[]string{flagParsingError},
 		); err != nil {
-			return event, errors.Wrap(err, "cannot add new flag the event")
+			return event, fmt.Errorf("cannot add new flag the event: %w", err)
 		}
 		if p.config.IgnoreFailure {
 			return event, nil
@@ -132,7 +130,7 @@ func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 		} else {
 			// When the target key exists but is a string instead of a map.
 			if err != nil {
-				return event, errors.Wrapf(err, "cannot override existing key with `%s`", prefixKey)
+				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
 			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}

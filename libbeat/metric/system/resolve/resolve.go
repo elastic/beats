@@ -17,7 +17,9 @@
 
 package resolve
 
-import "path/filepath"
+import (
+	"path/filepath"
+)
 
 // Resolver is an interface for HostFS resolvers. This is meant to be generic and (hopefully) future-proof way of dealing with a user-supplied root filesystem path.
 // A resolver-style function serves two ends:

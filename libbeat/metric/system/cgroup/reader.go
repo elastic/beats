@@ -24,8 +24,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgv1"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgv2"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
@@ -119,7 +117,7 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 	// Locate the mountpoints of those subsystems.
 	mountpoints, err := SubsystemMountpoints(opts.RootfsMountpoint, subsystems)
 	if err != nil {
-		return nil, errors.Wrap(err, "error finding mountpoints")
+		return nil, fmt.Errorf("error finding mountpoints: %w", err)
 	}
 
 	return &Reader{
@@ -136,7 +134,7 @@ func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 	cgPath = r.rootfsMountpoint.ResolveHostFS(cgPath)
 	cgraw, err := ioutil.ReadFile(cgPath)
 	if err != nil {
-		return CgroupsV1, errors.Wrapf(err, "error reading %s", cgPath)
+		return CgroupsV1, fmt.Errorf("error reading %s: %w", cgPath, err)
 	}
 	cgstring := string(cgraw)
 	//V2 cgroups always begin with 0::/
@@ -151,7 +149,7 @@ func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 		// Otherwise, check to see what's in the controllers file
 		controllers, err := readControllerList(cgstring, r.cgroupMountpoints.V2Loc)
 		if err != nil {
-			return CgroupsV1, errors.Wrapf(err, "error fetching cgroup controller list for pid %d", pid)
+			return CgroupsV1, fmt.Errorf("error fetching cgroup controller list for pid %d: %w", pid, err)
 		}
 		// The logic here is a tad opinionated. If we're at this point in the code, it's because we have both
 		// V1 and V2 controllers on a cgroup. If the V2 controller has no actual controllers associated with it,
@@ -170,7 +168,7 @@ func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 func (r *Reader) GetStatsForPid(pid int) (CGStats, error) {
 	v, err := r.CgroupsVersion(pid)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error finding cgroup version for pid %d", pid)
+		return nil, fmt.Errorf("error finding cgroup version for pid %d: %w", pid, err)
 	}
 	if v == CgroupsV1 {
 		return r.GetV1StatsForProcess(pid)
@@ -195,7 +193,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 		}
 		err := getStatsV1(cgPath, conName, &stats)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching stats for controller %s", conName)
+			return nil, fmt.Errorf("error fetching stats for controller %s: %w", conName, err)
 		}
 	}
 
@@ -218,7 +216,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 		}
 		err := getStatsV2(cgPath, conName, &stats)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching stats for controller %s", conName)
+			return nil, fmt.Errorf("error fetching stats for controller %s: %w", conName, err)
 		}
 	}
 	return &stats, nil
@@ -229,7 +227,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 func ProcessCgroupPaths(hostfs resolve.Resolver, pid int) (PathList, error) {
 	reader, err := NewReader(hostfs, false)
 	if err != nil {
-		return PathList{}, errors.Wrap(err, "error creating cgroups reader")
+		return PathList{}, fmt.Errorf("error creating cgroups reader: %w", err)
 	}
 	return reader.ProcessCgroupPaths(pid)
 }
@@ -242,7 +240,7 @@ func getStatsV2(path ControllerPath, name string, stats *StatsV2) error {
 		stats.CPU = &cgv2.CPUSubsystem{}
 		err := stats.CPU.Get(path.FullPath)
 		if err != nil {
-			return errors.Wrap(err, "error fetching CPU stats")
+			return fmt.Errorf("error fetching CPU stats: %w", err)
 		}
 		stats.CPU.ID = id
 		stats.CPU.Path = path.ControllerPath
@@ -250,7 +248,7 @@ func getStatsV2(path ControllerPath, name string, stats *StatsV2) error {
 		stats.Memory = &cgv2.MemorySubsystem{}
 		err := stats.Memory.Get(path.FullPath)
 		if err != nil {
-			return errors.Wrap(err, "error fetching Memory stats")
+			return fmt.Errorf("error fetching Memory stats: %w", err)
 		}
 		stats.Memory.ID = id
 		stats.Memory.Path = path.ControllerPath
@@ -258,7 +256,7 @@ func getStatsV2(path ControllerPath, name string, stats *StatsV2) error {
 		stats.IO = &cgv2.IOSubsystem{}
 		err := stats.IO.Get(path.FullPath, true)
 		if err != nil {
-			return errors.Wrap(err, "error fetching IO stats")
+			return fmt.Errorf("error fetching IO stats: %w", err)
 		}
 		stats.IO.ID = id
 		stats.IO.Path = path.ControllerPath
@@ -275,7 +273,7 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 		stats.BlockIO = &cgv1.BlockIOSubsystem{}
 		err := stats.BlockIO.Get(path.FullPath)
 		if err != nil {
-			return errors.Wrap(err, "error fetching BlockIO stats")
+			return fmt.Errorf("error fetching BlockIO stats: %w", err)
 		}
 		stats.BlockIO.ID = id
 		stats.BlockIO.Path = path.ControllerPath
@@ -283,7 +281,7 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 		stats.CPU = &cgv1.CPUSubsystem{}
 		err := stats.CPU.Get(path.FullPath)
 		if err != nil {
-			return errors.Wrap(err, "error fetching cpu stats")
+			return fmt.Errorf("error fetching cpu stats: %w", err)
 		}
 		stats.CPU.ID = id
 		stats.CPU.Path = path.ControllerPath
@@ -291,7 +289,7 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 		stats.CPUAccounting = &cgv1.CPUAccountingSubsystem{}
 		err := stats.CPUAccounting.Get(path.FullPath)
 		if err != nil {
-			return errors.Wrap(err, "error fetching cpuacct stats")
+			return fmt.Errorf("error fetching cpuacct stats: %w", err)
 		}
 		stats.CPUAccounting.ID = id
 		stats.CPUAccounting.Path = path.ControllerPath
@@ -299,7 +297,7 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 		stats.Memory = &cgv1.MemorySubsystem{}
 		err := stats.Memory.Get(path.FullPath)
 		if err != nil {
-			return errors.Wrap(err, "error fetching memory stats")
+			return fmt.Errorf("error fetching memory stats: %w", err)
 		}
 		stats.Memory.ID = id
 		stats.Memory.Path = path.ControllerPath
@@ -347,7 +345,7 @@ func readControllerList(cgroupsFile string, v2path string) ([]string, error) {
 	file := filepath.Join(v2path, cgpath, "cgroup.controllers")
 	controllersRaw, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading %s", file)
+		return nil, fmt.Errorf("error reading %s: %w", file, err)
 	}
 
 	if len(controllersRaw) == 0 {

@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -90,7 +88,7 @@ func NewAutodiscover(
 	for _, providerCfg := range c.Providers {
 		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
 		if err != nil {
-			return nil, errors.Wrap(err, "error in autodiscover provider settings")
+			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}
 		logger.Debugf("Configured autodiscover provider: %s", provider)
 		providers = append(providers, provider)
@@ -233,9 +231,9 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.factory.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s', won't start runner",
-				conf.DebugString(config, true))))
+			a.logger.Error(fmt.Errorf("Auto discover config check failed for config '%s', won't start runner: %w",
+				conf.DebugString(config, true), err),
+			)
 			continue
 		}
 		newCfg[hash] = &reload.ConfigWithMeta{

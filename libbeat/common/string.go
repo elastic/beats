@@ -17,7 +17,9 @@
 
 package common
 
-import "strings"
+import (
+	"strings"
+)
 
 // NetString store the byte length of the data that follows, making it easier
 // to unambiguously pass text and byte data between programs that could be

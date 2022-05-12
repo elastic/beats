@@ -17,7 +17,9 @@
 
 package timestamp
 
-import "github.com/elastic/beats/v7/libbeat/common/cfgtype"
+import (
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+)
 
 type config struct {
 	Field          string            `config:"field" validate:"required"`   // Source field containing time time to be parsed.

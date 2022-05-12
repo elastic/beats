@@ -26,8 +26,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/gosigar/sys/linux"
 )
@@ -56,15 +54,15 @@ type CPUAccountingStats struct {
 func (cpuacct *CPUAccountingSubsystem) Get(path string) error {
 	cpuacct.UsagePerCPU = make(map[string]uint64)
 	if err := cpuacctStat(path, cpuacct); err != nil {
-		return errors.Wrap(err, "error fetching cpuacct stats")
+		return fmt.Errorf("error fetching cpuacct stats: %w", err)
 	}
 
 	if err := cpuacctUsage(path, cpuacct); err != nil {
-		return errors.Wrap(err, "error fetching cpuacct usage")
+		return fmt.Errorf("error fetching cpuacct usage: %w", err)
 	}
 
 	if err := cpuacctUsagePerCPU(path, cpuacct); err != nil {
-		return errors.Wrap(err, "error fetching per_cpu data")
+		return fmt.Errorf("error fetching per_cpu data: %w", err)
 	}
 
 	return nil

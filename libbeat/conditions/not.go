@@ -17,7 +17,9 @@
 
 package conditions
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Not is a condition that negates its inner condition.
 type Not struct {

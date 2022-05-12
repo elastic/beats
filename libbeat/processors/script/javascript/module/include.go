@@ -18,6 +18,7 @@
 package module
 
 import (
+
 	// Register javascript modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/console"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/net"

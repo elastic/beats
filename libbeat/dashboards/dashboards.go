@@ -23,12 +23,11 @@ import (
 	"fmt"
 	"path/filepath"
 
-	errw "github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	errw "github.com/pkg/errors"
 )
 
 // ImportDashboards tries to import the kibana dashboards.

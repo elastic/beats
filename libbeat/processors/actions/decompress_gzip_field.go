@@ -20,10 +20,9 @@ package actions
 import (
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -107,7 +106,7 @@ func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 
 	r, err := gzip.NewReader(inBuf)
 	if err != nil {
-		return errors.Wrapf(err, "error decompressing field %s", f.config.Field.From)
+		return fmt.Errorf("error decompressing field %s: %w", f.config.Field.From, err)
 	}
 
 	var outBuf bytes.Buffer

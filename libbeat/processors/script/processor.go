@@ -18,9 +18,8 @@
 package script
 
 import (
+	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
@@ -47,6 +46,6 @@ func New(c *config.C) (processors.Processor, error) {
 	case "javascript", "js":
 		return javascript.New(c)
 	default:
-		return nil, errors.Errorf("script type must be declared (e.g. type: javascript)")
+		return nil, fmt.Errorf("script type must be declared (e.g. type: javascript)")
 	}
 }

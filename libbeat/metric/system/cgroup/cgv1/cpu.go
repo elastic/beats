@@ -19,10 +19,9 @@ package cgv1
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -84,15 +83,15 @@ type ThrottledField struct {
 // cgroup hierarchy to read.
 func (cpu *CPUSubsystem) Get(path string) error {
 	if err := cpuCFS(path, cpu); err != nil {
-		return errors.Wrap(err, "error fetching CFS data")
+		return fmt.Errorf("error fetching CFS data: %w", err)
 	}
 
 	if err := cpuRT(path, cpu); err != nil {
-		return errors.Wrap(err, "error fetching RT data")
+		return fmt.Errorf("error fetching RT data: %w", err)
 	}
 
 	if err := cpuStat(path, cpu); err != nil {
-		return errors.Wrap(err, "error fetching CPU stats")
+		return fmt.Errorf("error fetching CPU stats: %w", err)
 	}
 
 	return nil

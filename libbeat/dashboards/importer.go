@@ -29,10 +29,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	errw "github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	errw "github.com/pkg/errors"
 )
 
 // ErrNotFound returned when we cannot find any dashboard to import.
