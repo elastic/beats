@@ -21,11 +21,8 @@ import (
 	"fmt"
 	"time"
 
-	k8sclient "k8s.io/client-go/kubernetes"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -101,7 +98,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	// add ECS orchestrator fields
 	cfg, _ := conf.NewConfigFrom(&config)
-	ecsClusterMeta, err := getClusterECSMeta(cfg, client, ms.Logger())
+	ecsClusterMeta, err := util.GetClusterECSMeta(cfg, client, ms.Logger())
 	if err != nil {
 		ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
 	}
@@ -110,21 +107,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return ms, nil
-}
-
-func getClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Logger) (mapstr.M, error) {
-	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
-	if err != nil {
-		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
-	}
-	ecsClusterMeta := mapstr.M{}
-	if clusterInfo.Url != "" {
-		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
-	}
-	if clusterInfo.Name != "" {
-		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
-	}
-	return ecsClusterMeta, nil
 }
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
