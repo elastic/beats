@@ -748,7 +748,7 @@ processors:
       - "^(Group = %{IP}, )?(IP = %{IP:source.address}, )?%{GREEDYDATA:event.reason}$"
    # Handle ecs action outcome protocol
   - set:
-      if: '["434002", "434003", "434004"].contains(ctx._temp_.cisco.message_id)'
+      if: '["434001", "434002", "434003", "434004"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
       value: "unknown"
   - set:

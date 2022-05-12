@@ -4747,6 +4747,7 @@
         "event.dataset": "cisco.asa",
         "event.module": "cisco",
         "event.original": "%ASA-4-434001: SFR card not up and fail-close mode used, dropping TCP packet from outside:54.239.28.85/443 to Inside:10.12.128.89/57388",
+        "event.outcome": "unknown",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "fileset.name": "asa",
