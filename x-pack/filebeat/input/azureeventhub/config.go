@@ -10,7 +10,10 @@ package azureeventhub
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"unicode"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type azureInputConfig struct {
@@ -29,6 +32,7 @@ const ephContainerName = "filebeat"
 
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
+	logger := logp.NewLogger("azureeventhub.config")
 	if conf.ConnectionString == "" {
 		return errors.New("no connection string configured")
 	}
@@ -40,6 +44,20 @@ func (conf *azureInputConfig) Validate() error {
 	}
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
+	}
+	if strings.Contains(conf.SAContainer, "_") {
+		originalValue := conf.SAContainer
+		// When a user specifies an event hub name in the input settings,
+		// the configuration uses it to compose the storage account (SA) container
+		// name (for example, `filebeat-<DATA-STREAM>-<EVENTHUB>`).
+		//
+		// The event hub allows names with underscores (_) characters, but unfortunately,
+		// the SA container does not permit them.
+		//
+		// So instead of throwing an error to the user, we decided to replace
+		// underscores (_) characters with hyphens (-).
+		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
+		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {

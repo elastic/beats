@@ -80,7 +80,7 @@ func TestNewParser(t *testing.T) {
 			},
 			Want: []testResult{
 				{
-					Timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
+					Timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
 					Content:   []byte("this is the message"),
 					Fields: common.MapStr{
 						"log": common.MapStr{
@@ -98,7 +98,7 @@ func TestNewParser(t *testing.T) {
 								"appname":  "evntslog",
 								"procid":   "1024",
 								"msgid":    "ID47",
-								"version":  1,
+								"version":  "1",
 								"structured_data": map[string]map[string]string{
 									"examplePriority@32473": {
 										"class": "high",
@@ -115,7 +115,7 @@ func TestNewParser(t *testing.T) {
 					},
 				},
 				{
-					Timestamp: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", time.Local),
+					Timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
 					Content:   []byte("this is the message"),
 					Fields: common.MapStr{
 						"log": common.MapStr{

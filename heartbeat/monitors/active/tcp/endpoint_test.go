@@ -37,8 +37,8 @@ func TestMakeEndpoints(t *testing.T) {
 	}{
 		{
 			"hostname",
-			args{[]string{"localhost"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tcp", Hostname: "localhost", Ports: []uint16{123}}},
+			args{[]string{Localhost}, []uint16{123}, "tcp"},
+			[]endpoint{{Scheme: "tcp", Hostname: Localhost, Ports: []uint16{123}}},
 			false,
 		},
 		{
@@ -80,14 +80,14 @@ func TestMakeEndpoints(t *testing.T) {
 		{
 			"hybrid",
 			args{[]string{
-				"localhost",
+				Localhost,
 				"192.168.0.1",
 				"[2607:f8b0:4004:814::200e]",
 				"example.net:999",
 				"tls://example.net:999",
 			}, []uint16{123}, "tcp"},
 			[]endpoint{
-				{Scheme: "tcp", Hostname: "localhost", Ports: []uint16{123}},
+				{Scheme: "tcp", Hostname: Localhost, Ports: []uint16{123}},
 				{Scheme: "tcp", Hostname: "192.168.0.1", Ports: []uint16{123}},
 				{Scheme: "tcp", Hostname: "2607:f8b0:4004:814::200e", Ports: []uint16{123}},
 				{Scheme: "tcp", Hostname: "example.net", Ports: []uint16{999}},

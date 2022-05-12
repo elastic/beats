@@ -440,8 +440,8 @@ def runE2ETests(){
          gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
          gitHubCheckRepo: env.REPO,
          gitHubCheckSha1: env.GIT_BASE_COMMIT,
-         propagate: true,
-         wait: true)
+         propagate: false,
+         wait: false)
 }
 
 /**

@@ -34,10 +34,7 @@ var srvrTestInput = `/172.17.0.1:55218[0](queued=0,recved=1,sent=0)
 func TestParser(t *testing.T) {
 	conns := MetricSet{}
 
-	mapStr, err := conns.parseCons(bytes.NewReader([]byte(srvrTestInput)))
-	if err != nil {
-		t.Fatal(err)
-	}
+	mapStr := conns.parseCons(bytes.NewReader([]byte(srvrTestInput)))
 	assert.True(t, len(mapStr) == 3)
 	firstLine := mapStr[0]
 	secondLine := mapStr[1]
