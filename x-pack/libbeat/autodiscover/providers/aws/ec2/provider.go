@@ -5,10 +5,11 @@
 package ec2
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -80,7 +81,7 @@ func AutodiscoverBuilder(
 	var clients []ec2iface.ClientAPI
 	for _, region := range config.Regions {
 		if err != nil {
-			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
+			logp.Error(fmt.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %w", err))
 		}
 		awsCfg.Region = region
 		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, region)

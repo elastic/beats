@@ -6,6 +6,7 @@ package management
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -53,7 +53,7 @@ func NewFleetManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UU
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
-			return nil, errors.Wrap(err, "parsing fleet management settings")
+			return nil, fmt.Errorf("parsing fleet management settings: %w", err)
 		}
 	}
 	return NewFleetManagerWithConfig(c, registry, beatUUID)
@@ -77,13 +77,13 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 		// Initialize configs blacklist
 		blacklist, err = NewConfigBlacklist(c.Blacklist)
 		if err != nil {
-			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
+			return nil, fmt.Errorf("wrong settings for configurations blacklist: %w", err)
 		}
 
 		// Initialize the client
 		eac, err = client.NewFromReader(os.Stdin, m)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create elastic-agent-client")
+			return nil, fmt.Errorf("failed to create elastic-agent-client: %w", err)
 		}
 	}
 
@@ -185,21 +185,21 @@ func (cm *Manager) OnConfig(s string) {
 	var configMap mapstr.M
 	uconfig, err := conf.NewConfigFrom(s)
 	if err != nil {
-		err = errors.Wrap(err, "config blocks unsuccessfully generated")
+		err = fmt.Errorf("config blocks unsuccessfully generated: %w", err)
 		cm.updateStatusWithError(err)
 		return
 	}
 
 	err = uconfig.Unpack(&configMap)
 	if err != nil {
-		err = errors.Wrap(err, "config blocks unsuccessfully generated")
+		err = fmt.Errorf("config blocks unsuccessfully generated: %w", err)
 		cm.updateStatusWithError(err)
 		return
 	}
 
 	blocks, err := cm.toConfigBlocks(configMap)
 	if err != nil {
-		err = errors.Wrap(err, "failed to parse configuration")
+		err = fmt.Errorf("failed to parse configuration: %w", err)
 		cm.updateStatusWithError(err)
 		return
 	}

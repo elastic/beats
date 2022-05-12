@@ -5,8 +5,9 @@
 package ec2
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/pkg/errors"
 
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -21,7 +22,7 @@ type ec2Instance struct {
 func (i *ec2Instance) toMap() mapstr.M {
 	architecture, err := i.ec2Instance.Architecture.MarshalValue()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for architecture: "))
+		logp.Error(fmt.Errorf("MarshalValue failed for architecture: : %w", err))
 	}
 
 	m := mapstr.M{
@@ -56,7 +57,7 @@ func (i *ec2Instance) toImage() mapstr.M {
 func (i *ec2Instance) toMonitoringState() mapstr.M {
 	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
+		logp.Error(fmt.Errorf("MarshalValue failed for monitoring state: : %w", err))
 	}
 
 	m := mapstr.M{}
@@ -111,7 +112,7 @@ func (i *ec2Instance) toCloudMap() mapstr.M {
 
 	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
+		logp.Error(fmt.Errorf("MarshalValue failed for instance type: : %w", err))
 	}
 	machine := mapstr.M{}
 	machine["type"] = instanceType
@@ -125,7 +126,7 @@ func (i *ec2Instance) stateMap() (stateMap mapstr.M) {
 	stateMap = mapstr.M{}
 	nameString, err := state.Name.MarshalValue()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance state name: "))
+		logp.Error(fmt.Errorf("MarshalValue failed for instance state name: : %w", err))
 	}
 
 	stateMap["name"] = nameString

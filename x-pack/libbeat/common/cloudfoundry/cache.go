@@ -7,11 +7,11 @@ package cloudfoundry
 import (
 	"crypto/sha1"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/persistentcache"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -84,7 +84,7 @@ func (r *appResponse) toStructs() (*AppMeta, error) {
 	var empty cfclient.CloudFoundryError
 	if r.Error != empty {
 		// Wrapping the error so cfclient.IsAppNotFoundError can identify it
-		return nil, errors.Wrap(r.Error, r.ErrorMessage)
+		return nil, fmt.Errorf(r.ErrorMessage+": %w", r.Error)
 	}
 	if len(r.ErrorMessage) > 0 {
 		return nil, errors.New(r.ErrorMessage)

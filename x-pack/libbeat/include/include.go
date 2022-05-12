@@ -5,6 +5,7 @@
 package include
 
 import (
+
 	// Register Fleet
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 

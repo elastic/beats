@@ -8,8 +8,9 @@
 package add_cloudfoundry_metadata
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -43,14 +44,14 @@ func New(cfg *conf.C) (processors.Processor, error) {
 	config.ShardID = uuid.Must(uuid.NewV4()).String()
 
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	log := logp.NewLogger(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
 	client, err := hub.ClientWithCache()
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s: creating cloudfoundry client", processorName)
+		return nil, fmt.Errorf("%s: creating cloudfoundry client: %w", processorName, err)
 	}
 
 	return &addCloudFoundryMetadata{
@@ -112,7 +113,7 @@ func (d *addCloudFoundryMetadata) Close() error {
 	}
 	err := d.client.Close()
 	if err != nil {
-		return errors.Wrap(err, "closing client")
+		return fmt.Errorf("closing client: %w", err)
 	}
 	return nil
 }
