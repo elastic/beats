@@ -176,3 +176,74 @@
           description: >
             An array of Kafka header strings for this message, in the form
             "<key>: <value>".
+
+- key: threat
+  title: threat
+  description: >
+    Threat indicator fields.
+  fields:
+    - name: threat.indicator.file.x509
+      type: group
+      fields:
+        - name: issuer
+          type: keyword
+          ignore_above: 1024
+          description: Name of issuing certificate authority. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+          example:
+            C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance
+            Server CA
+        - name: issuer.common_name
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: List of common name (CN) of issuing certificate authority.
+          example: Example SHA2 High Assurance Server CA
+          default_field: false
+        - name: not_after
+          level: extended
+          type: date
+          description: Time at which the certificate is no longer considered valid.
+          example: 2020-07-16 03:15:39+00:00
+          default_field: false
+        - name: not_before
+          level: extended
+          type: date
+          description: Time at which the certificate is first considered valid.
+          example: 2019-08-16 01:40:25+00:00
+          default_field: false
+        - name: public_key_algorithm
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Algorithm used to generate the public key.
+          example: RSA
+          default_field: false
+        - name: serial_number
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: Unique serial number issued by the certificate authority. For consistency,
+            if this value is alphanumeric, it should be formatted without colons and uppercase
+            characters.
+          example: 55FBB9C7DEBF09809D12CCAA
+          default_field: false
+        - name: subject
+          type: keyword
+          ignore_above: 1024
+          description: Name of the certificate subject entity. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+          example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+        - name: subject.common_name
+          level: extended
+          type: keyword
+          ignore_above: 1024
+          description: List of common names (CN) of subject.
+          example: shared.global.example.net
+          default_field: false
+        - name: alternative_names
+          type: keyword
+          ignore_above: 1024
+          description:
+            List of subject alternative names (SAN). Name types vary by certificate
+            authority and certificate type but commonly contain IP addresses, DNS names
+            (and wildcards), and email addresses.
+          example: "*.elastic.co"
