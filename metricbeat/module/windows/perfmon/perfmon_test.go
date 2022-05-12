@@ -178,7 +178,7 @@ func TestNonExistingCounter(t *testing.T) {
 	}
 	handle, err := NewReader(config)
 	if assert.Error(t, err) {
-		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, errors.Unwrap(err))
 	}
 
 	if handle != nil {
@@ -204,7 +204,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 	values, err := handle.Read()
 
 	if assert.Error(t, err) {
-		assert.EqualValues(t, pdh.PDH_NO_DATA, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_NO_DATA, errors.Unwrap(err))
 	}
 
 	if handle != nil {
@@ -228,7 +228,7 @@ func TestNonExistingObject(t *testing.T) {
 	}
 	handle, err := NewReader(config)
 	if assert.Error(t, err) {
-		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, errors.Unwrap(err))
 	}
 
 	if handle != nil {

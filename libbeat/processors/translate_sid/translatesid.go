@@ -76,7 +76,7 @@ func (p *processor) String() string {
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	err := p.translateSID(event)
-	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && mapstr.ErrKeyNotFound == errors.Cause(err)) {
+	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound)) {
 		return event, nil
 	}
 	return event, err

@@ -199,7 +199,7 @@ func TestEventIterator(t *testing.T) {
 			assert.Zero(t, h)
 			if assert.Error(t, itr.Err()) {
 				assert.Contains(t, itr.Err().Error(), "try reducing the batch size")
-				assert.Equal(t, windows.RPC_S_INVALID_BOUND, errors.Cause(itr.Err()))
+				assert.Equal(t, windows.RPC_S_INVALID_BOUND, errors.Unwrap(itr.Err()))
 			}
 		})
 

@@ -63,9 +63,9 @@ type appResponse struct {
 
 func (r *appResponse) fromStructs(app cfclient.App, err error) {
 	if err != nil {
-		cause := errors.Cause(err)
-		if cferr, ok := cause.(cfclient.CloudFoundryError); ok {
-			r.Error = cferr
+		var cferr *cfclient.CloudFoundryError
+		if errors.As(err, &cferr) {
+			r.Error = *cferr
 		}
 		r.ErrorMessage = err.Error()
 		return

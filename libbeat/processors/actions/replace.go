@@ -99,7 +99,7 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 	currentValue, err := event.GetValue(field)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
-		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)

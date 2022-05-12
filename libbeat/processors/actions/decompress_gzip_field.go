@@ -88,7 +88,7 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 	data, err := event.GetValue(f.config.Field.From)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %v", f.config.Field.From, err)

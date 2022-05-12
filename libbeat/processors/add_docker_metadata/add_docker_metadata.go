@@ -23,6 +23,7 @@ package add_docker_metadata
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"regexp"
 	"strings"
@@ -252,7 +253,7 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 		}
 
 		cgroups, err = d.getProcessCgroups(pid)
-		if err != nil && os.IsNotExist(errors.Cause(err)) {
+		if err != nil && errors.Is(err, fs.ErrNotExist) {
 			continue
 		}
 		if err != nil {

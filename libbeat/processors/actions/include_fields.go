@@ -77,7 +77,7 @@ func (f *includeFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		// Ignore ErrKeyNotFound errors
-		if err != nil && errors.Cause(err) != mapstr.ErrKeyNotFound {
+		if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
 			errs = append(errs, err.Error())
 		}
 	}

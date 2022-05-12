@@ -227,5 +227,5 @@ func testPublisherMetadata(t *testing.T, provider string) {
 
 func TestNewPublisherMetadataUnknown(t *testing.T) {
 	_, err := NewPublisherMetadata(NilHandle, "Fake-Publisher")
-	assert.Equal(t, windows.ERROR_FILE_NOT_FOUND, errors.Cause(err))
+	assert.Equal(t, windows.ERROR_FILE_NOT_FOUND, errors.Unwrap(err))
 }

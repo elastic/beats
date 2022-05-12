@@ -97,7 +97,7 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error {
 	value, err := event.GetValue(from)
 	if err != nil {
-		if p.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
+		if p.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %v", from, err)
