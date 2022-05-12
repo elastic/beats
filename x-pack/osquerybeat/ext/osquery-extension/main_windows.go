@@ -7,7 +7,9 @@
 
 package main
 
-import "github.com/osquery/osquery-go"
+import (
+	"github.com/osquery/osquery-go"
+)
 
 func RegisterTables(server *osquery.ExtensionManagerServer) {
 }

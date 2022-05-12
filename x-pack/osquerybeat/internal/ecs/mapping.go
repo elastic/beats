@@ -4,7 +4,9 @@
 
 package ecs
 
-import "strings"
+import (
+	"strings"
+)
 
 const keySeparator = "."
 

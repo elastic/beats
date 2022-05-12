@@ -8,13 +8,12 @@
 package osqd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -57,5 +56,5 @@ func setpgid() *syscall.SysProcAttr {
 // For clean process tree kill
 func killProcessGroup(cmd *exec.Cmd) error {
 	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-	return errors.Wrapf(err, "kill process group %d", cmd.Process.Pid)
+	return fmt.Errorf("kill process group %d: %w", cmd.Process.Pid, err)
 }

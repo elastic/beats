@@ -7,7 +7,9 @@
 
 package install
 
-import "os/exec"
+import (
+	"os/exec"
+)
 
 func setCommandArg(cmd *exec.Cmd, arg string) {
 	// Noop in *nix

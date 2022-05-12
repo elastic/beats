@@ -7,6 +7,7 @@ package osqd
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,7 +20,6 @@ import (
 	"time"
 
 	"github.com/dolmen-go/contextio"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
@@ -264,9 +264,9 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	extensionPath := osqueryExtensionPath(q.binPath)
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.Wrapf(err, "extension path does not exist: %s", extensionPath)
+			return nil, fmt.Errorf("extension path does not exist: %s: %w", extensionPath, err)
 		} else {
-			return nil, errors.Wrapf(err, "failed to stat extension path")
+			return nil, fmt.Errorf("failed to stat extension path: %w", err)
 		}
 	}
 
@@ -274,7 +274,7 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	extensionAutoloadPath := q.resolveDataPath(osqueryAutoload)
 	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, q.log)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to prepare extensions autoload file")
+		return nil, fmt.Errorf("failed to prepare extensions autoload file: %w", err)
 	}
 
 	// Write the flagsfile in order to lock down/prevent loading default flags from osquery global locations.
@@ -283,12 +283,12 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	flagsfilePath := q.resolveDataPath(osqueryFlagfile)
 	exists, err := fileutil.FileExists(flagsfilePath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to check flagsfile path")
+		return nil, fmt.Errorf("failed to check flagsfile path: %w", err)
 	}
 	if !exists {
 		f, err := os.OpenFile(flagsfilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create flagsfile")
+			return nil, fmt.Errorf("failed to create flagsfile: %w", err)
 		}
 		f.Close()
 	}
@@ -299,7 +299,7 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, log *logp.Logger) error {
 	ok, err := fileutil.FileExists(extensionAutoloadPath)
 	if err != nil {
-		return errors.Wrapf(err, "failed to check osquery.autoload file exists")
+		return fmt.Errorf("failed to check osquery.autoload file exists: %w", err)
 	}
 
 	rewrite := false
@@ -318,7 +318,7 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, l
 
 	if rewrite {
 		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0644); err != nil {
-			return errors.Wrap(err, "failed write osquery extension autoload file")
+			return fmt.Errorf("failed write osquery extension autoload file: %w", err)
 		}
 	}
 	return nil

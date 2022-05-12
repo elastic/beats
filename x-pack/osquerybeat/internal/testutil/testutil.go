@@ -4,7 +4,9 @@
 
 package testutil
 
-import "testing"
+import (
+	"testing"
+)
 
 func AssertPanic(t *testing.T, fn func()) {
 	defer func() {

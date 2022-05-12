@@ -4,7 +4,9 @@
 
 package fileutil
 
-import "os"
+import (
+	"os"
+)
 
 func FileExists(fp string) (ok bool, err error) {
 	if _, err = os.Stat(fp); err == nil {
