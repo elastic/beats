@@ -123,12 +123,21 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 	return nil
 }
 
+func sanitizeFilePath(filePath string, workdir string) (string, error) {
+	destPath := filepath.Join(workdir, filePath)
+	if !strings.HasPrefix(destPath, filepath.Clean(workdir)+string(os.PathSeparator)) {
+		return filePath, fmt.Errorf("failed to extract illegal file path: %s", filePath)
+	}
+	return destPath, nil
+}
+
 // unzip file takes a given directory and a zipped file and extracts
 // all the contents of the file based on the provided folder path,
 // if the folder path is empty, it extracts the contents based on file
 // tree structure
 func unzipFile(workdir string, folder string, f *zip.File) error {
 	var destPath string
+	var err error
 	if folder != "" {
 		folderPaths := strings.Split(folder, string(filepath.Separator))
 		var folderDepth = 1
@@ -148,9 +157,10 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 		sansFolder := splitZipFileName[folderDepth:]
 		destPath = filepath.Join(workdir, filepath.Join(sansFolder...))
 	} else {
-		//nolint:gosec // zip slip vulnerability, but we control the zipping when
-		//pushing the monitors
-		destPath = filepath.Join(workdir, f.Name)
+		destPath, err = sanitizeFilePath(f.Name, workdir)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Never unpack node modules
@@ -166,7 +176,7 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 		return nil
 	}
 
-	// In the case of pushed monitors, the desPath would be the direct
+	// In the case of pushed monitors, the destPath would be the direct
 	// file path instead of directory, so we create the directory
 	// if its not set up properly
 	destDir := filepath.Dir(destPath)
