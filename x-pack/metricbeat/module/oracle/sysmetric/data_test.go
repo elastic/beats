@@ -27,7 +27,7 @@ func TestMetricSetTransform(t *testing.T) {
 					metricUnit:  sql.NullString{String: "% (LogRead - PhyRead)/LogRead", Valid: true},
 					conId:       sql.NullFloat64{Float64: 0, Valid: true}}},
 			},
-			want: `{"metrics":{"begin_time":"2022-04-27T06:48:57Z","container_id":0,"end_time":"2022-04-27T06:49:57Z","group_id":2,"interval_size_csec":6021,"metric_id":2000,"metric_unit":"% (LogRead - PhyRead)/LogRead","name":"Buffer Cache Hit Ratio","value":100}}`,
+			want: `{"metrics":{"begin_time":"2022-04-27T06:48:57Z","container_id":0,"end_time":"2022-04-27T06:49:57Z","group_id":2,"interval_size_csec":6021,"metric_id":2000,"metric_unit":"% (LogRead - PhyRead)/LogRead","name":"buffer_cache_hit_ratio","value":100}}`,
 		},
 	}
 	for _, tt := range tests {
