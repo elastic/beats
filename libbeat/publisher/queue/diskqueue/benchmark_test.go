@@ -64,7 +64,7 @@ func makeEvent() publisher.Event {
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup() (*diskQueue, queue.Producer, queue.Consumer) {
+func setup() (*diskQueue, queue.Producer) {
 	dir, err := os.MkdirTemp("", "benchmark")
 	if err != nil {
 		panic(err)
@@ -76,9 +76,8 @@ func setup() (*diskQueue, queue.Producer, queue.Consumer) {
 		os.RemoveAll(dir)
 		panic(err)
 	}
-	prod := q.Producer(queue.ProducerConfig{})
-	cons := q.Consumer()
-	return q, prod, cons
+	p := q.Producer(queue.ProducerConfig{})
+	return q, p
 }
 
 //clean closes the queue and deletes the temporory directory that
@@ -90,7 +89,7 @@ func cleanup(q *diskQueue) {
 
 //produceAndConsume does the interesting work.  It generates events,
 // publishes them, consumes them, and ACKS them.
-func produceAndConsume(p queue.Producer, c queue.Consumer, num_events int, batch_size int) error {
+func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
 	go func() {
 		for i := 0; i < num_events; i++ {
 			p.Publish(makeEvent())
@@ -98,7 +97,7 @@ func produceAndConsume(p queue.Producer, c queue.Consumer, num_events int, batch
 	}()
 	var received int
 	for {
-		batch, err := c.Get(batch_size)
+		batch, err := q.Get(batch_size)
 		if err != nil {
 			return err
 		}
@@ -117,10 +116,10 @@ func produceAndConsume(p queue.Producer, c queue.Consumer, num_events int, batch
 func benchmarkQueue(num_events int, batch_size int, b *testing.B) { //nolint:unparam // num_events likely to change in future
 	var err error
 	rand.Seed(1)
-	q, p, c := setup()
+	q, p := setup()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		if err = produceAndConsume(p, c, num_events, batch_size); err != nil {
+		if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
 			break
 		}
 	}
