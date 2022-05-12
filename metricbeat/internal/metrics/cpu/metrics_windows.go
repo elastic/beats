@@ -27,8 +27,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/gosigar/sys/windows"
 )
 
