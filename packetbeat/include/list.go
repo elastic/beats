@@ -20,6 +20,7 @@
 package include
 
 import (
+
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/packetbeat/protos/amqp"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/cassandra"

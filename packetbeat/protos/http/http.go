@@ -27,8 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -712,7 +710,7 @@ func decodeBody(body []byte, encodings []string, maxSize int) (result []byte, er
 			if idx != 0 {
 				body = nil
 			}
-			return body, errors.Wrapf(err, "unable to decode body using %s encoding", format)
+			return body, fmt.Errorf("unable to decode body using %s encoding: %w", format, err)
 		}
 	}
 	return body, nil

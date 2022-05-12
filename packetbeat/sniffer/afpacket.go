@@ -17,7 +17,9 @@
 
 package sniffer
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Computes the block_size and the num_blocks in such a way that the
 // allocated mmap buffer is close to but smaller than target_size_mb.

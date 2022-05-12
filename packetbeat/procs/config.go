@@ -17,7 +17,9 @@
 
 package procs
 
-import "time"
+import (
+	"time"
+)
 
 type ProcsConfig struct {
 	Enabled         bool          `config:"enabled"`

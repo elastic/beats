@@ -17,7 +17,9 @@
 
 package icmp
 
-import "time"
+import (
+	"time"
+)
 
 type icmpTransaction struct {
 	ts    time.Time // timestamp of the first packet

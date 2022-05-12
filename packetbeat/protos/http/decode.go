@@ -21,9 +21,8 @@ import (
 	"bytes"
 	"compress/flate"
 	"compress/gzip"
+	"errors"
 	"io"
-
-	"github.com/pkg/errors"
 )
 
 var (

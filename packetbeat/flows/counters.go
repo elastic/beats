@@ -17,7 +17,9 @@
 
 package flows
 
-import "sync"
+import (
+	"sync"
+)
 
 type Var interface{}
 
