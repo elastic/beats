@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -197,7 +198,7 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 		}
 		tester, ok := globalIntegrationTesters["docker"]
 		if !ok {
-			return nil, fmt.Errorf("docker integration test runner not registered: %w", err)
+			return nil, errors.New("docker integration test runner not registered")
 		}
 		runner, err := initRunner(tester, dir, passInEnv)
 		if err != nil {
