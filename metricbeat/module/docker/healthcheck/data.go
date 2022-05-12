@@ -19,7 +19,6 @@ package healthcheck
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -43,7 +42,6 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		fmt.Errorf("Error inspecting container %v: %w", cont.ID, err)
 		return
 	}
 

@@ -170,7 +170,7 @@ func GenerateDirModulesD() error {
 
 	docBranch, err := devtools.BeatDocBranch()
 	if err != nil {
-		fmt.Errorf("failed to get doc branch: %w", err)
+		return fmt.Errorf("failed to get doc branch: %w", err)
 	}
 
 	mode := 0644

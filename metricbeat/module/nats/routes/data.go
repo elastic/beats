@@ -57,7 +57,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	}
 	timestamp, err := util.GetNatsTimestamp(moduleFields)
 	if err != nil {
-		fmt.Errorf("failure parsing server timestamp: %w", err)
+		return fmt.Errorf("failure parsing server timestamp: %w", err)
 	}
 	event := mb.Event{
 		MetricSetFields: metricSetFields,

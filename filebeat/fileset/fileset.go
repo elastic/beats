@@ -268,7 +268,7 @@ func ApplyTemplate(vars map[string]interface{}, templateString string, specialDe
 
 	tplFunctions, err := getTemplateFunctions(vars)
 	if err != nil {
-		return "", errw.Wrap(err, "error fetching template functions")
+		return "", fmt.Errorf("error fetching template functions: %w", err)
 	}
 	tpl = tpl.Funcs(tplFunctions)
 
@@ -386,7 +386,7 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 			rootPipelineID = fs.pipelineIDs[0]
 		}
 		if err := cfg.SetString(pipelineField, -1, rootPipelineID); err != nil {
-			return nil, errw.Wrap(err, "error setting the fileset pipeline ID in config")
+			return nil, fmt.Errorf("error setting the fileset pipeline ID in config: %w", err)
 		}
 	}
 
