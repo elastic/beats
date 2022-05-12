@@ -5,9 +5,9 @@
 package pipelinemanager
 
 import (
+	"errors"
+	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -66,11 +66,11 @@ func (cfg ContainerOutputConfig) CreateConfig() (*config.C, error) {
 	var tmp map[string]interface{}
 	err := typeconv.Convert(&tmp, cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "error converting config struct to interface")
+		return nil, fmt.Errorf("error converting config struct to interface: %w", err)
 	}
 	cfgFinal, err := config.NewConfigFrom(tmp)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating config object")
+		return nil, fmt.Errorf("error creating config object: %w", err)
 	}
 
 	return cfgFinal, nil
