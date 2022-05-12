@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	errw "github.com/pkg/errors"
 )
 
 // ImportDashboards tries to import the kibana dashboards.
@@ -77,20 +76,20 @@ func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname s
 func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields mapstr.M) error {
 	version := kibanaLoader.version
 	if !version.IsValid() {
-		return errors.New("No valid kibana version available")
+		return errors.New("no valid kibana version available")
 	}
 
 	if !isKibanaAPIavailable(kibanaLoader.version) {
-		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version.String())
+		return fmt.Errorf("kibana API is not available in Kibana version %s", kibanaLoader.version.String())
 	}
 
 	importer, err := NewImporter(version, kibanaLoader.config, *kibanaLoader, fields)
 	if err != nil {
-		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %v", err)
+		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %w", err)
 	}
 
 	if err := importer.Import(); err != nil {
-		return errw.Wrap(err, "fail to import the dashboards in Kibana")
+		return fmt.Errorf("fail to import the dashboards in Kibana: %w", err)
 	}
 
 	return nil

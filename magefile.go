@@ -26,7 +26,6 @@ import (
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -88,7 +87,7 @@ func PackageBeatDashboards() error {
 		} else if _, err := os.Stat(legacyDir); err == nil {
 			spec.Files[beatName] = devtools.PackageFile{Source: legacyDir}
 		} else {
-			return errors.Errorf("no dashboards found for %v", beatDir)
+			return fmt.Errorf("no dashboards found for %v", beatDir)
 		}
 	}
 
