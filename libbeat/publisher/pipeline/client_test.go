@@ -83,16 +83,15 @@ func TestClient(t *testing.T) {
 			},
 		}
 
-		if testing.Verbose() {
-			logp.TestingSetup()
-		}
+		err := logp.TestingSetup()
+		assert.Nil(t, err)
 
 		for name, test := range cases {
 			t.Run(name, func(t *testing.T) {
 				routinesChecker := resources.NewGoroutinesChecker()
 				defer routinesChecker.Check(t)
 
-				pipeline := makePipeline(Settings{}, makeBlockingQueue())
+				pipeline := makePipeline(Settings{}, makeTestQueue())
 				defer pipeline.Close()
 
 				var ctx context.Context
@@ -140,9 +139,8 @@ func TestClientWaitClose(t *testing.T) {
 
 		return p
 	}
-	if testing.Verbose() {
-		logp.TestingSetup()
-	}
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
 	pipeline := makePipeline(Settings{}, q)
