@@ -34,7 +34,6 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"

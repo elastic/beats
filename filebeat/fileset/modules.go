@@ -19,13 +19,13 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -109,7 +109,7 @@ func newModuleRegistry(modulesPath string,
 	for _, mod := range reg.registry {
 		filesets := reg.ModuleConfiguredFilesets(mod)
 		if len(filesets) == 0 {
-			return nil, errors.Errorf("module %s is configured but has no enabled filesets", mod.config.Module)
+			return nil, fmt.Errorf("module %s is configured but has no enabled filesets", mod.config.Module)
 		}
 	}
 	return &reg, nil
@@ -143,7 +143,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool) (
 
 		moduleConfig, err := mcfgFromConfig(cfg)
 		if err != nil {
-			return nil, errors.Wrap(err, "error unpacking module config")
+			return nil, fmt.Errorf("error unpacking module config: %w", err)
 		}
 		mcfgs = append(mcfgs, moduleConfig)
 	}

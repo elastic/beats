@@ -17,7 +17,9 @@
 
 package hints
 
-import conf "github.com/elastic/elastic-agent-libs/config"
+import (
+	conf "github.com/elastic/elastic-agent-libs/config"
+)
 
 type config struct {
 	Key           string  `config:"key"`

@@ -20,7 +20,9 @@
 
 package journalfield
 
-import "github.com/coreos/go-systemd/v22/sdjournal"
+import (
+	"github.com/coreos/go-systemd/v22/sdjournal"
+)
 
 // journaldEventFields provides default field mappings and conversions rules.
 var journaldEventFields = FieldConversion{

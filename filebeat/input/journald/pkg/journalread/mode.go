@@ -17,7 +17,9 @@
 
 package journalread
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // SeekMode is used by (*Reader).Seek to decide where to advance the read pointer to.
 type SeekMode uint

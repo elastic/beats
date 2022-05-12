@@ -17,7 +17,9 @@
 
 package inputsource
 
-import "strings"
+import (
+	"strings"
+)
 
 // Family represents the type of connection we're handling
 type Family string

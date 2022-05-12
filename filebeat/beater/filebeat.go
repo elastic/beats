@@ -18,12 +18,11 @@
 package beater
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -433,7 +432,7 @@ func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
-			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
+			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
 		}
 		return esClient, nil
 	}

@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
-	"github.com/pkg/errors"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -66,7 +65,7 @@ func configure(cfg *conf.C) (input.Input, error) {
 
 	saramaConfig, err := newSaramaConfig(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing Sarama config")
+		return nil, fmt.Errorf("initializing Sarama config: %w", err)
 	}
 	return NewInput(config, saramaConfig)
 }

@@ -20,7 +20,9 @@
 
 package file
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestInodeMarkerError(t *testing.T) {
 	_, err := newINodeMarkerIdentifier(nil)
