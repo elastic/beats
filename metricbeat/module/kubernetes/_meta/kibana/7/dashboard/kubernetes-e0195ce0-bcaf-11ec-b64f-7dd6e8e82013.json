@@ -816,14 +816,14 @@
                     "enhancements": {}
                 },
                 "gridData": {
-                    "h": 14,
-                    "i": "e24207cb-0171-4122-bbdc-ca631f8dcc95",
+                    "h": 15,
+                    "i": "4a66eae8-63ab-40c9-85c4-69c6165a1c72",
                     "w": 48,
                     "x": 0,
                     "y": 25
                 },
-                "panelIndex": "e24207cb-0171-4122-bbdc-ca631f8dcc95",
-                "panelRefName": "panel_e24207cb-0171-4122-bbdc-ca631f8dcc95",
+                "panelIndex": "4a66eae8-63ab-40c9-85c4-69c6165a1c72",
+                "panelRefName": "panel_4a66eae8-63ab-40c9-85c4-69c6165a1c72",
                 "type": "search",
                 "version": "8.3.0"
             }
@@ -984,12 +984,12 @@
             "type": "dashboard"
         },
         {
-            "id": "kubernetes-06b6fa00-cf9e-11ec-8018-1ddbb9494775",
-            "name": "e24207cb-0171-4122-bbdc-ca631f8dcc95:panel_e24207cb-0171-4122-bbdc-ca631f8dcc95",
+            "id": "adc7d0c0-d1fc-11ec-8c69-8bbb7ca8f9ee",
+            "name": "4a66eae8-63ab-40c9-85c4-69c6165a1c72:panel_4a66eae8-63ab-40c9-85c4-69c6165a1c72",
             "type": "search"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-11T10:28:29.799Z",
-    "version": "Wzg4MywxXQ=="
+    "updated_at": "2022-05-12T14:08:07.408Z",
+    "version": "WzMxMzMsMV0="
 }
