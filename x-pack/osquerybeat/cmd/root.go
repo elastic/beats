@@ -37,7 +37,7 @@ var RootCmd = Osquerybeat()
 func Osquerybeat() *cmd.BeatsRootCmd {
 	settings := instance.Settings{
 		Name:            Name,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		ElasticLicensed: true,
 	}
 	command := cmd.GenRootCmdWithSettings(beater.New, settings)
