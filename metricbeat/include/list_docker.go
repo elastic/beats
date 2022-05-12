@@ -23,7 +23,6 @@
 package include
 
 import (
-
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/container"
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/cpu"

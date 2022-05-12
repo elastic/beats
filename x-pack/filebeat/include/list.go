@@ -7,7 +7,6 @@
 package include
 
 import (
-
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
