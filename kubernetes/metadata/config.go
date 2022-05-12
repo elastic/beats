@@ -37,6 +37,7 @@ type AddResourceMetadataConfig struct {
 	Node       *config.C `config:"node"`
 	Namespace  *config.C `config:"namespace"`
 	Deployment bool      `config:"deployment"`
+	CronJob    bool      `config:"cronjob"`
 }
 
 // InitDefaults initializes the defaults for the config.
@@ -58,5 +59,6 @@ func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
 		Node:       metaCfg,
 		Namespace:  metaCfg,
 		Deployment: true,
+		CronJob:    true,
 	}
 }
