@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Settings contains the configuration fields to create a new disk queue
