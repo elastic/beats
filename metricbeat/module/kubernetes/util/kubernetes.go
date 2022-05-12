@@ -537,8 +537,8 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
 	}
 	ecsClusterMeta := mapstr.M{}
-	if clusterInfo.Url != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
+	if clusterInfo.URL != "" {
+		ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
 	}
 	if clusterInfo.Name != "" {
 		ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
