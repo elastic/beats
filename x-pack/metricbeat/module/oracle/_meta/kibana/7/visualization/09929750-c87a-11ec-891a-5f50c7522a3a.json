@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Physical Writes Per Sec"
+                                "query": "physical_writes_per_sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Physical Writes Per Sec"
+                                "oracle.sysmetric.metrics.name": "physical_writes_per_sec"
                             }
                         }
                     }
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:38:21.387Z",
-    "version": "WzI2MjYxLDFd"
+    "updated_at": "2022-05-12T08:59:57.550Z",
+    "version": "WzI1NTcsMV0="
 }

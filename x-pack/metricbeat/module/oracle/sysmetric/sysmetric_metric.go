@@ -8,7 +8,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
@@ -78,7 +80,7 @@ func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) map[string]mapstr.M {
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.interval_size_csec", &oracle.Float64Value{NullFloat64: sysmetricMetric.intsizeCsec})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.group_id", &oracle.Int64Value{NullInt64: sysmetricMetric.groupId})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.metric_id", &oracle.Int64Value{NullInt64: sysmetricMetric.metricId})
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.name", &oracle.StringValue{NullString: sysmetricMetric.name})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.name", &oracle.StringValue{NullString: ConvertToSnakeCase(sysmetricMetric.name)})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.value", &oracle.Float64Value{NullFloat64: sysmetricMetric.value})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.metric_unit", &oracle.StringValue{NullString: sysmetricMetric.metricUnit})
 		oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "metrics.container_id", &oracle.Float64Value{NullFloat64: sysmetricMetric.conId})
@@ -92,4 +94,19 @@ func ParseDate(date sql.NullString) sql.NullString {
 	t, _ := time.Parse(layout, date.String)
 
 	return sql.NullString{String: t.UTC().Format(time.RFC3339), Valid: date.Valid}
+}
+
+// ConvertToSnakeCase function converts a string to snake case to follow
+// the Elastic naming conventions in the dynamically mapped fields
+func ConvertToSnakeCase(name sql.NullString) sql.NullString {
+	reg, _ := regexp.Compile("[()/]") // Regex to remove '(', ')' and '/' characters from the string
+	// Convert to lowercase, replace spaces and hyphens with '_' and replace '%' with 'pct'
+	str := name.String
+	str = strings.ToLower(str)
+	str = strings.ReplaceAll(str, " ", "_")
+	str = reg.ReplaceAllString(str, "")
+	str = strings.ReplaceAll(str, "%", "pct")
+	str = strings.ReplaceAll(str, "-", "_")
+	name.String = str
+	return name
 }

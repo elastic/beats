@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Response Time Per Txn"
+                                "query": "response_time_per_txn"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Response Time Per Txn"
+                                "oracle.sysmetric.metrics.name": "response_time_per_txn"
                             }
                         }
                     }
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-02T07:07:25.170Z",
-    "version": "WzM1MzcxLDFd"
+    "updated_at": "2022-05-12T09:10:15.024Z",
+    "version": "WzMwNjUsMV0="
 }

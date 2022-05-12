@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Network Traffic Volume Per Sec"
+                                "query": "network_traffic_volume_per_sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Network Traffic Volume Per Sec"
+                                "oracle.sysmetric.metrics.name": "network_traffic_volume_per_sec"
                             }
                         }
                     }
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:52:25.509Z",
-    "version": "WzI2ODM5LDFd"
+    "updated_at": "2022-05-12T09:05:20.549Z",
+    "version": "WzI3NjIsMV0="
 }

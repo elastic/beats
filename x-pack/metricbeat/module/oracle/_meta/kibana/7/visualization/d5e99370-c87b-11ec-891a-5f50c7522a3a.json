@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "User Rollbacks Per Sec"
+                                "query": "user_rollbacks_per_sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "User Rollbacks Per Sec"
+                                "oracle.sysmetric.metrics.name": "user_rollbacks_per_sec"
                             }
                         }
                     }
@@ -119,6 +119,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:51:13.720Z",
-    "version": "WzI2Nzc3LDFd"
+    "updated_at": "2022-05-12T09:06:27.616Z",
+    "version": "WzI4MzQsMV0="
 }

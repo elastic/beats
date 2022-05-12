@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Total Index Scans Per Txn"
+                                "query": "total_index_scans_per_txn"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Total Index Scans Per Txn"
+                                "oracle.sysmetric.metrics.name": "total_index_scans_per_txn"
                             }
                         }
                     }
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:46:33.508Z",
-    "version": "WzI2Njg1LDFd"
+    "updated_at": "2022-05-12T09:00:43.408Z",
+    "version": "WzI2MjYsMV0="
 }

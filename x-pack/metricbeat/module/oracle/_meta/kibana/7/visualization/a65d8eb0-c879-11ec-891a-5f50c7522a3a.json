@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Total Table Scans Per Txn"
+                                "query": "total_table_scans_per_txn"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Total Table Scans Per Txn"
+                                "oracle.sysmetric.metrics.name": "total_table_scans_per_txn"
                             }
                         }
                     }
@@ -117,6 +117,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:35:34.945Z",
-    "version": "WzI2MTU2LDFd"
+    "updated_at": "2022-05-12T08:58:59.691Z",
+    "version": "WzI0OTEsMV0="
 }

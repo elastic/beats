@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Session Count"
+                                "query": "session_count"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Session Count"
+                                "oracle.sysmetric.metrics.name": "session_count"
                             }
                         }
                     }
@@ -131,6 +131,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-02T07:05:47.783Z",
-    "version": "WzM1MzQwLDFd"
+    "updated_at": "2022-05-12T08:53:43.916Z",
+    "version": "WzIxMzUsMV0="
 }

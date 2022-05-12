@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Current OS Load"
+                                "query": "current_os_load"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Current OS Load"
+                                "oracle.sysmetric.metrics.name": "current_os_load"
                             }
                         }
                     }
@@ -112,6 +112,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:33:12.744Z",
-    "version": "WzI1OTQ5LDFd"
+    "updated_at": "2022-05-12T08:56:24.509Z",
+    "version": "WzIzMjMsMV0="
 }

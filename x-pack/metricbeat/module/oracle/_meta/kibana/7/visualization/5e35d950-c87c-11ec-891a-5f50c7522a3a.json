@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "Physical Read Total Bytes Per Sec"
+                                "query": "physical_read_total_bytes_per_sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Physical Read Total Bytes Per Sec"
+                                "oracle.sysmetric.metrics.name": "physical_read_total_bytes_per_sec"
                             }
                         }
                     }
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:55:02.379Z",
-    "version": "WzI3MDM0LDFd"
+    "updated_at": "2022-05-12T09:09:16.021Z",
+    "version": "WzMwMTAsMV0="
 }

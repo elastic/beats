@@ -15,13 +15,13 @@
                             "key": "oracle.sysmetric.metrics.name",
                             "negate": false,
                             "params": {
-                                "query": "CPU Usage Per Sec"
+                                "query": "cpu_usage_per_sec"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "CPU Usage Per Sec"
+                                "oracle.sysmetric.metrics.name": "cpu_usage_per_sec"
                             }
                         }
                     }
@@ -111,6 +111,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-04-30T11:54:11.776Z",
-    "version": "WzI2OTY0LDFd"
+    "updated_at": "2022-05-12T09:07:42.204Z",
+    "version": "WzI4ODYsMV0="
 }
