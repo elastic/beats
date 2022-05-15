@@ -698,9 +698,17 @@ processors:
       separator: ",\\s+"
       ignore_missing: true
   - dissect:
+      if: "ctx._temp_.cisco.message_id == '434001'"
+      field: "message"
+      pattern: "SFR card not up and fail-close mode used, %{event.action}ping %{network.protocol} packet from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+  - dissect:
       if: "ctx._temp_.cisco.message_id == '434002'"
       field: "message"
       pattern: "SFR requested to %{event.action} %{network.protocol} packet from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '434003'"
+      field: "message"
+      pattern: "SFR requested to %{event.action} %{network.protocol} connection from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '434004'"
       field: "message"
@@ -740,7 +748,7 @@ processors:
       - "^(Group = %{IP}, )?(IP = %{IP:source.address}, )?%{GREEDYDATA:event.reason}$"
    # Handle ecs action outcome protocol
   - set:
-      if: '["434002", "434004"].contains(ctx._temp_.cisco.message_id)'
+      if: '["434001", "434002", "434003", "434004"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
       value: "unknown"
   - set:

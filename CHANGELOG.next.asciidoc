@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
 - Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 - Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
+- Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 
 *Auditbeat*
 
