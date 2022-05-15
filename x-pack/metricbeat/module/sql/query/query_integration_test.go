@@ -27,13 +27,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 )
 
-type config struct {
-	Driver         string
-	Query          string
-	ResponseFormat string
-	RawData        rawData
-}
-
 type testFetchConfig struct {
 	config    config
 	Host      string
@@ -98,7 +91,7 @@ func TestPostgreSQL(t *testing.T) {
 		config: config{
 			Driver:         "postgres",
 			Query:          "select * from pg_stat_database",
-			ResponseFormat: "",
+			ResponseFormat: tableResponseFormat,
 		},
 		Host:      fmt.Sprintf("user=%s password=%s sslmode=disable host=%s port=%s", user, password, host, port),
 		Assertion: assertFieldNotContains("service.address", "password="+password),

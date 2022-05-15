@@ -32,9 +32,24 @@ func init() {
 	)
 }
 
+// Single query
 type query struct {
 	Query          string `config:"query" validate:"nonzero,required"`
 	ResponseFormat string `config:"response_format" validate:"nonzero,required"`
+}
+
+// Metricset configuration
+type config struct {
+	// New flag
+	RawData rawData `config:"raw_data"`
+
+	Driver string `config:"driver" validate:"nonzero,required"`
+
+	// Support either the previous query / or the new list of queries.
+	ResponseFormat string `config:"sql_response_format"`
+	Query          string `config:"sql_query" `
+
+	Queries []query `config:"sql_queries" `
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -43,16 +58,8 @@ type query struct {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Config struct {
-		Driver         string `config:"driver" validate:"nonzero,required"`
-		ResponseFormat string `config:"sql_response_format"`
-		// New flag
-		RawData rawData `config:"raw_data"`
-		// Support either the previous query / or the new list of queries.
-		Query   string  `config:"sql_query" `
-		Queries []query `config:"sql_queries" `
-	}
-	db *sqlx.DB
+	Config config
+	db     *sqlx.DB
 }
 
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
@@ -72,7 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	if b.Config.ResponseFormat != "" && b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
+	if b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
 		return nil, fmt.Errorf("invalid sql_response_format value: %s", b.Config.ResponseFormat)
 	}
 
@@ -116,7 +123,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			// Table format
 			mss, err := db.FetchTableMode(ctx, q.Query)
 			if err != nil {
-				return err
+				return fmt.Errorf("fetch table mode failed: %w", err)
 			}
 
 			for _, ms := range mss {
@@ -126,7 +133,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			// Variable format
 			ms, err := db.FetchVariableMode(ctx, q.Query)
 			if err != nil {
-				return err
+				return fmt.Errorf("fetch variable mode failed: %w", err)
 			}
 
 			m.reportEvent(ms, reporter, q.Query)
