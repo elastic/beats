@@ -21,11 +21,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestFileParsers(t *testing.T) {
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	cfg, err := config.NewConfigFrom(map[string]interface{}{
 		"paths":        []string{"/usr/bin"},
 		"file_parsers": []string{"file.elf.sections", `/\.pe\./`},
 	})
@@ -34,7 +34,7 @@ func TestFileParsers(t *testing.T) {
 	}
 
 	c := defaultConfig
-	if err := config.Unpack(&c); err != nil {
+	if err := cfg.Unpack(&c); err != nil {
 		t.Fatal(err)
 	}
 
