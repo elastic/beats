@@ -79,8 +79,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("unpack config failed: %w", err)
 	}
 
-	if b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
-		return nil, fmt.Errorf("invalid sql_response_format value: %s", b.Config.ResponseFormat)
+	if b.Config.ResponseFormat != "" {
+		if b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
+			return nil, fmt.Errorf("invalid sql_response_format value: %s", b.Config.ResponseFormat)
+		}
+	} else {
+		// Backword compartibility, if no value is provided
+		// This will ensure there is no braking change, as the previous code worked with no ResponseFormat
+		b.Config.ResponseFormat = variableResponseFormat
 	}
 
 	for _, q := range b.Config.Queries {
