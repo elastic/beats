@@ -59,7 +59,7 @@ func TestData(t *testing.T) {
 		return hasType && hasState
 	})
 	if err != nil {
-		t.Fatal("write", err)
+		t.Fatal("error creating data.json file:", err)
 	}
 }
 
