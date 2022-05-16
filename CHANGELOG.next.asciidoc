@@ -118,6 +118,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 - Change threatintel module from beta to GA. {pull}31693[31693]
 - Add template helper function for hashing strings. {issue}31613[31613] {pull}[]
+- Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
 
 *Auditbeat*
 
