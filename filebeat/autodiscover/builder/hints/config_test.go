@@ -22,12 +22,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestUnpackCopiesDefault(t *testing.T) {
-	userCfg := common.MustNewConfigFrom(mapstr.M{
+	userCfg := conf.MustNewConfigFrom(mapstr.M{
 		"default_config": mapstr.M{
 			"type": "container",
 			"paths": []string{

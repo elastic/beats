@@ -20,12 +20,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	azureConfig = common.MustNewConfigFrom(mapstr.M{
+	azureConfig = conf.MustNewConfigFrom(mapstr.M{
 		"storage_account_key":       lookupEnv("STORAGE_ACCOUNT_NAME"),
 		"storage_account":           lookupEnv("STORAGE_ACCOUNT_KEY"),
 		"storage_account_container": ephContainerName,
@@ -51,7 +51,7 @@ func TestInput(t *testing.T) {
 	o.cond = sync.NewCond(o)
 	defer o.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return o, nil
 	})
 	input, err := NewInput(azureConfig, connector, context)

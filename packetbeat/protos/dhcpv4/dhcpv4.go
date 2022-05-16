@@ -26,12 +26,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -48,12 +49,12 @@ func New(
 	testMode bool,
 	results protos.Reporter,
 	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	return newPlugin(testMode, results, watcher, cfg)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*dhcpv4Plugin, error) {
+func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {

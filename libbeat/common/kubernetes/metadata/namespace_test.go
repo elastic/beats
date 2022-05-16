@@ -30,8 +30,8 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -77,7 +77,7 @@ func TestNamespace_Generate(t *testing.T) {
 		},
 	}
 
-	cfg, err := common.NewConfigFrom(Config{
+	cfg, err := config.NewConfigFrom(Config{
 		IncludeLabels:      []string{"foo"},
 		IncludeAnnotations: []string{"spam"},
 	})
@@ -134,7 +134,7 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, err := common.NewConfigFrom(Config{
+		cfg, err := config.NewConfigFrom(Config{
 			IncludeAnnotations: []string{"spam"},
 		})
 		if err != nil {

@@ -20,9 +20,9 @@ package actions
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -36,7 +36,7 @@ func init() {
 			checks.AllowedFields(LabelsKey, "when")))
 }
 
-func createAddLabels(c *common.Config) (processors.Processor, error) {
+func createAddLabels(c *conf.C) (processors.Processor, error) {
 	config := struct {
 		Labels mapstr.M `config:"labels" validate:"required"`
 	}{}
@@ -71,7 +71,7 @@ func NewAddLabels(labels mapstr.M, shared bool) (processors.Processor, error) {
 }
 
 func flattenLabels(labels mapstr.M) (mapstr.M, error) {
-	labelConfig, err := common.NewConfigFrom(labels)
+	labelConfig, err := conf.NewConfigFrom(labels)
 	if err != nil {
 		return nil, err
 	}

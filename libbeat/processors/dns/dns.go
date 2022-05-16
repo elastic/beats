@@ -26,13 +26,13 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const logName = "processor.dns"
@@ -52,7 +52,7 @@ type processor struct {
 }
 
 // New constructs a new DNS processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *config.C) (processors.Processor, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the dns configuration")

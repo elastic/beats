@@ -18,7 +18,7 @@
 package add_cloud_metadata
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -44,8 +44,8 @@ var openstackNovaSSLMetadataFetcher = provider{
 	Create: buildOpenstackNovaCreate("https"),
 }
 
-func buildOpenstackNovaCreate(scheme string) func(provider string, c *common.Config) (metadataFetcher, error) {
-	return func(provider string, c *common.Config) (metadataFetcher, error) {
+func buildOpenstackNovaCreate(scheme string) func(provider string, c *conf.C) (metadataFetcher, error) {
+	return func(provider string, c *conf.C) (metadataFetcher, error) {
 		osSchema := func(m map[string]interface{}) mapstr.M {
 			m["service"] = mapstr.M{
 				"name": "Nova",

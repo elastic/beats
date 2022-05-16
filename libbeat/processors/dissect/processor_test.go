@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -127,7 +127,7 @@ func TestProcessor(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test.c)
+			c, err := conf.NewConfigFrom(test.c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -170,7 +170,7 @@ func TestProcessor(t *testing.T) {
 			"field":         "@metadata.message",
 			"target_prefix": "@metadata",
 		}
-		cfg, err := common.NewConfigFrom(c)
+		cfg, err := conf.NewConfigFrom(c)
 		assert.NoError(t, err)
 
 		processor, err := NewProcessor(cfg)
@@ -184,7 +184,7 @@ func TestProcessor(t *testing.T) {
 }
 
 func TestFieldDoesntExist(t *testing.T) {
-	c, err := common.NewConfigFrom(map[string]interface{}{"tokenizer": "hello %{key}"})
+	c, err := conf.NewConfigFrom(map[string]interface{}{"tokenizer": "hello %{key}"})
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -230,7 +230,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(map[string]interface{}{
+			c, err := conf.NewConfigFrom(map[string]interface{}{
 				"tokenizer":     test.tokenizer,
 				"target_prefix": test.prefix,
 			})
@@ -255,7 +255,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 
 func TestErrorFlagging(t *testing.T) {
 	t.Run("when the parsing fails add a flag", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{ok} - %{notvalid}",
 		})
 
@@ -284,7 +284,7 @@ func TestErrorFlagging(t *testing.T) {
 	})
 
 	t.Run("when the parsing is succesful do not add a flag", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{ok} %{valid}",
 		})
 
@@ -339,7 +339,7 @@ func TestIgnoreFailure(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test.c)
+			c, err := conf.NewConfigFrom(test.c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -406,7 +406,7 @@ func TestOverwriteKeys(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test.c)
+			c, err := conf.NewConfigFrom(test.c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -457,7 +457,7 @@ func TestProcessorConvert(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test.c)
+			c, err := conf.NewConfigFrom(test.c)
 			if !assert.NoError(t, err) {
 				return
 			}

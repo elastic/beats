@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -32,12 +32,12 @@ func TestConfig(t *testing.T) {
 
 	info := beat.Info{Beat: "testbeat", Name: "foo", IndexPrefix: "bar"}
 	for name, test := range map[string]struct {
-		config         *common.Config
+		config         *config.C
 		expectedConfig *Config
 		err            bool
 	}{
 		"default config": {
-			config: common.MustNewConfigFrom([]byte(`{ }`)),
+			config: config.MustNewConfigFrom([]byte(`{ }`)),
 			expectedConfig: &Config{
 				LoadBalance:      false,
 				Pipelining:       2,
@@ -56,7 +56,7 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		"config given": {
-			config: common.MustNewConfigFrom(mapstr.M{
+			config: config.MustNewConfigFrom(mapstr.M{
 				"index":         "beat-index",
 				"loadbalance":   true,
 				"bulk_max_size": 1024,
@@ -80,7 +80,7 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		"removed config setting": {
-			config: common.MustNewConfigFrom(mapstr.M{
+			config: config.MustNewConfigFrom(mapstr.M{
 				"port": "8080",
 			}),
 			expectedConfig: nil,

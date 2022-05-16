@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
@@ -29,15 +30,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
 }
 
 const (
-	montype    = "type"
 	schedule   = "schedule"
 	hosts      = "hosts"
 	processors = "processors"
@@ -49,19 +49,19 @@ type heartbeatHints struct {
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder
-func NewHeartbeatHints(cfg *common.Config) (autodiscover.Builder, error) {
+func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.NewLogger("hints.builder")}, nil
+	return &heartbeatHints{config, logp.L()}, nil
 }
 
 // Create config based on input hints in the bus event
-func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
+func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
 	var hints mapstr.M
 	hIface, ok := event["hints"]
 	if ok {
@@ -73,20 +73,20 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	// If explicty disabled, return nothing
 	if builder.IsDisabled(hints, hb.config.Key) {
 		hb.logger.Warnf("heartbeat config disabled by hint: %+v", event)
-		return []*common.Config{}
+		return []*conf.C{}
 	}
 
 	port, _ := common.TryToInt(event["port"])
 
 	host, _ := event["host"].(string)
 	if host == "" {
-		return []*common.Config{}
+		return []*conf.C{}
 	}
 
 	if monitorConfig != nil {
-		configs := []*common.Config{}
+		configs := []*conf.C{}
 		for _, cfg := range monitorConfig {
-			if config, err := common.NewConfigFrom(cfg); err == nil {
+			if config, err := conf.NewConfigFrom(cfg); err == nil {
 				configs = append(configs, config)
 			}
 		}
@@ -98,7 +98,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	tempCfg := mapstr.M{}
 	monitors := builder.GetHintsAsList(hints, hb.config.Key)
 
-	var configs []*common.Config
+	configs := make([]*conf.C, 0, len(monitors))
 	for _, monitor := range monitors {
 		// If a monitor doesn't have a schedule associated with it then default it.
 		if _, ok := monitor[schedule]; !ok {
@@ -112,10 +112,10 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		h := hb.getHostsWithPort(monitor, port)
 		monitor[hosts] = h
 
-		config, err := common.NewConfigFrom(monitor)
+		config, err := conf.NewConfigFrom(monitor)
 		if err != nil {
 			hb.logger.Debugf("unable to create config from MapStr %+v", tempCfg)
-			return []*common.Config{}
+			return []*conf.C{}
 		}
 		hb.logger.Debugf("hints.builder", "generated config %+v", config)
 		configs = append(configs, config)
@@ -123,14 +123,6 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 
 	// Apply information in event to the template to generate the final config
 	return template.ApplyConfigTemplate(event, configs)
-}
-
-func (hb *heartbeatHints) getType(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, hb.config.Key, montype)
-}
-
-func (hb *heartbeatHints) getSchedule(hints mapstr.M) []string {
-	return builder.GetHintAsList(hints, hb.config.Key, schedule)
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {

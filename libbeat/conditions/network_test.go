@@ -25,23 +25,23 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNetworkConfigUnpack(t *testing.T) {
 	testYAMLConfig := func(t *testing.T, expected bool, evt *beat.Event, yml string) {
-		c, err := common.NewConfigWithYAML([]byte(yml), "test")
+		c, err := config.NewConfigWithYAML([]byte(yml), "test")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		var config Config
-		if err = c.Unpack(&config); err != nil {
+		var cfg Config
+		if err = c.Unpack(&cfg); err != nil {
 			t.Fatal(err)
 		}
 
-		testConfig(t, expected, evt, &config)
+		testConfig(t, expected, evt, &cfg)
 	}
 
 	t.Run("string values", func(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Transaction represents a DNS transaction of A or AAAA type.

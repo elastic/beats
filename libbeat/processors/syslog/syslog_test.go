@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -57,14 +57,14 @@ func mustParseTime(layout, value string, loc *time.Location) time.Time {
 }
 
 var syslogCases = map[string]struct {
-	Cfg      *common.Config
+	Cfg      *conf.C
 	In       mapstr.M
 	Want     mapstr.M
 	WantTime time.Time
 	WantErr  bool
 }{
 	"rfc-3164": {
-		Cfg: common.MustNewConfigFrom(mapstr.M{
+		Cfg: conf.MustNewConfigFrom(mapstr.M{
 			"timezone": "America/Chicago",
 		}),
 		In: mapstr.M{
@@ -92,7 +92,7 @@ var syslogCases = map[string]struct {
 		WantTime: mustParseTime(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
 	},
 	"rfc-5424": {
-		Cfg: common.MustNewConfigFrom(mapstr.M{}),
+		Cfg: conf.MustNewConfigFrom(mapstr.M{}),
 		In: mapstr.M{
 			"message": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
 		},

@@ -29,9 +29,9 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -178,7 +178,7 @@ func (f *fakeStatelessInput) Run(ctx v2.Context, publish stateless.Publisher) er
 }
 
 func createConfiguredInput(t *testing.T, manager stateless.InputManager, config map[string]interface{}) v2.Input {
-	input, err := manager.Create(common.MustNewConfigFrom(config))
+	input, err := manager.Create(conf.MustNewConfigFrom(config))
 	require.NoError(t, err)
 	return input
 }
@@ -187,8 +187,8 @@ func constInputManager(input stateless.Input) stateless.InputManager {
 	return stateless.NewInputManager(constInput(input))
 }
 
-func constInput(input stateless.Input) func(*common.Config) (stateless.Input, error) {
-	return func(_ *common.Config) (stateless.Input, error) {
+func constInput(input stateless.Input) func(*conf.C) (stateless.Input, error) {
+	return func(_ *conf.C) (stateless.Input, error) {
 		return input, nil
 	}
 }

@@ -33,11 +33,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -238,7 +238,7 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	conn.Do("DEL", key)
 
 	// subscribe to packetbeat channel
-	psc := redis.PubSubConn{conn}
+	psc := redis.PubSubConn{Conn: conn}
 	if err := psc.Subscribe(key); err != nil {
 		t.Fatal(err)
 	}
@@ -318,7 +318,7 @@ func getSRedisAddr() string {
 }
 
 func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Client {
-	config, err := common.NewConfigFrom(cfg)
+	config, err := conf.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)
 	}

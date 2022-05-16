@@ -25,10 +25,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 
-	//nolint:gomodguard // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -36,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -90,7 +86,7 @@ func addMonitorMeta(sf stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper
 			if isMulti {
 				url, err := event.GetValue("url.full")
 				if err != nil {
-					logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
+					logp.Error(fmt.Errorf("mandatory url.full key missing: %w", err))
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
@@ -255,9 +251,7 @@ func makeAddSummary() jobs.JobWrapper {
 				}
 			}
 
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			event.PutValue("monitor.check_group", state.checkGroup)
+			_, _ = event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))

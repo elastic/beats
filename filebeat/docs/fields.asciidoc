@@ -2026,20 +2026,57 @@ type: keyword
 --
 
 [[exported-fields-aws-cloudwatch]]
-== aws-cloudwatch fields
+== AWS CloudWatch fields
 
 Fields from AWS CloudWatch logs.
 
 
 
 [float]
-=== aws-cloudwatch
+=== awscloudwatch
+
+Fields from AWS CloudWatch logs. Deprecated: Use aws.cloudwatch.* instead
+
+
+
+*`awscloudwatch.log_group`*::
++
+--
+The name of the log group to which this event belongs. Deprecated: Use aws.cloudwatch.log_group instead
+
+
+type: keyword
+
+--
+
+*`awscloudwatch.log_stream`*::
++
+--
+The name of the log stream to which this event belongs. Deprecated: Use aws.cloudwatch.log_stream instead
+
+
+type: keyword
+
+--
+
+*`awscloudwatch.ingestion_time`*::
++
+--
+The time the event was ingested in AWS CloudWatch. Deprecated: Use aws.cloudwatch.ingestion_time instead
+
+
+type: keyword
+
+--
+
+[float]
+=== aws.cloudwatch
 
 Fields from AWS CloudWatch logs.
 
 
 
-*`aws-cloudwatch.log_group`*::
+*`aws.cloudwatch.log_group`*::
 +
 --
 The name of the log group to which this event belongs.
@@ -2048,7 +2085,7 @@ type: keyword
 
 --
 
-*`aws-cloudwatch.log_stream`*::
+*`aws.cloudwatch.log_stream`*::
 +
 --
 The name of the log stream to which this event belongs.
@@ -2057,7 +2094,7 @@ type: keyword
 
 --
 
-*`aws-cloudwatch.ingestion_time`*::
+*`aws.cloudwatch.ingestion_time`*::
 +
 --
 The time the event was ingested in AWS CloudWatch.
@@ -86776,66 +86813,17 @@ type: object
 
 --
 
-*`kibana.log.kibana.log.meta.req.headers.referer`*::
+*`kibana.log.meta.req.headers`*::
 +
 --
-type: alias
-
-alias to: http.request.referrer
+type: flattened
 
 --
 
-*`kibana.log.kibana.log.meta.req.referer`*::
+*`kibana.log.meta.res.headers`*::
 +
 --
-type: alias
-
-alias to: http.request.referrer
-
---
-
-*`kibana.log.kibana.log.meta.req.headers.user-agent`*::
-+
---
-type: alias
-
-alias to: user_agent.original
-
---
-
-*`kibana.log.kibana.log.meta.req.remoteAddress`*::
-+
---
-type: alias
-
-alias to: source.address
-
---
-
-*`kibana.log.kibana.log.meta.req.url`*::
-+
---
-type: alias
-
-alias to: url.original
-
---
-
-*`kibana.log.kibana.log.meta.statusCode`*::
-+
---
-type: alias
-
-alias to: http.response.status_code
-
---
-
-*`kibana.log.kibana.log.meta.method`*::
-+
---
-type: alias
-
-alias to: http.request.method
+type: flattened
 
 --
 
@@ -151621,7 +151609,7 @@ type: long
 Code signing information for the sample.
 
 
-type: keyword
+type: nested
 
 --
 

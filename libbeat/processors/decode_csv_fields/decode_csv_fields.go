@@ -26,10 +26,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -67,7 +67,7 @@ func init() {
 }
 
 // NewDecodeCSVField construct a new decode_csv_field processor.
-func NewDecodeCSVField(c *common.Config) (processors.Processor, error) {
+func NewDecodeCSVField(c *config.C) (processors.Processor, error) {
 	config := defaultCSVConfig
 
 	err := c.Unpack(&config)

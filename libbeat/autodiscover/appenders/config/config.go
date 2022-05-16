@@ -24,11 +24,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -38,7 +38,7 @@ func init() {
 
 type config struct {
 	ConditionConfig *conditions.Config `config:"condition"`
-	Config          *common.Config     `config:"config"`
+	Config          *conf.C            `config:"config"`
 }
 
 type configAppender struct {
@@ -47,7 +47,7 @@ type configAppender struct {
 }
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
-func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
+func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	cfgwarn.Beta("The config appender is beta")
 
 	config := config{}
@@ -84,7 +84,7 @@ func (c *configAppender) Append(event bus.Event) {
 		return
 	}
 
-	cfgs, ok := cfgsRaw.([]*common.Config)
+	cfgs, ok := cfgsRaw.([]*conf.C)
 	// Config key doesnt have an array of config objects
 	if !ok {
 		return

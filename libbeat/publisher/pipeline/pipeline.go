@@ -26,15 +26,15 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -107,7 +107,7 @@ const (
 type OutputReloader interface {
 	Reload(
 		cfg *reload.ConfigWithMeta,
-		factory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+		factory func(outputs.Observer, config.Namespace) (outputs.Group, error),
 	) error
 }
 
@@ -198,9 +198,9 @@ func (p *Pipeline) Close() error {
 
 	// Note: active clients are not closed / disconnected.
 
-	// close output before shutting down queue
+	// Closing the queue stops ACKs from propagating, so we close the output first
+	// to give it a chance to wait for any outstanding events to be acknowledged.
 	p.output.Close()
-
 	// shutdown queue
 	err := p.queue.Close()
 	if err != nil {
@@ -211,7 +211,6 @@ func (p *Pipeline) Close() error {
 	if p.sigNewClient != nil {
 		close(p.sigNewClient)
 	}
-
 	return nil
 }
 

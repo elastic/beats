@@ -20,7 +20,7 @@ package add_id
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -29,7 +29,7 @@ import (
 )
 
 func TestDefaultTargetField(t *testing.T) {
-	p, err := New(common.MustNewConfigFrom(nil))
+	p, err := New(conf.MustNewConfigFrom(nil))
 	assert.NoError(t, err)
 
 	testEvent := &beat.Event{}
@@ -43,7 +43,7 @@ func TestDefaultTargetField(t *testing.T) {
 }
 
 func TestNonDefaultTargetField(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"target_field": "foo",
 	})
 	p, err := New(cfg)
@@ -66,7 +66,7 @@ func TestNonDefaultTargetField(t *testing.T) {
 }
 
 func TestNonDefaultMetadataTarget(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"target_field": "@metadata.foo",
 	})
 	p, err := New(cfg)

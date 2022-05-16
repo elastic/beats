@@ -21,8 +21,8 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
@@ -34,7 +34,7 @@ type service struct {
 }
 
 // NewServiceMetadataGenerator creates a metagen for service resources
-func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen, client k8s.Interface) MetaGen {
+func NewServiceMetadataGenerator(cfg *config.C, services cache.Store, namespace MetaGen, client k8s.Interface) MetaGen {
 	return &service{
 		resource:  NewResourceMetadataGenerator(cfg, client),
 		store:     services,

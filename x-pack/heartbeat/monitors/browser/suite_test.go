@@ -13,9 +13,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -26,7 +26,7 @@ func TestValidLocal(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
@@ -63,7 +63,7 @@ func TestValidInline(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name":   "My Name",
 		"id":     "myId",
 		"params": testParams,
@@ -87,7 +87,7 @@ func TestValidInline(t *testing.T) {
 }
 
 func TestNameRequired(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"id": "myId",
 		"source": mapstr.M{
 			"inline": mapstr.M{
@@ -100,7 +100,7 @@ func TestNameRequired(t *testing.T) {
 }
 
 func TestIDRequired(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"name": "My Name",
 		"source": mapstr.M{
 			"inline": mapstr.M{
@@ -113,7 +113,7 @@ func TestIDRequired(t *testing.T) {
 }
 
 func TestEmptySource(t *testing.T) {
-	cfg := common.MustNewConfigFrom(mapstr.M{
+	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
 	s, e := NewSuite(cfg)
@@ -154,9 +154,18 @@ func TestExtraArgs(t *testing.T) {
 			[]string{"--no-throttling"},
 		},
 		{
-			"override throttling",
+			"override throttling - text format",
 			&Config{Throttling: "10d/3u/20l"},
 			[]string{"--throttling", "10d/3u/20l"},
+		},
+		{
+			"override throttling - JSON format",
+			&Config{Throttling: map[string]interface{}{
+				"download": 10,
+				"upload":   3,
+				"latency":  20,
+			}},
+			[]string{"--throttling", `{"download":10,"latency":20,"upload":3}`},
 		},
 		{
 			"ignore_https_errors",

@@ -17,8 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -180,7 +180,7 @@ func createServer(tls bool) (addr *httptest.Server) {
 		user, pass, hasAuth := req.BasicAuth()
 		if hasAuth && (user != "testuser" || pass != "testpass") {
 			resp.WriteHeader(403)
-			resp.Write([]byte("forbidden"))
+			_, _ = resp.Write([]byte("forbidden"))
 		}
 		http.StripPrefix("/fixtures", fileServer).ServeHTTP(resp, req)
 	})
@@ -210,7 +210,7 @@ func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
 func dummyZus(conf map[string]interface{}) (*ZipURLSource, error) {
 	zus := &ZipURLSource{}
 	y, _ := yaml.Marshal(conf)
-	c, err := common.NewConfigWithYAML(y, string(y))
+	c, err := config.NewConfigWithYAML(y, string(y))
 	if err != nil {
 		return nil, err
 	}

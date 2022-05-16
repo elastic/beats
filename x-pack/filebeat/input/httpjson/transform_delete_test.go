@@ -2,7 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:dupl // Bad linter!
 package httpjson
 
 import (
@@ -11,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -116,7 +115,7 @@ func TestNewDelete(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.config)
+			cfg := conf.MustNewConfigFrom(tc.config)
 			gotDelete, gotErr := tc.constructor(cfg, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)

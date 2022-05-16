@@ -13,7 +13,7 @@ Redo thread mounted by this instance: 1
 Oracle process number: 51
 Unix process pid: 28264, image: oracle@testlab.local (J002)
 
-Wed Oct  7 12:28:38 2020 -04:00
+Wed Oct 21 12:28:38 2020 -04:00
 LENGTH : '370'
 ACTION :[123] 'SELECT moving_window_size
       FROM AWR_PDB_baseline_metadata

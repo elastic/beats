@@ -20,11 +20,11 @@ package channel
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,7 +33,7 @@ type onCreateFactory struct {
 	create  onCreateWrapper
 }
 
-type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common.Config) (cfgfile.Runner, error)
+type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
 
 // commonInputConfig defines common input settings
 // for the publisher pipeline.
@@ -60,11 +60,11 @@ type commonInputConfig struct {
 	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
 }
 
-func (f *onCreateFactory) CheckConfig(cfg *common.Config) error {
+func (f *onCreateFactory) CheckConfig(cfg *conf.C) error {
 	return f.factory.CheckConfig(cfg)
 }
 
-func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *common.Config) (cfgfile.Runner, error) {
+func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	return f.create(f.factory, pipeline, cfg)
 }
 
@@ -89,7 +89,7 @@ func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactor
 		func(
 			f cfgfile.RunnerFactory,
 			pipeline beat.PipelineConnector,
-			cfg *common.Config,
+			cfg *conf.C,
 		) (runner cfgfile.Runner, err error) {
 			pipeline, err = withClientConfig(info, pipeline, cfg)
 			if err != nil {
@@ -109,7 +109,7 @@ func wrapRunnerCreate(f cfgfile.RunnerFactory, edit onCreateWrapper) cfgfile.Run
 func withClientConfig(
 	beatInfo beat.Info,
 	pipeline beat.PipelineConnector,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (beat.PipelineConnector, error) {
 	editor, err := newCommonConfigEditor(beatInfo, cfg)
 	if err != nil {
@@ -120,7 +120,7 @@ func withClientConfig(
 
 func newCommonConfigEditor(
 	beatInfo beat.Info,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (pipetool.ConfigEditor, error) {
 	config := commonInputConfig{}
 	if err := cfg.Unpack(&config); err != nil {

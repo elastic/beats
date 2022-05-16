@@ -64,7 +64,7 @@ func (c *DialerChain) Build(event *beat.Event) (d transport.Dialer, err error) {
 			return nil, err
 		}
 	}
-	return
+	return d, nil
 }
 
 // AddLayer adds another layer to the dialer chain.
