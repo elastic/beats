@@ -10,16 +10,20 @@
         "period": 10000
     },
     "service": {
-        "address": "localhost:65194",
+        "address": "localhost:54399",
         "type": "sql"
     },
     "sql": {
         "driver": "mysql",
         "metrics": {
-            "engine": "InnoDB",
-            "table_name": "db",
-            "table_rows": 2,
-            "table_schema": "mysql"
+            "numeric": {
+                "table_rows": 2
+            },
+            "string": {
+                "engine": "InnoDB",
+                "table_name": "db",
+                "table_schema": "mysql"
+            }
         },
         "query": "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows \u003e 0;"
     }
