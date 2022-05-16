@@ -122,6 +122,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
+
 
 *Metricbeat*
 
