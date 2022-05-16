@@ -76,7 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	b := &MetricSet{BaseMetricSet: base}
 
 	if err := base.Module().UnpackConfig(&b.Config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unpack config failed: %w", err)
 	}
 
 	if b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
