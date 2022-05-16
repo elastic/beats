@@ -20,11 +20,16 @@ package volume
 import (
 	"fmt"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -56,8 +61,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
-	mod  k8smod.Module
+	http        *helper.HTTP
+	mod         k8smod.Module
+	clusterMeta mapstr.M
 }
 
 // New create a new instance of the MetricSet
@@ -72,11 +78,32 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
-	return &MetricSet{
+
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
 		mod:           mod,
-	}, nil
+	}
+
+	// add ECS orchestrator fields
+	config := util.ValidatedConfig(base)
+	if config == nil {
+		logp.Info("Kubernetes metricset enriching is disabled")
+	} else {
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+		if err != nil {
+			return nil, fmt.Errorf("fail to get kubernetes client: %w", err)
+		}
+		cfg, _ := conf.NewConfigFrom(&config)
+		ecsClusterMeta, err := util.GetClusterECSMeta(cfg, client, ms.Logger())
+		if err != nil {
+			ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
+		}
+		if ecsClusterMeta != nil {
+			ms.clusterMeta = ecsClusterMeta
+		}
+	}
+	return ms, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -93,7 +120,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return err
 	}
 	for _, e := range events {
-		isOpen := reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
+		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
+		if m.clusterMeta != nil {
+			event.RootFields.DeepUpdate(m.clusterMeta)
+		}
+		isOpen := reporter.Event(event)
 		if !isOpen {
 			return nil
 		}
