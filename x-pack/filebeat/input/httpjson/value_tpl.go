@@ -62,6 +62,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"mul":                 mul,
 			"div":                 div,
 			"hmac":                hmacStringHex,
+			"hash":                hashStringHex,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
 			"base64Decode":        base64Decode,
@@ -69,6 +70,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"join":                join,
 			"sprintf":             fmt.Sprintf,
 			"hmacBase64":          hmacStringBase64,
+			"hashBase64":          hashStringBase64,
 			"uuid":                uuidString,
 			"userAgent":           userAgentString,
 			"beatInfo":            beatInfo,
@@ -329,8 +331,56 @@ func hmacStringBase64(hmacType string, hmacKey string, values ...string) string 
 	}
 	bytes := hmacString(hmacType, []byte(hmacKey), data)
 
-	// Get result and encode as hexadecimal string
+	// Get result and encode as base64 string
 	return base64.StdEncoding.EncodeToString(bytes)
+}
+
+func hashStringHex(typ string, values ...string) string {
+	// Get result and encode as hexadecimal string
+	h := hashStrings(typ, values)
+	if h == nil {
+		return ""
+	}
+	return hex.EncodeToString(h)
+}
+
+func hashStringBase64(typ string, values ...string) string {
+	// Get result and encode as base64 string
+	h := hashStrings(typ, values)
+	if h == nil {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(h)
+}
+
+func hashStrings(typ string, data []string) []byte {
+	if len(data) == 0 {
+		return nil
+	}
+	var n int
+	for _, d := range data {
+		n += len(d)
+	}
+	if n == 0 {
+		return nil
+	}
+	var mac hash.Hash
+	switch typ {
+	case "sha256":
+		mac = sha256.New()
+	case "sha1":
+		mac = sha1.New() //nolint:gosec // Bad linter!
+	default:
+		// Upstream config validation prevents this from happening.
+		return nil
+	}
+	// Write Data to it
+	for _, d := range data {
+		mac.Write([]byte(d))
+	}
+
+	// Get result and encode as hashStrings(typ, values)
+	return mac.Sum(nil)
 }
 
 func uuidString() string {
