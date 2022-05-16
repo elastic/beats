@@ -87,6 +87,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
+
 
 *Auditbeat*
 
