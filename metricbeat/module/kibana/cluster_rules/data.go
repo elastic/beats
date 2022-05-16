@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -30,19 +31,6 @@ import (
 )
 
 var (
-	kibanaSchema = s.Schema{
-		"uuid":  c.Str("uuid"),
-		"name":  c.Str("name"),
-		"index": c.Str("index"),
-		"host": s.Object{
-			"name": c.Str("host"),
-		},
-		"transport_address": c.Str("transport_address"),
-		"version":           c.Str("version"),
-		"snapshot":          c.Bool("snapshot"),
-		"status":            c.Str("status"),
-	}
-
 	rulesSchema = s.Schema{
 		"overdue": c.Dict("overdue", s.Schema{
 			"count": c.Int("count"),
@@ -67,14 +55,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return fmt.Errorf("failure parsing Kibana Cluster Rules API response: %w", err)
 	}
 
-	rootFields := mapstr.M{}
-	moduleFields := mapstr.M{}
-
-	// Set elasticsearch cluster id
-	//nolint: errcheck // This should not fail
-	moduleFields.Put("elasticsearch.cluster.id", data.ClusterUuid)
-
-	kibana, _ := kibanaSchema.Apply(data.Kibana)
+	kibana, err := kibana.GetKibanaSchema().Apply(data.Kibana)
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana", elastic.Kibana)
 	}
@@ -84,31 +65,35 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
 	}
-	//nolint: errcheck // This should not fail
-	rootFields.Put("service.id", serviceId)
 
 	// Set service version
 	version, err := kibana.GetValue("version")
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
 	}
-	//nolint: errcheck // This should not fail
-	rootFields.Put("service.version", version)
 
 	// Set service address
 	serviceAddress, err := kibana.GetValue("transport_address")
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 	}
-	//nolint: errcheck // This should not fail
-	rootFields.Put("service.address", serviceAddress)
 
 	rulesFields, err := rulesSchema.Apply(data.Rules)
 	if err != nil {
 		return fmt.Errorf("failure to apply cluster rules specific schema: %w", err)
 	}
 
-	event := mb.Event{ModuleFields: moduleFields, RootFields: rootFields, MetricSetFields: rulesFields}
+	event := mb.Event{
+		ModuleFields: mapstr.M{
+			"elasticsearch.cluster.id": data.ClusterUuid,
+		},
+		RootFields: mapstr.M{
+			"service.id":      serviceId,
+			"service.version": version,
+			"service.address": serviceAddress,
+		},
+		MetricSetFields: rulesFields,
+	}
 
 	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 	// When using Agent, the index name is overwritten anyways.

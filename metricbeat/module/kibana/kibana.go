@@ -27,6 +27,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
 
 // ModuleName is the name of this module
@@ -139,4 +142,19 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
 	return http.FetchContent()
+}
+
+func GetKibanaSchema() s.Schema {
+	return s.Schema{
+		"uuid":  c.Str("uuid"),
+		"name":  c.Str("name"),
+		"index": c.Str("index"),
+		"host": s.Object{
+			"name": c.Str("host"),
+		},
+		"transport_address": c.Str("transport_address"),
+		"version":           c.Str("version"),
+		"snapshot":          c.Bool("snapshot"),
+		"status":            c.Str("status"),
+	}
 }
