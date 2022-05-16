@@ -40,8 +40,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -139,7 +137,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 
 	args, exe, env, err := getProcArgs(pid, filter)
 	if err != nil {
-		return state, errors.Wrap(err, "error fetching string data from process")
+		return state, fmt.Errorf("error fetching string data from process: %w", err)
 	}
 
 	state.Args = args
@@ -160,7 +158,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 	buf := make([]byte, argmax)
 	err := sysctl(mib, &buf[0], &argmax, nil, 0)
 	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "error in sysctl")
+		return nil, "", nil, fmt.Errorf("error in sysctl: %w", err)
 	}
 
 	bbuf := bytes.NewBuffer(buf)
@@ -171,7 +169,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 
 	path, err := bbuf.ReadBytes(0)
 	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "Error reading the executable name")
+		return nil, "", nil, fmt.Errorf("error reading the executable name: %w", err)
 	}
 
 	exeName = stripNullByte(path)
@@ -180,7 +178,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 	for {
 		c, err := bbuf.ReadByte()
 		if err != nil {
-			return nil, "", nil, errors.Wrap(err, "Error skipping nul values in KERN_PROCARGS2 buffer")
+			return nil, "", nil, fmt.Errorf("error skipping nul values in KERN_PROCARGS2 buffer: %w", err)
 		}
 		if c != 0 {
 			bbuf.UnreadByte()
@@ -196,7 +194,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 			break
 		}
 		if err != nil {
-			return nil, exeName, nil, errors.Wrap(err, "Error reading args from KERN_PROCARGS2")
+			return nil, exeName, nil, fmt.Errorf("error reading args from KERN_PROCARGS2: %w", err)
 		}
 		argv = append(argv, stripNullByte(arg))
 	}
@@ -210,12 +208,12 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 			break
 		}
 		if err != nil {
-			return argv, exeName, nil, errors.Wrap(err, "Error reading args from KERN_PROCARGS2 buffer")
+			return argv, exeName, nil, fmt.Errorf("error reading args from KERN_PROCARGS2 buffer: %w", err)
 		}
 		pair := bytes.SplitN(stripNullByteRaw(line), delim, 2)
 
 		if len(pair) != 2 {
-			return argv, exeName, nil, errors.Wrap(err, "Error reading process information from KERN_PROCARGS2")
+			return argv, exeName, nil, fmt.Errorf("error reading process information from KERN_PROCARGS2: %w", err)
 		}
 		eKey := string(pair[0])
 		if filter == nil || filter(eKey) {

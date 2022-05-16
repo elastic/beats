@@ -20,9 +20,9 @@ package pipeline
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // eventConsumer collects and forwards events from the queue to the outputs work queue.
@@ -98,10 +98,8 @@ func (c *eventConsumer) run() {
 	log.Debug("start pipeline event consumer")
 
 	// Create a queueReader to run our queue fetches in the background
-	c.wg.Add(1)
 	queueReader := makeQueueReader()
 	go func() {
-		defer c.wg.Done()
 		queueReader.run(log)
 	}()
 
@@ -118,10 +116,6 @@ func (c *eventConsumer) run() {
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
 		target consumerTarget
-
-		// The queue.Consumer we get the raw batches from. Reset whenever
-		// the target changes.
-		consumer queue.Consumer = c.queue.Consumer()
 	)
 
 outerLoop:
@@ -130,7 +124,7 @@ outerLoop:
 		if queueBatch == nil && !pendingRead {
 			pendingRead = true
 			queueReader.req <- queueReaderRequest{
-				consumer:   consumer,
+				queue:      c.queue,
 				retryer:    c,
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,
@@ -175,11 +169,10 @@ outerLoop:
 			pendingRead = false
 
 		case req := <-c.retryChan:
-			alive := true
 			if req.decreaseTTL {
 				countFailed := len(req.batch.Events())
 
-				alive = req.batch.reduceTTL()
+				alive := req.batch.reduceTTL()
 
 				countDropped := countFailed - len(req.batch.Events())
 				c.observer.eventsDropped(countDropped)
@@ -197,22 +190,8 @@ outerLoop:
 		}
 	}
 
-	// Close the queue.Consumer, otherwise queueReader can get blocked
-	// waiting on a read.
-	consumer.Close()
-
 	// Close the queueReader request channel so it knows to shutdown.
 	close(queueReader.req)
-
-	// If there's an outstanding request, we need to read the response
-	// to unblock it, but we won't pass on the value.
-	if pendingRead {
-		batch := <-queueReader.resp
-		if batch != nil {
-			// Inform any listeners that we couldn't deliver this batch.
-			batch.Drop()
-		}
-	}
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {

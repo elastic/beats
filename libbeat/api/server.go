@@ -25,8 +25,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Server takes cares of correctly starting the HTTP component of the API

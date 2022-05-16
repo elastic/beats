@@ -27,8 +27,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -36,6 +34,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestClient(t *testing.T) {
@@ -83,16 +83,15 @@ func TestClient(t *testing.T) {
 			},
 		}
 
-		if testing.Verbose() {
-			logp.TestingSetup()
-		}
+		err := logp.TestingSetup()
+		assert.Nil(t, err)
 
 		for name, test := range cases {
 			t.Run(name, func(t *testing.T) {
 				routinesChecker := resources.NewGoroutinesChecker()
 				defer routinesChecker.Check(t)
 
-				pipeline := makePipeline(Settings{}, makeBlockingQueue())
+				pipeline := makePipeline(Settings{}, makeTestQueue())
 				defer pipeline.Close()
 
 				var ctx context.Context
@@ -140,9 +139,8 @@ func TestClientWaitClose(t *testing.T) {
 
 		return p
 	}
-	if testing.Verbose() {
-		logp.TestingSetup()
-	}
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
 	pipeline := makePipeline(Settings{}, q)
