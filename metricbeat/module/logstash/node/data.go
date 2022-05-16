@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -42,8 +43,8 @@ var (
 	}
 )
 
-func commonFieldsMapping(event *mb.Event, fields common.MapStr) error {
-	event.RootFields = common.MapStr{}
+func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
+	event.RootFields = mapstr.M{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
 
 	// Set service ID
@@ -109,10 +110,10 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 			}
 
 			event := mb.Event{
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"state": logstashState,
 				},
-				ModuleFields: common.MapStr{},
+				ModuleFields: mapstr.M{},
 			}
 			event.MetricSetFields.Update(fields)
 

@@ -15,6 +15,7 @@ Learn how to perform common {beatname_uc} configuration tasks.
 * <<configuring-ingest-node>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<migrate-to-filestream>>
 
 
 --
@@ -43,5 +44,6 @@ include::{libbeat-dir}/shared-env-vars.asciidoc[]
 include::{libbeat-dir}/yaml.asciidoc[]
 :standalone!:
 
+include::migrate-to-filestream.asciidoc[]
 
 

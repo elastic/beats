@@ -21,15 +21,14 @@ import (
 	"fmt"
 	"time"
 
-	k8sclient "k8s.io/client-go/kubernetes"
-
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -47,7 +46,7 @@ type MetricSet struct {
 	watchOptions kubernetes.WatchOptions
 	dedotConfig  dedotConfig
 	skipOlder    bool
-	clusterMeta  common.MapStr
+	clusterMeta  mapstr.M
 }
 
 // dedotConfig defines LabelsDedot and AnnotationsDedot.
@@ -98,8 +97,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// add ECS orchestrator fields
-	cfg, _ := common.NewConfigFrom(&config)
-	ecsClusterMeta, err := getClusterECSMeta(cfg, client, ms.Logger())
+	cfg, _ := conf.NewConfigFrom(&config)
+	ecsClusterMeta, err := util.GetClusterECSMeta(cfg, client, ms.Logger())
 	if err != nil {
 		ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
 	}
@@ -108,21 +107,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return ms, nil
-}
-
-func getClusterECSMeta(cfg *common.Config, client k8sclient.Interface, logger *logp.Logger) (common.MapStr, error) {
-	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
-	if err != nil {
-		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
-	}
-	ecsClusterMeta := common.MapStr{}
-	if clusterInfo.Url != "" {
-		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
-	}
-	if clusterInfo.Name != "" {
-		util.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
-	}
-	return ecsClusterMeta, nil
 }
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
@@ -178,9 +162,9 @@ func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) {
 	reporter.Event(event)
 }
 
-func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) common.MapStr {
-	eventMeta := common.MapStr{
-		"timestamp": common.MapStr{
+func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) mapstr.M {
+	eventMeta := mapstr.M{
+		"timestamp": mapstr.M{
 			"created": kubernetes.Time(&eve.ObjectMeta.CreationTimestamp).UTC(),
 		},
 		"name":             eve.ObjectMeta.GetName(),
@@ -192,7 +176,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 	}
 
 	if len(eve.ObjectMeta.Labels) != 0 {
-		labels := make(common.MapStr, len(eve.ObjectMeta.Labels))
+		labels := make(mapstr.M, len(eve.ObjectMeta.Labels))
 		for k, v := range eve.ObjectMeta.Labels {
 			if dedotConfig.LabelsDedot {
 				label := common.DeDot(k)
@@ -210,7 +194,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 	}
 
 	if len(eve.ObjectMeta.Annotations) != 0 {
-		annotations := make(common.MapStr, len(eve.ObjectMeta.Annotations))
+		annotations := make(mapstr.M, len(eve.ObjectMeta.Annotations))
 		for k, v := range eve.ObjectMeta.Annotations {
 			if dedotConfig.AnnotationsDedot {
 				annotation := common.DeDot(k)
@@ -226,16 +210,16 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 		eventMeta["annotations"] = annotations
 	}
 
-	output := common.MapStr{
+	output := mapstr.M{
 		"message": eve.Message,
 		"reason":  eve.Reason,
 		"type":    eve.Type,
 		"count":   eve.Count,
-		"source": common.MapStr{
+		"source": mapstr.M{
 			"host":      eve.Source.Host,
 			"component": eve.Source.Component,
 		},
-		"involved_object": common.MapStr{
+		"involved_object": mapstr.M{
 			"api_version":      eve.InvolvedObject.APIVersion,
 			"resource_version": eve.InvolvedObject.ResourceVersion,
 			"name":             eve.InvolvedObject.Name,
@@ -245,7 +229,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 		"metadata": eventMeta,
 	}
 
-	tsMap := make(common.MapStr)
+	tsMap := make(mapstr.M)
 
 	tsMap["first_occurrence"] = kubernetes.Time(&eve.FirstTimestamp).UTC()
 	tsMap["last_occurrence"] = kubernetes.Time(&eve.LastTimestamp).UTC()

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: kubernetes
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/kubernetes/_meta/docs.asciidoc
+
 
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
@@ -198,6 +200,8 @@ Kubernetes proxy example:
 
 image::./images/metricbeat-kubernetes-proxy.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -458,3 +462,4 @@ include::kubernetes/system.asciidoc[]
 
 include::kubernetes/volume.asciidoc[]
 
+:edit_url!:

@@ -32,7 +32,7 @@ var parseRFC3164Cases = map[string]struct {
 	"ok": {
 		In: "<13>Oct 11 22:14:15 test-host this is the message",
 		Want: message{
-			timestamp: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", time.Local),
+			timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
 			priority:  13,
 			facility:  1,
 			severity:  5,
@@ -43,7 +43,7 @@ var parseRFC3164Cases = map[string]struct {
 	"ok-rfc3339": {
 		In: "<13>2003-08-24T05:14:15.000003-07:00 test-host this is the message",
 		Want: message{
-			timestamp: mustParseTime(time.RFC3339Nano, "2003-08-24T05:14:15.000003-07:00"),
+			timestamp: mustParseTime(time.RFC3339Nano, "2003-08-24T05:14:15.000003-07:00", nil),
 			priority:  13,
 			facility:  1,
 			severity:  5,
@@ -54,7 +54,7 @@ var parseRFC3164Cases = map[string]struct {
 	"ok-process": {
 		In: "<13>Oct 11 22:14:15 test-host su: this is the message",
 		Want: message{
-			timestamp: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", time.Local),
+			timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
 			priority:  13,
 			facility:  1,
 			severity:  5,
@@ -66,7 +66,7 @@ var parseRFC3164Cases = map[string]struct {
 	"ok-process-pid": {
 		In: "<13>Oct 11 22:14:15 test-host su[1024]: this is the message",
 		Want: message{
-			timestamp: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", time.Local),
+			timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
 			priority:  13,
 			facility:  1,
 			severity:  5,
@@ -79,7 +79,7 @@ var parseRFC3164Cases = map[string]struct {
 	"non-standard-date": {
 		In: "<123>Sep 01 02:03:04 hostname message",
 		Want: message{
-			timestamp: mustParseTimeLoc(time.Stamp, "Sep 1 02:03:04", time.Local),
+			timestamp: mustParseTime(time.Stamp, "Sep 1 02:03:04", time.Local),
 			priority:  123,
 			facility:  15,
 			severity:  3,

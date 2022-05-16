@@ -44,7 +44,7 @@ func queuePositionFromHandle(
 	}
 	if version > currentStateFileVersion {
 		return queuePosition{},
-			fmt.Errorf("Unsupported queue metadata version (%d)", version)
+			fmt.Errorf("unsupported queue metadata version (%d)", version)
 	}
 
 	position := queuePosition{}

@@ -26,7 +26,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestInputFieldsTranslation(t *testing.T) {
@@ -49,7 +49,7 @@ func TestInputFieldsTranslation(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
-			inp := env.mustCreateInput(common.MapStr{
+			inp := env.mustCreateInput(mapstr.M{
 				"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
 				"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
 				"save_remote_hostname":  tc.saveRemoteHostname,

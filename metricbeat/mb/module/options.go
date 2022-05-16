@@ -20,8 +20,8 @@ package module
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -76,7 +76,7 @@ func WithServiceName() Option {
 				return
 			}
 			if event.RootFields == nil {
-				event.RootFields = common.MapStr{}
+				event.RootFields = mapstr.M{}
 			} else if current, err := event.RootFields.GetValue("service.name"); err == nil && current != "" {
 				// Already set by the metricset, don't overwrite
 				return

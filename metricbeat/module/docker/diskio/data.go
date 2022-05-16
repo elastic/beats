@@ -18,8 +18,8 @@
 package diskio
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
@@ -29,8 +29,8 @@ func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
 }
 
 func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
-	fields := common.MapStr{
-		"read": common.MapStr{
+	fields := mapstr.M{
+		"read": mapstr.M{
 			"ops":          stats.serviced.reads,
 			"bytes":        stats.servicedBytes.reads,
 			"rate":         stats.reads,
@@ -38,7 +38,7 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 			"wait_time":    stats.waitTime.reads,
 			"queued":       stats.queued.reads,
 		},
-		"write": common.MapStr{
+		"write": mapstr.M{
 			"ops":          stats.serviced.writes,
 			"bytes":        stats.servicedBytes.writes,
 			"rate":         stats.writes,
@@ -46,7 +46,7 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 			"wait_time":    stats.waitTime.writes,
 			"queued":       stats.queued.writes,
 		},
-		"summary": common.MapStr{
+		"summary": mapstr.M{
 			"ops":          stats.serviced.totals,
 			"bytes":        stats.servicedBytes.totals,
 			"rate":         stats.totals,

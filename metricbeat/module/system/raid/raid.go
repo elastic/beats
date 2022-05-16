@@ -20,11 +20,11 @@ package raid
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/raid/blockinfo"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -67,11 +67,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	for _, blockDev := range devices {
 
-		event := common.MapStr{
+		event := mapstr.M{
 			"name":   blockDev.Name,
 			"status": blockDev.ArrayState,
 			"level":  blockDev.Level,
-			"disks": common.MapStr{
+			"disks": mapstr.M{
 				"active": blockDev.DiskStates.Active,
 				"total":  blockDev.DiskStates.Total,
 				"spare":  blockDev.DiskStates.Spare,
@@ -81,12 +81,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 		//emulate the behavior of the previous mdstat parser by using the size when no sync data is available
 		if blockDev.SyncStatus.Total == 0 {
-			event["blocks"] = common.MapStr{
+			event["blocks"] = mapstr.M{
 				"synced": blockto1024(blockDev.Size),
 				"total":  blockto1024(blockDev.Size),
 			}
 		} else {
-			event["blocks"] = common.MapStr{
+			event["blocks"] = mapstr.M{
 				"synced": blockto1024(blockDev.SyncStatus.Complete),
 				"total":  blockto1024(blockDev.SyncStatus.Total),
 			}

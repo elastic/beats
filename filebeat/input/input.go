@@ -24,9 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var inputList = monitoring.NewUniqueList()
@@ -54,7 +54,7 @@ type Runner struct {
 
 // New instantiates a new Runner
 func New(
-	conf *common.Config,
+	conf *conf.C,
 	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,

@@ -57,8 +57,8 @@
 package httpjson
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // chainConfig for chain request.
@@ -81,7 +81,7 @@ type stepConfig struct {
 type requestChainConfig struct {
 	URL        *urlConfig       `config:"url" validate:"required"`
 	Method     string           `config:"method" validate:"required"`
-	Body       *common.MapStr   `config:"body"`
+	Body       *mapstr.M        `config:"body"`
 	Transforms transformsConfig `config:"transforms"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`

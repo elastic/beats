@@ -19,17 +19,17 @@ package queue
 
 import (
 	"errors"
-	"io"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *common.Config, int) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *config.C, int) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {
@@ -64,12 +64,15 @@ var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 // consumer or flush to some other intermediate storage), it will send an ACK signal
 // with the number of ACKed events to the Producer (ACK happens in batches).
 type Queue interface {
-	io.Closer
+	Close() error
 
 	BufferConfig() BufferConfig
 
 	Producer(cfg ProducerConfig) Producer
-	Consumer() Consumer
+
+	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
+	// there is no bound on the number of returned events.
+	Get(eventCount int) (Batch, error)
 
 	Metrics() (Metrics, error)
 }
@@ -124,18 +127,6 @@ type Producer interface {
 	//       the originating Producer. The pipeline client must accept and
 	//       discard these ACKs.
 	Cancel() int
-}
-
-// Consumer is an interface to be used by the pipeline output workers,
-// used to read events from the head of the queue.
-type Consumer interface {
-	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
-	// there is no bound on the number of returned events.
-	Get(eventCount int) (Batch, error)
-
-	// Close closes this Consumer. Returns an error if the Consumer is
-	// already closed.
-	Close() error
 }
 
 // Batch of events to be returned to Consumers. The `ACK` method will send the

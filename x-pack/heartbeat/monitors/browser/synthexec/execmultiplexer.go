@@ -23,7 +23,7 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 		return
 	}
 
-	if se.Type == "journey/start" {
+	if se.Type == JourneyStart {
 		e.eventCounter.Store(-1)
 	}
 	se.index = e.eventCounter.Inc()

@@ -8,7 +8,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type statelessInput struct {
@@ -19,7 +19,7 @@ func (statelessInput) Name() string {
 	return "httpjson-stateless"
 }
 
-func statelessConfigure(cfg *common.Config) (stateless.Input, error) {
+func statelessConfigure(cfg *conf.C) (stateless.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err

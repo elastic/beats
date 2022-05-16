@@ -26,6 +26,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestParseTime(t *testing.T) {
@@ -65,7 +67,7 @@ func TestParseTimeNegative(t *testing.T) {
 	tests := []inputOutput{
 		{
 			Input: "2015-02-29TT14:06:05.071Z",
-			Err:   "parsing time \"2015-02-29TT14:06:05.071Z\" as \"2006-01-02T15:04:05.000Z\": cannot parse \"T14:06:05.071Z\" as \"15\"",
+			Err:   "parsing time \"2015-02-29TT14:06:05.071Z\" as \"2006-01-02T15:04:05.000000000Z\": cannot parse \"T14:06:05.071Z\" as \"15\"",
 		},
 	}
 
@@ -78,19 +80,19 @@ func TestParseTimeNegative(t *testing.T) {
 
 func TestTimeMarshal(t *testing.T) {
 	type inputOutput struct {
-		Input  MapStr
+		Input  mapstr.M
 		Output string
 	}
 
 	tests := []inputOutput{
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"@timestamp": Time(time.Date(2015, time.March, 01, 11, 19, 05, 112*1e6, time.UTC)),
 			},
 			Output: `{"@timestamp":"2015-03-01T11:19:05.112Z"}`,
 		},
 		{
-			Input: MapStr{
+			Input: mapstr.M{
 				"@timestamp": MustParseTime("2015-03-01T11:19:05.112Z"),
 				"another":    MustParseTime("2015-03-01T14:19:05.112Z"),
 			},

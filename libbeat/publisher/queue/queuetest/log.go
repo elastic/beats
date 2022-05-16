@@ -25,7 +25,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"gotest.tools/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var debug bool
@@ -40,15 +42,6 @@ type TestLogger struct {
 func init() {
 	flag.BoolVar(&debug, "debug", false, "enable test debug log")
 	flag.BoolVar(&printLog, "debug-print", false, "print test log messages right away")
-}
-
-type testLogWriter struct {
-	t *testing.T
-}
-
-func (w *testLogWriter) Write(p []byte) (int, error) {
-	w.t.Log(string(p))
-	return len(p), nil
 }
 
 func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
@@ -95,7 +88,8 @@ func withOptLogOutput(capture bool, fn func(*testing.T)) func(*testing.T) {
 		if debug {
 			level = logp.DebugLevel
 		}
-		logp.DevelopmentSetup(logp.WithLevel(level))
+		err = logp.DevelopmentSetup(logp.WithLevel(level))
+		assert.NilError(t, err)
 		fn(t)
 	}
 }
@@ -148,14 +142,17 @@ func (l *TestLogger) Errf(format string, v ...interface{}) {
 
 func print(vs []interface{}) {
 	if printLog {
+		//nolint: forbidigo // Printing is ok during specialized tests.
 		fmt.Println(vs...)
 	}
 }
 
 func printf(format string, vs []interface{}) {
 	if printLog {
+		//nolint: forbidigo // Printing is ok during specialized tests.
 		fmt.Printf(format, vs...)
 		if format[len(format)-1] != '\n' {
+			//nolint: forbidigo // Printing is ok during specialized tests.
 			fmt.Println("")
 		}
 	}

@@ -21,7 +21,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const logName = "conditions"

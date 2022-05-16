@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: mssql
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/mssql/_meta/docs.asciidoc
+
 
 [[metricbeat-module-mssql]]
 [role="xpack"]
@@ -73,6 +75,8 @@ metricbeat.modules:
 Store sensitive values like passwords in the <<keystore,secrets keystore>>.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -106,3 +110,4 @@ include::mssql/performance.asciidoc[]
 
 include::mssql/transaction_log.asciidoc[]
 
+:edit_url!:

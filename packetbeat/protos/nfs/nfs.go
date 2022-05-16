@@ -19,8 +19,8 @@ package nfs
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type nfs struct {
@@ -30,8 +30,8 @@ type nfs struct {
 	event beat.Event
 }
 
-func (nfs *nfs) getRequestInfo(xdr *xdr) common.MapStr {
-	nfsInfo := common.MapStr{
+func (nfs *nfs) getRequestInfo(xdr *xdr) mapstr.M {
+	nfsInfo := mapstr.M{
 		"version": nfs.vers,
 	}
 

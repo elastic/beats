@@ -20,7 +20,7 @@ package fleetmode
 import (
 	"flag"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Enabled checks to see if filebeat/metricbeat is running under Agent
@@ -37,7 +37,7 @@ func Enabled() bool {
 		return false
 	}
 
-	cfgObject, _ := cfgFlag.Value.(*common.SettingsFlag)
+	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
 	cliCfg := cfgObject.Config()
 
 	err := cliCfg.Unpack(&managementSettings)

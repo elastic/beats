@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var testEventTime = time.Now().UTC()
@@ -520,7 +520,7 @@ func mustDecodeHex(v string) []byte {
 	return data
 }
 
-func assertHasKey(t testing.TB, m common.MapStr, key string) bool {
+func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 	t.Helper()
 	found, err := m.HasKey(key)
 	if err != nil || !found {

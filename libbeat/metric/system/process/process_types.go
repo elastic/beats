@@ -20,9 +20,9 @@ package process
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ProcState is the main struct for process information and metrics.
@@ -36,11 +36,11 @@ type ProcState struct {
 	Pgid     opt.Int  `struct:"pgid,omitempty"`
 
 	// Extended Process Data
-	Args    []string      `struct:"args,omitempty"`
-	Cmdline string        `struct:"cmdline,omitempty"`
-	Cwd     string        `struct:"cwd,omitempty"`
-	Exe     string        `struct:"exe,omitempty"`
-	Env     common.MapStr `struct:"env,omitempty"`
+	Args    []string `struct:"args,omitempty"`
+	Cmdline string   `struct:"cmdline,omitempty"`
+	Cwd     string   `struct:"cwd,omitempty"`
+	Exe     string   `struct:"exe,omitempty"`
+	Env     mapstr.M `struct:"env,omitempty"`
 
 	// Resource Metrics
 	Memory ProcMemInfo `struct:"memory,omitempty"`
@@ -113,6 +113,7 @@ func (t ProcFDInfo) IsZero() bool {
 	return t.Open.IsZero() && t.Limit.Hard.IsZero() && t.Limit.Soft.IsZero()
 }
 
+// FormatForRoot shuffles around events to fit in the ECS root fields
 func (p *ProcState) FormatForRoot() ProcStateRootEvent {
 	root := ProcStateRootEvent{}
 
@@ -151,12 +152,12 @@ func (p *ProcState) FormatForRoot() ProcStateRootEvent {
 
 // ProcStateRootEvent represents the "root" beat/agent ECS event fields that are copied from the integration-level event.
 type ProcStateRootEvent struct {
-	Process ProcessRoot `struct:"process,omitempty"`
-	User    Name        `struct:"user,omitempty"`
+	Process ProcRoot `struct:"process,omitempty"`
+	User    Name     `struct:"user,omitempty"`
 }
 
-// ProcessRoot wraps the process metrics for the root ECS fields
-type ProcessRoot struct {
+// ProcRoot wraps the process metrics for the root ECS fields
+type ProcRoot struct {
 	Cmdline string        `struct:"command_line,omitempty"`
 	State   PidState      `struct:"state,omitempty"`
 	CPU     RootCPUFields `struct:"cpu,omitempty"`
@@ -170,14 +171,17 @@ type ProcessRoot struct {
 	Pgid    opt.Int       `struct:"pgid,omitempty"`
 }
 
+// Parent is the wrapper struct for the parent.pid field
 type Parent struct {
 	Pid opt.Int `struct:"pid,omitempty"`
 }
 
+// Name is the wrapper struct for the name.pid field
 type Name struct {
 	Name string `struct:"name,omitempty"`
 }
 
+// RootCPUFields is the wrapper for the cpu.* root fields
 type RootCPUFields struct {
 	StartTime string    `struct:"start_time,omitempty"`
 	Pct       opt.Float `struct:"pct,omitempty"`

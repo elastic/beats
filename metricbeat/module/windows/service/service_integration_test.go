@@ -23,12 +23,11 @@ package service
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/StackExchange/wmi"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Win32Service struct {
@@ -74,7 +73,7 @@ func TestReadService(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var stateChangedServices []common.MapStr
+	var stateChangedServices []mapstr.M
 
 	// Compare our module's data against WMI.
 	for _, s := range services {

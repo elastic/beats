@@ -1,9 +1,32 @@
 - key: aws-cloudwatch
-  title: "aws-cloudwatch"
+  title: "AWS CloudWatch"
   description: >
     Fields from AWS CloudWatch logs.
   fields:
-    - name: aws-cloudwatch
+    - name: awscloudwatch
+      deprecated: 9.0.0
+      default_field: true
+      type: group
+      description: >
+        Fields from AWS CloudWatch logs.
+        Deprecated: Use aws.cloudwatch.* instead
+      fields:
+        - name: log_group
+          type: keyword
+          description: >
+            The name of the log group to which this event belongs.
+            Deprecated: Use aws.cloudwatch.log_group instead
+        - name: log_stream
+          type: keyword
+          description: >
+            The name of the log stream to which this event belongs.
+            Deprecated: Use aws.cloudwatch.log_stream instead
+        - name: ingestion_time
+          type: keyword
+          description: >
+            The time the event was ingested in AWS CloudWatch.
+            Deprecated: Use aws.cloudwatch.ingestion_time instead
+    - name: aws.cloudwatch
       default_field: true
       type: group
       description: >

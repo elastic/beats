@@ -66,6 +66,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-aws-s3>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-cloudfoundry>>
+* <<{beatname_lc}-input-cometd>>
 * <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-filestream>>
 * <<{beatname_lc}-input-gcp-pubsub>>
@@ -93,6 +94,8 @@ include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-cometd.asciidoc[]
 
 include::inputs/input-container.asciidoc[]
 

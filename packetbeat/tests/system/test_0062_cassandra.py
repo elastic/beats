@@ -26,7 +26,7 @@ class Test(BaseTest):
         assert o["event.dataset"] == "cassandra"
         assert o["event.duration"] == 62453000
         assert o["event.start"] == o["@timestamp"]
-        assert o["event.end"] == "2016-06-28T09:03:53.502Z"
+        assert o["event.end"] == "2016-06-28T09:03:53.502299Z"
         assert o["client.ip"] == "127.0.0.1"
         assert o["client.port"] == 52749
         assert o["client.bytes"] == 133
