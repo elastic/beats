@@ -15,23 +15,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package buffer
+package api
 
 import (
-	"time"
+	context "context"
 )
 
-type config struct {
-	Period     time.Duration `config:"period"`
-	Size       int           `config:"size" validate:"min=2"`
-	Namespaces []string      `config:"namespaces"`
+func NewProducerMock(cap int) *ProducerMock {
+	return &ProducerMock{
+		Q: make([]*Event, 0, cap),
+	}
 }
 
-// defaultConfig will gather 10m of data (every 10s) for the stats registry.
-func defaultConfig() config {
-	return config{
-		Period:     10 * time.Second,
-		Size:       60,
-		Namespaces: []string{"stats"},
+type ProducerMock struct {
+	UnimplementedProducerServer
+	Q     []*Event
+	Error error
+}
+
+func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*PublishReply, error) {
+	if p.Error != nil {
+		return nil, p.Error
 	}
+
+	resp := &PublishReply{
+		Results: make([]*EventResult, 0, len(r.Events)),
+	}
+
+	for _, e := range r.Events {
+		if len(p.Q) == cap(p.Q) {
+			return resp, nil
+		}
+
+		p.Q = append(p.Q, e)
+
+		resp.Results = append(resp.Results, &EventResult{
+			Timestamp: e.GetTimestamp(),
+			QueueId:   "queue",
+			EventId:   e.GetEventId(),
+		})
+	}
+
+	return resp, nil
 }

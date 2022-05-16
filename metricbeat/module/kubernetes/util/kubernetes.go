@@ -23,6 +23,8 @@ import (
 	"sync"
 	"time"
 
+	k8sclient "k8s.io/client-go/kubernetes"
+
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -30,9 +32,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -81,7 +83,7 @@ func NewResourceMetadataEnricher(
 	res kubernetes.Resource,
 	nodeScope bool) Enricher {
 
-	config := validatedConfig(base)
+	config := ValidatedConfig(base)
 	if config == nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
@@ -146,6 +148,12 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("namespace", r)
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate("replicaset", r)
+			case *kubernetes.DaemonSet:
+				m[id] = metaGen.Generate("daemonset", r)
+			case *kubernetes.PersistentVolume:
+				m[id] = metaGen.Generate("persistentvolume", r)
+			case *kubernetes.PersistentVolumeClaim:
+				m[id] = metaGen.Generate("persistentvolumeclaim", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
@@ -176,7 +184,7 @@ func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	nodeScope bool) Enricher {
 
-	config := validatedConfig(base)
+	config := ValidatedConfig(base)
 	if config == nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
@@ -322,7 +330,7 @@ func GetDefaultDisabledMetaConfig() *kubernetesConfig {
 	}
 }
 
-func validatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
+func ValidatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
 	config := kubernetesConfig{
 		AddMetadata:         true,
 		SyncPeriod:          time.Minute * 10,
@@ -522,4 +530,19 @@ func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
 	if err != nil {
 		logger.Debugf("Failed to delete field '%s': %s", field, err)
 	}
+}
+
+func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Logger) (mapstr.M, error) {
+	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
+	if err != nil {
+		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
+	}
+	ecsClusterMeta := mapstr.M{}
+	if clusterInfo.Url != "" {
+		ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
+	}
+	if clusterInfo.Name != "" {
+		ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
+	}
+	return ecsClusterMeta, nil
 }

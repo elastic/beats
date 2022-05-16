@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"capacity": {
@@ -22,7 +22,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"capacity": {

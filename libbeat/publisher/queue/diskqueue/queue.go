@@ -24,9 +24,9 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // diskQueue is the internal type representing a disk-based implementation
@@ -273,10 +273,6 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 		encoder: newEventEncoder(),
 		done:    make(chan struct{}),
 	}
-}
-
-func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{queue: dq, done: make(chan struct{})}
 }
 
 func (dq *diskQueue) Metrics() (queue.Metrics, error) {
