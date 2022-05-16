@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - aws-s3 input: Stop SQS keep-alive routine on InvalidParameterValue error. {issue}30675[30675] {pull}31499[31499]
 - Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
 - Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
+- Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
 
 *Heartbeat*
 - Fix unintentional use of no-op logger. {pull}31543[31543]
@@ -108,6 +109,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 - Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
 - Registry default flush time increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk on every update. {issue}30279[30279]
+- Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 
 *Auditbeat*
 
