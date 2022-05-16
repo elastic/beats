@@ -23,8 +23,6 @@ package leader
 import (
 	"testing"
 
-	// "github.com/stretchr/testify/assert"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
@@ -41,7 +39,6 @@ func TestFetch(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	// assert.NotEmpty(t, events)
 
 	if len(events) > 0 {
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
@@ -56,7 +53,6 @@ func TestData(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	// assert.NotEmpty(t, events)
 
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
