@@ -1871,6 +1871,10 @@ processors:
         } else if (ctx?.event?.action.startsWith('connection-')) {
           ctx.event.type.add('connection');
         }
+        if (ctx.event.outcome == 'monitored') {
+          ctx.event.category.add('intrusion_detection');
+          ctx.event.outcome = 'success';
+        }
 
   - set:
       description: copy destination.user.name to user.name if it is not set
