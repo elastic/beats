@@ -13,7 +13,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Rename docker tar.gz packages to docker-image-linux-<arch>.tar.gz. {pull}30895[30895]
 - Update to Go 1.17.9 {issue}31350[31350]
 
-
 *Auditbeat*
 
 
