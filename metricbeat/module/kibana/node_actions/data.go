@@ -67,6 +67,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	moduleFields := mapstr.M{}
 
 	// Set elasticsearch cluster id
+	//nolint: errcheck // This should not fail
 	moduleFields.Put("elasticsearch.cluster.id", data.ClusterUuid)
 
 	kibana, _ := kibanaSchema.Apply(data.Kibana)
@@ -79,6 +80,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
 	}
+	//nolint: errcheck // This should not fail
 	rootFields.Put("service.id", serviceId)
 
 	// Set service version
@@ -86,6 +88,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
 	}
+	//nolint: errcheck // This should not fail
 	rootFields.Put("service.version", version)
 
 	// Set service address
@@ -93,6 +96,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 	}
+	//nolint: errcheck // This should not fail
 	rootFields.Put("service.address", serviceAddress)
 
 	actionsFields, err := actionsSchema.Apply(data.Actions)
