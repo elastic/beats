@@ -128,7 +128,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 
-
 *Packetbeat*
 
 
