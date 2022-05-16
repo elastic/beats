@@ -22,11 +22,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/go-ucfg"
-
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 // Builder provides an interface by which configs can be built from provider metadata
@@ -39,7 +38,7 @@ type Builder interface {
 // has access to a keystores registry
 type Builders struct {
 	builders         []Builder
-	keystoreProvider keystore.Provider
+	keystoreProvider bus.KeystoreProvider
 }
 
 // BuilderConstructor is a func used to generate a Builder object
@@ -120,7 +119,7 @@ func (b Builders) GetConfig(event bus.Event) []*config.C {
 func NewBuilders(
 	bConfigs []*config.C,
 	hintsCfg *config.C,
-	keystoreProvider keystore.Provider,
+	keystoreProvider bus.KeystoreProvider,
 ) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
