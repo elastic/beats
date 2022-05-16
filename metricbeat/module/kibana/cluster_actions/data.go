@@ -22,8 +22,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -67,46 +67,44 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return fmt.Errorf("failure parsing Kibana Cluster Actions API response: %w", err)
 	}
 
-	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
+	rootFields := mapstr.M{}
+	moduleFields := mapstr.M{}
 
 	// Set elasticsearch cluster id
-	event.ModuleFields.Put("elasticsearch.cluster.id", data.ClusterUuid)
+	moduleFields.Put("elasticsearch.cluster.id", data.ClusterUuid)
 
 	kibana, _ := kibanaSchema.Apply(data.Kibana)
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("kibana", elastic.Kibana)
-		return event.Error
+		return elastic.MakeErrorForMissingField("kibana", elastic.Kibana)
 	}
 
 	// Set service ID
 	serviceId, err := kibana.GetValue("uuid")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
-		return event.Error
+		return elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
 	}
-	event.RootFields.Put("service.id", serviceId)
+	rootFields.Put("service.id", serviceId)
 
 	// Set service version
 	version, err := kibana.GetValue("version")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
-		return event.Error
+		return elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
 	}
-	event.RootFields.Put("service.version", version)
+	rootFields.Put("service.version", version)
 
 	// Set service address
 	serviceAddress, err := kibana.GetValue("transport_address")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
-		return event.Error
+		return elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 	}
-	event.RootFields.Put("service.address", serviceAddress)
+	rootFields.Put("service.address", serviceAddress)
 
 	actionsFields, err := actionsSchema.Apply(data.Actions)
 	if err != nil {
 		return fmt.Errorf("failure to apply cluster actions specific schema: %w", err)
 	}
-	event.MetricSetFields = actionsFields
+
+	event := mb.Event{ModuleFields: moduleFields, RootFields: rootFields, MetricSetFields: actionsFields}
 
 	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 	// When using Agent, the index name is overwritten anyways.
