@@ -47,7 +47,6 @@ linters:
     - nolintlint # reports ill-formed or insufficient nolint directives
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
     - stylecheck # a replacement for golint
-    - unparam # reports unused function parameters
     - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
@@ -65,7 +64,6 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
 linters-settings:
@@ -92,21 +90,12 @@ linters-settings:
   goimports:
     local-prefixes: github.com/elastic
 
-  gomodguard:
-    blocked:
-      # List of blocked modules.
-      modules:
-        # Blocked module.
-        - github.com/pkg/errors:
-            # Recommended modules that should be used instead. (Optional)
-            recommendations:
-              - errors
-              - fmt
-            reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
-
   gosimple:
     # Select the Go version to target. The default is '1.13'.
     go: "{{.GoVersion}}"
+    # Disabled:
+    # S1007: should use raw string (`...`) with regexp.MustCompile to avoid having to escape twice
+    checks: ["-S1007"]
 
   misspell:
     # Correct spellings using locale preferences for US or UK.
@@ -147,15 +136,15 @@ linters-settings:
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
     go: "{{.GoVersion}}"
-    checks: ["all"]
-
-  unparam:
-    # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
-    # XXX: if you enable this setting, unparam will report a lot of false-positives in text editors:
-    # if it's called for subdir of a project it can't find external interfaces. All text editor integrations
-    # with golangci-lint call it on a directory with the changed file.
-    check-exported: false
+    # Disabled:
+    # ST1005: error strings should not be capitalized
+    checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
     go: "{{.GoVersion}}"
+
+  gosec:
+    excludes:
+    - G306 # Expect WriteFile permissions to be 0600 or less
+    - G404 # Use of weak random number generator
