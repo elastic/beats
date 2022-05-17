@@ -85,7 +85,7 @@ func (paths *Path) InitPaths(cfg *Path) error {
 	}
 
 	// make sure the data path exists
-	err = os.MkdirAll(paths.Data, 0750)
+	err = os.MkdirAll(paths.Data, 0770)
 	if err != nil {
 		return fmt.Errorf("failed to create data path %s: %w", paths.Data, err)
 	}
