@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
+- Fix `include_top_n` fields in system/process {pull}31595[31595]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
 *Packetbeat*
