@@ -22,12 +22,14 @@ import (
 	"sync"
 	"time"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/x-pack/filebeat/httppanic"
 )
 
 // List of metrics that are gauges. This is used to identify metrics that should
@@ -162,6 +164,11 @@ func (r *reporter) snapshotLoop() {
 		case <-ticker.C:
 		}
 
+		select {
+		case <-httppanic.PanicCh():
+			panic("HTTP Panic server said to panic!")
+		default:
+		}
 		snaps := make(map[string]monitoring.FlatSnapshot, len(r.registries))
 		for name, reg := range r.registries {
 			snap := makeSnapshot(reg)

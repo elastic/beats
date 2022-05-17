@@ -5,14 +5,10 @@
 package main
 
 import (
-	"fmt"
-	"math/rand"
-	"net/http"
 	"os"
-	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/filebeat/httppanic"
 )
 
 // The basic model of execution:
@@ -24,38 +20,7 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
-	port := fmt.Sprintf(":424%d", rand.Intn(10))
-	go func() {
-		s := &http.Server{
-			Addr: port,
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodGet:
-					fmt.Println("logging to stdout")
-					fmt.Fprintf(os.Stderr, "logging to os.Stderr")
-					fmt.Fprintln(w, "logged to stdout")
-				case http.MethodPost:
-					fmt.Fprintln(w, "panicking in 1 s")
-					go func() {
-						fmt.Println("logging to stdout before POST panic!")
-						time.Sleep(time.Second)
-						panic("HTTP PANIC!!")
-					}()
-				case "PANIC":
-					fmt.Fprintln(w, "HTTP METHOD PANIC")
-					go func() {
-						fmt.Println("logging to stdout before PANIC panic!")
-						time.Sleep(time.Second)
-						panic("HTTP PANIC!")
-					}()
-				}
-			}),
-		}
-		fmt.Printf("starting HTTP panic server on port %s\n", port)
-		if err := s.ListenAndServe(); err != nil {
-			logp.L().Error(fmt.Errorf("panic http server error: %w", err))
-		}
-	}()
+	httppanic.StartServer()
 
 	if err := cmd.Filebeat().Execute(); err != nil {
 		os.Exit(1)
