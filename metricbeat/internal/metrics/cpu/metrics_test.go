@@ -18,6 +18,9 @@
 package cpu
 
 import (
+	"bufio"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -158,4 +161,19 @@ func TestMetricsPercentages(t *testing.T) {
 	assert.EqualValues(t, .7, system.(float64))
 	assert.EqualValues(t, .0, idle.(float64))
 	assert.EqualValues(t, 1., total.(float64))
+}
+
+func TestInfoScanner(t *testing.T) {
+	fd, err := os.Open(filepath.Join("testdata", "cpuinfo"))
+	if err != nil {
+		t.Fatalf("cannot open test file: %s", err)
+	}
+
+	scanner := bufio.NewScanner(fd)
+	info, err := cpuinfoScanner(scanner)
+	if err != nil {
+		t.Fatalf("infoScnner error: %s", err)
+	}
+
+	t.Log(info)
 }

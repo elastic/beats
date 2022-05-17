@@ -49,11 +49,26 @@ type MetricOpts struct {
 	NormalizedPercentages bool
 }
 
+// CPUInfo manages the CPU information from /proc/cpuinfo
+// If a given value isn't available on a given platformn
+// the value will be the type's zero-value
+type CPUInfo struct {
+	ModelName   string
+	ModelNumber string
+	Mhz         float64
+	PhysicalID  int
+	CoreID      int
+}
+
 // CPUMetrics carries global and per-core CPU metrics
 type CPUMetrics struct {
 	totals CPU
+
 	// list carries the same data, broken down by CPU
 	list []CPU
+
+	// CPUInfo carries some data from /proc/cpuinfo
+	CPUinfo []CPUInfo
 }
 
 // Total returns the total CPU time in ticks as scraped by the API
@@ -97,7 +112,6 @@ func (m *Monitor) Fetch() (Metrics, error) {
 // FetchCores collects a new sample of CPU usage metrics per-core
 // This will overwrite the currently stored samples.
 func (m *Monitor) FetchCores() ([]Metrics, error) {
-
 	metric, err := Get(m.Hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error fetching CPU metrics")
@@ -114,6 +128,7 @@ func (m *Monitor) FetchCores() ([]Metrics, error) {
 			currentSample:  metric.list[i],
 			previousSample: lastMetric,
 			isTotals:       false,
+			cpuInfo:        metric.CPUinfo[i],
 		}
 	}
 	m.lastSample = metric
@@ -125,6 +140,7 @@ type Metrics struct {
 	previousSample CPU
 	currentSample  CPU
 	count          int
+	cpuInfo        CPUInfo
 	isTotals       bool
 }
 
@@ -155,6 +171,7 @@ func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 		formattedMetrics.Put("total.norm.pct", createTotal(metric.previousSample, metric.currentSample, timeDelta, 1))
 	}
 
+	// /proc/stat metrics
 	reportOptMetric("user", metric.currentSample.User, metric.previousSample.User, normCPU)
 	reportOptMetric("system", metric.currentSample.Sys, metric.previousSample.Sys, normCPU)
 	reportOptMetric("idle", metric.currentSample.Idle, metric.previousSample.Idle, normCPU)
@@ -163,6 +180,13 @@ func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 	reportOptMetric("iowait", metric.currentSample.Wait, metric.previousSample.Wait, normCPU)
 	reportOptMetric("softirq", metric.currentSample.SoftIrq, metric.previousSample.SoftIrq, normCPU)
 	reportOptMetric("steal", metric.currentSample.Stolen, metric.previousSample.Stolen, normCPU)
+
+	// /proc/cpuinfo metrics
+	formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
+	formattedMetrics["model_name"] = metric.cpuInfo.ModelName
+	formattedMetrics["mhz"] = metric.cpuInfo.Mhz
+	formattedMetrics["core_id"] = metric.cpuInfo.CoreID
+	formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
 
 	return formattedMetrics, nil
 }
