@@ -51,7 +51,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
@@ -65,6 +64,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/configure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -1135,7 +1135,7 @@ func obfuscateConfigOpts() []ucfg.Option {
 func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
 	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
-	return keystore.Factory(keystoreCfg, defaultPathConfig)
+	return keystore.Factory(keystoreCfg, defaultPathConfig, common.IsStrictPerms())
 }
 
 func InitKibanaConfig(beatConfig beatConfig) *config.C {

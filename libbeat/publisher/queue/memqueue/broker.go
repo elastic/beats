@@ -18,10 +18,12 @@
 package memqueue
 
 import (
+	"io"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -85,6 +87,12 @@ type Settings struct {
 	FlushMinEvents int
 	FlushTimeout   time.Duration
 	InputQueueSize int
+}
+
+type batch struct {
+	queue   *broker
+	events  []publisher.Event
+	ackChan chan batchAckMsg
 }
 
 // batchACKState stores the metadata associated with a batch of events sent to
@@ -223,8 +231,28 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *broker) Consumer() queue.Consumer {
-	return newConsumer(b)
+func (b *broker) Get(count int) (queue.Batch, error) {
+	responseChan := make(chan getResponse, 1)
+	select {
+	case <-b.done:
+		return nil, io.EOF
+	case b.getChan <- getRequest{
+		entryCount: count, responseChan: responseChan}:
+	}
+
+	// if request has been sent, we have to wait for a response
+	resp := <-responseChan
+	events := make([]publisher.Event, 0, len(resp.entries))
+	for _, entry := range resp.entries {
+		if event, ok := entry.event.(*publisher.Event); ok {
+			events = append(events, *event)
+		}
+	}
+	return &batch{
+		queue:   b,
+		events:  events,
+		ackChan: resp.ackChan,
+	}, nil
 }
 
 func (b *broker) Metrics() (queue.Metrics, error) {
@@ -332,4 +360,12 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 		actual = minInputQueueSize
 	}
 	return actual
+}
+
+func (b *batch) Events() []publisher.Event {
+	return b.events
+}
+
+func (b *batch) ACK() {
+	b.ackChan <- batchAckMsg{}
 }

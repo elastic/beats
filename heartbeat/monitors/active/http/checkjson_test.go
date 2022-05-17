@@ -99,7 +99,7 @@ func TestCheckJsonExpression(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests[6:] { //nolint:dupl // similar to other lines, but with a different type. Not worth refactoring
+	for _, test := range tests[6:] {
 		t.Run(test.description, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, test.body)
@@ -203,7 +203,7 @@ func TestCheckJsonCondition(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests { //nolint:dupl // similar to other lines, but with a different type. Not worth refactoring
+	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, test.body)
