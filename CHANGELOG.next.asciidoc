@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - aws-s3 input: Stop SQS keep-alive routine on InvalidParameterValue error. {issue}30675[30675] {pull}31499[31499]
 - Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
 - Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
+- Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
 
 *Heartbeat*
 - Fix unintentional use of no-op logger. {pull}31543[31543]
@@ -85,6 +86,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 ==== Added
 
 *Affecting all Beats*
+
+- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
 
 
 *Auditbeat*
@@ -119,6 +122,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
+
 
 *Metricbeat*
 
@@ -126,6 +131,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
+- Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 
 *Packetbeat*

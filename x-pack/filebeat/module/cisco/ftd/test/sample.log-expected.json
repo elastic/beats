@@ -3427,6 +3427,7 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
+            "intrusion_detection",
             "network"
         ],
         "event.code": 338004,
@@ -3434,7 +3435,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.225/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
-        "event.outcome": "monitored",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
