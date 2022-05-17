@@ -41,13 +41,13 @@ func TestGetOne(t *testing.T) {
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),
-		CPUTicks:     true,
+		CPUTicks:     false,
 		CacheCmdLine: true,
 		EnvWhitelist: []string{".*"},
 		IncludeTop: IncludeTopConfig{
 			Enabled:  true,
 			ByCPU:    4,
-			ByMemory: 4,
+			ByMemory: 0,
 		},
 		EnableCgroups: false,
 		CgroupOpts: cgroup.ReaderOptions{
@@ -58,9 +58,54 @@ func TestGetOne(t *testing.T) {
 	err := testConfig.Init()
 	assert.NoError(t, err, "Init")
 
-	procData, err := testConfig.GetOne(os.Getpid())
+	_, _, err = testConfig.Get()
 	assert.NoError(t, err, "GetOne")
-	t.Logf("Proc: %s", procData.StringToPrint())
+
+	time.Sleep(time.Second * 2)
+
+	procData, _, err := testConfig.Get()
+	assert.NoError(t, err, "GetOne")
+
+	t.Logf("Proc: %s", procData[0].StringToPrint())
+}
+
+func TestFilter(t *testing.T) {
+	//The logic itself is os-independent, so we'll only test this on the platform least likly to have CI issues
+	if runtime.GOOS != "linux" {
+		t.Skip("Run on Linux only")
+	}
+	testConfig := Stats{
+		Procs:  []string{".*"},
+		Hostfs: resolve.NewTestResolver("/"),
+		IncludeTop: IncludeTopConfig{
+			Enabled:  true,
+			ByCPU:    1,
+			ByMemory: 1,
+		},
+	}
+	err := testConfig.Init()
+	assert.NoError(t, err, "Init")
+
+	procData, _, err := testConfig.Get()
+	assert.NoError(t, err, "GetOne")
+	assert.Equal(t, 2, len(procData))
+
+	testZero := Stats{
+		Procs:  []string{".*"},
+		Hostfs: resolve.NewTestResolver("/"),
+		IncludeTop: IncludeTopConfig{
+			Enabled:  true,
+			ByCPU:    0,
+			ByMemory: 1,
+		},
+	}
+
+	err = testZero.Init()
+	assert.NoError(t, err, "Init")
+
+	oneData, _, err := testZero.Get()
+	assert.NoError(t, err, "GetOne with one event")
+	assert.Equal(t, 1, len(oneData))
 }
 
 func TestProcessList(t *testing.T) {
@@ -87,19 +132,21 @@ func TestGetProcess(t *testing.T) {
 	assert.NotEqual(t, "unknown", process.State)
 
 	// Memory Checks
-	assert.True(t, (process.Memory.Size.ValueOr(0) >= 0))      //nolint: staticcheck // it's not pointless in this case?
-	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) >= 0)) //nolint: staticcheck // it's not pointless in this case?
-	assert.True(t, (process.Memory.Share.ValueOr(0) >= 0))     //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, process.Memory.Size.Exists())
+	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) > 0))
+	if runtime.GOOS == "linux" {
+		assert.True(t, process.Memory.Share.Exists())
+	}
 
 	// CPU Checks
 	assert.True(t, (process.CPU.Total.Value.ValueOr(0) >= 0))
-	assert.True(t, (process.CPU.User.Ticks.ValueOr(0) >= 0))   //nolint: staticcheck // it's not pointless in this case?
-	assert.True(t, (process.CPU.System.Ticks.ValueOr(0) >= 0)) //nolint: staticcheck // it's not pointless in this case?
+	assert.True(t, process.CPU.User.Ticks.Exists())
+	assert.True(t, process.CPU.System.Ticks.Exists())
 
 	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
 	switch runtime.GOOS {
-	case "darwin", "linux", "freebsd": //nolint: goconst // it is just a test file
+	case "darwin", "linux", "freebsd":
 		assert.True(t, len(process.Env) > 0, "empty environment")
 	}
 

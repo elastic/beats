@@ -72,7 +72,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	procStats.ProcsMap = pidMap
 
 	// filter the process list that will be passed down to users
-	procStats.includeTopProcesses(plist)
+	plist = procStats.includeTopProcesses(plist)
 
 	// This is a holdover until we migrate this library to metricbeat/internal
 	// At which point we'll use the memory code there.

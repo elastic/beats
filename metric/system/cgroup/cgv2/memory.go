@@ -232,7 +232,7 @@ func fetchEventsFile(path, file string) (Events, error) {
 			evt.Low = opt.UintWith(val)
 		case "high":
 			evt.High = val
-		case "max": //nolint: goconst // we are not winning anything
+		case "max":
 			evt.Max = val
 		case "oom":
 			evt.OOM = opt.UintWith(val)

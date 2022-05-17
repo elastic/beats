@@ -191,7 +191,7 @@ func avoidFileSystem(fs FSStat) bool {
 	}
 
 	// This logic only applies on non-windows machines, the device path logic seems to be different on windows.
-	if runtime.GOOS != "windows" { //nolint:goconst // Not needed here
+	if runtime.GOOS != "windows" {
 		// If the device name is a directory, this is a bind mount or nullfs,
 		// don't count it as it'd be counting again its parent filesystem.
 		devFileInfo, err := os.Stat(fs.Device)
