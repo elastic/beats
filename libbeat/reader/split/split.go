@@ -60,7 +60,7 @@ func New(r reader.Reader, cfg *Config) *splitterReader {
 		cfg:    cfg,
 		logger: logp.NewLogger("parser_split"),
 		buf:    make(chan reader.Message),
-		ctx:    context.TODO(),
+		ctx:    context.Background(),
 	}
 }
 
@@ -91,6 +91,7 @@ func (r *splitterReader) reading() {
 		data, _ := json.Marshal(message.Content)
 		eventsCh, err := split.StartSplit(data)
 		if err != nil {
+			r.logger.Errorf("error splitting response: %v", err)
 			return
 		}
 		for maybeMsg := range eventsCh {
@@ -106,6 +107,6 @@ func (r *splitterReader) reading() {
 }
 
 func (r *splitterReader) Close() error {
-	r.cancel()
-	return nil
+	return r.reader.Close()
+	// return nil
 }
