@@ -198,9 +198,9 @@ func (p *Pipeline) Close() error {
 
 	// Note: active clients are not closed / disconnected.
 
-	// close output before shutting down queue
+	// Closing the queue stops ACKs from propagating, so we close the output first
+	// to give it a chance to wait for any outstanding events to be acknowledged.
 	p.output.Close()
-
 	// shutdown queue
 	err := p.queue.Close()
 	if err != nil {
@@ -211,7 +211,6 @@ func (p *Pipeline) Close() error {
 	if p.sigNewClient != nil {
 		close(p.sigNewClient)
 	}
-
 	return nil
 }
 

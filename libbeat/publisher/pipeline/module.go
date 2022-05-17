@@ -118,11 +118,6 @@ func loadOutput(
 	monitors Monitors,
 	makeOutput OutputFactory,
 ) (outputs.Group, error) {
-	log := monitors.Logger
-	if log == nil {
-		log = logp.L()
-	}
-
 	if publishDisabled {
 		return outputs.Group{}, nil
 	}
@@ -138,7 +133,11 @@ func loadOutput(
 	if monitors.Metrics != nil {
 		metrics = monitors.Metrics.GetRegistry("output")
 		if metrics != nil {
-			metrics.Clear()
+			err := metrics.Clear()
+			if err != nil {
+				return outputs.Group{}, err
+			}
+
 		} else {
 			metrics = monitors.Metrics.NewRegistry("output")
 		}
@@ -156,7 +155,10 @@ func loadOutput(
 	if monitors.Telemetry != nil {
 		telemetry := monitors.Telemetry.GetRegistry("output")
 		if telemetry != nil {
-			telemetry.Clear()
+			err := telemetry.Clear()
+			if err != nil {
+				return outputs.Group{}, err
+			}
 		} else {
 			telemetry = monitors.Telemetry.NewRegistry("output")
 		}
