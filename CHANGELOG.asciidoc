@@ -3,14 +3,68 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-7.17.3]]
 === Beats version 7.17.3
 https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
+=======
+[[release-notes-8.2.0]]
+=== Beats version 8.2.0
+https://github.com/elastic/beats/compare/v8.1.3\...v8.2.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
+>>>>>>> 7ad8b2a403 (Fix View Commit links in Beats relnotes (#31537))
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
+<<<<<<< HEAD
+=======
+- Add support for port mapping in docker hints. {pull}31243[31243]
+- Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
+
+*Filebeat*
+
+- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
+- Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
+- Add support in httpjson input for chain calls. {pull}29816[29816]
+
+*Auditbeat*
+
+- Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
+
+*Metricbeat*
+
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
+- Add `commandstats` field to Redis module {pull}29662[29662]
+- Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
+- Improve Kubernetes dashboard. {pull}30913[30913]
+- Populate new container ECS fields in Docker module. {pull}30399[30399]
+- Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
+- Populate ecs container fields in Containerd module. {pull}31025[31025]
+
+*Winlogbeat*
+
+- Improve the error message when the registry file content is invalid. {pull}30543[30543]
+
+[[release-notes-8.1.3]]
+=== Beats version 8.1.3
+https://github.com/elastic/beats/compare/v8.1.2\...v8.1.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
+- Add ecs container fields {pull}31020[31020]
+- Fix docs reference for syslog processor {pull}31087[31087]
+>>>>>>> 7ad8b2a403 (Fix View Commit links in Beats relnotes (#31537))
 - Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
 
 *Filebeat*
@@ -25,9 +79,66 @@ https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
 - checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
 
 
+<<<<<<< HEAD
 [[release-notes-7.17.2]]
 === Beats version 7.17.2
 https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]
+=======
+- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
+
+*Packetbeat*
+
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
+
+*Winlogbeat*
+
+- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
+- Add support for kafka message headers. {pull}29940[29940]
+- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
+- Add syslog parser and processor. {issue}30139[30139] {pull}30541[30541]
+- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
+- Add cronjob metadata by default {pull}30637[30637]
+- New option `setup.template.json.data_stream` is added to indicate if the JSON index template is a data stream. {pull}31048[31048]
+
+*Winlogbeat*
+
+- Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
+
+
+[[release-notes-8.1.2]]
+=== Beats version 8.1.2
+https://github.com/elastic/beats/compare/v8.1.1\...v8.1.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+
+*Filebeat*
+
+- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+
+*Packetbeat*
+
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
+
+==== Added
+
+*Heartbeat*
+
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
+
+[[release-notes-8.1.1]]
+=== Beats version 8.1.1
+https://github.com/elastic/beats/compare/v8.1.0\...v8.1.1[View commits]
+>>>>>>> 7ad8b2a403 (Fix View Commit links in Beats relnotes (#31537))
 
 ==== Bugfixes
 
@@ -35,8 +146,34 @@ https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]
 
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 - Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
+<<<<<<< HEAD
 - Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
 - Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
+=======
+- Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
+
+*Filebeat*
+
+- Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+
+*Packetbeat*
+
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
+
+[[release-notes-8.1.0]]
+=== Beats version 8.1.0
+https://github.com/elastic/beats/compare/v8.0.1\...v8.1.0[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Remove Recorded Future fileset integration from threatintel module. {pull}30564[30564]
+
+==== Bugfixes
+>>>>>>> 7ad8b2a403 (Fix View Commit links in Beats relnotes (#31537))
 
 *Auditbeat*
 
@@ -74,9 +211,15 @@ https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]
 
 
 
+<<<<<<< HEAD
 [[release-notes-7.17.1]]
 === Beats version 7.17.1
 https://github.com/elastic/beats/compare/v7.17.0...v7.17.1[View commits]
+=======
+[[release-notes-8.0.1]]
+=== Beats version 8.0.1
+https://github.com/elastic/beats/compare/v8.0.0\...v8.0.1[View commits]
+>>>>>>> 7ad8b2a403 (Fix View Commit links in Beats relnotes (#31537))
 
 ==== Bugfixes
 
@@ -99,8 +242,43 @@ https://github.com/elastic/beats/compare/v7.17.0...v7.17.1[View commits]
 
 *Heartbeat*
 
+<<<<<<< HEAD
 - Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
 - Fix missing mapping for `service.name`. {pull}30324[30324]
+=======
+[[release-notes-8.0.0]]
+=== Beats version 8.0.0
+https://github.com/elastic/beats/compare/v7.17.0\...v8.0.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
+- Remove deprecated/undocumented `IncludeCreatorMetadata` setting from kubernetes metadata config options. {pull}28006[28006]
+- Remove deprecated fields from kubernetes module. {pull}28046[28046]
+- Remove deprecated config option `aws_partition`. {pull}28120[28120]
+- Improve stats API by adding host metadata. {pull}27963[27963]
+- Libbeat: logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
+- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
+- add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Use data streams instead of indices for storing events from Beats. {pull}28450[28450]
+- Remove option `setup.template.type` and always load composable template with data streams. {pull}28450[28450]
+- Remove several ILM options (`rollover_alias` and `pattern`) as data streams do not require index aliases. {pull}28450[28450]
+- Populate index template's `default_fields` setting with ECS fields only. {pull}28596[28596] {issue}28215[28215]
+- Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
+- Remove `logging.files.suffix` option, and default to datetime endings in log file names. The format of the new name is `{beatname}-{date}(-n)?.ndjson`. Example log file names from oldest to newest: `filebeat-20200101.ndjson`, `filebeat-20200101-1.ndjson`, `filebeat-20200101-2.ndjson`. {pull}28927[28927]
+- Align kubernetes configuration settings. {pull}29908[29908]
+- Change log file extension for Beats and Elastic Agent to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
+- Remove legacy support for SSLv3. {pull}30071[30071]
+
+*Filebeat*
+
+- Add `while_pattern` type to multiline reader. {pull}19662[19662]
+- auditd dataset: Use `process.args` to store program arguments instead of `auditd.log.aNNN` fields. {pull}29601[29601]
+- Remove deprecated old `awscloudwatch` input name. {pull}29844[29844]
+>>>>>>> 7ad8b2a403 (Fix View Commit links in Beats relnotes (#31537))
 
 *Metricbeat*
 
@@ -119,7 +297,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v7.17.1[View commits]
 
 [[release-notes-7.17.0]]
 === Beats version 7.17.0
-https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
+https://github.com/elastic/beats/compare/v7.16.3\...v7.17.0[View commits]
 
 ==== Breaking changes
 
@@ -194,7 +372,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 
 [[release-notes-7.16.3]]
 === Beats version 7.16.3
-https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
+https://github.com/elastic/beats/compare/v7.16.2\...v7.16.3[View commits]
 
 ==== Bugfixes
 
@@ -204,7 +382,7 @@ https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
 
 [[release-notes-7.16.2]]
 === Beats version 7.16.2
-https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
+https://github.com/elastic/beats/compare/v7.16.1\...v7.16.2[View commits]
 
 ==== Bugfixes
 
@@ -225,7 +403,7 @@ https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
 
 [[release-notes-7.16.1]]
 === Beats version 7.16.1
-https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]
+https://github.com/elastic/beats/compare/v7.16.0\...v7.16.1[View commits]
 
 ==== Bugfixes
 
@@ -407,7 +585,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 [[release-notes-7.15.2]]
 === Beats version 7.15.2
-https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
+https://github.com/elastic/beats/compare/v7.15.1\...v7.15.2[View commits]
 
 ==== Bugfixes
 
@@ -438,7 +616,7 @@ https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
 
 [[release-notes-7.15.1]]
 === Beats version 7.15.1
-https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
+https://github.com/elastic/beats/compare/v7.15.0\...v7.15.1[View commits]
 
 ==== Bugfixes
 
@@ -453,7 +631,7 @@ https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
 
 [[release-notes-7.15.0]]
 === Beats version 7.15.0
-https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
+https://github.com/elastic/beats/compare/v7.14.2\...v7.15.0[View commits]
 
 ==== Breaking changes
 
@@ -546,7 +724,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 
 [[release-notes-7.14.2]]
 === Beats version 7.14.2
-https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
+https://github.com/elastic/beats/compare/v7.14.1\...v7.14.2[View commits]
 
 ==== Bugfixes
 
@@ -558,7 +736,7 @@ https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
 
 [[release-notes-7.14.1]]
 === Beats version 7.14.1
-https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
+https://github.com/elastic/beats/compare/v7.14.0\...v7.14.1[View commits]
 
 ==== Bugfixes
 
@@ -588,7 +766,7 @@ https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
 
 [[release-notes-7.14.0]]
 === Beats version 7.14.0
-https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
+https://github.com/elastic/beats/compare/v7.13.4\...v7.14.0[View commits]
 
 ==== Breaking changes
 
@@ -757,7 +935,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 [[release-notes-7.13.4]]
 === Beats version 7.13.4
-https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
+https://github.com/elastic/beats/compare/v7.13.3\...v7.13.4[View commits]
 
 ==== Bugfixes
 
@@ -778,7 +956,7 @@ https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
 
 [[release-notes-7.13.3]]
 === Beats version 7.13.3
-https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
+https://github.com/elastic/beats/compare/v7.13.2\...v7.13.3[View commits]
 
 ==== Bugfixes
 
@@ -791,7 +969,7 @@ https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
 
 [[release-notes-7.13.2]]
 === Beats version 7.13.2
-https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
+https://github.com/elastic/beats/compare/v7.13.1\...v7.13.2[View commits]
 
 ==== Bugfixes
 
@@ -816,7 +994,7 @@ https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
 
 [[release-notes-7.13.1]]
 === Beats version 7.13.1
-https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
+https://github.com/elastic/beats/compare/v7.13.0\...v7.13.1[View commits]
 
 ==== Bugfixes
 
@@ -831,7 +1009,7 @@ https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
 
 [[release-notes-7.13.0]]
 === Beats version 7.13.0
-https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
+https://github.com/elastic/beats/compare/v7.12.1\...v7.13.0[View commits]
 
 ==== Breaking changes
 
@@ -952,7 +1130,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 [[release-notes-7.12.1]]
 === Beats version 7.12.1
-https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
+https://github.com/elastic/beats/compare/v7.12.0\...v7.12.1[View commits]
 
 ==== Breaking changes
 
@@ -1007,7 +1185,7 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 
 [[release-notes-7.12.0]]
 === Beats version 7.12.0
-https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
+https://github.com/elastic/beats/compare/v7.11.2\...v7.12.0[View commits]
 
 ==== Breaking changes
 
@@ -1168,7 +1346,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 [[release-notes-7.11.2]]
 === Beats version 7.11.2
-https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
+https://github.com/elastic/beats/compare/v7.11.1\...v7.11.2[View commits]
 
 ==== Bugfixes
 
@@ -1188,7 +1366,7 @@ https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
 
 [[release-notes-7.11.1]]
 === Beats version 7.11.1
-https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
+https://github.com/elastic/beats/compare/v7.11.0\...v7.11.1[View commits]
 
 ==== Bugfixes
 
@@ -1203,7 +1381,7 @@ https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
 
 [[release-notes-7.11.0]]
 === Beats version 7.11.0
-https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
+https://github.com/elastic/beats/compare/v7.10.2\...v7.11.0[View commits]
 
 ==== Breaking changes
 
