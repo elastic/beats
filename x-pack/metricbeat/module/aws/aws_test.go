@@ -8,9 +8,10 @@
 package aws
 
 import (
+	"testing"
+
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
-	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"

@@ -6,6 +6,7 @@ package cloudwatch
 
 import (
 	"fmt"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -39,9 +40,6 @@ func addMetadata(namespace string, endpoint string, regionName string, awsConfig
 		if err != nil {
 			return events, fmt.Errorf("error adding metadata to sqs: %w", err)
 		}
-	default:
-		return events, nil
 	}
-
-	return nil, fmt.Errorf("no events to add metadata to")
+	return events, nil
 }

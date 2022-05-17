@@ -6,10 +6,11 @@ package aws
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"math"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"

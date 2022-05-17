@@ -65,7 +65,7 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fi
 			logp.Error(fmt.Errorf("instance.State.Name is empty"))
 		}
 
-		if output.Monitoring.State != ""{
+		if output.Monitoring.State != "" {
 			monitoringStates[instanceID] = string(output.Monitoring.State)
 			events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
 		} else {
