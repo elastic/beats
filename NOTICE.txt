@@ -23493,11 +23493,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.4.3
+Version: v1.5.7
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.4.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.7/LICENSE:
 
 
                                  Apache License
@@ -33835,11 +33835,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/gomega
-Version: v1.10.1
+Version: v1.10.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.10.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.10.3/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
