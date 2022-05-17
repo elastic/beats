@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type Config struct {

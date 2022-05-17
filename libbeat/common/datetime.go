@@ -23,19 +23,36 @@ import (
 	"errors"
 	"hash"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
 )
 
-// TsLayout is the layout to be used in the timestamp marshaling/unmarshaling everywhere.
-// The timezone must always be UTC.
-const TsLayout = "2006-01-02T15:04:05.000Z"
+const (
+	// TsLayout is the seconds layout to be used in the timestamp marshaling/unmarshaling everywhere.
+	// The timezone must always be UTC.
+	TsLayout = "2006-01-02T15:04:05.000Z"
+
+	tsLayoutMillis = "2006-01-02T15:04:05.000Z"
+	tsLayoutMicros = "2006-01-02T15:04:05.000000Z"
+	tsLayoutNanos  = "2006-01-02T15:04:05.000000000Z"
+)
 
 // Time is an abstraction for the time.Time type
 type Time time.Time
 
+var defaultTimeFormatter = dtfmt.MustNewFormatter("yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'")
+
+var defaultParseFormats = []string{
+	tsLayoutMillis,
+	tsLayoutMicros,
+	tsLayoutNanos,
+}
+
 // MarshalJSON implements json.Marshaler interface.
 // The time is a quoted string in the JsTsLayout format.
 func (t Time) MarshalJSON() ([]byte, error) {
-	return json.Marshal(time.Time(t).UTC().Format(TsLayout))
+	str, _ := defaultTimeFormatter.Format(time.Time(t).UTC())
+	return json.Marshal(str)
 }
 
 // UnmarshalJSON implements js.Unmarshaler interface.
@@ -43,10 +60,10 @@ func (t Time) MarshalJSON() ([]byte, error) {
 // format.
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	if data[0] != []byte(`"`)[0] || data[len(data)-1] != []byte(`"`)[0] {
-		return errors.New("Not quoted")
+		return errors.New("not quoted")
 	}
 	*t, err = ParseTime(string(data[1 : len(data)-1]))
-	return
+	return err
 }
 
 func (t Time) Hash32(h hash.Hash32) error {
@@ -54,14 +71,24 @@ func (t Time) Hash32(h hash.Hash32) error {
 	return err
 }
 
-// ParseTime parses a time in the TsLayout format.
+// ParseTime parses a time in the MillisTsLayout, then micros and finally nanos.
 func ParseTime(timespec string) (Time, error) {
-	t, err := time.Parse(TsLayout, timespec)
+	var err error
+	var t time.Time
+
+	for _, layout := range defaultParseFormats {
+		t, err = time.Parse(layout, timespec)
+		if err == nil {
+			break
+		}
+	}
+
 	return Time(t), err
 }
 
 func (t Time) String() string {
-	return time.Time(t).UTC().Format(TsLayout)
+	str, _ := defaultTimeFormatter.Format(time.Time(t).UTC())
+	return str
 }
 
 // MustParseTime is a convenience equivalent of the ParseTime function

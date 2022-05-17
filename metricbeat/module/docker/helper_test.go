@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
+	helpers "github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
