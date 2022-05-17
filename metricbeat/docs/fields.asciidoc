@@ -60058,6 +60058,33 @@ type: long
 
 --
 
+*`system.cpu.model_num`*::
++
+--
+CPU model number
+
+type: keyword
+
+--
+
+*`system.cpu.model_name`*::
++
+--
+CPU model name
+
+type: keyword
+
+--
+
+*`system.cpu.mhz`*::
++
+--
+Average of all CPU cores current clock
+
+type: float
+
+--
+
 [float]
 === diskio
 

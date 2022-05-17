@@ -15,7 +15,7 @@ SYSTEM_CPU = {
 }
 SYSTEM_CPU[metricbeat.P_DARWIN] = SYSTEM_CPU[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CPU[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_DARWIN] + ["iowait.pct", "irq.pct", "nice.pct",
-                                                                    "softirq.pct", "steal.pct"]
+                                                                    "softirq.pct", "steal.pct", "model_name", "model_num", "mhz"]
 SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
 
@@ -43,7 +43,7 @@ SYSTEM_CORE = {
 }
 SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
-    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct"]
+    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct", "model_name", "model_num", "mhz"]
 
 SYSTEM_CORE_ALL = {
     metricbeat.P_WIN: SYSTEM_CORE[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
@@ -280,7 +280,6 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
-            print(evt)
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
             self.assert_fields_for_platform(SYSTEM_FILESYSTEM, filesystem)
