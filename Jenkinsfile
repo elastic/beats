@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/with-terraform') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
