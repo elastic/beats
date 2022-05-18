@@ -190,7 +190,7 @@ func (c *Checkpoint) PersistState(st EventLogState) {
 }
 
 // persist writes the current state to disk if the in-memory state is dirty.
-func (c *Checkpoint) persist() bool {
+func (c *Checkpoint) persist() bool { //nolint:unparam // ignoring return value for now as long as failure is logged
 	if c.numUpdates == 0 {
 		return false
 	}
@@ -222,7 +222,7 @@ func (c *Checkpoint) flush() error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("Failed to flush state to disk. %v", err)
+		return fmt.Errorf("failed to flush state to disk. %w", err)
 	}
 
 	// Sort persisted eventLogs by name.
@@ -243,15 +243,15 @@ func (c *Checkpoint) flush() error {
 	data, err := yaml.Marshal(ps)
 	if err != nil {
 		file.Close()
-		return fmt.Errorf("Failed to flush state to disk. Could not marshal "+
-			"data to YAML. %v", err)
+		return fmt.Errorf("failed to flush state to disk. Could not marshal "+
+			"data to YAML. %w", err)
 	}
 
 	_, err = file.Write(data)
 	if err != nil {
 		file.Close()
-		return fmt.Errorf("Failed to flush state to disk. Could not write to "+
-			"%s. %v", tempFile, err)
+		return fmt.Errorf("failed to flush state to disk. Could not write to "+
+			"%s. %w", tempFile, err)
 	}
 
 	file.Close()
