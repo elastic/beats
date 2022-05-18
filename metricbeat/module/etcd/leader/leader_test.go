@@ -18,6 +18,7 @@
 package leader
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -30,6 +31,34 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
+
+func TestEventMapping(t *testing.T) {
+	content, err := ioutil.ReadFile("../_meta/test/leaderstats.json")
+	assert.NoError(t, err)
+
+	var data Leader
+	err = json.Unmarshal(content, &data)
+	assert.NoError(t, err)
+
+	event := eventMapping("6e3bd23ae5f1eae0", data, FollowersID{
+		Counts: Counts{
+			Success: 745,
+		},
+	})
+	assert.NotZero(t, event)
+
+	leader, err := event.MetricSetFields.GetValue("follower.leader")
+	assert.NoError(t, err)
+	assert.Equal(t, leader, "924e2e83e93f2560")
+
+	followerID, err := event.MetricSetFields.GetValue("follower.id")
+	assert.NoError(t, err)
+	assert.Equal(t, followerID, "6e3bd23ae5f1eae0")
+
+	successOps, err := event.MetricSetFields.GetValue("follower.success_operations")
+	assert.NoError(t, err)
+	assert.Equal(t, successOps, int64(745))
+}
 
 func TestFetchEventContent(t *testing.T) {
 
