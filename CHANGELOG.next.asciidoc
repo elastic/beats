@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
 - Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 - Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
+- Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
 - Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 
 *Auditbeat*
