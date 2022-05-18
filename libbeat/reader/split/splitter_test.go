@@ -9,16 +9,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestSplit(t *testing.T) {
 	cases := []struct {
 		name             string
 		config           *Config
-		json             common.MapStr
-		expectedMessages []common.MapStr
+		json             mapstr.M
+		expectedMessages []mapstr.M
 		expectedErr      error
 	}{
 		{
@@ -27,7 +27,7 @@ func TestSplit(t *testing.T) {
 				Target:     "Records",
 				KeepParent: true,
 			},
-			json: common.MapStr{
+			json: mapstr.M{
 				"Records": []interface{}{
 					map[string]interface{}{
 						"this_is": "also kept",
@@ -37,7 +37,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"Records.this_is": "also kept",
 				},
@@ -57,7 +57,7 @@ func TestSplit(t *testing.T) {
 					KeepParent: true,
 				},
 			},
-			json: common.MapStr{
+			json: mapstr.M{
 				"this": "is kept",
 				"Records": []interface{}{
 					map[string]interface{}{
@@ -78,7 +78,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"this":                             "is kept",
 					"Records.this_is":                  "also kept",
@@ -98,7 +98,7 @@ func TestSplit(t *testing.T) {
 				Target:     "Records",
 				KeepParent: false,
 			},
-			json: common.MapStr{
+			json: mapstr.M{
 				"Records": []interface{}{
 					map[string]interface{}{
 						"this_is": "also kept",
@@ -108,7 +108,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"this_is": "also kept",
 				},
@@ -128,7 +128,7 @@ func TestSplit(t *testing.T) {
 					KeepParent: false,
 				},
 			},
-			json: common.MapStr{
+			json: mapstr.M{
 				"this": "is kept",
 				"Records": []interface{}{
 					map[string]interface{}{
@@ -149,7 +149,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"something_else": "also kept",
 				},
@@ -169,7 +169,7 @@ func TestSplit(t *testing.T) {
 					KeepParent: true,
 				},
 			},
-			json: common.MapStr{
+			json: mapstr.M{
 				"this": "is kept",
 				"Records": []interface{}{
 					map[string]interface{}{
@@ -190,7 +190,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"this_is":                  "also kept",
 					"sub_array.something_else": "also kept",
@@ -212,7 +212,7 @@ func TestSplit(t *testing.T) {
 					KeepParent: false,
 				},
 			},
-			json: common.MapStr{
+			json: mapstr.M{
 				"this": "is kept",
 				"Records": []interface{}{
 					map[string]interface{}{
@@ -233,7 +233,7 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []common.MapStr{
+			expectedMessages: []mapstr.M{
 				{
 					"something_else": "also kept",
 				},

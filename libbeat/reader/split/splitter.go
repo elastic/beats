@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -110,8 +110,6 @@ func (s *split) run(jsonObject mapstr.M, ch chan<- maybeMsg) error {
 // split recursively executes the split processor chain.
 func (s *split) split(root mapstr.M, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.target)
-	s.log.Info(s.target)
-	s.log.Info(v)
 	if err != nil && err != mapstr.ErrKeyNotFound {
 		return err
 	}

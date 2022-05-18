@@ -92,7 +92,7 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing multiline parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing split parser config: %+v", err)
 			}
 		case "multiline":
 			var config multiline.Config

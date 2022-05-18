@@ -19,11 +19,10 @@ package split
 
 import (
 	"context"
-	"encoding/json"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Config struct {
@@ -77,31 +76,30 @@ func (r *splitterReader) Next() (reader.Message, error) {
 }
 
 func (r *splitterReader) reading() {
-	for r.ctx.Err() == nil {
-		message, err := r.reader.Next()
-		if err != nil {
-			return
+	message, err := r.reader.Next()
+	if err != nil {
+		return
+	}
+	split, err := NewSplit(r.cfg, r.logger)
+	if err != nil {
+		return
+	}
+	// We want to be able to identify which split is the root of the chain.
+	split.IsRoot = true
+	// data, _ := json.Marshal(message.Content)
+	eventsCh, err := split.StartSplit(message.Content)
+	if err != nil {
+		r.logger.Errorf("error splitting response: %v", err)
+		return
+	}
+	for maybeMsg := range eventsCh {
+		if maybeMsg.Failed() {
+			r.logger.Errorf("error processing response: %v", maybeMsg)
+			continue
 		}
-		split, err := NewSplit(r.cfg, r.logger)
-		if err != nil {
-			return
-		}
-		// We want to be able to identify which split is the root of the chain.
-		split.IsRoot = true
-		data, _ := json.Marshal(message.Content)
-		eventsCh, err := split.StartSplit(data)
-		if err != nil {
-			r.logger.Errorf("error splitting response: %v", err)
-			return
-		}
-		for maybeMsg := range eventsCh {
-			if maybeMsg.Failed() {
-				r.logger.Errorf("error processing response: %v", maybeMsg)
-				continue
-			}
-			r.buf <- reader.Message{
-				Content: []byte(maybeMsg.Msg.String()),
-			}
+		r.buf <- reader.Message{
+			Content: []byte(maybeMsg.Msg.String()),
+			Bytes:   len([]byte(maybeMsg.Msg.String())),
 		}
 	}
 }
