@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix resource handle leak during event log enrichment. {pull}31504[31504]
+- Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
+- Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
 
 *Functionbeat*
 
