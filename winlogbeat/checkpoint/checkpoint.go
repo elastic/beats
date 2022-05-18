@@ -118,16 +118,17 @@ func (c *Checkpoint) run() {
 	defer c.wg.Done()
 	defer c.persist()
 
-	stopTimer := func(t *time.Timer) {
-		if !t.Stop() {
-			<-t.C
-		}
-	}
 	// Create a timer and stop it immediately. We only want to
 	// start it once there is data to persist.
 	flushTimer := time.NewTimer(c.flushInterval)
-	stopTimer(flushTimer)
-	defer stopTimer(flushTimer)
+	if !flushTimer.Stop() {
+		// Drain the timer channel in the unlikely case that it was
+		// signaled already.
+		<-flushTimer.C
+	}
+	// The channel doesn't need draining in the termination case.
+	// Doing so can introduce a deadlock.
+	defer flushTimer.Stop()
 
 loop:
 	for {
@@ -142,11 +143,9 @@ loop:
 				flushTimer.Reset(c.flushInterval)
 			}
 			c.numUpdates++
-			continue
 		case <-flushTimer.C:
+			c.persist()
 		}
-
-		c.persist()
 	}
 }
 
