@@ -30,7 +30,50 @@ import (
 const (
 	path = "/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 	id   = "b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
+
+	pathv2 = "/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
+	idv2   = "docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
 )
+
+// func TestForPid(t *testing.T) {
+// 	pid := 3757
+// 	reader, err := NewReader(resolve.NewTestResolver(""), true)
+// 	assert.NoError(t, err, "error in NewReader")
+
+// 	vers, err := reader.CgroupsVersion(1989)
+// 	if vers == CgroupsV1 {
+// 		t.Logf("Got V1 process.")
+// 		stats, err := reader.GetV1StatsForProcess(pid)
+// 		assert.NoError(t, err, "error in GetV1StatsForProcess")
+// 		t.Logf("Event: %#v", stats)
+// 	}
+
+// 	if vers == CgroupsV2 {
+// 		t.Logf("Got V2 process.")
+// 		stats, err := reader.GetV2StatsForProcess(pid)
+// 		assert.NoError(t, err, "error in GetV2StatsForProcess")
+// 		t.Logf("Event: %#v", stats)
+// 	}
+
+// }
+
+func TestV1EventDifferentPaths(t *testing.T) {
+	pid := 3757
+	reader, err := NewReader(resolve.NewTestResolver("testdata/ubuntu1804"), true)
+	assert.NoError(t, err, "error in NewReader")
+
+	stats, err := reader.GetV1StatsForProcess(pid)
+	assert.NoError(t, err, "error in GetV1StatsForProcess")
+
+	if stats == nil {
+		t.Fatal("no cgroup stats found")
+	}
+
+	// Make sure we can handle root paths properly
+	assert.Equal(t, "/system.slice/networkd-dispatcher.service", stats.Path)
+	assert.Equal(t, "networkd-dispatcher.service", stats.ID)
+
+}
 
 func TestReaderGetStatsV1(t *testing.T) {
 	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true)
@@ -79,10 +122,18 @@ func TestReaderGetStatsV2(t *testing.T) {
 	require.NotNil(t, stats.Memory)
 	require.NotNil(t, stats.IO)
 
+	assert.Equal(t, pathv2, stats.Path)
+	assert.Equal(t, idv2, stats.ID)
+
 	require.NotZero(t, stats.CPU.Stats.Usage.NS)
 	require.NotZero(t, stats.Memory.Mem.Usage.Bytes)
 	require.NotZero(t, stats.IO.Pressure["some"].Sixty.Pct)
+	json, err := json.MarshalIndent(stats, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	t.Log(string(json))
 }
 
 func TestReaderGetStatsHierarchyOverride(t *testing.T) {
