@@ -144,7 +144,10 @@ loop:
 			}
 			c.numUpdates++
 		case <-flushTimer.C:
-			c.persist()
+			if !c.persist() {
+				// Error during persist: Retry after interval.
+				flushTimer.Reset(c.flushInterval)
+			}
 		}
 	}
 }
@@ -189,9 +192,9 @@ func (c *Checkpoint) PersistState(st EventLogState) {
 }
 
 // persist writes the current state to disk if the in-memory state is dirty.
-func (c *Checkpoint) persist() bool { //nolint:unparam // ignoring return value for now as long as failure is logged
+func (c *Checkpoint) persist() bool {
 	if c.numUpdates == 0 {
-		return false
+		return true
 	}
 
 	err := c.flush()
