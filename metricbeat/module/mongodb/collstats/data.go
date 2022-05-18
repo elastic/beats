@@ -28,7 +28,7 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 	names := strings.SplitN(key, ".", 2)
 
 	if len(names) < 2 {
-		return nil, errors.New("Collection name invalid")
+		return nil, errors.New("collection name invalid")
 	}
 
 	event := mapstr.M{
