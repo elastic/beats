@@ -15,7 +15,7 @@ SYSTEM_CPU = {
 }
 SYSTEM_CPU[metricbeat.P_DARWIN] = SYSTEM_CPU[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CPU[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_DARWIN] + ["iowait.pct", "irq.pct", "nice.pct",
-                                                                    "softirq.pct", "steal.pct", "model_name", "model_num", "mhz"]
+                                                                    "softirq.pct", "steal.pct"]
 SYSTEM_CPU_HOST_FIELDS = ["usage"]
 
 
@@ -39,7 +39,9 @@ SYSTEM_CPU_ALL[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_LINUX] + ["idle.tic
 
 SYSTEM_CORE = {
     metricbeat.P_WIN: ["id", "idle.pct",
-                       "system.pct", "user.pct", "total.pct"]
+                       "system.pct", "user.pct", "total.pct",
+                       "model_name", "model_number", "mhz",
+                       "core_id", "physical_id"]
 }
 SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
