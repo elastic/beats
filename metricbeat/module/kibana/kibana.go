@@ -65,6 +65,21 @@ var (
 	ActionsAPIAvailableVersion = v8_2_0
 )
 
+var (
+	KibanaSchema = s.Schema{
+		"uuid":  c.Str("uuid"),
+		"name":  c.Str("name"),
+		"index": c.Str("index"),
+		"host": s.Object{
+			"name": c.Str("host"),
+		},
+		"transport_address": c.Str("transport_address"),
+		"version":           c.Str("version"),
+		"snapshot":          c.Bool("snapshot"),
+		"status":            c.Str("status"),
+	}
+)
+
 func init() {
 	// Register the ModuleFactory function for this module.
 	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
@@ -144,17 +159,6 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
 	return http.FetchContent()
 }
 
-func GetKibanaSchema() s.Schema {
-	return s.Schema{
-		"uuid":  c.Str("uuid"),
-		"name":  c.Str("name"),
-		"index": c.Str("index"),
-		"host": s.Object{
-			"name": c.Str("host"),
-		},
-		"transport_address": c.Str("transport_address"),
-		"version":           c.Str("version"),
-		"snapshot":          c.Bool("snapshot"),
-		"status":            c.Str("status"),
-	}
-}
+// func GetKibanaSchema() s.Schema {
+// 	return
+// }

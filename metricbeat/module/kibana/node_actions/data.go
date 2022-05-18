@@ -51,25 +51,25 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return fmt.Errorf("failure parsing Kibana Node Actions API response: %w", err)
 	}
 
-	kibana, err := kibana.GetKibanaSchema().Apply(data.Kibana)
+	kibanaData, err := kibana.KibanaSchema.Apply(data.Kibana)
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana", elastic.Kibana)
 	}
 
 	// Set service ID
-	serviceId, err := kibana.GetValue("uuid")
+	serviceId, err := kibanaData.GetValue("uuid")
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
 	}
 
 	// Set service version
-	version, err := kibana.GetValue("version")
+	version, err := kibanaData.GetValue("version")
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
 	}
 
 	// Set service address
-	serviceAddress, err := kibana.GetValue("transport_address")
+	serviceAddress, err := kibanaData.GetValue("transport_address")
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 	}
