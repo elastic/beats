@@ -18,9 +18,9 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestInput(t *testing.T) {
@@ -813,7 +813,7 @@ func paginationHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
 		case 1:
-			if r.URL.Query().Get("page") != "bar" { //nolint:goconst // Bad linter! Tests should be explicit and local.
+			if r.URL.Query().Get("page") != "bar" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return

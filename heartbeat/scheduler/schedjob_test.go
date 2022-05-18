@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestSchedJobRun(t *testing.T) {

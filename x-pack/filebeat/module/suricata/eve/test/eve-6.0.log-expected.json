@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-01-27T00:28:11.488Z",
+        "@timestamp": "2021-01-27T00:28:11.488362Z",
         "destination.address": "10.31.64.240",
         "destination.bytes": 876,
         "destination.domain": "testmynids.org",

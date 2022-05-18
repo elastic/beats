@@ -26,8 +26,8 @@ class Test(BaseTest):
         assert o["network.transport"] == "udp"
         assert o["network.bytes"] == 312
         assert "network.community_id" in o
-        assert o["event.start"] == "2015-08-27T08:00:55.638Z"
-        assert o["event.end"] == "2015-08-27T08:00:55.700Z"
+        assert o["event.start"] == "2015-08-27T08:00:55.638957Z"
+        assert o["event.end"] == "2015-08-27T08:00:55.700739Z"
         assert o["event.duration"] == 61782000
         assert o["client.ip"] == "192.168.238.68"
         assert o["source.ip"] == "192.168.238.68"

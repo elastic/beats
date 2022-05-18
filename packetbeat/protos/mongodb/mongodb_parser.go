@@ -23,10 +23,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"go.mongodb.org/mongo-driver/bson"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -477,7 +477,7 @@ func (d *decoder) readByte() (byte, error) {
 	i := d.i
 	d.i++
 	if d.i > len(d.in) {
-		return 0, errors.New("Read byte failed")
+		return 0, errors.New("read byte failed")
 	}
 	return d.in[i], nil
 }
@@ -552,7 +552,7 @@ func (d *decoder) readBytes(length int32) ([]byte, error) {
 	start := d.i
 	d.i += int(length)
 	if d.i > len(d.in) {
-		return *new([]byte), errors.New("No byte to read")
+		return *new([]byte), errors.New("no byte to read")
 	}
 	return d.in[start : start+int(length)], nil
 }
