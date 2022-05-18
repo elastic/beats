@@ -171,15 +171,3 @@
         The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
-
-    - name: model_num
-      type: keyword
-      description: CPU model number
-
-    - name: model_name
-      type: keyword
-      description: CPU model name
-
-    - name: mhz
-      type: float
-      description: Average of all CPU cores current clock
