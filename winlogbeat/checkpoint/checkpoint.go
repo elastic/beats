@@ -118,8 +118,17 @@ func (c *Checkpoint) run() {
 	defer c.wg.Done()
 	defer c.persist()
 
+	stopTimer := func(t *time.Timer) {
+		if !t.Stop() {
+			<-t.C
+		}
+	}
+	// Create a timer and stop it immediately. We only want to
+	// start it once there is data to persist.
 	flushTimer := time.NewTimer(c.flushInterval)
-	defer flushTimer.Stop()
+	stopTimer(flushTimer)
+	defer stopTimer(flushTimer)
+
 loop:
 	for {
 		select {
@@ -129,12 +138,15 @@ loop:
 			c.lock.Lock()
 			c.states[s.Name] = s
 			c.lock.Unlock()
+			if c.numUpdates == 0 {
+				flushTimer.Reset(c.flushInterval)
+			}
 			c.numUpdates++
+			continue
 		case <-flushTimer.C:
 		}
 
 		c.persist()
-		flushTimer.Reset(c.flushInterval)
 	}
 }
 
