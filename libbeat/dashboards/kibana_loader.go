@@ -29,11 +29,13 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/kibana"
+	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
+	libkbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 var importAPI = "/api/saved_objects/_import"
@@ -42,7 +44,7 @@ var importAPI = "/api/saved_objects/_import"
 type KibanaLoader struct {
 	client        *kibana.Client
 	config        *Config
-	version       common.Version
+	version       version.V
 	hostname      string
 	msgOutputter  MessageOutputter
 	defaultLogger *logp.Logger
@@ -79,7 +81,7 @@ func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Confi
 }
 
 func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
-	client, err := kibana.NewKibanaClient(cfg, beatname)
+	client, err := libkbn.NewKibanaClient(cfg, beatname, beatversion.GetDefaultVersion(), beatversion.Commit(), beatversion.BuildTime().String())
 	if err != nil {
 		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {
 			select {
@@ -91,7 +93,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 		}
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
 	}
-	return client, nil
+	return &kibana.Client{Client: *client}, nil
 }
 
 // ImportIndexFile imports an index pattern from a file

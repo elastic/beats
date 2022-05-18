@@ -25,7 +25,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
+	kbn "github.com/elastic/elastic-agent-libs/kibana"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
@@ -58,14 +60,15 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			// part of the initialization.
 			initConfig := instance.InitKibanaConfig(b.Config)
 
-			client, err := kibana.NewKibanaClient(initConfig, b.Info.Beat)
+			client, err := kbn.NewKibanaClient(initConfig, b.Info.Beat, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 			if err != nil {
 				fatalf("Error creating Kibana client: %+v.\n", err)
 			}
+			kibanaClient := &kibana.Client{Client: *client}
 
 			// Export dashboards from yml file
 			if yml != "" {
-				results, info, err := dashboards.ExportAllFromYml(client, yml)
+				results, info, err := dashboards.ExportAllFromYml(kibanaClient, yml)
 				if err != nil {
 					fatalf("Error exporting dashboards from yml: %+v.\n", err)
 				}
@@ -83,7 +86,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 			// Export single dashboard
 			if dashboard != "" {
-				result, err := dashboards.Export(client, dashboard)
+				result, err := dashboards.Export(kibanaClient, dashboard)
 				if err != nil {
 					fatalf("Error exporting dashboard: %+v.\n", err)
 				}

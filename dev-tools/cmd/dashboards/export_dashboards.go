@@ -27,6 +27,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/version"
+	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -71,7 +73,7 @@ func main() {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
-	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
+	c, err := kbn.NewClientWithConfig(&kbn.ClientConfig{
 		Protocol:  u.Scheme,
 		Host:      u.Host,
 		Username:  user,
@@ -79,10 +81,11 @@ func main() {
 		Path:      u.Path,
 		SpaceID:   *spaceID,
 		Transport: transport,
-	}, "Beat Development Tools")
+	}, "Beat Development Tools", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
+	client := &kibana.Client{Client: *c}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
 		flag.Usage()

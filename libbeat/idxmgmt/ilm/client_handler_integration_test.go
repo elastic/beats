@@ -31,7 +31,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -215,7 +214,7 @@ func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
 }
 
 type mockClient struct {
-	v                     common.Version
+	v                     version.V
 	component, name, body string
 }
 
@@ -223,10 +222,10 @@ func newMockClient(v string) *mockClient {
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
-	return &mockClient{v: *common.MustNewVersion(v)}
+	return &mockClient{v: *version.MustNew(v)}
 }
 
-func (c *mockClient) GetVersion() common.Version {
+func (c *mockClient) GetVersion() version.V {
 	return c.v
 }
 
