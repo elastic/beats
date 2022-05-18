@@ -315,7 +315,8 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 func getCommonCgroupMetadata(mounts map[string]ControllerPath, ignoreRoot bool) (string, string) {
 	var path string
 	for _, m := range mounts {
-
+		// In cases where we have some root controllers and some non-root controllers attached to a single PID,
+		// we still need to report the "correct" root ID.
 		if !m.IsV2 && ignoreRoot && m.ControllerPath == "/" {
 			continue
 		}
