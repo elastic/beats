@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"fmt"
 	"io"
 	"sync"
 	"time"
@@ -244,8 +245,10 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	resp := <-responseChan
 	events := make([]publisher.Event, 0, len(resp.entries))
 	for _, entry := range resp.entries {
-		if event, ok := entry.event.(*publisher.Event); ok {
-			events = append(events, *event)
+		if event, ok := entry.event.(publisher.Event); ok {
+			events = append(events, event)
+		} else {
+			panic("idk")
 		}
 	}
 	return &batch{
@@ -268,8 +271,7 @@ var ackChanPool = sync.Pool{
 }
 
 func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	//nolint: errcheck // Return value doesn't need to be checked before conversion.
-	ch := ackChanPool.Get().(*batchACKState)
+	ch, _ := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
 	ch.start = start
 	ch.count = count
@@ -321,7 +323,7 @@ func (l *chanList) front() *batchACKState {
 	return l.head
 }
 
-func (l *chanList) channel() chan batchAckMsg {
+func (l *chanList) nextBatchChannel() chan batchAckMsg {
 	if l.head == nil {
 		return nil
 	}
@@ -367,5 +369,7 @@ func (b *batch) Events() []publisher.Event {
 }
 
 func (b *batch) ACK() {
+	fmt.Printf("batch.ACK()\n")
 	b.ackChan <- batchAckMsg{}
+	fmt.Printf("batch.ACK() done\n")
 }

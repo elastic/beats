@@ -18,6 +18,7 @@
 package queuetest
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -73,14 +74,14 @@ func TestMultiProducerConsumer(
 	queueFactory QueueFactory,
 ) {
 	tests := []testCase{
-		{
+		/*{
 			"2 producers, 1 consumer, without ack, complete batches",
 			multiple(
 				makeProducer(events, false, countEvent),
 				makeProducer(events, false, countEvent),
 			),
 			makeConsumer(events*2, -1),
-		},
+		},*/
 		{
 			"2 producers, 1 consumer, all ack, complete batches",
 			multiple(
@@ -89,7 +90,7 @@ func TestMultiProducerConsumer(
 			),
 			makeConsumer(events*2, -1),
 		},
-		{
+		/*{
 			"2 producers, 1 consumer, 1 ack, complete batches",
 			multiple(
 				makeProducer(events, true, countEvent),
@@ -180,7 +181,7 @@ func TestMultiProducerConsumer(
 				makeProducer(events, false, countEvent),
 			),
 			multiConsumer(2, events*2, batchSize),
-		},
+		},*/
 	}
 
 	runTestCases(t, tests, queueFactory)
@@ -210,7 +211,9 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 			go test.producers(&wg, nil, log, queue)()
 			go test.consumers(&wg, nil, log, queue)()
 
+			fmt.Printf("waiting on wg\n")
 			wg.Wait()
+			fmt.Printf("done waiting\n")
 		}))
 	}
 }
@@ -242,6 +245,8 @@ func makeProducer(
 		return func() {
 			defer wg.Done()
 
+			fmt.Printf("start producer\n")
+			defer fmt.Printf("stop producer\n")
 			log.Debug("start producer")
 			defer log.Debug("stop producer")
 
@@ -251,10 +256,12 @@ func makeProducer(
 			)
 
 			if waitACK {
+				fmt.Printf("waitACK is true\n")
 				ackWG.Add(maxEvents)
 
 				total := 0
 				ackCB = func(N int) {
+					fmt.Printf("ackCB(%v)\n", N)
 					total += N
 					log.Debugf("producer ACK: N=%v, total=%v\n", N, total)
 
@@ -296,6 +303,8 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 				b := b
 
 				go func() {
+					fmt.Printf("start consumer\n")
+					defer fmt.Printf("end consumer\n")
 					for {
 						batch, err := b.Get(batchSize)
 						if err != nil {
@@ -303,17 +312,21 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 						}
 
 						collected := batch.Events()
+						fmt.Printf("got batch of size %d\n", len(collected))
 						log.Debug("consumer: process batch", len(collected))
 
 						for range collected {
 							events.Done()
 						}
 						batch.ACK()
+						fmt.Printf("batch acked\n")
 					}
 				}()
 			}
 
+			fmt.Printf("waiting on events wg\n")
 			events.Wait()
+			fmt.Printf("done waiting on events wg\n")
 		}
 	}
 }
