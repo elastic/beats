@@ -19,6 +19,7 @@ package tcp
 
 import (
 	"crypto/x509"
+	"errors"
 	"net"
 	"net/url"
 	"time"
@@ -33,11 +34,11 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func init() {
@@ -172,12 +173,12 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 }
 
 // makeSocksLookupEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
-func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
+func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) jobs.Job {
 	return wrappers.WithURLField(endpointURL,
 		jobs.MakeSimpleJob(func(event *beat.Event) error {
 			hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
 			return jf.dial(event, hostPort, endpointURL)
-		})), nil
+		}))
 }
 
 // dial builds a dialer and executes the network request.
@@ -229,7 +230,8 @@ func (jf *jobFactory) execDialer(
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
-		if certErr, ok := err.(x509.CertificateInvalidError); ok {
+		var certErr x509.CertificateInvalidError
+		if errors.As(err, &certErr) {
 			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 		}
 		return reason.IOFailed(err)
@@ -247,7 +249,7 @@ func (jf *jobFactory) execDialer(
 
 	validateStart := time.Now()
 	err = jf.dataCheck.Check(conn)
-	if err != nil && err != errRecvMismatch {
+	if err != nil && !errors.Is(err, errRecvMismatch) {
 		debugf("check failed with: %v", err)
 		return reason.IOFailed(err)
 	}

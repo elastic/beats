@@ -25,10 +25,10 @@ import (
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 
-	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Mapper maps config templates with conditions in ConditionMaps, if a match happens on a discover event
@@ -38,7 +38,7 @@ import (
 type Mapper struct {
 	ConditionMaps    []*ConditionMap
 	keystore         keystore.Keystore
-	keystoreProvider keystore.Provider
+	keystoreProvider bus.KeystoreProvider
 }
 
 // ConditionMap maps a condition to the configs to use when it's triggered
@@ -57,7 +57,7 @@ type MapperSettings []*struct {
 func NewConfigMapper(
 	configs MapperSettings,
 	keystore keystore.Keystore,
-	keystoreProvider keystore.Provider,
+	keystoreProvider bus.KeystoreProvider,
 ) (mapper Mapper, err error) {
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}

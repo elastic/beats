@@ -25,8 +25,8 @@ import (
 
 	protoio "github.com/gogo/protobuf/io"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // containerConfig is the config.C unpacking type

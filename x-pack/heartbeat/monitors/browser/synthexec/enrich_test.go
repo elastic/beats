@@ -19,8 +19,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
@@ -110,7 +110,6 @@ func TestJourneyEnricher(t *testing.T) {
 
 		// We need an expectation for each input plus a final
 		// expectation for the summary which comes on the nil data.
-
 		if se.Type != JourneyEnd {
 			// Test that the created event includes the mapped
 			// version of the event
@@ -232,9 +231,8 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &beat.Event{}
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			tt.je.enrichSynthEvent(e, tt.se)
+			err := tt.je.enrichSynthEvent(e, tt.se)
+			require.NoError(t, err)
 			tt.check(t, e, tt.je)
 		})
 	}
@@ -289,7 +287,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 		{
 			"journey/end",
 			&journeyEnricher{},
-			&SynthEvent{Type: "journey/end"},
+			&SynthEvent{Type: JourneyEnd},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(mapstr.M{
@@ -367,7 +365,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		Id:   "my-bad-after-all-hook",
 	}
 	journeyStart := &SynthEvent{
-		Type:                 "journey/start",
+		Type:                 JourneyStart,
 		TimestampEpochMicros: 1000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
@@ -379,7 +377,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		Stack:   "my\nerr\nstack",
 	}
 	journeyEnd := &SynthEvent{
-		Type:                 "journey/end",
+		Type:                 JourneyEnd,
 		TimestampEpochMicros: 2000,
 		PackageVersion:       "1.0.0",
 		Journey:              journey,
@@ -395,7 +393,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 	synthEvents := []*SynthEvent{
 		journeyStart,
 		makeStepEvent("step/start", 10, "Step1", 1, "", "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1, "failed", badStepUrl, syntherr),
+		makeStepEvent("step/end", 20, "Step1", 2, "failed", badStepUrl, syntherr),
 		journeyEnd,
 		cmdStatus,
 	}

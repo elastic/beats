@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -41,8 +42,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type requestFactory func() (*http.Request, error)
@@ -72,9 +73,9 @@ func newHTTPMonitorHostJob(
 			return fmt.Errorf("could not make http request: %w", err)
 		}
 
-		_, _, err = execPing(event, client, req, body, config.Transport.Timeout, validator, config.Response)
+		_, err = execPing(event, client, req, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
-			event.PutValue("http.response.redirects", redirects)
+			_, _ = event.PutValue("http.response.redirects", redirects)
 		}
 		return err
 	}), nil
@@ -124,8 +125,6 @@ func createPingFactory(
 			Net: dialchain.MakeConstAddrDialer(addr, dialchain.TCPDialer(timeout)),
 		}
 
-		// TODO: add socks5 proxy?
-
 		if isTLS {
 			d.AddLayer(dialchain.TLSLayer(tls, timeout))
 		}
@@ -170,7 +169,7 @@ func createPingFactory(
 			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": userAgent}),
 		}
 
-		_, end, err := execPing(event, client, req, body, timeout, validator, config.Response)
+		end, err := execPing(event, client, req, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -185,8 +184,8 @@ func createPingFactory(
 			})
 		}
 		if !writeStart.IsZero() {
-			event.PutValue("http.rtt.validate", look.RTT(end.Sub(writeStart)))
-			event.PutValue("http.rtt.content", look.RTT(end.Sub(readStart)))
+			_, _ = event.PutValue("http.rtt.validate", look.RTT(end.Sub(writeStart)))
+			_, _ = event.PutValue("http.rtt.content", look.RTT(end.Sub(readStart)))
 		}
 
 		return err
@@ -195,7 +194,7 @@ func createPingFactory(
 
 func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
 	method := strings.ToUpper(config.Check.Request.Method)
-	request, err := http.NewRequest(method, addr, nil)
+	request, err := http.NewRequestWithContext(context.TODO(), method, addr, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +227,7 @@ func execPing(
 	timeout time.Duration,
 	validator multiValidator,
 	responseConfig responseConfig,
-) (start, end time.Time, err reason.Reason) {
+) (end time.Time, err reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -241,13 +240,15 @@ func execPing(
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
 	if resp == nil || errReason != nil {
-		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
-			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+		var urlError *url.Error
+		if errors.As(errReason.Unwrap(), &urlError) {
+			var certErr x509.CertificateInvalidError
+			if errors.As(urlError, &certErr) {
 				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 			}
 		}
 
-		return start, time.Now(), errReason
+		return time.Now(), errReason
 	}
 
 	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
@@ -295,7 +296,7 @@ func execPing(
 		},
 	}})
 
-	return start, end, errReason
+	return end, errReason
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {

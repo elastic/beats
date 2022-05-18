@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"app": "nginx"
@@ -29,7 +29,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"app": "nginx"

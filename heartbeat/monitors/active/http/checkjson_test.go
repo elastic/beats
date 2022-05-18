@@ -106,10 +106,11 @@ func TestCheckJsonExpression(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			res, err := http.Get(ts.URL)
+			res, err := http.Get(ts.URL) //nolint:noctx // fine for tests
 			if err != nil {
 				log.Fatal(err)
 			}
+			defer res.Body.Close()
 
 			checker, err := checkJson(
 				[]*jsonResponseCheck{
@@ -209,10 +210,11 @@ func TestCheckJsonCondition(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			res, err := http.Get(ts.URL)
+			res, err := http.Get(ts.URL) //nolint:noctx // fine for tests
 			if err != nil {
 				log.Fatal(err)
 			}
+			defer res.Body.Close()
 
 			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
 			require.NoError(t, err)

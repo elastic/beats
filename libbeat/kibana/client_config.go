@@ -20,7 +20,7 @@ package kibana
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 // ClientConfig to connect to Kibana

@@ -27,6 +27,7 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -34,12 +35,12 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -53,6 +54,9 @@ const (
 	// eventLoggingAPIName is the name used to identify the Event Logging API
 	// as both an event type and an API.
 	eventLoggingAPIName = "eventlogging"
+
+	// metaTTL is the length of time a WinMeta value is valid in the cache.
+	metaTTL = time.Hour
 )
 
 func init() {
@@ -173,6 +177,8 @@ type winEventLog struct {
 	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
+
+	winMetaCache // Cached WinMeta tables by provider.
 
 	logPrefix string // String to prefix on log messages.
 }
@@ -397,7 +403,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	}
 
 	// Get basic string values for raw fields.
-	winevent.EnrichRawValuesWithNames(nil, &e)
+	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name), &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
@@ -421,6 +427,56 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	}
 
 	return r
+}
+
+// winMetaCache retrieves and caches WinMeta tables by provider name.
+// It is a cut down version of the PublisherMetadataStore caching in wineventlog.Renderer.
+type winMetaCache struct {
+	ttl    time.Duration
+	logger *logp.Logger
+
+	mu    sync.RWMutex
+	cache map[string]winMetaCacheEntry
+}
+
+type winMetaCacheEntry struct {
+	expire time.Time
+	*winevent.WinMeta
+}
+
+func newWinMetaCache(ttl time.Duration) winMetaCache {
+	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
+}
+
+func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
+	c.mu.RLock()
+	e, ok := c.cache[provider]
+	c.mu.RUnlock()
+	if ok && time.Until(e.expire) > 0 {
+		return e.WinMeta
+	}
+
+	// Upgrade lock.
+	defer c.mu.Unlock()
+	c.mu.Lock()
+
+	// Did the cache get updated during lock upgrade?
+	// No need to check expiry here since we must have a new entry
+	// if there is an entry at all.
+	if e, ok := c.cache[provider]; ok {
+		return e.WinMeta
+	}
+
+	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
+	if err != nil {
+		// Return an empty store on error (can happen in cases where the
+		// log was forwarded and the provider doesn't exist on collector).
+		s = win.NewEmptyPublisherMetadataStore(provider, c.logger)
+		logp.Warn("failed to load publisher metadata for %v (returning an empty metadata store): %v", provider, err)
+	}
+	s.Close()
+	c.cache[provider] = winMetaCacheEntry{expire: time.Now().Add(c.ttl), WinMeta: &s.WinMeta}
+	return &s.WinMeta
 }
 
 func newEventLogging(options *conf.C) (EventLog, error) {
@@ -480,16 +536,17 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	}
 
 	l := &winEventLog{
-		id:          id,
-		config:      c,
-		query:       xmlQuery,
-		channelName: c.Name,
-		file:        filepath.IsAbs(c.Name),
-		maxRead:     c.BatchReadSize,
-		renderBuf:   make([]byte, renderBufferSize),
-		outputBuf:   sys.NewByteBuffer(renderBufferSize),
-		cache:       newMessageFilesCache(id, eventMetadataHandle, freeHandle),
-		logPrefix:   fmt.Sprintf("WinEventLog[%s]", id),
+		id:           id,
+		config:       c,
+		query:        xmlQuery,
+		channelName:  c.Name,
+		file:         filepath.IsAbs(c.Name),
+		maxRead:      c.BatchReadSize,
+		renderBuf:    make([]byte, renderBufferSize),
+		outputBuf:    sys.NewByteBuffer(renderBufferSize),
+		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
+		winMetaCache: newWinMetaCache(metaTTL),
+		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more

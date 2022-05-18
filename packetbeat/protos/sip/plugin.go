@@ -26,11 +26,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -148,7 +148,7 @@ func newParsingInfo(pkt *protos.Packet) *parsingInfo {
 	}
 }
 
-func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error) {
+func (p *plugin) buildEvent(m *message, _ *protos.Packet) (*beat.Event, error) {
 	status := common.OK_STATUS
 	if m.statusCode >= 400 {
 		status = common.ERROR_STATUS
@@ -319,7 +319,7 @@ func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 
 func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields ProtocolFields) {
 	pbf.Event.Kind = "event"
-	pbf.Event.Type = []string{"info"}
+	pbf.Event.Type = []string{"info", "protocol"}
 	pbf.Event.Dataset = "sip"
 	pbf.Event.Sequence = int64(fields.CseqCode)
 
@@ -332,7 +332,7 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields Protocol
 		pbf.Event.Original = string(m.rawData)
 	}
 
-	pbf.Event.Category = []string{"network", "protocol"}
+	pbf.Event.Category = []string{"network"}
 	if _, found := m.headers["authorization"]; found {
 		pbf.Event.Category = append(pbf.Event.Category, "authentication")
 	}

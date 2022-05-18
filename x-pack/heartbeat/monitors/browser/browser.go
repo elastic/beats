@@ -11,8 +11,8 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -37,7 +37,7 @@ func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 
 	// We do not use user.Current() which does not reflect setuid changes!
 	if syscall.Geteuid() == 0 {
-		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root!")
+		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root")
 	}
 
 	s, err := NewSuite(cfg)

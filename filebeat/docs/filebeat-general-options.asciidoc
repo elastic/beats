@@ -59,7 +59,7 @@ filebeat.registry.file_permissions: 0600
 The timeout value that controls when registry entries are written to disk
 (flushed). When an unwritten update exceeds this value, it triggers a write to
 disk. When `registry.flush` is set to 0s, the registry is written to disk after
-each batch of events has been published successfully. The default value is 0s.
+each batch of events has been published successfully. The default value is 1s.
 
 NOTE: The registry is always updated when Filebeat shuts down normally. After an
 abnormal shutdown, the registry will not be up-to-date if the `registry.flush`

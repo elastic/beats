@@ -11,10 +11,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type logProcessor struct {
@@ -36,12 +36,11 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 	}
 }
 
-func (p *logProcessor) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) error {
+func (p *logProcessor) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) {
 	for _, logEvent := range logEvents {
 		event := createEvent(logEvent, logGroup, regionName)
 		p.publish(p.ack, &event)
 	}
-	return nil
 }
 
 func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
@@ -62,6 +61,11 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 				"ingested": time.Now(),
 			},
 			"awscloudwatch": mapstr.M{
+				"log_group":      logGroup,
+				"log_stream":     *logEvent.LogStreamName,
+				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+			},
+			"aws.cloudwatch": mapstr.M{
 				"log_group":      logGroup,
 				"log_stream":     *logEvent.LogStreamName,
 				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
