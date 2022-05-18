@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
 - Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 - Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
+- Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
 - Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 
 *Auditbeat*
@@ -122,13 +123,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
+
 
 *Metricbeat*
 
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
+- Fix `include_top_n` fields in system/process {pull}31595[31595]
+- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
 *Packetbeat*
 

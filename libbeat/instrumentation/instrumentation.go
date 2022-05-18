@@ -28,9 +28,9 @@ import (
 	"go.elastic.co/apm/v2"
 	apmtransport "go.elastic.co/apm/v2/transport"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 // Instrumentation is an interface that can return an APM tracer a net.listener
