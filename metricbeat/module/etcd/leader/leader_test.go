@@ -80,7 +80,7 @@ func TestFetchEventContent(t *testing.T) {
 			name:              "Leader member stats",
 			mockedFetchFile:   "/leaderstats.json",
 			httpCode:          http.StatusOK,
-			expectedNumEvents: 0,
+			expectedNumEvents: 1,
 		},
 		{
 			name:              "Follower member",
