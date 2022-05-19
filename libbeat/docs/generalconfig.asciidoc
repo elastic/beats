@@ -111,5 +111,5 @@ default is the number of logical CPUs available in the system.
 [float]
 ==== `timestamp.precision`
 
-Configure the precision of all timestamps.
+Configure the precision of all timestamps. By default it is set to microsecond.
 Available options: millisecond, microsecond, nanosecond
