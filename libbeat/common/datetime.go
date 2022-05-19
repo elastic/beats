@@ -86,6 +86,10 @@ func (p *TimestampPrecision) Unpack(v string) error {
 }
 
 func SetTimestampPrecision(c *conf.C) error {
+	if c == nil {
+		return nil
+	}
+
 	p := DefaultTimestampPrecision
 	err := c.Unpack(&p)
 	if err != nil {
