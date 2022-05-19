@@ -35,23 +35,23 @@ import (
 	// register kubernetes runner
 	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
+	//mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
+	//mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
@@ -62,6 +62,11 @@ func init() {
 	unittest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
+}
+
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+func BuildSystemTestBinary() error {
+	return devtools.BuildSystemTestBinary()
 }
 
 // CollectAll generates the docs and the fields.
