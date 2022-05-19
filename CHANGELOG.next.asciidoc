@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Update to Go 1.17.10 {issue}31636[31636]
 - Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
+- Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
 
 
 *Auditbeat*

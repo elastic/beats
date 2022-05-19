@@ -30,8 +30,8 @@ import (
 )
 
 const (
-	microsecPrecision TimestampPrecision = iota + 1
-	millisecPrecision
+	millisecPrecision TimestampPrecision = iota + 1
+	microsecPrecision
 	nanosecPrecision
 
 	DefaultTimestampPrecision = millisecPrecision
@@ -44,8 +44,8 @@ const (
 	tsLayoutMicros = "2006-01-02T15:04:05.000000Z"
 	tsLayoutNanos  = "2006-01-02T15:04:05.000000000Z"
 
-	microsecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'"
-	millisecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'"
+	millisecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'"
+	microsecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'"
 	nanosecPrecisionFmt  = "yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'"
 )
 
@@ -57,8 +57,8 @@ var (
 	}
 
 	precisions = map[TimestampPrecision]string{
-		microsecPrecision: microsecPrecisionFmt,
 		millisecPrecision: millisecPrecisionFmt,
+		microsecPrecision: microsecPrecisionFmt,
 		nanosecPrecision:  nanosecPrecisionFmt,
 	}
 
@@ -69,6 +69,14 @@ var (
 type Time time.Time
 
 type TimestampPrecision uint8
+
+type TimestampConfig struct {
+	Precision TimestampPrecision `config:"precision"`
+}
+
+func defaultTimestampConfig() TimestampConfig {
+	return TimestampConfig{Precision: DefaultTimestampPrecision}
+}
 
 func (p *TimestampPrecision) Unpack(v string) error {
 	switch v {
@@ -89,13 +97,13 @@ func SetTimestampPrecision(c *conf.C) error {
 		return nil
 	}
 
-	p := DefaultTimestampPrecision
+	p := defaultTimestampConfig()
 	err := c.Unpack(&p)
 	if err != nil {
 		return fmt.Errorf("failed to set timestamp precision: %w", err)
 	}
 
-	timeFormatter = dtfmt.MustNewFormatter(precisions[p])
+	timeFormatter = dtfmt.MustNewFormatter(precisions[p.Precision])
 
 	return nil
 }

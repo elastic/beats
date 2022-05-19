@@ -3462,7 +3462,7 @@ filebeat.inputs:
 
 # Configure the precision of all timestamps in Filebeat.
 # Available options: millisecond, microsecond, nanosecond
-#timestamp_precision: millisecond
+#timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
 #queue:

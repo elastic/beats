@@ -130,7 +130,7 @@ type beatConfig struct {
 	// Migration config to migration from 6 to 7
 	Migration *config.C `config:"migration.6_to_7"`
 	// TimestampPrecision sets the precision of all timestamps in the Beat.
-	TimestampPrecision *config.C `config:"timestamp_precision"`
+	TimestampPrecision *config.C `config:"timestamp"`
 }
 
 var debugf = logp.MakeDebug("beat")
