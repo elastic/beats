@@ -21,13 +21,22 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"hash"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
+	invalidTimestampPrecision TimestampPrecision = iota
+	microsecPrecision
+	millisecPrecision
+	nanosecPrecision
+
+	DefaultTimestampPrecision = millisecPrecision
+
 	// TsLayout is the seconds layout to be used in the timestamp marshaling/unmarshaling everywhere.
 	// The timezone must always be UTC.
 	TsLayout = "2006-01-02T15:04:05.000Z"
@@ -35,23 +44,63 @@ const (
 	tsLayoutMillis = "2006-01-02T15:04:05.000Z"
 	tsLayoutMicros = "2006-01-02T15:04:05.000000Z"
 	tsLayoutNanos  = "2006-01-02T15:04:05.000000000Z"
+
+	microsecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'"
+	millisecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'"
+	nanosecPrecisionFmt  = "yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'"
+)
+
+var (
+	defaultParseFormats = []string{
+		tsLayoutMillis,
+		tsLayoutMicros,
+		tsLayoutNanos,
+	}
+
+	precisions = map[TimestampPrecision]string{
+		microsecPrecision: microsecPrecisionFmt,
+		millisecPrecision: millisecPrecisionFmt,
+		nanosecPrecision:  nanosecPrecisionFmt,
+	}
+
+	timeFormatter = dtfmt.MustNewFormatter(precisions[DefaultTimestampPrecision])
 )
 
 // Time is an abstraction for the time.Time type
 type Time time.Time
 
-var defaultTimeFormatter = dtfmt.MustNewFormatter("yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'")
+type TimestampPrecision uint8
 
-var defaultParseFormats = []string{
-	tsLayoutMillis,
-	tsLayoutMicros,
-	tsLayoutNanos,
+func (p *TimestampPrecision) Unpack(v string) error {
+	switch v {
+	case "millisecond", "":
+		*p = millisecPrecision
+	case "microsecond":
+		*p = microsecPrecision
+	case "nanosecond":
+		*p = nanosecPrecision
+	default:
+		return fmt.Errorf("invalid timestamp precision %s, available options: millisecond, microsecond, nanosecond", v)
+	}
+	return nil
+}
+
+func SetTimestampPrecision(c *conf.C) error {
+	p := DefaultTimestampPrecision
+	err := c.Unpack(&p)
+	if err != nil {
+		return fmt.Errorf("failed to set timestamp precision: %w", err)
+	}
+
+	timeFormatter = dtfmt.MustNewFormatter(precisions[p])
+
+	return nil
 }
 
 // MarshalJSON implements json.Marshaler interface.
 // The time is a quoted string in the JsTsLayout format.
 func (t Time) MarshalJSON() ([]byte, error) {
-	str, _ := defaultTimeFormatter.Format(time.Time(t).UTC())
+	str, _ := timeFormatter.Format(time.Time(t).UTC())
 	return json.Marshal(str)
 }
 
@@ -87,7 +136,7 @@ func ParseTime(timespec string) (Time, error) {
 }
 
 func (t Time) String() string {
-	str, _ := defaultTimeFormatter.Format(time.Time(t).UTC())
+	str, _ := timeFormatter.Format(time.Time(t).UTC())
 	return str
 }
 

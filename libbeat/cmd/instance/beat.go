@@ -129,6 +129,8 @@ type beatConfig struct {
 
 	// Migration config to migration from 6 to 7
 	Migration *config.C `config:"migration.6_to_7"`
+	// TimestampPrecision sets the precision of all timestamps in the Beat.
+	TimestampPrecision *config.C `config:"timestamp_precision"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -681,6 +683,8 @@ func (b *Beat) configure(settings Settings) error {
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
 	}
+
+	common.SetTimestampPrecision(b.Config.TimestampPrecision)
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
