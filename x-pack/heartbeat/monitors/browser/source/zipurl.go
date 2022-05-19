@@ -176,7 +176,7 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 		return nil
 	}
 
-	// In the case of pushed monitors, the destPath would be the direct
+	// In the case of project monitors, the destPath would be the direct
 	// file path instead of directory, so we create the directory
 	// if its not set up properly
 	destDir := filepath.Dir(destPath)
