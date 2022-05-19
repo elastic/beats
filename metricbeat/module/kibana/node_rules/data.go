@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -30,19 +31,6 @@ import (
 )
 
 var (
-	kibanaSchema = s.Schema{
-		"uuid":  c.Str("uuid"),
-		"name":  c.Str("name"),
-		"index": c.Str("index"),
-		"host": s.Object{
-			"name": c.Str("host"),
-		},
-		"transport_address": c.Str("transport_address"),
-		"version":           c.Str("version"),
-		"snapshot":          c.Bool("snapshot"),
-		"status":            c.Str("status"),
-	}
-
 	rulesSchema = s.Schema{
 		"failures":   c.Int("failures"),
 		"executions": c.Int("executions"),
@@ -63,7 +51,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return fmt.Errorf("failure parsing Kibana Node Rules API response: %w", err)
 	}
 
-	kibana, err := kibanaSchema.Apply(data.Kibana)
+	kibana, err := kibana.KibanaSchema.Apply(data.Kibana)
 	if err != nil {
 		return elastic.MakeErrorForMissingField("kibana", elastic.Kibana)
 	}

@@ -161,7 +161,3 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
 	http.SetURI(u.String())
 	return http.FetchContent()
 }
-
-// func GetKibanaSchema() s.Schema {
-// 	return
-// }
