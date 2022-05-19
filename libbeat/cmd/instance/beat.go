@@ -684,7 +684,9 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.Name = name
 	}
 
-	common.SetTimestampPrecision(b.Config.TimestampPrecision)
+	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
+		return fmt.Errorf("error setting timestamp precision: %w", err)
+	}
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
