@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
 - Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 - Change threatintel module from beta to GA. {pull}31693[31693]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
 
 *Auditbeat*
 
