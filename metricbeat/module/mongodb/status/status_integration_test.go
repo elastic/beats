@@ -47,13 +47,13 @@ func TestFetch(t *testing.T) {
 
 	// Check event fields
 	current, _ := event.GetValue("mongodb.status.connections.current")
-	assert.True(t, current.(int64) >= 0)
+	assert.True(t, current.(int32) >= 0)
 
 	available, _ := event.GetValue("mongodb.status.connections.available")
-	assert.True(t, available.(int64) > 0)
+	assert.True(t, available.(int32) > 0)
 
 	pageFaults, _ := event.GetValue("mongodb.status.extra_info.page_faults")
-	assert.True(t, pageFaults.(int64) >= 0)
+	assert.True(t, pageFaults.(int32) >= 0)
 }
 
 func TestData(t *testing.T) {

@@ -12,6 +12,7 @@ type Source struct {
 	Local      *LocalSource  `config:"local"`
 	Inline     *InlineSource `config:"inline" json:"inline"`
 	ZipUrl     *ZipURLSource `config:"zip_url" json:"zip_url"`
+	Pushed     *PushedSource `config:"pushed" json:"pushed"`
 	ActiveMemo ISource       // cache for selected source
 }
 
@@ -26,6 +27,8 @@ func (s *Source) Active() ISource {
 		s.ActiveMemo = s.Inline
 	} else if s.ZipUrl != nil {
 		s.ActiveMemo = s.ZipUrl
+	} else if s.Pushed != nil {
+		s.ActiveMemo = s.Pushed
 	}
 
 	return s.ActiveMemo
