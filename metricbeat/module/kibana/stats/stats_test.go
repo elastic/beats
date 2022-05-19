@@ -25,10 +25,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana/mtest"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFetchExcludeUsage(t *testing.T) {
@@ -37,7 +36,7 @@ func TestFetchExcludeUsage(t *testing.T) {
 	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/status":
-			w.Write([]byte("{ \"version\": { \"number\": \"7.5.0\" }}"))
+			w.Write([]byte("{ \"version\": { \"number\": \"8.2.0\" }}"))
 
 		case "/api/stats":
 			excludeUsage := r.FormValue("exclude_usage")
@@ -62,7 +61,7 @@ func TestFetchExcludeUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", kib.URL)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
@@ -91,7 +90,7 @@ func TestFetchNoExcludeUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", kib.URL)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 

@@ -62,7 +62,7 @@ func TestFetchExcludeUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("settings", kib.URL, false)
+	config := mtest.GetConfig("settings", kib.URL)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 

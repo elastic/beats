@@ -89,7 +89,10 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions"}, logp.NewLogger(ModuleName))
+	xpackEnabledMetricSets := []string{
+		"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions",
+	}
+	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
