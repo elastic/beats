@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Update to Go 1.17.9 {issue}31350[31350]
 
 *Auditbeat*
 
@@ -82,6 +81,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
+
+- Update to Go 1.17.10 {issue}31636[31636]
+- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
 
 
 *Auditbeat*
