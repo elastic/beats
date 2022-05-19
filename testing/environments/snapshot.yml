@@ -39,6 +39,9 @@ services:
     volumes:
       - ./docker/logstash/pipeline-xpack:/usr/share/logstash/pipeline:ro
       - ./docker/logstash/pki:/etc/pki:ro
+    ports:
+      - 5044:5044
+      - 5055:5055
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.3.0-e4aa1f83-SNAPSHOT
@@ -47,9 +50,10 @@ services:
     - "ELASTICSEARCH_PASSWORD=testing"
     - "XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=gwaXhuYzE6l3r1wh5ZdSkJvtK6uSw11d"
     - "XPACK_SECURITY_ENCRYPTIONKEY=wZSVeczkXAmebqNgfcKEzNMmQCBZKkSH"
-#    - "XPACK_XPACK_MAIN_TELEMETRY_ENABLED=false"
     - "XPACK_REPORTING_ENCRYPTIONKEY=xCyqJUFqrUJJKxjZVGfnhrRkyqqaKeAG"
     - "LOGGING_ROOT_LEVEL=all"
+    ports:
+      - 5601:5601
     # When extend is used it merges healthcheck.tests, see:
     # https://github.com/docker/compose/issues/8962
     # healthcheck:
