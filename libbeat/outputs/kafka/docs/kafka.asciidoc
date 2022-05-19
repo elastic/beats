@@ -36,7 +36,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 [[kafka-compatibility]]
 ==== Compatibility
 
-This output works with all Kafka versions in between 0.11 and 2.8.0. Older versions
+This output can connect to Kafka version 0.8.2.0 and up. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options
@@ -62,9 +62,9 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka version {beatname_lc} is assumed to run against. Defaults to 1.0.0.
+Kafka protocol version {beatname_lc} will request when connecting. Defaults to 1.0.0.
 
-Valid values are all kafka releases in between `0.8.2.0` and `2.0.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
 
 See <<kafka-compatibility>> for information on supported versions.
 
