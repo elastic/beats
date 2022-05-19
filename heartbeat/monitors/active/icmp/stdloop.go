@@ -340,8 +340,8 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 	id := requestID{
 		addr:  addr.String(),
 		proto: proto,
-		id:    rand.Intn(0xffff), //nolint:gosec // no cryptographic significance vs crypto/rand
-		seq:   rand.Intn(0xffff), //nolint:gosec // no cryptographic significance vs. crypto/rand
+		id:    rand.Intn(0xffff),
+		seq:   rand.Intn(0xffff),
 	}
 
 	ctx := &requestContext{

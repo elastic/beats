@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:gosec,dupl // Bad linter!
+//nolint:gosec // Bad linter!
 package cef
 
 import (

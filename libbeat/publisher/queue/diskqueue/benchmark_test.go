@@ -54,7 +54,7 @@ func makeEvent() publisher.Event {
 		Content: beat.Event{
 			Timestamp: eventTime,
 			Fields: mapstr.M{
-				"message": msgs[rand.Intn(len(msgs))], //nolint:gosec // crypto rand not required
+				"message": msgs[rand.Intn(len(msgs))],
 			},
 		},
 	}
