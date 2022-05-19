@@ -920,7 +920,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 	_, err := elasticsearch.RegisterConnectCallback(b.indexSetupCallback())
 	if err != nil {
-		return fmt.Errorf("failed to register index management with elasticsearch: %+v", err)
+		return fmt.Errorf("failed to register index management with elasticsearch: %w", err)
 	}
 	return nil
 }
@@ -1188,11 +1188,11 @@ func initPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %+v", err)
+		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %+v", err)
+		return fmt.Errorf("error setting default paths: %w", err)
 	}
 	return nil
 }

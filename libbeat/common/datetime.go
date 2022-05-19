@@ -30,8 +30,7 @@ import (
 )
 
 const (
-	invalidTimestampPrecision TimestampPrecision = iota
-	microsecPrecision
+	microsecPrecision TimestampPrecision = iota + 1
 	millisecPrecision
 	nanosecPrecision
 
