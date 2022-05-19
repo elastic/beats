@@ -93,13 +93,17 @@ func addMonitorMeta(sf stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper
 				id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
 			}
 
-			eventext.MergeEventFields(event, mapstr.M{
-				"monitor": mapstr.M{
-					"id":   id,
-					"name": name,
-					"type": sf.Type,
-				},
-			})
+			fields := mapstr.M{
+				"id":   id,
+				"name": name,
+				"type": sf.Type,
+			}
+
+			if sf.Source != "" {
+				fields["source"] = sf.Source
+			}
+
+			eventext.MergeEventFields(event, mapstr.M{"monitor": fields})
 			return cont, err
 		}
 	}
