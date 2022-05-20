@@ -36,14 +36,12 @@ output:
 linters:
   disable-all: true
   enable:
-    - deadcode # finds unused code
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
     - forbidigo # forbids identifiers	matched by reg exps
     - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
     - nakedret # finds naked returns in functions greater than a specified function length
-    - prealloc # finds slice declarations that could potentially be preallocated
     - nolintlint # reports ill-formed or insufficient nolint directives
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
     - stylecheck # a replacement for golint
@@ -64,6 +62,7 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
+    - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
 linters-settings:
@@ -90,31 +89,25 @@ linters-settings:
   goimports:
     local-prefixes: github.com/elastic
 
+  gomodguard:
+    blocked:
+      # List of blocked modules.
+      modules:
+        # Blocked module.
+        - github.com/pkg/errors:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - errors
+              - fmt
+            reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+
   gosimple:
     # Select the Go version to target. The default is '1.13'.
     go: "{{.GoVersion}}"
-    # Disabled:
-    # S1007: should use raw string (`...`) with regexp.MustCompile to avoid having to escape twice
-    checks: ["-S1007"]
-
-  misspell:
-    # Correct spellings using locale preferences for US or UK.
-    # Default is to use a neutral variety of English.
-    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
-    # locale: US
-    # ignore-words:
-    #   - IdP
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
     max-func-lines: 0
-
-  prealloc:
-    # Report preallocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
-    # True by default.
-    simple: true
-    range-loops: true # Report preallocation suggestions on range loops, true by default
-    for-loops: false # Report preallocation suggestions on for loops, false by default
 
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
@@ -148,3 +141,6 @@ linters-settings:
     excludes:
     - G306 # Expect WriteFile permissions to be 0600 or less
     - G404 # Use of weak random number generator
+    - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
+    - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
+    - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.

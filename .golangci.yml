@@ -48,6 +48,7 @@ linters:
     - nolintlint # reports ill-formed or insufficient nolint directives
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
     - stylecheck # a replacement for golint
+    - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
     - structcheck # finds unused struct fields
@@ -107,14 +108,6 @@ linters-settings:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17.10"
 
-  misspell:
-    # Correct spellings using locale preferences for US or UK.
-    # Default is to use a neutral variety of English.
-    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
-    # locale: US
-    # ignore-words:
-    #   - IdP
-
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
     max-func-lines: 0
@@ -143,10 +136,14 @@ linters-settings:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
+  unused:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.17.10"
+
   gosec:
     excludes:
-    - G306 # Expect WriteFile permissions to be 0600 or less.
-    - G404 # Use of weak random number generator.
+    - G306 # Expect WriteFile permissions to be 0600 or less
+    - G404 # Use of weak random number generator
     - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
     - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
     - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
