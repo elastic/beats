@@ -24,20 +24,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 var (
 	truthy     = true
 	falsy      = false
 	ctMetaData = 4
-	version, _ = common.NewVersion("6.0.0")
+	ver, _     = version.New("6.0.0")
 )
 
 func TestEmpty(t *testing.T) {
-	trans, err := newFieldsTransformer(version, mapping.Fields{}, true)
+	trans, err := newFieldsTransformer(ver, mapping.Fields{}, true)
 	assert.NoError(t, err)
 	out, err := trans.transform()
 	assert.NoError(t, err)
@@ -94,7 +94,7 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestMissingVersion(t *testing.T) {
-	var c *common.Version
+	var c *version.V
 	_, err := newFieldsTransformer(c, mapping.Fields{}, true)
 	assert.Error(t, err)
 }
@@ -120,7 +120,7 @@ func TestDuplicateField(t *testing.T) {
 		}},
 	}
 	for _, testCase := range testCases {
-		trans, err := newFieldsTransformer(version, testCase.commonFields, true)
+		trans, err := newFieldsTransformer(ver, testCase.commonFields, true)
 		require.NoError(t, err)
 		_, err = trans.transform()
 		fmt.Println(err)
@@ -154,7 +154,7 @@ func TestValidDuplicateField(t *testing.T) {
 			},
 		},
 	}
-	trans, err := newFieldsTransformer(version, commonFields, true)
+	trans, err := newFieldsTransformer(ver, commonFields, true)
 	require.NoError(t, err)
 	transformed, err := trans.transform()
 	require.NoError(t, err)
@@ -182,7 +182,7 @@ func TestInvalidVersion(t *testing.T) {
 			},
 		},
 	}
-	trans, err := newFieldsTransformer(version, commonFields, true)
+	trans, err := newFieldsTransformer(ver, commonFields, true)
 	assert.NoError(t, err)
 	_, err = trans.transform()
 	assert.Error(t, err)
@@ -211,7 +211,7 @@ func TestTransformTypes(t *testing.T) {
 		{commonField: mapping.Field{Type: "invalid"}, expected: nil},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, mapping.Fields{test.commonField}, true)
+		trans, _ := newFieldsTransformer(ver, mapping.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)[0]
@@ -256,7 +256,7 @@ func TestTransformGroup(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, test.commonFields, false)
+		trans, _ := newFieldsTransformer(ver, test.commonFields, false)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)
@@ -332,7 +332,7 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: mapping.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, mapping.Fields{test.commonField}, true)
+		trans, _ := newFieldsTransformer(ver, mapping.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)[0]
@@ -343,29 +343,29 @@ func TestTransformMisc(t *testing.T) {
 
 func TestTransformFieldFormatMap(t *testing.T) {
 	precision := 3
-	version620, _ := common.NewVersion("6.2.0")
+	version620, _ := version.New("6.2.0")
 	truthy := true
 	falsy := false
 
 	tests := []struct {
 		commonField mapping.Field
-		version     *common.Version
+		version     *version.V
 		expected    mapstr.M
 	}{
 		{
 			commonField: mapping.Field{Name: "c"},
 			expected:    mapstr.M{},
-			version:     version,
+			version:     ver,
 		},
 		{
 			commonField: mapping.Field{Name: "c", Format: "url"},
 			expected:    mapstr.M{"c": mapstr.M{"id": "url"}},
-			version:     version,
+			version:     ver,
 		},
 		{
 			commonField: mapping.Field{Name: "c", Pattern: "p"},
 			expected:    mapstr.M{"c": mapstr.M{"params": mapstr.M{"pattern": "p"}}},
-			version:     version,
+			version:     ver,
 		},
 		{
 			commonField: mapping.Field{
@@ -379,7 +379,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					"params": mapstr.M{"pattern": "p"},
 				},
 			},
-			version: version,
+			version: ver,
 		},
 		{
 			commonField: mapping.Field{
@@ -395,7 +395,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					},
 				},
 			},
-			version: version,
+			version: ver,
 		},
 		{
 			commonField: mapping.Field{
@@ -415,7 +415,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					},
 				},
 			},
-			version: version,
+			version: ver,
 		},
 		{
 			commonField: mapping.Field{
@@ -423,7 +423,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				InputFormat: "string",
 			},
 			expected: mapstr.M{},
-			version:  version,
+			version:  ver,
 		},
 		{
 			version: version620,
@@ -599,7 +599,7 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, test.commonFields, true)
+		trans, _ := newFieldsTransformer(ver, test.commonFields, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]mapstr.M)
@@ -619,7 +619,7 @@ func TestTransformMultiField(t *testing.T) {
 			mapping.Field{Name: "text", Type: "text"},
 		},
 	}
-	trans, _ := newFieldsTransformer(version, mapping.Fields{f}, true)
+	trans, _ := newFieldsTransformer(ver, mapping.Fields{f}, true)
 	transformed, err := trans.transform()
 	assert.NoError(t, err)
 	out := transformed["fields"].([]mapstr.M)

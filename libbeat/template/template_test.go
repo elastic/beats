@@ -27,9 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 type testTemplate struct {
@@ -113,7 +113,7 @@ func TestTemplate(t *testing.T) {
 func createTestTemplate(t *testing.T, beatVersion, esVersion string, config TemplateConfig) *testTemplate {
 	beatVersion = getVersion(beatVersion)
 	esVersion = getVersion(esVersion)
-	ver := common.MustNewVersion(esVersion)
+	ver := libversion.MustNew(esVersion)
 	template, err := New(beatVersion, "testbeat", false, *ver, config, false)
 	if err != nil {
 		t.Fatalf("Failed to create the template: %+v", err)

@@ -44,6 +44,7 @@ import (
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 type testIndexSelector struct{}
@@ -561,7 +562,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 			)
 			assert.NoError(t, err)
 
-			encoded, bulkItems := client.bulkEncodePublishRequest(*common.MustNewVersion(test.version), events)
+			encoded, bulkItems := client.bulkEncodePublishRequest(*libversion.MustNew(test.version), events)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
 			assert.Equal(t, 2*len(events), len(bulkItems), "incomplete bulk")
 
@@ -635,7 +636,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		nil,
 	)
 
-	encoded, bulkItems := client.bulkEncodePublishRequest(*common.MustNewVersion(version.GetDefaultVersion()), events)
+	encoded, bulkItems := client.bulkEncodePublishRequest(*libversion.MustNew(version.GetDefaultVersion()), events)
 	require.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
 	require.Equal(t, 9, len(bulkItems), "incomplete bulk")
 

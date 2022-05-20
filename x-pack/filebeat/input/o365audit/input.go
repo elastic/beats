@@ -16,12 +16,13 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -163,7 +164,7 @@ func (inp *o365input) runOnce(
 		poll.WithLogger(log),
 		poll.WithContext(ctxtool.FromCanceller(ctx.Cancelation)),
 		poll.WithRequestDecorator(
-			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName)),
+			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())),
 			autorest.WithQueryParameters(mapstr.M{
 				"publisherIdentifier": tenantID,
 			}),
