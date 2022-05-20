@@ -73,6 +73,9 @@ type ListingKeystore interface {
 	List() ([]string, error)
 }
 
+// Use parse.NoopConfig to disable interpreting all parser characters when loading secrets.
+var parseConfig = parse.NoopConfig
+
 // ResolverWrap wrap a config resolver around an existing keystore.
 func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) {
 	return func(keyName string) (string, parse.Config, error) {
@@ -82,17 +85,17 @@ func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) 
 			// If we cannot find the key, its a non fatal error
 			// and we pass to other resolver.
 			if errors.Is(err, ErrKeyDoesntExists) {
-				return "", parse.DefaultConfig, ucfg.ErrMissing
+				return "", parseConfig, ucfg.ErrMissing
 			}
-			return "", parse.DefaultConfig, err
+			return "", parseConfig, err
 		}
 
 		v, err := key.Get()
 		if err != nil {
-			return "", parse.DefaultConfig, err
+			return "", parseConfig, err
 		}
 
-		return string(v), parse.DefaultConfig, nil
+		return string(v), parseConfig, nil
 	}
 }
 

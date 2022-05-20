@@ -31,7 +31,10 @@ import (
 )
 
 var keyValue = "output.elasticsearch.password"
-var secretValue = []byte("secret")
+
+// Include uppercase, lowercase, symbols, and whitespace in the password.
+// Commas in particular have caused parsing issues before: https://github.com/elastic/beats/issues/29789
+var secretValue = []byte(",s3cRet~`! @#$%^&*()_-+={[}]|\\:;\"'<,>.?/")
 
 func TestCanCreateAKeyStore(t *testing.T) {
 	path := GetTemporaryKeystoreFile()
@@ -229,7 +232,7 @@ func TestGetConfig(t *testing.T) {
 
 	secret, err := cfg.String("output.elasticsearch.password", 0)
 	require.NoError(t, err)
-	require.Equal(t, secret, "secret")
+	require.Equal(t, string(secretValue), secret)
 
 	port, err := cfg.String("super.nested", 0)
 	require.NoError(t, err)
