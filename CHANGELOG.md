@@ -44,8 +44,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release of `github.come/elastic/elastic-agent-system-metrics`.
 
-[Unreleased]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.0.0...v0.3.0
-[0.2.1]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.0.0...v0.2.1
-[0.2.0]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.0.0...v0.2.0
-[0.1.0]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.0.0...v0.1.0
+[Unreleased]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.3.0
+[0.2.1]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.2.1
+[0.2.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.2.0
+[0.1.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.1.0
