@@ -59731,7 +59731,7 @@ type: float
 CPU physical core ID. One core might might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
 
 
-type: integer
+type: keyword
 
 --
 
@@ -59741,7 +59741,7 @@ type: integer
 CPU core physical ID. Only availabe on Linux
 
 
-type: integer
+type: keyword
 
 --
 

@@ -124,12 +124,12 @@
         CPU core current clock. Only availabe on Linux
 
     - name: core_id
-      type: integer
+      type: keyword
       description: >
         CPU physical core ID. One core might might execute multiple threads, hence more than
         one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
 
     - name: physical_id
-      type: integer
+      type: keyword
       description: >
         CPU core physical ID. Only availabe on Linux
