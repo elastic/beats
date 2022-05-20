@@ -106,9 +106,6 @@ linters-settings:
   gosimple:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17.10"
-    # Disabled:
-    # S1007: should use raw string (`...`) with regexp.MustCompile to avoid having to escape twice
-    checks: ["-S1007"]
 
   misspell:
     # Correct spellings using locale preferences for US or UK.
