@@ -91,11 +91,11 @@ func TestJourneyEnricher(t *testing.T) {
 
 	projectValidator := func() validator.Validator {
 		return lookslike.MustCompile(mapstr.M{
-			"project.id":   stdFields.Id,
-			"project.name": stdFields.Name,
-			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
-			"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-			"monitor.type": stdFields.Type,
+			"monitor.project.id":   stdFields.Id,
+			"monitor.project.name": stdFields.Name,
+			"monitor.id":           fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
+			"monitor.name":         fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
+			"monitor.type":         stdFields.Type,
 		})
 	}
 	inlineValidator := func() validator.Validator {
@@ -135,7 +135,7 @@ func TestJourneyEnricher(t *testing.T) {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
 			if ssf.IsInline {
-				sv, _ := e.Fields.GetValue("project")
+				sv, _ := e.Fields.GetValue("monitor.project")
 				require.Nil(t, sv)
 				testslike.Test(t, inlineValidator(), e.Fields)
 			} else {
