@@ -45,7 +45,6 @@ linters:
     - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
     - nakedret # finds naked returns in functions greater than a specified function length
-    - prealloc # finds slice declarations that could potentially be preallocated
     - nolintlint # reports ill-formed or insufficient nolint directives
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
     - stylecheck # a replacement for golint
@@ -109,13 +108,6 @@ linters-settings:
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
     max-func-lines: 0
-
-  prealloc:
-    # Report preallocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
-    # True by default.
-    simple: true
-    range-loops: true # Report preallocation suggestions on range loops, true by default
-    for-loops: false # Report preallocation suggestions on for loops, false by default
 
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
