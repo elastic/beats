@@ -64,6 +64,7 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
+    - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
 linters-settings:
@@ -89,6 +90,18 @@ linters-settings:
 
   goimports:
     local-prefixes: github.com/elastic
+
+  gomodguard:
+    blocked:
+      # List of blocked modules.
+      modules:
+        # Blocked module.
+        - github.com/pkg/errors:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - errors
+              - fmt
+            reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
