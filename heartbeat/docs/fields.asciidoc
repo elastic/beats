@@ -458,11 +458,27 @@ type: date_range
 
 --
 
-*`monitor.source`*::
+*`monitor.origin`*::
 +
 --
-The source of this monitor configuration, usually either "ui", or "project"
+The origin of this monitor configuration, usually either "ui", or "project"
 
+
+type: keyword
+
+--
+
+[float]
+=== project
+
+Project info for this monitor
+
+
+
+*`monitor.project.name`*::
++
+--
+Project name
 
 type: keyword
 
