@@ -64,10 +64,7 @@ func New(r reader.Reader, cfg *Config) *splitterReader {
 }
 
 func (r *splitterReader) Next() (reader.Message, error) {
-	splitOnce.Do(func() {
-		go r.reading()
-	})
-
+	go r.reading()
 	for r.ctx.Err() == nil {
 		msg := <-r.buf
 		return msg, nil
@@ -105,6 +102,7 @@ func (r *splitterReader) reading() {
 }
 
 func (r *splitterReader) Close() error {
+	close(r.buf)
 	return r.reader.Close()
 	// return nil
 }
