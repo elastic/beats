@@ -22,9 +22,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/asset"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/beats/v7/libbeat/version"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 // MaxDefaultFieldLength is the limit on the number of default_field values
@@ -42,7 +42,7 @@ func TestTemplate(t *testing.T, beatName string, elasticLicensed bool) {
 func testTemplateDefaultFieldLength(beatName string, elasticLicensed bool) func(*testing.T) {
 	return func(t *testing.T) {
 		// 7.0 is when default_field was introduced.
-		esVersion, err := common.NewVersion("7.0.0")
+		esVersion, err := libversion.New("7.0.0")
 		if err != nil {
 			t.Fatal(err)
 		}

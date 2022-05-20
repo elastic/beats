@@ -32,9 +32,9 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // PipelinesFS is used from the x-pack/winlogbeat code to inject modules. The
@@ -64,7 +64,7 @@ func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwrite
 // ExportPipelines reads all pipelines embedded in the Winlogbeat executable
 // and adapts the pipelines for a given ES version and writes the
 // converted pipelines to the given directory in JSON format.
-func ExportPipelines(info beat.Info, version common.Version, directory string) error {
+func ExportPipelines(info beat.Info, version version.V, directory string) error {
 	log := logp.NewLogger(logName)
 	pipelines, err := readAll(info)
 	if err != nil {
