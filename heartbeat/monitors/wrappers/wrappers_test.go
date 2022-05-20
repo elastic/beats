@@ -160,14 +160,14 @@ func TestAdditionalStdFields(t *testing.T) {
 			}),
 		},
 		{
-			"with source",
+			"with origin",
 			func() stdfields.StdMonitorFields {
 				f := testMonFields
-				f.Source = "ui"
+				f.Origin = "ui"
 				return f
 			},
 			lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{"source": "ui"},
+				"monitor": map[string]interface{}{"origin": "ui"},
 			}),
 		},
 	}

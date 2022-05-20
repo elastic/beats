@@ -110,9 +110,11 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdP
 	// Write project level fields for project monitors
 	if !fields.IsInline {
 		eventext.MergeEventFields(event, mapstr.M{
-			"project": mapstr.M{
-				"id":   fields.Id,
-				"name": fields.Name,
+			"monitor": mapstr.M{
+				"project": mapstr.M{
+					"id":   fields.Id,
+					"name": fields.Name,
+				},
 			},
 		})
 	}
