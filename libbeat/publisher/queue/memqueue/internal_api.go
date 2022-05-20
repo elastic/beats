@@ -49,3 +49,13 @@ type getResponse struct {
 }
 
 type batchAckMsg struct{}
+
+// Metrics API
+
+type metricsRequest struct {
+	responseChan chan memQueueMetrics
+}
+
+type memQueueMetrics struct {
+	currentQueueSize int
+}

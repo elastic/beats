@@ -121,11 +121,18 @@ func (l *directEventLoop) run() {
 		case req := <-getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
+		case req := <-l.broker.metricChan:
+			l.handleMetricsRequest(&req)
+
 		case schedACKs <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list
 			l.pendingACKs = chanList{}
 		}
 	}
+}
+
+func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
+	req.responseChan <- memQueueMetrics{currentQueueSize: len(l.buf.entries)}
 }
 
 // Returns true if the queue is full after handling the insertion request.
