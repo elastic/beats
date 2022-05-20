@@ -57,15 +57,14 @@ func Get(procfs resolve.Resolver) (CPUMetrics, error) {
 	metrics.CPUinfo = cpuInfo
 
 	return metrics, err
-
 }
 
 func cpuinfoScanner(scanner *bufio.Scanner) ([]CPUInfo, error) {
 	cpuInfos := []CPUInfo{}
 	current := CPUInfo{}
-	// On my tests the same order the cores appear on /proc/cpuinfo
-	// is the same in which they appear on /proc/stats, this means it
-	// matches our current 'system.core.id' metric. This information
+	// On my tests the order the cores appear on /proc/cpuinfo
+	// is the same as on /proc/stats, this means it matches our
+	// current 'system.core.id' metric. This information
 	// is also the same as the 'processor' line on /proc/cpuinfo.
 	coreID := 0
 	for scanner.Scan() {
