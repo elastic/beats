@@ -37,7 +37,10 @@ func TestFetchExcludeUsage(t *testing.T) {
 	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/status":
-			w.Write([]byte("{ \"version\": { \"number\": \"7.5.0\" }}"))
+			_, err := w.Write([]byte("{ \"version\": { \"number\": \"7.5.0\" }}"))
+			if err != nil {
+				t.Fatal("write", err)
+			}
 
 		case "/api/stats":
 			excludeUsage := r.FormValue("exclude_usage")
