@@ -24,8 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
+	kbn "github.com/elastic/elastic-agent-libs/kibana"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
@@ -58,7 +59,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			// part of the initialization.
 			initConfig := instance.InitKibanaConfig(b.Config)
 
-			client, err := kibana.NewKibanaClient(initConfig, b.Info.Beat)
+			client, err := kbn.NewKibanaClient(initConfig, b.Info.Beat, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 			if err != nil {
 				fatalf("Error creating Kibana client: %+v.\n", err)
 			}

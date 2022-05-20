@@ -24,28 +24,28 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 type IndexPatternGenerator struct {
 	indexName   string
 	beatVersion string
 	fields      []byte
-	version     common.Version
+	version     version.V
 	migration   bool
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName string, fields []byte, beatVersion string, version common.Version, migration bool) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName string, fields []byte, beatVersion string, v version.V, migration bool) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
 	return &IndexPatternGenerator{
 		indexName:   indexName + "-*",
 		fields:      fields,
 		beatVersion: beatVersion,
-		version:     version,
+		version:     v,
 		migration:   migration,
 	}, nil
 }
@@ -151,7 +151,7 @@ func dumpToFile(f string, pattern mapstr.M) error {
 	return nil
 }
 
-func createTargetDir(baseDir string, version common.Version) string {
+func createTargetDir(baseDir string, version version.V) string {
 	targetDir := filepath.Join(baseDir, getVersionPath(version), "index-pattern")
 	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
 		os.MkdirAll(targetDir, 0755)
@@ -159,6 +159,6 @@ func createTargetDir(baseDir string, version common.Version) string {
 	return targetDir
 }
 
-func getVersionPath(version common.Version) string {
+func getVersionPath(version version.V) string {
 	return "7"
 }
