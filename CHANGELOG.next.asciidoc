@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix group write permissions on runtime directories. {pull}30869[30869]
 - Store syslog version as string. {pull}31446[31446]
 - Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
+- Allow loading secrets that contain commas from the keystore {pull}31694{pull}.
 
 *Auditbeat*
 
