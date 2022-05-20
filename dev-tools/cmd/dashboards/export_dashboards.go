@@ -73,7 +73,7 @@ func main() {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
-	c, err := kbn.NewClientWithConfig(&kbn.ClientConfig{
+	client, err := kbn.NewClientWithConfig(&kbn.ClientConfig{
 		Protocol:  u.Scheme,
 		Host:      u.Host,
 		Username:  user,
@@ -85,7 +85,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
-	client := &kibana.Client{Client: *c}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
 		flag.Usage()

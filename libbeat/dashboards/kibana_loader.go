@@ -29,16 +29,21 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/kibana"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
-	libkbn "github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
-var importAPI = "/api/saved_objects/_import"
+var (
+	// We started using Saved Objects API in 7.15. But to help integration
+	// developers migrate their dashboards we are more lenient.
+	minimumRequiredVersionSavedObjects = version.MustNew("7.14.0")
+
+	importAPI = "/api/saved_objects/_import"
+)
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
@@ -81,7 +86,7 @@ func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Confi
 }
 
 func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
-	client, err := libkbn.NewKibanaClient(cfg, beatname, beatversion.GetDefaultVersion(), beatversion.Commit(), beatversion.BuildTime().String())
+	client, err := kibana.NewKibanaClient(cfg, beatname, beatversion.GetDefaultVersion(), beatversion.Commit(), beatversion.BuildTime().String())
 	if err != nil {
 		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {
 			select {
@@ -93,13 +98,13 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 		}
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
 	}
-	return &kibana.Client{Client: *client}, nil
+	return client, nil
 }
 
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
@@ -121,8 +126,8 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs multierror.Errors
@@ -142,8 +147,8 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)

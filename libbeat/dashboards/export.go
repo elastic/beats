@@ -32,7 +32,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -57,7 +57,7 @@ type YMLElement struct {
 
 // Export wraps GetDashboard call to provide a more descriptive API
 func Export(client *kibana.Client, id string) ([]byte, error) {
-	return client.GetDashboard(id)
+	return Get(client, id)
 }
 
 // ExportAllFromYml exports all dashboards found in the YML file
