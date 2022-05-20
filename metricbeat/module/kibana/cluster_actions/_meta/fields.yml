@@ -1,7 +1,7 @@
-- name: actions
+- name: cluster_actions
   type: group
   description: >
-    Kibana actions metrics.
+    Kibana cluster actions metrics.
   release: beta
   fields:
     - name: kibana

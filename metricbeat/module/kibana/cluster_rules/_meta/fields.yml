@@ -1,7 +1,7 @@
-- name: rules
+- name: cluster_rules
   type: group
   description: >
-    Kibana rule metrics.
+    Kibana cluster rule metrics.
   release: beta
   fields:
     - name: kibana

@@ -41648,14 +41648,14 @@ type: keyword
 --
 
 [float]
-=== actions
+=== cluster_actions
 
-Kibana actions metrics.
-
-
+Kibana cluster actions metrics.
 
 
-*`kibana.actions.kibana.status`*::
+
+
+*`kibana.cluster_actions.kibana.status`*::
 +
 --
 type: keyword
@@ -41663,7 +41663,7 @@ type: keyword
 --
 
 
-*`kibana.actions.overdue.count`*::
+*`kibana.cluster_actions.overdue.count`*::
 +
 --
 type: long
@@ -41671,14 +41671,14 @@ type: long
 --
 
 
-*`kibana.actions.overdue.delay.p50`*::
+*`kibana.cluster_actions.overdue.delay.p50`*::
 +
 --
 type: float
 
 --
 
-*`kibana.actions.overdue.delay.p99`*::
+*`kibana.cluster_actions.overdue.delay.p99`*::
 +
 --
 type: float
@@ -41686,14 +41686,14 @@ type: float
 --
 
 [float]
-=== rules
+=== cluster_rules
 
-Kibana rule metrics.
-
-
+Kibana cluster rule metrics.
 
 
-*`kibana.rules.kibana.status`*::
+
+
+*`kibana.cluster_rules.kibana.status`*::
 +
 --
 type: keyword
@@ -41701,7 +41701,7 @@ type: keyword
 --
 
 
-*`kibana.rules.overdue.count`*::
+*`kibana.cluster_rules.overdue.count`*::
 +
 --
 type: long
@@ -41709,14 +41709,14 @@ type: long
 --
 
 
-*`kibana.rules.overdue.delay.p50`*::
+*`kibana.cluster_rules.overdue.delay.p50`*::
 +
 --
 type: float
 
 --
 
-*`kibana.rules.overdue.delay.p99`*::
+*`kibana.cluster_rules.overdue.delay.p99`*::
 +
 --
 type: float
@@ -41724,35 +41724,35 @@ type: float
 --
 
 [float]
-=== actions
+=== node_actions
 
-Kibana actions metrics.
-
-
+Kibana node actions metrics.
 
 
-*`kibana.actions.kibana.status`*::
+
+
+*`kibana.node_actions.kibana.status`*::
 +
 --
 type: keyword
 
 --
 
-*`kibana.actions.failures`*::
+*`kibana.node_actions.failures`*::
 +
 --
 type: long
 
 --
 
-*`kibana.actions.executions`*::
+*`kibana.node_actions.executions`*::
 +
 --
 type: long
 
 --
 
-*`kibana.actions.failures`*::
+*`kibana.node_actions.timeouts`*::
 +
 --
 type: long
@@ -41762,7 +41762,7 @@ type: long
 [float]
 === node_rules
 
-Kibana rule metrics.
+Kibana node rule metrics.
 
 
 
@@ -41788,7 +41788,7 @@ type: long
 
 --
 
-*`kibana.node_rules.failures`*::
+*`kibana.node_rules.timeouts`*::
 +
 --
 type: long
