@@ -181,12 +181,16 @@ func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 	reportOptMetric("softirq", metric.currentSample.SoftIrq, metric.previousSample.SoftIrq, normCPU)
 	reportOptMetric("steal", metric.currentSample.Stolen, metric.previousSample.Stolen, normCPU)
 
-	// /proc/cpuinfo metrics
-	formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
-	formattedMetrics["model_name"] = metric.cpuInfo.ModelName
-	formattedMetrics["mhz"] = metric.cpuInfo.Mhz
-	formattedMetrics["core_id"] = metric.cpuInfo.CoreID
-	formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
+	// Only add CPU info metrics if we're returning information by core
+	// (isTotals is false)
+	if !metric.isTotals {
+		// /proc/cpuinfo metrics
+		formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
+		formattedMetrics["model_name"] = metric.cpuInfo.ModelName
+		formattedMetrics["mhz"] = metric.cpuInfo.Mhz
+		formattedMetrics["core_id"] = metric.cpuInfo.CoreID
+		formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
+	}
 
 	return formattedMetrics, nil
 }
