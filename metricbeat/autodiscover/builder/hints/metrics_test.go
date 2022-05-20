@@ -459,7 +459,7 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			message: "Module with mutliple sets of hints must return the right configs",
+			message: "Module with multiple sets of hints must return the right configs",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": mapstr.M{
@@ -632,7 +632,9 @@ func TestGenerateHints(t *testing.T) {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
-						metricsets[i] = v.(string)
+						var ok bool
+						metricsets[i], ok = v.(string)
+						assert.Truef(t, ok, "Failed to convert metricset: %d=%v", i, metricsets[i])
 					}
 					sort.Strings(metricsets)
 					config["metricsets"] = metricsets
@@ -649,7 +651,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 	path := getTemporaryKeystoreFile()
 	defer os.Remove(path)
 	// store the secret
-	keystore := createAnExistingKeystore(path, "stored_secret")
+	keystore := createAnExistingKeystore(t, path, "stored_secret")
 	os.Setenv("PASSWORD", "env_secret")
 
 	tests := []struct {
@@ -706,7 +708,9 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
-						metricsets[i] = v.(string)
+						var ok bool
+						metricsets[i], ok = v.(string)
+						assert.Truef(t, ok, "Failed to convert metricset: %d=%v", i, metricsets[i])
 					}
 					sort.Strings(metricsets)
 					config["metricsets"] = metricsets
@@ -727,7 +731,7 @@ func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MockMetricSet{}, nil
 }
 
-func (ms *MockMetricSet) Fetch(report mb.Reporter) {
+func (ms *MockMetricSet) Fetch(report mb.ReporterV2) {
 
 }
 
@@ -741,7 +745,8 @@ func NewMockPrometheus(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // create a keystore with an existing key
 // `PASSWORD` with the value of `secret` variable.
-func createAnExistingKeystore(path string, secret string) keystore.Keystore {
+func createAnExistingKeystore(t *testing.T, path string, secret string) keystore.Keystore {
+	t.Helper()
 	keyStore, err := keystore.NewFileKeystore(path)
 	// Fail fast in the test suite
 	if err != nil {
@@ -753,8 +758,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret))
-	writableKeystore.Save()
+	assert.NoError(t, writableKeystore.Store("PASSWORD", []byte(secret)))
+	assert.NoError(t, writableKeystore.Save())
 	return keyStore
 }
 
