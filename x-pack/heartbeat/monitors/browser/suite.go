@@ -18,19 +18,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type JourneyLister func(ctx context.Context, suitePath string, params mapstr.M) (journeyNames []string, err error)
+type JourneyLister func(ctx context.Context, projectPath string, params mapstr.M) (journeyNames []string, err error)
 
-type Suite struct {
-	rawCfg   *config.C
-	suiteCfg *Config
+type Project struct {
+	rawCfg     *config.C
+	projectCfg *Config
 }
 
-func NewSuite(rawCfg *config.C) (*Suite, error) {
-	s := &Suite{
-		rawCfg:   rawCfg,
-		suiteCfg: DefaultConfig(),
+func NewProject(rawCfg *config.C) (*Project, error) {
+	s := &Project{
+		rawCfg:     rawCfg,
+		projectCfg: DefaultConfig(),
 	}
-	err := rawCfg.Unpack(s.suiteCfg)
+	err := rawCfg.Unpack(s.projectCfg)
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
@@ -39,73 +39,73 @@ func NewSuite(rawCfg *config.C) (*Suite, error) {
 }
 
 func ErrBadConfig(err error) error {
-	return fmt.Errorf("could not parse suite config: %w", err)
+	return fmt.Errorf("could not parse project config: %w", err)
 }
 
-func (s *Suite) String() string {
+func (s *Project) String() string {
 	panic("implement me")
 }
 
-func (s *Suite) Fetch() error {
-	return s.suiteCfg.Source.Active().Fetch()
+func (s *Project) Fetch() error {
+	return s.projectCfg.Source.Active().Fetch()
 }
 
-func (s *Suite) Workdir() string {
-	return s.suiteCfg.Source.Active().Workdir()
+func (s *Project) Workdir() string {
+	return s.projectCfg.Source.Active().Workdir()
 }
 
-func (s *Suite) InlineSource() (string, bool) {
-	if s.suiteCfg.Source.Inline != nil {
-		return s.suiteCfg.Source.Inline.Script, true
+func (s *Project) InlineSource() (string, bool) {
+	if s.projectCfg.Source.Inline != nil {
+		return s.projectCfg.Source.Inline.Script, true
 	}
 	return "", false
 }
 
-func (s *Suite) Params() map[string]interface{} {
-	return s.suiteCfg.Params
+func (s *Project) Params() map[string]interface{} {
+	return s.projectCfg.Params
 }
 
-func (s *Suite) FilterJourneys() synthexec.FilterJourneyConfig {
-	return s.suiteCfg.FilterJourneys
+func (s *Project) FilterJourneys() synthexec.FilterJourneyConfig {
+	return s.projectCfg.FilterJourneys
 }
 
-func (s *Suite) Fields() synthexec.StdSuiteFields {
+func (s *Project) Fields() synthexec.StdProjectFields {
 	_, isInline := s.InlineSource()
-	return synthexec.StdSuiteFields{
-		Name:     s.suiteCfg.Name,
-		Id:       s.suiteCfg.Id,
+	return synthexec.StdProjectFields{
+		Name:     s.projectCfg.Name,
+		Id:       s.projectCfg.Id,
 		IsInline: isInline,
 		Type:     "browser",
 	}
 }
 
-func (s *Suite) Close() error {
-	if s.suiteCfg.Source.ActiveMemo != nil {
-		s.suiteCfg.Source.ActiveMemo.Close()
+func (s *Project) Close() error {
+	if s.projectCfg.Source.ActiveMemo != nil {
+		s.projectCfg.Source.ActiveMemo.Close()
 	}
 
 	return nil
 }
 
-func (s *Suite) extraArgs() []string {
-	extraArgs := s.suiteCfg.SyntheticsArgs
-	if s.suiteCfg.IgnoreHTTPSErrors {
+func (s *Project) extraArgs() []string {
+	extraArgs := s.projectCfg.SyntheticsArgs
+	if s.projectCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
-	if s.suiteCfg.Sandbox {
+	if s.projectCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
-	if s.suiteCfg.Screenshots != "" {
-		extraArgs = append(extraArgs, "--screenshots", s.suiteCfg.Screenshots)
+	if s.projectCfg.Screenshots != "" {
+		extraArgs = append(extraArgs, "--screenshots", s.projectCfg.Screenshots)
 	}
-	if s.suiteCfg.Throttling != nil {
-		switch t := s.suiteCfg.Throttling.(type) {
+	if s.projectCfg.Throttling != nil {
+		switch t := s.projectCfg.Throttling.(type) {
 		case bool:
 			if !t {
 				extraArgs = append(extraArgs, "--no-throttling")
 			}
 		case string:
-			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", s.suiteCfg.Throttling))
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", s.projectCfg.Throttling))
 		case map[string]interface{}:
 			j, err := json.Marshal(t)
 			if err != nil {
@@ -119,7 +119,7 @@ func (s *Suite) extraArgs() []string {
 	return extraArgs
 }
 
-func (s *Suite) jobs() []jobs.Job {
+func (s *Project) jobs() []jobs.Job {
 	var j jobs.Job
 	if src, ok := s.InlineSource(); ok {
 		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.Fields(), s.extraArgs()...)
@@ -127,9 +127,9 @@ func (s *Suite) jobs() []jobs.Job {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := s.Fetch()
 			if err != nil {
-				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
+				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.extraArgs()...)
+			sj, err := synthexec.ProjectJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
@@ -139,7 +139,7 @@ func (s *Suite) jobs() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func (s *Suite) plugin() plugin.Plugin {
+func (s *Project) plugin() plugin.Plugin {
 	return plugin.Plugin{
 		Jobs:      s.jobs(),
 		DoClose:   s.Close,
