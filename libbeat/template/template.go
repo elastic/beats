@@ -23,10 +23,10 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
@@ -47,9 +47,9 @@ type Template struct {
 	name            string
 	pattern         string
 	elasticLicensed bool
-	beatVersion     common.Version
+	beatVersion     version.V
 	beatName        string
-	esVersion       common.Version
+	esVersion       version.V
 	config          TemplateConfig
 	migration       bool
 	order           int
@@ -61,11 +61,11 @@ func New(
 	beatVersion string,
 	beatName string,
 	elasticLicensed bool,
-	esVersion common.Version,
+	esVersion version.V,
 	config TemplateConfig,
 	migration bool,
 ) (*Template, error) {
-	bV, err := common.NewVersion(beatVersion)
+	bV, err := version.New(beatVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (t *Template) generateComponent(properties, analyzers mapstr.M, dynamicTemp
 }
 
 func buildMappings(
-	beatVersion common.Version,
+	beatVersion version.V,
 	beatName string,
 	properties mapstr.M,
 	dynTmpls []mapstr.M,
@@ -276,7 +276,7 @@ func buildMappings(
 	return mapping
 }
 
-func buildDynTmpl(ver common.Version) mapstr.M {
+func buildDynTmpl(ver version.V) mapstr.M {
 	return mapstr.M{
 		"strings_as_keyword": mapstr.M{
 			"mapping": mapstr.M{
@@ -288,7 +288,7 @@ func buildDynTmpl(ver common.Version) mapstr.M {
 	}
 }
 
-func buildIdxSettings(ver common.Version, userSettings mapstr.M) mapstr.M {
+func buildIdxSettings(ver version.V, userSettings mapstr.M) mapstr.M {
 	indexSettings := mapstr.M{
 		"refresh_interval": "5s",
 		"mapping": mapstr.M{

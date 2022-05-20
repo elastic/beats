@@ -12,10 +12,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 func TestValueTpl(t *testing.T) {
@@ -402,28 +402,28 @@ func TestValueTpl(t *testing.T) {
 			value:       `[[userAgent]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()),
 		},
 		{
 			name:        "func userAgent blank value",
 			value:       `[[userAgent ""]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()),
 		},
 		{
 			name:        "func userAgent 1 value",
 			value:       `[[userAgent "integration_name/1.2.3"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat", "integration_name/1.2.3"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), "integration_name/1.2.3"),
 		},
 		{
 			name:        "func userAgent 2 value",
 			value:       `[[userAgent "integration_name/1.2.3" "test"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat", "integration_name/1.2.3", "test"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), "integration_name/1.2.3", "test"),
 		},
 		{
 			name:        "func beatInfo GOOS",
