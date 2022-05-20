@@ -121,7 +121,7 @@ func (l *directEventLoop) run() {
 		case req := <-getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
-		case req := <-l.broker.metricChan:
+		case req := <-l.broker.metricChan: // broker asking for queue metrics
 			l.handleMetricsRequest(&req)
 
 		case schedACKs <- l.pendingACKs:
@@ -309,6 +309,9 @@ func (l *bufferingEventLoop) run() {
 		case count := <-l.broker.ackChan:
 			l.handleACK(count)
 
+		case req := <-l.broker.metricChan: // broker asking for queue metrics
+			l.handleMetricsRequest(&req)
+
 		case <-l.idleC:
 			l.idleC = nil
 			l.timer.Stop()
@@ -317,6 +320,10 @@ func (l *bufferingEventLoop) run() {
 			}
 		}
 	}
+}
+
+func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount}
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {

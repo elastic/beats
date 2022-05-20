@@ -18,11 +18,15 @@
 package queuetest
 
 import (
+	"errors"
+	"io"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
 )
 
 // QueueFactory is used to create a per test queue instance.
@@ -209,9 +213,26 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 
 			go test.producers(&wg, nil, log, queue)()
 			go test.consumers(&wg, nil, log, queue)()
-
+			go testFetchMetrics(t, queue)
 			wg.Wait()
 		}))
+	}
+}
+
+func testFetchMetrics(t *testing.T, mon queue.Queue) {
+	_, err := mon.Metrics()
+	if errors.Is(err, queue.ErrMetricsNotImplemented) {
+		return
+	}
+
+	for {
+		metrics, err := mon.Metrics()
+		if errors.Is(err, io.EOF) {
+			continue
+		}
+		t.Logf("Got event count: %d/%d", metrics.EventCount.ValueOr(0), metrics.ByteCount.ValueOr(0))
+		assert.True(t, metrics.EventCount.Exists() || metrics.ByteCount.Exists())
+		time.Sleep(time.Second)
 	}
 }
 
