@@ -39,7 +39,6 @@ output:
 linters:
   disable-all: true
   enable:
-    - deadcode # finds unused code
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
     - forbidigo # forbids identifiers	matched by reg exps
@@ -50,7 +49,6 @@ linters:
     - nolintlint # reports ill-formed or insufficient nolint directives
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
     - stylecheck # a replacement for golint
-    - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
     - structcheck # finds unused struct fields
@@ -142,10 +140,6 @@ linters-settings:
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
-
-  unused:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.17.10"
 
   gosec:
     excludes:
