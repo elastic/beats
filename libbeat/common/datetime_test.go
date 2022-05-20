@@ -51,6 +51,16 @@ func TestParseTime(t *testing.T) {
 			Input:  "2015-02-28T11:19:05.112Z",
 			Output: time.Date(2015, time.February, 28, 11, 19, 05, 112*1e6, time.UTC),
 		},
+		// ParseTime must be able to parse microsecond precision timestamps
+		{
+			Input:  "2015-02-28T11:19:05.000001Z",
+			Output: time.Date(2015, time.February, 28, 11, 19, 05, 1000, time.UTC),
+		},
+		// ParseTime must be able to parse nanosecond precision timestamps
+		{
+			Input:  "2015-02-28T11:19:05.000001122Z",
+			Output: time.Date(2015, time.February, 28, 11, 19, 05, 1122, time.UTC),
+		},
 	}
 
 	for _, test := range tests {
@@ -114,7 +124,7 @@ func TestTimeString(t *testing.T) {
 		precisionCfg *conf.C
 		ts           string
 	}{
-		"emtpy config": {
+		"empty config": {
 			nil,
 			"2015-03-01T11:19:05.000Z",
 		},
