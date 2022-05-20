@@ -42,70 +42,70 @@ func ErrBadConfig(err error) error {
 	return fmt.Errorf("could not parse project config: %w", err)
 }
 
-func (s *Project) String() string {
+func (p *Project) String() string {
 	panic("implement me")
 }
 
-func (s *Project) Fetch() error {
-	return s.projectCfg.Source.Active().Fetch()
+func (p *Project) Fetch() error {
+	return p.projectCfg.Source.Active().Fetch()
 }
 
-func (s *Project) Workdir() string {
-	return s.projectCfg.Source.Active().Workdir()
+func (p *Project) Workdir() string {
+	return p.projectCfg.Source.Active().Workdir()
 }
 
-func (s *Project) InlineSource() (string, bool) {
-	if s.projectCfg.Source.Inline != nil {
-		return s.projectCfg.Source.Inline.Script, true
+func (p *Project) InlineSource() (string, bool) {
+	if p.projectCfg.Source.Inline != nil {
+		return p.projectCfg.Source.Inline.Script, true
 	}
 	return "", false
 }
 
-func (s *Project) Params() map[string]interface{} {
-	return s.projectCfg.Params
+func (p *Project) Params() map[string]interface{} {
+	return p.projectCfg.Params
 }
 
-func (s *Project) FilterJourneys() synthexec.FilterJourneyConfig {
-	return s.projectCfg.FilterJourneys
+func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
+	return p.projectCfg.FilterJourneys
 }
 
-func (s *Project) Fields() synthexec.StdProjectFields {
-	_, isInline := s.InlineSource()
+func (p *Project) Fields() synthexec.StdProjectFields {
+	_, isInline := p.InlineSource()
 	return synthexec.StdProjectFields{
-		Name:     s.projectCfg.Name,
-		Id:       s.projectCfg.Id,
+		Name:     p.projectCfg.Name,
+		Id:       p.projectCfg.Id,
 		IsInline: isInline,
 		Type:     "browser",
 	}
 }
 
-func (s *Project) Close() error {
-	if s.projectCfg.Source.ActiveMemo != nil {
-		s.projectCfg.Source.ActiveMemo.Close()
+func (p *Project) Close() error {
+	if p.projectCfg.Source.ActiveMemo != nil {
+		p.projectCfg.Source.ActiveMemo.Close()
 	}
 
 	return nil
 }
 
-func (s *Project) extraArgs() []string {
-	extraArgs := s.projectCfg.SyntheticsArgs
-	if s.projectCfg.IgnoreHTTPSErrors {
+func (p *Project) extraArgs() []string {
+	extraArgs := p.projectCfg.SyntheticsArgs
+	if p.projectCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
-	if s.projectCfg.Sandbox {
+	if p.projectCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
-	if s.projectCfg.Screenshots != "" {
-		extraArgs = append(extraArgs, "--screenshots", s.projectCfg.Screenshots)
+	if p.projectCfg.Screenshots != "" {
+		extraArgs = append(extraArgs, "--screenshots", p.projectCfg.Screenshots)
 	}
-	if s.projectCfg.Throttling != nil {
-		switch t := s.projectCfg.Throttling.(type) {
+	if p.projectCfg.Throttling != nil {
+		switch t := p.projectCfg.Throttling.(type) {
 		case bool:
 			if !t {
 				extraArgs = append(extraArgs, "--no-throttling")
 			}
 		case string:
-			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", s.projectCfg.Throttling))
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", p.projectCfg.Throttling))
 		case map[string]interface{}:
 			j, err := json.Marshal(t)
 			if err != nil {
@@ -119,17 +119,17 @@ func (s *Project) extraArgs() []string {
 	return extraArgs
 }
 
-func (s *Project) jobs() []jobs.Job {
+func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
-	if src, ok := s.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.Fields(), s.extraArgs()...)
+	if src, ok := p.InlineSource(); ok {
+		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.Fields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
-			err := s.Fetch()
+			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.extraArgs()...)
+			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.Fields(), p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
@@ -139,10 +139,10 @@ func (s *Project) jobs() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func (s *Project) plugin() plugin.Plugin {
+func (p *Project) plugin() plugin.Plugin {
 	return plugin.Plugin{
-		Jobs:      s.jobs(),
-		DoClose:   s.Close,
+		Jobs:      p.jobs(),
+		DoClose:   p.Close,
 		Endpoints: 1,
 	}
 }
