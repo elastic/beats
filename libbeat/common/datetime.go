@@ -36,10 +36,6 @@ const (
 
 	DefaultTimestampPrecision = millisecPrecision
 
-	// TsLayout is the seconds layout to be used in the timestamp marshaling/unmarshaling everywhere.
-	// The timezone must always be UTC.
-	TsLayout = "2006-01-02T15:04:05.000Z"
-
 	tsLayoutMillis = "2006-01-02T15:04:05.000Z"
 	tsLayoutMicros = "2006-01-02T15:04:05.000000Z"
 	tsLayoutNanos  = "2006-01-02T15:04:05.000000000Z"
@@ -47,7 +43,18 @@ const (
 	millisecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'"
 	microsecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'"
 	nanosecPrecisionFmt  = "yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'"
+
+	localMillisecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.fffz"
+	localMicrosecPrecisionFmt = "yyyy-MM-dd'T'HH:mm:ss.ffffffz"
+	localNanosecPrecisionFmt  = "yyyy-MM-dd'T'HH:mm:ss.fffffffffz"
 )
+
+// timestampFmt stores the format strings for both UTC and local
+// form of a specific precision.
+type timestampFmt struct {
+	utc   string
+	local string
+}
 
 var (
 	defaultParseFormats = []string{
@@ -56,13 +63,16 @@ var (
 		tsLayoutNanos,
 	}
 
-	precisions = map[TimestampPrecision]string{
-		millisecPrecision: millisecPrecisionFmt,
-		microsecPrecision: microsecPrecisionFmt,
-		nanosecPrecision:  nanosecPrecisionFmt,
+	precisions = map[TimestampPrecision]timestampFmt{
+		millisecPrecision: timestampFmt{utc: millisecPrecisionFmt, local: localMillisecPrecisionFmt},
+		microsecPrecision: timestampFmt{utc: microsecPrecisionFmt, local: localMicrosecPrecisionFmt},
+		nanosecPrecision:  timestampFmt{utc: nanosecPrecisionFmt, local: localNanosecPrecisionFmt},
 	}
 
-	timeFormatter = dtfmt.MustNewFormatter(precisions[DefaultTimestampPrecision])
+	// tsFmt is the selected timestamp format
+	tsFmt = precisions[DefaultTimestampPrecision]
+	// timeFormatter is a datettime formatter with a selected timestamp precision in UTC.
+	timeFormatter = dtfmt.MustNewFormatter(tsFmt.utc)
 )
 
 // Time is an abstraction for the time.Time type
@@ -92,6 +102,9 @@ func (p *TimestampPrecision) Unpack(v string) error {
 	return nil
 }
 
+// SetTimestampPrecision sets the precision of timestamps in the Beat.
+// It is only supposed to be called during init because it changes
+// the format of the timestamps globally.
 func SetTimestampPrecision(c *conf.C) error {
 	if c == nil {
 		return nil
@@ -103,9 +116,20 @@ func SetTimestampPrecision(c *conf.C) error {
 		return fmt.Errorf("failed to set timestamp precision: %w", err)
 	}
 
-	timeFormatter = dtfmt.MustNewFormatter(precisions[p.Precision])
+	tsFmt = precisions[p.Precision]
+	timeFormatter = dtfmt.MustNewFormatter(precisions[p.Precision].utc)
 
 	return nil
+}
+
+// TimestampFormat returns the datettime format string
+// with the configured timestamp precision. It can return
+// either the UTC format or the local one.
+func TimestampFormat(local bool) string {
+	if local {
+		return tsFmt.local
+	}
+	return tsFmt.utc
 }
 
 // MarshalJSON implements json.Marshaler interface.
