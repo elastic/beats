@@ -61,7 +61,7 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.1
-	github.com/elastic/go-ucfg v0.8.4
+	github.com/elastic/go-ucfg v0.8.5
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -161,7 +161,7 @@ require (
 require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.1.1
-	github.com/elastic/elastic-agent-libs v0.2.3
+	github.com/elastic/elastic-agent-libs v0.2.4
 	github.com/elastic/elastic-agent-system-metrics v0.3.0
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
@@ -310,7 +310,6 @@ replace (
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
-	github.com/elastic/go-ucfg => github.com/elastic/go-ucfg v0.8.3 // starting with v0.8.4 we need to re-write a lot of tests
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
 	github.com/godror/godror => github.com/godror/godror v0.10.4 // updating to v0.24.2 caused a breaking change

@@ -160,14 +160,14 @@ func TestAdditionalStdFields(t *testing.T) {
 			}),
 		},
 		{
-			"with source",
+			"with origin",
 			func() stdfields.StdMonitorFields {
 				f := testMonFields
-				f.Source = "ui"
+				f.Origin = "ui"
 				return f
 			},
 			lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{"source": "ui"},
+				"monitor": map[string]interface{}{"origin": "ui"},
 			}),
 		},
 	}
@@ -520,13 +520,13 @@ func TestInlineBrowserJob(t *testing.T) {
 	})
 }
 
-var suiteMonitorValues = BrowserMonitor{
-	id:         "suite-journey_1",
-	name:       "suite-Journey 1",
+var projectMonitorValues = BrowserMonitor{
+	id:         "project-journey_1",
+	name:       "project-Journey 1",
 	checkGroup: "journey-1-check-group",
 }
 
-func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) jobs.Job {
+func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
@@ -534,14 +534,14 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
 				"type":        "browser",
-				"id":          suiteMonitorValues.id,
-				"name":        suiteMonitorValues.name,
-				"check_group": suiteMonitorValues.checkGroup,
+				"id":          projectMonitorValues.id,
+				"name":        projectMonitorValues.name,
+				"check_group": projectMonitorValues.checkGroup,
 			},
 		})
 		if summary {
 			sumFields := mapstr.M{"up": 0, "down": 0}
-			if suiteErr == nil {
+			if projectErr == nil {
 				sumFields["up"] = 1
 			} else {
 				sumFields["down"] = 1
@@ -550,20 +550,20 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 				"summary": sumFields,
 			})
 		}
-		return nil, suiteErr
+		return nil, projectErr
 	}
 }
 
-func TestSuiteBrowserJob(t *testing.T) {
+func TestProjectBrowserJob(t *testing.T) {
 	fields := testBrowserMonFields
 	urlStr := "http://foo.com"
 	urlU, _ := url.Parse(urlStr)
 	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
 		"monitor": map[string]interface{}{
 			"type":        "browser",
-			"id":          suiteMonitorValues.id,
-			"name":        suiteMonitorValues.name,
-			"check_group": suiteMonitorValues.checkGroup,
+			"id":          projectMonitorValues.id,
+			"name":        projectMonitorValues.name,
+			"check_group": projectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
 				"gte": hbtestllext.IsTime,
 				"lt":  hbtestllext.IsTime,
@@ -574,7 +574,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"simple", // has no summary fields!
 		fields,
-		[]jobs.Job{makeSuiteBrowserJob(t, urlStr, false, nil)},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -587,7 +587,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"with up summary",
 		fields,
-		[]jobs.Job{makeSuiteBrowserJob(t, urlStr, true, nil)},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -604,7 +604,7 @@ func TestSuiteBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"with down summary",
 		fields,
-		[]jobs.Job{makeSuiteBrowserJob(t, urlStr, true, fmt.Errorf("testerr"))},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, fmt.Errorf("testerr"))},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
