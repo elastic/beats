@@ -76,6 +76,12 @@
           description: >
             Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
 
+        - name: source
+          type: keyword
+          description: >
+            The source of this monitor configuration, usually either "ui", or "project"
+
+
 - key: summary
   title: "Monitor summary"
   description:
