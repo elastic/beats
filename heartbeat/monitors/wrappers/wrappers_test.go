@@ -140,35 +140,67 @@ func TestSimpleJob(t *testing.T) {
 	})
 }
 
-func TestJobWithServiceName(t *testing.T) {
-	fields := testMonFields
-	fields.Service.Name = "testServiceName"
-	testCommonWrap(t, testDef{
-		"simple",
-		fields,
-		[]jobs.Job{makeURLJob(t, "tcp://foo.com:80")},
-		[]validator.Validator{
-			lookslike.Compose(
-				urlValidator(t, "tcp://foo.com:80"),
-				lookslike.MustCompile(map[string]interface{}{
-					"monitor": map[string]interface{}{
-						"duration.us": hbtestllext.IsInt64,
-						"id":          testMonFields.ID,
-						"name":        testMonFields.Name,
-						"type":        testMonFields.Type,
-						"status":      "up",
-						"check_group": isdef.IsString,
-					},
-					"service": map[string]interface{}{
-						"name": fields.Service.Name,
-					},
-				}),
-				hbtestllext.MonitorTimespanValidator,
-				summaryValidator(1, 0),
-			)},
-		nil,
-		nil,
-	})
+func TestAdditionalStdFields(t *testing.T) {
+	scenarios := []struct {
+		name           string
+		fieldGenerator func() stdfields.StdMonitorFields
+		validator      validator.Validator
+	}{
+		{
+			"with service name",
+			func() stdfields.StdMonitorFields {
+				f := testMonFields
+				f.Service.Name = "mysvc"
+				return f
+			},
+			lookslike.MustCompile(map[string]interface{}{
+				"service": map[string]interface{}{
+					"name": "mysvc",
+				},
+			}),
+		},
+		{
+			"with source",
+			func() stdfields.StdMonitorFields {
+				f := testMonFields
+				f.Source = "ui"
+				return f
+			},
+			lookslike.MustCompile(map[string]interface{}{
+				"monitor": map[string]interface{}{"source": "ui"},
+			}),
+		},
+	}
+
+	for _, tt := range scenarios {
+		t.Run(tt.name, func(t *testing.T) {
+			testCommonWrap(t, testDef{
+				"simple",
+				tt.fieldGenerator(),
+				[]jobs.Job{makeURLJob(t, "tcp://foo.com:80")},
+				[]validator.Validator{
+					lookslike.Compose(
+						tt.validator,
+						urlValidator(t, "tcp://foo.com:80"),
+						lookslike.MustCompile(map[string]interface{}{
+							"monitor": map[string]interface{}{
+								"duration.us": hbtestllext.IsInt64,
+								"id":          testMonFields.ID,
+								"name":        testMonFields.Name,
+								"type":        testMonFields.Type,
+								"status":      "up",
+								"check_group": isdef.IsString,
+							},
+						}),
+						hbtestllext.MonitorTimespanValidator,
+						summaryValidator(1, 0),
+					)},
+				nil,
+				nil,
+			})
+		})
+	}
+
 }
 
 func TestErrorJob(t *testing.T) {
