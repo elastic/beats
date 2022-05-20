@@ -18,8 +18,6 @@
 package pipeline
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -45,12 +43,6 @@ type ttlBatch struct {
 	events []publisher.Event
 }
 
-var batchPool = sync.Pool{
-	New: func() interface{} {
-		return &ttlBatch{}
-	},
-}
-
 func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	if original == nil {
 		panic("empty batch")
@@ -68,8 +60,7 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 		}
 	}
 
-	b := batchPool.Get().(*ttlBatch)
-	*b = ttlBatch{
+	b := &ttlBatch{
 		ack:     original.ACK,
 		retryer: retryer,
 		ttl:     ttl,
@@ -78,23 +69,16 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	return b
 }
 
-func releaseBatch(b *ttlBatch) {
-	*b = ttlBatch{} // clear batch
-	batchPool.Put(b)
-}
-
 func (b *ttlBatch) Events() []publisher.Event {
 	return b.events
 }
 
 func (b *ttlBatch) ACK() {
 	b.ack()
-	releaseBatch(b)
 }
 
 func (b *ttlBatch) Drop() {
 	b.ack()
-	releaseBatch(b)
 }
 
 func (b *ttlBatch) Retry() {
