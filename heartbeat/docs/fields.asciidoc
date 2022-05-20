@@ -458,6 +458,16 @@ type: date_range
 
 --
 
+*`monitor.source`*::
++
+--
+The source of this monitor configuration, usually either "ui", or "project"
+
+
+type: keyword
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
