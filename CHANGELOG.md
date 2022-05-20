@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Add more build tags to `process_common.go` so the module can be used on NetBSD and OpenBSD. #24
+
 ## [0.3.0]
 
 ### Added
