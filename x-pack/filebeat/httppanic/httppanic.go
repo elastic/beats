@@ -33,6 +33,7 @@ func StartServer() {
 			}),
 		}
 		fmt.Printf("starting HTTP panic server on port %s\n", port)
+		logp.L().Infof("starting HTTP panic server on port %s\n", port)
 		if err := s.ListenAndServe(); err != nil {
 			logp.L().Error(fmt.Errorf("panic http server error: %w", err))
 		}
