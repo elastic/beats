@@ -545,9 +545,9 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 	return len(data), nil
 }
 
-func checkSkip(t *testing.T, metricset string, version *version.V) {
+func checkSkip(t *testing.T, metricset string, ver *version.V) {
 	checkSkipFeature := func(name string, availableVersion *version.V) {
-		isAPIAvailable := elastic.IsFeatureAvailable(version, availableVersion)
+		isAPIAvailable := elastic.IsFeatureAvailable(ver, availableVersion)
 		if !isAPIAvailable {
 			t.Skipf("elasticsearch %s stats API is not available until %s", name, availableVersion)
 		}
@@ -579,12 +579,12 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 		return nil, err
 	}
 
-	version, err := data.GetValue("version.number")
+	v, err := data.GetValue("version.number")
 	if err != nil {
 		return nil, err
 	}
 
-	return version.New(version.(string))
+	return version.New(v.(string))
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {

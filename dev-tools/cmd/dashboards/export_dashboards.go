@@ -26,9 +26,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/version"
-	kbn "github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -73,7 +72,7 @@ func main() {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
-	client, err := kbn.NewClientWithConfig(&kbn.ClientConfig{
+	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol:  u.Scheme,
 		Host:      u.Host,
 		Username:  user,

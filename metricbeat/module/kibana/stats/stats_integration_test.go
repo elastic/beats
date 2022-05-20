@@ -100,11 +100,11 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*version.V, error) {
 		return nil, err
 	}
 
-	version, err := data.GetValue("version.number")
+	v, err := data.GetValue("version.number")
 	if err != nil {
 		t.Log("Kibana GET /"+kibana.StatusPath+" response:", string(body))
 		return nil, err
 	}
 
-	return version.New(version.(string))
+	return version.New(v.(string))
 }
