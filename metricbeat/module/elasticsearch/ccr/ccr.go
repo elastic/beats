@@ -20,13 +20,12 @@ package ccr
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -92,7 +91,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return eventsMapping(r, *info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
+func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *version.V) (message string, err error) {
 	license, err := elasticsearch.GetLicense(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		return "", errors.Wrap(err, "error determining Elasticsearch license")

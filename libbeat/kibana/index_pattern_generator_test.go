@@ -28,8 +28,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -45,7 +45,7 @@ func TestNewGenerator(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	v, _ := common.NewVersion("7.0.0")
+	v, _ := version.New("7.0.0")
 	// checks for fields.yml
 	generator, err := NewGenerator("beat-index", "mybeat.", data, "7.0", *v, true)
 	if err != nil {
@@ -76,8 +76,8 @@ func TestGenerate(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	v7, _ := common.NewVersion("7.0.0-alpha1")
-	versions := []*common.Version{v7}
+	v7, _ := version.New("7.0.0-alpha1")
+	versions := []*version.V{v7}
 	var d mapstr.M
 	for _, version := range versions {
 		data, err := ioutil.ReadFile("./testdata/fields.yml")
@@ -114,8 +114,8 @@ func TestGenerateExtensive(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	version7, _ := common.NewVersion("7.0.0-alpha1")
-	versions := []*common.Version{version7}
+	version7, _ := version.New("7.0.0-alpha1")
+	versions := []*version.V{version7}
 
 	var d mapstr.M
 	for _, version := range versions {

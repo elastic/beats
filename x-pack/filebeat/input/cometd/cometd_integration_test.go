@@ -64,7 +64,7 @@ func TestInput(t *testing.T) {
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
 		"auth.oauth2.password":      "password",
-		"auth.oauth2.token_url":     "http://cometd:8080/token",
+		"auth.oauth2.token_url":     "http://localhost:8080/token",
 	})
 
 	// Route input events through our captor instead of sending through ES.

@@ -65,12 +65,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/configure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
 	"github.com/elastic/elastic-agent-libs/paths"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 	sysinfo "github.com/elastic/go-sysinfo"
@@ -844,7 +846,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig := InitKibanaConfig(b.Config)
 
-		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
+		client, err := kbn.NewKibanaClient(kibanaConfig, b.Info.Beat, b.Info.Version, version.Commit(), version.BuildTime().String())
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %w", err)
 		}
@@ -883,7 +885,7 @@ func (b *Beat) checkElasticsearchVersion() {
 
 	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
-		beatVersion, err := common.NewVersion(b.Info.Version)
+		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
 			return err
 		}

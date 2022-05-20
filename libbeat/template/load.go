@@ -26,10 +26,10 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // Loader interface for loading templates.
@@ -48,7 +48,7 @@ type ESLoader struct {
 // loading the template.
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
+	GetVersion() version.V
 }
 
 // FileLoader implements Loader interface for loading templates to a File.
@@ -60,7 +60,7 @@ type FileLoader struct {
 
 // FileClient defines the minimal interface required for the FileLoader
 type FileClient interface {
-	GetVersion() common.Version
+	GetVersion() version.V
 	Write(component string, name string, body string) error
 }
 
@@ -228,7 +228,7 @@ func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, 
 	return nil
 }
 
-func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVersion common.Version, migration bool) (*Template, error) {
+func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVersion version.V, migration bool) (*Template, error) {
 	if !config.Enabled {
 		b.log.Info("template config not enabled")
 		return nil, nil

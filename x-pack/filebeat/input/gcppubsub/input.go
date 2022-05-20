@@ -22,10 +22,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 const (
@@ -247,7 +248,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 }
 
 func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, error) {
-	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
+	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))}
 
 	if in.AlternativeHost != "" {
 		// this will be typically set because we want to point the input to a testing pubsub emulator

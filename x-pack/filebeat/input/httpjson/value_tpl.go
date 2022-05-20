@@ -25,9 +25,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.
@@ -369,7 +369,7 @@ func join(v interface{}, sep string) string {
 }
 
 func userAgentString(values ...string) string {
-	return useragent.UserAgent("Filebeat", values...)
+	return useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), values...)
 }
 
 func beatInfo() map[string]string {
