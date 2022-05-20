@@ -29,7 +29,9 @@ type retryer interface {
 }
 
 type ttlBatch struct {
-	original queue.Batch
+	// The callback to inform the queue (and possibly the producer)
+	// that this batch has been acknowledged.
+	ack func()
 
 	// The internal hook back to the eventConsumer, used to implement the
 	// publisher.Batch retry interface.
@@ -54,12 +56,24 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 		panic("empty batch")
 	}
 
+	count := original.Count()
+	events := make([]publisher.Event, 0, count)
+	for i := 0; i <= count; i++ {
+		event, ok := original.Event(i).(publisher.Event)
+		if ok {
+			// In Beats this conversion will always succeed because only
+			// publisher.Event objects are inserted into the queue, but
+			// there's no harm in making sure.
+			events = append(events, event)
+		}
+	}
+
 	b := batchPool.Get().(*ttlBatch)
 	*b = ttlBatch{
-		original: original,
-		retryer:  retryer,
-		ttl:      ttl,
-		events:   original.Events(),
+		ack:     original.ACK,
+		retryer: retryer,
+		ttl:     ttl,
+		events:  events,
 	}
 	return b
 }
@@ -74,12 +88,12 @@ func (b *ttlBatch) Events() []publisher.Event {
 }
 
 func (b *ttlBatch) ACK() {
-	b.original.ACK()
+	b.ack()
 	releaseBatch(b)
 }
 
 func (b *ttlBatch) Drop() {
-	b.original.ACK()
+	b.ack()
 	releaseBatch(b)
 }
 

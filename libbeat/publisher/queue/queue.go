@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -132,6 +131,7 @@ type Producer interface {
 // Batch of events to be returned to Consumers. The `ACK` method will send the
 // ACK signal to the queue.
 type Batch interface {
-	Events() []publisher.Event
+	Count() int
+	Event(i int) interface{}
 	ACK()
 }
