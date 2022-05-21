@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azure_blob"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
@@ -28,5 +29,6 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		o365audit.Plugin(log, store),
 		awss3.Plugin(store),
 		awscloudwatch.Plugin(store),
+		azure_blob.Plugin(store),
 	}
 }
