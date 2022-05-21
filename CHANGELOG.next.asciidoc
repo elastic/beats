@@ -165,6 +165,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
+- Bump node.js version for synthetics to 16.15.0. {pull}31675[31675]
 
 *Metricbeat*
 
