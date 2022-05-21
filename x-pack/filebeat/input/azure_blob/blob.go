@@ -16,6 +16,7 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
@@ -39,11 +40,11 @@ type blobObjectPayload struct {
 }
 
 type blobPoller struct {
-	numberOfWorkers  int
-	container        string
-	listPrefix       string
-	blobPollInterval time.Duration
-	// workerSem            *awscommon.Sem
+	numberOfWorkers      int
+	container            string
+	listPrefix           string
+	blobPollInterval     time.Duration
+	workerSem            *awscommon.Sem
 	log                  *logp.Logger
 	metrics              *inputMetrics
 	blob                 blobAPI
@@ -69,11 +70,11 @@ func newBlobPoller(log *logp.Logger,
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
 	return &blobPoller{
-		numberOfWorkers:  numberOfWorkers,
-		container:        container,
-		listPrefix:       listPrefix,
-		blobPollInterval: blobPollInterval,
-		// workerSem:          awscommon.NewSem(numberOfWorkers),
+		numberOfWorkers:      numberOfWorkers,
+		container:            container,
+		listPrefix:           listPrefix,
+		blobPollInterval:     blobPollInterval,
+		workerSem:            awscommon.NewSem(numberOfWorkers),
 		log:                  log,
 		metrics:              metrics,
 		blob:                 blob,
@@ -107,21 +108,21 @@ func (p *blobPoller) handlePurgingLock(info blobObjectInfo, isStored bool) {
 	}
 }
 
-func (p *blobPoller) ProcessObject(s3ObjectPayloadChan <-chan *blobObjectPayload) error {
+func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPayload) error {
 	var errs []error
 
-	for s3ObjectPayload := range s3ObjectPayloadChan {
+	for blobObjectPayload := range blobObjectPayloadChan {
 		// Process S3 object (download, parse, create events).
-		err := s3ObjectPayload.blobObjectHandler.ProcessBlobObject()
+		err := blobObjectPayload.blobObjectHandler.ProcessBlobObject()
 
 		// Wait for all events to be ACKed before proceeding.
-		s3ObjectPayload.blobObjectHandler.Wait()
+		blobObjectPayload.blobObjectHandler.Wait()
 
-		info := s3ObjectPayload.blobObjectInfo
+		info := blobObjectPayload.blobObjectInfo
 
 		if err != nil {
-			blob_name := s3ObjectPayload.blobObjectInfo.blob_name
-			container_name := s3ObjectPayload.blobObjectInfo.container_name
+			blob_name := blobObjectPayload.blobObjectInfo.blob_name
+			container_name := blobObjectPayload.blobObjectInfo.container_name
 			errs = append(errs, errors.Wrapf(err,
 				"failed processing Azure Blob event for object name %q in container %q",
 				blob_name, container_name))
@@ -139,7 +140,7 @@ func (p *blobPoller) ProcessObject(s3ObjectPayloadChan <-chan *blobObjectPayload
 	return multierr.Combine(errs...)
 }
 
-func (p *blobPoller) GetS3Objects(ctx context.Context, blobObjectPayloadChan chan<- *blobObjectPayload) {
+func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan chan<- *blobObjectPayload) {
 	defer close(blobObjectPayloadChan)
 
 	for p.marker.NotDone() {
@@ -305,33 +306,33 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 	workerWg := new(sync.WaitGroup)
 	for ctx.Err() == nil {
 		// Determine how many S3 workers are available.
-		// workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
-		// if err != nil {
-		// 	break
-		// }
+		workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
+		if err != nil {
+			break
+		}
 
-		// if workers == 0 {
-		// 	continue
-		// }
+		if workers == 0 {
+			continue
+		}
 
 		s3ObjectPayloadChan := make(chan *blobObjectPayload)
 
-		workerWg.Add(1)
+		workerWg.Add(workers)
 		go func() {
 			defer func() {
 				workerWg.Done()
 			}()
 
-			p.GetS3Objects(ctx, s3ObjectPayloadChan)
+			p.GetBlobObjects(ctx, s3ObjectPayloadChan)
 			p.Purge()
 		}()
 
-		workerWg.Add(p.numberOfWorkers)
-		for i := 0; i < p.numberOfWorkers; i++ {
+		workerWg.Add(workers)
+		for i := 0; i < workers; i++ {
 			go func() {
 				defer func() {
 					workerWg.Done()
-					// p.workerSem.Release(1)
+					p.workerSem.Release(1)
 				}()
 				if err := p.ProcessObject(s3ObjectPayloadChan); err != nil {
 					p.log.Warnw("Failed processing Blob listing.", "error", err)
