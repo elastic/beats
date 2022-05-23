@@ -25,11 +25,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestFetch(t *testing.T) {

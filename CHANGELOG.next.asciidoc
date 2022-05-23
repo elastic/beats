@@ -16,6 +16,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Add a new `salesforce` module to collect data from salesforce. {pull}31486[31486]
+
 *Heartbeat*
 
 - Restrict setuid to containerized environments. {pull}30869[30869]
@@ -59,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
 - Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
 - Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+- Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 
 *Heartbeat*
 - Fix unintentional use of no-op logger. {pull}31543[31543]
@@ -93,6 +96,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Update to Go 1.17.10 {issue}31636[31636]
 - Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
+- Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
 
 
 *Auditbeat*
@@ -118,6 +122,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
 - Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
 - Change threatintel module from beta to GA. {pull}31693[31693]
+- Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
 
 *Auditbeat*
 
@@ -142,6 +147,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Fix `include_top_n` fields in system/process {pull}31595[31595]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
+- system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 
 *Packetbeat*
 
@@ -166,6 +172,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
+- Bump node.js version for synthetics to 16.15.0. {pull}31675[31675]
 
 *Metricbeat*
 
