@@ -367,7 +367,7 @@ def tagAndPush(Map args = [:]) {
   pushDockerImages(
     registry: env.DOCKER_REGISTRY,
     secret: env.DOCKERELASTIC_SECRET,
-    snapshot: env.SNAPSHOT,
+    snapshot: true,
     version: env.BEAT_VERSION,
     images: images
   )
