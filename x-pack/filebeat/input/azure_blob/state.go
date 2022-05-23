@@ -12,11 +12,11 @@ import (
 // state is used to communicate the publishing state of a s3 object
 type state struct {
 	// ID is used to identify the state in the store, and it is composed by
-	// Bucket + Key + Etag + LastModified.String(): changing this value or how it is
+	// Container + Blob + Etag + LastModified.String(): changing this value or how it is
 	// composed will break backward compatibilities with entries already in the store.
 	ID           string    `json:"id" struct:"id"`
-	Bucket       string    `json:"bucket" struct:"bucket"`
-	Key          string    `json:"key" struct:"key"`
+	Container    string    `json:"container" struct:"container"`
+	Blob         string    `json:"blob" struct:"blob"`
 	Etag         string    `json:"etag" struct:"etag"`
 	LastModified time.Time `json:"last_modified" struct:"last_modified"`
 
@@ -27,17 +27,17 @@ type state struct {
 }
 
 // newState creates a new s3 object state
-func newState(bucket, key, etag string, lastModified time.Time) state {
+func newState(container, blob, etag string, lastModified time.Time) state {
 	s := state{
-		Bucket:       bucket,
-		Key:          key,
+		Container:    container,
+		Blob:         blob,
 		LastModified: lastModified,
 		Etag:         etag,
 		Stored:       false,
 		Error:        false,
 	}
 
-	s.ID = s.Bucket + s.Key + s.Etag + s.LastModified.String()
+	s.ID = s.Container + s.Blob + s.Etag + s.LastModified.String()
 
 	return s
 }
@@ -54,22 +54,22 @@ func (s *state) MarkAsError() {
 
 // IsEqual checks if the two states point to the same s3 object.
 func (s *state) IsEqual(c *state) bool {
-	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
+	return s.Container == c.Container && s.Blob == c.Blob && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
 }
 
 // IsEmpty checks if the state is empty
 func (s *state) IsEmpty() bool {
 	c := state{}
-	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
+	return s.Container == c.Container && s.Blob == c.Blob && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
 }
 
 // String returns string representation of the struct
 func (s *state) String() string {
 	return fmt.Sprintf(
-		"{ID: %v, Bucket: %v, Key: %v, Etag: %v, LastModified: %v}",
+		"{ID: %v, Container: %v, Blob: %v, Etag: %v, LastModified: %v}",
 		s.ID,
-		s.Bucket,
-		s.Key,
+		s.Container,
+		s.Blob,
 		s.Etag,
 		s.LastModified)
 }

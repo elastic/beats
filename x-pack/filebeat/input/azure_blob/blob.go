@@ -110,13 +110,15 @@ func (p *blobPoller) handlePurgingLock(info blobObjectInfo, isStored bool) {
 
 func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPayload) error {
 	var errs []error
-
+	p.log.Info("Number of objects, processObject Func: ", len(blobObjectPayloadChan))
 	for blobObjectPayload := range blobObjectPayloadChan {
 		// Process S3 object (download, parse, create events).
 		err := blobObjectPayload.blobObjectHandler.ProcessBlobObject()
+		p.log.Info("asdf1234")
 
 		// Wait for all events to be ACKed before proceeding.
-		blobObjectPayload.blobObjectHandler.Wait()
+		// TODO Figure this out
+		// blobObjectPayload.blobObjectHandler.Wait()
 
 		info := blobObjectPayload.blobObjectInfo
 
@@ -136,18 +138,24 @@ func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPaylo
 		// Metrics
 		p.metrics.s3ObjectsAckedTotal.Inc()
 	}
+	p.log.Info("Process Object Complete.  No more objects")
 
 	return multierr.Combine(errs...)
 }
 
 func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan chan<- *blobObjectPayload) {
-	defer close(blobObjectPayloadChan)
+	defer func() {
+		p.log.Info("GetBlobObjects ended")
+		p.marker = azblob.Marker{}
+		close(blobObjectPayloadChan)
+	}()
 
+	p.log.Info("Blob Marker Start: ", p.marker, "  --  ", p.marker.NotDone())
 	for p.marker.NotDone() {
 		listingID, err := uuid.NewV4()
 		if err != nil {
 			p.log.Warnw("Error generating UUID for listing page.", "error", err)
-			continue
+			return
 		}
 
 		// lock for the listing page and state in workersListingMap
@@ -159,23 +167,25 @@ func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan c
 		page, err := p.blob.ListObjectsPaginator(ctx, p.listPrefix, p.marker)
 		if err != nil {
 			p.log.Errorf("Azure Blob GetObjects failed: %w", err)
-			return
+			break
 		}
 		p.marker = page.NextMarker
+		p.log.Info("Blob Marker: ", p.marker, "  --  ", p.marker.NotDone())
 
 		totProcessableObjects := 0
 		totListedObjects := len(page.Segment.BlobItems)
 		blobObjectPayloadChanByPage := make(chan *blobObjectPayload, totListedObjects)
 
-		// Metrics
+		// // Metrics
 		p.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Segment.BlobItems {
-			// Unescape s3 key name. For example, convert "%3D" back to "=".
+			// 	// Unescape s3 key name. For example, convert "%3D" back to "=".
 			filename, err := url.QueryUnescape(object.Name)
 			if err != nil {
-				p.log.Errorw("Error when unescaping object key, skipping.", "error", err, "s3_object", object.Name)
+				p.log.Errorw("Error when unescaping object key, skipping.", "error", err, "s3_object", filename)
 				continue
 			}
+			p.log.Infof("Blob Object: %s", filename)
 
 			state := newState(p.container, filename, string(object.Properties.Etag), object.Properties.LastModified)
 			if p.states.MustSkip(state, p.store) {
@@ -187,7 +197,7 @@ func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan c
 
 			acker := NewEventACKTracker(ctx)
 
-			blobProcessor := p.blobObjectHandler.Create(ctx, p.log, acker, p.container, object.Name)
+			blobProcessor := p.blobObjectHandler.Create(ctx, p.log, acker, p.container, filename)
 			if blobProcessor == nil {
 				continue
 			}
@@ -257,10 +267,10 @@ func (p *blobPoller) Purge() {
 
 			var latestStoredTime time.Time
 			keys[state.ID] = struct{}{}
-			latestStoredTime, ok := latestStoredTimeByBucket[state.Bucket]
+			latestStoredTime, ok := latestStoredTimeByBucket[state.Container]
 			if !ok {
 				var commitWriteState commitWriteState
-				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+				err := p.store.Get(azureBlobWriteCommitPrefix+state.Container, &commitWriteState)
 				if err == nil {
 					// we have no entry in the map and we have no entry in the store
 					// set zero time
@@ -271,7 +281,7 @@ func (p *blobPoller) Purge() {
 			}
 
 			if state.LastModified.After(latestStoredTime) {
-				latestStoredTimeByBucket[state.Bucket] = state.LastModified
+				latestStoredTimeByBucket[state.Container] = state.LastModified
 			}
 
 		}
@@ -285,7 +295,7 @@ func (p *blobPoller) Purge() {
 		}
 
 		for bucket, latestStoredTime := range latestStoredTimeByBucket {
-			if err := p.store.Set(awsS3WriteCommitPrefix+bucket, commitWriteState{latestStoredTime}); err != nil {
+			if err := p.store.Set(azureBlobWriteCommitPrefix+bucket, commitWriteState{latestStoredTime}); err != nil {
 				p.log.Errorw("Failed to write commit time to the registry", "error", err)
 			}
 		}
@@ -304,6 +314,7 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 	// honoring the number in config opposed to a simpler loop that does one
 	//  listing, sequentially processes every object and then does another listing
 	workerWg := new(sync.WaitGroup)
+	p.log.Info("Starting Poll Loop")
 	for ctx.Err() == nil {
 		// Determine how many S3 workers are available.
 		workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
@@ -317,10 +328,11 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 
 		s3ObjectPayloadChan := make(chan *blobObjectPayload)
 
-		workerWg.Add(workers)
+		workerWg.Add(1)
 		go func() {
 			defer func() {
 				workerWg.Done()
+				p.log.Info("GetBlobObjects complete")
 			}()
 
 			p.GetBlobObjects(ctx, s3ObjectPayloadChan)
@@ -329,17 +341,21 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 
 		workerWg.Add(workers)
 		for i := 0; i < workers; i++ {
+			p.log.Infof("Worker %d started.", i)
 			go func() {
 				defer func() {
 					workerWg.Done()
 					p.workerSem.Release(1)
+					p.log.Infof("ProcessObject Worker #%d Complete", i)
 				}()
 				if err := p.ProcessObject(s3ObjectPayloadChan); err != nil {
 					p.log.Warnw("Failed processing Blob listing.", "error", err)
 				}
+				return
 			}()
 		}
 
+		p.log.Info("Waiting for timer")
 		timed.Wait(ctx, p.blobPollInterval)
 
 	}

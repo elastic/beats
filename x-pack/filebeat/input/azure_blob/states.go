@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
-	awsS3WriteCommitPrefix = "filebeat::aws-s3::writeCommit::"
+	azureBlobObjectStatePrefix = "filebeat::azure-blob::state::"
+	azureBlobWriteCommitPrefix = "filebeat::azure-blob::writeCommit::"
 )
 
 type listingInfo struct {
@@ -29,7 +29,7 @@ type listingInfo struct {
 	finalCheck    bool
 }
 
-// states handles list of s3 object state. One must use newStates to instantiate a
+// states handles list of azure blob state. One must use newStates to instantiate a
 // file states registry. Using the zero-value is not safe.
 type states struct {
 	sync.RWMutex
@@ -70,7 +70,7 @@ func (s *states) MustSkip(state state, store *statestore.Store) bool {
 	// the state.LastModified is before the last cleanStore
 	// write commit we can remove
 	var commitWriteState commitWriteState
-	err := store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+	err := store.Get(azureBlobWriteCommitPrefix+state.Container, &commitWriteState)
 	if err == nil && previousState.IsEmpty() &&
 		(state.LastModified.Before(commitWriteState.Time) || state.LastModified.Equal(commitWriteState.Time)) {
 		return true
@@ -145,7 +145,7 @@ func (s *states) Update(newState state, listingID string) {
 	s.Lock()
 	defer s.Unlock()
 
-	id := newState.Bucket + newState.Key
+	id := newState.Container + newState.Blob
 	index := s.findPrevious(id)
 
 	if index >= 0 {
@@ -189,7 +189,7 @@ func (s *states) Update(newState state, listingID string) {
 func (s *states) FindPrevious(newState state) state {
 	s.RLock()
 	defer s.RUnlock()
-	id := newState.Bucket + newState.Key
+	id := newState.Container + newState.Blob
 	i := s.findPrevious(id)
 	if i < 0 {
 		return state{}
@@ -212,7 +212,7 @@ func (s *states) FindPreviousByID(id string) state {
 func (s *states) IsNew(state state) bool {
 	s.RLock()
 	defer s.RUnlock()
-	id := state.Bucket + state.Key
+	id := state.Container + state.Blob
 	i := s.findPrevious(id)
 
 	if i < 0 {
@@ -272,7 +272,7 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 	var states []state
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
+		if !strings.HasPrefix(key, azureBlobObjectStatePrefix) {
 			return true, nil
 		}
 
@@ -285,7 +285,7 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 			return true, nil
 		}
 
-		st.ID = key[len(awsS3ObjectStatePrefix):]
+		st.ID = key[len(azureBlobObjectStatePrefix):]
 		states = append(states, st)
 		return true, nil
 	})
@@ -347,7 +347,7 @@ func mergeStates(st, other *state) {
 
 func (s *states) writeStates(store *statestore.Store) error {
 	for _, state := range s.GetStates() {
-		key := awsS3ObjectStatePrefix + state.ID
+		key := azureBlobObjectStatePrefix + state.ID
 		if err := store.Set(key, state); err != nil {
 			return err
 		}

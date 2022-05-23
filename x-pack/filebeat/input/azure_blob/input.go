@@ -130,7 +130,6 @@ func (in *blobInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error 
 }
 
 func (in *blobInput) createBlobLister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*blobPoller, error) {
-	// s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 	u := ParseEndpointUrl(in.config.Endpoint, in.config.AccountName)
 	p := azblob.NewPipeline(in.credential, azblob.PipelineOptions{})
 	serviceURL := azblob.NewServiceURL(*u, p)

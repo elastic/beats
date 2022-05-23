@@ -11,13 +11,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "azure_blob", asset.ModuleFieldsPri, AssetAwss3); err != nil {
+	if err := asset.SetFields("filebeat", "azure_blob", asset.ModuleFieldsPri, AssetAzureBlob); err != nil {
 		panic(err)
 	}
 }
 
-// AssetAwss3 returns asset data.
-// This is the base64 encoded zlib format compressed contents of input/awss3.
-func AssetAwss3() string {
-	return "eJy00LFOwzAYBODdT3Hq3izZPCDxAh3owIj+JpfWxLEj+3dR3h45pYBEBxDgwZLts+7Tv8XIxSK3BlCnnhab3G4M0DN3yc3qYrC4MwCwbzE4+j5jSHFCbuHCXLQxQKKnZFocxeAtZddPWwSZaHEo3Uht6mG9rw2DFK9Pa9pCU7m+6DLTVtlLTP17+ounrp1MRBygJ1bfpQV6krq5DB+PSNTkeGa/uptbLEnhL1X3D7vfoOLhmZ02I5d/HNWl5AeqiSq9qHzTNHhRZeAt1cegHvefLNcGnMUX5sa8BgAA//9Tvst1"
+// AssetAzureBlob returns asset data.
+// This is the base64 encoded zlib format compressed contents of input/azure_blob.
+func AssetAzureBlob() string {
+	return "eJy0kDFOxDAURHufYrT95gAukICehgMgJ5kkBsc/+vkGLadHNhskREG17kYz43n2GW+8ePRJegdYtESPU5UnB4zcB42bRckedw4A7j+LEg9JekyRadwxqaztAsS8FescoEwMOz3m4HDN+VY/I4eVHoNkCzFTu6qbVeemUJK9tIKHaTkcu2z0FfVDdPxJ/4Gr5ymshEyw5Yr5bKJhJh6PSdgSDLbEHUlmKE0j3zm2l3S/MKV/5WA3ZWw/973zD9hXAAAA//9YVIX8"
 }

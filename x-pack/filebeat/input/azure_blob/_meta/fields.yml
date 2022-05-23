@@ -1,0 +1,16 @@
+- key: blob
+  title: "blob"
+  description: >
+    Azure Blob fields from blob input.
+  release: ga
+  fields:
+    - name: container.name
+      default_field: true
+      type: keyword
+      description: >
+        Name of the Blob Storage Container that this log retrieved from.
+    - name: object.name
+      default_field: true
+      type: keyword
+      description: >
+        Name of the blob object that this log retrieved from.
