@@ -23,9 +23,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // init registers the MetricSet with the central registry.
@@ -88,7 +88,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return eventsMapping(r, m.HTTP, *info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) updateServicePath(esVersion common.Version) error {
+func (m *MetricSet) updateServicePath(esVersion version.V) error {
 	p, err := getServicePath(esVersion)
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (m *MetricSet) updateServicePath(esVersion common.Version) error {
 
 }
 
-func getServicePath(esVersion common.Version) (string, error) {
+func getServicePath(esVersion version.V) (string, error) {
 	currPath := statsPath
 	u, err := url.Parse(currPath)
 	if err != nil {

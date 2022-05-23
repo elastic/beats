@@ -25,7 +25,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -91,7 +90,7 @@ func PythonAutopep8() error {
 	}
 
 	fmt.Println(">> fmt - autopep8: Formatting Python code")
-	ve, err := PythonVirtualenv()
+	ve, err := PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}
@@ -129,7 +128,7 @@ func AddLicenseHeaders() error {
 	case "Elasticv2", "Elastic License 2.0":
 		license = "Elasticv2"
 	default:
-		return errors.Errorf("unknown license type %v", BeatLicense)
+		return fmt.Errorf("unknown license type %v", BeatLicense)
 	}
 
 	licenser := gotool.Licenser

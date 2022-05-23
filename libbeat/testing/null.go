@@ -17,12 +17,16 @@
 
 package testing
 
+import (
+	libtesting "github.com/elastic/elastic-agent-libs/testing"
+)
+
 type nullDriver struct{}
 
 // NullDriver does nothing, ignores all output and doesn't die on errors
 var NullDriver = &nullDriver{}
 
-func (d *nullDriver) Run(name string, f func(Driver)) {
+func (d *nullDriver) Run(name string, f func(libtesting.Driver)) {
 	f(d)
 }
 

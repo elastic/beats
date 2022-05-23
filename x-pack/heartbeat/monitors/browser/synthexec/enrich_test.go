@@ -40,9 +40,9 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 }
 
 func TestJourneyEnricher(t *testing.T) {
-	var stdFields = StdSuiteFields{
-		Id:       "mysuite",
-		Name:     "mysuite",
+	var stdFields = StdProjectFields{
+		Id:       "myproject",
+		Name:     "myproject",
 		Type:     "browser",
 		IsInline: false,
 	}
@@ -89,13 +89,13 @@ func TestJourneyEnricher(t *testing.T) {
 		journeyEnd,
 	}
 
-	suiteValidator := func() validator.Validator {
+	projectValidator := func() validator.Validator {
 		return lookslike.MustCompile(mapstr.M{
-			"suite.id":     stdFields.Id,
-			"suite.name":   stdFields.Name,
-			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
-			"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-			"monitor.type": stdFields.Type,
+			"monitor.project.id":   stdFields.Id,
+			"monitor.project.name": stdFields.Name,
+			"monitor.id":           fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
+			"monitor.name":         fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
+			"monitor.type":         stdFields.Type,
 		})
 	}
 	inlineValidator := func() validator.Validator {
@@ -127,7 +127,7 @@ func TestJourneyEnricher(t *testing.T) {
 	}
 
 	je := &journeyEnricher{}
-	check := func(t *testing.T, se *SynthEvent, ssf StdSuiteFields) {
+	check := func(t *testing.T, se *SynthEvent, ssf StdProjectFields) {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, ssf)
@@ -135,11 +135,11 @@ func TestJourneyEnricher(t *testing.T) {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
 			if ssf.IsInline {
-				sv, _ := e.Fields.GetValue("suite")
+				sv, _ := e.Fields.GetValue("monitor.project")
 				require.Nil(t, sv)
 				testslike.Test(t, inlineValidator(), e.Fields)
 			} else {
-				testslike.Test(t, suiteValidator(), e.Fields)
+				testslike.Test(t, projectValidator(), e.Fields)
 			}
 			testslike.Test(t, commonValidator(se), e.Fields)
 
@@ -152,7 +152,7 @@ func TestJourneyEnricher(t *testing.T) {
 		isInline bool
 	}{
 		{
-			name:     "suite monitor",
+			name:     "project monitor",
 			isInline: false,
 		},
 		{
@@ -402,7 +402,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StdSuiteFields{IsInline: false}
+		stdFields := StdProjectFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
@@ -464,7 +464,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StdSuiteFields{IsInline: false}
+		stdFields := StdProjectFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 

@@ -28,7 +28,7 @@ services:
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=false"
     ports:
-      - 9200
+      - 9200:9200
 
   # Used by autodiscover tests
   jolokia:
@@ -43,10 +43,13 @@ services:
       context: ./module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-8.1.2}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600
     depends_on:
       - elasticsearch
     ports:
-      - 5601
+      - 5601:5601
 
   # Used by base tests
   metricbeat:
@@ -57,4 +60,4 @@ services:
         BEAT_VERSION: ${BEAT_VERSION:-8.1.2}
     command: '-e'
     ports:
-      - 5066
+      - 5066:5066
