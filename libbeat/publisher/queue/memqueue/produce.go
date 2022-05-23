@@ -18,8 +18,6 @@
 package memqueue
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -61,7 +59,6 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	}
 
 	if cb != nil {
-		fmt.Printf("creating producer with non-nil ack handler\n")
 		p := &ackProducer{broker: b, seq: 1, dropOnCancel: dropOnCancel, openState: openState}
 		p.state.cb = cb
 		p.state.dropCB = dropCB

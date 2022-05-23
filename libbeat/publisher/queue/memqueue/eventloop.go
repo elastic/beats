@@ -113,7 +113,6 @@ func (l *directEventLoop) run() {
 
 		case count := <-l.broker.ackChan:
 			// Events have been ACKed, remove them from the internal buffer.
-			fmt.Printf("directEventLoop got %d on ackChan\n", count)
 			l.buf.removeEntries(count)
 
 		case req := <-l.broker.cancelChan: // producer cancelling active events
@@ -124,7 +123,6 @@ func (l *directEventLoop) run() {
 			l.handleGetRequest(&req)
 
 		case schedACKs <- l.pendingACKs:
-			fmt.Printf("sent pendingACKs to schedACKs\n")
 			// on send complete list of pending batches has been forwarded -> clear list
 			l.pendingACKs = chanList{}
 		}
@@ -137,7 +135,6 @@ func (l *directEventLoop) insert(req *pushRequest) {
 
 	st := req.state
 	if st == nil {
-		fmt.Printf("directEventLoop.insert nil state\n")
 		l.buf.insert(req.event, clientState{})
 	} else if st.cancelled {
 		reportCancelledState(log, req)
@@ -184,8 +181,6 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 
 // processACK is called by the ackLoop to process the list of acked batches
 func (l *directEventLoop) processACK(lst chanList, N int) {
-	fmt.Printf("processACK(%v)\n", N)
-	defer fmt.Printf("processACK finished\n")
 	log := l.broker.logger
 	{
 		start := time.Now()
@@ -238,7 +233,6 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 				N, total,
 			))
 		}
-		fmt.Printf("calling produceState callback\n")
 		client.state.cb(int(count))
 		client.state.lastACK = client.seq
 		client.state = nil

@@ -18,7 +18,6 @@
 package queuetest
 
 import (
-	"fmt"
 	"sync"
 	"testing"
 
@@ -211,9 +210,7 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 			go test.producers(&wg, nil, log, queue)()
 			go test.consumers(&wg, nil, log, queue)()
 
-			fmt.Printf("waiting on wg\n")
 			wg.Wait()
-			fmt.Printf("done waiting\n")
 		}))
 	}
 }
@@ -245,8 +242,6 @@ func makeProducer(
 		return func() {
 			defer wg.Done()
 
-			fmt.Printf("start producer\n")
-			defer fmt.Printf("stop producer\n")
 			log.Debug("start producer")
 			defer log.Debug("stop producer")
 
@@ -256,12 +251,10 @@ func makeProducer(
 			)
 
 			if waitACK {
-				fmt.Printf("waitACK is true\n")
 				ackWG.Add(maxEvents)
 
 				total := 0
 				ackCB = func(N int) {
-					fmt.Printf("ackCB(%v)\n", N)
 					total += N
 					log.Debugf("producer ACK: N=%v, total=%v\n", N, total)
 
@@ -292,7 +285,6 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
 		wg.Add(1)
 		return func() {
-			total := 0
 			defer wg.Done()
 
 			var events sync.WaitGroup
@@ -304,30 +296,23 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 				b := b
 
 				go func() {
-					fmt.Printf("start consumer\n")
-					defer fmt.Printf("end consumer\n")
 					for {
 						batch, err := b.Get(batchSize)
 						if err != nil {
 							return
 						}
 
-						total += batch.Count()
-						fmt.Printf("got batch of size %d, total %d / %d\n", batch.Count(), total, maxEvents)
 						log.Debug("consumer: process batch", batch.Count())
 
 						for j := 0; j < batch.Count(); j++ {
 							events.Done()
 						}
 						batch.ACK()
-						fmt.Printf("batch acked\n")
 					}
 				}()
 			}
 
-			fmt.Printf("waiting on events wg\n")
 			events.Wait()
-			fmt.Printf("done waiting on events wg\n")
 		}
 	}
 }
