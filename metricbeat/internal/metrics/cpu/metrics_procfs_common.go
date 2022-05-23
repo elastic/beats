@@ -46,14 +46,14 @@ func Get(procfs resolve.Resolver) (CPUMetrics, error) {
 		return CPUMetrics{}, fmt.Errorf("scanning stat file: %w", err)
 	}
 
-	infoPath := procfs.ResolveHostFS("/proc/cpuinfo")
-	infoFd, err := os.Open(infoPath)
+	cpuInfoPath := procfs.ResolveHostFS("/proc/cpuinfo")
+	cpuInfoFd, err := os.Open(cpuInfoPath)
 	if err != nil {
-		return CPUMetrics{}, fmt.Errorf("opening /proc/cpuinfo: %w", err)
+		return CPUMetrics{}, fmt.Errorf("opening '%s': %w", cpuInfoPath, err)
 	}
-	defer infoFd.Close()
+	defer cpuInfoFd.Close()
 
-	cpuInfo, err := scanCPUInfoFile(bufio.NewScanner(infoFd))
+	cpuInfo, err := scanCPUInfoFile(bufio.NewScanner(cpuInfoFd))
 	metrics.CPUinfo = cpuInfo
 
 	return metrics, err
