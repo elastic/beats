@@ -33,10 +33,10 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/service"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/service"
 )
 
 var (
