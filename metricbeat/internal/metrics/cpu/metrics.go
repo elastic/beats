@@ -124,11 +124,18 @@ func (m *Monitor) FetchCores() ([]Metrics, error) {
 		if len(m.lastSample.list) > i {
 			lastMetric = m.lastSample.list[i]
 		}
+
 		coreMetrics[i] = Metrics{
 			currentSample:  metric.list[i],
 			previousSample: lastMetric,
 			isTotals:       false,
-			cpuInfo:        metric.CPUinfo[i],
+		}
+
+		// Only add CPUInfo metric if it's available
+		// TODO: Remove this if statement once CPUInfo is supported
+		// by all systems
+		if len(metric.CPUinfo) != 0 {
+			coreMetrics[i].cpuInfo = metric.CPUinfo[i]
 		}
 	}
 	m.lastSample = metric
