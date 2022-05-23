@@ -34,13 +34,22 @@ const (
 const (
 	defaultExitTimeout           = 10 * time.Second
 	defaultDataDir               = "osquery"
+	defaultCertsDir              = "certs"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
 )
+
+const (
+	flagEnableTables  = "enable_tables"
+	flagDisableTables = "disable_tables"
+)
+
+var defaultDisabledTables = []string{"curl", "carves"}
 
 type OSQueryD struct {
 	socketPath string
 	binPath    string
 	dataPath   string
+	certsPath  string
 
 	configPlugin string
 	loggerPlugin string
@@ -108,6 +117,10 @@ func New(socketPath string, opts ...Option) *OSQueryD {
 
 	if q.dataPath == "" {
 		q.dataPath = filepath.Join(q.binPath, defaultDataDir)
+	}
+
+	if q.certsPath == "" {
+		q.certsPath = filepath.Join(q.binPath, defaultCertsDir)
 	}
 
 	return q
@@ -367,6 +380,11 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 
 	// Copy user flags
 	for k, userValue := range userFlags {
+		// Skip enable_tables and disable_tables flags, they are set later in this function
+		// after merging with default disabled tables
+		if k == flagEnableTables || flagEnableTables == flagDisableTables {
+			continue
+		}
 		flags[k] = userValue
 	}
 
@@ -379,6 +397,8 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	flags["database_path"] = q.resolveDataPath(flags.GetString("database_path"))
 	flags["extensions_autoload"] = q.resolveDataPath(flags.GetString("extensions_autoload"))
 	flags["flagfile"] = q.resolveDataPath(flags.GetString("flagfile"))
+
+	flags["tls_server_certs"] = q.resolveCertsPath(flags.GetString("tls_server_certs"))
 
 	flags["extensions_socket"] = q.socketPath
 
@@ -404,7 +424,82 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 		flags["disable_logging"] = false
 	}
 
+	// Check enabled tables
+	// If the default disabled table shows up in the enabled tables list, remove it from disabled tables list
+	// This changes the behvaour for this flag in a sense that if `curl` table is enabled
+	// then it just removes is from disabled tables flag and doesn't disable all the other table
+	enabledTables, disabledTables := getEnabledDisabledTables(userFlags)
+	if len(enabledTables) != 0 {
+		flags[flagEnableTables] = strings.Join(enabledTables, ",")
+	}
+
+	if len(disabledTables) != 0 {
+		flags[flagDisableTables] = strings.Join(disabledTables, ",")
+	}
+
 	return convertToArgs(flags)
+}
+
+func arrayToSet(arr []string) map[string]struct{} {
+	m := make(map[string]struct{}, len(arr))
+	for _, n := range arr {
+		m[n] = struct{}{}
+	}
+	return m
+}
+
+// https://osquery.readthedocs.io/en/stable/installation/cli-flags/#enable-and-disable-flags
+// By default every table is enabled.
+// If a specific table is set in both --enable_tables and --disable_tables, disabling take precedence.
+// If --enable_tables is defined and --disable_tables is not set, every table but the one defined in --enable_tables
+func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
+	enabledTables := make(map[string]struct{})
+
+	// Initialize with default disabled tables
+	disabledTables := arrayToSet(defaultDisabledTables)
+
+	// Append the disabled tables from flags
+	if disabledTablesValue, ok := userFlags["disable_tables"]; ok {
+		if disabledTablesString, ok := disabledTablesValue.(string); ok {
+			tables := strings.Split(disabledTablesString, ",")
+			for _, table := range tables {
+				name := strings.TrimSpace(table)
+				if name == "" {
+					continue
+				}
+				disabledTables[name] = struct{}{}
+			}
+		}
+	}
+
+	// Check enabled tables flag and remove these tables from disabledTables
+	if enabledTablesValue, ok := userFlags["enable_tables"]; ok {
+		if enabledTablesString, ok := enabledTablesValue.(string); ok {
+			tables := strings.Split(enabledTablesString, ",")
+			for _, table := range tables {
+				name := strings.TrimSpace(table)
+				if name == "" {
+					continue
+				}
+				if _, ok := disabledTables[table]; ok {
+					delete(disabledTables, name)
+				} else {
+					enabledTables[name] = struct{}{}
+				}
+			}
+		}
+	}
+
+	enabled = make([]string, 0, len(enabledTables))
+	for name := range enabledTables {
+		enabled = append(enabled, name)
+	}
+
+	disabled = make([]string, 0, len(disabledTables))
+	for name := range disabledTables {
+		disabled = append(disabled, name)
+	}
+	return enabled, disabled
 }
 
 func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
@@ -442,6 +537,10 @@ func osqueryExtensionPath(dir string) string {
 
 func (q *OSQueryD) resolveDataPath(filename string) string {
 	return filepath.Join(q.dataPath, filename)
+}
+
+func (q *OSQueryD) resolveCertsPath(filename string) string {
+	return filepath.Join(q.certsPath, filename)
 }
 
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
