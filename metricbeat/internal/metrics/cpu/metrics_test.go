@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -54,7 +55,7 @@ func TestCoresMonitorSample(t *testing.T) {
 		evt := mapstr.M{}
 		metricOpts := MetricOpts{Percentages: true, Ticks: true}
 		evt, err := s.Format(metricOpts)
-		assert.NoError(t, err, "error in Format")
+		require.NoError(t, err, "error in Format")
 		testPopulatedEvent(evt, t, false)
 	}
 }

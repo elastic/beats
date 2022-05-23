@@ -146,6 +146,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Fix `include_top_n` fields in system/process {pull}31595[31595]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
+- system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 
 *Packetbeat*
 
