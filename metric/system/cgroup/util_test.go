@@ -40,12 +40,12 @@ const ubuntuTestData = "testdata/ubuntu1804.zip"
 func TestMain(m *testing.M) {
 	err := extractTestData(dockerTestData)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
 		os.Exit(1)
 	}
 	err = extractTestData(ubuntuTestData)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
 		os.Exit(1)
 	}
 	os.Exit(m.Run())
