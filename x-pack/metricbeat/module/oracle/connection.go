@@ -20,7 +20,8 @@ type ConnectionDetails struct {
 	Password string `config:"password"`
 }
 
-// HostParser parses host value
+// HostParser parses host and extracts connection information and returns it to HostData
+// HostData can then be used to make connection to SQL
 func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
 	params, err := godror.ParseConnString(rawURL)
 	if err != nil {
