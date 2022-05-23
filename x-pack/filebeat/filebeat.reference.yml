@@ -3589,6 +3589,10 @@ filebeat.inputs:
 # sub-dictionary. Default is false.
 #fields_under_root: false
 
+# Configure the precision of all timestamps in Filebeat.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
+
 # Internal queue configuration for buffering events to be published.
 #queue:
   # Queue type by name (default 'mem')

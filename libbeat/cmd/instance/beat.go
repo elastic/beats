@@ -131,6 +131,8 @@ type beatConfig struct {
 
 	// Migration config to migration from 6 to 7
 	Migration *config.C `config:"migration.6_to_7"`
+	// TimestampPrecision sets the precision of all timestamps in the Beat.
+	TimestampPrecision *config.C `config:"timestamp"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -684,6 +686,10 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.Name = name
 	}
 
+	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
+		return fmt.Errorf("error setting timestamp precision: %w", err)
+	}
+
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -916,7 +922,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 	_, err := elasticsearch.RegisterConnectCallback(b.indexSetupCallback())
 	if err != nil {
-		return fmt.Errorf("failed to register index management with elasticsearch: %+v", err)
+		return fmt.Errorf("failed to register index management with elasticsearch: %w", err)
 	}
 	return nil
 }
@@ -1184,11 +1190,11 @@ func initPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %+v", err)
+		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %+v", err)
+		return fmt.Errorf("error setting default paths: %w", err)
 	}
 	return nil
 }
