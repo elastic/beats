@@ -40,7 +40,7 @@ func TestValidLocal(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewSuite(cfg)
+	s, e := NewProject(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	_, ok := s.InlineSource()
@@ -73,7 +73,7 @@ func TestValidInline(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewSuite(cfg)
+	s, e := NewProject(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	sSrc, ok := s.InlineSource()
@@ -95,7 +95,7 @@ func TestNameRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSuite(cfg)
+	_, e := NewProject(cfg)
 	require.Regexp(t, ErrNameRequired, e)
 }
 
@@ -108,7 +108,7 @@ func TestIDRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSuite(cfg)
+	_, e := NewProject(cfg)
 	require.Regexp(t, ErrIdRequired, e)
 }
 
@@ -116,7 +116,7 @@ func TestEmptySource(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
-	s, e := NewSuite(cfg)
+	s, e := NewProject(cfg)
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)
@@ -190,11 +190,11 @@ func TestExtraArgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &Suite{
-				suiteCfg: tt.cfg,
+			s := &Project{
+				projectCfg: tt.cfg,
 			}
 			if got := s.extraArgs(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Suite.extraArgs() = %v, want %v", got, tt.want)
+				t.Errorf("Project.extraArgs() = %v, want %v", got, tt.want)
 			}
 		})
 	}
