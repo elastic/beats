@@ -21,10 +21,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestMonitorSample(t *testing.T) {
@@ -54,7 +55,7 @@ func TestCoresMonitorSample(t *testing.T) {
 		evt := mapstr.M{}
 		metricOpts := MetricOpts{Percentages: true, Ticks: true}
 		evt, err := s.Format(metricOpts)
-		assert.NoError(t, err, "error in Format")
+		require.NoError(t, err, "error in Format")
 		testPopulatedEvent(evt, t, false)
 	}
 }
