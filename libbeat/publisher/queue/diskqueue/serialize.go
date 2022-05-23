@@ -142,12 +142,12 @@ func (d *eventDecoder) Buffer(n int) []byte {
 }
 
 func (d *eventDecoder) Decode() (publisher.Event, error) {
-	var (
-		to  entry
-		err error
-	)
+	var to entry
 
-	d.unfolder.SetTarget(&to)
+	err := d.unfolder.SetTarget(&to)
+	if err != nil {
+		return publisher.Event{}, err
+	}
 	defer d.unfolder.Reset()
 
 	if d.useJSON {
