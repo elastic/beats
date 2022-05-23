@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -54,7 +53,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/metric/system/host"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -75,6 +73,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
 	"github.com/elastic/elastic-agent-libs/paths"
 	libversion "github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
+	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	ucfg "github.com/elastic/go-ucfg"
@@ -263,7 +263,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     metrics.EphemeralID(),
+			EphemeralID:     metricreport.EphemeralID(),
 		},
 		Fields: fields,
 	}
@@ -341,7 +341,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = metrics.SetupMetrics(b.Info.Beat)
+	err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Info.Beat, version.GetDefaultVersion())
 	if err != nil {
 		return nil, err
 	}

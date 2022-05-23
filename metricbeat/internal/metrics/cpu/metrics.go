@@ -21,9 +21,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // CPU manages the CPU metrics from /proc/stat

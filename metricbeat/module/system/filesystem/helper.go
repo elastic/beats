@@ -30,8 +30,8 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	sigar "github.com/elastic/gosigar"
 )
 
