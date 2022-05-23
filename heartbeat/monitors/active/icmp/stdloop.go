@@ -28,10 +28,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type stdICMPLoop struct {
