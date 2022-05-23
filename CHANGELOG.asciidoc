@@ -7,31 +7,6 @@
 === Beats version 8.2.1
 https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -39,8 +14,6 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 - Fix group write permissions on runtime directories. {pull}30869[30869]
 - Store syslog version as string. {pull}31446[31446]
 - Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
-
-*Auditbeat*
 
 *Filebeat*
 
@@ -71,13 +44,6 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 - Fix resource handle leak during event log enrichment. {pull}31504[31504]
 - Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
 
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
@@ -85,25 +51,11 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 - Update to Go 1.17.10 {issue}31636[31636]
 - Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
 
-
-*Auditbeat*
-
-
 *Filebeat*
 
 - Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 - Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 - Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
-
-*Auditbeat*
-
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
 
 *Metricbeat*
 
@@ -114,49 +66,6 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Fix `include_top_n` fields in system/process {pull}31595[31595]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
 
 [[release-notes-8.2.0]]
 === Beats version 8.2.0
