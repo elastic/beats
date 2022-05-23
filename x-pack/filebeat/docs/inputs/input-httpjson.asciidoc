@@ -368,15 +368,12 @@ NOTE: Only one of the credentials settings can be set at once. If none is provid
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
-<<<<<<< HEAD
 =======
 [float]
 ==== `auth.oauth2.google.delegated_account`
 
 Email of the delegated account used to create the credentials (usually an admin).
 
-[[request-parameters]]
->>>>>>> 249a87520a ([filebeat][httpjson] Add missing docs for the delegated_account option (#31498))
 [float]
 ==== `request.url`
 
