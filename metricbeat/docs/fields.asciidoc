@@ -60259,6 +60259,16 @@ type: long
 
 --
 
+*`system.filesystem.options`*::
++
+--
+The options present on the filesystem mount.
+
+
+type: keyword
+
+--
+
 *`system.filesystem.free`*::
 +
 --
