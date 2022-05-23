@@ -99,8 +99,8 @@ func addMonitorMeta(sf stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper
 				"type": sf.Type,
 			}
 
-			if sf.Source != "" {
-				fields["source"] = sf.Source
+			if sf.Origin != "" {
+				fields["origin"] = sf.Origin
 			}
 
 			eventext.MergeEventFields(event, mapstr.M{"monitor": fields})
