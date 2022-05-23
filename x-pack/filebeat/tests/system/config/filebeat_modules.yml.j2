@@ -25,3 +25,5 @@ setup.kibana.host: {{ kibana_url }}
 {% if kibana_path %}
 setup.dashboards.directory: {{ kibana_path }}
 {% endif %}
+
+timestamp.precision: nanosecond
