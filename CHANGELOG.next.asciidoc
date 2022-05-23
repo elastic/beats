@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Auditbeat*
 
 - Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+- Fix audit status collection on kernels prior to version 5.9. {issue}31616[31616] {pull}31710[31710]
 
 *Filebeat*
 
