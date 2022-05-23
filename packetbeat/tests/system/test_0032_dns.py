@@ -13,6 +13,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             dns_ports=[53],
+            timestamp_precision="nanosecond",
         )
         self.run_packetbeat(pcap="dns_google_com.pcap")
 
