@@ -1,0 +1,146 @@
+[role="xpack"]
+
+:type: azure-blob
+
+[id="{beatname_lc}-input-{type}"]
+=== Azure eventhub input
+
+++++
+<titleabbrev>Azure Blob</titleabbrev>
+++++
+
+Use of the `azure-blob` input in order to poll a list of blobs within an Azure Storage Account container.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-blob
+  storage_account: "devstoreaccount1"
+  storage_account_key: "....."
+  storage_account_container: "test"
+----
+
+==== Configuration options
+
+The `azure-blob` input supports the following configuration:
+
+==== `storage_account`
+
+The name of the storage account. Required.
+
+==== `storage_account_key`
+
+The storage account key, this key will be used to authorize access to data in your storage account. Required.
+
+==== `storage_account_container`
+
+The name of the storage account container to poll fort blobs.  Required.
+
+==== `blob_list_prefix`
+
+Prefix to apply for the list request to the Azure sotrage container. Default empty.
+
+==== `blob_list_interval`
+
+Time interval for polling listing of the Azure sotrage container: default to `120s`.
+
+==== `number_of_workers`
+
+Number of workers that will process the Azure sotrage container objects listed.
+
+==== `endpoint`
+
+The parent domain for the environment that contains the sotrage account.
+Options include:
+|===
+|Azure Environment | Endpoint
+|Commercial Cloud (default) | core.usgovcloudapi.net
+|US Government Cloud | core.usgovcloudapi.net
+|China Cloud | core.chinacloudapi.cn
+|German Cloud | core.cloudapi.de
+|===
+
+To use a self hosted, emulated or other compatible service the `endpoint` setting should be a full URI in the form of `https(s)://<storage endpoint>`, with scheme and port if required.
+
+Example configuration using the https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=visual-studio[Azurite emulator]:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-blob
+  storage_account: "devstoreaccount1"
+  storage_account_key: "....."
+  storage_account_container: "test"
+  endpoint: http://127.0.0.1:10000
+----
+
+[id="input-{type}-buffer_size"]
+[float]
+==== `buffer_size`
+
+The size in bytes of the buffer that each harvester uses when fetching a file.
+This only applies to non-JSON logs. The default is `16 KiB`.
+
+[id="input-{type}-content_type"]
+[float]
+==== `content_type`
+
+A standard MIME type describing the format of the object data.  This
+can be set to override the MIME type that was given to the object when
+it was uploaded. For example: `application/json`.
+
+[id="input-{type}-encoding"]
+[float]
+==== `encoding`
+
+The file encoding to use for reading data that contains international
+characters. This only applies to non-JSON logs. See <<_encoding_3>>.
+
+[id="input-{type}-max_bytes"]
+[float]
+==== `max_bytes`
+
+The maximum number of bytes that a single log message can have. All bytes after
+`max_bytes` are discarded and not sent. This setting is especially useful for
+multiline log messages, which can get large. This only applies to non-JSON logs.
+The default is `10 MiB`.
+
+[id="input-{type}-parsers"]
+[float]
+==== `parsers`
+
+beta[]
+
+This option expects a list of parsers that non-JSON logs go through.
+
+Available parsers:
+
+* `multiline`t start with the `<Event>` tag.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  parsers:
+    - multiline:
+        pattern: "^<Event"
+        negate:  true
+        match:   a
+
+In this example, {beatname_uc} is reading multiline messages that
+consist of XML thafter
+----
+
+See the available parser settings in detail below.
+
+[float]
+===== `multiline`
+
+beta[]
+
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
