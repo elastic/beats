@@ -20,14 +20,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type PushedSource struct {
+type ProjectSource struct {
 	Content         string `config:"content" json:"content"`
 	TargetDirectory string
 }
 
-var ErrNoContent = fmt.Errorf("no 'content' value specified for pushed monitor source")
+var ErrNoContent = fmt.Errorf("no 'content' value specified for project monitor source")
 
-func (p *PushedSource) Validate() error {
+func (p *ProjectSource) Validate() error {
 	if !regexp.MustCompile(`\S`).MatchString(p.Content) {
 		return ErrNoContent
 	}
@@ -35,7 +35,7 @@ func (p *PushedSource) Validate() error {
 	return nil
 }
 
-func (p *PushedSource) Fetch() error {
+func (p *ProjectSource) Fetch() error {
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func (p *PushedSource) Fetch() error {
 
 	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
 	if err != nil {
-		return fmt.Errorf("could not create tmpfile for pushed monitor source: %w", err)
+		return fmt.Errorf("could not create tmpfile for project monitor source: %w", err)
 	}
 	defer os.Remove(tf.Name())
 
@@ -55,7 +55,7 @@ func (p *PushedSource) Fetch() error {
 
 	p.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
 	if err != nil {
-		return fmt.Errorf("could not make temp dir for unzipping pushed source: %w", err)
+		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
 
 	err = unzip(tf, p.Workdir(), "")
@@ -64,7 +64,7 @@ func (p *PushedSource) Fetch() error {
 		return err
 	}
 
-	// Offline is not required for pushed resources as we are only linking
+	// Offline is not required for project resources as we are only linking
 	// to the globally installed agent, but useful for testing purposes
 	if !Offline() {
 		// set up npm project and ensure synthetics is installed
@@ -99,7 +99,7 @@ func setupProjectDir(workdir string) error {
 	globalPath := strings.Replace(fname, "bin/elastic-synthetics", "lib/node_modules/@elastic/synthetics", 1)
 	symlinkPath := fmt.Sprintf("file:%s", globalPath)
 	pkgJson := PackageJSON{
-		Name:    "pushed-journey",
+		Name:    "project-journey",
 		Private: true,
 		Dependencies: mapstr.M{
 			"@elastic/synthetics": symlinkPath,
@@ -119,11 +119,11 @@ func setupProjectDir(workdir string) error {
 	return runSimpleCommand(exec.Command("npm", "install"), workdir)
 }
 
-func (p *PushedSource) Workdir() string {
+func (p *ProjectSource) Workdir() string {
 	return p.TargetDirectory
 }
 
-func (p *PushedSource) Close() error {
+func (p *ProjectSource) Close() error {
 	if p.TargetDirectory != "" {
 		return os.RemoveAll(p.TargetDirectory)
 	}

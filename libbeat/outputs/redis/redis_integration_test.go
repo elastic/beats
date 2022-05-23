@@ -79,7 +79,8 @@ func TestPublishListTLS(t *testing.T) {
 		"datatype": "list",
 		"timeout":  "5s",
 
-		"ssl.verification_mode": "full",
+		// Use certificate level verification to avoid verifying the hostname when using localhost.
+		"ssl.verification_mode": "certificate",
 		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
@@ -114,7 +115,8 @@ func TestWithSchema(t *testing.T) {
 				"datatype": "list",
 				"timeout":  "5s",
 
-				"ssl.verification_mode": "full",
+				// Use certificate level verification to avoid verifying the hostname when using localhost.
+				"ssl.verification_mode": "certificate",
 				"ssl.certificate_authorities": []string{
 					"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 				},
@@ -192,7 +194,8 @@ func TestPublishChannelTLS(t *testing.T) {
 		"datatype": "channel",
 		"timeout":  "5s",
 
-		"ssl.verification_mode": "full",
+		// Use certificate level verification to avoid verifying the hostname when using localhost.
+		"ssl.verification_mode": "certificate",
 		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},

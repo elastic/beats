@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // ClientHandler defines the interface between a remote service and the Manager.
@@ -37,7 +37,7 @@ type ESClientHandler struct {
 }
 
 type VersionCheckerClient interface {
-	GetVersion() common.Version
+	GetVersion() version.V
 }
 
 // ESClient defines the minimal interface required for the Loader to
@@ -60,7 +60,7 @@ type FileClientHandler struct {
 // FileClient defines the minimal interface required for the Loader to
 // prepare a policy.
 type FileClient interface {
-	GetVersion() common.Version
+	GetVersion() version.V
 	Write(component string, name string, body string) error
 }
 
@@ -69,7 +69,7 @@ const (
 )
 
 var (
-	esMinDefaultILMVersion = common.MustNewVersion("7.0.0")
+	esMinDefaultILMVersion = version.MustNew("7.0.0")
 )
 
 // NewESClientHandler initializes and returns an ESClientHandler,
