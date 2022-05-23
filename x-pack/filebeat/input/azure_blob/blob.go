@@ -53,7 +53,6 @@ type blobPoller struct {
 	store                *statestore.Store
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
-	marker               azblob.Marker
 }
 
 func newBlobPoller(log *logp.Logger,
@@ -83,7 +82,6 @@ func newBlobPoller(log *logp.Logger,
 		store:                store,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
-		marker:               azblob.Marker{},
 	}
 }
 
@@ -117,8 +115,7 @@ func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPaylo
 		p.log.Info("asdf1234")
 
 		// Wait for all events to be ACKed before proceeding.
-		// TODO Figure this out
-		// blobObjectPayload.blobObjectHandler.Wait()
+		blobObjectPayload.blobObjectHandler.Wait()
 
 		info := blobObjectPayload.blobObjectInfo
 
@@ -146,12 +143,12 @@ func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPaylo
 func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan chan<- *blobObjectPayload) {
 	defer func() {
 		p.log.Info("GetBlobObjects ended")
-		p.marker = azblob.Marker{}
 		close(blobObjectPayloadChan)
 	}()
 
-	p.log.Info("Blob Marker Start: ", p.marker, "  --  ", p.marker.NotDone())
-	for p.marker.NotDone() {
+	blobMarker := azblob.Marker{}
+	p.log.Info("Blob Marker Start: ", blobMarker, "  --  ", blobMarker.NotDone())
+	for blobMarker.NotDone() {
 		listingID, err := uuid.NewV4()
 		if err != nil {
 			p.log.Warnw("Error generating UUID for listing page.", "error", err)
@@ -164,13 +161,13 @@ func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan c
 		lock.Lock()
 		p.workersListingMap.Store(listingID.String(), lock)
 
-		page, err := p.blob.ListObjectsPaginator(ctx, p.listPrefix, p.marker)
+		page, err := p.blob.ListObjectsPaginator(ctx, p.listPrefix, blobMarker)
 		if err != nil {
 			p.log.Errorf("Azure Blob GetObjects failed: %w", err)
 			break
 		}
-		p.marker = page.NextMarker
-		p.log.Info("Blob Marker: ", p.marker, "  --  ", p.marker.NotDone())
+		blobMarker = page.NextMarker
+		p.log.Info("Blob Marker: ", blobMarker, "  --  ", blobMarker.NotDone())
 
 		totProcessableObjects := 0
 		totListedObjects := len(page.Segment.BlobItems)
