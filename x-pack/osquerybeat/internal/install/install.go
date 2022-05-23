@@ -28,7 +28,7 @@ const (
 func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) error {
 	dstfp := filepath.Join(dstDir, distro.OsquerydDarwinApp())
 
-	dir, err := installFromCommon(ctx, srcPkg, dstDir, dstfp, force, "pkgutil", "--expand-full", srcPkg)
+	dir, err := installFromCommon(ctx, dstDir, dstfp, force, "pkgutil", "--expand-full", srcPkg)
 	// Remove the directory that was created could have been created by pkgutil
 	// In case if the process was killed or finished with error but still left a directory behind
 	defer os.RemoveAll(dir)
@@ -47,7 +47,7 @@ func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) erro
 	return devtools.Copy(filepath.Join(dir, payloadPath, distro.OsquerydDarwinDistroPath()), filepath.Join(dstDir, distro.OsquerydDarwinApp()))
 }
 
-func installFromCommon(ctx context.Context, srcfp, dstDir, dstfp string, force bool, name string, arg ...string) (dir string, err error) {
+func installFromCommon(ctx context.Context, dstDir, dstfp string, force bool, name string, arg ...string) (dir string, err error) {
 	if !force {
 		//check if files exists
 		exists, err := fileutil.FileExists(dstfp)

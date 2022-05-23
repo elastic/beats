@@ -7,6 +7,7 @@ package osqd
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,10 +17,8 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/dolmen-go/contextio"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
@@ -32,7 +31,6 @@ const (
 )
 
 const (
-	defaultExitTimeout           = 10 * time.Second
 	defaultDataDir               = "osquery"
 	defaultCertsDir              = "certs"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
@@ -141,6 +139,7 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 		return fmt.Errorf("failed to prepare bin path, %w", err)
 	}
 
+	//nolint:gosec // works as expected
 	cmd := exec.Command(
 		osquerydPath(q.binPath),
 		"--S",
@@ -152,14 +151,12 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 		return err
 	}
 
-	err = cmd.Wait()
-
-	return nil
+	return cmd.Wait()
 }
 
 // Run executes osqueryd binary as a child process
 func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
-	cleanup, err := q.prepare(ctx)
+	cleanup, err := q.prepare()
 	if err != nil {
 		return err
 	}
@@ -182,7 +179,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			q.logOSQueryOutput(ctx, stdout)
+			_ = q.logOSQueryOutput(ctx, stdout)
 		}()
 	}
 
@@ -239,7 +236,9 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 		}
 	case <-ctx.Done():
 		q.log.Debug("kill process group on context done")
-		killProcessGroup(cmd)
+		if err := killProcessGroup(cmd); err != nil {
+			q.log.Errorf("kill process group failed: %v", err)
+		}
 		// Wait till finished
 		<-finished
 	}
@@ -249,7 +248,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	return err
 }
 
-func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
+func (q *OSQueryD) prepare() (func(), error) {
 	err := q.prepareBinPath()
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare bin path, %w", err)
@@ -277,9 +276,9 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	extensionPath := osqueryExtensionPath(q.binPath)
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.Wrapf(err, "extension path does not exist: %s", extensionPath)
+			return nil, fmt.Errorf("extension path does not exist: %s, %w", extensionPath, err)
 		} else {
-			return nil, errors.Wrapf(err, "failed to stat extension path")
+			return nil, fmt.Errorf("failed to stat extension path, %w", err)
 		}
 	}
 
@@ -287,7 +286,7 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	extensionAutoloadPath := q.resolveDataPath(osqueryAutoload)
 	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, q.log)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to prepare extensions autoload file")
+		return nil, fmt.Errorf("failed to prepare extensions autoload file, %w", err)
 	}
 
 	// Write the flagsfile in order to lock down/prevent loading default flags from osquery global locations.
@@ -296,12 +295,12 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	flagsfilePath := q.resolveDataPath(osqueryFlagfile)
 	exists, err := fileutil.FileExists(flagsfilePath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to check flagsfile path")
+		return nil, fmt.Errorf("failed to check flagsfile path, %w", err)
 	}
 	if !exists {
 		f, err := os.OpenFile(flagsfilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create flagsfile")
+			return nil, fmt.Errorf("failed to create flagsfile, %w", err)
 		}
 		f.Close()
 	}
@@ -312,7 +311,7 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, log *logp.Logger) error {
 	ok, err := fileutil.FileExists(extensionAutoloadPath)
 	if err != nil {
-		return errors.Wrapf(err, "failed to check osquery.autoload file exists")
+		return fmt.Errorf("failed to check osquery.autoload file exists, %w", err)
 	}
 
 	rewrite := false
@@ -330,8 +329,8 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, l
 	}
 
 	if rewrite {
-		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0644); err != nil {
-			return errors.Wrap(err, "failed write osquery extension autoload file")
+		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
+			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
 		}
 	}
 	return nil
@@ -503,6 +502,7 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 }
 
 func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+	//nolint:gosec // works as expected
 	return exec.Command(
 		osquerydPath(q.binPath), q.args(userFlags)...)
 }
@@ -546,7 +546,7 @@ func (q *OSQueryD) resolveCertsPath(filename string) string {
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
 	log := q.log.With("ctx", "osqueryd output")
 
-	buf := make([]byte, 2048, 2048)
+	buf := make([]byte, 2048)
 LOOP:
 	for {
 		n, err := r.Read(buf[:])
@@ -554,7 +554,7 @@ LOOP:
 			log.Info(string(buf[:n]))
 		}
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				err = nil
 			}
 			return err
