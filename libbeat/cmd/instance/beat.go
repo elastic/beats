@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -54,7 +53,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/metric/system/host"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -62,17 +60,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	svc "github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/configure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
 	"github.com/elastic/elastic-agent-libs/paths"
+	svc "github.com/elastic/elastic-agent-libs/service"
+	libversion "github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
+	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	ucfg "github.com/elastic/go-ucfg"
@@ -129,6 +131,8 @@ type beatConfig struct {
 
 	// Migration config to migration from 6 to 7
 	Migration *config.C `config:"migration.6_to_7"`
+	// TimestampPrecision sets the precision of all timestamps in the Beat.
+	TimestampPrecision *config.C `config:"timestamp"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -261,7 +265,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     metrics.EphemeralID(),
+			EphemeralID:     metricreport.EphemeralID(),
 		},
 		Fields: fields,
 	}
@@ -339,7 +343,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = metrics.SetupMetrics(b.Info.Beat)
+	err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Info.Beat, version.GetDefaultVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -682,6 +686,10 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.Name = name
 	}
 
+	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
+		return fmt.Errorf("error setting timestamp precision: %w", err)
+	}
+
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -844,7 +852,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig := InitKibanaConfig(b.Config)
 
-		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
+		client, err := kbn.NewKibanaClient(kibanaConfig, b.Info.Beat, b.Info.Version, version.Commit(), version.BuildTime().String())
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %w", err)
 		}
@@ -883,7 +891,7 @@ func (b *Beat) checkElasticsearchVersion() {
 
 	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
-		beatVersion, err := common.NewVersion(b.Info.Version)
+		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
 			return err
 		}
@@ -914,7 +922,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 	_, err := elasticsearch.RegisterConnectCallback(b.indexSetupCallback())
 	if err != nil {
-		return fmt.Errorf("failed to register index management with elasticsearch: %+v", err)
+		return fmt.Errorf("failed to register index management with elasticsearch: %w", err)
 	}
 	return nil
 }
@@ -1182,11 +1190,11 @@ func initPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %+v", err)
+		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %+v", err)
+		return fmt.Errorf("error setting default paths: %w", err)
 	}
 	return nil
 }

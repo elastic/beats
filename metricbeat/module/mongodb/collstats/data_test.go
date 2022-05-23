@@ -36,7 +36,10 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err)
 
 	data := mapstr.M{}
-	json.Unmarshal(content, &data)
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	event, _ := eventMapping("unit.test", data)
 
