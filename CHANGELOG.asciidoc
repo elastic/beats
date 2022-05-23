@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 
 *Heartbeat*
 
-- Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
 
@@ -56,6 +55,7 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 
 *Heartbeat*
 
+- Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
 
