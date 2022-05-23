@@ -24,7 +24,15 @@
     - name: files
       type: long
       description: >
+<<<<<<< HEAD
         The total number of file nodes in the file system.
+=======
+        Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
+    - name: options
+      type: keyword
+      description: >
+        The options present on the filesystem mount.
+>>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
     - name: free
       type: long
       format: bytes

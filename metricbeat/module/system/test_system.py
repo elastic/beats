@@ -64,6 +64,13 @@ SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
 SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
                                     "mount_point", "total", "used.bytes",
                                     "used.pct"]
+<<<<<<< HEAD
+=======
+}
+SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] + \
+    ["files", "free_files", "options"]
+
+>>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
