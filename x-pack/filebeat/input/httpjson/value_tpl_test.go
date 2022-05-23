@@ -292,6 +292,13 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errEmptyTemplateResult.Error(),
 		},
 		{
+			name:        "func sha1 hash Hex empty",
+			value:       `[[hash "sha1"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+		},
+		{
 			name:        "func sha1 hash Hex",
 			value:       `[[hash "sha1" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
@@ -405,6 +412,13 @@ func TestValueTpl(t *testing.T) {
 			paramTr:       transformable{},
 			expectedVal:   "",
 			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
+			name:        "func sha1 empty",
+			value:       `[[hashBase64 "sha1"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
 		},
 		{
 			name:        "func sha1 hash Base64",

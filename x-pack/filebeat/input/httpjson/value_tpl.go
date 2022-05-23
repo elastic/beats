@@ -7,7 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1" //nolint:gosec // Bad linter!
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -337,50 +337,29 @@ func hmacStringBase64(hmacType string, hmacKey string, values ...string) string 
 
 func hashStringHex(typ string, values ...string) string {
 	// Get result and encode as hexadecimal string
-	h := hashStrings(typ, values)
-	if h == nil {
-		return ""
-	}
-	return hex.EncodeToString(h)
+	return hex.EncodeToString(hashStrings(typ, values))
 }
 
 func hashStringBase64(typ string, values ...string) string {
 	// Get result and encode as base64 string
-	h := hashStrings(typ, values)
-	if h == nil {
-		return ""
-	}
-	return base64.StdEncoding.EncodeToString(h)
+	return base64.StdEncoding.EncodeToString(hashStrings(typ, values))
 }
 
 func hashStrings(typ string, data []string) []byte {
-	if len(data) == 0 {
-		return nil
-	}
-	var n int
-	for _, d := range data {
-		n += len(d)
-	}
-	if n == 0 {
-		return nil
-	}
-	var mac hash.Hash
+	var h hash.Hash
 	switch typ {
 	case "sha256":
-		mac = sha256.New()
+		h = sha256.New()
 	case "sha1":
-		mac = sha1.New() //nolint:gosec // Bad linter!
+		h = sha1.New()
 	default:
 		// Upstream config validation prevents this from happening.
 		return nil
 	}
-	// Write Data to it
 	for _, d := range data {
-		mac.Write([]byte(d))
+		h.Write([]byte(d))
 	}
-
-	// Get result and encode as hashStrings(typ, values)
-	return mac.Sum(nil)
+	return h.Sum(nil)
 }
 
 func uuidString() string {
