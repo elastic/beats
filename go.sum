@@ -549,8 +549,8 @@ github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4 h1:ViJxdtOsHeO+SWVe
 github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4/go.mod h1:EWib/APOK0SL3dFbYqvxE3UYd8E6s1ouQ7iEp/0LWV4=
 github.com/elastic/go-concert v0.2.0 h1:GAQrhRVXprnNjtvTP9pWJ1d4ToEA4cU5ci7TwTa20xg=
 github.com/elastic/go-concert v0.2.0/go.mod h1:HWjpO3IAEJUxOeaJOWXWEp7imKd27foxz9V5vegC/38=
-github.com/elastic/go-libaudit/v2 v2.3.0 h1:1VvghBhaQX4X/PQdsHFTRSSP20M9YYWJAmYRcmwPXpo=
-github.com/elastic/go-libaudit/v2 v2.3.0/go.mod h1:GOkMRbzKV7ePrMOy+k6gGF0QvulQ16Cr38b60oirv8U=
+github.com/elastic/go-libaudit/v2 v2.3.1-0.20220523121157-87f0a814a1c0 h1:UaX9gwFak4RyXlTCEOXONNvmZxBk0MAcXA0kCvlSxy4=
+github.com/elastic/go-libaudit/v2 v2.3.1-0.20220523121157-87f0a814a1c0/go.mod h1:GOkMRbzKV7ePrMOy+k6gGF0QvulQ16Cr38b60oirv8U=
 github.com/elastic/go-licenser v0.4.0 h1:jLq6A5SilDS/Iz1ABRkO6BHy91B9jBora8FwGRsDqUI=
 github.com/elastic/go-licenser v0.4.0/go.mod h1:V56wHMpmdURfibNBggaSBfqgPxyT1Tldns1i87iTEvU=
 github.com/elastic/go-lookslike v0.3.0 h1:HDI/DQ65V85ZqM7D/sbxcK2wFFnh3+7iFvBk2v2FTHs=
