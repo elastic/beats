@@ -89,7 +89,8 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 		// In order to support events of varying type, the disk queue needs
 		// to know how to encode them. When we decide to do this, we'll need
 		// to add an encoder to the settings passed in when creating a disk
-		// queue. For now, just return an error.
+		// queue. See https://github.com/elastic/elastic-agent-shipper/issues/41.
+		// For now, just return an error.
 		return nil, fmt.Errorf("disk queue only supports publisher.Event")
 	}
 
