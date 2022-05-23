@@ -53,7 +53,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
 	github.com/elastic/go-concert v0.2.0
-	github.com/elastic/go-libaudit/v2 v2.3.0
+	github.com/elastic/go-libaudit/v2 v2.3.1-0.20220523121157-87f0a814a1c0
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
@@ -74,7 +74,7 @@ require (
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
 	github.com/godror/godror v0.24.2
 	github.com/gofrs/flock v0.8.1
-	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -126,7 +126,7 @@ require (
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
-	go.elastic.co/ecszap v1.0.0 // indirect
+	go.elastic.co/ecszap v1.0.1 // indirect
 	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.9.0
@@ -138,7 +138,7 @@ require (
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
+	golang.org/x/sys v0.0.0-20220405052023-b1e9470b6e64
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 	golang.org/x/tools v0.1.9
@@ -162,6 +162,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.1.1
 	github.com/elastic/elastic-agent-libs v0.2.4
+	github.com/elastic/elastic-agent-system-metrics v0.3.1
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
