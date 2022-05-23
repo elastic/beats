@@ -191,12 +191,17 @@ func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 	// Only add CPU info metrics if we're returning information by core
 	// (isTotals is false)
 	if !metric.isTotals {
-		// /proc/cpuinfo metrics
-		formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
-		formattedMetrics["model_name"] = metric.cpuInfo.ModelName
-		formattedMetrics["mhz"] = metric.cpuInfo.Mhz
-		formattedMetrics["core_id"] = metric.cpuInfo.CoreID
-		formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
+		// Some platforms do not report those metrics, so metric.cpuInfo
+		// is empty, if that happens we do not add the empty metrics to the
+		// final event.
+		if metric.cpuInfo != (CPUInfo{}) {
+			// /proc/cpuinfo metrics
+			formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
+			formattedMetrics["model_name"] = metric.cpuInfo.ModelName
+			formattedMetrics["mhz"] = metric.cpuInfo.Mhz
+			formattedMetrics["core_id"] = metric.cpuInfo.CoreID
+			formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
+		}
 	}
 
 	return formattedMetrics, nil
