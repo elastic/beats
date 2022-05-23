@@ -74,14 +74,14 @@ func TestMultiProducerConsumer(
 	queueFactory QueueFactory,
 ) {
 	tests := []testCase{
-		/*{
+		{
 			"2 producers, 1 consumer, without ack, complete batches",
 			multiple(
 				makeProducer(events, false, countEvent),
 				makeProducer(events, false, countEvent),
 			),
 			makeConsumer(events*2, -1),
-		},*/
+		},
 		{
 			"2 producers, 1 consumer, all ack, complete batches",
 			multiple(
@@ -90,7 +90,7 @@ func TestMultiProducerConsumer(
 			),
 			makeConsumer(events*2, -1),
 		},
-		/*{
+		{
 			"2 producers, 1 consumer, 1 ack, complete batches",
 			multiple(
 				makeProducer(events, true, countEvent),
@@ -181,7 +181,7 @@ func TestMultiProducerConsumer(
 				makeProducer(events, false, countEvent),
 			),
 			multiConsumer(2, events*2, batchSize),
-		},*/
+		},
 	}
 
 	runTestCases(t, tests, queueFactory)
@@ -292,6 +292,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
 		wg.Add(1)
 		return func() {
+			total := 0
 			defer wg.Done()
 
 			var events sync.WaitGroup
@@ -311,10 +312,11 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 							return
 						}
 
-						fmt.Printf("got batch of size %d\n", batch.Count())
+						total += batch.Count()
+						fmt.Printf("got batch of size %d, total %d / %d\n", batch.Count(), total, maxEvents)
 						log.Debug("consumer: process batch", batch.Count())
 
-						for j := 0; j <= batch.Count(); j++ {
+						for j := 0; j < batch.Count(); j++ {
 							events.Done()
 						}
 						batch.ACK()

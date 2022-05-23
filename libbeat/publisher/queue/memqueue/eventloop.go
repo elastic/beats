@@ -142,7 +142,6 @@ func (l *directEventLoop) insert(req *pushRequest) {
 	} else if st.cancelled {
 		reportCancelledState(log, req)
 	} else {
-		fmt.Printf("directEventLoop.insert non-nil state\n")
 		l.buf.insert(req.event, clientState{
 			seq:   req.seq,
 			state: st,
@@ -213,7 +212,6 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 
 		idx--
 		if client.state == nil {
-			fmt.Printf("no state set\n")
 			log.Debug("no state set")
 			continue
 		}

@@ -17,8 +17,6 @@
 
 package memqueue
 
-import "fmt"
-
 // ackLoop implements the brokers asynchronous ACK worker.
 // Multiple concurrent ACKs from consecutive published batches will be batched up by the
 // worker, to reduce the number of signals to return to the producer and the
@@ -56,17 +54,13 @@ func (l *ackLoop) run() {
 			return
 
 		case ackChan <- ackCount:
-			fmt.Printf("ackLoop sent %v to ackChan\n", ackCount)
 			ackChan, ackCount = nil, 0
 
 		case chanList := <-l.broker.scheduledACKs:
-			fmt.Printf("ackLoop read from scheduledACKs, adding to ackChans\n")
 			l.ackChans.concat(&chanList)
 
 		case <-nextBatchChan:
-			fmt.Printf("ackLoop read from ackChans.channel()\n")
 			ackCount += l.handleBatchSig()
-			fmt.Printf("ackCount is %d\n", ackCount)
 			if ackCount > 0 {
 				ackChan = l.broker.ackChan
 			}
@@ -106,7 +100,6 @@ func (l *ackLoop) handleBatchSig() int {
 }
 
 func (l *ackLoop) collectAcked() chanList {
-	fmt.Printf("collectAcked\n")
 	lst := chanList{}
 
 	acks := l.ackChans.pop()
@@ -117,7 +110,6 @@ func (l *ackLoop) collectAcked() chanList {
 		acks := l.ackChans.front()
 		select {
 		case <-acks.ackChan:
-			fmt.Printf("collectAcked received on ackChan, appending to lst\n")
 			lst.append(l.ackChans.pop())
 
 		default:
