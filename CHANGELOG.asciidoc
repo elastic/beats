@@ -43,8 +43,6 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 
 *Auditbeat*
 
-- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
-
 *Filebeat*
 
 - Netflow: replace invalid field value. {pull}31295[31295]
@@ -55,7 +53,6 @@ https://github.com/elastic/beats/compare/v8.2.0...v8.2.1[View commits]
 - Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
 - Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
 - Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
-- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
 
 *Heartbeat*
 
