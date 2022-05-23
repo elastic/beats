@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -128,7 +127,6 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
-	Split                    *split.SplitConfig      `config:"split"`
 }
 
 func (rc *readerConfig) Validate() error {
@@ -142,10 +140,6 @@ func (rc *readerConfig) Validate() error {
 
 	if rc.ExpandEventListFromField != "" && rc.ContentType != "" && rc.ContentType != contentTypeJSON {
 		return fmt.Errorf("content_type must be `application/json` when expand_event_list_from_field is used")
-	}
-
-	if rc.Split != nil && rc.ContentType != "" && rc.ContentType != contentTypeJSON && rc.ContentType != contentTypeNDJSON {
-		return fmt.Errorf("content_type must be `" + contentTypeJSON + "` or `" + contentTypeNDJSON + "` when split is used")
 	}
 
 	_, found := encoding.FindEncoding(rc.Encoding)

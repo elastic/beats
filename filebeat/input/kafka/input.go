@@ -197,6 +197,7 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 		// expandEventListFromField will be assigned the configuration option expand_event_list_from_field
 		expandEventListFromField: input.config.ExpandEventListFromField,
 		log:                      log,
+		ctx:                      context,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -280,6 +281,7 @@ type groupHandler struct {
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
 	expandEventListFromField string // TODO
 	log                      *logp.Logger
+	ctx                      context.Context
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -308,7 +310,7 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 
 func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	reader := h.createReader(claim)
-	parser := h.parsers.Create(reader)
+	parser := h.parsers.Create(h.ctx, reader)
 	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
 		if err == io.EOF {

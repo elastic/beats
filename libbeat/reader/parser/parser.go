@@ -18,6 +18,7 @@
 package parser
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -141,7 +142,7 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 
 }
 
-func (c *Config) Create(in reader.Reader) Parser {
+func (c *Config) Create(ctx context.Context, in reader.Reader) Parser {
 	p := in
 	for _, ns := range c.parsers {
 		name := ns.Name()
@@ -153,7 +154,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p = split.New(p, &config)
+			p = split.New(ctx, p, &config)
 		case "multiline":
 			var config multiline.Config
 			cfg := ns.Config()

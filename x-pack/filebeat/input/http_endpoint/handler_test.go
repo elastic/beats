@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -233,7 +234,7 @@ func Test_apiResponse(t *testing.T) {
 			// Setup
 			pub := new(publisher)
 			conf := defaultConfig()
-			apiHandler := newHandler(conf, pub, logp.NewLogger("http_endpoint.test"))
+			apiHandler := newHandler(v2.Context{}, conf, pub, logp.NewLogger("http_endpoint.test"))
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()

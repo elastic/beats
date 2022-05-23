@@ -6,19 +6,19 @@ package http_endpoint
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
-	// v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 
-	// "github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -42,17 +42,30 @@ type httpHandler struct {
 	includeHeaders        []string
 	preserveOriginalEvent bool
 	parsers               parser.Config
-	// context               v2.Context
+	context               context.Context
 }
 
-type readertest struct {
-	msg mapstr.M
+type recordReader struct {
+	messages chan mapstr.M
 }
 
-func (a readertest) Close() error { return nil }
-func (a readertest) Next() (reader.Message, error) {
+func (m recordReader) Close() error {
+	return nil
+}
+
+func (m recordReader) Next() (reader.Message, error) {
+	fmt.Print("COUNT: ", len(m.messages))
+	if len(m.messages) == 0 {
+		fmt.Print("I'm done")
+		return reader.Message{}, io.EOF
+	}
+	msg := <-m.messages
 	return reader.Message{
-		Content: []byte(a.msg.String()),
+		Ts:      time.Now(),
+		Content: []byte(msg.String()),
+		Fields: mapstr.M{
+			"message": msg.String(),
+		},
 	}, nil
 }
 
@@ -76,30 +89,32 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
+	re := recordReader{
+		messages: make(chan mapstr.M, len(objs)),
+	}
+	// defer close(re.messages)
 	for _, obj := range objs {
-		b := readertest{
-			msg: obj,
-		}
-		a := h.parsers.Create(b)
-
-		// TODO: Need to figure out how to loop through here!!!!
-		message, err := a.Next()
-		if err != nil {
-			h.log.Error("%v", err)
+		h.log.Info("MESSAGE: ", obj)
+		re.messages <- obj
+	}
+	close(re.messages)
+	read := h.parsers.Create(h.context, re)
+	for h.context.Err() == nil {
+		message, err := read.Next()
+		if err == io.EOF || message.IsEmpty() {
+			h.log.Info("HELP!!!")
 			break
 		}
-		// if message.IsEmpty() {
-		// 	continue
-		// }
+		if err != nil {
+			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			return
+		}
+		h.log.Info("asdfasdf: ", message)
 		if err = h.publishEvent(message.ToEvent(), headers); err != nil {
 			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
-		// for _, obj := range a {
-		// 	h.publishEvent(obj, headers)
-		// }
 	}
-
 	h.sendResponse(w, h.responseCode, h.responseBody)
 }
 

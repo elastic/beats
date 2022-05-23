@@ -26,7 +26,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -221,33 +220,8 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		}
 		messages := p.parseMultipleMessages(item)
 		for _, item := range messages {
-			if p.readerConfig.Split != nil {
-				split, err := split.NewSplit(p.readerConfig.Split, p.log)
-				if err != nil {
-					return nil
-				}
-				// We want to be able to identify which split is the root of the chain.
-				split.IsRoot = true
-				arrayOffset := int64(0)
-				eventsCh, err := split.StartSplit([]byte(item))
-				if err != nil {
-					return err
-				}
-				for maybeMsg := range eventsCh {
-					if maybeMsg.Failed() {
-						p.log.Errorf("error processing response: %v", maybeMsg)
-						continue
-					}
-
-					data, _ := json.Marshal(maybeMsg.Msg)
-					evt := p.createEvent(string(data), offset+arrayOffset)
-					p.publish(p.acker, &evt)
-					arrayOffset++
-				}
-			} else {
-				evt := p.createEvent(item, offset)
-				p.publish(p.acker, &evt)
-			}
+			evt := p.createEvent(item, offset)
+			p.publish(p.acker, &evt)
 		}
 	}
 	return nil
@@ -349,7 +323,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
-	reader = p.readerConfig.Parsers.Create(reader)
+	reader = p.readerConfig.Parsers.Create(p.ctx, reader)
 	reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
 
 	var offset int64

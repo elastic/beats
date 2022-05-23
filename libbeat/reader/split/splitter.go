@@ -196,10 +196,6 @@ func toMapStr(v interface{}) (mapstr.M, bool) {
 		return t, true
 	case map[string]interface{}:
 		return mapstr.M(t), true
-	case string:
-		temp := make(map[string]interface{})
-		temp["data"] = t
-		return mapstr.M(temp), true
 	}
 	return mapstr.M{}, false
 }

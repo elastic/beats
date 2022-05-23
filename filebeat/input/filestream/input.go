@@ -223,7 +223,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewFilemeta(r, fs.newPath, offset)
 
-	r = inp.parsers.Create(r)
+	r = inp.parsers.Create(logReader.readerCtx, r)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 

@@ -146,6 +146,7 @@ func (inp *journald) Run(
 	}
 
 	parser := inp.Parsers.Create(
+		ctx,
 		&readerAdapter{
 			r:                  reader,
 			converter:          journalfield.NewConverter(ctx.Logger, nil),

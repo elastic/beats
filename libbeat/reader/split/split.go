@@ -53,13 +53,13 @@ var (
 	splitOnce sync.Once
 )
 
-func New(r reader.Reader, cfg *Config) *splitterReader {
+func New(ctx context.Context, r reader.Reader, cfg *Config) *splitterReader {
 	return &splitterReader{
 		reader: r,
 		cfg:    cfg,
 		logger: logp.NewLogger("parser_split"),
 		buf:    make(chan reader.Message),
-		ctx:    context.Background(),
+		ctx:    ctx,
 	}
 }
 
