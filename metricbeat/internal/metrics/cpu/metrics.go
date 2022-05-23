@@ -68,7 +68,7 @@ type CPUMetrics struct {
 	list []CPU
 
 	// CPUInfo carries some data from /proc/cpuinfo
-	CPUinfo []CPUInfo
+	CPUInfo []CPUInfo
 }
 
 // Total returns the total CPU time in ticks as scraped by the API
@@ -134,8 +134,8 @@ func (m *Monitor) FetchCores() ([]Metrics, error) {
 		// Only add CPUInfo metric if it's available
 		// TODO: Remove this if statement once CPUInfo is supported
 		// by all systems
-		if len(metric.CPUinfo) != 0 {
-			coreMetrics[i].cpuInfo = metric.CPUinfo[i]
+		if len(metric.CPUInfo) != 0 {
+			coreMetrics[i].cpuInfo = metric.CPUInfo[i]
 		}
 	}
 	m.lastSample = metric

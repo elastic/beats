@@ -54,7 +54,7 @@ func Get(procfs resolve.Resolver) (CPUMetrics, error) {
 	defer cpuInfoFd.Close()
 
 	cpuInfo, err := scanCPUInfoFile(bufio.NewScanner(cpuInfoFd))
-	metrics.CPUinfo = cpuInfo
+	metrics.CPUInfo = cpuInfo
 
 	return metrics, err
 }
