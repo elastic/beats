@@ -10,7 +10,11 @@
                                 "b0d6d768-94b4-4a60-8703-d4e2f7a04df2",
                                 "7ccec911-2e78-4c28-ade7-94447ebb88b2",
                                 "802c8bea-aecf-4d1b-9b54-84d527d1fc18",
-                                "370e0d18-2e9c-46ae-9174-9fed8a48bf49"
+                                "370e0d18-2e9c-46ae-9174-9fed8a48bf49",
+                                "968ccc98-9aab-42e0-9ae1-bb2767d38edb",
+                                "d9dbaa39-4e9e-41a9-b6ce-dbe76d4e865e",
+                                "f17d0cb7-9045-4bc8-a26a-0777b34a90e6",
+                                "f146f523-db5b-4965-8486-615c98de32f7"
                             ],
                             "columns": {
                                 "370e0d18-2e9c-46ae-9174-9fed8a48bf49": {
@@ -83,6 +87,22 @@
                                     "scale": "ordinal",
                                     "sourceField": "kubernetes.labels.kubernetes_io/hostname"
                                 },
+                                "968ccc98-9aab-42e0-9ae1-bb2767d38edb": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.ready: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Ready",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.status.ready"
+                                },
                                 "b0d6d768-94b4-4a60-8703-d4e2f7a04df2": {
                                     "customLabel": true,
                                     "dataType": "string",
@@ -98,6 +118,54 @@
                                     },
                                     "scale": "ordinal",
                                     "sourceField": "kubernetes.labels.kubernetes_io/arch"
+                                },
+                                "d9dbaa39-4e9e-41a9-b6ce-dbe76d4e865e": {
+                                    "customLabel": true,
+                                    "dataType": "boolean",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.unschedulable: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Unschedulable",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.node.status.unschedulable"
+                                },
+                                "f146f523-db5b-4965-8486-615c98de32f7": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.memory_pressure: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Memory Pressure",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.status.memory_pressure"
+                                },
+                                "f17d0cb7-9045-4bc8-a26a-0777b34a90e6": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.disk_pressure: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Disk Pressure",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.status.disk_pressure"
                                 }
                             },
                             "incompleteColumns": {}
@@ -113,17 +181,30 @@
                     "meta": {
                         "alias": null,
                         "disabled": false,
-                        "index": "369ad33d-cbfa-43a6-b73b-d174da76457c",
+                        "index": "35ac07a8-9e0e-4d3f-b297-6ba228415322",
                         "key": "metricset.name",
                         "negate": false,
-                        "params": {
-                            "query": "node"
-                        },
-                        "type": "phrase"
+                        "params": [
+                            "node",
+                            "state_node"
+                        ],
+                        "type": "phrases"
                     },
                     "query": {
-                        "match_phrase": {
-                            "metricset.name": "node"
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "node"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_node"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -153,6 +234,22 @@
                     {
                         "columnId": "802c8bea-aecf-4d1b-9b54-84d527d1fc18",
                         "isTransposed": false
+                    },
+                    {
+                        "columnId": "968ccc98-9aab-42e0-9ae1-bb2767d38edb",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "d9dbaa39-4e9e-41a9-b6ce-dbe76d4e865e",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "f17d0cb7-9045-4bc8-a26a-0777b34a90e6",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "f146f523-db5b-4965-8486-615c98de32f7",
+                        "isTransposed": false
                     }
                 ],
                 "layerId": "28060f62-4880-4b1c-aef2-fe42f9df0c64",
@@ -175,11 +272,11 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "369ad33d-cbfa-43a6-b73b-d174da76457c",
+            "name": "35ac07a8-9e0e-4d3f-b297-6ba228415322",
             "type": "index-pattern"
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-11T10:39:22.770Z",
-    "version": "WzExODgsMV0="
+    "updated_at": "2022-05-23T15:01:04.709Z",
+    "version": "WzYxNTcsMV0="
 }

@@ -18,10 +18,10 @@
             "params": {
                 "controls": [
                     {
-                        "fieldName": "kubernetes.namespace",
-                        "id": "1649326490068",
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1653381940058",
                         "indexPatternRefName": "control_0_index_pattern",
-                        "label": "Namespace name",
+                        "label": "Cluster name",
                         "options": {
                             "dynamicOptions": true,
                             "multiselect": true,
@@ -33,9 +33,24 @@
                         "type": "list"
                     },
                     {
+                        "fieldName": "kubernetes.namespace",
+                        "id": "1649326490068",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Namespace name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1653381940058",
+                        "type": "list"
+                    },
+                    {
                         "fieldName": "kubernetes.deployment.name",
                         "id": "1649326511591",
-                        "indexPatternRefName": "control_1_index_pattern",
+                        "indexPatternRefName": "control_2_index_pattern",
                         "label": "Deployment Name",
                         "options": {
                             "dynamicOptions": true,
@@ -48,7 +63,7 @@
                         "type": "list"
                     }
                 ],
-                "pinFilters": false,
+                "pinFilters": true,
                 "updateFiltersOnChange": true,
                 "useTimeFilter": true
             },
@@ -71,9 +86,14 @@
             "id": "metricbeat-*",
             "name": "control_1_index_pattern",
             "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-11T10:39:19.714Z",
-    "version": "WzExNjUsMV0="
+    "updated_at": "2022-05-24T08:46:20.863Z",
+    "version": "WzkyMTksMV0="
 }

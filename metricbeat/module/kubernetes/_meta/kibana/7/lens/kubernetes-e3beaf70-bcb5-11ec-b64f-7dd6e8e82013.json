@@ -40,7 +40,7 @@
                     "meta": {
                         "alias": null,
                         "disabled": false,
-                        "index": "afb22b4d-7cb7-42fa-941c-3bf209c2e33e",
+                        "index": "9e1c7b22-fdba-47a4-a329-9d2c7e198861",
                         "key": "metricset.name",
                         "negate": false,
                         "params": {
@@ -63,7 +63,7 @@
                 "accessor": "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae",
                 "layerId": "b23da578-55ca-4199-9298-1e54b87997ac",
                 "layerType": "data",
-                "size": "xl",
+                "size": "l",
                 "textAlign": "center",
                 "titlePosition": "bottom"
             }
@@ -84,11 +84,11 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "afb22b4d-7cb7-42fa-941c-3bf209c2e33e",
+            "name": "9e1c7b22-fdba-47a4-a329-9d2c7e198861",
             "type": "index-pattern"
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-11T10:39:24.896Z",
-    "version": "WzEyMjEsMV0="
+    "updated_at": "2022-05-23T15:34:21.658Z",
+    "version": "WzY5ODgsMV0="
 }

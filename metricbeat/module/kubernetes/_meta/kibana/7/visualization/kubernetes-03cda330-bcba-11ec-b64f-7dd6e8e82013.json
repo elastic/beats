@@ -18,10 +18,10 @@
             "params": {
                 "controls": [
                     {
-                        "fieldName": "kubernetes.namespace",
-                        "id": "1649751495081",
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1653382091292",
                         "indexPatternRefName": "control_0_index_pattern",
-                        "label": "Namespace Name",
+                        "label": "Cluster Name",
                         "options": {
                             "dynamicOptions": true,
                             "multiselect": true,
@@ -33,9 +33,24 @@
                         "type": "list"
                     },
                     {
+                        "fieldName": "kubernetes.namespace",
+                        "id": "1649751495081",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Namespace Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1653382091292",
+                        "type": "list"
+                    },
+                    {
                         "fieldName": "kubernetes.statefulset.name",
                         "id": "1649751552978",
-                        "indexPatternRefName": "control_1_index_pattern",
+                        "indexPatternRefName": "control_2_index_pattern",
                         "label": "StatefulSet Name",
                         "options": {
                             "dynamicOptions": true,
@@ -48,9 +63,9 @@
                         "type": "list"
                     }
                 ],
-                "pinFilters": false,
+                "pinFilters": true,
                 "updateFiltersOnChange": true,
-                "useTimeFilter": false
+                "useTimeFilter": true
             },
             "title": "Select Namespace and StatefulSet  [Metricbeat Kubernetes]",
             "type": "input_control_vis"
@@ -71,9 +86,14 @@
             "id": "metricbeat-*",
             "name": "control_1_index_pattern",
             "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-11T10:39:16.665Z",
-    "version": "WzExNDIsMV0="
+    "updated_at": "2022-05-24T08:48:41.472Z",
+    "version": "WzkzMzcsMV0="
 }

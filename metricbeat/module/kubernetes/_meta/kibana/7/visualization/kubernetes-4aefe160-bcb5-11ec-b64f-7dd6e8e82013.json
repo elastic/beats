@@ -18,10 +18,10 @@
             "params": {
                 "controls": [
                     {
-                        "fieldName": "kubernetes.node.name",
-                        "id": "1649341934441",
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1653381203491",
                         "indexPatternRefName": "control_0_index_pattern",
-                        "label": "Node name",
+                        "label": "Cluster Name",
                         "options": {
                             "dynamicOptions": true,
                             "multiselect": true,
@@ -30,6 +30,21 @@
                             "type": "terms"
                         },
                         "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.node.name",
+                        "id": "1649341934441",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Node name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1653381203491",
                         "type": "list"
                     }
                 ],
@@ -51,9 +66,14 @@
             "id": "metricbeat-*",
             "name": "control_0_index_pattern",
             "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-11T10:39:22.770Z",
-    "version": "WzExODcsMV0="
+    "updated_at": "2022-05-24T08:33:46.757Z",
+    "version": "Wzg2OTYsMV0="
 }
