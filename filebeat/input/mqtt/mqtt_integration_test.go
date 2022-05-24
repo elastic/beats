@@ -33,8 +33,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,7 +46,7 @@ const (
 
 var (
 	hostPort = fmt.Sprintf("tcp://%s:%s",
-		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "mosquitto"),
+		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"),
 		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))
 	topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
 )

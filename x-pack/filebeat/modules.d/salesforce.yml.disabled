@@ -1,0 +1,130 @@
+# Module: salesforce
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-salesforce.html
+
+- module: salesforce
+
+  apex-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+      
+  login-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  login-stream:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  logout-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  logout-stream:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  setupaudittrail-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"

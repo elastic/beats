@@ -28,12 +28,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -61,17 +61,17 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 
 var (
 	// CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
-	CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+	CCRStatsAPIAvailableVersion = version.MustNew("6.5.0")
 
 	// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
-	EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
+	EnrichStatsAPIAvailableVersion = version.MustNew("7.5.0")
 
 	// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
-	BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
+	BulkStatsAvailableVersion = version.MustNew("8.0.0")
 
 	//ExpandWildcardsHiddenAvailableVersion is the version since when the "expand_wildcards" query parameter to
 	// the Indices Stats API can accept "hidden" as a value.
-	ExpandWildcardsHiddenAvailableVersion = common.MustNewVersion("7.7.0")
+	ExpandWildcardsHiddenAvailableVersion = version.MustNew("7.7.0")
 
 	// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 	clusterIDCache = map[string]string{}
@@ -90,7 +90,7 @@ type Info struct {
 
 // Version contains the semver formatted version of ES
 type Version struct {
-	Number *common.Version `json:"number"`
+	Number *version.V `json:"number"`
 }
 
 // NodeInfo struct cotains data about the node.

@@ -26,10 +26,10 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -108,6 +108,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -132,6 +133,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -153,6 +155,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -175,6 +178,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -196,6 +200,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -243,6 +248,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -321,6 +327,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -365,6 +372,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -391,6 +399,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -417,6 +426,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -444,11 +454,12 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
 		{
-			message: "Module with mutliple sets of hints must return the right configs",
+			message: "Module with multiple sets of hints must return the right configs",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": mapstr.M{
@@ -476,6 +487,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 				{
 					"module":     "mockmoduledefaults",
@@ -485,6 +497,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090/fake"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -510,6 +523,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 				{
 					"module":     "mockmoduledefaults",
@@ -519,6 +533,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9091"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -545,6 +560,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9091"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -574,6 +590,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 					"metrics_filters": map[string]interface{}{
 						"exclude": []interface{}{"foo", "bar"},
 						"include": []interface{}{"xxx", "yyy"},
@@ -615,7 +632,9 @@ func TestGenerateHints(t *testing.T) {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
-						metricsets[i] = v.(string)
+						var ok bool
+						metricsets[i], ok = v.(string)
+						assert.Truef(t, ok, "Failed to convert metricset: %d=%v", i, metricsets[i])
 					}
 					sort.Strings(metricsets)
 					config["metricsets"] = metricsets
@@ -632,7 +651,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 	path := getTemporaryKeystoreFile()
 	defer os.Remove(path)
 	// store the secret
-	keystore := createAnExistingKeystore(path, "stored_secret")
+	keystore := createAnExistingKeystore(t, path, "stored_secret")
 	os.Setenv("PASSWORD", "env_secret")
 
 	tests := []struct {
@@ -664,6 +683,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 				"period":     "1m",
 				"enabled":    true,
 				"password":   "env_secret",
+				"processors": []interface{}{},
 			},
 		},
 	}
@@ -688,7 +708,9 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
-						metricsets[i] = v.(string)
+						var ok bool
+						metricsets[i], ok = v.(string)
+						assert.Truef(t, ok, "Failed to convert metricset: %d=%v", i, metricsets[i])
 					}
 					sort.Strings(metricsets)
 					config["metricsets"] = metricsets
@@ -709,7 +731,7 @@ func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MockMetricSet{}, nil
 }
 
-func (ms *MockMetricSet) Fetch(report mb.Reporter) {
+func (ms *MockMetricSet) Fetch(report mb.ReporterV2) {
 
 }
 
@@ -723,7 +745,8 @@ func NewMockPrometheus(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // create a keystore with an existing key
 // `PASSWORD` with the value of `secret` variable.
-func createAnExistingKeystore(path string, secret string) keystore.Keystore {
+func createAnExistingKeystore(t *testing.T, path string, secret string) keystore.Keystore {
+	t.Helper()
 	keyStore, err := keystore.NewFileKeystore(path)
 	// Fail fast in the test suite
 	if err != nil {
@@ -735,8 +758,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret))
-	writableKeystore.Save()
+	assert.NoError(t, writableKeystore.Store("PASSWORD", []byte(secret)))
+	assert.NoError(t, writableKeystore.Save())
 	return keyStore
 }
 

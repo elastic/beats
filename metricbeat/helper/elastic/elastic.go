@@ -23,10 +23,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -106,7 +106,7 @@ func MakeErrorForMissingField(field string, product Product) error {
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
-func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *common.Version) bool {
+func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *version.V) bool {
 	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
 }
 

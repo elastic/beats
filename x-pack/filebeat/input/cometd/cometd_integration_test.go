@@ -16,10 +16,10 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 
 	bay "github.com/elastic/bayeux"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -64,7 +64,7 @@ func TestInput(t *testing.T) {
 		"auth.oauth2.client.secret": "client.secret",
 		"auth.oauth2.user":          "user",
 		"auth.oauth2.password":      "password",
-		"auth.oauth2.token_url":     "http://cometd:8080/token",
+		"auth.oauth2.token_url":     "http://localhost:8080/token",
 	})
 
 	// Route input events through our captor instead of sending through ES.

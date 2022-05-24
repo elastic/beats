@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type ZipURLSource struct {
@@ -95,7 +95,7 @@ func (z *ZipURLSource) Fetch() error {
 	if !Offline() {
 		err = setupOnlineDir(z.TargetDirectory)
 		if err != nil {
-			os.RemoveAll(z.TargetDirectory)
+			z.Close()
 			return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
 		}
 	}
@@ -104,15 +104,11 @@ func (z *ZipURLSource) Fetch() error {
 }
 
 func unzip(tf *os.File, targetDir string, folder string) error {
-	stat, err := tf.Stat()
+	rdr, err := zip.OpenReader(tf.Name())
 	if err != nil {
 		return err
 	}
-
-	rdr, err := zip.NewReader(tf, stat.Size())
-	if err != nil {
-		return fmt.Errorf("could not read file %s as zip: %w", tf.Name(), err)
-	}
+	defer rdr.Close()
 
 	for _, f := range rdr.File {
 		err = unzipFile(targetDir, folder, f)
@@ -127,24 +123,45 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 	return nil
 }
 
+func sanitizeFilePath(filePath string, workdir string) (string, error) {
+	destPath := filepath.Join(workdir, filePath)
+	if !strings.HasPrefix(destPath, filepath.Clean(workdir)+string(os.PathSeparator)) {
+		return filePath, fmt.Errorf("failed to extract illegal file path: %s", filePath)
+	}
+	return destPath, nil
+}
+
+// unzip file takes a given directory and a zipped file and extracts
+// all the contents of the file based on the provided folder path,
+// if the folder path is empty, it extracts the contents based on file
+// tree structure
 func unzipFile(workdir string, folder string, f *zip.File) error {
-	folderPaths := strings.Split(folder, string(filepath.Separator))
-	var folderDepth = 1
-	for _, path := range folderPaths {
-		if path != "" {
-			folderDepth++
+	var destPath string
+	var err error
+	if folder != "" {
+		folderPaths := strings.Split(folder, string(filepath.Separator))
+		var folderDepth = 1
+		for _, path := range folderPaths {
+			if path != "" {
+				folderDepth++
+			}
+		}
+		splitZipFileName := strings.Split(f.Name, string(filepath.Separator))
+		root := splitZipFileName[0]
+
+		prefix := filepath.Join(root, folder)
+		if !strings.HasPrefix(f.Name, prefix) {
+			return nil
+		}
+
+		sansFolder := splitZipFileName[folderDepth:]
+		destPath = filepath.Join(workdir, filepath.Join(sansFolder...))
+	} else {
+		destPath, err = sanitizeFilePath(f.Name, workdir)
+		if err != nil {
+			return err
 		}
 	}
-	splitZipFileName := strings.Split(f.Name, string(filepath.Separator))
-	root := splitZipFileName[0]
-
-	prefix := filepath.Join(root, folder)
-	if !strings.HasPrefix(f.Name, prefix) {
-		return nil
-	}
-
-	sansFolder := splitZipFileName[folderDepth:]
-	destPath := filepath.Join(workdir, filepath.Join(sansFolder...))
 
 	// Never unpack node modules
 	if strings.HasPrefix(destPath, "node_modules/") {
@@ -157,6 +174,17 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 			return fmt.Errorf("could not make dest zip dir '%s': %w", destPath, err)
 		}
 		return nil
+	}
+
+	// In the case of project monitors, the destPath would be the direct
+	// file path instead of directory, so we create the directory
+	// if its not set up properly
+	destDir := filepath.Dir(destPath)
+	if _, err := os.Stat(destDir); os.IsNotExist(err) {
+		err = os.MkdirAll(destDir, 0700) // Create your file
+		if err != nil {
+			return fmt.Errorf("could not make dest zip dir '%s': %w", destDir, err)
+		}
 	}
 
 	dest, err := os.Create(destPath)

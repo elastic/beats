@@ -29,14 +29,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 var (
@@ -283,7 +283,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
-func (client *Client) bulkEncodePublishRequest(version common.Version, data []publisher.Event) ([]publisher.Event, []interface{}) {
+func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
@@ -304,7 +304,7 @@ func (client *Client) bulkEncodePublishRequest(version common.Version, data []pu
 	return okEvents, bulkItems
 }
 
-func (client *Client) createEventBulkMeta(version common.Version, event *beat.Event) (interface{}, error) {
+func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) (interface{}, error) {
 	eventType := ""
 	if version.Major < 7 {
 		eventType = defaultEventType

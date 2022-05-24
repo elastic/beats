@@ -33,7 +33,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -42,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const (
@@ -151,7 +151,8 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	}
 	if tls {
 		config["hosts"] = []string{getLogstashTLSHost()}
-		config["ssl.verification_mode"] = "full"
+		// Disable hostname verification as we are writing to localhost.
+		config["ssl.verification_mode"] = "certificate"
 		config["ssl.certificate_authorities"] = []string{
 			"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
 		}

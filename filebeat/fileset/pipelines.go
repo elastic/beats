@@ -24,8 +24,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // PipelineLoaderFactory builds and returns a PipelineLoader
@@ -36,7 +36,7 @@ type PipelineLoaderFactory func() (PipelineLoader, error)
 type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
+	GetVersion() version.V
 }
 
 // MultiplePipelineUnsupportedError is an error returned when a fileset uses multiple pipelines but is
@@ -44,8 +44,8 @@ type PipelineLoader interface {
 type MultiplePipelineUnsupportedError struct {
 	module               string
 	fileset              string
-	esVersion            common.Version
-	minESVersionRequired common.Version
+	esVersion            version.V
+	minESVersionRequired version.V
 }
 
 func (m MultiplePipelineUnsupportedError) Error() string {
@@ -79,7 +79,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 
 			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
 			esVersion := esClient.GetVersion()
-			minESVersionRequired := common.MustNewVersion("6.5.0")
+			minESVersionRequired := version.MustNew("6.5.0")
 			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
 				return MultiplePipelineUnsupportedError{module.config.Module, fileset.name, esVersion, *minESVersionRequired}
 			}

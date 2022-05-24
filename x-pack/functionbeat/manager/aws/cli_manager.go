@@ -18,13 +18,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 	merrors "github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
 	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

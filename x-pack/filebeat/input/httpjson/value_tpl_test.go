@@ -12,10 +12,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 func TestValueTpl(t *testing.T) {
@@ -292,6 +292,37 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errEmptyTemplateResult.Error(),
 		},
 		{
+			name:        "func sha1 hash Hex empty",
+			value:       `[[hash "sha1"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+		},
+		{
+			name:        "func sha1 hash Hex",
+			value:       `[[hash "sha1" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "6b3966bea9fe56d1f9708517fd22b70c682b8a3d",
+		},
+		{
+			name:        "func sha256 hash Hex",
+			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			teardown:    func() { timeNow = time.Now },
+			value:       `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96",
+		},
+		{
+			name:          "func invalid hash Hex",
+			value:         `[[hash "md5" "string1" "string2"]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
 			name:        "func base64Encode 2 strings",
 			value:       `[[base64Encode "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
@@ -383,6 +414,37 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errEmptyTemplateResult.Error(),
 		},
 		{
+			name:        "func sha1 empty",
+			value:       `[[hashBase64 "sha1"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
+		},
+		{
+			name:        "func sha1 hash Base64",
+			value:       `[[hashBase64 "sha1" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "azlmvqn+VtH5cIUX/SK3DGgrij0=",
+		},
+		{
+			name:        "func sha256 hash Base64",
+			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			teardown:    func() { timeNow = time.Now },
+			value:       `[[hashBase64 "sha256" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "usCapy5jLnbDbmwcTlArc8Paf8poxHUnPcVReBVYfMQ=",
+		},
+		{
+			name:          "func invalid hmac Base64",
+			value:         `[[hmacBase64 "md5" "string1" "string2"]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
 			name:        "func base64Decode 2 strings",
 			value:       `[[base64Decode "c3RyaW5nMXN0cmluZzI="]]`,
 			paramCtx:    emptyTransformContext(),
@@ -402,28 +464,28 @@ func TestValueTpl(t *testing.T) {
 			value:       `[[userAgent]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()),
 		},
 		{
 			name:        "func userAgent blank value",
 			value:       `[[userAgent ""]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()),
 		},
 		{
 			name:        "func userAgent 1 value",
 			value:       `[[userAgent "integration_name/1.2.3"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat", "integration_name/1.2.3"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), "integration_name/1.2.3"),
 		},
 		{
 			name:        "func userAgent 2 value",
 			value:       `[[userAgent "integration_name/1.2.3" "test"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: useragent.UserAgent("Filebeat", "integration_name/1.2.3", "test"),
+			expectedVal: useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), "integration_name/1.2.3", "test"),
 		},
 		{
 			name:        "func beatInfo GOOS",

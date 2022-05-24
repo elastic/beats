@@ -31,14 +31,16 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/version"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 type esHTTPClient interface {
@@ -54,7 +56,7 @@ type Connection struct {
 	HTTP    esHTTPClient
 
 	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
-	version          common.Version
+	version          libversion.V
 	log              *logp.Logger
 }
 
@@ -119,7 +121,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	if s.Beatname == "" {
 		s.Beatname = "Libbeat"
 	}
-	userAgent := useragent.UserAgent(s.Beatname)
+	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// Default the product origin header to beats if it wasn't already set.
 	if _, ok := s.Headers[productorigin.Header]; !ok {
@@ -379,7 +381,7 @@ func (conn *Connection) execRequest(
 }
 
 // GetVersion returns the elasticsearch version the client is connected to.
-func (conn *Connection) GetVersion() common.Version {
+func (conn *Connection) GetVersion() libversion.V {
 	if !conn.version.IsValid() {
 		_ = conn.getVersion()
 	}
@@ -393,11 +395,11 @@ func (conn *Connection) getVersion() error {
 		return err
 	}
 
-	if version, err := common.NewVersion(versionString); err != nil {
+	if v, err := libversion.New(versionString); err != nil {
 		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
-		conn.version = common.Version{}
+		conn.version = libversion.V{}
 	} else {
-		conn.version = *version
+		conn.version = *v
 	}
 
 	return nil

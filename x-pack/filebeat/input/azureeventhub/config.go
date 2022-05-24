@@ -13,7 +13,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type azureInputConfig struct {

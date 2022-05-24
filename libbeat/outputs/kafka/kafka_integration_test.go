@@ -36,18 +36,18 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
-	kafkaDefaultHost     = "kafka"
-	kafkaDefaultPort     = "9092"
+	kafkaDefaultHost     = "localhost"
+	kafkaDefaultPort     = "9094"
 	kafkaDefaultSASLPort = "9093"
 )
 
@@ -204,6 +204,8 @@ func TestKafkaPublish(t *testing.T) {
 				"hosts":          []string{getTestSASLKafkaHost()},
 				"protocol":       "https",
 				"sasl.mechanism": "SCRAM-SHA-512",
+				// Disable hostname verification since we are likely writing to localhost.
+				"ssl.verification_mode": "certificate",
 				"ssl.certificate_authorities": []string{
 					"../../../testing/environments/docker/kafka/certs/ca-cert",
 				},

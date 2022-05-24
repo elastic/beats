@@ -24,17 +24,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func TestProcessor(t *testing.T) {
 	falseVar := false
 	trueVar := true
-	p := &Processor{EsVersion: *common.MustNewVersion("7.0.0")}
-	migrationP := &Processor{EsVersion: *common.MustNewVersion("7.0.0"), Migration: true}
-	pEsVersion76 := &Processor{EsVersion: *common.MustNewVersion("7.6.0")}
+	p := &Processor{EsVersion: *version.MustNew("7.0.0")}
+	migrationP := &Processor{EsVersion: *version.MustNew("7.0.0"), Migration: true}
+	pEsVersion76 := &Processor{EsVersion: *version.MustNew("7.6.0")}
 
 	tests := []struct {
 		output   mapstr.M
@@ -516,7 +516,7 @@ func TestDynamicTemplates(t *testing.T) {
 	for _, test := range tests {
 		output := make(mapstr.M)
 		analyzers := make(mapstr.M)
-		p := &Processor{EsVersion: *common.MustNewVersion("8.0.0")}
+		p := &Processor{EsVersion: *version.MustNew("8.0.0")}
 		err := p.Process(mapping.Fields{
 			test.field,
 			test.field, // should not be added twice
@@ -553,7 +553,7 @@ func TestPropertiesCombine(t *testing.T) {
 
 	output := mapstr.M{}
 	analyzers := mapstr.M{}
-	version, err := common.NewVersion("6.0.0")
+	version, err := version.New("6.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -602,7 +602,7 @@ func TestProcessNoName(t *testing.T) {
 
 	output := mapstr.M{}
 	analyzers := mapstr.M{}
-	version, err := common.NewVersion("6.0.0")
+	version, err := version.New("6.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -734,7 +734,7 @@ func TestProcessDefaultField(t *testing.T) {
 		},
 	}
 
-	version, err := common.NewVersion("7.0.0")
+	version, err := version.New("7.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -779,7 +779,7 @@ func TestProcessWildcardOSS(t *testing.T) {
 
 	output := mapstr.M{}
 	analyzers := mapstr.M{}
-	version, err := common.NewVersion("8.0.0")
+	version, err := version.New("8.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -865,7 +865,7 @@ func TestProcessWildcardElastic(t *testing.T) {
 		t.Run(test.title, func(t *testing.T) {
 			output := mapstr.M{}
 			analyzers := mapstr.M{}
-			version, err := common.NewVersion("8.0.0")
+			version, err := version.New("8.0.0")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -896,7 +896,7 @@ func TestProcessWildcardPreSupport(t *testing.T) {
 
 	output := mapstr.M{}
 	analyzers := mapstr.M{}
-	version, err := common.NewVersion("7.8.0")
+	version, err := version.New("7.8.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -938,7 +938,7 @@ func TestProcessNestedSupport(t *testing.T) {
 
 	output := mapstr.M{}
 	analyzers := mapstr.M{}
-	version, err := common.NewVersion("7.8.0")
+	version, err := version.New("7.8.0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -974,7 +974,7 @@ func TestProcessNestedSupportNoSubfields(t *testing.T) {
 
 	output := mapstr.M{}
 	analyzers := mapstr.M{}
-	version, err := common.NewVersion("7.8.0")
+	version, err := version.New("7.8.0")
 	if err != nil {
 		t.Fatal(err)
 	}
