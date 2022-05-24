@@ -80,7 +80,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
 
 	// Write fake extension file for testing
-	err = ioutil.WriteFile(mandatoryExtensionPath, nil, 0644)
+	err = ioutil.WriteFile(mandatoryExtensionPath, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 
 			extensionAutoloadPath := filepath.Join(dir, osqueryAutoload)
 
-			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0644)
+			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
 			if err != nil {
 				t.Fatal(err)
 			}
