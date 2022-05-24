@@ -7,28 +7,6 @@
 === Beats version 7.17.4
 https://github.com/elastic/beats/compare/v7.17.3\...v7.17.4[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -37,21 +15,12 @@ https://github.com/elastic/beats/compare/v7.17.3\...v7.17.4[View commits]
 - Store syslog version as string. {pull}31446[31446]
 - Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
 - Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
 - google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
 - cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
 
 *Packetbeat*
 
@@ -63,67 +32,20 @@ https://github.com/elastic/beats/compare/v7.17.3\...v7.17.4[View commits]
 - Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
 - Fix resource handle leak during event log enrichment. {pull}31504[31504]
 
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
 
 - Update to Go 1.17.9 {issue}31350[31350]
 
-*Auditbeat*
-
 *Filebeat*
 
 - Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 - Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
 
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
 *Winlogbeat*
 
 - Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
 
 [[release-notes-7.17.3]]
 === Beats version 7.17.3
