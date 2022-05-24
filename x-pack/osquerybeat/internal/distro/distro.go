@@ -29,10 +29,16 @@ const (
 	osqueryDarwinApp       = "osquery.app"
 	osqueryDarwinPath      = "opt/osquery/lib/" + osqueryDarwinApp
 
-	osqueryLinuxPath = "opt/osquery/bin"
-	osqueryVersion   = "5.2.2"
-	osqueryMSIExt    = ".msi"
-	osqueryPkgExt    = ".pkg"
+	osqueryCertsPEM         = "certs.pem"
+	osqueryCertsPath        = "certs/" + osqueryCertsPEM
+	osqueryLinuxPath        = "opt/osquery/bin"
+	osqueryCertsLinuxPath   = "opt/osquery/share/osquery/certs/" + osqueryCertsPEM
+	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
+	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
+
+	osqueryVersion = "5.2.2"
+	osqueryMSIExt  = ".msi"
+	osqueryPkgExt  = ".pkg"
 
 	osqueryDistroDarwinSHA256   = "c1db00554f65a1f240e9c827c73e0a768fbda66475b18bd68786b3a12e04200f"
 	osqueryDistroLinuxSHA256    = "e86e4cec2f941782a6223a09c2e9d7bdc6cfea0e30ba9792056749b0e79f4576"
@@ -80,12 +86,28 @@ func OsquerydPath(dir string) string {
 	return OsquerydPathForOS(runtime.GOOS, dir)
 }
 
+func OsquerydCertsPath(dir string) string {
+	return filepath.Join(dir, osqueryCertsPath)
+}
+
 func OsquerydDarwinDistroPath() string {
 	return osqueryDarwinPath
 }
 
 func OsquerydLinuxDistroPath() string {
 	return OsquerydPath(osqueryLinuxPath)
+}
+
+func OsquerydCertsLinuxDistroPath() string {
+	return osqueryCertsLinuxPath
+}
+
+func OsquerydCertsDarwinDistroPath() string {
+	return osqueryCertsDarwinPath
+}
+
+func OsquerydCertsWindowsDistroPath() string {
+	return osqueryCertsWindowsPath
 }
 
 func OsquerydDistroFilename() string {

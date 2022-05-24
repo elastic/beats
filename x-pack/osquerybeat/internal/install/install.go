@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 
@@ -22,10 +21,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 )
 
+const (
+	payloadPath = "Payload"
+)
+
 func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) error {
 	dstfp := filepath.Join(dstDir, distro.OsquerydDarwinApp())
 
-	dir, err := installFromCommon(ctx, srcPkg, dstDir, dstfp, force, "pkgutil", "--expand-full", srcPkg)
+	dir, err := installFromCommon(ctx, dstDir, dstfp, force, "pkgutil", "--expand-full", srcPkg)
 	// Remove the directory that was created could have been created by pkgutil
 	// In case if the process was killed or finished with error but still left a directory behind
 	defer os.RemoveAll(dir)
@@ -34,29 +37,17 @@ func InstallFromPkg(ctx context.Context, srcPkg, dstDir string, force bool) erro
 		return err
 	}
 
-	// Copy over the osqueryd from under Payload into the dstDir directory
-	return devtools.Copy(filepath.Join(dir, "Payload", distro.OsquerydDarwinDistroPath()), filepath.Join(dstDir, distro.OsquerydDarwinApp()))
-}
-
-func InstallFromMSI(ctx context.Context, srcMSI, dstDir string, force bool) error {
-	dstfp := filepath.Join(dstDir, distro.OsquerydFilename())
-
-	// Winderz is odd, passing params to msiexec as usual didn't work
-	dir, err := installFromCommon(ctx, srcMSI, dstDir, dstfp, force, "msiexec", `/quiet /a "`+srcMSI+`"`)
-
-	// Remove the directory that was created could have been created by msiexec
-	// In case if the process was killed or finished with error but still left a directory behind
-	defer os.RemoveAll(dir)
-
+	// Copy over certs
+	err = devtools.Copy(filepath.Join(dir, payloadPath, distro.OsquerydCertsDarwinDistroPath()), distro.OsquerydCertsPath(dstDir))
 	if err != nil {
 		return err
 	}
 
-	// Copy over the or osquery.app osqueryd from under osquery/osqueryd into the dstDir directory
-	return devtools.Copy(path.Join(dir, "osquery", distro.OsquerydPath("osqueryd")), dstfp)
+	// Copy over the osqueryd from under Payload into the dstDir directory
+	return devtools.Copy(filepath.Join(dir, payloadPath, distro.OsquerydDarwinDistroPath()), filepath.Join(dstDir, distro.OsquerydDarwinApp()))
 }
 
-func installFromCommon(ctx context.Context, srcfp, dstDir, dstfp string, force bool, name string, arg ...string) (dir string, err error) {
+func installFromCommon(ctx context.Context, dstDir, dstfp string, force bool, name string, arg ...string) (dir string, err error) {
 	if !force {
 		//check if files exists
 		exists, err := fileutil.FileExists(dstfp)
