@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 *Metricbeat*
 
@@ -49,6 +50,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Winlogbeat*
+
+- Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
 
 
 *Functionbeat*
@@ -62,12 +65,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-
+- Update to Go 1.17.10 {issue}31636[31636]
+- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
 
 *Auditbeat*
 
 *Filebeat*
 
+- Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
 
 *Heartbeat*
 
