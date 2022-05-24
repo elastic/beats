@@ -120,6 +120,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
+- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Add new Kubernetes module dashboards {pull}31341[31341]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 
 *Packetbeat*
