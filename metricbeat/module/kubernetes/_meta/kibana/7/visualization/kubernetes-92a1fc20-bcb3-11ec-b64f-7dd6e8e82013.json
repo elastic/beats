@@ -59,7 +59,7 @@
                             "size": 5,
                             "type": "terms"
                         },
-                        "parent": "1649326490068",
+                        "parent": "1653381940058",
                         "type": "list"
                     }
                 ],
@@ -94,6 +94,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-24T08:46:20.863Z",
-    "version": "WzkyMTksMV0="
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwNDYsMV0="
 }

@@ -96,6 +96,23 @@
                 "panelRefName": "panel_cbef571a-c739-4d01-ba4c-68941d362a35",
                 "type": "visualization",
                 "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "28861472-d00c-4634-9e7c-20335cd49404",
+                    "w": 48,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "28861472-d00c-4634-9e7c-20335cd49404",
+                "panelRefName": "panel_28861472-d00c-4634-9e7c-20335cd49404",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
             }
         ],
         "timeRestore": false,
@@ -132,9 +149,14 @@
             "id": "kubernetes-80c3b480-bcb3-11ec-b64f-7dd6e8e82013",
             "name": "cbef571a-c739-4d01-ba4c-68941d362a35:panel_cbef571a-c739-4d01-ba4c-68941d362a35",
             "type": "visualization"
+        },
+        {
+            "id": "ed0682d0-db7b-11ec-9a27-6bd4c921c53b",
+            "name": "28861472-d00c-4634-9e7c-20335cd49404:panel_28861472-d00c-4634-9e7c-20335cd49404",
+            "type": "lens"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-23T08:46:47.833Z",
-    "version": "WzcwMywxXQ=="
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwNDUsMV0="
 }
