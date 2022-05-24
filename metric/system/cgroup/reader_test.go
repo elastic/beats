@@ -21,10 +21,8 @@
 package cgroup
 
 import (
-	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -38,105 +36,67 @@ const (
 	idv2   = "docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
 )
 
-// func TestForPid(t *testing.T) {
-// 	pid := 3757
-// 	reader, err := NewReader(resolve.NewTestResolver(""), true)
-// 	assert.NoError(t, err, "error in NewReader")
-
-// 	vers, err := reader.CgroupsVersion(1989)
-// 	if vers == CgroupsV1 {
-// 		t.Logf("Got V1 process.")
-// 		stats, err := reader.GetV1StatsForProcess(pid)
-// 		assert.NoError(t, err, "error in GetV1StatsForProcess")
-// 		t.Logf("Event: %#v", stats)
-// 	}
-
-// 	if vers == CgroupsV2 {
-// 		t.Logf("Got V2 process.")
-// 		stats, err := reader.GetV2StatsForProcess(pid)
-// 		assert.NoError(t, err, "error in GetV2StatsForProcess")
-// 		t.Logf("Event: %#v", stats)
-// 	}
-
-// }
-
 func TestV1EventDifferentPaths(t *testing.T) {
 	pid := 3757
 	reader, err := NewReader(resolve.NewTestResolver("testdata/ubuntu1804"), true)
-	assert.NoError(t, err, "error in NewReader")
+	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(pid)
-	assert.NoError(t, err, "error in GetV1StatsForProcess")
+	require.NoError(t, err, "error in GetV1StatsForProcess")
 
-	if stats == nil {
-		t.Fatal("no cgroup stats found")
-	}
+	require.NotNil(t, stats, "no cgroup stats found")
 
 	// Make sure we can handle root paths properly
-	assert.Equal(t, "/system.slice/networkd-dispatcher.service", stats.Path)
-	assert.Equal(t, "networkd-dispatcher.service", stats.ID)
-
+	require.Equal(t, "/system.slice/networkd-dispatcher.service", stats.Path)
+	require.Equal(t, "networkd-dispatcher.service", stats.ID)
 }
 
 func TestReaderGetStatsV1(t *testing.T) {
 	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true)
-	assert.NoError(t, err, "error in NewReader")
+	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(985)
-	assert.NoError(t, err, "error in GetV1StatsForProcess")
+	require.NoError(t, err, "error in GetV1StatsForProcess")
 
-	if stats == nil {
-		t.Fatal("no cgroup stats found")
-	}
+	require.NotNil(t, stats, "no cgroup stats found")
 
-	assert.Equal(t, id, stats.ID)
-	assert.Equal(t, id, stats.BlockIO.ID)
-	assert.Equal(t, id, stats.CPU.ID)
-	assert.Equal(t, id, stats.CPUAccounting.ID)
-	assert.Equal(t, id, stats.Memory.ID)
+	require.Equal(t, id, stats.ID)
+	require.Equal(t, id, stats.BlockIO.ID)
+	require.Equal(t, id, stats.CPU.ID)
+	require.Equal(t, id, stats.CPUAccounting.ID)
+	require.Equal(t, id, stats.Memory.ID)
 
-	assert.NotZero(t, stats.CPU.CFS.PeriodMicros.Us)
-	assert.NotZero(t, stats.CPUAccounting.Total.NS)
-	assert.NotZero(t, stats.Memory.Mem.Usage.Bytes)
-	assert.NotZero(t, stats.BlockIO.Total.Bytes)
+	require.NotZero(t, stats.CPU.CFS.PeriodMicros.Us)
+	require.NotZero(t, stats.CPUAccounting.Total.NS)
+	require.NotZero(t, stats.Memory.Mem.Usage.Bytes)
+	require.NotZero(t, stats.BlockIO.Total.Bytes)
 
-	assert.Equal(t, path, stats.Path)
-	assert.Equal(t, path, stats.BlockIO.Path)
-	assert.Equal(t, path, stats.CPU.Path)
-	assert.Equal(t, path, stats.CPUAccounting.Path)
-	assert.Equal(t, path, stats.Memory.Path)
+	require.Equal(t, path, stats.Path)
+	require.Equal(t, path, stats.BlockIO.Path)
+	require.Equal(t, path, stats.CPU.Path)
+	require.Equal(t, path, stats.CPUAccounting.Path)
+	require.Equal(t, path, stats.Memory.Path)
 
-	json, err := json.MarshalIndent(stats, "", "  ")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log(string(json))
 }
 
 func TestReaderGetStatsV2(t *testing.T) {
 	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true)
-	assert.NoError(t, err, "error in NewReader")
+	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV2StatsForProcess(312)
-	assert.NoError(t, err, "error in GetV2StatsForProcess")
+	require.NoError(t, err, "error in GetV2StatsForProcess")
 
 	require.NotNil(t, stats.CPU)
 	require.NotNil(t, stats.Memory)
 	require.NotNil(t, stats.IO)
 
-	assert.Equal(t, pathv2, stats.Path)
-	assert.Equal(t, idv2, stats.ID)
+	require.Equal(t, pathv2, stats.Path)
+	require.Equal(t, idv2, stats.ID)
 
 	require.NotZero(t, stats.CPU.Stats.Usage.NS)
 	require.NotZero(t, stats.Memory.Mem.Usage.Bytes)
 	require.NotZero(t, stats.IO.Pressure["some"].Sixty.Pct)
-	json, err := json.MarshalIndent(stats, "", "  ")
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	t.Log(string(json))
 }
 
 func TestReaderGetStatsHierarchyOverride(t *testing.T) {
@@ -153,38 +113,28 @@ func TestReaderGetStatsHierarchyOverride(t *testing.T) {
 		IgnoreRootCgroups:        false,
 		CgroupsHierarchyOverride: "/",
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err, "error in NewReaderOptions")
 
 	stats, err := reader.GetV1StatsForProcess(1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if stats == nil {
-		t.Fatal("no cgroup stats found")
-	}
+	require.NoError(t, err, "error in GetV1StatsForProcess")
 
-	require.NotNil(t, stats.CPU)
-	assert.NotZero(t, stats.CPU.CFS.Shares)
+	require.NotNil(t, stats, "no cgroup stats found")
+
+	require.NotNil(t, stats.CPU, "no cpu metrics")
+	require.NotZero(t, stats.CPU.CFS.Shares, "no V1 CFS cpu metrics")
 
 	reader2, err := NewReaderOptions(ReaderOptions{
 		RootfsMountpoint:         resolve.NewTestResolver("testdata/docker"),
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: "/system.slice/",
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err, "error in NewReaderOptions")
 
 	stats2, err := reader2.GetV2StatsForProcess(312)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if stats == nil {
-		t.Fatal("no cgroup stats found")
-	}
+	require.NoError(t, err, "error in GetV2StatsForProcess")
 
-	require.NotNil(t, stats2.CPU)
-	require.NotZero(t, stats2.CPU.Stats.Usage.NS)
+	require.NotNil(t, stats, "no cgroup stats found")
+
+	require.NotNil(t, stats2.CPU, "no v2 cpu stats found")
+	require.NotZero(t, stats2.CPU.Stats.Usage.NS, "no v2 CPU usage stats")
 }
