@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"sync"
 
@@ -41,7 +42,7 @@ const (
 	flagDisableTables = "disable_tables"
 )
 
-var defaultDisabledTables = []string{"curl", "carves"}
+var defaultDisabledTables = []string{"carves", "curl"}
 
 type OSQueryD struct {
 	socketPath string
@@ -457,48 +458,47 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	// Initialize with default disabled tables
 	disabledTables := arrayToSet(defaultDisabledTables)
 
-	// Append the disabled tables from flags
-	if disabledTablesValue, ok := userFlags["disable_tables"]; ok {
-		if disabledTablesString, ok := disabledTablesValue.(string); ok {
-			tables := strings.Split(disabledTablesString, ",")
-			for _, table := range tables {
-				name := strings.TrimSpace(table)
-				if name == "" {
-					continue
+	iterate := func(key string, fn func(name string)) {
+		if tablesValue, ok := userFlags[key]; ok {
+			if tablesString, ok := tablesValue.(string); ok {
+				tables := strings.Split(tablesString, ",")
+				for _, table := range tables {
+					name := strings.TrimSpace(table)
+					if name == "" {
+						continue
+					}
+					fn(name)
 				}
-				disabledTables[name] = struct{}{}
 			}
 		}
 	}
+
+	normalize := func(tables map[string]struct{}) []string {
+		res := make([]string, 0, len(tables))
+		for name := range tables {
+			res = append(res, name)
+		}
+		if len(res) > 0 {
+			sort.Strings(res)
+		}
+		return res
+	}
+
+	// Append the disabled tables from flags
+	iterate("disable_tables", func(name string) {
+		disabledTables[name] = struct{}{}
+	})
 
 	// Check enabled tables flag and remove these tables from disabledTables
-	if enabledTablesValue, ok := userFlags["enable_tables"]; ok {
-		if enabledTablesString, ok := enabledTablesValue.(string); ok {
-			tables := strings.Split(enabledTablesString, ",")
-			for _, table := range tables {
-				name := strings.TrimSpace(table)
-				if name == "" {
-					continue
-				}
-				if _, ok := disabledTables[table]; ok {
-					delete(disabledTables, name)
-				} else {
-					enabledTables[name] = struct{}{}
-				}
-			}
+	iterate("enable_tables", func(name string) {
+		if _, ok := disabledTables[name]; ok {
+			delete(disabledTables, name)
+		} else {
+			enabledTables[name] = struct{}{}
 		}
-	}
+	})
 
-	enabled = make([]string, 0, len(enabledTables))
-	for name := range enabledTables {
-		enabled = append(enabled, name)
-	}
-
-	disabled = make([]string, 0, len(disabledTables))
-	for name := range disabledTables {
-		disabled = append(disabled, name)
-	}
-	return enabled, disabled
+	return normalize(enabledTables), normalize(disabledTables)
 }
 
 func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {

@@ -173,3 +173,90 @@ func TestPrepareAutoloadFile(t *testing.T) {
 		})
 	}
 }
+
+func TestGetEnabledDisabledTables(t *testing.T) {
+
+	tests := []struct {
+		name             string
+		flags            Flags
+		expectedEnabled  []string
+		expectedDisabled []string
+	}{
+		{
+			name:             "default",
+			expectedEnabled:  []string{},
+			expectedDisabled: defaultDisabledTables,
+		},
+		{
+			name: "enable all",
+			flags: map[string]interface{}{
+				"enable_tables": "curl,carves",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: []string{},
+		},
+		{
+			name: "enable curl",
+			flags: map[string]interface{}{
+				"enable_tables": "curl",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: []string{"carves"},
+		},
+		{
+			name: "enable curl and carves",
+			flags: map[string]interface{}{
+				"enable_tables": "curl, carves",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: []string{},
+		},
+		{
+			name: "enable os_info",
+			flags: map[string]interface{}{
+				"enable_tables": "os_info",
+			},
+			expectedEnabled:  []string{"os_info"},
+			expectedDisabled: defaultDisabledTables,
+		},
+		{
+			name: "disable os_info",
+			flags: map[string]interface{}{
+				"disable_tables": "os_info",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: append(defaultDisabledTables, "os_info"),
+		},
+		{
+			name: "disable curl os_info",
+			flags: map[string]interface{}{
+				"disable_tables": "curl, os_info",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: append(defaultDisabledTables, "os_info"),
+		},
+		{
+			name: "disable curl os_info, enable os_info",
+			flags: map[string]interface{}{
+				"disable_tables": "curl, os_info",
+				"enable_tables":  "os_info",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: defaultDisabledTables,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			enabled, disabled := getEnabledDisabledTables(tc.flags)
+			diff := cmp.Diff(tc.expectedEnabled, enabled)
+			if diff != "" {
+				t.Error(diff)
+			}
+			diff = cmp.Diff(tc.expectedDisabled, disabled)
+			if diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
