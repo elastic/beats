@@ -1,19 +1,26 @@
-FROM golang:1.17.8 as builder
+# syntax = docker/dockerfile:1-experimental
+
+FROM golang:alpine3.15 as builder
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 
-RUN go install github.com/go-delve/delve/cmd/dlv@latest
+ENV CGO_ENABLED=0
+
+RUN apk add --no-cache git
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.3
 
 WORKDIR /usr/share/beats
 RUN mkdir /usr/share/beats/build
 
+COPY go.mod go.sum /usr/share/beats/
+RUN go mod download -x
+
 COPY . /usr/share/beats
 
-RUN go build -gcflags "-N -l" -o /usr/share/beats/build/metricbeat metricbeat/main.go
+RUN --mount=type=cache,target=/root/.cache/go-build go build -gcflags "-N -l" -o /usr/share/beats/build/metricbeat metricbeat/main.go
 
 
-
-FROM golang:1.17.8
+FROM alpine:3.15
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 
