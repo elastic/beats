@@ -5,6 +5,7 @@
 package browser
 
 import (
+	"encoding/json"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -123,6 +124,14 @@ func TestEmptySource(t *testing.T) {
 }
 
 func TestExtraArgs(t *testing.T) {
+	playWrightOpts := map[string]interface{}{
+		"simpleOption": "simpleValue",
+		"extraHTTPHeaders": map[string]interface{}{
+			"foo": "bar",
+		},
+	}
+	playwrightOptsJsonBytes, err := json.Marshal(playWrightOpts)
+	require.NoError(t, err)
 	tests := []struct {
 		name string
 		cfg  *Config
@@ -181,6 +190,13 @@ func TestExtraArgs(t *testing.T) {
 			"capabilities",
 			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}},
 			[]string{"--capability", "trace", "ssblocks"},
+		},
+		{
+			"playwright options",
+			&Config{
+				PlaywrightOpts: playWrightOpts,
+			},
+			[]string{"--playwright-options", string(playwrightOptsJsonBytes)},
 		},
 		{
 			"kitchen sink",
