@@ -458,6 +458,32 @@ type: date_range
 
 --
 
+*`monitor.origin`*::
++
+--
+The origin of this monitor configuration, usually either "ui", or "project"
+
+
+type: keyword
+
+--
+
+[float]
+=== project
+
+Project info for this monitor
+
+
+
+*`monitor.project.name`*::
++
+--
+Project name
+
+type: keyword
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 

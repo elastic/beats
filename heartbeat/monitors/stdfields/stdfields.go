@@ -37,6 +37,7 @@ type StdMonitorFields struct {
 	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
 	Timeout           time.Duration      `config:"timeout"`
 	Service           ServiceFields      `config:"service"`
+	Origin            string             `config:"origin"`
 	LegacyServiceName string             `config:"service_name"`
 	Enabled           bool               `config:"enabled"`
 }

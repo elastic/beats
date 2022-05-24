@@ -79,6 +79,7 @@ grouped in the following categories:
 * <<exported-fields-radware>>
 * <<exported-fields-redis>>
 * <<exported-fields-s3>>
+* <<exported-fields-salesforce>>
 * <<exported-fields-santa>>
 * <<exported-fields-snort>>
 * <<exported-fields-snyk>>
@@ -112014,6 +112015,16 @@ type: keyword
 
 --
 
+*`okta.debug_context.debug_data.risk_level`*::
++
+--
+The risk level assigned to the sign in attempt.
+
+
+type: keyword
+
+--
+
 *`okta.debug_context.debug_data.url`*::
 +
 --
@@ -112021,6 +112032,16 @@ The URL.
 
 
 type: keyword
+
+--
+
+*`okta.debug_context.debug_data.flattened`*::
++
+--
+The complete debug_data object.
+
+
+type: flattened
 
 --
 
@@ -124820,6 +124841,769 @@ type: keyword
 AWS S3 object metadata values.
 
 type: flattened
+
+--
+
+[[exported-fields-salesforce]]
+== Salesforce fields
+
+Salesforce Module
+
+
+
+[float]
+=== salesforce
+
+Fileset for ingesting Salesforce Apex logs.
+
+
+
+*`salesforce.access_mode`*::
++
+--
+The mode of collecting logs from Salesforce - "rest" or "stream".
+
+
+type: keyword
+
+--
+
+[float]
+=== apex
+
+Fileset for ingesting Salesforce Apex logs.
+
+
+
+*`salesforce.apex.action`*::
++
+--
+Action performed by the callout.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.callout_time`*::
++
+--
+Time spent waiting on webservice callouts, in milliseconds.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.class_name`*::
++
+--
+The Apex class name. If the class is part of a managed package, this string includes the package namespace.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.client_name`*::
++
+--
+The name of the client that's using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didnt specify a client in the CallOptions header.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.cpu_time`*::
++
+--
+The CPU time in milliseconds used to complete the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.db_blocks`*::
++
+--
+Indicates how much activity is occurring in the database. A high value for this field suggests that adding indexes or filters on your queries would benefit performance.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.db_cpu_time`*::
++
+--
+The CPU time in milliseconds to complete the request. Indicates the amount of activity taking place in the database layer during the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.db_total_time`*::
++
+--
+Time (in milliseconds) spent waiting for database processing in aggregate for all operations in the request. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.entity`*::
++
+--
+Name of the external object being accessed.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.entity_name`*::
++
+--
+The name of the object affected by the trigger.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.entry_point`*::
++
+--
+The entry point for this Apex execution.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.event_type`*::
++
+--
+The type of event. The value is always ApexCallout.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.execute_ms`*::
++
+--
+How long it took (in milliseconds) for Salesforce to prepare and execute the query. Available in API version 42.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.fetch_ms`*::
++
+--
+How long it took (in milliseconds) to retrieve the query results from the external system. Available in API version 42.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.filter`*::
++
+--
+Field expressions to filter which rows to return. Corresponds to WHERE in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.is_long_running_request`*::
++
+--
+Indicates whether the request is counted against your org's concurrent long-running Apex request limit (true) or not (false).
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.limit`*::
++
+--
+Maximum number of rows to return for a query. Corresponds to LIMIT in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.limit_usage_percent`*::
++
+--
+The percentage of Apex SOAP calls that were made against the organization's limit.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.login_key`*::
++
+--
+The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.media_type`*::
++
+--
+The media type of the response.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.message`*::
++
+--
+Error or warning message associated with the failed call.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.method_name`*::
++
+--
+The name of the calling Apex method.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.number_fields`*::
++
+--
+The number of fields or columns, where applicable.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.number_soql_queries`*::
++
+--
+The number of SOQL queries that were executed during the event.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.offset`*::
++
+--
+Number of rows to skip when paging through a result set. Corresponds to OFFSET in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.orderby`*::
++
+--
+Field or column to use for sorting query results, and whether to sort the results in ascending (default) or descending order. Corresponds to ORDER BY in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.organization_id`*::
++
+--
+The 15-character ID of the organization.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.query`*::
++
+--
+The SOQL query, if one was performed.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.quiddity`*::
++
+--
+The type of outer execution associated with this event.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.request.id`*::
++
+--
+The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.request.status`*::
++
+--
+The status of the request for a page view or user interface action.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.rows.total`*::
++
+--
+Total number of records in the result set. The value is always -1 if the custom adapter's DataSource.Provider class doesn't declare the QUERY_TOTAL_SIZE capability.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.rows.fetched`*::
++
+--
+Number of rows fetched by the callout. Available in API version 42.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.rows.processed`*::
++
+--
+The number of rows that were processed in the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.run_time`*::
++
+--
+Not used for this event type. Use the TIME field instead.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.select`*::
++
+--
+Comma-separated list of fields being queried. Corresponds to SELECT in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.subqueries`*::
++
+--
+Reserved for future use.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.throughput`*::
++
+--
+Number of records retrieved in one second.
+
+
+type: keyword
+
+--
+
+
+*`salesforce.apex.trigger.id`*::
++
+--
+The 15-character ID of the trigger that was fired.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.trigger.name`*::
++
+--
+For triggers coming from managed packages, TRIGGER_NAME includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.trigger.type`*::
++
+--
+The type of this trigger.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.type`*::
++
+--
+The type of Apex callout.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.uri`*::
++
+--
+The URI of the page that's receiving the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.uri_id_derived`*::
++
+--
+The 18-character case-safe ID of the URI of the page that's receiving the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.user_agent`*::
++
+--
+The numeric code for the type of client used to make the request (for example, the browser, application, or API).
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.user_id_derived`*::
++
+--
+The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
+
+
+type: keyword
+
+--
+
+[float]
+=== salesforce.login
+
+Fileset for ingesting Salesforce Login (Streaming) logs.
+
+
+
+*`salesforce.login.application`*::
++
+--
+The application used to access the org. Possible values include: AppExchange, Browser, Salesforce for iOS, Salesforce Developers API Explorer, N/A
+
+
+type: keyword
+
+--
+
+*`salesforce.login.auth_method_reference`*::
++
+--
+The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.auth_service_id`*::
++
+--
+The 18-character ID for an authentication service for a login event.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.client_version`*::
++
+--
+The version number of the login client. If no version number is available, “Unknown” is returned.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.created_by_id`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+*`salesforce.login.evaluation_time`*::
++
+--
+The amount of time it took to evaluate the transaction security policy, in milliseconds.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_geo_id`*::
++
+--
+The Salesforce ID of the LoginGeo object associated with the login user’s IP address.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_history_id`*::
++
+--
+Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and LoginHistory objects, making it easier to trace events back to a user’s original authentication.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_type`*::
++
+--
+The type of login used to access the session.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.policy_id`*::
++
+--
+The ID of the transaction security policy associated with this event.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.policy_outcome`*::
++
+--
+The result of the transaction policy.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.related_event_identifier`*::
++
+--
+This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.session_level`*::
++
+--
+Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
+
+
+type: keyword
+
+--
+
+[float]
+=== salesforce.logout
+
+Fileset for parsing Salesforce Logout (Streaming) logs.
+
+
+
+*`salesforce.logout.created_by_id`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.related_event_identifier`*::
++
+--
+This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.replay_id`*::
++
+--
+Represents an ID value that is populated by the system and refers to the position of the event in the event stream. Replay ID values aren’t guaranteed to be contiguous for consecutive events. A subscriber can store a replay ID value and use it on resubscription to retrieve missed events that are within the retention window.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.schema`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+[float]
+=== salesforce.setup_audit_trail
+
+Fileset for ingesting Salesforce SetupAuditTrail logs.
+
+
+
+*`salesforce.setup_audit_trail.event_type`*::
++
+--
+Event type
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.created_by_context`*::
++
+--
+The context under which the Setup change was made. For example, if Einstein uses cloud-to-cloud services to make a change in Setup, the value of this field is Einstein.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.created_by_id`*::
++
+--
+Unknown
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.created_by_issuer`*::
++
+--
+Reserved for future use.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.delegate_user`*::
++
+--
+The Login-As user who executed the action in Setup. If a Login-As user didn’t perform the action, this field is blank. This field is available in API version 35.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.display`*::
++
+--
+The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.responsible_namespace_prefix`*::
++
+--
+Unknown
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.section`*::
++
+--
+The section in the Setup menu where the action occurred. For example, Manage Users or Company Profile.
+
+
+type: keyword
 
 --
 
