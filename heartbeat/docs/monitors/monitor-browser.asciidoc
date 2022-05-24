@@ -196,7 +196,7 @@ in two different supported formats.
 -------------------------------------------------------------------------------
 - type: browser
   schedule: '@every 1m'
-  throttling: "1.6d/0.75u/150l"
+  throttling:
     download: 1.6
     upload: 0.75
     latency: 150
