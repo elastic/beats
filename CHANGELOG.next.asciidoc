@@ -58,7 +58,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 - make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
 
 *Packetbeat*
@@ -158,12 +157,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
-
-
-
-
-
-
 
 
 
