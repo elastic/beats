@@ -59695,6 +59695,56 @@ type: long
 
 --
 
+*`system.core.model_number`*::
++
+--
+CPU model number. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.model_name`*::
++
+--
+CPU model name. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.mhz`*::
++
+--
+CPU core current clock. Only availabe on Linux
+
+
+type: float
+
+--
+
+*`system.core.core_id`*::
++
+--
+CPU physical core ID. One core might might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.physical_id`*::
++
+--
+CPU core physical ID. Only availabe on Linux
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
@@ -60206,6 +60256,16 @@ Total number of inodes on the system, which will be a combination of files, fold
 
 
 type: long
+
+--
+
+*`system.filesystem.options`*::
++
+--
+The options present on the filesystem mount.
+
+
+type: keyword
 
 --
 
