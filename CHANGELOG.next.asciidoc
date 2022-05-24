@@ -116,6 +116,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
 - Add ARM64 seccomp profile. {issue}31285[31285] {pull}31422[31422]
+- Add new `playwright_options` config for browser monitors. {issue}28197[28196] {pull}31737[31737]
 
 
 *Metricbeat*
