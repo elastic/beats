@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build go build -gcflags "-N -l" -o
 
 FROM alpine:3.15
 
-ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
+ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin
 
 WORKDIR /usr/share/beats
 
