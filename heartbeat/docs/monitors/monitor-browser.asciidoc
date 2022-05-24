@@ -247,6 +247,13 @@ Example configuration:
 *`match`*:: run only journeys with a name or tags that matches the configured glob
 
 [float]
+[[monitor-browser-playwright-options]]
+==== `playwright_options`
+
+A map of extra options to pass in to the synthetics agent. These are used as the context for the Playwright
+browser object. See https://playwright.dev/docs/api/class-browser#browser-new-context[the playwright browser context docs] for more information.
+
+[float]
 [[monitor-browser-synthetics-args]]
 ==== `synthetics_args`
 

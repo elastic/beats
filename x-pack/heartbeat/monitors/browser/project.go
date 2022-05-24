@@ -89,6 +89,15 @@ func (p *Project) Close() error {
 
 func (p *Project) extraArgs() []string {
 	extraArgs := p.projectCfg.SyntheticsArgs
+	if len(p.projectCfg.PlaywrightOpts) > 0 {
+		s, err := json.Marshal(p.projectCfg.PlaywrightOpts)
+		if err != nil {
+			// This should never happen, if it was parsed as a config it should be serializable
+			logp.L().Warn("could not serialize playwright options '%v': %w", p.projectCfg.PlaywrightOpts, err)
+		} else {
+			extraArgs = append(extraArgs, "--playwright-options", string(s))
+		}
+	}
 	if p.projectCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
