@@ -91,15 +91,15 @@ setup.kibana:
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["${ELASTICSEARCH_HOST:localhost}:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  username: "${ELASTICSEARCH_USERNAME:elastic}"
-  password: "${ELASTICSEARCH_PASSWORD:changeme}"
+  #username: "elastic"
+  #password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:

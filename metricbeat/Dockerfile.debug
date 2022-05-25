@@ -24,4 +24,5 @@ COPY --from=builder /go/bin/dlv /go/bin/dlv
 COPY --from=builder /usr/share/beats/metricbeat /usr/share/beats/metricbeat
 COPY --from=builder /usr/share/beats/metricbeat.yml /usr/share/beats/metricbeat.yml
 
-CMD ["dlv", "--headless=true", "--listen=:56268", "--api-version=2", "--log", "exec", "./metricbeat", "--", "-c", "./metricbeat.yml", "-e"]
+ENTRYPOINT ["dlv", "--headless=true", "--listen=:56268", "--api-version=2", "--log", "exec", "./metricbeat", "--"]
+CMD [ "-c", "./metricbeat.yml", "-e" ]
