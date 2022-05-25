@@ -55,7 +55,7 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable'
+            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'darwin && orka && x86_64'
           }
         }
         stages {
