@@ -50,12 +50,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 
-*Filebeat*
-
-
 *Heartbeat*
-- Fix unintentional use of no-op logger. {pull}31543[31543]
 
+- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 *Metricbeat*
 
@@ -122,6 +119,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
+- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 
 *Packetbeat*
