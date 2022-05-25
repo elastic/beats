@@ -52,6 +52,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 
+*Filebeat*
+
+
 *Heartbeat*
 - Fix unintentional use of no-op logger. {pull}31543[31543]
 
@@ -162,6 +165,15 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
+
+
+
 
 
 
