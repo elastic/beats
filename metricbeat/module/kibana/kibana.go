@@ -26,6 +26,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -34,9 +37,13 @@ const (
 	ModuleName = "kibana"
 
 	// API Paths
-	StatusPath   = "api/status"
-	StatsPath    = "api/stats"
-	SettingsPath = "api/settings"
+	StatusPath         = "api/status"
+	StatsPath          = "api/stats"
+	ClusterRulesPath   = "api/monitoring_collection/cluster_rules"
+	NodeRulesPath      = "api/monitoring_collection/node_rules"
+	ClusterActionsPath = "api/monitoring_collection/cluster_actions"
+	NodeActionsPath    = "api/monitoring_collection/node_actions"
+	SettingsPath       = "api/settings"
 )
 
 var (
@@ -45,12 +52,32 @@ var (
 	v6_7_2 = version.MustNew("6.7.2")
 	v7_0_0 = version.MustNew("7.0.0")
 	v7_0_1 = version.MustNew("7.0.1")
+	v8_2_0 = version.MustNew("8.2.0")
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
 
 	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
 	SettingsAPIAvailableVersion = v6_5_0
+
+	// Version of Kibana since when the rules and task manager APIs are available
+	RulesAPIAvailableVersion   = v8_2_0
+	ActionsAPIAvailableVersion = v8_2_0
+)
+
+var (
+	KibanaSchema = s.Schema{
+		"uuid":  c.Str("uuid"),
+		"name":  c.Str("name"),
+		"index": c.Str("index"),
+		"host": s.Object{
+			"name": c.Str("host"),
+		},
+		"transport_address": c.Str("transport_address"),
+		"version":           c.Str("version"),
+		"snapshot":          c.Bool("snapshot"),
+		"status":            c.Str("status"),
+	}
 )
 
 func init() {
@@ -62,7 +89,10 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats"}, logp.NewLogger(ModuleName))
+	xpackEnabledMetricSets := []string{
+		"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions",
+	}
+	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
@@ -94,6 +124,16 @@ func IsStatsAPIAvailable(currentKibanaVersion *version.V) bool {
 // IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
 func IsSettingsAPIAvailable(currentKibanaVersion *version.V) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
+}
+
+// IsRulesAPIAvailable returns whether the rules API is available in the given version of Kibana
+func IsRulesAPIAvailable(currentKibanaVersion *version.V) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, RulesAPIAvailableVersion)
+}
+
+// IsActionsAPIAvailable returns whether the actions API is available in the given version of Kibana
+func IsActionsAPIAvailable(currentKibanaVersion *version.V) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, ActionsAPIAvailableVersion)
 }
 
 // IsUsageExcludable returns whether the stats API supports the exclude_usage parameter in the

@@ -116,6 +116,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
 - Add ARM64 seccomp profile. {issue}31285[31285] {pull}31422[31422]
+- Add new `playwright_options` config for browser monitors. {issue}28197[28196] {pull}31737[31737]
 
 
 *Metricbeat*
@@ -128,6 +129,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Fix `include_top_n` fields in system/process {pull}31595[31595]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
+- Add new Kubernetes module dashboards {pull}31341[31341]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 
 *Packetbeat*
