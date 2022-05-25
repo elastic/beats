@@ -6,7 +6,6 @@ package http_endpoint
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,9 +17,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
-
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -41,32 +37,6 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
-	parsers               parser.Config
-	context               context.Context
-}
-
-type recordReader struct {
-	messages chan mapstr.M
-}
-
-func (m recordReader) Close() error {
-	return nil
-}
-
-func (m recordReader) Next() (reader.Message, error) {
-	fmt.Print("COUNT: ", len(m.messages))
-	if len(m.messages) == 0 {
-		fmt.Print("I'm done")
-		return reader.Message{}, io.EOF
-	}
-	msg := <-m.messages
-	return reader.Message{
-		Ts:      time.Now(),
-		Content: []byte(msg.String()),
-		Fields: mapstr.M{
-			"message": msg.String(),
-		},
-	}, nil
 }
 
 // Triggers if middleware validation returns successful
@@ -89,32 +59,13 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
-	re := recordReader{
-		messages: make(chan mapstr.M, len(objs)),
-	}
-	// defer close(re.messages)
 	for _, obj := range objs {
-		h.log.Info("MESSAGE: ", obj)
-		re.messages <- obj
-	}
-	close(re.messages)
-	read := h.parsers.Create(h.context, re)
-	for h.context.Err() == nil {
-		message, err := read.Next()
-		if err == io.EOF || message.IsEmpty() {
-			h.log.Info("HELP!!!")
-			break
-		}
-		if err != nil {
-			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
-			return
-		}
-		h.log.Info("asdfasdf: ", message)
-		if err = h.publishEvent(message.ToEvent(), headers); err != nil {
+		if err = h.publishEvent(obj, headers); err != nil {
 			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
 	}
+
 	h.sendResponse(w, h.responseCode, h.responseBody)
 }
 
@@ -126,23 +77,21 @@ func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message st
 	}
 }
 
-func (h *httpHandler) publishEvent(event beat.Event, headers mapstr.M) error {
-	// event := beat.Event{
-	// 	Timestamp: time.Now().UTC(),
-	// 	Fields: mapstr.M{
-	// 		h.messageField: obj,
-	// 	},
-	// }
+func (h *httpHandler) publishEvent(obj, headers mapstr.M) error {
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields:    mapstr.M{},
+	}
 	if h.preserveOriginalEvent {
 		event.Fields["event"] = mapstr.M{
-			"original": event.Fields["message"],
+			"original": obj.String(),
 		}
 	}
 	if len(headers) > 0 {
 		event.Fields["headers"] = headers
 	}
 
-	if _, err := event.PutValue(h.messageField, event.Fields["message"]); err != nil {
+	if _, err := event.PutValue(h.messageField, obj); err != nil {
 		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
 	}
 

@@ -9,7 +9,6 @@ import (
 	"errors"
 	"net/textproto"
 
-	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -34,7 +33,6 @@ type config struct {
 	HMACPrefix            string                  `config:"hmac.prefix"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
-	Parsers               parser.Config           `config:",inline"`
 }
 
 func defaultConfig() config {

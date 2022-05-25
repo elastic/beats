@@ -84,7 +84,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	log := ctx.Logger.With("address", e.addr)
 
 	mux := http.NewServeMux()
-	mux.Handle(e.config.URL, newHandler(ctx, e.config, publisher, log))
+	mux.Handle(e.config.URL, newHandler(e.config, publisher, log))
 	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
 	_, cancel := ctxtool.WithFunc(ctx.Cancelation, func() { server.Close() })
 	defer cancel()
@@ -105,8 +105,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	return nil
 }
 
-func newHandler(ctx v2.Context, c config, pub stateless.Publisher, log *logp.Logger) http.Handler {
-	cont := ctxtool.FromCanceller(ctx.Cancelation)
+func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.Handler {
 	validator := &apiValidator{
 		basicAuth:    c.BasicAuth,
 		username:     c.Username,
@@ -129,8 +128,6 @@ func newHandler(ctx v2.Context, c config, pub stateless.Publisher, log *logp.Log
 		responseBody:          c.ResponseBody,
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
-		parsers:               c.Parsers,
-		context:               cont,
 	}
 
 	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
