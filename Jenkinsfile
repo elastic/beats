@@ -678,15 +678,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
           if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
-<<<<<<< HEAD
-          body()
-=======
           withOtelEnv() {
             withTerraformEnv(version: env.TERRAFORM_VERSION) {
               body()
             }
           }
->>>>>>> b98101dc67 (ci: use withTerraformEnv (#31663))
         } catch(err) {
           // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
           upload = true
