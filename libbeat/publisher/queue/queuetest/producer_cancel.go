@@ -72,12 +72,11 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 			}))
 		}
 
-		// consumer all events
-		consumer := b.Consumer()
+		// consume all events
 		total := N2 - N1
 		events := make([]publisher.Event, 0, total)
 		for len(events) < total {
-			batch, err := consumer.Get(-1) // collect all events
+			batch, err := b.Get(-1) // collect all events
 			if err != nil {
 				panic(err)
 			}
@@ -93,7 +92,8 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		}
 
 		for i, event := range events {
-			value := event.Content.Fields["value"].(int)
+			value, ok := event.Content.Fields["value"].(int)
+			assert.True(t, ok, "event.value should be an int")
 			assert.Equal(t, i+N1, value)
 		}
 	})

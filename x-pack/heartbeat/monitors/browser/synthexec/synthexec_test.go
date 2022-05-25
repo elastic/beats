@@ -159,32 +159,32 @@ Loop:
 	}
 }
 
-func TestSuiteCommandFactory(t *testing.T) {
+func TestProjectCommandFactory(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	origPath := path.Join(filepath.Dir(filename), "../source/fixtures/todos")
-	suitePath, err := filepath.Abs(origPath)
+	projectPath, err := filepath.Abs(origPath)
 	require.NoError(t, err)
-	binPath := path.Join(suitePath, "node_modules/.bin/elastic-synthetics")
+	binPath := path.Join(projectPath, "node_modules/.bin/elastic-synthetics")
 
 	tests := []struct {
-		name      string
-		suitePath string
-		extraArgs []string
-		want      []string
-		wantErr   bool
+		name        string
+		projectPath string
+		extraArgs   []string
+		want        []string
+		wantErr     bool
 	}{
 		{
 			"no args",
-			suitePath,
+			projectPath,
 			nil,
-			[]string{binPath, suitePath},
+			[]string{binPath, projectPath},
 			false,
 		},
 		{
 			"with args",
-			suitePath,
+			projectPath,
 			[]string{"--capability", "foo", "bar", "--rich-events"},
-			[]string{binPath, suitePath, "--capability", "foo", "bar", "--rich-events"},
+			[]string{binPath, projectPath, "--capability", "foo", "bar", "--rich-events"},
 			false,
 		},
 		{
@@ -197,7 +197,7 @@ func TestSuiteCommandFactory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory, err := suiteCommandFactory(tt.suitePath, tt.extraArgs...)
+			factory, err := projectCommandFactory(tt.projectPath, tt.extraArgs...)
 
 			if tt.wantErr {
 				require.Error(t, err)

@@ -55,6 +55,16 @@ func releaseCtx(c *ctx) {
 	ctxPool.Put(c)
 }
 
+// MustNewFormatter creates a new time formatter based on the provided pattern.
+// The functions panics if the pattern is invalid
+func MustNewFormatter(pattern string) *Formatter {
+	f, err := NewFormatter(pattern)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 // NewFormatter creates a new time formatter based on provided pattern.
 // If pattern is invalid an error is returned.
 func NewFormatter(pattern string) (*Formatter, error) {
@@ -95,7 +105,7 @@ func (f *Formatter) EstimateSize() int {
 
 func (f *Formatter) appendTo(ctx *ctx, b []byte, t time.Time) ([]byte, error) {
 	ctx.initTime(&f.config, t)
-	return f.prog.eval(b, ctx, t)
+	return f.prog.eval(b, ctx)
 }
 
 // AppendTo appends the formatted time value to the given byte buffer.
@@ -209,7 +219,17 @@ func parsePatternTo(b *builder, pattern string) error {
 			b.secondOfMinute(tokLen)
 
 		case 'S': // fraction of second
-			b.millisOfSecond(tokLen)
+			b.nanoOfSecond(tokLen)
+
+		case 'f': // faction of second (without zeros)
+			b.fractNanoOfSecond(tokLen)
+
+		case 'n': // nano second
+			// if timestamp layout use `n`, it always return 9 digits nanoseconds.
+			if tokLen != 9 {
+				tokLen = 9
+			}
+			b.nanoOfSecond(tokLen)
 
 		case 'z': // timezone offset
 			b.timeZoneOffsetText()

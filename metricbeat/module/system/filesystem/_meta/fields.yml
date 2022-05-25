@@ -25,6 +25,10 @@
       type: long
       description: >
         Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
+    - name: options
+      type: keyword
+      description: >
+        The options present on the filesystem mount.
     - name: free
       type: long
       format: bytes
