@@ -221,37 +221,7 @@ to 5.
 
 beta[]
 
-This option expects a list of parsers that non-JSON logs go through.
-
-Available parsers:
-
-* `multiline`
-
-In this example, {beatname_uc} is reading multiline messages that
-consist of XML that start with the `<Event>` tag.
-
-["source","yaml",subs="attributes"]
-----
-{beatname_lc}.inputs:
-- type: {type}
-  ...
-  parsers:
-    - multiline:
-        pattern: "^<Event"
-        negate:  true
-        match:   after
-----
-
-See the available parser settings in detail below.
-
-[float]
-===== `multiline`
-
-beta[]
-
-Options that control how {beatname_uc} deals with log messages that span
-multiple lines. See <<multiline-examples>> for more information about
-configuring multiline options.
+This option expects a list of parsers that the log line has to go through.  See <<parsers-options>> for a full list of all supported options.
 
 [float]
 ==== `queue_url`
