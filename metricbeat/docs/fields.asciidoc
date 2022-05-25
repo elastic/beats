@@ -41648,6 +41648,154 @@ type: keyword
 --
 
 [float]
+=== cluster_actions
+
+Kibana cluster actions metrics.
+
+
+
+
+*`kibana.cluster_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_actions.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_actions.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_actions.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== cluster_rules
+
+Kibana cluster rule metrics.
+
+
+
+
+*`kibana.cluster_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_rules.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_rules.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_rules.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== node_actions
+
+Kibana node actions metrics.
+
+
+
+
+*`kibana.node_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_actions.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
+=== node_rules
+
+Kibana node rule metrics.
+
+
+
+
+*`kibana.node_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_rules.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
 === settings
 
 Kibana stats and run-time metrics.
