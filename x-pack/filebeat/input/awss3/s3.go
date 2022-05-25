@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -143,7 +144,7 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 	return multierr.Combine(errs...)
 }
 
-func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
+func (p *s3Poller) GetS3Objects(ctx context.Context, inputContext v2.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
 	defer close(s3ObjectPayloadChan)
 
 	bucketName := getBucketNameFromARN(p.bucket)
@@ -195,7 +196,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 
 			acker := awscommon.NewEventACKTracker(ctx)
 
-			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
+			s3Processor := p.s3ObjectHandler.Create(ctx, inputContext, p.log, acker, event)
 			if s3Processor == nil {
 				continue
 			}
@@ -308,7 +309,7 @@ func (p *s3Poller) Purge() {
 	return
 }
 
-func (p *s3Poller) Poll(ctx context.Context) error {
+func (p *s3Poller) Poll(ctx context.Context, inputContext v2.Context) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	//  listing, sequentially processes every object and then does another listing
@@ -332,7 +333,7 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 				workerWg.Done()
 			}()
 
-			p.GetS3Objects(ctx, s3ObjectPayloadChan)
+			p.GetS3Objects(ctx, inputContext, s3ObjectPayloadChan)
 			p.Purge()
 		}()
 

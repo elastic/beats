@@ -19,6 +19,7 @@ package split
 
 import (
 	"context"
+	"io"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -66,7 +67,10 @@ func New(ctx context.Context, r reader.Reader, cfg *Config) *splitterReader {
 func (r *splitterReader) Next() (reader.Message, error) {
 	go r.reading()
 	for r.ctx.Err() == nil {
-		msg := <-r.buf
+		msg, ok := <-r.buf
+		if !ok {
+			return reader.Message{}, io.EOF
+		}
 		return msg, nil
 	}
 	return reader.Message{}, nil
@@ -83,7 +87,6 @@ func (r *splitterReader) reading() {
 	}
 	// We want to be able to identify which split is the root of the chain.
 	split.IsRoot = true
-	// data, _ := json.Marshal(message.Content)
 	eventsCh, err := split.StartSplit(message.Content)
 	if err != nil {
 		r.logger.Errorf("error splitting response: %v", err)

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"time"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -51,7 +52,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *sqs.Message) error
+	ProcessSQS(ctx context.Context, inputContext v2.Context, msg *sqs.Message) error
 }
 
 // ------
@@ -81,7 +82,7 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, inputContext v2.Context, log *logp.Logger, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {

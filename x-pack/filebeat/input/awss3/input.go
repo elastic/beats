@@ -133,7 +133,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer receiver.metrics.Close()
 
-		if err := receiver.Receive(ctx); err != nil {
+		if err := receiver.Receive(ctx, inputContext); err != nil {
 			return err
 		}
 	}
@@ -146,7 +146,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer poller.metrics.Close()
 
-		if err := poller.Poll(ctx); err != nil {
+		if err := poller.Poll(ctx, inputContext); err != nil {
 			return err
 		}
 	}

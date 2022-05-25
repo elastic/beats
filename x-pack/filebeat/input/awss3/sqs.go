@@ -12,6 +12,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -45,7 +46,7 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 }
 
-func (r *sqsReader) Receive(ctx context.Context) error {
+func (r *sqsReader) Receive(ctx context.Context, inputContext v2.Context) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the max message cap as opposed to a simpler loop that receives
 	// N messages, waits for them all to finish, then requests N more messages.
@@ -88,7 +89,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 					r.workerSem.Release(1)
 				}()
 
-				if err := r.msgHandler.ProcessSQS(ctx, &msg); err != nil {
+				if err := r.msgHandler.ProcessSQS(ctx, inputContext, &msg); err != nil {
 					r.log.Warnw("Failed processing SQS message.",
 						"error", err,
 						"message_id", *msg.MessageId,

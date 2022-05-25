@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
@@ -108,7 +109,7 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 	}
 }
 
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, inputContext v2.Context, msg *sqs.Message) error {
 	log := p.log.With(
 		"message_id", *msg.MessageId,
 		"message_receipt_time", time.Now().UTC())
@@ -121,7 +122,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 	keepaliveWg.Add(1)
 	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
 
-	processingErr := p.processS3Events(ctx, log, *msg.Body)
+	processingErr := p.processS3Events(ctx, inputContext, log, *msg.Body)
 
 	// Stop keepalive routine before changing visibility.
 	keepaliveCancel()
@@ -265,7 +266,7 @@ func (*sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
 	return event.EventSource == "aws:s3" && strings.HasPrefix(event.EventName, "ObjectCreated:")
 }
 
-func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Logger, body string) error {
+func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, inputContext v2.Context, log *logp.Logger, body string) error {
 	s3Events, err := p.getS3Notifications(body)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
@@ -283,7 +284,7 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 
 	var errs []error
 	for i, event := range s3Events {
-		s3Processor := p.s3ObjectHandler.Create(ctx, log, acker, event)
+		s3Processor := p.s3ObjectHandler.Create(ctx, inputContext, log, acker, event)
 		if s3Processor == nil {
 			continue
 		}

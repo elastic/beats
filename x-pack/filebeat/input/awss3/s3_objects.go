@@ -19,8 +19,11 @@ import (
 	"strings"
 	"time"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-concert/ctxtool"
+	"gotest.tools/gotestsum/log"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
@@ -75,7 +78,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, inputContext v2.Context, log *logp.Logger, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
 		"bucket_arn", obj.S3.Bucket.Name,
 		"object_key", obj.S3.Object.Key)
@@ -90,6 +93,7 @@ func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger,
 		s3ObjectProcessorFactory: f,
 		log:                      log,
 		ctx:                      ctx,
+		inputContext:             inputContext,
 		acker:                    ack,
 		readerConfig:             readerConfig,
 		s3Obj:                    obj,
@@ -102,6 +106,7 @@ type s3ObjectProcessor struct {
 
 	log          *logp.Logger
 	ctx          context.Context
+	inputContext v2.Context
 	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
 	readerConfig *readerConfig              // Config about how to process the object.
 	s3Obj        s3EventV2                  // S3 object information.
@@ -325,6 +330,13 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
 	reader = p.readerConfig.Parsers.Create(p.ctx, reader)
 	reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
+	_, streamCancel := ctxtool.WithFunc(p.inputContext.Cancelation, func() {
+		err := reader.Close()
+		if err != nil {
+			log.Errorf("Error stopping filestream reader %v", err)
+		}
+	})
+	defer streamCancel()
 
 	var offset int64
 	for {
