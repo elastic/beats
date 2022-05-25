@@ -96,6 +96,7 @@ type oAuth2Config struct {
 	GoogleCredentialsFile  string          `config:"google.credentials_file"`
 	GoogleCredentialsJSON  common.JSONBlob `config:"google.credentials_json"`
 	GoogleJWTFile          string          `config:"google.jwt_file"`
+	GoogleJWTJSON          common.JSONBlob `config:"google.jwt_json"`
 	GoogleDelegatedAccount string          `config:"google.delegated_account"`
 
 	// microsoft azure specific
@@ -147,8 +148,8 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 	case oAuth2ProviderAzure:
 		return o.clientCredentialsGrant(ctx, client), nil
 	case oAuth2ProviderGoogle:
-		if o.GoogleJWTFile != "" {
-			cfg, err := google.JWTConfigFromJSON(o.GoogleCredentialsJSON, o.Scopes...)
+		if len(o.GoogleJWTJSON) > 0 {
+			cfg, err := google.JWTConfigFromJSON(o.GoogleJWTJSON, o.Scopes...)
 			if err != nil {
 				return nil, fmt.Errorf("oauth2 client: error loading jwt credentials: %w", err)
 			}
@@ -250,7 +251,12 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 
 	// jwt_file
 	if o.GoogleJWTFile != "" {
-		return o.populateCredentialsJSONFromFile(o.GoogleJWTFile)
+		return o.populateJWTJSONFromFile(o.GoogleJWTFile)
+	}
+
+	// jwt_json
+	if len(o.GoogleJWTJSON) > 0 {
+		return nil
 	}
 
 	// Application Default Credentials (ADC)
@@ -278,6 +284,25 @@ func (o *oAuth2Config) populateCredentialsJSONFromFile(file string) error {
 	}
 
 	o.GoogleCredentialsJSON = credBytes
+
+	return nil
+}
+
+func (o *oAuth2Config) populateJWTJSONFromFile(file string) error {
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		return fmt.Errorf("the file %q cannot be found", file)
+	}
+
+	credBytes, err := ioutil.ReadFile(file)
+	if err != nil {
+		return fmt.Errorf("the file %q cannot be read", file)
+	}
+
+	if !json.Valid(credBytes) {
+		return fmt.Errorf("the file %q does not contain valid JSON", file)
+	}
+
+	o.GoogleJWTJSON = credBytes
 
 	return nil
 }
