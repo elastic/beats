@@ -54,7 +54,7 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'macosx && x86_64', 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable'
+            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'darwin && orka && x86_64'
           }
           axis {
             name 'GO_VERSION'
