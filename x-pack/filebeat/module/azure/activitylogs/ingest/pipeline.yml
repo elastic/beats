@@ -76,6 +76,11 @@ processors:
     field: azure.activitylogs.location
     target_field: geo.name
     ignore_missing: true
+- rename:
+    field: azure.activitylogs.identity
+    if: "ctx.azure?.activitylogs?.identity instanceof String"
+    target_field: azure.activitylogs.identity_name
+    ignore_missing: true
 - json:
     field: azure.activitylogs.identity
     if: "ctx.azure?.activitylogs?.identity instanceof String"
@@ -123,6 +128,18 @@ processors:
     field: azure.activitylogs.operation_name
     target_field: event.action
     type: string
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.operationVersion
+    target_field: azure.activitylogs.operation_version
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.tenantId
+    target_field: azure.activitylogs.tenant_id
+    ignore_missing: true
+- rename:
+    field: azure.activitylogs.Level
+    target_field: azure.activitylogs.level
     ignore_missing: true
 - rename:
     field: azure.activitylogs.resultSignature

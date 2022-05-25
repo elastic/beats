@@ -20,14 +20,13 @@ package winevent
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const allXML = `
@@ -84,7 +83,7 @@ func TestXML(t *testing.T) {
 	tests := []struct {
 		xml    string
 		event  Event
-		mapstr common.MapStr
+		mapstr mapstr.M
 	}{
 		{
 			xml: allXML,
@@ -97,6 +96,7 @@ func TestXML(t *testing.T) {
 				EventIdentifier: EventIdentifier{ID: 91},
 				LevelRaw:        4,
 				TaskRaw:         9,
+				OpcodeRaw:       new(uint8), // The value in the XML is 0.
 				KeywordsRaw:     0x8020000000000000,
 				TimeCreated:     TimeCreated{allXMLTimeCreated},
 				RecordID:        100,
@@ -153,10 +153,10 @@ func TestXML(t *testing.T) {
 					},
 				},
 			},
-			mapstr: common.MapStr{
+			mapstr: mapstr.M{
 				"event_id":     "0",
 				"time_created": time.Time{},
-				"user_data": common.MapStr{
+				"user_data": mapstr.M{
 					"Id":       "{00000000-0000-0000-0000-000000000000}",
 					"xml_name": "Operation_ClientFailure",
 				},
@@ -180,7 +180,7 @@ func TestXML(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			fmt.Println(string(json))
+			t.Logf("%s", json)
 		}
 	}
 }

@@ -125,6 +125,12 @@ func extractFromMSI() error {
 			return err
 		}
 
+		fmt.Println("copy certs.pem from MSI")
+		err = devtools.Copy(filepath.Join(dip, distro.OsquerydCertsWindowsDistroPath()), distro.OsquerydCertsPath(dip))
+		if err != nil {
+			return err
+		}
+
 		fmt.Println("copy osqueryd.exe from MSI")
 		dp := distro.OsquerydPathForOS(osarch.OS, dip)
 		err = devtools.Copy(filepath.Join(dip, "osquery", "osqueryd", "osqueryd.exe"), dp)

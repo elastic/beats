@@ -1,3 +1,4 @@
+---
 description: Pipeline for parsing sophos firewall logs (systemhealth pipeline)
 processors:
 #######################
@@ -79,59 +80,59 @@ processors:
       - remove:
           field: sophos.xg.free
 - gsub:
-    field: sophos.xg.Configuration
+    field: sophos.xg.configuration
     pattern: "%$"
     replacement: ""
     ignore_missing: true
     ignore_failure: true
 - convert:
-    field: sophos.xg.Configuration
+    field: sophos.xg.configuration
     type: float
     ignore_missing: true
     on_failure:
       - remove:
           field:
-            - sophos.xg.Configuration
+            - sophos.xg.configuration
 
 - gsub:
-    field: sophos.xg.Reports
+    field: sophos.xg.reports
     pattern: "%$"
     replacement: ""
     ignore_missing: true
     ignore_failure: true
 - convert:
-    field: sophos.xg.Reports
+    field: sophos.xg.reports
     type: float
     ignore_missing: true
     on_failure:
       - remove:
-          field: sophos.xg.Reports
+          field: sophos.xg.reports
 - gsub:
-    field: sophos.xg.Temp
+    field: sophos.xg.temp
     pattern: "%$"
     replacement: ""
     ignore_missing: true
     ignore_failure: true
 - convert:
-    field: sophos.xg.Temp
+    field: sophos.xg.temp
     type: float
     ignore_missing: true
     on_failure:
       - remove:
-          field: sophos.xg.Temp
+          field: sophos.xg.temp
 - gsub:
-    field: sophos.xg.Signature
+    field: sophos.xg.signature
     pattern: "%$"
     replacement: ""
     ignore_missing: true
     ignore_failure: true
 - convert:
-    field: sophos.xg.Signature
+    field: sophos.xg.signature
     type: float
     ignore_missing: true
     on_failure:
       - remove:
-          field: sophos.xg.Signature
+          field: sophos.xg.signature
 - convert:
     field: sophos.xg.users
     type: integer
@@ -153,6 +154,27 @@ processors:
     on_failure:
       - remove:
           field: sophos.xg.receivedkbits
+- convert:
+    field: sophos.xg.collisions
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.collisions
+- convert:
+    field: sophos.xg.receiveddrops
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.receiveddrops
+- convert:
+    field: sophos.xg.transmitteddrops
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.transmitteddrops
 
 on_failure:
 - set:

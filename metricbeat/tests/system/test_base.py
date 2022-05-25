@@ -85,28 +85,6 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         assert exit_code == 0, 'Error output: ' + self.get_log()
         assert self.log_contains("Kibana dashboards successfully loaded.")
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_migration(self):
-        """
-        Test that the template loads when migration is enabled
-        """
-
-        es = Elasticsearch([self.get_elasticsearch_url()])
-        self.render_config_template(
-            modules=[{
-                "name": "apache",
-                "metricsets": ["status"],
-                "hosts": ["localhost"],
-            }],
-            elasticsearch={"host": self.get_elasticsearch_url()},
-        )
-        exit_code = self.run_beat(extra_args=["setup", "--index-management",
-                                              "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
-
-        assert exit_code == 0
-        assert self.log_contains('Loaded index template')
-        assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
-
     def get_elasticsearch_url(self):
         return "http://" + self.compose_host("elasticsearch")
 

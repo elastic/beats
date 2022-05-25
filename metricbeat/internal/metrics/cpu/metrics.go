@@ -21,8 +21,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // CPU manages the CPU metrics from /proc/stat
@@ -48,11 +49,26 @@ type MetricOpts struct {
 	NormalizedPercentages bool
 }
 
+// CPUInfo manages the CPU information from /proc/cpuinfo
+// If a given value isn't available on a given platformn
+// the value will be the type's zero-value
+type CPUInfo struct {
+	ModelName   string
+	ModelNumber string
+	Mhz         float64
+	PhysicalID  int
+	CoreID      int
+}
+
 // CPUMetrics carries global and per-core CPU metrics
 type CPUMetrics struct {
 	totals CPU
+
 	// list carries the same data, broken down by CPU
 	list []CPU
+
+	// CPUInfo carries some data from /proc/cpuinfo
+	CPUInfo []CPUInfo
 }
 
 // Total returns the total CPU time in ticks as scraped by the API
@@ -96,7 +112,6 @@ func (m *Monitor) Fetch() (Metrics, error) {
 // FetchCores collects a new sample of CPU usage metrics per-core
 // This will overwrite the currently stored samples.
 func (m *Monitor) FetchCores() ([]Metrics, error) {
-
 	metric, err := Get(m.Hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error fetching CPU metrics")
@@ -109,10 +124,18 @@ func (m *Monitor) FetchCores() ([]Metrics, error) {
 		if len(m.lastSample.list) > i {
 			lastMetric = m.lastSample.list[i]
 		}
+
 		coreMetrics[i] = Metrics{
 			currentSample:  metric.list[i],
 			previousSample: lastMetric,
 			isTotals:       false,
+		}
+
+		// Only add CPUInfo metric if it's available
+		// TODO: Remove this if statement once CPUInfo is supported
+		// by all systems
+		if len(metric.CPUInfo) != 0 {
+			coreMetrics[i].cpuInfo = metric.CPUInfo[i]
 		}
 	}
 	m.lastSample = metric
@@ -124,11 +147,12 @@ type Metrics struct {
 	previousSample CPU
 	currentSample  CPU
 	count          int
+	cpuInfo        CPUInfo
 	isTotals       bool
 }
 
 // Format returns the final MapStr data object for the metrics.
-func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
+func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 
 	timeDelta := metric.currentSample.Total() - metric.previousSample.Total()
 	if timeDelta <= 0 {
@@ -139,7 +163,7 @@ func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 		normCPU = 1
 	}
 
-	formattedMetrics := common.MapStr{}
+	formattedMetrics := mapstr.M{}
 
 	reportOptMetric := func(name string, current, previous opt.Uint, norm int) {
 		if !current.IsZero() {
@@ -154,6 +178,7 @@ func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 		formattedMetrics.Put("total.norm.pct", createTotal(metric.previousSample, metric.currentSample, timeDelta, 1))
 	}
 
+	// /proc/stat metrics
 	reportOptMetric("user", metric.currentSample.User, metric.previousSample.User, normCPU)
 	reportOptMetric("system", metric.currentSample.Sys, metric.previousSample.Sys, normCPU)
 	reportOptMetric("idle", metric.currentSample.Idle, metric.previousSample.Idle, normCPU)
@@ -162,6 +187,22 @@ func (metric Metrics) Format(opts MetricOpts) (common.MapStr, error) {
 	reportOptMetric("iowait", metric.currentSample.Wait, metric.previousSample.Wait, normCPU)
 	reportOptMetric("softirq", metric.currentSample.SoftIrq, metric.previousSample.SoftIrq, normCPU)
 	reportOptMetric("steal", metric.currentSample.Stolen, metric.previousSample.Stolen, normCPU)
+
+	// Only add CPU info metrics if we're returning information by core
+	// (isTotals is false)
+	if !metric.isTotals {
+		// Some platforms do not report those metrics, so metric.cpuInfo
+		// is empty, if that happens we do not add the empty metrics to the
+		// final event.
+		if metric.cpuInfo != (CPUInfo{}) {
+			// /proc/cpuinfo metrics
+			formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
+			formattedMetrics["model_name"] = metric.cpuInfo.ModelName
+			formattedMetrics["mhz"] = metric.cpuInfo.Mhz
+			formattedMetrics["core_id"] = metric.cpuInfo.CoreID
+			formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
+		}
+	}
 
 	return formattedMetrics, nil
 }
@@ -176,8 +217,8 @@ func createTotal(prev, cur CPU, timeDelta uint64, numCPU int) float64 {
 	return common.Round(float64(numCPU)-idleTime, common.DefaultDecimalPlacesCount)
 }
 
-func fillMetric(opts MetricOpts, cur, prev opt.Uint, timeDelta uint64, numCPU int) common.MapStr {
-	event := common.MapStr{}
+func fillMetric(opts MetricOpts, cur, prev opt.Uint, timeDelta uint64, numCPU int) mapstr.M {
+	event := mapstr.M{}
 	if opts.Ticks {
 		event.Put("ticks", cur.ValueOr(0))
 	}

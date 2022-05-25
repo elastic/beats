@@ -46,7 +46,8 @@
                 "hide_last_value_indicator": true,
                 "id": "2fe9d3b0-30d5-11e7-8df8-6d3604a72912",
                 "index_pattern": "metricbeat-*",
-                "interval": "auto",
+                "interval": "2m",
+                "isModelInvalid": false,
                 "max_lines_legend": 1,
                 "series": [
                     {
@@ -108,6 +109,6 @@
     },
     "references": [],
     "type": "visualization",
-    "updated_at": "2022-03-18T12:10:56.522Z",
-    "version": "WzI3ODksMl0="
+    "updated_at": "2022-03-24T09:59:20.270Z",
+    "version": "Wzc4MTUsM10="
 }

@@ -18,15 +18,16 @@
 package memlog
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // store implements an actual memlog based store.
@@ -112,11 +113,20 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 		active := dataFiles[L-1]
 		txid = active.txid
 		if err := loadDataFile(active.path, tbl); err != nil {
-			return nil, err
+			if errors.Is(err, ErrCorruptStore) {
+				corruptFilePath := active.path + ".corrupted"
+				err := os.Rename(active.path, corruptFilePath)
+				if err != nil {
+					logp.Debug("Failed to backup corrupt data file '%s': %+v", active.path, err)
+				}
+				logp.Warn("Data file is corrupt. It has been renamed to %s. Attempting to restore partial state from log file.", corruptFilePath)
+			} else {
+				return nil, err
+			}
+		} else {
+			logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
 		}
 	}
-
-	logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
 
 	var entries uint
 	memstore := memstore{tbl}
@@ -174,7 +184,7 @@ func (s *store) Get(key string, to interface{}) error {
 // If encoding was successful the in-memory state will be updated and a
 // set-operation is logged to the diskstore.
 func (s *store) Set(key string, value interface{}) error {
-	var tmp common.MapStr
+	var tmp mapstr.M
 	if err := typeconv.Convert(&tmp, value); err != nil {
 		return err
 	}
@@ -215,8 +225,8 @@ func (s *store) logOperation(op op) error {
 		if err != nil {
 			// if writing the new checkpoint file failed we try to fallback to
 			// appending the log operation.
-			// TODO: make append configurable and retry checkpointing with backoff.
-			s.disk.LogOperation(op)
+			// idea: make append configurable and retry checkpointing with backoff.
+			_ = s.disk.LogOperation(op)
 		}
 
 		return err
@@ -253,7 +263,7 @@ func (m *memstore) Get(key string) backend.ValueDecoder {
 	return entry
 }
 
-func (m *memstore) Set(key string, value common.MapStr) {
+func (m *memstore) Set(key string, value mapstr.M) {
 	m.table[key] = entry{value: value}
 }
 

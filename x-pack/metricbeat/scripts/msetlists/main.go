@@ -11,9 +11,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/scripts/msetlists"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func main() {

@@ -18,9 +18,9 @@
 package status
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -161,7 +161,7 @@ var (
 
 // Map data to MapStr of server stats variables: http://dev.mysql.com/doc/refman/5.7/en/server-status-variables.html
 // This is only a subset of the available values
-func eventMapping(status map[string]string) common.MapStr {
+func eventMapping(status map[string]string) mapstr.M {
 	source := map[string]interface{}{}
 	for key, val := range status {
 		source[key] = val
@@ -170,8 +170,8 @@ func eventMapping(status map[string]string) common.MapStr {
 	return data
 }
 
-func rawEventMapping(status map[string]string) common.MapStr {
-	source := common.MapStr{}
+func rawEventMapping(status map[string]string) mapstr.M {
+	source := mapstr.M{}
 	for key, val := range status {
 		// Only adds events which are not in the mapping
 		if schema.HasKey(key) {

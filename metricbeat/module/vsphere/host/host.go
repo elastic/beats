@@ -24,9 +24,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -100,7 +100,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	for _, hs := range hst {
 
-		event := common.MapStr{}
+		event := mapstr.M{}
 
 		event["name"] = hs.Summary.Config.Name
 		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)

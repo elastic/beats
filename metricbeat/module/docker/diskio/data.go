@@ -18,19 +18,19 @@
 package diskio
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
-	for _, blkioStats := range blkioStatsList {
-		eventMapping(r, &blkioStats)
+	for i := range blkioStatsList {
+		eventMapping(r, &blkioStatsList[i])
 	}
 }
 
 func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
-	fields := common.MapStr{
-		"read": common.MapStr{
+	fields := mapstr.M{
+		"read": mapstr.M{
 			"ops":          stats.serviced.reads,
 			"bytes":        stats.servicedBytes.reads,
 			"rate":         stats.reads,
@@ -38,7 +38,7 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 			"wait_time":    stats.waitTime.reads,
 			"queued":       stats.queued.reads,
 		},
-		"write": common.MapStr{
+		"write": mapstr.M{
 			"ops":          stats.serviced.writes,
 			"bytes":        stats.servicedBytes.writes,
 			"rate":         stats.writes,
@@ -46,7 +46,7 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 			"wait_time":    stats.waitTime.writes,
 			"queued":       stats.queued.writes,
 		},
-		"summary": common.MapStr{
+		"summary": mapstr.M{
 			"ops":          stats.serviced.totals,
 			"bytes":        stats.servicedBytes.totals,
 			"rate":         stats.totals,
@@ -56,8 +56,13 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 		},
 	}
 
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	_, _ = rootFields.Put("container.disk.read.bytes", stats.servicedBytes.reads)
+	_, _ = rootFields.Put("container.disk.write.bytes", stats.servicedBytes.writes)
+
 	r.Event(mb.Event{
-		RootFields:      stats.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }

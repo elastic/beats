@@ -9,19 +9,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 	tests := []struct {
 		name     string
-		config   *common.Config
+		config   *conf.C
 		error    bool
 		expected ConfigBlacklistSettings
 	}{
 		{
 			name: "Simple config",
-			config: common.MustNewConfigFrom(map[string]interface{}{
+			config: conf.MustNewConfigFrom(map[string]interface{}{
 				"foo": "bar",
 			}),
 			expected: ConfigBlacklistSettings{
@@ -32,12 +32,12 @@ func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 		},
 		{
 			name:   "Wrong config",
-			config: common.MustNewConfigFrom([]string{"a", "b"}),
+			config: conf.MustNewConfigFrom([]string{"a", "b"}),
 			error:  true,
 		},
 		{
 			name: "Tree config",
-			config: common.MustNewConfigFrom(map[string]interface{}{
+			config: conf.MustNewConfigFrom(map[string]interface{}{
 				"foo": map[string]interface{}{
 					"bar": "baz",
 				},

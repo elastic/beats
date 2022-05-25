@@ -42,6 +42,9 @@ processors:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
   - set:
+      field: event.module
+      value: powershell
+  - set:
       field: event.kind
       value: event
   - set:

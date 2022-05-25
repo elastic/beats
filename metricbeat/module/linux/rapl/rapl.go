@@ -36,9 +36,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -143,11 +144,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	watts := m.updatePower()
 
 	for cpu, metric := range watts {
-		evt := common.MapStr{
+		evt := mapstr.M{
 			"core": cpu,
 		}
 		for domain, power := range metric {
-			evt[strings.ToLower(domain.Name)] = common.MapStr{
+			evt[strings.ToLower(domain.Name)] = mapstr.M{
 				"watts":  common.Round(power.watts, common.DefaultDecimalPlacesCount),
 				"joules": common.Round(power.joules, common.DefaultDecimalPlacesCount),
 			}

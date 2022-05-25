@@ -181,7 +181,19 @@ processors:
       ignore_empty_value: true
       override: true
 
-  # This script converts the nested object under cyberarkpas.audit.CAProperties.CAProperty
+  # This script ensures that CAProperties.CAProperty is an array.
+  # When there's a single property, it is serialised as an object instead
+  # of a single element array.
+  - script:
+      lang: painless
+      description: "Converts CAProperties into an array if necessary"
+      source: >
+        def props = ctx.cyberarkpas?.audit?.CAProperties?.CAProperty;
+        if (props != null && props instanceof Map) {
+          ctx.cyberarkpas.audit.CAProperties.CAProperty = [ props ];
+        }
+
+  # This processor converts the nested object under cyberarkpas.audit.CAProperties.CAProperty
   # into an object under cyberarkpas.audit.CAProperties:
   #
   # input:

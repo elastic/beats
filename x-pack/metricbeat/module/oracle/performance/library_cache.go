@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type libraryCache struct {
@@ -53,8 +53,8 @@ func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache
 	return results, nil
 }
 
-func (m *MetricSet) addLibraryCacheData(ls []libraryCache) common.MapStr {
-	out := common.MapStr{}
+func (m *MetricSet) addLibraryCacheData(ls []libraryCache) mapstr.M {
+	out := mapstr.M{}
 
 	for _, v := range ls {
 		if v.name.Valid {

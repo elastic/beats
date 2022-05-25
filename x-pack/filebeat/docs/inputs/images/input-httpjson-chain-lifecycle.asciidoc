@@ -1,0 +1,30 @@
+┌─────────┐        ┌────────┐                              ┌────────┐              ┌────────┐
+│ Regular │        │ step-1 │  ──────────────────────────► │ step-i │              │ Output │
+└─────────┘        └────────┘                              └────────┘              └────────┘
+    │                  │                                       │                       │
+    │ 1. Response from │                                       │                       │
+    │ regular call.    │                                       │                       │
+    │                  │                                       │                       │
+    ├─────────────────►│                                       │                       │
+    │                  │                                       │                       │
+    │                  │                                       │                       │
+    │                ┌─┴──────┬────────────────────────────────┼──┐                    │
+    │                │  loop  │                                │  │                    │
+    │                ├─┬──────┘                                │  │                    │
+    │                │ │ 2. Extract data from response and     │  │                    │
+    │                │ │ generate new requests from responses. │  │                    │
+    │                │ │                                       │  │                    │
+    │                │ │    ┌────────────────────────────┐     │  │                    │
+    │                │ │    │ Process generated requests │     │  │                    │
+    │                │ ├────┤ and collect responses from ├────►│  │                    │
+    │                │ │    │ server.                    │     │  │                    │
+    │                │ │    └────────────────────────────┘     │  │                    │
+    │                │ │                                       │  │                    │
+    │                └─┼───────────────────────────────────────┼──┘                    │
+    │                  │                                       │                       │
+    │                  │                                       │3. Publish every event │
+    │                  │                                       │to output. Events will │
+    │                  │                                       │only be published for  │
+    │                  │                                       │the last step in chain.│
+    │                  │                                       ├──────────────────────►│
+    │                  │                                       │                       │

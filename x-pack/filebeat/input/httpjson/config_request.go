@@ -7,12 +7,13 @@ package httpjson
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type retryConfig struct {
@@ -87,7 +88,7 @@ func (u *urlConfig) Unpack(in string) error {
 type requestConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
 	Method                 string           `config:"method" validate:"required"`
-	Body                   *common.MapStr   `config:"body"`
+	Body                   *mapstr.M        `config:"body"`
 	EncodeAs               string           `config:"encode_as"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
@@ -102,8 +103,8 @@ type requestConfig struct {
 func (c *requestConfig) Validate() error {
 	c.Method = strings.ToUpper(c.Method)
 	switch c.Method {
-	case "POST":
-	case "GET":
+	case http.MethodPost:
+	case http.MethodGet:
 		if c.Body != nil {
 			return errors.New("body can't be used with method: \"GET\"")
 		}

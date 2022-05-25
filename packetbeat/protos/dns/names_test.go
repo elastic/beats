@@ -32,17 +32,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type dnsTestMsg struct {
 	rawData     []byte
-	question    common.MapStr
-	answers     []common.MapStr
-	authorities []common.MapStr
-	additionals []common.MapStr
-	opt         common.MapStr
+	question    mapstr.M
+	answers     []mapstr.M
+	authorities []mapstr.M
+	additionals []mapstr.M
+	opt         mapstr.M
 }
 
 // DNS messages for testing.
@@ -59,7 +59,7 @@ var (
 			0x21, 0x51, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65, 0x6c, 0x61,
 			0x73, 0x74, 0x69, 0x63, 0x02, 0x63, 0x6f, 0x00, 0x00, 0x1e, 0x00, 0x01,
 		},
-		question: common.MapStr{
+		question: mapstr.M{
 			"type": "NXT",
 			"name": "elastic.co",
 		},
@@ -70,7 +70,7 @@ var (
 			0x21, 0x51, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65, 0x6c, 0x61,
 			0x73, 0x74, 0x69, 0x63, 0x02, 0x63, 0x6f, 0x00, 0xff, 0x00, 0x00, 0x01,
 		},
-		question: common.MapStr{
+		question: mapstr.M{
 			"type": "65280",
 			"name": "elastic.co",
 		},
@@ -82,11 +82,11 @@ var (
 			0x04, 0x69, 0x65, 0x74, 0x66, 0x03, 0x6f, 0x72, 0x67, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
 			0x29, 0x10, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
 		},
-		question: common.MapStr{
+		question: mapstr.M{
 			"type": "A",
 			"name": "www.ietf.org",
 		},
-		opt: common.MapStr{
+		opt: mapstr.M{
 			"version": "0",
 			"do":      true,
 		},
@@ -94,7 +94,7 @@ var (
 )
 
 // oracleRRs and rrs should be sorted in the same order
-func assertRRs(t testing.TB, oracleRRs []common.MapStr, rrs []common.MapStr) {
+func assertRRs(t testing.TB, oracleRRs []mapstr.M, rrs []mapstr.M) {
 	assert.Equal(t, len(oracleRRs), len(rrs))
 	for i, oracleRR := range oracleRRs {
 		rr := rrs[i]
@@ -111,27 +111,27 @@ func assertDNSMessage(t testing.TB, q dnsTestMsg) {
 		t.Error("failed to decode dns data")
 	}
 
-	mapStr := common.MapStr{}
+	mapStr := mapstr.M{}
 	addDNSToMapStr(mapStr, pb.NewFields(), dns, true, true)
 	if q.question != nil {
 		for k, v := range q.question {
-			assert.NotNil(t, mapStr["question"].(common.MapStr)[k])
-			assert.Equal(t, v, mapStr["question"].(common.MapStr)[k])
+			assert.NotNil(t, mapStr["question"].(mapstr.M)[k])
+			assert.Equal(t, v, mapStr["question"].(mapstr.M)[k])
 		}
 	}
 	if len(q.answers) > 0 {
-		assertRRs(t, q.answers, mapStr["answer"].([]common.MapStr))
+		assertRRs(t, q.answers, mapStr["answer"].([]mapstr.M))
 	}
 	if len(q.authorities) > 0 {
-		assertRRs(t, q.authorities, mapStr["authorities"].([]common.MapStr))
+		assertRRs(t, q.authorities, mapStr["authorities"].([]mapstr.M))
 	}
 	if len(q.additionals) > 0 {
-		assertRRs(t, q.additionals, mapStr["additionals"].([]common.MapStr))
+		assertRRs(t, q.additionals, mapStr["additionals"].([]mapstr.M))
 	}
 	if q.opt != nil {
 		for k, v := range q.opt {
-			assert.NotNil(t, mapStr["opt"].(common.MapStr)[k])
-			assert.Equal(t, v, mapStr["opt"].(common.MapStr)[k])
+			assert.NotNil(t, mapStr["opt"].(mapstr.M)[k])
+			assert.Equal(t, v, mapStr["opt"].(mapstr.M)[k])
 		}
 	}
 }

@@ -22,9 +22,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/munin"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -97,9 +97,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 		event := mb.Event{
 			Service: plugin,
-			RootFields: common.MapStr{
-				"munin": common.MapStr{
-					"plugin": common.MapStr{
+			RootFields: mapstr.M{
+				"munin": mapstr.M{
+					"plugin": mapstr.M{
 						"name": plugin,
 					},
 					"metrics": metrics,

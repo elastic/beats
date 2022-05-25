@@ -23,9 +23,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type testOutput struct {
@@ -54,7 +54,7 @@ func init() {
 	outputs.RegisterType("test", makeTestOutput)
 }
 
-func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *common.Config) (outputs.Group, error) {
+func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C) (outputs.Group, error) {
 	config := defaultTestOutputConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)

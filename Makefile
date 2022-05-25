@@ -10,6 +10,8 @@ VENV_PARAMS?=
 FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
 XPACK_SUFFIX=x-pack/
 
+BEAT_VERSION=$(shell grep defaultBeatVersion libbeat/version/version.go | cut -d'=' -f2 | tr -d '" ')
+
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
 # of artifacts). This will be removed once we complete the transition.
@@ -196,7 +198,7 @@ test-apm:
 ## get-version : Get the libbeat version
 .PHONY: get-version
 get-version:
-	@mage dumpVariables | grep 'beat_version' | cut -d"=" -f 2 | tr -d " "
+	@echo $(BEAT_VERSION)
 
 ### Packaging targets ####
 
@@ -228,3 +230,8 @@ release-manager-release:
 .PHONY: beats-dashboards
 beats-dashboards: mage update
 	@mage packageBeatDashboards
+
+## build/distributions/dependencies.csv : Generates the dependencies file
+build/distributions/dependencies.csv: $(PYTHON)
+	@mkdir -p build/distributions
+	$(PYTHON) dev-tools/dependencies-report --csv $@

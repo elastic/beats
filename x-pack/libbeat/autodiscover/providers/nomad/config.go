@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -28,9 +28,9 @@ type Config struct {
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
-	Hints     *common.Config          `config:"hints"`
-	Builders  []*common.Config        `config:"builders"`
-	Appenders []*common.Config        `config:"appenders"`
+	Hints     *conf.C                 `config:"hints"`
+	Builders  []*conf.C               `config:"builders"`
+	Appenders []*conf.C               `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
 
 	waitTime   time.Duration

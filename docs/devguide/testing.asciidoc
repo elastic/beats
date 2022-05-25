@@ -15,30 +15,68 @@ For both of the above test suites so called integration tests exists. Integratio
 
 ==== Running Go Tests
 
-The Go tests can be executed in each Go package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To also run the Go integration tests run `go test -tags=integration .`. It will require you to run the expected services on localhost.
+The Go tests can be executed in each Go package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
 
-To run all non integration tests for a beat run `make unit`. This will execute all the tests which are not inside a `vendor` directory. If you want to have a coverage report for the tests which were run use `make unit-tests`. A coverage report will be generated under `build/coverage` directory.
+All Go tests are in the same package as the tested code itself and have the suffix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
 
-All Go tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
+===== Running Go Integration Tests
 
+Integration tests are labelled with the `//go:build integration` build tag and use the `_integration_test.go` suffix.
+
+To run the integration tests use the `mage goIntegTest` target, which will start the required services using https://docs.docker.com/compose/[docker-compose] and run all integration tests.
+
+It is possible to start the `docker-compose` services manually to allow selecting which specific tests should be run. An example follows for filebeat:
+
+[source,bash]
+----
+cd filebeat
+# Pull and build the containers. Only needs to be done once unless you change the containers.
+mage docker:composeBuild
+# Bring up all containers, wait until they are healthy, and put them in the background.
+mage docker:composeUp
+# Run all integration tests.
+go test ./filebeat/...  -tags integration
+# Stop all started containers.
+mage docker:composeDown
+----
+
+===== Generate sample events
+
+Go tests support generating sample events to be used as fixtures.
+
+This generation can be perfomed running `go test --data`. This functionality is supported by packetbeat and Metricbeat.
+
+In Metricbeat, run the command from within a module like this: `go test --tags integration,azure --data --run "TestData"`. Make sure to add the relevant tags (`integration` is common then add module and metricset specific tags).
+
+A note about tags: the `--data` flag is a custom flag added by Metricbeat and Packetbeat frameworks. It will not be present in case tags do not match, as the relevant code will not be run and silently skipped (without the tag the test file is ignored by Go compiler so the framework doesn't load). This may happen if there are different tags in the build tags of the metricset under test (i.e. the GCP billing metricset requires the `billing` tag too).
 
 ==== Running Python Tests
 
-The system tests require a testing binary to be available and the python environment to be set up. To create the testing binary run `make {beatname}.test`. This will create the test binary in the beat directory. To setup the testing environment `make python-env` can be run which will use `venv` to load the dependencies. Then `pytest` has to be run inside `tests/system`.
+Python system tests are defined in the `tests/system` directory. They require a testing binary to be available and the python environment to be set up.
 
-To automate all these steps into one `make system-tests` can be run. This creates the binary, the environment and runs all tests which do not require and external service.
+To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To setup the testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment[virtualenv documentation].
 
-For the tests which require an external service like Elasticsearch to be running use `INTEGRATION_TESTS=1 make system-tests`. This will assume the services are running on localhost.
+To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using https://docs.docker.com/compose/[docker-compose] and run all integration tests. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
 
-To run the tests without the services running locally, the command `make system-tests-environment` can be used. This will start up the required environment in docker and will run all tests including the testing binary inside the docker environment.
-
-All Python tests are under `tests/system` directory.
+[source,bash]
+----
+# Create and activate the system test virtual environment (assumes a Unix system).
+source $(mage pythonVirtualEnv)/bin/activate
+# Pull and build the containers. Only needs to be done once unless you change the containers.
+mage docker:composeBuild
+# Bring up all containers, wait until they are healthy, and put them in the background.
+mage docker:composeUp
+# Run all system and integration tests.
+INTEGRATION_TESTS=1 pytest ./tests/system
+# Stop all started containers.
+mage docker:composeDown
+----
 
 Filebeat's module python tests have additional documentation found in the <<filebeat-modules-devguide,Filebeat module>> guide.
 
 ==== Test commands
 
-This is a quick summary of the available test commands:
+To list all mage commands run `mage -l`. A quick summary of the available test Make commands is:
 
 * `unit`: Go tests
 * `unit-tests`: Go tests with coverage reports
@@ -64,7 +102,3 @@ If the tests were run to create a test coverage, the coverage report files can b
 ==== Race detection
 
 All tests can be run with the Go race detector enabled by setting the environment variable `RACE_DETECTOR=1`. This applies to tests in Go and Python. For Python the test binary has to be recompile when the flag is changed. Having the race detection enabled will slow down the tests.
-
-==== Docker environment
-
-Running the tests inside the docker environment is useful to not have to setup all services locally. It has the disadvantage that also the binary is run inside the docker container and not on the local machine.

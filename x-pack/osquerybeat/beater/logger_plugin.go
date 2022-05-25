@@ -10,7 +10,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/logger"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type SnapshotResult struct {

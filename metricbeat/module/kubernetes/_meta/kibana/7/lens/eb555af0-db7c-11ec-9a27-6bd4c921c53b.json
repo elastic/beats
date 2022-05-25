@@ -1,0 +1,148 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "0b03a29a-8bd6-485d-b34c-5682853a3ec6": {
+                            "columnOrder": [
+                                "c7aa47ec-c87d-47ac-a318-a00b90b32b5d",
+                                "0c8870bf-3e60-4949-9715-6b7a762034b4",
+                                "6d1c5b5e-1686-44e9-8d96-cf72f5c3b519"
+                            ],
+                            "columns": {
+                                "0c8870bf-3e60-4949-9715-6b7a762034b4": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.statefulset.replicas.desired: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Replicas Desired",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.statefulset.replicas.desired"
+                                },
+                                "6d1c5b5e-1686-44e9-8d96-cf72f5c3b519": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.statefulset.replicas.ready: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Replicas ready",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.statefulset.replicas.ready"
+                                },
+                                "c7aa47ec-c87d-47ac-a318-a00b90b32b5d": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "StatefulSet Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "0c8870bf-3e60-4949-9715-6b7a762034b4",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.statefulset.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "0ca4453d-a4eb-48d9-afb4-e70e141079f4",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_statefulset"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_statefulset"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "accessors": [
+                            "0c8870bf-3e60-4949-9715-6b7a762034b4",
+                            "6d1c5b5e-1686-44e9-8d96-cf72f5c3b519"
+                        ],
+                        "layerId": "0b03a29a-8bd6-485d-b34c-5682853a3ec6",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "bar_stacked",
+                        "showGridlines": false,
+                        "xAccessor": "c7aa47ec-c87d-47ac-a318-a00b90b32b5d"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked",
+                "title": "Empty XY chart",
+                "valueLabels": "hide"
+            }
+        },
+        "title": "Replicas per StatefulSet [Metricbeat Kubernetes]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "eb555af0-db7c-11ec-9a27-6bd4c921c53b",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-0b03a29a-8bd6-485d-b34c-5682853a3ec6",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "0ca4453d-a4eb-48d9-afb4-e70e141079f4",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwMzcsMV0="
+}

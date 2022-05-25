@@ -2,18 +2,20 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//nolint:gosec,dupl // Bad linter!
 package cef
 
 import (
 	"crypto/sha1"
 	"encoding/hex"
 	"flag"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/multierr"
 )
 
 var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
@@ -54,6 +56,14 @@ const (
 	tabNoSepMessage = "CEF:0|security|threatmanager|1.0|100|message has tabs|10|spt=1232 msg=Tab is not a separator\tsrc=127.0.0.1"
 
 	escapedMessage = `CEF:0|security\\compliance|threat\|->manager|1.0|100|message contains escapes|10|spt=1232 msg=Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\\=.`
+
+	truncatedHeader = "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT"
+
+	// Found by fuzzing but minimised by hand.
+	fuzz0 = `CEF:0|a=\\ b|`
+	fuzz1 = `CEF:0|\|a=|b=`
+	fuzz2 = `CEF:0|\||a=b`
+	fuzz3 = `CEF:0|a=|b\\ c=d`
 )
 
 var testMessages = []string{
@@ -74,6 +84,11 @@ var testMessages = []string{
 	crlfMessage,
 	tabMessage,
 	escapedMessage,
+	truncatedHeader,
+	fuzz0,
+	fuzz1,
+	fuzz2,
+	fuzz3,
 }
 
 func TestGenerateFuzzCorpus(t *testing.T) {
@@ -86,7 +101,10 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 		h.Write([]byte(m))
 		name := hex.EncodeToString(h.Sum(nil))
 
-		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
+		err := os.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
+		if err != nil {
+			t.Fatalf("failed to write fuzzing corpus: %v", err)
+		}
 	}
 }
 
@@ -401,6 +419,26 @@ func TestEventUnpack(t *testing.T) {
 			"key2": UndocumentedField("a"),
 		}, e.Extensions)
 	})
+
+	t.Run("truncatedHeader", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(truncatedHeader)
+		assert.Equal(t, multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader), err)
+		assert.Equal(t, 0, e.Version)
+		assert.Equal(t, "SentinelOne", e.DeviceVendor)
+		assert.Equal(t, "Mgmt", e.DeviceProduct)
+		assert.Equal(t, map[string]*Field{
+			// None of the fields in the test case map to types,
+			// so we just compare with the Unset type.
+			"activityID":        {String: "1111111111111111111"},
+			"accountId":         {String: "1222222222222222222"},
+			"accountName":       {String: "foo-bar mdr"},
+			"activityType":      {String: "3505"},
+			"siteId":            {String: "None"},
+			"siteName":          {String: "None"},
+			"notificationScope": {String: "ACCOUNT"},
+		}, e.Extensions)
+	})
 }
 
 func TestEventUnpackWithFullExtensionNames(t *testing.T) {
@@ -416,15 +454,12 @@ func TestEventUnpackWithFullExtensionNames(t *testing.T) {
 }
 
 func BenchmarkEventUnpack(b *testing.B) {
-	var messages []string
-	for _, m := range testMessages {
-		messages = append(messages, m)
-	}
+	messages := append([]string(nil), testMessages...)
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
 		var e Event
-		e.Unpack(messages[i%len(messages)])
+		_ = e.Unpack(messages[i%len(messages)])
 	}
 }
 

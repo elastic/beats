@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type forgetfulProducer struct {
@@ -37,7 +38,7 @@ type ackProducer struct {
 }
 
 type openState struct {
-	log    logger
+	log    *logp.Logger
 	done   chan struct{}
 	events chan pushRequest
 }
@@ -55,7 +56,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	openState := openState{
 		log:    b.logger,
 		done:   make(chan struct{}),
-		events: b.events,
+		events: b.pushChan,
 	}
 
 	if cb != nil {
@@ -68,14 +69,14 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 }
 
 func (p *forgetfulProducer) Publish(event publisher.Event) bool {
-	return p.openState.publish(p.makeRequest(event))
+	return p.openState.publish(p.makeRequest(&event))
 }
 
 func (p *forgetfulProducer) TryPublish(event publisher.Event) bool {
-	return p.openState.tryPublish(p.makeRequest(event))
+	return p.openState.tryPublish(p.makeRequest(&event))
 }
 
-func (p *forgetfulProducer) makeRequest(event publisher.Event) pushRequest {
+func (p *forgetfulProducer) makeRequest(event *publisher.Event) pushRequest {
 	return pushRequest{event: event}
 }
 
@@ -85,11 +86,11 @@ func (p *forgetfulProducer) Cancel() int {
 }
 
 func (p *ackProducer) Publish(event publisher.Event) bool {
-	return p.updSeq(p.openState.publish(p.makeRequest(event)))
+	return p.updSeq(p.openState.publish(p.makeRequest(&event)))
 }
 
 func (p *ackProducer) TryPublish(event publisher.Event) bool {
-	return p.updSeq(p.openState.tryPublish(p.makeRequest(event)))
+	return p.updSeq(p.openState.tryPublish(p.makeRequest(&event)))
 }
 
 func (p *ackProducer) updSeq(ok bool) bool {
@@ -99,7 +100,7 @@ func (p *ackProducer) updSeq(ok bool) bool {
 	return ok
 }
 
-func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
+func (p *ackProducer) makeRequest(event *publisher.Event) pushRequest {
 	req := pushRequest{
 		event: event,
 		seq:   p.seq,
@@ -113,7 +114,7 @@ func (p *ackProducer) Cancel() int {
 
 	if p.dropOnCancel {
 		ch := make(chan producerCancelResponse)
-		p.broker.pubCancel <- producerCancelRequest{
+		p.broker.cancelChan <- producerCancelRequest{
 			state: &p.state,
 			resp:  ch,
 		}
