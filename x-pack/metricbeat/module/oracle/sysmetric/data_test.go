@@ -17,17 +17,12 @@ func TestMetricSetTransform(t *testing.T) {
 		{
 			in: &extractedData{
 				sysmetricMetrics: []sysmetricMetric{{
-					beginTime:   sql.NullString{String: "2022-04-27T12:18:57+05:30", Valid: true},
-					endTime:     sql.NullString{String: "2022-04-27T12:19:57+05:30", Valid: true},
-					intsizeCsec: sql.NullFloat64{Float64: 6021, Valid: true},
-					groupId:     sql.NullInt64{Int64: 2, Valid: true},
-					metricId:    sql.NullInt64{Int64: 2000, Valid: true},
-					name:        sql.NullString{String: "Buffer Cache Hit Ratio", Valid: true},
-					value:       sql.NullFloat64{Float64: 100, Valid: true},
-					metricUnit:  sql.NullString{String: "% (LogRead - PhyRead)/LogRead", Valid: true},
-					conId:       sql.NullFloat64{Float64: 0, Valid: true}}},
+					groupId: sql.NullInt64{Int64: 2, Valid: true},
+					name:    sql.NullString{String: "Buffer Cache Hit Ratio", Valid: true},
+					value:   sql.NullFloat64{Float64: 100, Valid: true},
+				}},
 			},
-			want: `{"metrics":{"begin_time":"2022-04-27T06:48:57Z","container_id":0,"end_time":"2022-04-27T06:49:57Z","group_id":2,"interval_size_csec":6021,"metric_id":2000,"metric_unit":"% (LogRead - PhyRead)/LogRead","name":"buffer_cache_hit_ratio","value":100}}`,
+			want: `{"metrics":{"buffer_cache_hit_ratio_2":100}}`,
 		},
 	}
 	for _, tt := range tests {
