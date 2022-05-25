@@ -11,9 +11,9 @@ import (
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Client interface exposed by Hub.Client.

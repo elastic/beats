@@ -27,10 +27,10 @@ import (
 	"net/http"
 	"strings"
 
-	"go.elastic.co/apm"
-	"go.elastic.co/apm/module/apmhttp"
+	"go.elastic.co/apm/module/apmhttp/v2"
+	"go.elastic.co/apm/v2"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (

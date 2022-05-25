@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestReturnAllDimensions(t *testing.T) {
@@ -122,5 +122,5 @@ func TestCreateEvent(t *testing.T) {
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
-	assert.Equal(t, val.(common.MapStr), common.MapStr{"total": total})
+	assert.Equal(t, val.(mapstr.M), mapstr.M{"total": total})
 }

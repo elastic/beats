@@ -40,7 +40,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -117,7 +119,7 @@ type manifest struct {
 	} `config:"requires"`
 }
 
-func newManifest(cfg *common.Config) (*manifest, error) {
+func newManifest(cfg *conf.C) (*manifest, error) {
 	if err := cfgwarn.CheckRemoved6xSetting(cfg, "prospector"); err != nil {
 		return nil, err
 	}
@@ -196,7 +198,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 
 // turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
 // set.
-func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion common.Version) (map[string]interface{}, error) {
+func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion version.V) (map[string]interface{}, error) {
 	retVars := map[string]interface{}{}
 	for key, val := range vars {
 		retVars[key] = val
@@ -215,7 +217,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 
 		minESVersion, ok := vals["min_elasticsearch_version"].(map[string]interface{})
 		if ok {
-			minVersion, err := common.NewVersion(minESVersion["version"].(string))
+			minVersion, err := version.New(minESVersion["version"].(string))
 			if err != nil {
 				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
 			}
@@ -342,7 +344,7 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 	}, nil
 }
 
-func (fs *Fileset) getInputConfig() (*common.Config, error) {
+func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	path, err := ApplyTemplate(fs.vars, fs.manifest.Input, false)
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the input path: %v", err)
@@ -357,7 +359,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error interpreting the template of the input: %v", err)
 	}
 
-	cfg, err := common.NewConfigWithYAML([]byte(yaml), "")
+	cfg, err := conf.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
 		return nil, fmt.Errorf("Error reading input config: %v", err)
 	}
@@ -369,11 +371,11 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 
 	// overrides
 	if len(fs.fcfg.Input) > 0 {
-		overrides, err := common.NewConfigFrom(fs.fcfg.Input)
+		overrides, err := conf.NewConfigFrom(fs.fcfg.Input)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
 		}
-		cfg, err = common.MergeConfigsWithOptions([]*common.Config{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldAppendValues("**.processors"))
+		cfg, err = conf.MergeConfigsWithOptions([]*conf.C{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldAppendValues("**.processors"))
 		if err != nil {
 			return nil, fmt.Errorf("Error applying config overrides: %v", err)
 		}
@@ -400,7 +402,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %v", err)
 	}
 
-	cfg.PrintDebugf("Merged input config for fileset %s/%s", fs.mname, fs.name)
+	common.PrintConfigDebugf(cfg, "Merged input config for fileset %s/%s", fs.mname, fs.name)
 
 	return cfg, nil
 }
@@ -421,7 +423,7 @@ func (fs *Fileset) getPipelineIDs(info beat.Info) ([]string, error) {
 }
 
 // GetPipelines returns the JSON content of the Ingest Node pipeline that parses the logs.
-func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline, err error) {
+func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err error) {
 	vars, err := fs.turnOffElasticsearchVars(fs.vars, esVersion)
 	if err != nil {
 		return nil, err

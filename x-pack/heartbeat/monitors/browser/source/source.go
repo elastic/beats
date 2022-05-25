@@ -9,10 +9,11 @@ import (
 )
 
 type Source struct {
-	Local      *LocalSource  `config:"local"`
-	Inline     *InlineSource `config:"inline" json:"inline"`
-	ZipUrl     *ZipURLSource `config:"zip_url" json:"zip_url"`
-	ActiveMemo ISource       // cache for selected source
+	Local      *LocalSource   `config:"local"`
+	Inline     *InlineSource  `config:"inline" json:"inline"`
+	ZipUrl     *ZipURLSource  `config:"zip_url" json:"zip_url"`
+	Project    *ProjectSource `config:"project" json:"project"`
+	ActiveMemo ISource        // cache for selected source
 }
 
 func (s *Source) Active() ISource {
@@ -26,12 +27,14 @@ func (s *Source) Active() ISource {
 		s.ActiveMemo = s.Inline
 	} else if s.ZipUrl != nil {
 		s.ActiveMemo = s.ZipUrl
+	} else if s.Project != nil {
+		s.ActiveMemo = s.Project
 	}
 
 	return s.ActiveMemo
 }
 
-var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor.")
+var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor")
 
 func (s *Source) Validate() error {
 	if s.Active() == nil {

@@ -46,7 +46,7 @@
                 "hide_last_value_indicator": true,
                 "id": "2fe9d3b0-30d5-11e7-8df8-6d3604a72912",
                 "index_pattern": "metricbeat-*",
-                "interval": "auto",
+                "interval": "2m",
                 "isModelInvalid": false,
                 "max_lines_legend": 1,
                 "series": [
@@ -92,7 +92,7 @@
                 "show_grid": 1,
                 "show_legend": 1,
                 "time_field": "@timestamp",
-                "time_range_mode": "entire_time_range",
+                "time_range_mode": "last_value",
                 "tooltip_mode": "show_all",
                 "truncate_legend": 1,
                 "type": "metric",
@@ -109,6 +109,6 @@
     },
     "references": [],
     "type": "visualization",
-    "updated_at": "2022-03-18T12:12:36.940Z",
-    "version": "WzI3OTQsMl0="
+    "updated_at": "2022-03-24T10:00:17.692Z",
+    "version": "Wzc5NDAsM10="
 }

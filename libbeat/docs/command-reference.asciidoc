@@ -621,7 +621,7 @@ Lists the modules that are currently enabled and disabled.
 *FLAGS*
 
 *`-h, --help`*::
-Shows help for the `export` command.
+Shows help for the `modules` command.
 
 
 {global-flags}

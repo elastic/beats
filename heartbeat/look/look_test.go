@@ -27,28 +27,29 @@ import (
 
 	reason2 "github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // helper
-func testRTT(t *testing.T, expected time.Duration, provided time.Duration) {
+func testRTT(t *testing.T, expected int64, provided time.Duration) {
 	actual, err := RTT(provided).GetValue("us")
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, expected, actual.(int64))
 }
 
 func TestPositiveRTTIsKept(t *testing.T) {
-	testRTT(t, 5, time.Duration(5*time.Microsecond))
+	testRTT(t, 5, 5*time.Microsecond)
 }
 
 func TestNegativeRTTIsZero(t *testing.T) {
-	testRTT(t, time.Duration(0), time.Duration(-1))
+	testRTT(t, 0, time.Duration(-1))
 }
 
 func TestReason(t *testing.T) {
 	reason := reason2.ValidateFailed(fmt.Errorf("an error"))
 	res := Reason(reason)
 	assert.Equal(t,
-		common.MapStr{
+		mapstr.M{
 			"type":    reason.Type(),
 			"message": reason.Error(),
 		}, res)
@@ -57,7 +58,7 @@ func TestReason(t *testing.T) {
 func TestReasonGenericError(t *testing.T) {
 	msg := "An error"
 	res := Reason(fmt.Errorf(msg))
-	assert.Equal(t, common.MapStr{
+	assert.Equal(t, mapstr.M{
 		"type":    "io",
 		"message": msg,
 	}, res)

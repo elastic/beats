@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"net"
 	"os"
@@ -57,14 +58,17 @@ func TestWindowsNpcapInstaller(t *testing.T) {
 }
 
 func TestDevices(t *testing.T) {
-	t.Skip("needs test devices to be set up")
-
 	stdout, stderr, err := runPacketbeat(t, "devices")
 	require.NoError(t, err, stderr)
 	t.Log("Output:\n", stdout)
 
 	ifcs, err := net.Interfaces()
 	require.NoError(t, err)
+	var expected []string
+	for _, ifc := range ifcs {
+		expected = append(expected, fmt.Sprintf("%d:%s:%s", ifc.Index, ifc.Name, ifc.Flags))
+	}
+	t.Log("Expect interfaces:\n", expected)
 
 	for _, ifc := range ifcs {
 		assert.Contains(t, stdout, ifc.Name)
@@ -74,14 +78,11 @@ func TestDevices(t *testing.T) {
 func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err error) {
 	t.Helper()
 
-	packetbeatPath, err := filepath.Abs(exe("../../packetbeat.test"))
+	packetbeatPath, err := filepath.Abs("../../packetbeat.test")
 	require.NoError(t, err)
 
 	if _, err := os.Stat(packetbeatPath); err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			t.Skipf("%v binary not found", filepath.Base(packetbeatPath))
-		}
-		t.Fatal(err)
+		t.Fatalf("%v binary not found: %v", filepath.Base(packetbeatPath), err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
@@ -99,11 +100,4 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	err = cmd.Run()
 
 	return strings.TrimSpace(stdoutBuf.String()), strings.TrimSpace(stderrBuf.String()), err
-}
-
-func exe(path string) string {
-	if runtime.GOOS == "windows" {
-		return path + ".exe"
-	}
-	return path
 }

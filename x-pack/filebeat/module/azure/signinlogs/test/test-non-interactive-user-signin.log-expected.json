@@ -1,0 +1,268 @@
+[
+    {
+        "@timestamp": "2022-03-17T09:44:46.309Z",
+        "azure.correlation_id": "8b79f1be-9ed1-48f5-ad92-1df3f421e142",
+        "azure.resource.id": "/tenants/226f45e7-e2e2-4228-9e9d-612687e8c133/providers/Microsoft.aadiam",
+        "azure.resource.provider": "Microsoft.aadiam",
+        "azure.signinlogs.category": "NonInteractiveUserSignInLogs",
+        "azure.signinlogs.identity": "Nikhita Sethi",
+        "azure.signinlogs.operation_name": "Sign-in activity",
+        "azure.signinlogs.operation_version": "1.0",
+        "azure.signinlogs.properties.app_display_name": "Microsoft Edge Enterprise New Tab Page",
+        "azure.signinlogs.properties.app_id": "d7b530a4-7680-4c23-a8bf-c52c121d2e87",
+        "azure.signinlogs.properties.applied_conditional_access_policies": [
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "Block Non-MFA and Legacy Protocol USERS from non-trusted locations",
+                "enforced_grant_controls": [
+                    "Block"
+                ],
+                "enforced_session_controls": [],
+                "id": "97dd0e67-9953-49fc-ae42-70e4ead3ffc0",
+                "result": "notApplied"
+            },
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "Block all guest acccess apart from SharePoint Online",
+                "enforced_grant_controls": [
+                    "Block"
+                ],
+                "enforced_session_controls": [],
+                "id": "c28b1740-4158-4b71-9269-9a4a41fd0204",
+                "result": "notApplied"
+            },
+            {
+                "conditions_not_satisfied": 16,
+                "conditions_satisfied": 3,
+                "display_name": "Block Legacy Authentication",
+                "enforced_grant_controls": [
+                    "Block"
+                ],
+                "enforced_session_controls": [],
+                "id": "f1938df8-77ab-445a-8cba-4e7be5d55dca",
+                "result": "notApplied"
+            },
+            {
+                "conditions_not_satisfied": 8,
+                "conditions_satisfied": 3,
+                "display_name": "Blocked Countries",
+                "enforced_grant_controls": [
+                    "Block"
+                ],
+                "enforced_session_controls": [],
+                "id": "051d2ce9-6d47-4c12-a113-c25223217bcb",
+                "result": "notApplied"
+            },
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "Guest terms of use policy",
+                "enforced_grant_controls": [
+                    "Guest terms of use"
+                ],
+                "enforced_session_controls": [],
+                "id": "b00a4704-5613-49d6-bd4e-283d23d29f0a",
+                "result": "notApplied"
+            },
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "Guest session timeout",
+                "enforced_grant_controls": [],
+                "enforced_session_controls": [
+                    "SignInFrequency"
+                ],
+                "id": "484acb18-0d56-41a8-844c-9e7c8e9cf819",
+                "result": "notApplied"
+            },
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "Block Legacy EAS Auth",
+                "enforced_grant_controls": [
+                    "Block"
+                ],
+                "enforced_session_controls": [],
+                "id": "f6623a16-4455-48f9-893f-70f1c564a534",
+                "result": "reportOnlyNotApplied"
+            },
+            {
+                "conditions_not_satisfied": 1,
+                "conditions_satisfied": 0,
+                "display_name": "CA \u2013 iOS \\\\u0026 Android \u2013 Unmanaged",
+                "enforced_grant_controls": [
+                    "Mfa",
+                    "RequireApprovedApp"
+                ],
+                "enforced_session_controls": [],
+                "id": "cb26a614-e2c4-4644-b226-4dcb0c79ad61",
+                "result": "reportOnlyNotApplied"
+            },
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "TEST - Cyberfort Users using Compliant Devices",
+                "enforced_grant_controls": [
+                    "Mfa",
+                    "RequireCompliantDevice"
+                ],
+                "enforced_session_controls": [],
+                "id": "ee64eba5-e4bd-40ca-aee7-d98ad45ab33a",
+                "result": "reportOnlyNotApplied"
+            },
+            {
+                "conditions_not_satisfied": 2,
+                "conditions_satisfied": 1,
+                "display_name": "TEST - Cyberfort Users using non-compliant devices",
+                "enforced_grant_controls": [
+                    "Mfa"
+                ],
+                "enforced_session_controls": [],
+                "id": "8ddf1a42-cb27-44a7-aa12-a65343e41be4",
+                "result": "reportOnlyNotApplied"
+            },
+            {
+                "conditions_not_satisfied": 1,
+                "conditions_satisfied": 0,
+                "display_name": "Require Mobile access from protected apps/compliant devices",
+                "enforced_grant_controls": [
+                    "RequireCompliantDevice"
+                ],
+                "enforced_session_controls": [],
+                "id": "39300713-85f0-41f5-ae90-823cc0be3b4a",
+                "result": "reportOnlyNotApplied"
+            },
+            {
+                "conditions_not_satisfied": 0,
+                "conditions_satisfied": 19,
+                "display_name": "Require MFA for everyone",
+                "enforced_grant_controls": [
+                    "Mfa"
+                ],
+                "enforced_session_controls": [],
+                "id": "9bc14439-0b78-4d1e-bb27-8fab658d0e83",
+                "result": "success"
+            }
+        ],
+        "azure.signinlogs.properties.authentication_details": [
+            {
+                "authentication_method": "Previously satisfied",
+                "authentication_step_date_time": "2022-03-17T09:44:46.3097429+00:00",
+                "authentication_step_requirement": "Multi-factor authentication",
+                "authentication_step_result_detail": "MFA requirement satisfied by claim in the token",
+                "succeeded": true
+            }
+        ],
+        "azure.signinlogs.properties.authentication_processing_details.Is CAE Token": "False",
+        "azure.signinlogs.properties.authentication_processing_details.Legacy TLS (TLS 1.0, 1.1, 3DES)": "False",
+        "azure.signinlogs.properties.authentication_processing_details.Oauth Scope Info": "[User.Read,Userinfo.ReadWrite]",
+        "azure.signinlogs.properties.authentication_protocol": "none",
+        "azure.signinlogs.properties.authentication_requirement": "multiFactorAuthentication",
+        "azure.signinlogs.properties.authentication_requirement_policies": [
+            {
+                "detail": "Conditional Access",
+                "requirement_provider": "multiConditionalAccess"
+            }
+        ],
+        "azure.signinlogs.properties.autonomous_system_number": 5089,
+        "azure.signinlogs.properties.client_app_used": "Mobile Apps and Desktop clients",
+        "azure.signinlogs.properties.conditional_access_status": "success",
+        "azure.signinlogs.properties.correlation_id": "8b79f1be-9ed1-48f5-ad92-1df3f421e142",
+        "azure.signinlogs.properties.created_at": "2022-03-17T09:44:46.3097429+00:00",
+        "azure.signinlogs.properties.cross_tenant_access_type": "none",
+        "azure.signinlogs.properties.device_detail.browser": "Edge 18.19042",
+        "azure.signinlogs.properties.device_detail.device_id": "ef5d12a1-7768-4085-9047-5d33aee251fa",
+        "azure.signinlogs.properties.device_detail.display_name": "LW-TBSH006933",
+        "azure.signinlogs.properties.device_detail.is_compliant": true,
+        "azure.signinlogs.properties.device_detail.is_managed": true,
+        "azure.signinlogs.properties.device_detail.operating_system": "Windows 10",
+        "azure.signinlogs.properties.device_detail.trust_type": "Azure AD joined",
+        "azure.signinlogs.properties.flagged_for_review": false,
+        "azure.signinlogs.properties.home_tenant_id": "226f45e7-e2e2-4228-9e9d-612687e8c133",
+        "azure.signinlogs.properties.id": "088b4409-9e63-425d-b777-2c8c6c380b00",
+        "azure.signinlogs.properties.incoming_token_type": "none",
+        "azure.signinlogs.properties.is_interactive": false,
+        "azure.signinlogs.properties.is_tenant_restricted": false,
+        "azure.signinlogs.properties.network_location_details": [],
+        "azure.signinlogs.properties.original_request_id": "088b4409-9e63-425d-b777-2c8c6c380b00",
+        "azure.signinlogs.properties.processing_time_ms": 90,
+        "azure.signinlogs.properties.resource_display_name": "Microsoft News Feed",
+        "azure.signinlogs.properties.resource_id": "f920ab6b-8a48-4438-9255-1650179a3a0f",
+        "azure.signinlogs.properties.resource_tenant_id": "226f45e7-e2e2-4228-9e9d-612687e8c133",
+        "azure.signinlogs.properties.risk_detail": "none",
+        "azure.signinlogs.properties.risk_event_types": [],
+        "azure.signinlogs.properties.risk_event_types_v2": [],
+        "azure.signinlogs.properties.risk_level_aggregated": "none",
+        "azure.signinlogs.properties.risk_level_during_signin": "none",
+        "azure.signinlogs.properties.risk_state": "none",
+        "azure.signinlogs.properties.service_principal_id": "",
+        "azure.signinlogs.properties.sso_extension_version": "",
+        "azure.signinlogs.properties.status.error_code": 0,
+        "azure.signinlogs.properties.token_issuer_name": "",
+        "azure.signinlogs.properties.token_issuer_type": "AzureAD",
+        "azure.signinlogs.properties.unique_token_identifier": "MDg4YjQ0MDktOWU2My00MjVkLWI3NzctMmM4YzZjMzgwYjAw",
+        "azure.signinlogs.properties.user_display_name": "Nikhita Sethi",
+        "azure.signinlogs.properties.user_id": "da495378-1cbd-450f-997c-5393402e41f8",
+        "azure.signinlogs.properties.user_principal_name": "nikhita.sethi@cyberfortgroup.com",
+        "azure.signinlogs.properties.user_type": "Member",
+        "azure.signinlogs.result_signature": "None",
+        "azure.signinlogs.result_type": "0",
+        "azure.tenant_id": "226f45e7-e2e2-4228-9e9d-612687e8c133",
+        "client.ip": "81.2.69.143",
+        "cloud.provider": "azure",
+        "event.action": "Sign-in activity",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "azure.signinlogs",
+        "event.duration": 0,
+        "event.id": "088b4409-9e63-425d-b777-2c8c6c380b00",
+        "event.kind": "event",
+        "event.module": "azure",
+        "event.original": "{\"Level\":4,\"callerIpAddress\":\"81.2.69.143\",\"category\":\"NonInteractiveUserSignInLogs\",\"correlationId\":\"8b79f1be-9ed1-48f5-ad92-1df3f421e142\",\"durationMs\":0,\"identity\":\"Nikhita Sethi\",\"location\":\"GB\",\"operationName\":\"Sign-in activity\",\"operationVersion\":\"1.0\",\"properties\":{\"appDisplayName\":\"Microsoft Edge Enterprise New Tab Page\",\"appId\":\"d7b530a4-7680-4c23-a8bf-c52c121d2e87\",\"appliedConditionalAccessPolicies\":[{\"conditionsNotSatisfied\":0,\"conditionsSatisfied\":19,\"displayName\":\"Require MFA for everyone\",\"enforcedGrantControls\":[\"Mfa\"],\"enforcedSessionControls\":[],\"id\":\"9bc14439-0b78-4d1e-bb27-8fab658d0e83\",\"result\":\"success\"},{\"conditionsNotSatisfied\":16,\"conditionsSatisfied\":3,\"displayName\":\"Block Legacy Authentication\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"f1938df8-77ab-445a-8cba-4e7be5d55dca\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Block Non-MFA and Legacy Protocol USERS from non-trusted locations\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"97dd0e67-9953-49fc-ae42-70e4ead3ffc0\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Block all guest acccess apart from SharePoint Online\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"c28b1740-4158-4b71-9269-9a4a41fd0204\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Guest terms of use policy\",\"enforcedGrantControls\":[\"Guest terms of use\"],\"enforcedSessionControls\":[],\"id\":\"b00a4704-5613-49d6-bd4e-283d23d29f0a\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Guest session timeout\",\"enforcedGrantControls\":[],\"enforcedSessionControls\":[\"SignInFrequency\"],\"id\":\"484acb18-0d56-41a8-844c-9e7c8e9cf819\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":8,\"conditionsSatisfied\":3,\"displayName\":\"Blocked Countries\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"051d2ce9-6d47-4c12-a113-c25223217bcb\",\"result\":\"notApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"TEST - Cyberfort Users using non-compliant devices\",\"enforcedGrantControls\":[\"Mfa\"],\"enforcedSessionControls\":[],\"id\":\"8ddf1a42-cb27-44a7-aa12-a65343e41be4\",\"result\":\"reportOnlyNotApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"TEST - Cyberfort Users using Compliant Devices\",\"enforcedGrantControls\":[\"Mfa\",\"RequireCompliantDevice\"],\"enforcedSessionControls\":[],\"id\":\"ee64eba5-e4bd-40ca-aee7-d98ad45ab33a\",\"result\":\"reportOnlyNotApplied\"},{\"conditionsNotSatisfied\":1,\"conditionsSatisfied\":0,\"displayName\":\"CA \u2013 iOS \\\\\\\\u0026 Android \u2013 Unmanaged\",\"enforcedGrantControls\":[\"Mfa\",\"RequireApprovedApp\"],\"enforcedSessionControls\":[],\"id\":\"cb26a614-e2c4-4644-b226-4dcb0c79ad61\",\"result\":\"reportOnlyNotApplied\"},{\"conditionsNotSatisfied\":1,\"conditionsSatisfied\":0,\"displayName\":\"Require Mobile access from protected apps/compliant devices\",\"enforcedGrantControls\":[\"RequireCompliantDevice\"],\"enforcedSessionControls\":[],\"id\":\"39300713-85f0-41f5-ae90-823cc0be3b4a\",\"result\":\"reportOnlyNotApplied\"},{\"conditionsNotSatisfied\":2,\"conditionsSatisfied\":1,\"displayName\":\"Block Legacy EAS Auth\",\"enforcedGrantControls\":[\"Block\"],\"enforcedSessionControls\":[],\"id\":\"f6623a16-4455-48f9-893f-70f1c564a534\",\"result\":\"reportOnlyNotApplied\"}],\"authenticationDetails\":[{\"authenticationMethod\":\"Previously satisfied\",\"authenticationStepDateTime\":\"2022-03-17T09:44:46.3097429+00:00\",\"authenticationStepRequirement\":\"Multi-factor authentication\",\"authenticationStepResultDetail\":\"MFA requirement satisfied by claim in the token\",\"succeeded\":true}],\"authenticationProcessingDetails\":[{\"key\":\"Legacy TLS (TLS 1.0, 1.1, 3DES)\",\"value\":\"False\"},{\"key\":\"Oauth Scope Info\",\"value\":\"[User.Read,Userinfo.ReadWrite]\"},{\"key\":\"Is CAE Token\",\"value\":\"False\"}],\"authenticationProtocol\":\"none\",\"authenticationRequirement\":\"multiFactorAuthentication\",\"authenticationRequirementPolicies\":[{\"detail\":\"Conditional Access\",\"requirementProvider\":\"multiConditionalAccess\"}],\"autonomousSystemNumber\":5089,\"clientAppUsed\":\"Mobile Apps and Desktop clients\",\"conditionalAccessStatus\":\"success\",\"correlationId\":\"8b79f1be-9ed1-48f5-ad92-1df3f421e142\",\"createdDateTime\":\"2022-03-17T09:44:46.3097429+00:00\",\"crossTenantAccessType\":\"none\",\"deviceDetail\":{\"browser\":\"Edge 18.19042\",\"deviceId\":\"ef5d12a1-7768-4085-9047-5d33aee251fa\",\"displayName\":\"LW-TBSH006933\",\"isCompliant\":true,\"isManaged\":true,\"operatingSystem\":\"Windows 10\",\"trustType\":\"Azure AD joined\"},\"flaggedForReview\":false,\"homeTenantId\":\"226f45e7-e2e2-4228-9e9d-612687e8c133\",\"id\":\"088b4409-9e63-425d-b777-2c8c6c380b00\",\"incomingTokenType\":\"none\",\"ipAddress\":\"81.2.69.143\",\"isInteractive\":false,\"isTenantRestricted\":false,\"location\":{\"city\":\"Strood\",\"countryOrRegion\":\"GB\",\"geoCoordinates\":{\"latitude\":51.394798278808594,\"longitude\":0.4803900122642517},\"state\":\"Medway\"},\"mfaDetail\":{},\"networkLocationDetails\":[],\"originalRequestId\":\"088b4409-9e63-425d-b777-2c8c6c380b00\",\"privateLinkDetails\":{},\"processingTimeInMilliseconds\":90,\"resourceDisplayName\":\"Microsoft News Feed\",\"resourceId\":\"f920ab6b-8a48-4438-9255-1650179a3a0f\",\"resourceTenantId\":\"226f45e7-e2e2-4228-9e9d-612687e8c133\",\"riskDetail\":\"none\",\"riskEventTypes\":[],\"riskEventTypes_v2\":[],\"riskLevelAggregated\":\"none\",\"riskLevelDuringSignIn\":\"none\",\"riskState\":\"none\",\"servicePrincipalId\":\"\",\"ssoExtensionVersion\":\"\",\"status\":{\"additionalDetails\":\"MFA requirement satisfied by claim in the token\",\"errorCode\":0},\"tokenIssuerName\":\"\",\"tokenIssuerType\":\"AzureAD\",\"uniqueTokenIdentifier\":\"MDg4YjQ0MDktOWU2My00MjVkLWI3NzctMmM4YzZjMzgwYjAw\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19042\",\"userDisplayName\":\"Nikhita Sethi\",\"userId\":\"da495378-1cbd-450f-997c-5393402e41f8\",\"userPrincipalName\":\"nikhita.sethi@cyberfortgroup.com\",\"userType\":\"Member\"},\"resourceId\":\"/tenants/226f45e7-e2e2-4228-9e9d-612687e8c133/providers/Microsoft.aadiam\",\"resultSignature\":\"None\",\"resultType\":\"0\",\"tenantId\":\"226f45e7-e2e2-4228-9e9d-612687e8c133\",\"time\":\"2022-03-17T09:44:46.3097429Z\"}",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "signinlogs",
+        "geo.city_name": "Strood",
+        "geo.country_iso_code": "GB",
+        "geo.country_name": "Medway",
+        "geo.location.lat": 51.394798278808594,
+        "geo.location.lon": 0.4803900122642517,
+        "input.type": "log",
+        "log.level": "4",
+        "log.offset": 0,
+        "message": "MFA requirement satisfied by claim in the token",
+        "related.ip": [
+            "81.2.69.143"
+        ],
+        "service.type": "azure",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
+        "tags": [
+            "forwarded"
+        ],
+        "user.domain": "cyberfortgroup.com",
+        "user.full_name": "Nikhita Sethi",
+        "user.id": "da495378-1cbd-450f-997c-5393402e41f8",
+        "user.name": "nikhita.sethi",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Edge",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19042",
+        "user_agent.os.full": "Windows 10",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "10",
+        "user_agent.version": "18.19042"
+    }
+]

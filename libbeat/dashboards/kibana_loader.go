@@ -29,18 +29,27 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/kibana"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	beatversion "github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
-var importAPI = "/api/saved_objects/_import"
+var (
+	// We started using Saved Objects API in 7.15. But to help integration
+	// developers migrate their dashboards we are more lenient.
+	minimumRequiredVersionSavedObjects = version.MustNew("7.14.0")
+
+	importAPI = "/api/saved_objects/_import"
+)
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
 	client        *kibana.Client
 	config        *Config
-	version       common.Version
+	version       version.V
 	hostname      string
 	msgOutputter  MessageOutputter
 	defaultLogger *logp.Logger
@@ -49,7 +58,7 @@ type KibanaLoader struct {
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
-func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
+func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
 
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Kibana is not configured or enabled")
@@ -76,8 +85,8 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 	return &loader, nil
 }
 
-func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
-	client, err := kibana.NewKibanaClient(cfg, beatname)
+func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
+	client, err := kibana.NewKibanaClient(cfg, beatname, beatversion.GetDefaultVersion(), beatversion.Commit(), beatversion.BuildTime().String())
 	if err != nil {
 		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {
 			select {
@@ -94,8 +103,8 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
@@ -106,7 +115,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
 	}
 
-	var indexContent common.MapStr
+	var indexContent mapstr.M
 	err = json.Unmarshal(reader, &indexContent)
 	if err != nil {
 		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
@@ -116,9 +125,9 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 }
 
 // ImportIndex imports the passed index pattern to Kibana
-func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs multierror.Errors
@@ -138,8 +147,8 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)
@@ -207,7 +216,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 		loader.loadedAssets[referencePath] = true
 	}
 
-	var res common.MapStr
+	var res mapstr.M
 	err = json.Unmarshal(dashboard, &res)
 	if err != nil {
 		return "", fmt.Errorf("failed to convert asset: %+v", err)
@@ -220,7 +229,16 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 func (loader KibanaLoader) formatDashboardAssets(content []byte) []byte {
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 	content = EncodeJSONObjects(content)
-	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+
+	replacements := loader.config.StringReplacements
+	if replacements == nil {
+		replacements = make(map[string]string)
+	}
+	replacements["CHANGEME_HOSTNAME"] = loader.hostname
+	for needle, replacement := range replacements {
+		content = ReplaceStringInDashboard(needle, replacement, content)
+	}
+
 	return content
 }
 

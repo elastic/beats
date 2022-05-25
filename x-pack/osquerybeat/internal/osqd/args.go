@@ -85,6 +85,9 @@ var protectedFlags = Flags{
 	// Osquery does not expect that frequent policy/configuration changes
 	// and can tolerate non real-time configuration change application.
 	"config_refresh": 60,
+
+	// certificates to use for curl table for example
+	"tls_server_certs": "certs.pem",
 }
 
 func init() {

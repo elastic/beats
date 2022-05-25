@@ -20,8 +20,8 @@ package mgr_cluster_disk
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type DfResponse struct {
@@ -32,21 +32,21 @@ type DfResponse struct {
 	} `json:"stats"`
 }
 
-func eventMapping(content []byte) (common.MapStr, error) {
+func eventMapping(content []byte) (mapstr.M, error) {
 	var response DfResponse
 	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get response data")
 	}
 
-	return common.MapStr{
-		"used": common.MapStr{
+	return mapstr.M{
+		"used": mapstr.M{
 			"bytes": response.Stats.TotalUsedBytes,
 		},
-		"total": common.MapStr{
+		"total": mapstr.M{
 			"bytes": response.Stats.TotalBytes,
 		},
-		"available": common.MapStr{
+		"available": mapstr.M{
 			"bytes": response.Stats.TotalAvailableBytes,
 		},
 	}, nil

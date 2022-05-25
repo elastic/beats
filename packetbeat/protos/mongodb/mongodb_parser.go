@@ -23,10 +23,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"go.mongodb.org/mongo-driver/bson"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -77,7 +77,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	debugf("opCode = %d (%v)", s.message.opCode, s.message.opCode)
 
 	// then split depending on operation type
-	s.message.event = common.MapStr{}
+	s.message.event = mapstr.M{}
 
 	switch s.message.opCode {
 	case opReply:
@@ -477,7 +477,7 @@ func (d *decoder) readByte() (byte, error) {
 	i := d.i
 	d.i++
 	if d.i > len(d.in) {
-		return 0, errors.New("Read byte failed")
+		return 0, errors.New("read byte failed")
 	}
 	return d.in[i], nil
 }
@@ -552,7 +552,7 @@ func (d *decoder) readBytes(length int32) ([]byte, error) {
 	start := d.i
 	d.i += int(length)
 	if d.i > len(d.in) {
-		return *new([]byte), errors.New("No byte to read")
+		return *new([]byte), errors.New("no byte to read")
 	}
 	return d.in[start : start+int(length)], nil
 }

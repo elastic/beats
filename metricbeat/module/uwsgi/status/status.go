@@ -28,9 +28,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/uwsgi"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -104,7 +104,7 @@ func fetchStatData(URL string) ([]byte, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := fetchStatData(m.HostData().URI)
 	if err != nil {
-		reporter.Event(mb.Event{MetricSetFields: common.MapStr{
+		reporter.Event(mb.Event{MetricSetFields: mapstr.M{
 			"error": err.Error(),
 		}},
 		)

@@ -24,7 +24,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -39,11 +39,11 @@ var DefaultSettings = WinlogbeatConfig{
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
-	EventLogs          []*common.Config `config:"event_logs"`
-	RegistryFile       string           `config:"registry_file"`
-	RegistryFlush      time.Duration    `config:"registry_flush"`
-	ShutdownTimeout    time.Duration    `config:"shutdown_timeout"`
-	OverwritePipelines bool             `config:"overwrite_pipelines"`
+	EventLogs          []*conf.C     `config:"event_logs"`
+	RegistryFile       string        `config:"registry_file"`
+	RegistryFlush      time.Duration `config:"registry_flush"`
+	ShutdownTimeout    time.Duration `config:"shutdown_timeout"`
+	OverwritePipelines bool          `config:"overwrite_pipelines"`
 }
 
 // Validate validates the WinlogbeatConfig data and returns an error describing

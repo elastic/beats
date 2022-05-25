@@ -21,14 +21,14 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type multiplexedFactory []FactoryMatcher
 
 // FactoryMatcher returns a RunnerFactory that can handle the given
 // configuration if it supports it, otherwise it returns nil.
-type FactoryMatcher func(cfg *common.Config) RunnerFactory
+type FactoryMatcher func(cfg *config.C) RunnerFactory
 
 var errConfigDoesNotMatch = errors.New("config does not match accepted configurations")
 
@@ -48,7 +48,7 @@ func MultiplexedRunnerFactory(matchers ...FactoryMatcher) RunnerFactory {
 // MatchHasField returns a FactoryMatcher that returns the given RunnerFactory
 // when the input config contains the given field name.
 func MatchHasField(field string, factory RunnerFactory) FactoryMatcher {
-	return func(cfg *common.Config) RunnerFactory {
+	return func(cfg *config.C) RunnerFactory {
 		if cfg.HasField(field) {
 			return factory
 		}
@@ -59,14 +59,14 @@ func MatchHasField(field string, factory RunnerFactory) FactoryMatcher {
 // MatchDefault return a FactoryMatcher that always returns returns the given
 // RunnerFactory.
 func MatchDefault(factory RunnerFactory) FactoryMatcher {
-	return func(cfg *common.Config) RunnerFactory {
+	return func(cfg *config.C) RunnerFactory {
 		return factory
 	}
 }
 
 func (f multiplexedFactory) Create(
 	p beat.PipelineConnector,
-	config *common.Config,
+	config *config.C,
 ) (Runner, error) {
 	factory, err := f.findFactory(config)
 	if err != nil {
@@ -75,7 +75,7 @@ func (f multiplexedFactory) Create(
 	return factory.Create(p, config)
 }
 
-func (f multiplexedFactory) CheckConfig(c *common.Config) error {
+func (f multiplexedFactory) CheckConfig(c *config.C) error {
 	factory, err := f.findFactory(c)
 	if err == nil {
 		err = factory.CheckConfig(c)
@@ -83,7 +83,7 @@ func (f multiplexedFactory) CheckConfig(c *common.Config) error {
 	return err
 }
 
-func (f multiplexedFactory) findFactory(c *common.Config) (RunnerFactory, error) {
+func (f multiplexedFactory) findFactory(c *config.C) (RunnerFactory, error) {
 	for _, matcher := range f {
 		if factory := matcher(c); factory != nil {
 			return factory, nil

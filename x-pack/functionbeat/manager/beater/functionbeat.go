@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -33,7 +33,7 @@ type Functionbeat struct {
 }
 
 // New creates an instance of functionbeat.
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %+v", err)
@@ -50,8 +50,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *Functionbeat) Run(b *beat.Beat) error {
 	bt.log.Info("Functionbeat is running")
 	defer bt.log.Info("Functionbeat stopped running")
-
-	bt.log.Warn("Functionbeat is going to be removed in 8.1")
 
 	return nil
 }

@@ -14,17 +14,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/licenser"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -55,7 +56,7 @@ type Functionbeat struct {
 }
 
 // New creates an instance of functionbeat.
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
@@ -84,8 +85,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 // Run starts functionbeat.
 func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer bt.cancel()
-
-	bt.log.Warn("Functionbeat is going to be removed in 8.1")
 
 	outputName := b.Config.Output.Name()
 	if !isOutputSupported(outputName) {
@@ -150,17 +149,17 @@ type fnExtraConfig struct {
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`
 
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"` // Fields and tags to add to events.
 
 	// ES output index pattern
 	Index fmtstr.EventFormatString `config:"index"`
 }
 
-func makeClientFactory(log *logp.Logger, pipe beat.Pipeline, beatInfo beat.Info) func(*common.Config) (pipeline.ISyncClient, error) {
+func makeClientFactory(log *logp.Logger, pipe beat.Pipeline, beatInfo beat.Info) func(*conf.C) (pipeline.ISyncClient, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
-	return func(cfg *common.Config) (pipeline.ISyncClient, error) {
+	return func(cfg *conf.C) (pipeline.ISyncClient, error) {
 		c := fnExtraConfig{}
 
 		if err := cfg.Unpack(&c); err != nil {

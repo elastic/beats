@@ -19,13 +19,13 @@ package beater
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/sniffer"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, workerFactory sniffer.WorkerFactory) (*sniffer.Sniffer, error) {
@@ -60,7 +60,7 @@ func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg conf
 		},
 	}
 	if cfg.Flows.Index != "" {
-		clientConfig.Processing.Meta = common.MapStr{"raw_index": cfg.Flows.Index}
+		clientConfig.Processing.Meta = mapstr.M{"raw_index": cfg.Flows.Index}
 	}
 
 	client, err := pipeline.ConnectWith(clientConfig)

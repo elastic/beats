@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestReadConfig2(t *testing.T) {
@@ -117,7 +117,7 @@ func TestMergeConfigFiles(t *testing.T) {
 }
 
 func TestEnabledInputs(t *testing.T) {
-	stdinEnabled, err := common.NewConfigFrom(map[string]interface{}{
+	stdinEnabled, err := conf.NewConfigFrom(map[string]interface{}{
 		"type":    "stdin",
 		"enabled": true,
 	})
@@ -125,7 +125,7 @@ func TestEnabledInputs(t *testing.T) {
 		return
 	}
 
-	udpDisabled, err := common.NewConfigFrom(map[string]interface{}{
+	udpDisabled, err := conf.NewConfigFrom(map[string]interface{}{
 		"type":    "udp",
 		"enabled": false,
 	})
@@ -133,7 +133,7 @@ func TestEnabledInputs(t *testing.T) {
 		return
 	}
 
-	logDisabled, err := common.NewConfigFrom(map[string]interface{}{
+	logDisabled, err := conf.NewConfigFrom(map[string]interface{}{
 		"type":    "log",
 		"enabled": false,
 	})
@@ -149,17 +149,17 @@ func TestEnabledInputs(t *testing.T) {
 		}{
 			{
 				name:     "all inputs disabled",
-				config:   &Config{Inputs: []*common.Config{udpDisabled, logDisabled}},
+				config:   &Config{Inputs: []*conf.C{udpDisabled, logDisabled}},
 				expected: []string{},
 			},
 			{
 				name:     "all inputs enabled",
-				config:   &Config{Inputs: []*common.Config{stdinEnabled}},
+				config:   &Config{Inputs: []*conf.C{stdinEnabled}},
 				expected: []string{"stdin"},
 			},
 			{
 				name:     "disabled and enabled inputs",
-				config:   &Config{Inputs: []*common.Config{stdinEnabled, udpDisabled, logDisabled}},
+				config:   &Config{Inputs: []*conf.C{stdinEnabled, udpDisabled, logDisabled}},
 				expected: []string{"stdin"},
 			},
 		}
@@ -172,7 +172,7 @@ func TestEnabledInputs(t *testing.T) {
 	})
 
 	t.Run("IsInputEnabled", func(t *testing.T) {
-		config := &Config{Inputs: []*common.Config{stdinEnabled, udpDisabled, logDisabled}}
+		config := &Config{Inputs: []*conf.C{stdinEnabled, udpDisabled, logDisabled}}
 
 		tests := []struct {
 			name     string

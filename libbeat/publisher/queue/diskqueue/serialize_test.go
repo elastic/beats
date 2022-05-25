@@ -23,8 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // A test to make sure serialization works correctly on multi-byte characters.
@@ -41,7 +41,7 @@ func TestSerialize(t *testing.T) {
 		encoder := newEventEncoder()
 		event := publisher.Event{
 			Content: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"test_field": test.value,
 				},
 			},

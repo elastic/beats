@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/google"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestProviderCanonical(t *testing.T) {
@@ -90,7 +90,7 @@ func TestConfigFailsWithInvalidMethod(t *testing.T) {
 	m := map[string]interface{}{
 		"request.method": "DELETE",
 	}
-	cfg := common.MustNewConfigFrom(m)
+	cfg := conf.MustNewConfigFrom(m)
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
@@ -101,7 +101,7 @@ func TestConfigMustFailWithInvalidURL(t *testing.T) {
 	m := map[string]interface{}{
 		"request.url": "::invalid::",
 	}
-	cfg := common.MustNewConfigFrom(m)
+	cfg := conf.MustNewConfigFrom(m)
 	conf := defaultConfig()
 	err := cfg.Unpack(&conf)
 	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'request.url'`)
@@ -394,7 +394,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 
 			c.input["request.url"] = "localhost"
-			cfg := common.MustNewConfigFrom(c.input)
+			cfg := conf.MustNewConfigFrom(c.input)
 			conf := defaultConfig()
 			err := cfg.Unpack(&conf)
 
@@ -426,7 +426,7 @@ func TestCursorEntryConfig(t *testing.T) {
 		},
 		"entry4": map[string]interface{}{},
 	}
-	cfg := common.MustNewConfigFrom(in)
+	cfg := conf.MustNewConfigFrom(in)
 	conf := cursorConfig{}
 	require.NoError(t, cfg.Unpack(&conf))
 	assert.True(t, conf["entry1"].mustIgnoreEmptyValue())

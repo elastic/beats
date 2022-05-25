@@ -172,6 +172,8 @@ Kubernetes cluster overview example:
 
 image::./images/metricbeat-kubernetes-clusteroverview.png[]
 
+If you are setting collection period to a value bigger than `2m` you will need to increase
+the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 

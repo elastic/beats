@@ -109,7 +109,8 @@ func (o *oAuth2Config) isEnabled() bool {
 }
 
 // clientCredentialsGrant creates http client from token_url and client credentials
-func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, client *http.Client) *http.Client {
+// held by the receiver.
+func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, _ *http.Client) *http.Client {
 	creds := clientcredentials.Config{
 		ClientID:       o.ClientID,
 		ClientSecret:   o.ClientSecret,

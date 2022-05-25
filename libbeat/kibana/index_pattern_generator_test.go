@@ -28,7 +28,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -44,7 +45,7 @@ func TestNewGenerator(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	v, _ := common.NewVersion("7.0.0")
+	v, _ := version.New("7.0.0")
 	// checks for fields.yml
 	generator, err := NewGenerator("beat-index", "mybeat.", data, "7.0", *v, true)
 	if err != nil {
@@ -75,9 +76,9 @@ func TestGenerate(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	v7, _ := common.NewVersion("7.0.0-alpha1")
-	versions := []*common.Version{v7}
-	var d common.MapStr
+	v7, _ := version.New("7.0.0-alpha1")
+	versions := []*version.V{v7}
+	var d mapstr.M
 	for _, version := range versions {
 		data, err := ioutil.ReadFile("./testdata/fields.yml")
 		if err != nil {
@@ -106,17 +107,17 @@ func TestGenerate(t *testing.T) {
 
 type compare struct {
 	existing string
-	created  common.MapStr
+	created  mapstr.M
 }
 
 func TestGenerateExtensive(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	version7, _ := common.NewVersion("7.0.0-alpha1")
-	versions := []*common.Version{version7}
+	version7, _ := version.New("7.0.0-alpha1")
+	versions := []*version.V{version7}
 
-	var d common.MapStr
+	var d mapstr.M
 	for _, version := range versions {
 		data, err := ioutil.ReadFile("testdata/extensive/fields.yml")
 		if err != nil {
@@ -151,7 +152,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 		}
 
 		for _, ex := range existing {
-			var attrExisting, attrCreated common.MapStr
+			var attrExisting, attrCreated mapstr.M
 
 			if strings.Contains(test.existing, "6") {
 				assert.Equal(t, ex["version"], test.created["version"])
@@ -159,7 +160,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 				assert.Equal(t, ex["type"], test.created["type"])
 
 				attrExisting = ex["attributes"].(map[string]interface{})
-				attrCreated = test.created["attributes"].(common.MapStr)
+				attrCreated = test.created["attributes"].(mapstr.M)
 			} else {
 				attrExisting = ex
 				attrCreated = test.created

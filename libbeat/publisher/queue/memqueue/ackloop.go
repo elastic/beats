@@ -24,65 +24,46 @@ package memqueue
 // Producer ACKs are run in the ackLoop go-routine.
 type ackLoop struct {
 	broker *broker
-	sig    chan batchAckMsg
-	lst    chanList
 
-	totalACK   uint64
-	totalSched uint64
+	// A list of ACK channels given to queue consumers,
+	// used to maintain sequencing of event acknowledgements.
+	ackChans chanList
 
-	batchesSched uint64
-	batchesACKed uint64
+	totalACK uint64
 
 	processACK func(chanList, int)
-}
-
-func newACKLoop(b *broker, processACK func(chanList, int)) *ackLoop {
-	l := &ackLoop{broker: b}
-	l.processACK = processACK
-	return l
 }
 
 func (l *ackLoop) run() {
 	var (
 		// log = l.broker.logger
 
-		// Buffer up acked event counter in acked. If acked > 0, acks will be set to
+		// Buffer up event counter in ackCount. If ackCount > 0, acks will be set to
 		// the broker.acks channel for sending the ACKs while potentially receiving
 		// new batches from the broker event loop.
 		// This concurrent bidirectionally communication pattern requiring 'select'
 		// ensures we can not have any deadlock between the event loop and the ack
 		// loop, as the ack loop will not block on any channel
-		acked int
-		acks  chan int
+		ackCount int
+		ackChan  chan int
+		sig      chan batchAckMsg
 	)
 
 	for {
 		select {
 		case <-l.broker.done:
-			// TODO: handle pending ACKs?
-			// TODO: panic on pending batches?
 			return
 
-		case acks <- acked:
-			acks, acked = nil, 0
+		case ackChan <- ackCount:
+			ackChan, ackCount = nil, 0
 
-		case lst := <-l.broker.scheduledACKs:
-			count, events := lst.count()
-			l.lst.concat(&lst)
+		case chanList := <-l.broker.scheduledACKs:
+			l.ackChans.concat(&chanList)
 
-			// log.Debug("ACK List:")
-			// for current := l.lst.head; current != nil; current = current.next {
-			// 	log.Debugf("  ack entry(seq=%v, start=%v, count=%v",
-			// 		current.seq, current.start, current.count)
-			// }
-
-			l.batchesSched += uint64(count)
-			l.totalSched += uint64(events)
-
-		case <-l.sig:
-			acked += l.handleBatchSig()
-			if acked > 0 {
-				acks = l.broker.acks
+		case <-sig:
+			ackCount += l.handleBatchSig()
+			if ackCount > 0 {
+				ackChan = l.broker.ackChan
 			}
 		}
 
@@ -92,7 +73,7 @@ func (l *ackLoop) run() {
 		// log.Debug("ackloop:   total batches scheduled = ", l.batchesSched)
 		// log.Debug("ackloop:   total batches ack = ", l.batchesACKed)
 
-		l.sig = l.lst.channel()
+		sig = l.ackChans.channel()
 		// if l.sig == nil {
 		// 	log.Debug("ackloop: no ack scheduled")
 		// } else {
@@ -135,17 +116,15 @@ func (l *ackLoop) handleBatchSig() int {
 func (l *ackLoop) collectAcked() chanList {
 	lst := chanList{}
 
-	acks := l.lst.pop()
-	l.onACK(acks)
+	acks := l.ackChans.pop()
 	lst.append(acks)
 
 	done := false
-	for !l.lst.empty() && !done {
-		acks := l.lst.front()
+	for !l.ackChans.empty() && !done {
+		acks := l.ackChans.front()
 		select {
-		case <-acks.ch:
-			l.onACK(acks)
-			lst.append(l.lst.pop())
+		case <-acks.ackChan:
+			lst.append(l.ackChans.pop())
 
 		default:
 			done = true
@@ -153,9 +132,4 @@ func (l *ackLoop) collectAcked() chanList {
 	}
 
 	return lst
-}
-
-func (l *ackLoop) onACK(acks *ackChan) {
-	l.batchesACKed++
-	l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 }

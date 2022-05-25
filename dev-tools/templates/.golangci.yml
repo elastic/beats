@@ -12,6 +12,15 @@ issues:
   # Set to 0 to disable.
   # Default: 50
   max-issues-per-linter: 50
+  exclude-rules:
+    # Exclude package name contains '-' issue because we have at least one package with
+    # it on its name.
+    - text: "ST1003:"
+      linters:
+        - stylecheck
+    # From mage we are priting to the console to ourselves
+    - path: (.*magefile.go|.*dev-tools/mage/.*)
+      linters: forbidigo
 
 output:
   sort-results: true
@@ -30,8 +39,6 @@ linters:
     - deadcode # finds unused code
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    - goconst # finds repeated strings that could be replaced by a constant
-    - dupl # tool for code clone detection
     - forbidigo # forbids identifiers	matched by reg exps
     - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
@@ -42,7 +49,6 @@ linters:
     - stylecheck # a replacement for golint
     - unparam # reports unused function parameters
     - unused # checks Go code for unused constants, variables, functions and types
-
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
     - structcheck # finds unused struct fields
@@ -59,7 +65,6 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - godox # tool for detection of FIXME, TODO and other comment keywords
     - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
@@ -76,16 +81,6 @@ linters-settings:
     asserts: true
     # Check for plain error comparisons
     comparison: true
-
-  goconst:
-    # minimal length of string constant, 3 by default
-    min-len: 3
-    # minimal occurrences count to trigger, 3 by default
-    min-occurrences: 2
-
-  dupl:
-    # tokens count to trigger issue, 150 by default
-    threshold: 100
 
   forbidigo:
     # Forbid the following identifiers
@@ -142,7 +137,7 @@ linters-settings:
     # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
     require-explanation: true
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
+    require-specific: false
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.

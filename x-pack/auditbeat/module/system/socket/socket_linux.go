@@ -26,12 +26,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/providers/linux"
@@ -66,7 +67,7 @@ var defaultMounts = []*mountPoint{
 // MetricSet for system/socket.
 type MetricSet struct {
 	system.SystemMetricSet
-	templateVars common.MapStr
+	templateVars mapstr.M
 	config       Config
 	log          *logp.Logger
 	detailLog    *logp.Logger
@@ -131,7 +132,7 @@ func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error
 	}
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
-		templateVars:    make(common.MapStr),
+		templateVars:    make(mapstr.M),
 		config:          config,
 		log:             logger,
 		isDebug:         logp.IsDebug(metricsetName),

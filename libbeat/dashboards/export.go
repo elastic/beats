@@ -32,8 +32,9 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -56,7 +57,7 @@ type YMLElement struct {
 
 // Export wraps GetDashboard call to provide a more descriptive API
 func Export(client *kibana.Client, id string) ([]byte, error) {
-	return client.GetDashboard(id)
+	return Get(client, id)
 }
 
 // ExportAllFromYml exports all dashboards found in the YML file
@@ -93,7 +94,7 @@ func ExportAll(client *kibana.Client, list ListYML) ([][]byte, error) {
 }
 
 // SaveToFile creates the required directories if needed and saves dashboard.
-func SaveToFile(dashboard []byte, filename, root string, version common.Version) error {
+func SaveToFile(dashboard []byte, filename, root string, version version.V) error {
 	dashboardsPath := path.Join("_meta", "kibana", strconv.Itoa(version.Major), "dashboard")
 	err := os.MkdirAll(path.Join(root, dashboardsPath), 0750)
 	if err != nil {
@@ -106,7 +107,7 @@ func SaveToFile(dashboard []byte, filename, root string, version common.Version)
 }
 
 // SaveToFile creates the required directories if needed and saves dashboard.
-func SaveToFolder(dashboard []byte, root string, version common.Version) error {
+func SaveToFolder(dashboard []byte, root string, version version.V) error {
 	p := path.Join(root, "_meta", "kibana", strconv.Itoa(version.Major))
 	err := os.MkdirAll(p, 0750)
 	if err != nil {
@@ -130,7 +131,7 @@ func SaveToFolder(dashboard []byte, root string, version common.Version) error {
 }
 
 func saveAsset(line []byte, assetRoot string) error {
-	var a common.MapStr
+	var a mapstr.M
 	err := json.Unmarshal(line, &a)
 	if err != nil {
 		return fmt.Errorf("failed to decode dashboard asset: %+v", err)

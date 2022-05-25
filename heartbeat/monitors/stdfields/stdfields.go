@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type ServiceFields struct {
@@ -37,11 +37,12 @@ type StdMonitorFields struct {
 	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
 	Timeout           time.Duration      `config:"timeout"`
 	Service           ServiceFields      `config:"service"`
+	Origin            string             `config:"origin"`
 	LegacyServiceName string             `config:"service_name"`
 	Enabled           bool               `config:"enabled"`
 }
 
-func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
+func ConfigToStdMonitorFields(config *conf.C) (StdMonitorFields, error) {
 	mpi := StdMonitorFields{Enabled: true}
 
 	if err := config.Unpack(&mpi); err != nil {

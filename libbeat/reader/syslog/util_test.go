@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestStringToInt(t *testing.T) {
@@ -200,46 +200,46 @@ func TestMapIndexToString(t *testing.T) {
 
 func TestAppendStringField(t *testing.T) {
 	tests := map[string]struct {
-		InMap   common.MapStr
+		InMap   mapstr.M
 		InField string
 		InValue string
-		Want    common.MapStr
+		Want    mapstr.M
 	}{
 		"nil": {
-			InMap:   common.MapStr{},
+			InMap:   mapstr.M{},
 			InField: "error",
 			InValue: "foo",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": "foo",
 			},
 		},
 		"string": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": "foo",
 			},
 			InField: "error",
 			InValue: "bar",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 		},
 		"string-slice": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 			InField: "error",
 			InValue: "some value",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []string{"foo", "bar", "some value"},
 			},
 		},
 		"interface-slice": {
-			InMap: common.MapStr{
+			InMap: mapstr.M{
 				"error": []interface{}{"foo", "bar"},
 			},
 			InField: "error",
 			InValue: "some value",
-			Want: common.MapStr{
+			Want: mapstr.M{
 				"error": []interface{}{"foo", "bar", "some value"},
 			},
 		},

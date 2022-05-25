@@ -19,7 +19,7 @@ package ilm
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type noopSupport struct{}
@@ -27,7 +27,7 @@ type noopManager struct{}
 
 // NewNoopSupport creates a noop ILM implementation with ILM support being always
 // disabled.  Attempts to install a policy will fail.
-func NewNoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
+func NewNoopSupport(info beat.Info, config *config.C) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 

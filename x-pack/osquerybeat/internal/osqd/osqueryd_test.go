@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
@@ -80,7 +80,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
 
 	// Write fake extension file for testing
-	err = ioutil.WriteFile(mandatoryExtensionPath, nil, 0644)
+	err = ioutil.WriteFile(mandatoryExtensionPath, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 
 			extensionAutoloadPath := filepath.Join(dir, osqueryAutoload)
 
-			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0644)
+			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -169,6 +169,93 @@ func TestPrepareAutoloadFile(t *testing.T) {
 			err = scanner.Err()
 			if err != nil {
 				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestGetEnabledDisabledTables(t *testing.T) {
+
+	tests := []struct {
+		name             string
+		flags            Flags
+		expectedEnabled  []string
+		expectedDisabled []string
+	}{
+		{
+			name:             "default",
+			expectedEnabled:  []string{},
+			expectedDisabled: defaultDisabledTables,
+		},
+		{
+			name: "enable all",
+			flags: map[string]interface{}{
+				"enable_tables": "curl,carves",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: []string{},
+		},
+		{
+			name: "enable curl",
+			flags: map[string]interface{}{
+				"enable_tables": "curl",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: []string{"carves"},
+		},
+		{
+			name: "enable curl and carves",
+			flags: map[string]interface{}{
+				"enable_tables": "curl, carves",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: []string{},
+		},
+		{
+			name: "enable os_info",
+			flags: map[string]interface{}{
+				"enable_tables": "os_info",
+			},
+			expectedEnabled:  []string{"os_info"},
+			expectedDisabled: defaultDisabledTables,
+		},
+		{
+			name: "disable os_info",
+			flags: map[string]interface{}{
+				"disable_tables": "os_info",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: append(defaultDisabledTables, "os_info"),
+		},
+		{
+			name: "disable curl os_info",
+			flags: map[string]interface{}{
+				"disable_tables": "curl, os_info",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: append(defaultDisabledTables, "os_info"),
+		},
+		{
+			name: "disable curl os_info, enable os_info",
+			flags: map[string]interface{}{
+				"disable_tables": "curl, os_info",
+				"enable_tables":  "os_info",
+			},
+			expectedEnabled:  []string{},
+			expectedDisabled: defaultDisabledTables,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			enabled, disabled := getEnabledDisabledTables(tc.flags)
+			diff := cmp.Diff(tc.expectedEnabled, enabled)
+			if diff != "" {
+				t.Error(diff)
+			}
+			diff = cmp.Diff(tc.expectedDisabled, disabled)
+			if diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

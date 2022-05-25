@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -54,7 +54,7 @@ func (d dateFormats) Parse(str string) (t time.Time, err error) {
 }
 
 // Get a key from a map and cast it to string.
-func getString(m common.MapStr, key string) (string, error) {
+func getString(m mapstr.M, key string) (string, error) {
 	iValue, err := m.GetValue(key)
 	if err != nil {
 		return "", err
@@ -67,7 +67,7 @@ func getString(m common.MapStr, key string) (string, error) {
 }
 
 // Parse a date from the given map key.
-func getDateKey(m common.MapStr, key string, formats dateFormats) (t time.Time, err error) {
+func getDateKey(m mapstr.M, key string, formats dateFormats) (t time.Time, err error) {
 	str, err := getString(m, key)
 	if err != nil {
 		return t, err

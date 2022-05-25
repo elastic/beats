@@ -30,6 +30,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
@@ -72,6 +73,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
@@ -112,6 +114,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains("Started listening for UDP connection"))
 
@@ -172,6 +175,7 @@ class Test(BaseTest):
             )
 
             filebeat = self.start_beat()
+            self.addCleanup(filebeat.kill_and_wait)
 
             if socket_type == "stream":
                 self.wait_until(lambda: self.log_contains("Start accepting connections"))
@@ -235,6 +239,7 @@ class Test(BaseTest):
             )
 
             filebeat = self.start_beat()
+            self.addCleanup(filebeat.kill_and_wait)
 
             if socket_type == "stream":
                 self.wait_until(lambda: self.log_contains("Start accepting connections"))

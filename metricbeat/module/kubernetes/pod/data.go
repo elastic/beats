@@ -21,19 +21,20 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
-	events := []common.MapStr{}
+func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *logp.Logger) ([]mapstr.M, error) {
+	events := []mapstr.M{}
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -57,45 +58,45 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			memLimit += perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 		}
 
-		podEvent := common.MapStr{
-			mb.ModuleDataKey: common.MapStr{
+		podEvent := mapstr.M{
+			mb.ModuleDataKey: mapstr.M{
 				"namespace": pod.PodRef.Namespace,
-				"node": common.MapStr{
+				"node": mapstr.M{
 					"name": node.NodeName,
 				},
 			},
 			"name": pod.PodRef.Name,
 			"uid":  pod.PodRef.UID,
 
-			"cpu": common.MapStr{
-				"usage": common.MapStr{
+			"cpu": mapstr.M{
+				"usage": mapstr.M{
 					"nanocores": usageNanoCores,
 				},
 			},
 
-			"memory": common.MapStr{
-				"usage": common.MapStr{
+			"memory": mapstr.M{
+				"usage": mapstr.M{
 					"bytes": usageMem,
 				},
-				"available": common.MapStr{
+				"available": mapstr.M{
 					"bytes": availMem,
 				},
-				"working_set": common.MapStr{
+				"working_set": mapstr.M{
 					"bytes": workingSet,
 				},
-				"rss": common.MapStr{
+				"rss": mapstr.M{
 					"bytes": rss,
 				},
 				"page_faults":       pageFaults,
 				"major_page_faults": majorPageFaults,
 			},
 
-			"network": common.MapStr{
-				"rx": common.MapStr{
+			"network": mapstr.M{
+				"rx": mapstr.M{
 					"bytes":  pod.Network.RxBytes,
 					"errors": pod.Network.RxErrors,
 				},
-				"tx": common.MapStr{
+				"tx": mapstr.M{
 					"bytes":  pod.Network.TxBytes,
 					"errors": pod.Network.TxErrors,
 				},
@@ -103,7 +104,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 		}
 
 		if pod.StartTime != "" {
-			podEvent.Put("start_time", pod.StartTime)
+			util.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
 		if coresLimit > nodeCores {
@@ -115,35 +116,52 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 		}
 
 		if nodeCores > 0 {
-			podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
+			util.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
 		}
 
 		if coresLimit > 0 {
-			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
+			util.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit, logger)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
-				podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
+				util.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
 			}
 			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
-				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
-
+				util.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/memLimit, logger)
+				util.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
 			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
 			if nodeMem > 0 {
-				podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
+				util.ShouldPut(podEvent, "memory.usage.node.pct", float64(workingSet)/nodeMem, logger)
 			}
 			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
-				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
+				util.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/memLimit, logger)
+
+				util.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
 			}
 		}
 
 		events = append(events, podEvent)
 	}
 	return events, nil
+}
+
+// ecsfields maps pod events fields to container ecs fields
+func ecsfields(podEvent mapstr.M, logger *logp.Logger) mapstr.M {
+	ecsfields := mapstr.M{}
+
+	egressBytes, err := podEvent.GetValue("network.tx.bytes")
+	if err == nil {
+		util.ShouldPut(ecsfields, "network.egress.bytes", egressBytes, logger)
+	}
+
+	ingressBytes, err := podEvent.GetValue("network.rx.bytes")
+	if err == nil {
+		util.ShouldPut(ecsfields, "network.ingress.bytes", ingressBytes, logger)
+	}
+
+	return ecsfields
 }

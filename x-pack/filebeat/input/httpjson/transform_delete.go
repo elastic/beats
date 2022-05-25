@@ -7,10 +7,9 @@ package httpjson
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const deleteName = "delete"
@@ -27,7 +26,7 @@ type delete struct {
 
 func (delete) transformName() string { return deleteName }
 
-func newDeleteRequest(cfg *common.Config, _ *logp.Logger) (transform, error) {
+func newDeleteRequest(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -47,7 +46,7 @@ func newDeleteRequest(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	return &delete, nil
 }
 
-func newDeleteResponse(cfg *common.Config, _ *logp.Logger) (transform, error) {
+func newDeleteResponse(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -63,7 +62,7 @@ func newDeleteResponse(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	return &delete, nil
 }
 
-func newDeletePagination(cfg *common.Config, _ *logp.Logger) (transform, error) {
+func newDeletePagination(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -83,10 +82,10 @@ func newDeletePagination(cfg *common.Config, _ *logp.Logger) (transform, error) 
 	return &delete, nil
 }
 
-func newDelete(cfg *common.Config) (delete, error) {
+func newDelete(cfg *conf.C) (delete, error) {
 	c := &deleteConfig{}
 	if err := cfg.Unpack(c); err != nil {
-		return delete{}, errors.Wrap(err, "fail to unpack the delete configuration")
+		return delete{}, fmt.Errorf("fail to unpack the delete configuration: %w", err)
 	}
 
 	ti, err := getTargetInfo(c.Target)
@@ -106,8 +105,8 @@ func (delete *delete) run(ctx *transformContext, tr transformable) (transformabl
 	return tr, nil
 }
 
-func deleteFromCommonMap(m common.MapStr, key string) error {
-	if err := m.Delete(key); err != common.ErrKeyNotFound {
+func deleteFromCommonMap(m mapstr.M, key string) error {
+	if err := m.Delete(key); err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by Delete.
 		return err
 	}
 	return nil
