@@ -13,7 +13,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -26,8 +25,7 @@ type azureInputConfig struct {
 	SAKey       string `config:"storage_account_key"`
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
-	OverrideEnvironment string             `config:"resource_manager_endpoint"`
-	Split               *split.SplitConfig `config:"split"`
+	OverrideEnvironment string `config:"resource_manager_endpoint"`
 }
 
 const ephContainerName = "filebeat"

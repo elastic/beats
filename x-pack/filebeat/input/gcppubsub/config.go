@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/split"
 
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"
@@ -40,8 +39,7 @@ type config struct {
 	CredentialsJSON common.JSONBlob `config:"credentials_json"`
 
 	// Overrides the default Pub/Sub service address and disables TLS. For testing.
-	AlternativeHost string             `config:"alternative_host"`
-	Split           *split.SplitConfig `config:"split"`
+	AlternativeHost string `config:"alternative_host"`
 }
 
 func (c *config) Validate() error {

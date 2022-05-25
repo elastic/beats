@@ -20,8 +20,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/split"
-
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -183,53 +181,21 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
-	azure.Put("offset", event.SystemProperties.Offset)
-	azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-	azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 	messages := a.parseMultipleMessages(event.Data)
-	for _, item := range messages {
-		if a.config.Split != nil {
-			split, err := split.NewSplit(a.config.Split, a.log)
-			if err != nil {
-				return false
-			}
-			// We want to be able to identify which split is the root of the chain.
-			split.IsRoot = true
-
-			eventsCh, err := split.StartSplit([]byte(item))
-			if err != nil {
-				return false
-			}
-			for maybeMsg := range eventsCh {
-				if maybeMsg.Failed() {
-					a.log.Errorf("error processing response: %v", maybeMsg)
-					continue
-				}
-				jsonString, _ := json.Marshal(maybeMsg.Msg)
-				ok := a.outlet.OnEvent(beat.Event{
-					Timestamp: timestamp,
-					Fields: mapstr.M{
-						"message": jsonString,
-						"azure":   azure,
-					},
-					Private: event.Data,
-				})
-				if !ok {
-					return ok
-				}
-			}
-		} else {
-			ok := a.outlet.OnEvent(beat.Event{
-				Timestamp: timestamp,
-				Fields: mapstr.M{
-					"message": item,
-					"azure":   azure,
-				},
-				Private: event.Data,
-			})
-			if !ok {
-				return ok
-			}
+	for _, msg := range messages {
+		azure.Put("offset", event.SystemProperties.Offset)
+		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+		ok := a.outlet.OnEvent(beat.Event{
+			Timestamp: timestamp,
+			Fields: mapstr.M{
+				"message": msg,
+				"azure":   azure,
+			},
+			Private: event.Data,
+		})
+		if !ok {
+			return ok
 		}
 	}
 	return true
@@ -237,74 +203,42 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
-	var mapObject mapstr.M
+	var mapObject map[string][]interface{}
 	var messages []string
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
 	if err == nil {
-		js, err := json.Marshal(mapObject)
-		if err != nil {
-			a.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
+		if len(mapObject[expandEventListFromField]) > 0 {
+			for _, ms := range mapObject[expandEventListFromField] {
+				js, err := json.Marshal(ms)
+				if err == nil {
+					messages = append(messages, string(js))
+				} else {
+					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+				}
+			}
 		}
-		return append(messages, string(js))
-	}
-	a.log.Debugf("deserializing message into object returning error: %s", err)
-	// in some cases the message is an array
-	var arrayObject []mapstr.M
-	err = json.Unmarshal(bMessage, &arrayObject)
-	if err != nil {
-		// return entire message
-		a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-		return append(messages, string(bMessage))
-	}
-	a.log.Debugf("deserializing multiple messages to an array")
-	for _, ms := range arrayObject {
-		js, err := json.Marshal(ms)
+	} else {
+		a.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
+		// in some cases the message is an array
+		var arrayObject []interface{}
+		err = json.Unmarshal(bMessage, &arrayObject)
 		if err != nil {
-			a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+			// return entire message
+			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			return []string{string(bMessage)}
 		}
-		messages = append(messages, string(js))
+		for _, ms := range arrayObject {
+			js, err := json.Marshal(ms)
+			if err == nil {
+				messages = append(messages, string(js))
+			} else {
+				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+			}
+		}
 	}
 	return messages
 }
-
-// func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
-// 	var mapObject map[string][]interface{}
-// 	var messages []string
-// 	// check if the message is a "records" object containing a list of events
-// 	err := json.Unmarshal(bMessage, &mapObject)
-// 	if err == nil {
-// 		if len(mapObject[expandEventListFromField]) > 0 {
-// 			for _, ms := range mapObject[expandEventListFromField] {
-// 				js, err := json.Marshal(ms)
-// 				if err == nil {
-// 					messages = append(messages, string(js))
-// 				} else {
-// 					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-// 				}
-// 			}
-// 		}
-// 	} else {
-// 		a.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
-// 		// in some cases the message is an array
-// 		var arrayObject []interface{}
-// 		err = json.Unmarshal(bMessage, &arrayObject)
-// 		if err != nil {
-// 			// return entire message
-// 			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-// 			return []string{string(bMessage)}
-// 		}
-// 		for _, ms := range arrayObject {
-// 			js, err := json.Marshal(ms)
-// 			if err == nil {
-// 				messages = append(messages, string(js))
-// 			} else {
-// 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-// 			}
-// 		}
-// 	}
-// 	return messages
-// }
 
 // Strip connection string to remove sensitive information
 // A connection string should look like this:

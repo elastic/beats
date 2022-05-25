@@ -8,7 +8,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -23,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -170,89 +168,21 @@ func (in *pubsubInput) run() error {
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		messages := in.parseMultipleMessages(msg.Data)
-		arrayOffset := int64(0)
-		for _, item := range messages {
-			if in.config.Split != nil {
-				split, err := split.NewSplit(in.config.Split, in.log)
-				if err != nil {
-					return
-				}
-				// We want to be able to identify which split is the root of the chain.
-				split.IsRoot = true
-
-				eventsCh, err := split.StartSplit([]byte(item))
-				if err != nil {
-					return
-				}
-				for maybeMsg := range eventsCh {
-					if maybeMsg.Failed() {
-						in.log.Errorf("error processing response: %v", maybeMsg)
-						continue
-					}
-
-					message, _ := json.Marshal(maybeMsg.Msg)
-					event := makeSplitEvent(topicID, msg, string(message), arrayOffset)
-					if ok := in.outlet.OnEvent(event); !ok {
-						msg.Nack()
-						in.log.Debug("OnEvent returned false. Stopping input worker.")
-						cancel()
-					}
-					arrayOffset++
-				}
-			} else {
-				event := makeSplitEvent(topicID, msg, item, arrayOffset)
-				if ok := in.outlet.OnEvent(event); !ok {
-					msg.Nack()
-					in.log.Debug("OnEvent returned false. Stopping input worker.")
-					cancel()
-				}
-				arrayOffset++
-			}
+		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
+			msg.Nack()
+			in.log.Debug("OnEvent returned false. Stopping input worker.")
+			cancel()
 		}
 	})
 }
 
-// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (in *pubsubInput) parseMultipleMessages(bMessage []byte) []string {
-	var mapObject mapstr.M
-	var messages []string
-	// check if the message is a "records" object containing a list of events
-	err := json.Unmarshal(bMessage, &mapObject)
-	if err == nil {
-		js, err := json.Marshal(mapObject)
-		if err != nil {
-			in.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
-		}
-		return append(messages, string(js))
-	}
-	in.log.Debugf("deserializing message into object returning error: %s", err)
-	// in some cases the message is an array
-	var arrayObject []mapstr.M
-	err = json.Unmarshal(bMessage, &arrayObject)
-	if err != nil {
-		// return entire message
-		in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-		return append(messages, string(bMessage))
-	}
-	in.log.Debugf("deserializing multiple messages to an array")
-	for _, ms := range arrayObject {
-		js, err := json.Marshal(ms)
-		if err != nil {
-			in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-		}
-		messages = append(messages, string(js))
-	}
-	return messages
-}
-
-// Stop stops the pubsub input and waits for it to fully stoin.
+// Stop stops the pubsub input and waits for it to fully stop.
 func (in *pubsubInput) Stop() {
 	in.workerCancel()
 	in.workerWg.Wait()
 }
 
-// Wait is an alias for Stoin.
+// Wait is an alias for Stop.
 func (in *pubsubInput) Wait() {
 	in.Stop()
 }
@@ -268,8 +198,9 @@ func makeTopicID(project, topic string) string {
 	return prefix[:10]
 }
 
-func makeSplitEvent(topicID string, msg *pubsub.Message, message string, offset int64) beat.Event {
-	id := fmt.Sprintf("%s-%s-%012d", topicID, msg.ID, offset)
+func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
+	id := topicID + "-" + msg.ID
+
 	event := beat.Event{
 		Timestamp: msg.PublishTime.UTC(),
 		Fields: mapstr.M{
@@ -277,7 +208,7 @@ func makeSplitEvent(topicID string, msg *pubsub.Message, message string, offset 
 				"id":      id,
 				"created": time.Now().UTC(),
 			},
-			"message": message,
+			"message": string(msg.Data),
 		},
 		Private: msg,
 	}
@@ -289,29 +220,6 @@ func makeSplitEvent(topicID string, msg *pubsub.Message, message string, offset 
 
 	return event
 }
-
-// func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
-// 	id := topicID + "-" + msg.ID
-
-// event := beat.Event{
-// 	Timestamp: msg.PublishTime.UTC(),
-// 	Fields: mapstr.M{
-// 		"event": mapstr.M{
-// 			"id":      id,
-// 			"created": time.Now().UTC(),
-// 		},
-// 		"message": string(msg.Data),
-// 	},
-// 	Private: msg,
-// }
-// event.SetID(id)
-
-// 	if len(msg.Attributes) > 0 {
-// 		event.PutValue("labels", msg.Attributes)
-// 	}
-
-// 	return event
-// }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscription, error) {
 	sub := client.Subscription(in.Subscription.Name)
