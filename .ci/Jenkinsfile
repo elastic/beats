@@ -56,15 +56,11 @@ pipeline {
             name 'PLATFORM'
             values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'darwin && orka && x86_64'
           }
-          axis {
-            name 'GO_VERSION'
-            values '1.17'
-          }
         }
         stages {
           stage('Test') {
             steps {
-              withGithubNotify(context: "Test-${GO_VERSION}-${PLATFORM}") {
+              withGithubNotify(context: "Test-${PLATFORM}") {
                 deleteDir()
                 unstash 'source'
                 dir("${BASE_DIR}"){
