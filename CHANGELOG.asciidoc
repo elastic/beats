@@ -3,6 +3,20 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.2.2]]
+=== Beats version 8.2.2
+https://github.com/elastic/beats/compare/v8.2.1\...v8.2.2[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+
+*Filebeat*
+
+- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+
 [[release-notes-8.2.1]]
 === Beats version 8.2.1
 https://github.com/elastic/beats/compare/v8.2.0\...v8.2.1[View commits]
@@ -60,8 +74,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...v8.2.1[View commits]
 *Metricbeat*
 
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
-- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Fix `include_top_n` fields in system/process {pull}31595[31595]
