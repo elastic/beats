@@ -22,7 +22,6 @@ import (
 	"io"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -226,15 +225,14 @@ func testFetchMetrics(t *testing.T, mon queue.Queue) {
 		return
 	}
 
-	for {
-		metrics, err := mon.Metrics()
-		if errors.Is(err, io.EOF) {
-			continue
-		}
-		t.Logf("Got event count: %d/%d", metrics.EventCount.ValueOr(0), metrics.ByteCount.ValueOr(0))
-		assert.True(t, metrics.EventCount.Exists() || metrics.ByteCount.Exists())
-		time.Sleep(time.Second)
+	metrics, err := mon.Metrics()
+	// EOF is returned if the queue is closing, so the only "good" error is that
+	if err != nil {
+		assert.ErrorIs(t, err, io.EOF)
 	}
+
+	assert.True(t, metrics.EventCount.Exists() || metrics.ByteCount.Exists())
+
 }
 
 func multiple(

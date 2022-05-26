@@ -133,7 +133,7 @@ func (l *directEventLoop) run() {
 }
 
 func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: len(l.buf.entries)}
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items()}
 }
 
 // Returns true if the queue is full after handling the insertion request.
