@@ -6,12 +6,8 @@
 [[community-beats]]
 == Community {beats}
 
-<<<<<<< HEAD
-Please note that Custom Beat generator has been deprecated since 7.16.
-=======
 ****
 **Custom Beat generator code no longer available in 8.0 and later**
->>>>>>> 67a5e38117 (Make Beat generator deprecation and removal more obvious in the docs (#31639))
 
 The custom Beat generator was a helper tool that allowed developers to bootstrap
 their custom {beats}. This tool was deprecated in 7.16 and is no longer
