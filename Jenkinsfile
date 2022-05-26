@@ -679,7 +679,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
           withOtelEnv() {
-            body()
+            withTerraformEnv(version: env.TERRAFORM_VERSION) {
+              body()
+            }
           }
         } catch(err) {
           // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
@@ -743,7 +745,7 @@ def fixPermissions(location) {
 def installTools(args) {
   def stepHeader = "${args.id?.trim() ? args.id : env.STAGE_NAME}"
   if(isUnix()) {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Python/Docker/Terraform", script: '.ci/scripts/install-tools.sh') }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Python/Docker", script: '.ci/scripts/install-tools.sh') }
     // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
     // See https://github.com/elastic/beats/issues/17787.
     sh(label: 'check git config', script: '''
