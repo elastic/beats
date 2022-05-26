@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -98,7 +97,7 @@ type Settings struct {
 
 type batch struct {
 	queue   *broker
-	events  []publisher.Event
+	entries []queueEntry
 	ackChan chan batchAckMsg
 }
 
@@ -250,15 +249,9 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
-	events := make([]publisher.Event, 0, len(resp.entries))
-	for _, entry := range resp.entries {
-		if event, ok := entry.event.(*publisher.Event); ok {
-			events = append(events, *event)
-		}
-	}
 	return &batch{
 		queue:   b,
-		events:  events,
+		entries: resp.entries,
 		ackChan: resp.ackChan,
 	}, nil
 }
@@ -286,8 +279,7 @@ var ackChanPool = sync.Pool{
 }
 
 func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	//nolint: errcheck // Return value doesn't need to be checked before conversion.
-	ch := ackChanPool.Get().(*batchACKState)
+	ch, _ := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
 	ch.start = start
 	ch.count = count
@@ -339,7 +331,7 @@ func (l *chanList) front() *batchACKState {
 	return l.head
 }
 
-func (l *chanList) channel() chan batchAckMsg {
+func (l *chanList) nextBatchChannel() chan batchAckMsg {
 	if l.head == nil {
 		return nil
 	}
@@ -380,8 +372,12 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 	return actual
 }
 
-func (b *batch) Events() []publisher.Event {
-	return b.events
+func (b *batch) Count() int {
+	return len(b.entries)
+}
+
+func (b *batch) Event(i int) interface{} {
+	return b.entries[i].event
 }
 
 func (b *batch) ACK() {

@@ -1,0 +1,168 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "14c12ba0-f1aa-48ac-98c4-111594e9244c": {
+                            "columnOrder": [
+                                "3f5990a9-a37a-429c-879c-8f4361fdb541",
+                                "ad8b1756-1e89-403e-a4be-6bb918a3ae4c",
+                                "34892916-522d-4b2e-b286-a534475b34a1",
+                                "431b1111-09a2-4c06-8a86-c345ea80f6ed"
+                            ],
+                            "columns": {
+                                "34892916-522d-4b2e-b286-a534475b34a1": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Replicas Desired",
+                                    "operationType": "median",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.daemonset.replicas.desired"
+                                },
+                                "3f5990a9-a37a-429c-879c-8f4361fdb541": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "DaemonSet Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "ad8b1756-1e89-403e-a4be-6bb918a3ae4c",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.daemonset.name"
+                                },
+                                "431b1111-09a2-4c06-8a86-c345ea80f6ed": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.daemonset.replicas.unavailable: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Replicas Unavailable",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.daemonset.replicas.unavailable"
+                                },
+                                "ad8b1756-1e89-403e-a4be-6bb918a3ae4c": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.daemonset.replicas.available: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Replicas Available",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.daemonset.replicas.available"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "8ce91ff5-20c7-4b5b-bde9-0e3e2a43c8a2",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_daemonset"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_daemonset"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "accessors": [
+                            "ad8b1756-1e89-403e-a4be-6bb918a3ae4c",
+                            "34892916-522d-4b2e-b286-a534475b34a1",
+                            "431b1111-09a2-4c06-8a86-c345ea80f6ed"
+                        ],
+                        "layerId": "14c12ba0-f1aa-48ac-98c4-111594e9244c",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "bar_stacked",
+                        "showGridlines": false,
+                        "xAccessor": "3f5990a9-a37a-429c-879c-8f4361fdb541",
+                        "yConfig": [
+                            {
+                                "color": "#dd0a50",
+                                "forAccessor": "431b1111-09a2-4c06-8a86-c345ea80f6ed"
+                            }
+                        ]
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked",
+                "title": "Empty XY chart",
+                "valueLabels": "hide"
+            }
+        },
+        "title": "Replicas per DaemonSet [Metricbeat Kubernetes]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "ed0682d0-db7b-11ec-9a27-6bd4c921c53b",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-14c12ba0-f1aa-48ac-98c4-111594e9244c",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "8ce91ff5-20c7-4b5b-bde9-0e3e2a43c8a2",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwNDQsMV0="
+}
