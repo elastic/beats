@@ -13,11 +13,10 @@ import (
 )
 
 var (
-	errEmptyField          = errors.New("the requested field is empty")
-	errEmptyRootField      = errors.New("the requested root field is empty")
-	errExpectedSplitArr    = errors.New("split was expecting field to be an array")
-	errExpectedSplitObj    = errors.New("split was expecting field to be an object")
-	errExpectedSplitString = errors.New("split was expecting field to be a string")
+	errEmptyField       = errors.New("the requested field is empty")
+	errEmptyRootField   = errors.New("the requested root field is empty")
+	errExpectedSplitArr = errors.New("split was expecting field to be an array")
+	errExpectedSplitObj = errors.New("split was expecting field to be an object")
 )
 
 // split is a split processor chain element. Split processing is executed
@@ -76,16 +75,15 @@ func (s *split) StartSplit(raw json.RawMessage) (<-chan maybeMsg, error) {
 	go func() {
 		defer close(ch)
 		if err := s.run(jsonObject, ch); err != nil {
-			switch err {
-			case errEmptyField:
+			if errors.Is(err, errEmptyField) {
 				// nothing else to send for this page
 				s.log.Debug("split operation finished")
 				return
-			case errEmptyRootField:
+			} else if errors.Is(err, errEmptyRootField) {
 				// root field not found, most likely the response is empty
 				s.log.Debug(err)
 				return
-			default:
+			} else {
 				s.log.Debug("split operation failed")
 				ch <- maybeMsg{err: err}
 				return
@@ -110,7 +108,7 @@ func (s *split) run(jsonObject mapstr.M, ch chan<- maybeMsg) error {
 // split recursively executes the split processor chain.
 func (s *split) split(root mapstr.M, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.target)
-	if err != nil && err != mapstr.ErrKeyNotFound {
+	if !errors.Is(err, nil) && errors.Is(err, mapstr.ErrKeyNotFound) {
 		return err
 	}
 

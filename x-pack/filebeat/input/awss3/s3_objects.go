@@ -23,7 +23,6 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
-	"gotest.tools/gotestsum/log"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
@@ -333,7 +332,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	_, streamCancel := ctxtool.WithFunc(p.inputContext.Cancelation, func() {
 		err := reader.Close()
 		if err != nil {
-			log.Errorf("Error stopping filestream reader %v", err)
+			p.log.Errorf("Error stopping filestream reader %v", err)
 		}
 	})
 	defer streamCancel()

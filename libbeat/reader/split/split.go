@@ -20,7 +20,6 @@ package split
 import (
 	"context"
 	"io"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,15 +43,10 @@ func (c *Config) Validate() error {
 type splitterReader struct {
 	reader reader.Reader
 	ctx    context.Context
-	cancel context.CancelFunc
 	cfg    *Config
 	buf    chan reader.Message
 	logger *logp.Logger
 }
-
-var (
-	splitOnce sync.Once
-)
 
 func New(ctx context.Context, r reader.Reader, cfg *Config) *splitterReader {
 	return &splitterReader{
@@ -70,8 +64,9 @@ func (r *splitterReader) Next() (reader.Message, error) {
 		msg, ok := <-r.buf
 		if !ok {
 			return reader.Message{}, io.EOF
+		} else {
+			return msg, nil
 		}
-		return msg, nil
 	}
 	return reader.Message{}, nil
 }

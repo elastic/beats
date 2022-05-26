@@ -29,8 +29,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"errors"
+
 	"github.com/Shopify/sarama"
-	"github.com/pkg/errors"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -66,7 +67,7 @@ func configure(cfg *conf.C) (input.Input, error) {
 
 	saramaConfig, err := newSaramaConfig(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing Sarama config")
+		return nil, errors.Unwrap(fmt.Errorf("initializing Sarama config: %w", err))
 	}
 	return NewInput(config, saramaConfig)
 }
@@ -101,7 +102,7 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 	}
 
 	if len(missingTopics) > 0 {
-		return fmt.Errorf("Of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
+		return fmt.Errorf("of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
 	}
 
 	return nil
@@ -165,7 +166,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		input.runConsumerGroup(log, client, goContext, consumerGroup)
 	}
 
-	if ctx.Cancelation.Err() == context.Canceled {
+	if errors.Is(ctx.Cancelation.Err(), context.Canceled) {
 		return nil
 	} else {
 		return ctx.Cancelation.Err()
@@ -255,7 +256,7 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
-	return
+	return //nolint:nakedret //Function is required
 }
 
 func (c channelCtx) Done() <-chan struct{} {
@@ -311,12 +312,12 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	reader := h.createReader(claim)
 	parser := h.parsers.Create(h.ctx, reader)
-	for h.session.Context().Err() == nil {
+	for errors.Is(h.session.Context().Err(), nil) {
 		message, err := parser.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return nil
 		}
-		if err != nil {
+		if !errors.Is(err, nil) {
 			return err
 		}
 		h.client.Publish(beat.Event{
