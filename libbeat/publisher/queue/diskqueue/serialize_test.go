@@ -46,7 +46,7 @@ func TestSerialize(t *testing.T) {
 				},
 			},
 		}
-		serialized, err := encoder.encode(&event)
+		serialized, err := encoder.encode(event)
 		if err != nil {
 			t.Fatalf("[%v] Couldn't encode event: %v", test.name, err)
 		}

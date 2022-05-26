@@ -19,7 +19,6 @@ package memqueue
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -68,16 +67,12 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	return &forgetfulProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfulProducer) Publish(event publisher.Event) bool {
-	return p.openState.publish(p.makeRequest(&event))
+func (p *forgetfulProducer) Publish(event interface{}) bool {
+	return p.openState.publish(pushRequest{event: event})
 }
 
-func (p *forgetfulProducer) TryPublish(event publisher.Event) bool {
-	return p.openState.tryPublish(p.makeRequest(&event))
-}
-
-func (p *forgetfulProducer) makeRequest(event *publisher.Event) pushRequest {
-	return pushRequest{event: event}
+func (p *forgetfulProducer) TryPublish(event interface{}) bool {
+	return p.openState.tryPublish(pushRequest{event: event})
 }
 
 func (p *forgetfulProducer) Cancel() int {
@@ -85,12 +80,12 @@ func (p *forgetfulProducer) Cancel() int {
 	return 0
 }
 
-func (p *ackProducer) Publish(event publisher.Event) bool {
-	return p.updSeq(p.openState.publish(p.makeRequest(&event)))
+func (p *ackProducer) Publish(event interface{}) bool {
+	return p.updSeq(p.openState.publish(p.makeRequest(event)))
 }
 
-func (p *ackProducer) TryPublish(event publisher.Event) bool {
-	return p.updSeq(p.openState.tryPublish(p.makeRequest(&event)))
+func (p *ackProducer) TryPublish(event interface{}) bool {
+	return p.updSeq(p.openState.tryPublish(p.makeRequest(event)))
 }
 
 func (p *ackProducer) updSeq(ok bool) bool {
@@ -100,7 +95,7 @@ func (p *ackProducer) updSeq(ok bool) bool {
 	return ok
 }
 
-func (p *ackProducer) makeRequest(event *publisher.Event) pushRequest {
+func (p *ackProducer) makeRequest(event interface{}) pushRequest {
 	req := pushRequest{
 		event: event,
 		seq:   p.seq,
