@@ -49,6 +49,9 @@ type bufferingEventLoop struct {
 	// those that have not yet been acked.
 	eventCount int
 
+	// The number of events that have been read by a consumer but not yet acked
+	unackedEventCount int
+
 	minEvents    int
 	maxEvents    int
 	flushTimeout time.Duration
@@ -133,7 +136,7 @@ func (l *directEventLoop) run() {
 }
 
 func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items()}
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items(), occupiedRead: l.buf.reserved}
 }
 
 // Returns true if the queue is full after handling the insertion request.
@@ -320,7 +323,7 @@ func (l *bufferingEventLoop) run() {
 }
 
 func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount}
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount, occupiedRead: l.unackedEventCount}
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
@@ -422,6 +425,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	req.responseChan <- getResponse{acker.ackChan, entries}
 	l.pendingACKs.append(acker)
 
+	l.unackedEventCount += len(entries)
 	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
@@ -429,6 +433,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *bufferingEventLoop) handleACK(count int) {
+	l.unackedEventCount -= count
 	l.eventCount -= count
 }
 

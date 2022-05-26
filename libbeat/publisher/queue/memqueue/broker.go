@@ -267,7 +267,11 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 	}
 	resp := <-responseChan
 
-	return queue.Metrics{EventCount: opt.UintWith(uint64(resp.currentQueueSize))}, nil
+	return queue.Metrics{
+		EventCount:   opt.UintWith(uint64(resp.currentQueueSize)),
+		EventLimit:   opt.UintWith(uint64(b.bufSize)),
+		OccupiedRead: opt.UintWith(uint64(resp.occupiedRead)),
+	}, nil
 }
 
 var ackChanPool = sync.Pool{

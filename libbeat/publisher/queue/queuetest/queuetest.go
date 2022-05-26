@@ -289,7 +289,7 @@ func makeProducer(
 			})
 			for i := 0; i < maxEvents; i++ {
 				log.Debug("publish event", i)
-				producer.Publish(makeEvent(makeFields(i)))
+				producer.Publish(MakeEvent(makeFields(i)))
 			}
 
 			ackWG.Wait()

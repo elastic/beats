@@ -46,6 +46,9 @@ type Metrics struct {
 	//EventLimit is the user-configured event limit of the queue
 	EventLimit opt.Uint
 
+	//OccupiedRead is the count of events that an output consumer has read, but not yet ack'ed
+	OccupiedRead opt.Uint
+
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time
 }
