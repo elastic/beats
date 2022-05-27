@@ -25,11 +25,11 @@ func TestSysmetricExtractorCalculateQuery(t *testing.T) {
 			fields{
 				patterns: patterns,
 			},
-			"SELECT * FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0 OR METRIC_NAME LIKE :pattern1 OR METRIC_NAME LIKE :pattern2",
+			"SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 AND METRIC_NAME LIKE :pattern0 OR METRIC_NAME LIKE :pattern1 OR METRIC_NAME LIKE :pattern2",
 		},
 		{
 			fields{},
-			"SELECT * FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0",
+			"SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 AND METRIC_NAME LIKE :pattern0",
 		},
 	}
 	for _, tt := range tests {
