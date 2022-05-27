@@ -74,14 +74,16 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 
 		// consume all events
 		total := N2 - N1
-		events := make([]publisher.Event, 0, total)
+		events := make([]interface{}, 0, total)
 		for len(events) < total {
 			batch, err := b.Get(-1) // collect all events
 			if err != nil {
 				panic(err)
 			}
 
-			events = append(events, batch.Events()...)
+			for i := 0; i < batch.Count(); i++ {
+				events = append(events, batch.Event(i))
+			}
 			batch.ACK()
 		}
 
@@ -92,7 +94,9 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		}
 
 		for i, event := range events {
-			value, ok := event.Content.Fields["value"].(int)
+			pubEvent, ok := event.(publisher.Event)
+			assert.True(t, ok, "queue output should be the same type as its input")
+			value, ok := pubEvent.Content.Fields["value"].(int)
 			assert.True(t, ok, "event.value should be an int")
 			assert.Equal(t, i+N1, value)
 		}

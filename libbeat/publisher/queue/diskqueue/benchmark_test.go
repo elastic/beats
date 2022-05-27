@@ -101,9 +101,8 @@ func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_siz
 		if err != nil {
 			return err
 		}
-		events := batch.Events()
 		batch.ACK()
-		received = received + len(events)
+		received = received + batch.Count()
 		if received == num_events {
 			break
 		}
