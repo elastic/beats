@@ -22,6 +22,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -189,14 +190,11 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		}()
 	}
 
-	acks := lst.front()
-	start := acks.start
 	entries := l.buf.entries
 
-	idx := start + N - 1
-	if idx >= len(entries) {
-		idx -= len(entries)
-	}
+	firstIndex := lst.front().start
+	// Position the index at the end of the block of ACKed events
+	idx := (firstIndex + N - 1) % len(entries)
 
 	total := 0
 	for i := N - 1; i >= 0; i-- {
@@ -235,7 +233,6 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 				N, total,
 			))
 		}
-
 		client.state.cb(int(count))
 		client.state.lastACK = client.seq
 		client.state = nil
@@ -532,7 +529,9 @@ func reportCancelledState(log *logp.Logger, req *pushRequest) {
 
 	st := req.state
 	if cb := st.dropCB; cb != nil {
-		cb(req.event.Content)
+		if event, ok := req.event.(publisher.Event); ok {
+			cb(event.Content)
+		}
 	}
 
 }

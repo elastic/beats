@@ -17,12 +17,10 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher"
-
 // producer -> broker API
 
 type pushRequest struct {
-	event *publisher.Event
+	event interface{}
 	seq   uint32
 	state *produceState
 }
