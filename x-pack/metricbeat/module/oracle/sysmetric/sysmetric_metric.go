@@ -17,16 +17,15 @@ import (
 )
 
 type sysmetricMetric struct {
-	groupId sql.NullInt64
-	name    sql.NullString
-	value   sql.NullFloat64
+	name  sql.NullString
+	value sql.NullFloat64
 }
 
 /*
  * The following function executes a query that produces the following result
  *
- *	GROUP_ID	METRIC_NAME								VALUE	METRIC_UNIT
- *	2 			PX operations not downgraded Per Sec	0		PX Operations Per Second                                                    0
+ *	METRIC_NAME								VALUE
+ *	PX operations not downgraded Per Sec	0
  *
  * Which is parsed into sysmetricMetric instances
  */
@@ -35,7 +34,7 @@ func (e *sysmetricExtractor) calculateQuery() string {
 		e.patterns = make([]interface{}, 1)
 		e.patterns[0] = "%"
 	}
-	query := "SELECT GROUP_ID, METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE METRIC_NAME LIKE :pattern0"
+	query := "SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 AND METRIC_NAME LIKE :pattern0"
 	for i := 1; i < len(e.patterns); i++ {
 		query = query + " OR METRIC_NAME LIKE :pattern" + strconv.Itoa(i)
 	}
@@ -53,7 +52,7 @@ func (e *sysmetricExtractor) sysmetricMetric(ctx context.Context) ([]sysmetricMe
 
 	for rows.Next() {
 		dest := sysmetricMetric{}
-		if err = rows.Scan(&dest.groupId, &dest.name, &dest.value); err != nil {
+		if err = rows.Scan(&dest.name, &dest.value); err != nil {
 			return nil, err
 		}
 		results = append(results, dest)
@@ -68,7 +67,7 @@ func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) []mapstr.M {
 
 	for _, sysmetricMetric := range bs {
 		metricName := ConvertToSnakeCase(sysmetricMetric.name).String
-		oracle.SetSqlValue(m.Logger(), ms, "metrics."+metricName+"_"+strconv.Itoa(int(sysmetricMetric.groupId.Int64)), &oracle.Float64Value{NullFloat64: sysmetricMetric.value})
+		oracle.SetSqlValue(m.Logger(), ms, "metrics."+metricName, &oracle.Float64Value{NullFloat64: sysmetricMetric.value})
 	}
 	out = append(out, ms)
 

@@ -17,12 +17,11 @@ func TestMetricSetTransform(t *testing.T) {
 		{
 			in: &extractedData{
 				sysmetricMetrics: []sysmetricMetric{{
-					groupId: sql.NullInt64{Int64: 2, Valid: true},
-					name:    sql.NullString{String: "Buffer Cache Hit Ratio", Valid: true},
-					value:   sql.NullFloat64{Float64: 100, Valid: true},
+					name:  sql.NullString{String: "Buffer Cache Hit Ratio", Valid: true},
+					value: sql.NullFloat64{Float64: 100, Valid: true},
 				}},
 			},
-			want: `{"metrics":{"buffer_cache_hit_ratio_2":100}}`,
+			want: `{"metrics":{"buffer_cache_hit_ratio":100}}`,
 		},
 	}
 	for _, tt := range tests {
