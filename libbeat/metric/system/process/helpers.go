@@ -32,11 +32,11 @@ func unixTimeMsToTime(unixTimeMs uint64) string {
 	return common.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
 }
 
-func stripNullByte(buf []byte) string { //nolint:deadcode,unused // used by platform-specific code
+func stripNullByte(buf []byte) string {
 	return string(buf[0 : len(buf)-1])
 }
 
-func stripNullByteRaw(buf []byte) []byte { //nolint:deadcode,unused // used by platform-specific code
+func stripNullByteRaw(buf []byte) []byte {
 	return buf[0 : len(buf)-1]
 }
 

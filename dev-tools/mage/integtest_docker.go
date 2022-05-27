@@ -472,7 +472,7 @@ func WriteDockerComposeEnvFile() (string, error) {
 	}
 
 	envFile := filepath.Join(esBeatsDir, "docker.env")
-	err = os.WriteFile( //nolint:gosec // File permissions are not a security risk.
+	err = os.WriteFile(
 		envFile,
 		[]byte(strings.Join(envFileContent, "\n")),
 		0644,

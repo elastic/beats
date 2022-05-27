@@ -7,7 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1" //nolint:gosec // Bad linter!
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"

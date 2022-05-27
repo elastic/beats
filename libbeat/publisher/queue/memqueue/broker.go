@@ -268,7 +268,6 @@ var ackChanPool = sync.Pool{
 }
 
 func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
 	ch.start = start
