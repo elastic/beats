@@ -34,6 +34,9 @@ func (e *sysmetricExtractor) calculateQuery() string {
 		e.patterns = make([]interface{}, 1)
 		e.patterns[0] = "%"
 	}
+
+	// System Metrics Long Duration (group_id = 2): 60 second interval
+	// Querying for Short Duration (15 seconds interval) will overload the system and may lead to performance issues.
 	query := "SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 AND METRIC_NAME LIKE :pattern0"
 	for i := 1; i < len(e.patterns); i++ {
 		query = query + " OR METRIC_NAME LIKE :pattern" + strconv.Itoa(i)

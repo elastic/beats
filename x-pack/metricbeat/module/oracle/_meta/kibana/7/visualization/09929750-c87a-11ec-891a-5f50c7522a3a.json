@@ -3,29 +3,7 @@
         "description": "",
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [
-                    {
-                        "$state": {
-                            "store": "appState"
-                        },
-                        "meta": {
-                            "alias": null,
-                            "disabled": false,
-                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "oracle.sysmetric.metrics.name",
-                            "negate": false,
-                            "params": {
-                                "query": "physical_writes_per_sec"
-                            },
-                            "type": "phrase"
-                        },
-                        "query": {
-                            "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "physical_writes_per_sec"
-                            }
-                        }
-                    }
-                ],
+                "filter": [],
                 "query": {
                     "language": "kuery",
                     "query": ""
@@ -59,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.value",
+                                "field": "oracle.sysmetric.metrics.physical_writes_per_sec",
                                 "id": "1f50728e-6c16-4543-b103-f35a4e37a415",
                                 "order": "desc",
                                 "size": 1,
@@ -101,16 +79,11 @@
     "references": [
         {
             "id": "metricbeat-*",
-            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-            "type": "index-pattern"
-        },
-        {
-            "id": "metricbeat-*",
             "name": "metrics_0_index_pattern",
             "type": "index-pattern"
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-12T08:59:57.550Z",
-    "version": "WzI1NTcsMV0="
+    "updated_at": "2022-05-27T05:52:44.264Z",
+    "version": "WzU3NTcsMV0="
 }

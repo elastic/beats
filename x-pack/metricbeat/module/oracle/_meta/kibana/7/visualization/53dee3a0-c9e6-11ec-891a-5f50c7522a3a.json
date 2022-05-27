@@ -12,16 +12,14 @@
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "oracle.sysmetric.metrics.name",
+                            "key": "_id",
                             "negate": false,
-                            "params": {
-                                "query": "average_active_sessions"
-                            },
-                            "type": "phrase"
+                            "type": "exists",
+                            "value": "exists"
                         },
                         "query": {
-                            "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "average_active_sessions"
+                            "exists": {
+                                "field": "_id"
                             }
                         }
                     }
@@ -74,7 +72,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.value",
+                                "field": "oracle.sysmetric.metrics.average_active_sessions",
                                 "id": "63e5475d-5d50-4796-a13a-1e53ebca3a5c",
                                 "order": "desc",
                                 "size": 1,
@@ -125,6 +123,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-12T08:54:57.335Z",
-    "version": "WzIyNDgsMV0="
+    "updated_at": "2022-05-27T06:05:31.886Z",
+    "version": "WzY0OTgsMV0="
 }
