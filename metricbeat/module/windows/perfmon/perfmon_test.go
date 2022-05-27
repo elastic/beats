@@ -27,7 +27,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -178,7 +177,7 @@ func TestNonExistingCounter(t *testing.T) {
 	}
 	handle, err := NewReader(config)
 	if assert.Error(t, err) {
-		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, err)
 	}
 
 	if handle != nil {
@@ -204,7 +203,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 	values, err := handle.Read()
 
 	if assert.Error(t, err) {
-		assert.EqualValues(t, pdh.PDH_NO_DATA, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_NO_DATA, err)
 	}
 
 	if handle != nil {
@@ -228,7 +227,7 @@ func TestNonExistingObject(t *testing.T) {
 	}
 	handle, err := NewReader(config)
 	if assert.Error(t, err) {
-		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, err)
 	}
 
 	if handle != nil {

@@ -25,7 +25,6 @@ import (
 	"testing"
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
 
@@ -198,7 +197,7 @@ func TestEventIterator(t *testing.T) {
 			assert.Zero(t, h)
 			if assert.Error(t, itr.Err()) {
 				assert.Contains(t, itr.Err().Error(), "try reducing the batch size")
-				assert.Equal(t, windows.RPC_S_INVALID_BOUND, errors.Cause(itr.Err()))
+				assert.ErrorIs(t, itr.Err(), windows.RPC_S_INVALID_BOUND)
 			}
 		})
 
