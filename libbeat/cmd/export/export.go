@@ -22,18 +22,18 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/version"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 type stdoutClient struct {
-	ver common.Version
+	ver libversion.V
 	f   *os.File
 }
 
 type fileClient struct {
-	ver common.Version
+	ver libversion.V
 	dir string
 }
 
@@ -56,7 +56,7 @@ func newStdoutClient(ver string) (*stdoutClient, error) {
 	if ver == "" {
 		ver = version.GetDefaultVersion()
 	}
-	v, err := common.NewVersion(ver)
+	v, err := libversion.New(ver)
 	if err != nil {
 		return nil, err
 	}
@@ -72,10 +72,10 @@ func newFileClient(dir string, ver string) (*fileClient, error) {
 		return nil, err
 	}
 	fmt.Println(fmt.Sprintf("Writing to directory %s", path))
-	return &fileClient{ver: *common.MustNewVersion(ver), dir: path}, nil
+	return &fileClient{ver: *libversion.MustNew(ver), dir: path}, nil
 }
 
-func (c *stdoutClient) GetVersion() common.Version {
+func (c *stdoutClient) GetVersion() libversion.V {
 	return c.ver
 }
 
@@ -84,7 +84,7 @@ func (c *stdoutClient) Write(_ string, _ string, body string) error {
 	return err
 }
 
-func (c *fileClient) GetVersion() common.Version {
+func (c *fileClient) GetVersion() libversion.V {
 	return c.ver
 }
 

@@ -26,9 +26,9 @@ import (
 	errw "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // ImportDashboards tries to import the kibana dashboards.
@@ -97,6 +97,6 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields mapstr.M) erro
 	return nil
 }
 
-func isKibanaAPIavailable(version common.Version) bool {
+func isKibanaAPIavailable(version version.V) bool {
 	return (version.Major == 5 && version.Minor >= 6) || version.Major >= 6
 }

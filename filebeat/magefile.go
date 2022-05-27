@@ -31,14 +31,16 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import generate
+	//mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	//mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 )
 
 func init() {
@@ -51,6 +53,11 @@ func init() {
 // Build builds the Beat binary.
 func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
+}
+
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+func BuildSystemTestBinary() error {
+	return devtools.BuildSystemTestBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside the golang-builder.
@@ -189,35 +196,13 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
-// GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
+// GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	runner, err := devtools.NewDockerIntegrationRunner()
-	if err != nil {
-		return err
-	}
-	return runner.Test("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	})
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
-// Use GENERATE=true to generate expected log files.
-// Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.
-// Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
+// PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
-	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields, Dashboards)
-	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
-	if err != nil {
-		return err
-	}
-	return runner.Test("pythonIntegTest", func() error {
-		mg.Deps(devtools.BuildSystemTestBinary)
-		args := devtools.DefaultPythonTestIntegrationArgs()
-		args.Env["MODULES_PATH"] = devtools.CWD("module")
-		return devtools.PythonTest(args)
-	})
+	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
+	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }

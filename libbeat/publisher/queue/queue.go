@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -112,14 +111,14 @@ type ProducerConfig struct {
 type Producer interface {
 	// Publish adds an event to the queue, blocking if necessary, and returns
 	// true on success.
-	Publish(event publisher.Event) bool
+	Publish(event interface{}) bool
 
 	// TryPublish adds an event to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
 	// configuration. Returns true if the event was successfully added, false
 	// otherwise.
-	TryPublish(event publisher.Event) bool
+	TryPublish(event interface{}) bool
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
 	// drop its events on Cancel, the number of dropped events is returned.
@@ -132,6 +131,7 @@ type Producer interface {
 // Batch of events to be returned to Consumers. The `ACK` method will send the
 // ACK signal to the queue.
 type Batch interface {
-	Events() []publisher.Event
+	Count() int
+	Event(i int) interface{}
 	ACK()
 }

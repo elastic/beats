@@ -125,7 +125,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		"user.id":             "0",
 		"user.name":           "root",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 		"related.ip":          []string{localIP, remoteIP},
 		"related.user":        []string{"root"},
 	} {
@@ -253,7 +253,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"process.name":        "curl",
 		"user.id":             "501",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -295,7 +295,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"network.transport": "tcp",
 		"network.type":      "ipv4",
 		"event.type":        []string{"info", "connection"},
-		"event.category":    []string{"network", "network_traffic"},
+		"event.category":    []string{"network"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -389,7 +389,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -461,7 +461,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 	} {
 		assertValue(t, flow, expected, field)
 	}

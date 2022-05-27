@@ -20,6 +20,7 @@ package leader
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,12 +47,29 @@ type Leader struct {
 	Leader    string                 `json:"leader"`
 }
 
-func eventMapping(content []byte) mapstr.M {
+func eventsMapping(r mb.ReporterV2, content []byte) {
 	var data Leader
-	json.Unmarshal(content, &data)
-	event := mapstr.M{
-		"followers": data.Followers,
-		"leader":    data.Leader,
+	_ = json.Unmarshal(content, &data)
+
+	for id, follower := range data.Followers {
+		event := eventMapping(id, data, follower)
+		r.Event(event)
 	}
-	return event
+}
+
+func eventMapping(id string, leader Leader, follower FollowersID) mb.Event {
+	return mb.Event{
+		MetricSetFields: mapstr.M{
+			"follower": mapstr.M{
+				"id": id,
+				"latency": mapstr.M{
+					"ms": follower.Latency.Current,
+				},
+				"success_operations": follower.Counts.Success,
+				"failed_operations":  follower.Counts.Fail,
+				"leader":             leader.Leader,
+			},
+		},
+		ModuleFields: mapstr.M{"api_version": apiVersion},
+	}
 }

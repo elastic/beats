@@ -17,8 +17,6 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher"
-
 type queueEntry struct {
 	event  interface{}
 	client clientState
@@ -36,7 +34,7 @@ func newBatchBuffer(sz int) *batchBuffer {
 	return b
 }
 
-func (b *batchBuffer) add(event *publisher.Event, st clientState) {
+func (b *batchBuffer) add(event interface{}, st clientState) {
 	b.entries = append(b.entries, queueEntry{event, st})
 }
 

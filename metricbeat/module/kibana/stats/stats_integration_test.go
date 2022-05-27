@@ -28,9 +28,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
@@ -40,7 +40,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("stats", service.Host())
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("stats", service.Host())
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestData(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {
+func getKibanaVersion(t *testing.T, kibanaHostPort string) (*version.V, error) {
 	resp, err := http.Get("http://" + kibanaHostPort + "/" + kibana.StatusPath)
 	if err != nil {
 		return nil, err
@@ -100,11 +100,11 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, err
 		return nil, err
 	}
 
-	version, err := data.GetValue("version.number")
+	v, err := data.GetValue("version.number")
 	if err != nil {
 		t.Log("Kibana GET /"+kibana.StatusPath+" response:", string(body))
 		return nil, err
 	}
 
-	return common.NewVersion(version.(string))
+	return version.New(v.(string))
 }

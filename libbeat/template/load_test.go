@@ -23,8 +23,8 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -239,8 +239,8 @@ func newFileClient(ver string) *fileClient {
 	return &fileClient{ver: ver}
 }
 
-func (c *fileClient) GetVersion() common.Version {
-	return *common.MustNewVersion(c.ver)
+func (c *fileClient) GetVersion() version.V {
+	return *version.MustNew(c.ver)
 }
 
 func (c *fileClient) Write(component string, name string, body string) error {
