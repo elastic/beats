@@ -20,7 +20,6 @@ package diskqueue
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -83,12 +82,12 @@ eventLoop:
 // diskQueueBatch implementation of the queue.Batch interface
 //
 
-func (batch *diskQueueBatch) Events() []publisher.Event {
-	events := make([]publisher.Event, len(batch.frames))
-	for i, frame := range batch.frames {
-		events[i] = frame.event
-	}
-	return events
+func (batch *diskQueueBatch) Count() int {
+	return len(batch.frames)
+}
+
+func (batch *diskQueueBatch) Event(i int) interface{} {
+	return batch.frames[i].event
 }
 
 func (batch *diskQueueBatch) ACK() {
