@@ -31,15 +31,15 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 const (

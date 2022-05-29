@@ -21,17 +21,19 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"testing"
+	gotest "testing"
 
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
+
+	libtesting "github.com/elastic/elastic-agent-libs/testing"
 )
 
 func init() {
 	color.NoColor = true
 }
 
-func TestConsoleDriverInfo(t *testing.T) {
+func TestConsoleDriverInfo(t *gotest.T) {
 	buffer, output, driver := createDriver(nil)
 
 	driver.Info("field", "value")
@@ -40,7 +42,7 @@ func TestConsoleDriverInfo(t *testing.T) {
 	assert.Equal(t, buffer.String(), "field: value\n")
 }
 
-func TestConsoleDriverWarn(t *testing.T) {
+func TestConsoleDriverWarn(t *gotest.T) {
 	buffer, output, driver := createDriver(nil)
 
 	driver.Warn("warning", "you got a warning")
@@ -49,7 +51,7 @@ func TestConsoleDriverWarn(t *testing.T) {
 	assert.Equal(t, buffer.String(), "warning... WARN you got a warning\n")
 }
 
-func TestConsoleDriverError(t *testing.T) {
+func TestConsoleDriverError(t *gotest.T) {
 	buffer, output, driver := createDriver(nil)
 
 	err := errors.New("This is an error")
@@ -61,7 +63,7 @@ func TestConsoleDriverError(t *testing.T) {
 	assert.Equal(t, buffer.String(), "no error... OK\nerror... ERROR This is an error\n")
 }
 
-func TestConsoleDriverFatal(t *testing.T) {
+func TestConsoleDriverFatal(t *gotest.T) {
 	var killed bool
 	buffer, output, driver := createDriver(func() { killed = true })
 
@@ -75,11 +77,11 @@ func TestConsoleDriverFatal(t *testing.T) {
 	assert.Equal(t, buffer.String(), "no error... OK\nerror... ERROR This is an error\n")
 }
 
-func TestConsoleDriverRun(t *testing.T) {
+func TestConsoleDriverRun(t *gotest.T) {
 	buffer, output, driver := createDriver(nil)
 
 	var called bool
-	driver.Run("test", func(d Driver) {
+	driver.Run("test", func(d libtesting.Driver) {
 		called = true
 	})
 
@@ -88,10 +90,10 @@ func TestConsoleDriverRun(t *testing.T) {
 	assert.Equal(t, buffer.String(), "test...OK\n")
 }
 
-func TestConsoleDriverResult(t *testing.T) {
+func TestConsoleDriverResult(t *gotest.T) {
 	buffer, output, driver := createDriver(nil)
 
-	driver.Run("test", func(d Driver) {
+	driver.Run("test", func(d libtesting.Driver) {
 		d.Result("This is a multiline\nresult")
 	})
 
@@ -99,12 +101,12 @@ func TestConsoleDriverResult(t *testing.T) {
 	assert.Equal(t, buffer.String(), "test...OK\n  result: \n   This is a multiline\n   result\n\n")
 }
 
-func TestConsoleDriverRunWithReports(t *testing.T) {
+func TestConsoleDriverRunWithReports(t *gotest.T) {
 	buffer, output, driver := createDriver(nil)
 
 	var called bool
 	err := errors.New("This is an error")
-	driver.Run("test", func(d Driver) {
+	driver.Run("test", func(d libtesting.Driver) {
 		called = true
 		d.Info("field", "value")
 		d.Error("error", err)

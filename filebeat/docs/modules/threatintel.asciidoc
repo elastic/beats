@@ -11,7 +11,6 @@ This file is generated! See scripts/docs_collector.py
 :has-dashboards: true
 
 == Threat Intel module
-beta[]
 
 This module ingests data from a collection of different threat intelligence
 sources. The ingested data is meant to be used with

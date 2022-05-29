@@ -18,14 +18,11 @@
 package mtest
 
 // GetConfig returns config for kibana module
-func GetConfig(metricset string, host string, xpackEnabled bool) map[string]interface{} {
+func GetConfig(metricset string, host string) map[string]interface{} {
 	config := map[string]interface{}{
 		"module":     "kibana",
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},
-	}
-	if xpackEnabled {
-		config["xpack.enabled"] = true
 	}
 
 	return config

@@ -241,3 +241,16 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.3 branch
+    conditions:
+      - merged
+      - label=backport-v8.3.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.3"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

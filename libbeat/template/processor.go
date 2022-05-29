@@ -23,25 +23,25 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // DefaultField controls the default value for the default_field flag.
 const DefaultField = false
 
 var (
-	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
-	minVersionHistogram               = common.MustNewVersion("7.6.0")
-	minVersionWildcard                = common.MustNewVersion("7.9.0")
-	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
-	minVersionMatchOnlyText           = common.MustNewVersion("7.14.0")
+	minVersionFieldMeta               = version.MustNew("7.6.0")
+	minVersionHistogram               = version.MustNew("7.6.0")
+	minVersionWildcard                = version.MustNew("7.9.0")
+	minVersionExplicitDynamicTemplate = version.MustNew("7.13.0")
+	minVersionMatchOnlyText           = version.MustNew("7.14.0")
 )
 
 // Processor struct to process fields to template
 type Processor struct {
-	EsVersion       common.Version
+	EsVersion       version.V
 	Migration       bool
 	ElasticLicensed bool
 
