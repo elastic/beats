@@ -40,9 +40,9 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := rabbitmq.NewMetricSet(base, rabbitmq.ShovelsPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create the metric set: %w", err)
 	}
-	return &MetricSet{ms}, fmt.Errorf("failed to create the metric set: %w", err)
+	return &MetricSet{ms}, nil
 }
 
 // Fetch fetches shovel data
