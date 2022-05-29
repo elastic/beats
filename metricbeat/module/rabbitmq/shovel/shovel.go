@@ -42,7 +42,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{ms}, nil
+	return &MetricSet{ms}, fmt.Errorf("failed to create the metric set: %w", err)
 }
 
 // Fetch fetches shovel data
