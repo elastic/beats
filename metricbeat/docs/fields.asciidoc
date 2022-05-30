@@ -56665,6 +56665,67 @@ type: long
 
 --
 
+[float]
+=== shovel
+
+shovel
+
+
+
+*`rabbitmq.shovel.name`*::
++
+--
+The name of the shovel with non-ASCII characters escaped as in C.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.vhost`*::
++
+--
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+type: alias
+
+alias to: rabbitmq.vhost
+
+--
+
+*`rabbitmq.shovel.node`*::
++
+--
+Node name.
+
+
+type: alias
+
+alias to: rabbitmq.node.name
+
+--
+
+*`rabbitmq.shovel.state`*::
++
+--
+The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.type`*::
++
+--
+The type of the shovel. Either 'static' or 'dynamic'.
+
+
+type: keyword
+
+--
+
 [[exported-fields-redis]]
 == Redis fields
 

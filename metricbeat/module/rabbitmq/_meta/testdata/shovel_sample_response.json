@@ -1,0 +1,9 @@
+[
+    {
+        "name": "testshovel",
+        "vhost": "/",
+        "type": "dynamic",
+        "state": "running",
+        "node": "rabbit@localhost"
+    }
+]
