@@ -56,7 +56,7 @@ docker build -t metricbeat-debugger-image -f Dockerfile.debug .
 3. run container
 
 ```bash
-docker run -p 56268:56268 --network elastic-package-stack_default metricbeat-debugger-image
+docker run -p 56268:56268 --network elastic-package-stack_default -v $(pwd)/metric.docker.yml:/usr/share/metricbeat/metricbeat.yml metricbeat-debugger-image -c /usr/share/metricbeat/metricbeat.yml -e
 ```
 
 4. Run debugger from VisualStudio Code via `.vscode/launch.json`. Remember to add first some breakpoints

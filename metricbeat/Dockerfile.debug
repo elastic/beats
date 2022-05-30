@@ -8,7 +8,6 @@ RUN apk add --no-cache git
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.3
 
 COPY metricbeat /usr/share/beats/metricbeat
-COPY metricbeat.yml /usr/share/beats/metricbeat.yml
 
 FROM alpine:3.15
 
@@ -22,7 +21,6 @@ ENV ELASTICSEARCH_HOST=elasticsearch
 
 COPY --from=builder /go/bin/dlv /go/bin/dlv
 COPY --from=builder /usr/share/beats/metricbeat /usr/share/beats/metricbeat
-COPY --from=builder /usr/share/beats/metricbeat.yml /usr/share/beats/metricbeat.yml
 
 ENTRYPOINT ["dlv", "--headless=true", "--listen=:56268", "--api-version=2", "--log", "exec", "./metricbeat", "--"]
-CMD [ "-c", "./metricbeat.yml", "-e" ]
+CMD [ "-e" ]
