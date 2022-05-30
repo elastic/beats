@@ -6,6 +6,8 @@
   #  - node
   #  - queue
   #  - connection
+  #  - exchange
+  #  - shovel
   period: 10s
   hosts: ["localhost:15672"]
   #username: guest
