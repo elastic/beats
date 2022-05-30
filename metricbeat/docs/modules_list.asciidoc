@@ -253,10 +253,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-prometheus-query,query>>   
 |<<metricbeat-metricset-prometheus-remote_write,remote_write>>   
 |<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
+.5+| .5+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
 |<<metricbeat-metricset-rabbitmq-exchange,exchange>>   
 |<<metricbeat-metricset-rabbitmq-node,node>>   
 |<<metricbeat-metricset-rabbitmq-queue,queue>>   
+|<<metricbeat-metricset-rabbitmq-shovel,shovel>> beta[]  
 |<<metricbeat-module-redis,Redis>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-key,key>>   
