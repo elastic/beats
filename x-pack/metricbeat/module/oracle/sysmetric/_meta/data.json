@@ -1,31 +1,26 @@
 {
-    "@timestamp": "2022-05-04T09:13:07.676Z",
+    "@timestamp": "2022-05-27T02:18:55.112Z",
     "event": {
         "dataset": "oracle.sysmetric",
         "module": "oracle",
-        "duration": 99066790
+        "duration": 408974115
     },
     "metricset": {
         "name": "sysmetric",
-        "period": 10000
+        "period": 60000
     },
     "oracle": {
         "sysmetric": {
             "metrics": {
-                "metric_id": 2143,
-                "end_time": "2022-05-04T09:12:30Z",
-                "group_id": 2,
-                "metric_unit": "Sessions",
-                "container_id": 0,
-                "begin_time": "2022-05-04T09:11:30Z",
-                "interval_size_csec": 6001,
-                "name": "session_count",
-                "value": 76
+                "physical_write_total_bytes_per_sec": 15323.3127812031,
+                "total_table_scans_per_txn": 40,
+                "physical_read_total_bytes_per_sec": 40680.153307782,
+                "total_pga_allocated": 2.364416e+08
             }
         }
     },
     "service": {
-        "type": "oracle",
-        "address": "oracle://localhost:1521/ORCLCDB.localdomain"
+        "address": "oracle://localhost:1521/ORCLCDB.localdomain",
+        "type": "oracle"
     }
 }

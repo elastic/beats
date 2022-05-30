@@ -1,6 +1,6 @@
 `sysmetric` Metricset includes the system metric values captured for the most current time interval from Oracle System View.
 
-This metricset dynamically filters metrics based on given input patterns. These patterns can be keywords or regular expressions. The `sysmetric` metricset uses the `OR` operator when forming the SQL query internally. Refer https://docs.oracle.com/cd/B12037_01/server.101/b10759/conditions016.htm[here] for more details.
+This metricset dynamically filters metrics based on given input patterns. These patterns can be keywords or regular expressions. The `sysmetric` metricset uses the `OR` operator when forming the SQL query internally. Refer https://docs.oracle.com/cd/B12037_01/server.101/b10759/conditions016.htm[here] for more details. `V$SYSMETRIC` table provides different metrics for a short duration (15 seconds, `GROUP_ID` 3) and a long duration (60 seconds, `GROUP_ID` 2). This metricset collects metrics which have `GROUP_ID` 2 i.e. the metrics that are queried for long-duration for DBAs to use the data for historical analysis.
 
 [float]
 === Required database access
@@ -10,45 +10,27 @@ To ensure that the module has access to the appropriate metrics, the module requ
 * V$SYSMETRIC
 
 [float]
-=== Description of fields
-
-* *metrics.begin_time*: Begin time of the interval.
-* *metrics.container_id*: The ID of the container to which the data pertains.
-* *metrics.end_time*: End time of the interval.
-* *metrics.group_id*: Metric group ID.
-* *metrics.interval_size_csec*: Interval size (in hundredths of a second).
-* *metrics.metric_id*: Metric ID.
-* *metrics.metric_unit*: Metric unit description.
-* *metrics.name*: Metric name.
-* *metrics.value*: Metric value.
-
-[float]
 === Example event
 
 ----
 {
-  "@timestamp": "2022-04-19T11:32:48.252Z",
+  "@timestamp": "2022-05-27T02:18:55.112Z",
   "event": {
-    "duration": 2953295950,
     "dataset": "oracle.sysmetric",
-    "module": "oracle"
+    "module": "oracle",
+    "duration": 408974115
   },
   "metricset": {
     "name": "sysmetric",
-    "period": 600000
+    "period": 60000
   },
   "oracle": {
     "sysmetric": {
       "metrics": {
-        "begin_time": "2022-04-19T11:31:26Z",
-        "end_time": "2022-04-19T11:32:26Z",
-        "metric_id": 2151,
-        "interval_size_csec": 6041,
-        "container_id": 0,
-        "group_id": 2,
-        "value": 0,
-        "name": "Replayed user calls",
-        "metric_unit": "calls"
+        "physical_write_total_bytes_per_sec": 15323.3127812031,
+        "total_table_scans_per_txn": 40,
+        "physical_read_total_bytes_per_sec": 40680.153307782,
+        "total_pga_allocated": 2.364416e+08
       }
     }
   },

@@ -22,12 +22,14 @@ func TestSysmetricExtractorCalculateQuery(t *testing.T) {
 		want   string
 	}{
 		{
+			// Checks if query is generated properly for given array of patterns.
 			fields{
 				patterns: patterns,
 			},
 			"SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 AND METRIC_NAME LIKE :pattern0 OR METRIC_NAME LIKE :pattern1 OR METRIC_NAME LIKE :pattern2",
 		},
 		{
+			// Checks if query is generated properly if patterns are not given.
 			fields{},
 			"SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 AND METRIC_NAME LIKE :pattern0",
 		},
