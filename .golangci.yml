@@ -71,7 +71,7 @@ linters-settings:
     # See https://github.com/kisielk/errcheck#excluding-functions for details.
     exclude-functions:
       - (mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
-      - (mapstr.M).Put # Can only fail on type conversations, usually safe to ignore.
+      - (mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
 
   errorlint:
     # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
