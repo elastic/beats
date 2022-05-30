@@ -204,5 +204,9 @@ func GoIntegTest(ctx context.Context) error {
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
-	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+	// Allow connecting to older versions in tests. There can be a delay producing the snapshot
+	// images for the next release after a feature freeze, which causes temporary test failures.
+	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
+	args.Env["TESTING_FILEBEAT_ALLOW_OLDER"] = "1"
+	return devtools.PythonIntegTestFromHost(args)
 }
