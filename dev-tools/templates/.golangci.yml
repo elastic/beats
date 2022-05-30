@@ -98,7 +98,7 @@ linters-settings:
             recommendations:
               - errors
               - fmt
-            reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+            reason: "This package is deprecated, use fmt.Errorf with %%w instead"
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
