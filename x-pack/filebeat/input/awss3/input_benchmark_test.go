@@ -11,8 +11,13 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -21,10 +26,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -93,7 +95,7 @@ func (c *s3PagerConstant) Err() error {
 	return nil
 }
 
-func newS3PagerConstant() *s3PagerConstant {
+func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	lastModified := time.Now()
 	ret := &s3PagerConstant{
 		currentIndex: 0,
@@ -101,7 +103,7 @@ func newS3PagerConstant() *s3PagerConstant {
 
 	for i := 0; i < totalListingObjects; i++ {
 		ret.objects = append(ret.objects, s3.Object{
-			Key:          aws.String(fmt.Sprintf("key-%d.json.gz", i)),
+			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%d", i)),
 			LastModified: aws.Time(lastModified),
 		})
@@ -258,8 +260,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics(metricRegistry, "test_id")
-		s3API := newConstantS3(t)
-		s3API.pagerConstant = newS3PagerConstant()
+
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
 			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
@@ -272,32 +273,46 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		if err != nil {
 			t.Fatalf("Failed to access store: %v", err)
 		}
-
-		err = store.Set(awsS3WriteCommitPrefix+"bucket", &commitWriteState{time.Time{}})
-		if err != nil {
-			t.Fatalf("Failed to reset store: %v", err)
-		}
-
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", "key-", "region", "provider", numberOfWorkers, time.Second)
-
+		s3APIs := make([]*constantS3, 0, 5)
+		b.ResetTimer()
+		start := time.Now()
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.s3ObjectsAckedTotal.Get() < totalListingObjects {
+			for metrics.s3ObjectsAckedTotal.Get() < 5*totalListingObjects {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
 		}()
 
-		b.ResetTimer()
-		start := time.Now()
-		if err := s3Poller.Poll(ctx); err != nil {
-			if !errors.Is(err, context.DeadlineExceeded) {
-				t.Fatal(err)
-			}
+		wg := new(sync.WaitGroup)
+		for i := 0; i < 5; i++ {
+			wg.Add(1)
+			go func(i int, wg *sync.WaitGroup) {
+				defer wg.Done()
+				listPrefix := fmt.Sprintf("list_prefix_%d", i)
+				s3API := newConstantS3(t)
+				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+				s3APIs = append(s3APIs, s3API)
+				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
+				if err != nil {
+					t.Fatalf("Failed to reset store: %v", err)
+				}
+
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
+
+				if err := s3Poller.Poll(ctx); err != nil {
+					if !errors.Is(err, context.DeadlineExceeded) {
+						t.Fatal(err)
+					}
+				}
+			}(i, wg)
 		}
+
+		wg.Wait()
+
 		b.StopTimer()
 		elapsed := time.Since(start)
 
