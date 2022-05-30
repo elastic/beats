@@ -54386,90 +54386,150 @@ Sysmetric related metrics.
 
 
 
-*`oracle.sysmetric.metrics.begin_time`*::
+*`oracle.sysmetric.metrics.session_count`*::
 +
 --
-Begin time of the interval.
-
-
-type: date
-
---
-
-*`oracle.sysmetric.metrics.container_id`*::
-+
---
-Container ID.
+Session Count.
 
 
 type: long
 
 --
 
-*`oracle.sysmetric.metrics.end_time`*::
+*`oracle.sysmetric.metrics.average_active_sessions`*::
 +
 --
-End time of the interval.
+Average Active Sessions.
 
 
-type: date
+type: double
 
 --
 
-*`oracle.sysmetric.metrics.group_id`*::
+*`oracle.sysmetric.metrics.current_os_load`*::
 +
 --
-Metric group ID.
+Current OS Load.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.physical_reads_per_sec`*::
++
+--
+Physical Reads Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.user_transaction_per_sec`*::
++
+--
+User Transaction Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.total_table_scans_per_txn`*::
++
+--
+Total Table Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.physical_writes_per_sec`*::
++
+--
+Physical Writes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.total_index_scans_per_txn`*::
++
+--
+Total Index Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.host_cpu_utilization_pct`*::
++
+--
+Host CPU Utilization (%).
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.network_traffic_volume_per_sec`*::
++
+--
+Network Traffic Volume Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.metrics.user_rollbacks_per_sec`*::
++
+--
+User Rollbacks Per Second.
 
 
 type: long
 
 --
 
-*`oracle.sysmetric.metrics.interval_size_csec`*::
+*`oracle.sysmetric.metrics.cpu_usage_per_sec`*::
 +
 --
-Interval size (in hundredths of a second).
+CPU Usage Per Second.
 
 
-type: long
+type: double
 
 --
 
-*`oracle.sysmetric.metrics.metric_id`*::
+*`oracle.sysmetric.metrics.db_block_changes_per_sec`*::
 +
 --
-Metric ID.
+DB Block Changes Per Second.
 
 
-type: long
+type: double
 
 --
 
-*`oracle.sysmetric.metrics.metric_unit`*::
+*`oracle.sysmetric.metrics.physical_read_total_bytes_per_sec`*::
 +
 --
-Description of metric unit.
+Physical Read Total Bytes Per Second.
 
 
-type: keyword
+type: double
 
 --
 
-*`oracle.sysmetric.metrics.name`*::
+*`oracle.sysmetric.metrics.response_time_per_txn`*::
 +
 --
-Metric name.
-
-
-type: keyword
-
---
-
-*`oracle.sysmetric.metrics.value`*::
-+
---
-Metric value.
+Response Time Per Transaction.
 
 
 type: double
