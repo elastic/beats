@@ -40,6 +40,9 @@ pipeline {
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
+  parameters {
+    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets.')
+  }
   stages {
     stage('Filter build') {
       options { skipDefaultCheckout() }
@@ -102,6 +105,9 @@ pipeline {
         }
         stage('Run E2E Tests for Packages'){
           options { skipDefaultCheckout() }
+          when {
+            expression { return params.run_e2e }
+          }
           steps {
             runE2ETests()
           }
