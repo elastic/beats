@@ -41,7 +41,7 @@ pipeline {
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
-    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets.')
+    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets. This workaround will generate broken/buggy binaries.')
   }
   stages {
     stage('Filter build') {
