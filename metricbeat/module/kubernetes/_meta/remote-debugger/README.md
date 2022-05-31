@@ -1,8 +1,10 @@
 # README
 
-This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with VisualStudioCode
+This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with VisualStudioCode. Other IDE can be used, here we only provide instructions for VisulStudioCode.
 
 A common requirement for both remote debugging in docker or kubernetes is to have a file `.vscode/launch.json` on your local machine. 
+
+Important Notice: Replace `<absolute path>` in the following config with the absolute path of the root folder.
 
 ```json
 {
@@ -22,8 +24,7 @@ A common requirement for both remote debugging in docker or kubernetes is to hav
             "substitutePath": [
                 { 
 	                "from": "${workspaceFolder}",
-					# NOTE: REPLACE `<absolute path>` with the absolute path of the root folder
-                    "to": "<absolute path>"     
+					"to": "<absolute path>"     
                 }
             ]
         }
@@ -92,7 +93,7 @@ kind load docker-image --name kind-v1.23.5 metricbeat-debugger-image:latest
 
 4. Edit `deploy/kubernetes/metricbeat-kubernetes.yaml` with these changes
 
-```json
+```yaml
 containers:
 - name: metricbeat
   # image: docker.elastic.co/beats/metricbeat:8.2.0
