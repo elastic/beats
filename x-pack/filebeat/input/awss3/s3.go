@@ -130,8 +130,7 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 			errs = append(errs,
 				fmt.Errorf(
 					fmt.Sprintf("failed processing S3 event for object key %q in bucket %q: %%w",
-						event.S3.Object.Key, event.S3.Bucket.Name
-					),
+						event.S3.Object.Key, event.S3.Bucket.Name),
 					err))
 
 			p.handlePurgingLock(info, false)
