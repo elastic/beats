@@ -47,3 +47,17 @@ type getResponse struct {
 }
 
 type batchAckMsg struct{}
+
+// Metrics API
+
+type metricsRequest struct {
+	responseChan chan memQueueMetrics
+}
+
+// memQueueMetrics tracks metrics that are returned by the individual memory queue implementations
+type memQueueMetrics struct {
+	// the size of items in the queue
+	currentQueueSize int
+	// the number of items that have been read by a consumer but not yet ack'ed
+	occupiedRead int
+}
