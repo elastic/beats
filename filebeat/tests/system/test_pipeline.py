@@ -43,15 +43,19 @@ class Test(BaseTest):
             pass
         self.wait_until(lambda: not self.es.indices.exists(index_name))
 
+        elasticsearch_config = {
+            'host': self.elasticsearch_url,
+            'pipeline': "estest",
+            'index': index_name,
+            'user': os.getenv("ES_USER"),
+            'pass': os.getenv("ES_PASS")
+        }
+        if os.getenv("TESTING_FILEBEAT_ALLOW_OLDER"):
+            elasticsearch_config["allow_older_versions"] = "true"
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            elasticsearch={
-                'host': self.elasticsearch_url,
-                'pipeline': "estest",
-                'index': index_name,
-                'user': os.getenv("ES_USER"),
-                'pass': os.getenv("ES_PASS")
-            },
+            elasticsearch=elasticsearch_config,
             pipeline="test",
             setup_template_name=index_name,
             setup_template_pattern=index_name + "*",
