@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -75,6 +76,12 @@ type broker struct {
 	// Pipeline.observer.queueACKed(), which updates the beats registry
 	// if needed.
 	ackListener queue.ACKListener
+
+	// This channel is used to request/return metrics where such metrics require insight into
+	// the actual eventloop itself. This seems like it might be overkill, but it seems that
+	// all communication between the broker and the eventloops
+	// happens via channels, so we're doing it this way.
+	metricChan chan metricsRequest
 
 	// wait group for worker shutdown
 	wg sync.WaitGroup
@@ -184,6 +191,7 @@ func NewQueue(
 		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,
+		metricChan:  make(chan metricsRequest),
 	}
 
 	var eventLoop interface {
@@ -249,7 +257,21 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 }
 
 func (b *broker) Metrics() (queue.Metrics, error) {
-	return queue.Metrics{}, queue.ErrMetricsNotImplemented
+
+	responseChan := make(chan memQueueMetrics, 1)
+	select {
+	case <-b.done:
+		return queue.Metrics{}, io.EOF
+	case b.metricChan <- metricsRequest{
+		responseChan: responseChan}:
+	}
+	resp := <-responseChan
+
+	return queue.Metrics{
+		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
+		EventLimit:            opt.UintWith(uint64(b.bufSize)),
+		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
+	}, nil
 }
 
 var ackChanPool = sync.Pool{
