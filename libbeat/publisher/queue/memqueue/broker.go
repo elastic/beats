@@ -261,7 +261,7 @@ var ackChanPool = sync.Pool{
 }
 
 func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	ch, _ := ackChanPool.Get().(*batchACKState)
+	ch := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
 	ch.start = start
 	ch.count = count

@@ -21,7 +21,7 @@ import (
 	dsa2 "crypto/dsa" //nolint:staticcheck // we need to calculate DSA stuff for completeness
 	"crypto/ecdsa"
 	"crypto/rsa"
-	"crypto/sha1" //nolint:gosec // we need to use sha1 here
+	"crypto/sha1"
 	"crypto/sha256"
 	cryptoTLS "crypto/tls"
 	"crypto/x509"
@@ -64,7 +64,6 @@ func AddCertMetadata(fields mapstr.M, certs []*x509.Certificate) {
 	serverFields := mapstr.M{"x509": x509Fields}
 	tlsFields := mapstr.M{"server": serverFields}
 
-	//nolint:gosec // we need to use sha1 here
 	_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
 	_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
 
