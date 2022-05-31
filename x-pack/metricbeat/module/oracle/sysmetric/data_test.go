@@ -21,7 +21,7 @@ func TestMetricSetTransform(t *testing.T) {
 					value: sql.NullFloat64{Float64: 100, Valid: true},
 				}},
 			},
-			want: `{"metrics":{"buffer_cache_hit_ratio":100}}`,
+			want: `{"buffer_cache_hit_ratio":100}`,
 		},
 	}
 	for _, tt := range tests {
