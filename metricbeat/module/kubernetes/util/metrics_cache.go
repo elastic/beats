@@ -24,7 +24,7 @@ import (
 )
 
 // PerfMetrics stores known metrics from Kubernetes nodes and containers
-var PerfMetrics = NewPerfMetricsCache()
+var PerfMetrics = NewPerfMetricsCache(0)
 
 func init() {
 	PerfMetrics.Start()
@@ -33,13 +33,18 @@ func init() {
 const defaultTimeout = 120 * time.Second
 
 // NewPerfMetricsCache initializes and returns a new PerfMetricsCache
-func NewPerfMetricsCache() *PerfMetricsCache {
-	return &PerfMetricsCache{
-		NodeMemAllocatable:   newValueMap(defaultTimeout),
-		NodeCoresAllocatable: newValueMap(defaultTimeout),
+func NewPerfMetricsCache(timeout time.Duration) *PerfMetricsCache {
+	if timeout <= 0 {
+		timeout = defaultTimeout
+	}
 
-		ContainerMemLimit:   newValueMap(defaultTimeout),
-		ContainerCoresLimit: newValueMap(defaultTimeout),
+	return &PerfMetricsCache{
+		Timeout: timeout,
+		NodeMemAllocatable:   newValueMap(timeout),
+		NodeCoresAllocatable: newValueMap(timeout),
+
+		ContainerMemLimit:   newValueMap(timeout),
+		ContainerCoresLimit: newValueMap(timeout),
 	}
 }
 
@@ -50,6 +55,8 @@ type PerfMetricsCache struct {
 
 	ContainerMemLimit   *valueMap
 	ContainerCoresLimit *valueMap
+
+	Timeout time.Duration
 }
 
 // Start cache workers
@@ -97,6 +104,10 @@ func (m *valueMap) GetWithDefault(name string, def float64) float64 {
 // Set value
 func (m *valueMap) Set(name string, val float64) {
 	m.cache.PutWithTimeout(name, val, m.timeout)
+}
+
+func (m *valueMap) SetWithTimeout(name string, val float64, timeout time.Duration) {
+	m.cache.PutWithTimeout(name, val, timeout)
 }
 
 // Start cache workers
