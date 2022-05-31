@@ -6281,11 +6281,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.2.4
+Version: v0.2.5
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.5/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -23704,11 +23704,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.5.7
+Version: v1.5.11
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.7/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.11/LICENSE:
 
 
                                  Apache License
@@ -38543,11 +38543,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : gopkg.in/yaml.v3
-Version: v3.0.0-20210107192922-496545a6307b
+Version: v3.0.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b/LICENSE:
+Contents of probable licence file $GOMODCACHE/gopkg.in/yaml.v3@v3.0.1/LICENSE:
 
 
 This project is covered by two different licenses: MIT and Apache.
