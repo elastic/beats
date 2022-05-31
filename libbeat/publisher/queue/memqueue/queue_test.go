@@ -76,7 +76,7 @@ func TestProduceConsumer(t *testing.T) {
 	t.Run("flush", testWith(makeTestQueue(bufferSize, batchSize/2, 100*time.Millisecond)))
 }
 
-func TestQueueMetrics(t *testing.T) {
+func TestQueueMetricsDirect(t *testing.T) {
 	eventsToTest := 5
 	maxEvents := 10
 
@@ -89,6 +89,11 @@ func TestQueueMetrics(t *testing.T) {
 	t.Logf("Testing directEventLoop")
 	queueTestWithSettings(t, directSettings, eventsToTest, "directEventLoop")
 
+}
+
+func TestQueueMetricsBuffer(t *testing.T) {
+	eventsToTest := 5
+	maxEvents := 10
 	// Test Buffered Event Loop
 	bufferedSettings := Settings{
 		Events:         maxEvents,
@@ -131,7 +136,7 @@ func queueMetricsAreValid(t *testing.T, q queue.Queue, evtCount, evtLimit, occup
 	assert.NilError(t, err, "error calling metrics for test %s", test)
 	assert.Equal(t, testMetrics.EventCount.ValueOr(0), uint64(evtCount), "incorrect EventCount for %s", test)
 	assert.Equal(t, testMetrics.EventLimit.ValueOr(0), uint64(evtLimit), "incorrect EventLimit for %s", test)
-	assert.Equal(t, testMetrics.OccupiedRead.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
+	assert.Equal(t, testMetrics.UnackedConsumedEvents.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
 }
 
 func TestProducerCancelRemovesEvents(t *testing.T) {

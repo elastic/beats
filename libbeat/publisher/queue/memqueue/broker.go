@@ -268,9 +268,9 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 	resp := <-responseChan
 
 	return queue.Metrics{
-		EventCount:   opt.UintWith(uint64(resp.currentQueueSize)),
-		EventLimit:   opt.UintWith(uint64(b.bufSize)),
-		OccupiedRead: opt.UintWith(uint64(resp.occupiedRead)),
+		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
+		EventLimit:            opt.UintWith(uint64(b.bufSize)),
+		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
 	}, nil
 }
 
