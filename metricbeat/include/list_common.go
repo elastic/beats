@@ -151,6 +151,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/rabbitmq/exchange"
 	_ "github.com/elastic/beats/v7/metricbeat/module/rabbitmq/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/rabbitmq/queue"
+	_ "github.com/elastic/beats/v7/metricbeat/module/rabbitmq/shovel"
 	_ "github.com/elastic/beats/v7/metricbeat/module/redis"
 	_ "github.com/elastic/beats/v7/metricbeat/module/redis/info"
 	_ "github.com/elastic/beats/v7/metricbeat/module/redis/key"
