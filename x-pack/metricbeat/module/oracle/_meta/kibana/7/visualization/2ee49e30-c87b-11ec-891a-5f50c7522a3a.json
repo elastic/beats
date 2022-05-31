@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.total_index_scans_per_txn",
+                                "field": "oracle.sysmetric.total_index_scans_per_txn",
                                 "id": "de615d10-f4fa-42d7-aff3-1e74a43a52d7",
                                 "order": "desc",
                                 "size": 1,

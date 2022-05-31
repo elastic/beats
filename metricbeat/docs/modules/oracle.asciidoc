@@ -61,7 +61,12 @@ Then, Metricbeat can be launched.
 [float]
 == Metricsets
 
-The following Metricset is included in the module:
+The following Metricsets are included in the module:
+
+[float]
+=== `performance`
+
+Includes performance related events which contains mainly cursor and cache based data.
 
 [float]
 === `tablespaces`
@@ -72,7 +77,7 @@ Includes information about data files and temp files, grouped by Tablespace with
 
 === `sysmetric`
 
-Includes the system metric values captured for the most current time interval from Oracle System View.
+Includes the system metric values captured for the most current time interval from Oracle system metrics.
 
 
 :edit_url:
@@ -103,12 +108,11 @@ metricbeat.modules:
   metricsets:
     - sysmetric
   enabled: true
-  # patterns: ["foo%","%bar","%foobar%"]
   hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
-  
+  # patterns: ["foo%","%bar","%foobar%"]
+
   # username: ""
   # password: ""
-
 ----
 
 [float]

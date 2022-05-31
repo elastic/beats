@@ -72,7 +72,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.average_active_sessions",
+                                "field": "oracle.sysmetric.average_active_sessions",
                                 "id": "63e5475d-5d50-4796-a13a-1e53ebca3a5c",
                                 "order": "desc",
                                 "size": 1,

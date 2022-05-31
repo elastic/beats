@@ -3,29 +3,7 @@
         "description": "",
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [
-                    {
-                        "$state": {
-                            "store": "appState"
-                        },
-                        "meta": {
-                            "alias": null,
-                            "disabled": false,
-                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "oracle.sysmetric.metrics.name",
-                            "negate": false,
-                            "params": {
-                                "query": "Average Active Sessions"
-                            },
-                            "type": "phrase"
-                        },
-                        "query": {
-                            "match_phrase": {
-                                "oracle.sysmetric.metrics.name": "Average Active Sessions"
-                            }
-                        }
-                    }
-                ],
+                "filter": [],
                 "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
                 "query": {
                     "language": "kuery",
@@ -44,7 +22,7 @@
                     "params": {
                         "aggregate": "concat",
                         "customLabel": "Average Active Sessions",
-                        "field": "oracle.sysmetric.metrics.value",
+                        "field": "oracle.sysmetric.average_active_sessions",
                         "size": 1,
                         "sortField": "@timestamp",
                         "sortOrder": "desc"

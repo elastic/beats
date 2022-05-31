@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.db_block_changes_per_sec",
+                                "field": "oracle.sysmetric.db_block_changes_per_sec",
                                 "id": "c3f9567a-8092-4b7e-8913-5f9c94d10698",
                                 "order": "desc",
                                 "size": 1,

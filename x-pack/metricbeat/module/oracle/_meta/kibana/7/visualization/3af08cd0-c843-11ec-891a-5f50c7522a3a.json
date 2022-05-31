@@ -38,7 +38,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.current_os_load",
+                                "field": "oracle.sysmetric.current_os_load",
                                 "id": "9f054aac-6be0-4e51-a21b-48a078761230",
                                 "order": "desc",
                                 "size": 1,

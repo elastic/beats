@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.network_traffic_volume_per_sec",
+                                "field": "oracle.sysmetric.network_traffic_volume_per_sec",
                                 "id": "d2752c2a-af50-4cc9-a8a4-212399bb67e5",
                                 "order": "desc",
                                 "size": 1,

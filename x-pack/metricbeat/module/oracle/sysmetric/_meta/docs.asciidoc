@@ -1,6 +1,6 @@
 `sysmetric` Metricset includes the system metric values captured for the most current time interval from Oracle System View.
 
-This metricset dynamically filters metrics based on given input patterns. These patterns can be keywords or regular expressions. The `sysmetric` metricset uses the `OR` operator when forming the SQL query internally. Refer https://docs.oracle.com/cd/B12037_01/server.101/b10759/conditions016.htm[here] for more details. `V$SYSMETRIC` table provides different metrics for a short duration (15 seconds, `GROUP_ID` 3) and a long duration (60 seconds, `GROUP_ID` 2). This metricset collects metrics which have `GROUP_ID` 2 i.e. the metrics that are queried for long-duration for DBAs to use the data for historical analysis.
+This metricset dynamically filters metrics based on given input `patterns`. These patterns can be keywords or regular expressions. The `sysmetric` metricset uses the `OR` operator when forming the SQL query internally. Refer https://docs.oracle.com/cd/B12037_01/server.101/b10759/conditions016.htm[here] for more details. `V$SYSMETRIC` table provides different metrics for a short duration (15 seconds, `GROUP_ID` 3) and a long duration (60 seconds, `GROUP_ID` 2). This metricset collects metrics which have `GROUP_ID` 2 i.e. the metrics that are queried for long-duration for DBAs to use the data for historical analysis.
 
 [float]
 === Required database access

@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.response_time_per_txn",
+                                "field": "oracle.sysmetric.response_time_per_txn",
                                 "id": "6fff9fe5-29f2-4c80-9a3b-c1a4ab2ffd27",
                                 "order": "desc",
                                 "size": 1,

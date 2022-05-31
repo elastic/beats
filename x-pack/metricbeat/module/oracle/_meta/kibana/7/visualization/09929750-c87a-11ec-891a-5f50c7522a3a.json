@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.physical_writes_per_sec",
+                                "field": "oracle.sysmetric.physical_writes_per_sec",
                                 "id": "1f50728e-6c16-4543-b103-f35a4e37a415",
                                 "order": "desc",
                                 "size": 1,

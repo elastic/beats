@@ -45,7 +45,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.user_rollbacks_per_sec",
+                                "field": "oracle.sysmetric.user_rollbacks_per_sec",
                                 "id": "312e4114-c5a7-4518-894b-dd53c59309d4",
                                 "order": "desc",
                                 "size": 1,

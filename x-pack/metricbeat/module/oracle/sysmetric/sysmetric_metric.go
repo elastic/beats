@@ -70,7 +70,7 @@ func (m *MetricSet) addSysmetricData(bs []sysmetricMetric) []mapstr.M {
 
 	for _, sysmetricMetric := range bs {
 		metricName := ConvertToSnakeCase(sysmetricMetric.name).String
-		oracle.SetSqlValue(m.Logger(), ms, "metrics."+metricName, &oracle.Float64Value{NullFloat64: sysmetricMetric.value})
+		oracle.SetSqlValue(m.Logger(), ms, metricName, &oracle.Float64Value{NullFloat64: sysmetricMetric.value})
 	}
 	out = append(out, ms)
 

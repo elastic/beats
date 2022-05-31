@@ -38,7 +38,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.physical_reads_per_sec",
+                                "field": "oracle.sysmetric.physical_reads_per_sec",
                                 "id": "a19b2652-8832-40a8-9f62-e2a09a78a292",
                                 "order": "desc",
                                 "size": 1,

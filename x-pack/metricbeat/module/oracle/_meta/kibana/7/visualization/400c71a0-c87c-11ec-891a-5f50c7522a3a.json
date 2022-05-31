@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.cpu_usage_per_sec",
+                                "field": "oracle.sysmetric.cpu_usage_per_sec",
                                 "id": "05f6a0dc-0d50-4ab8-81b2-f5e736e7b4be",
                                 "order": "desc",
                                 "size": 1,

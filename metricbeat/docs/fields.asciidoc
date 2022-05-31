@@ -54385,8 +54385,7 @@ Sysmetric related metrics.
 
 
 
-
-*`oracle.sysmetric.metrics.session_count`*::
+*`oracle.sysmetric.session_count`*::
 +
 --
 Session Count.
@@ -54396,7 +54395,7 @@ type: long
 
 --
 
-*`oracle.sysmetric.metrics.average_active_sessions`*::
+*`oracle.sysmetric.average_active_sessions`*::
 +
 --
 Average Active Sessions.
@@ -54406,7 +54405,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.current_os_load`*::
+*`oracle.sysmetric.current_os_load`*::
 +
 --
 Current OS Load.
@@ -54416,7 +54415,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.physical_reads_per_sec`*::
+*`oracle.sysmetric.physical_reads_per_sec`*::
 +
 --
 Physical Reads Per Second.
@@ -54426,7 +54425,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.user_transaction_per_sec`*::
+*`oracle.sysmetric.user_transaction_per_sec`*::
 +
 --
 User Transaction Per Second.
@@ -54436,7 +54435,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.total_table_scans_per_txn`*::
+*`oracle.sysmetric.total_table_scans_per_txn`*::
 +
 --
 Total Table Scans Per Transaction.
@@ -54446,7 +54445,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.physical_writes_per_sec`*::
+*`oracle.sysmetric.physical_writes_per_sec`*::
 +
 --
 Physical Writes Per Second.
@@ -54456,7 +54455,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.total_index_scans_per_txn`*::
+*`oracle.sysmetric.total_index_scans_per_txn`*::
 +
 --
 Total Index Scans Per Transaction.
@@ -54466,7 +54465,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.host_cpu_utilization_pct`*::
+*`oracle.sysmetric.host_cpu_utilization_pct`*::
 +
 --
 Host CPU Utilization (%).
@@ -54476,7 +54475,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.network_traffic_volume_per_sec`*::
+*`oracle.sysmetric.network_traffic_volume_per_sec`*::
 +
 --
 Network Traffic Volume Per Second.
@@ -54486,7 +54485,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.user_rollbacks_per_sec`*::
+*`oracle.sysmetric.user_rollbacks_per_sec`*::
 +
 --
 User Rollbacks Per Second.
@@ -54496,7 +54495,7 @@ type: long
 
 --
 
-*`oracle.sysmetric.metrics.cpu_usage_per_sec`*::
+*`oracle.sysmetric.cpu_usage_per_sec`*::
 +
 --
 CPU Usage Per Second.
@@ -54506,7 +54505,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.db_block_changes_per_sec`*::
+*`oracle.sysmetric.db_block_changes_per_sec`*::
 +
 --
 DB Block Changes Per Second.
@@ -54516,7 +54515,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.physical_read_total_bytes_per_sec`*::
+*`oracle.sysmetric.physical_read_total_bytes_per_sec`*::
 +
 --
 Physical Read Total Bytes Per Second.
@@ -54526,7 +54525,7 @@ type: double
 
 --
 
-*`oracle.sysmetric.metrics.response_time_per_txn`*::
+*`oracle.sysmetric.response_time_per_txn`*::
 +
 --
 Response Time Per Transaction.

@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": "oracle.sysmetric.metrics.host_cpu_utilization_pct",
+                                "field": "oracle.sysmetric.host_cpu_utilization_pct",
                                 "id": "3d751ffd-899e-41f4-b5f8-a673534be12f",
                                 "order": "desc",
                                 "size": 1,
