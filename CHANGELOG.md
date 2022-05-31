@@ -16,6 +16,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.0]
+
+### Added
+
+- Move packages from Metricbeat: `internal/metrics/cpu` and `internal/metrics/memory`. #27
+
 ## [0.3.1]
 
 ### Fixed
@@ -52,8 +58,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release of `github.come/elastic/elastic-agent-system-metrics`.
 
-[Unreleased]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.3.0
-[0.2.1]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.2.1
-[0.2.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.2.0
+[Unreleased]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/elastic/elastic-agent-system-metrics/compare/v0.0.0...v0.1.0
