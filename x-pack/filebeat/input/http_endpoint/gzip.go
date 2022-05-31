@@ -21,7 +21,7 @@ type pooledGzipReader struct {
 }
 
 func newPooledGzipReader(r io.Reader) (*pooledGzipReader, error) {
-	gzipReader := gzipDecoderPool.Get().(*gzip.Reader) //nolint:errcheck // Only *gzip.Reader are contained in the pool.
+	gzipReader := gzipDecoderPool.Get().(*gzip.Reader)
 	if err := gzipReader.Reset(r); err != nil {
 		gzipDecoderPool.Put(gzipReader)
 		return nil, err
