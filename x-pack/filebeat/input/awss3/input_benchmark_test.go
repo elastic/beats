@@ -34,8 +34,9 @@ import (
 )
 
 const (
-	cloudtrailTestFile  = "testdata/aws-cloudtrail.json.gz"
-	totalListingObjects = 10000
+	cloudtrailTestFile            = "testdata/aws-cloudtrail.json.gz"
+	totalListingObjects           = 10000
+	totalListingObjectsForInputS3 = totalListingObjects / 5
 )
 
 type constantSQS struct {
@@ -101,10 +102,10 @@ func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 		currentIndex: 0,
 	}
 
-	for i := 0; i < totalListingObjects; i++ {
+	for i := 0; i < totalListingObjectsForInputS3; i++ {
 		ret.objects = append(ret.objects, s3.Object{
 			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
-			ETag:         aws.String(fmt.Sprintf("etag-%d", i)),
+			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
 			LastModified: aws.Time(lastModified),
 		})
 	}
@@ -273,14 +274,14 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		if err != nil {
 			t.Fatalf("Failed to access store: %v", err)
 		}
-		s3APIs := make([]*constantS3, 0, 5)
+
 		b.ResetTimer()
 		start := time.Now()
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.s3ObjectsAckedTotal.Get() < 5*totalListingObjects {
+			for metrics.s3ObjectsAckedTotal.Get() <= totalListingObjects {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
@@ -294,7 +295,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				listPrefix := fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
 				s3API.pagerConstant = newS3PagerConstant(listPrefix)
-				s3APIs = append(s3APIs, s3API)
 				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
 				if err != nil {
 					t.Fatalf("Failed to reset store: %v", err)
@@ -355,10 +355,15 @@ func TestBenchmarkInputS3(t *testing.T) {
 
 	headers := []string{
 		"Number of workers",
+		"Objects listed total",
 		"Objects listed per sec",
+		"Objects processed total",
 		"Objects processed per sec",
+		"Objects acked total",
 		"Objects acked per sec",
+		"Events total",
 		"Events per sec",
+		"S3 Bytes total",
 		"S3 Bytes per sec",
 		"Time (sec)",
 		"CPUs",
@@ -367,10 +372,15 @@ func TestBenchmarkInputS3(t *testing.T) {
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["number_of_workers"]),
+			fmt.Sprintf("%v", r.Extra["objects_listed"]),
 			fmt.Sprintf("%v", r.Extra["objects_listed_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["objects_processed"]),
 			fmt.Sprintf("%v", r.Extra["objects_processed_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["objects_acked"]),
 			fmt.Sprintf("%v", r.Extra["objects_acked_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["events"]),
 			fmt.Sprintf("%v", r.Extra["events_per_sec"]),
+			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes"]))),
 			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes_per_sec"]))),
 			fmt.Sprintf("%v", r.Extra["sec"]),
 			fmt.Sprintf("%v", runtime.GOMAXPROCS(0)),
