@@ -38,8 +38,7 @@ var (
 )
 
 const (
-	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
-	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
+	adhocOsqueriesTypesCacheSize = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
 
 	// The interval in second for configuration refresh;
 	// osqueryd child process requests configuration from the configuration plugin implemented in osquerybeat
@@ -78,7 +77,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
 	bt := &osquerybeat{
@@ -181,7 +180,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// This way we don't need to persist the configuration for configuration plugin, because osquery is not running until
 	// we have the first valid configuration
 	if len(bt.config.Inputs) > 0 {
-		runner.Update(ctx, bt.config.Inputs)
+		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
 	// Ensure that all the hooks and actions are ready before starting the Manager
@@ -208,12 +207,15 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
-				bt.pub.Configure(inputConfigs)
+				err = bt.pub.Configure(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
 					return err
 				}
-				runner.Update(ctx, inputConfigs)
+				err = runner.Update(ctx, inputConfigs)
+				if err != nil {
+					bt.log.Errorf("Failed to configure osquery runner, err: %v", err)
+				}
 			}
 		}
 	})
@@ -277,7 +279,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		}
 		defer cli.Close()
 
-		// Run extensions only after succesful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
+		// Run extensions only after successful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
 		g.Go(func() error {
 			return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
 		})
