@@ -72,6 +72,7 @@ data:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
+      allow_older_versions: True
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -83,7 +84,7 @@ metadata:
 data:
   system.yml: |-
     - module: system
-      period: 10s
+      period: 1m
       metricsets:
         - cpu
         - load
@@ -115,7 +116,7 @@ data:
         - pod
         - container
         - volume
-      period: 4m
+      period: 3m
       host: ${NODE_NAME}
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -156,7 +157,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        # image: docker.elastic.co/beats/metricbeat:8.4.0
+        # image: docker.elastic.co/beats/metricbeat:8.3.0-SNAPSHOT
         image: metricbeat-debugger-image:latest
         imagePullPolicy: Never
         args: [
