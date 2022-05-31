@@ -19,7 +19,7 @@ import (
 func execDir() (exedir string, err error) {
 	exefp, err := os.Executable()
 	if err != nil {
-		return exedir, nil
+		return "", err
 	}
 	exedir = filepath.Dir(exefp)
 	return exedir, nil
