@@ -39,12 +39,13 @@ func NewPerfMetricsCache(timeout time.Duration) *PerfMetricsCache {
 	}
 
 	return &PerfMetricsCache{
-		Timeout: timeout,
 		NodeMemAllocatable:   newValueMap(timeout),
 		NodeCoresAllocatable: newValueMap(timeout),
 
 		ContainerMemLimit:   newValueMap(timeout),
 		ContainerCoresLimit: newValueMap(timeout),
+
+		Timeout: timeout,
 	}
 }
 

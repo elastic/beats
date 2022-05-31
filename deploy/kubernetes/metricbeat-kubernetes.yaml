@@ -27,7 +27,7 @@ data:
             - config:
                 - module: kubernetes
                   hosts: ["kube-state-metrics:8080"]
-                  period: 10s
+                  period: 3m
                   add_metadata: true
                   metricsets:
                     - state_node
@@ -115,7 +115,7 @@ data:
         - pod
         - container
         - volume
-      period: 10s
+      period: 4m
       host: ${NODE_NAME}
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
