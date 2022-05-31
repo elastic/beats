@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -24,7 +25,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
-	"github.com/pkg/errors"
 
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -57,11 +57,11 @@ func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sq
 	return c.msgs, nil
 }
 
-func (_ *constantSQS) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
 	return nil
 }
 
-func (_ *constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
 	return nil
 }
 
@@ -216,7 +216,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -239,7 +239,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		"Time (sec)",
 		"CPUs",
 	}
-	var data [][]string
+	data := make([][]string, 0)
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]),
@@ -281,12 +281,13 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.s3ObjectsAckedTotal.Get() <= totalListingObjects {
+			for metrics.s3ObjectsAckedTotal.Get() < totalListingObjects {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
 		}()
 
+		errChan := make(chan error)
 		wg := new(sync.WaitGroup)
 		for i := 0; i < 5; i++ {
 			wg.Add(1)
@@ -297,7 +298,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(listPrefix)
 				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
 				if err != nil {
-					t.Fatalf("Failed to reset store: %v", err)
+					errChan <- err
+					return
 				}
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
@@ -305,13 +307,21 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 				if err := s3Poller.Poll(ctx); err != nil {
 					if !errors.Is(err, context.DeadlineExceeded) {
-						t.Fatal(err)
+						errChan <- err
 					}
 				}
 			}(i, wg)
 		}
 
 		wg.Wait()
+		select {
+		case err := <-errChan:
+			if err != nil {
+				t.Fatal(err)
+			}
+		default:
+
+		}
 
 		b.StopTimer()
 		elapsed := time.Since(start)
@@ -337,7 +347,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),
@@ -368,7 +378,7 @@ func TestBenchmarkInputS3(t *testing.T) {
 		"Time (sec)",
 		"CPUs",
 	}
-	var data [][]string
+	data := make([][]string, 0)
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["number_of_workers"]),

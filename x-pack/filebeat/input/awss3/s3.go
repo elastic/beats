@@ -6,12 +6,13 @@ package awss3
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/url"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -126,9 +127,8 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 
 		if err != nil {
 			event := s3ObjectPayload.s3ObjectEvent
-			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q",
-				event.S3.Object.Key, event.S3.Bucket.Name))
+			errs = append(errs, fmt.Errorf("failed processing S3 event for object key %q in bucket %q (%w)",
+				event.S3.Object.Key, event.S3.Bucket.Name, err))
 
 			p.handlePurgingLock(info, false)
 			continue
@@ -238,8 +238,6 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	if err := paginator.Err(); err != nil {
 		p.log.Warnw("Error when paginating listing.", "error", err)
 	}
-
-	return
 }
 
 func (p *s3Poller) Purge() {
@@ -313,8 +311,6 @@ func (p *s3Poller) Purge() {
 		p.workersListingMap.Delete(listingID)
 		p.states.DeleteListing(listingID)
 	}
-
-	return
 }
 
 func (p *s3Poller) Poll(ctx context.Context) error {
@@ -358,8 +354,15 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 			}()
 		}
 
-		timed.Wait(ctx, p.bucketPollInterval)
+		err = timed.Wait(ctx, p.bucketPollInterval)
+		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				// A canceled context is a normal shutdown.
+				return nil
+			}
 
+			return err
+		}
 	}
 
 	// Wait for all workers to finish.
