@@ -121,7 +121,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
-- Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
