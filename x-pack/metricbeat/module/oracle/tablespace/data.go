@@ -6,35 +6,33 @@ package tablespace
 
 import (
 	"context"
-	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
 // by doing queries to Oracle
-func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (*extractedData, error) {
-	out := &extractedData{}
-	var err error
+func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (out *extractedData, err error) {
+	out = &extractedData{}
 
 	if out.dataFiles, err = extractor.dataFilesData(ctx); err != nil {
-		return nil, fmt.Errorf("error getting data_files: %w", err)
+		return nil, errors.Wrap(err, "error getting data_files")
 	}
 
 	if out.tempFreeSpace, err = extractor.tempFreeSpaceData(ctx); err != nil {
-		return nil, fmt.Errorf("error getting temp_free_space: %w", err)
+		return nil, errors.Wrap(err, "error getting temp_free_space")
 	}
 
 	if out.freeSpace, err = extractor.usedAndFreeSpaceData(ctx); err != nil {
-		return nil, fmt.Errorf("error getting free space data: %w", err)
+		return nil, errors.Wrap(err, "error getting free space data")
 	}
 
-	return out, nil
+	return
 }
 
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
@@ -43,27 +41,27 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
 	out = make(map[string]mapstr.M, 0)
 
-	for i := range in.dataFiles {
-		m.addDataFileData(&in.dataFiles[i], out)
+	for _, dataFile := range in.dataFiles {
+		m.addDataFileData(&dataFile, out)
 	}
 
 	m.addUsedAndFreeSpaceData(in.freeSpace, out)
 	m.addTempFreeSpaceData(in.tempFreeSpace, out)
 
-	return out
+	return
 }
 
 func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
 	extractedMetricsData, err := m.extract(ctx, m.extractor)
 	if err != nil {
-		return nil, fmt.Errorf("error extracting data: %w", err)
+		return nil, errors.Wrap(err, "error extracting data")
 	}
 
 	out := m.transform(extractedMetricsData)
 
 	events := make([]mb.Event, 0)
 	for _, v := range out {
-		events = append(events, mb.Event{MetricSetFields: v, Host: ServiceNameExtractor(m.BaseMetricSet.HostData().URI)})
+		events = append(events, mb.Event{MetricSetFields: v})
 	}
 
 	return events, nil
@@ -72,12 +70,13 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 // addTempFreeSpaceData is specific to the TEMP Tablespace.
 func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map[string]mapstr.M) {
 	for key, cm := range out {
-		name, err := cm.GetValue("name")
+		val, err := cm.GetValue("name")
 		if err != nil {
 			m.Logger().Debug("error getting tablespace name")
 			continue
 		}
 
+		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
 				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TablespaceSize})
@@ -91,12 +90,13 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 // addUsedAndFreeSpaceData is specific to all Tablespaces but TEMP
 func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out map[string]mapstr.M) {
 	for key, cm := range out {
-		name, err := cm.GetValue("name")
+		val, err := cm.GetValue("name")
 		if err != nil {
 			m.Logger().Debug("error getting tablespace name")
 			continue
 		}
 
+		name := val.(string)
 		if name != "" {
 			for _, freeSpaceTable := range freeSpaces {
 				if name == freeSpaceTable.TablespaceName {
@@ -125,12 +125,4 @@ func (m *MetricSet) addDataFileData(d *dataFile, output map[string]mapstr.M) {
 	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.max.bytes", &oracle.Int64Value{NullInt64: d.MaxFileSizeBytes})
 	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.free.bytes", &oracle.Int64Value{NullInt64: d.AvailableForUserBytes})
 
-}
-
-// ServiceName extracts ip address from host.
-func ServiceNameExtractor(host string) string {
-	re := regexp.MustCompile(`connectString="([a-zA-Z0-9_\-\.:/+;|_!@~#$%-^&*'(){}\[\]\?-]+)`)
-	address := re.FindString(host)
-	address = strings.TrimPrefix(address, `connectString="`)
-	return address
 }

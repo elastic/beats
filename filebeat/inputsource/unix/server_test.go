@@ -397,7 +397,7 @@ func randomString(l int) string {
 	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
 	message := make([]byte, l)
 	for i := range message {
-		message[i] = charsets[rand.Intn(len(charsets))] //nolint:gosec // it generates test string, allowed to be weak
+		message[i] = charsets[rand.Intn(len(charsets))]
 	}
 	return string(message)
 }

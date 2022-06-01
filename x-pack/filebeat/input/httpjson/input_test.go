@@ -723,7 +723,7 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500) //nolint:gosec // Bad linter! Not a crypto context.
+		w.WriteHeader(rand.Intn(100) + 500)
 		count += 1
 	}
 }

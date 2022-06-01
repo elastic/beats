@@ -16,7 +16,7 @@ import (
 )
 
 func TestRetryRun(t *testing.T) {
-	logp.Configure(logp.Config{
+	_ = logp.Configure(logp.Config{
 		Level:     logp.DebugLevel,
 		ToStderr:  true,
 		Selectors: []string{"*"},

@@ -48,8 +48,8 @@ var DefaultPolicy = mapstr.M{
 			"hot": mapstr.M{
 				"actions": mapstr.M{
 					"rollover": mapstr.M{
-						"max_size": "50gb",
-						"max_age":  "30d",
+						"max_primary_shard_size": "50gb",
+						"max_age":                "30d",
 					},
 				},
 			},

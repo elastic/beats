@@ -5,22 +5,19 @@
 package oracle
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/godror/godror"
-	"github.com/godror/godror/dsn"
 )
 
 // GetOracleConnectionDetails return a valid SID to use for testing
 func GetOracleConnectionDetails(host string) string {
 	params := godror.ConnectionParams{
-		CommonParams: dsn.CommonParams{
-			Username: GetOracleEnvUsername(),
-			Password: dsn.NewPassword((GetOracleEnvPassword())),
-		},
-		ConnParams: dsn.ConnParams{
-			IsSysDBA: true,
-		},
+		SID:      fmt.Sprintf("%s/%s", host, GetOracleEnvServiceName()),
+		Username: GetOracleEnvUsername(),
+		Password: GetOracleEnvPassword(),
+		IsSysDBA: true,
 	}
 
 	return params.StringWithPassword()
@@ -51,7 +48,7 @@ func GetOracleEnvPassword() string {
 	password := os.Getenv("ORACLE_PASSWORD")
 
 	if len(password) == 0 {
-		password = "Oradoc_db1" //nolint:gosec // Bad linter! Not a crypto context.
+		password = "Oradoc_db1"
 	}
 	return password
 }
