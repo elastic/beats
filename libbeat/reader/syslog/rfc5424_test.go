@@ -139,7 +139,7 @@ func TestParseRFC5424(t *testing.T) {
 				msgID:      "ID47",
 				rawSDValue: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
 			},
-			WantErr: `validation error at position 6: invalid version: strconv.Atoi: parsing "A": invalid syntax`,
+			WantErr: `validation error at position 6: invalid version, expected an integer: strconv.Atoi: parsing "A": invalid syntax`,
 		},
 		"err-invalid-timestamp": {
 			In: `<165>1 10-11-2003T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
