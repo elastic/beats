@@ -119,5 +119,5 @@ func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
 			Value: value,
 		}
 	}
-	return
+	return ecsm, err
 }

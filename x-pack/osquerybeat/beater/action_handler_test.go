@@ -6,7 +6,6 @@ package beater
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -156,8 +155,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-
-			fmt.Println(res)
 			_ = res
 		})
 	}

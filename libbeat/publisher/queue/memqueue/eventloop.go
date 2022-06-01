@@ -49,6 +49,9 @@ type bufferingEventLoop struct {
 	// those that have not yet been acked.
 	eventCount int
 
+	// The number of events that have been read by a consumer but not yet acked
+	unackedEventCount int
+
 	minEvents    int
 	maxEvents    int
 	flushTimeout time.Duration
@@ -122,11 +125,18 @@ func (l *directEventLoop) run() {
 		case req := <-getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
+		case req := <-l.broker.metricChan: // broker asking for queue metrics
+			l.handleMetricsRequest(&req)
+
 		case schedACKs <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list
 			l.pendingACKs = chanList{}
 		}
 	}
+}
+
+func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items(), occupiedRead: l.buf.reserved}
 }
 
 // Returns true if the queue is full after handling the insertion request.
@@ -299,6 +309,9 @@ func (l *bufferingEventLoop) run() {
 		case count := <-l.broker.ackChan:
 			l.handleACK(count)
 
+		case req := <-l.broker.metricChan: // broker asking for queue metrics
+			l.handleMetricsRequest(&req)
+
 		case <-l.idleC:
 			l.idleC = nil
 			l.timer.Stop()
@@ -307,6 +320,10 @@ func (l *bufferingEventLoop) run() {
 			}
 		}
 	}
+}
+
+func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount, occupiedRead: l.unackedEventCount}
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
@@ -408,6 +425,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	req.responseChan <- getResponse{acker.ackChan, entries}
 	l.pendingACKs.append(acker)
 
+	l.unackedEventCount += len(entries)
 	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
@@ -415,6 +433,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *bufferingEventLoop) handleACK(count int) {
+	l.unackedEventCount -= count
 	l.eventCount -= count
 }
 
