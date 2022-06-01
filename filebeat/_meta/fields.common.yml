@@ -179,6 +179,7 @@
 
 - key: threat
   title: threat
+  default_field: false
   description: >
     Threat indicator fields.
   fields:
