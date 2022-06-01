@@ -89,7 +89,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	// Get the source field value.
 	val, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreFailure || (p.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound) {
+		if p.IgnoreFailure || (p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound)) {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "failed to get time field %v", p.Field)
