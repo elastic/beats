@@ -9,19 +9,19 @@ import (
 	"database/sql"
 )
 
-// sysmetricExtractMethod contains the methods needed to extract the necessary information about the performance of the database
-type sysmetricExtractMethod interface {
+// sysmetricCollectMethod contains the methods needed to collect the necessary information about the performance of the database.
+type sysmetricCollectMethod interface {
 	sysmetricMetric(context.Context) ([]sysmetricMetric, error)
 }
 
-// extractedData contains the necessary system metric information.
-type extractedData struct {
+// collectedData contains the necessary system metric information.
+type collectedData struct {
 	sysmetricMetrics []sysmetricMetric
 }
 
-// sysmetricExtractor is the implementor of sysmetricExtractMethod. It's implementation are on different Go files
+// sysmetricCollector is the implementor of sysmetricCollectMethod. It's implementation are on different Go files
 // which refers to the origin of the data for organization purposes.
-type sysmetricExtractor struct {
+type sysmetricCollector struct {
 	db       *sql.DB
 	patterns []interface{}
 }

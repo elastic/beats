@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestSysmetricExtractorCalculateQuery(t *testing.T) {
+func TestSysmetricCollectorCalculateQuery(t *testing.T) {
 	type fields struct {
 		patterns []interface{}
 	}
@@ -36,11 +36,11 @@ func TestSysmetricExtractorCalculateQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("test func CalculateQuery()", func(t *testing.T) {
-			e := &sysmetricExtractor{
+			e := &sysmetricCollector{
 				patterns: tt.fields.patterns,
 			}
 			if got := e.calculateQuery(); got != tt.want {
-				t.Errorf("sysmetricExtractor.calculateQuery() = %v, want %v", got, tt.want)
+				t.Errorf("sysmetricCollector.calculateQuery() = %v, want %v", got, tt.want)
 			}
 		})
 	}

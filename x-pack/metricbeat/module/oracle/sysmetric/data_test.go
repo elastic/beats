@@ -11,11 +11,11 @@ import (
 
 func TestMetricSetTransform(t *testing.T) {
 	tests := []struct {
-		in   *extractedData
+		in   *collectedData
 		want string
 	}{
 		{
-			in: &extractedData{
+			in: &collectedData{
 				sysmetricMetrics: []sysmetricMetric{{
 					name:  sql.NullString{String: "Buffer Cache Hit Ratio", Valid: true},
 					value: sql.NullFloat64{Float64: 100, Valid: true},

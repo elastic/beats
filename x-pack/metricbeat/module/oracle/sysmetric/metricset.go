@@ -27,7 +27,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	extractor         sysmetricExtractMethod
+	collector         sysmetricCollectMethod
 	connectionDetails oracle.ConnectionDetails
 	Patterns          []interface{}
 }
@@ -57,9 +57,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	}
 	defer db.Close()
 
-	m.extractor = &sysmetricExtractor{db: db, patterns: m.Patterns}
+	m.collector = &sysmetricCollector{db: db, patterns: m.Patterns}
 
-	events, err := m.extractAndTransform(ctx)
+	events, err := m.collectAndTransform(ctx)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-//Load is the L of an ETL. In this case, takes the events and sends them to Elasticseach
+//Load takes the events and sends them to Elasticsearch.
 func (m *MetricSet) Load(ctx context.Context, events []mb.Event, reporter mb.ReporterV2) {
 	for _, event := range events {
 		if reported := reporter.Event(event); !reported {

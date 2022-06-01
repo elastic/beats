@@ -11,29 +11,29 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-// extract is the E of a ETL processing. Gets all the system metric information into an instance of extractedData
-func (m *MetricSet) extract(ctx context.Context, extractor sysmetricExtractMethod) (out *extractedData, err error) {
-	out = &extractedData{}
-	if out.sysmetricMetrics, err = extractor.sysmetricMetric(ctx); err != nil {
+// collect function collects all the system metric information into an instance of collectededData
+func (m *MetricSet) collect(ctx context.Context, collector sysmetricCollectMethod) (out *collectedData, err error) {
+	out = &collectedData{}
+	if out.sysmetricMetrics, err = collector.sysmetricMetric(ctx); err != nil {
 		return nil, fmt.Errorf("error getting system metrics %w", err)
 	}
 	return out, nil
 }
 
-// extractAndTransform just composes the ET operations from a ETL. It's called by the Fetch method, which is the one
-// that "loads" the data into Elasticsearch
-func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
-	extractedMetricsData, err := m.extract(ctx, m.extractor)
+// collectAndTransform is called by the Fetch method, which is the one
+// that "loads" the data into Elasticsearch.
+func (m *MetricSet) collectAndTransform(ctx context.Context) ([]mb.Event, error) {
+	collectedMetricsData, err := m.collect(ctx, m.collector)
 	if err != nil {
-		return nil, fmt.Errorf("error extracting data %w", err)
+		return nil, fmt.Errorf("error collecting data %w", err)
 	}
-	return m.transform(extractedMetricsData), nil
+	return m.transform(collectedMetricsData), nil
 }
 
-// transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
-// to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
-// was necessary. Data is organized by sysmetric entity that contains metrics details.
-func (m *MetricSet) transform(in *extractedData) []mb.Event {
+// Transform function Transforms the data to create a Kibana/Elasticsearch friendly JSON.
+// Data from Oracle is pretty fragmented by design so a lot of data was necessary.
+// Data is organized by sysmetric entity that contains metrics details.
+func (m *MetricSet) transform(in *collectedData) []mb.Event {
 	sysMetric := m.addSysmetricData(in.sysmetricMetrics)
 	events := make([]mb.Event, 0)
 	for _, v := range sysMetric {
