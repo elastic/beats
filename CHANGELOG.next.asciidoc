@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Allow loading secrets that contain commas from the keystore {pull}31694{pull}.
+- Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
 
 *Auditbeat*
 
