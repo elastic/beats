@@ -121,13 +121,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
-- Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
-- Add metadata for missing k8s resources/metricsets {pull}31590[31590]
-- Fix `include_top_n` fields in system/process {pull}31595[31595]
-- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
-- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
+- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
 
 *Packetbeat*
 
