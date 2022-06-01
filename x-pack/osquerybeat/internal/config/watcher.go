@@ -35,7 +35,7 @@ func (r *reloader) debugLogConfig(cfg *reload.ConfigWithMeta) {
 
 func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 	r.log.Debug("Inputs reloader got configuration update")
-	var inputConfigs []InputConfig
+	inputConfigs := make([]InputConfig, 0)
 	for _, cfg := range configs {
 		var icfg InputConfig
 		err := cfg.Config.Unpack(&icfg)

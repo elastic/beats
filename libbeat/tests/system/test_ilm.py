@@ -196,7 +196,7 @@ class TestCommandExportILMPolicy(BaseTest):
     def assert_log_contains_policy(self):
         assert self.log_contains(MSG_ILM_POLICY_LOADED)
         assert self.log_contains('"max_age": "30d"')
-        assert self.log_contains('"max_size": "50gb"')
+        assert self.log_contains('"max_primary_shard_size": "50gb"')
 
     def test_default(self):
         """
@@ -246,7 +246,7 @@ class TestCommandExportILMPolicy(BaseTest):
         file = os.path.join(base_path, "policy", self.policy_name + '.json')
         with open(file) as f:
             policy = json.load(f)
-        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_primary_shard_size"] == "50gb", policy
         assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
 
         os.remove(file)
@@ -266,7 +266,7 @@ class TestCommandExportILMPolicy(BaseTest):
         file = os.path.join(base_path, "policy", self.policy_name + '.json')
         with open(file) as f:
             policy = json.load(f)
-        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_primary_shard_size"] == "50gb", policy
         assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
 
         os.remove(file)
