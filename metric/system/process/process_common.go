@@ -79,8 +79,10 @@ var (
 	Running PidState = "running"
 	//Sleeping state
 	Sleeping PidState = "sleeping"
-	//Idle state. On linux this is "D"
+	//Idle state.
 	Idle PidState = "idle"
+	//DiskSleep is uninterruptible disk sleep
+	DiskSleep = "disk_sleep"
 	//Stopped state.
 	Stopped PidState = "stopped"
 	//Zombie state.
@@ -99,8 +101,8 @@ var (
 var PidStates = map[byte]PidState{
 	'S': Sleeping,
 	'R': Running,
-	'D': Idle, // Waiting in uninterruptible disk sleep, on some kernels this is marked as I below
-	'I': Idle, // in the scheduler, TASK_IDLE is defined as (TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
+	'D': DiskSleep, // Waiting in uninterruptible disk sleep, on some kernels this is marked as I below
+	'I': Idle,      // in the scheduler, TASK_IDLE is defined as (TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
 	'T': Stopped,
 	'Z': Zombie,
 	'X': Dead,
