@@ -82,7 +82,7 @@ var (
 	//Idle state.
 	Idle PidState = "idle"
 	//DiskSleep is uninterruptible disk sleep
-	DiskSleep = "disk_sleep"
+	DiskSleep PidState = "disk_sleep"
 	//Stopped state.
 	Stopped PidState = "stopped"
 	//Zombie state.
