@@ -100,7 +100,7 @@ http.host: xxx.xxx.xxx.xxx
 +
 --
 // tag::set-cluster-uuid[]
-To see the Beats monitoring section in Kibana if you have a cluster, you need to associate the {beatname_uc} with cluster UUID:
+Cluster UUID is necessary if you want to see beats monitoring in Kibana stack monitoring view. It will be grouped under the cluster for that uuid. To see the Beats monitoring section in Kibana if you have a cluster, you need to associate the {beatname_uc} with cluster UUID.  :
 
 [source,yaml]
 ----------------------------------
