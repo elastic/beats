@@ -51,7 +51,7 @@ func GetOracleEnvPassword() string {
 	password := os.Getenv("ORACLE_PASSWORD")
 
 	if len(password) == 0 {
-		password = "Oradoc_db1"
+		password = "Oradoc_db1" // #nosec
 	}
 	return password
 }
