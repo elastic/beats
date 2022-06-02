@@ -16,10 +16,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -27,7 +23,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -37,22 +32,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
-const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
-const totalListingObjects = 10000
-=======
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-)
-
 const (
 	cloudtrailTestFile            = "testdata/aws-cloudtrail.json.gz"
 	totalListingObjects           = 10000
 	totalListingObjectsForInputS3 = totalListingObjects / 5
 )
->>>>>>> ee386099db (add listPrefix in awsS3WriteCommitPrefix (#31776))
 
 type constantSQS struct {
 	msgs []sqs.Message
@@ -290,19 +274,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			t.Fatalf("Failed to access store: %v", err)
 		}
 
-<<<<<<< HEAD
-		err = store.Set(awsS3WriteCommitPrefix+"bucket", &commitWriteState{time.Time{}})
-		if err != nil {
-			t.Fatalf("Failed to reset store: %v", err)
-		}
-
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", "key-", "region", numberOfWorkers, time.Second)
-
-=======
 		b.ResetTimer()
 		start := time.Now()
->>>>>>> ee386099db (add listPrefix in awsS3WriteCommitPrefix (#31776))
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
@@ -329,7 +302,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				}
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {
 					if !errors.Is(err, context.DeadlineExceeded) {
