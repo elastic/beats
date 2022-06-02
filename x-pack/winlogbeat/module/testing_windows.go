@@ -191,7 +191,7 @@ func writeGolden(t testing.TB, source string, events []mapstr.M) {
 	}
 
 	outPath := filepath.Join("testdata", filepath.Base(source)+".golden.json")
-	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil { //nolint:gosec // Bad linter!
+	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

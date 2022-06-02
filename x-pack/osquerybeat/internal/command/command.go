@@ -64,8 +64,7 @@ func Execute(ctx context.Context, name string, arg ...string) (out string, err e
 			return "", fmt.Errorf("%s: %w", s, err)
 		}
 	case <-ctx.Done():
-		cmd.Process.Kill()
-		err = ctx.Err()
+		_ = cmd.Process.Kill()
 	}
 
 	return outbuf.String(), nil

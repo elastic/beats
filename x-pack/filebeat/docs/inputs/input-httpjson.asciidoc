@@ -374,9 +374,19 @@ default credentials from the environment will be attempted via ADC. For more inf
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [float]
+==== `auth.oauth2.google.jwt_json`
+
+The JWT Account Key file as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
 ==== `auth.oauth2.google.delegated_account`
 
-Email of the delegated account used to create the credentials (usually an admin).
+Email of the delegated account used to create the credentials (usually an admin). Used in combination
+with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
 
 [[request-parameters]]
 [float]
