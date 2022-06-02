@@ -16,23 +16,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-=======
->>>>>>> ee386099db (add listPrefix in awsS3WriteCommitPrefix (#31776))
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
