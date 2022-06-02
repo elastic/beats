@@ -29,7 +29,6 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	collector         sysmetricCollectMethod
 	connectionDetails oracle.ConnectionDetails
-	Patterns          []interface{}
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -43,7 +42,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet:     base,
 		connectionDetails: config,
-		Patterns:          config.Patterns,
 	}, nil
 }
 
@@ -51,13 +49,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	db, err := oracle.NewConnection(&m.connectionDetails)
+	db, err := oracle.NewConnection(m.HostData().URI)
 	if err != nil {
 		return fmt.Errorf("error creating connection to Oracle %w", err)
 	}
 	defer db.Close()
 
-	m.collector = &sysmetricCollector{db: db, patterns: m.Patterns}
+	m.collector = &sysmetricCollector{db: db, patterns: m.connectionDetails.Patterns}
 
 	events, err := m.collectAndTransform(ctx)
 	if err != nil {

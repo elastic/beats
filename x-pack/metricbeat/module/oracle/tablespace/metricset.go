@@ -28,14 +28,13 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	extractor         tablespaceExtractMethods
-	connectionDetails oracle.ConnectionDetails
+	extractor tablespaceExtractMethods
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := oracle.ConnectionDetails{}
+	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, fmt.Errorf("error parsing config file: %w", err)
 	}
@@ -46,8 +45,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		BaseMetricSet:     base,
-		connectionDetails: config,
+		BaseMetricSet: base,
 	}, nil
 }
 
@@ -60,7 +58,7 @@ func CheckCollectionPeriod(period time.Duration) bool {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	db, err := oracle.NewConnection(&m.connectionDetails)
+	db, err := oracle.NewConnection(m.HostData().URI)
 	if err != nil {
 		return fmt.Errorf("error creating connection to Oracle: %w", err)
 	}
