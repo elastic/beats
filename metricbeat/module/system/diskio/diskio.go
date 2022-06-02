@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/linux/iostat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
 
@@ -100,6 +101,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		// Add linux-only ops in progress
 		if runtime.GOOS == "linux" {
+			result, err := m.statistics.CalcIOStatistics(counters)
+			if err != nil {
+				return errors.Wrap(err, "error calculating iostat")
+			}
+			event["iostat"] = iostat.AddLinuxIOStat(result)
 			event.Put("io.ops", counters.IopsInProgress)
 		}
 
