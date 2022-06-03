@@ -546,6 +546,8 @@ github.com/elastic/elastic-agent-libs v0.2.5 h1:8+sYCW/kkWQe5KegGLMYYT3ELXUwibMc
 github.com/elastic/elastic-agent-libs v0.2.5/go.mod h1:chO3rtcLyGlKi9S0iGVZhYCzDfdDsAQYBc+ui588AFE=
 github.com/elastic/elastic-agent-system-metrics v0.3.1 h1:WXdDyIaBr9zIJoyvFNzgZbcFiEnmtaKfazHPJR4DJOM=
 github.com/elastic/elastic-agent-system-metrics v0.3.1/go.mod h1:RIYhJOS7mUeyIthfOSqmmbEILYSzaDWLi5zQ70bQo+o=
+github.com/elastic/elastic-agent-system-metrics v0.4.0 h1:IYzJAeKRrxlKFyD553M/TbQUExcKAiWCv0uMnpvrFXk=
+github.com/elastic/elastic-agent-system-metrics v0.4.0/go.mod h1:tHuyf0c29udPu5QxWArfKRTSIKJG7JmdCTG9e18Ahuc=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
 github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4 h1:ViJxdtOsHeO+SWVekzM82fYHH1xnvZ8CvGPXZj+G4YI=
