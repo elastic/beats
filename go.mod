@@ -62,7 +62,7 @@ require (
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.1
 	github.com/elastic/go-ucfg v0.8.5
-	github.com/elastic/go-windows v1.0.1
+	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
 	github.com/fearful-symmetry/gorapl v0.0.4
