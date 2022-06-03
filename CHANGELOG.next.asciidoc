@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
+- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
 
 *Heartbeat*
 
@@ -101,6 +102,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Change threatintel module from beta to GA. {pull}31693[31693]
 - Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
 - Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
+- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
 
 *Auditbeat*
 
@@ -123,6 +125,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
+- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
 
 *Packetbeat*
 

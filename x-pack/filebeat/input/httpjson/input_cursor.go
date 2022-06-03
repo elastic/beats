@@ -51,6 +51,6 @@ func (in *cursorInput) Run(
 	cursor inputcursor.Cursor,
 	publisher inputcursor.Publisher,
 ) error {
-	s := src.(*source) //nolint:errcheck // Bad linter! A panic is a check.
+	s := src.(*source)
 	return run(ctx, s.config, publisher, &cursor)
 }

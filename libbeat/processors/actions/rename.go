@@ -106,7 +106,7 @@ func (f *renameFields) renameField(from string, to string, event *beat.Event) er
 	value, err := event.GetValue(from)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
-		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
