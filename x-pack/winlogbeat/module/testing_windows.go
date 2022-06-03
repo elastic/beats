@@ -45,10 +45,10 @@ func WithFieldFilter(filter []string) Option {
 	}
 }
 
-// TestPipeline tests the partial pipeline by reading events from the .evtx files
+// TestCollectionPipeline tests the partial pipeline by reading events from the .evtx files
 // and processing them with a basic enrichment. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
-func TestPipeline(t *testing.T, evtx string, opts ...Option) {
+func TestCollectionPipeline(t *testing.T, evtx string, opts ...Option) {
 	// FIXME: We cannot generate golden files on Windows 2022.
 	if *update {
 		os, err := windows.OperatingSystem()
@@ -75,12 +75,12 @@ func TestPipeline(t *testing.T, evtx string, opts ...Option) {
 
 	for _, f := range files {
 		t.Run(filepath.Base(f), func(t *testing.T) {
-			testPipeline(t, f, &p)
+			testCollectionPipeline(t, f, &p)
 		})
 	}
 }
 
-func testPipeline(t testing.TB, evtx string, p *params) {
+func testCollectionPipeline(t testing.TB, evtx string, p *params) {
 	t.Helper()
 
 	path, err := filepath.Abs(evtx)
