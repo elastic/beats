@@ -186,18 +186,18 @@ func writeGolden(t testing.TB, source string, events []mapstr.M) {
 		t.Fatal(err)
 	}
 
-	if err := os.MkdirAll("testdata", 0755); err != nil {
+	if err := os.MkdirAll("testdata/collection", 0755); err != nil {
 		t.Fatal(err)
 	}
 
-	outPath := filepath.Join("testdata", filepath.Base(source)+".golden.json")
+	outPath := filepath.Join("testdata/collection", filepath.Base(source)+".golden.json")
 	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func readGolden(t testing.TB, source string) []mapstr.M {
-	inPath := filepath.Join("testdata", filepath.Base(source)+".golden.json")
+	inPath := filepath.Join("testdata/collection", filepath.Base(source)+".golden.json")
 
 	data, err := ioutil.ReadFile(inPath)
 	if err != nil {

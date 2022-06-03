@@ -29,5 +29,5 @@ var ignoreFields = []string{
 }
 
 func TestSysmon(t *testing.T) {
-	module.TestCollectionPipeline(t, "testdata/*.evtx", module.WithFieldFilter(ignoreFields))
+	module.TestCollectionPipeline(t, "testdata/collection/*.evtx", module.WithFieldFilter(ignoreFields))
 }
