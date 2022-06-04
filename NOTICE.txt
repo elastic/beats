@@ -8032,11 +8032,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sysinfo
-Version: v1.7.1
+Version: v1.8.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.7.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.8.0/LICENSE.txt:
 
 
                                  Apache License
@@ -17201,11 +17201,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.0.0-20220405052023-b1e9470b6e64
+Version: v0.0.0-20220520151302-bc2c85ada10a
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20220405052023-b1e9470b6e64/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20220520151302-bc2c85ada10a/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
