@@ -18,6 +18,7 @@
 package diskqueue
 
 import (
+	"bytes"
 	"encoding/binary"
 	"os"
 	"time"
@@ -91,9 +92,13 @@ type writerLoop struct {
 	outputFile *os.File
 
 	currentRetryInterval time.Duration
+
+	// buffer Used to gather write information so there is only one write syscall
+	buffer *bytes.Buffer
 }
 
 func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
+	buffer := &bytes.Buffer{}
 	return &writerLoop{
 		logger:   logger,
 		settings: settings,
@@ -102,6 +107,7 @@ func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
 		responseChan: make(chan writerLoopResponse),
 
 		currentRetryInterval: settings.RetryInterval,
+		buffer:               buffer,
 	}
 }
 
@@ -112,8 +118,8 @@ func (wl *writerLoop) run() {
 			// The request channel is closed, we are done. If there is an active
 			// segment file, finalize its frame count and close it.
 			if wl.outputFile != nil {
-				writeSegmentHeader(wl.outputFile, wl.currentSegment.frameCount)
-				wl.outputFile.Sync()
+				_ = writeSegmentHeader(wl.outputFile, wl.currentSegment.frameCount)
+				_ = wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
 			}
@@ -156,9 +162,9 @@ outerLoop:
 			if wl.outputFile != nil {
 				// Update the header with the frame count (including the ones we
 				// just wrote), try to sync to disk, then close the file.
-				writeSegmentHeader(wl.outputFile,
+				_ = writeSegmentHeader(wl.outputFile,
 					wl.currentSegment.frameCount+curSegmentResponse.framesWritten)
-				wl.outputFile.Sync()
+				_ = wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
 				// We are done with this segment, add the totals to the response and
@@ -185,25 +191,25 @@ outerLoop:
 		// to writing this block unless the queue is closed in the meantime.
 		frameSize := uint32(frameRequest.frame.sizeOnDisk())
 
-		// The Write calls below all pass through retryWriter, so they can
-		// only return an error if the write should be aborted. Thus, all we
-		// need to do when we see an error is break out of the request loop.
-		err := binary.Write(retryWriter, binary.LittleEndian, frameSize)
-		if err != nil {
-			break
-		}
-		_, err = retryWriter.Write(frameRequest.frame.serialized)
-		if err != nil {
-			break
-		}
+		// The Write calls to wl.buffer are for performance
+		// reasons, so all the data can be written with one
+		// Write call to the retryWriter.  err is always nil
+		// for writes to a bytes.Buffer
+		_ = binary.Write(wl.buffer, binary.LittleEndian, frameSize)
+		_, _ = wl.buffer.Write(frameRequest.frame.serialized)
+
 		// Compute / write the frame's checksum
 		checksum := computeChecksum(frameRequest.frame.serialized)
-		err = binary.Write(wl.outputFile, binary.LittleEndian, checksum)
-		if err != nil {
-			break
-		}
+		_ = binary.Write(wl.buffer, binary.LittleEndian, checksum)
+
 		// Write the frame footer's (duplicate) length
-		err = binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
+		_ = binary.Write(wl.buffer, binary.LittleEndian, frameSize)
+
+		// Write the entire frame to the retryWriter
+		_, err := retryWriter.Write(wl.buffer.Bytes())
+		// Reset the buffer even if there was an error, so
+		// buffer is setup for writing to next frame
+		wl.buffer.Reset()
 		if err != nil {
 			break
 		}
@@ -228,7 +234,7 @@ outerLoop:
 		}
 	}
 	// Try to sync the written data to disk.
-	wl.outputFile.Sync()
+	_ = wl.outputFile.Sync()
 
 	// If the queue has an ACK listener, notify it the frames were written.
 	if wl.settings.WriteToDiskListener != nil {
