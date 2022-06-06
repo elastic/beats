@@ -300,7 +300,7 @@ The URL of the Saleforce instance.
 [float]
 === Example dashboard
 
-This Salesforce module comes with a several predefined dashboards for Login, Logout, Apex and Setup Audit Trails Dashboards. For example:
+This Salesforce module comes with several predefined dashboards, including Login, Logout, Apex, and Setup Audit Trails Dashboards. For example:
 
 image::./images/filebeat-salesforce-login-dashboard.png[]
 
