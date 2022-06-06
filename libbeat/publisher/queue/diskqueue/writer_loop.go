@@ -18,6 +18,7 @@
 package diskqueue
 
 import (
+	"bytes"
 	"encoding/binary"
 	"time"
 
@@ -90,9 +91,13 @@ type writerLoop struct {
 	outputFile *segmentWriter
 
 	currentRetryInterval time.Duration
+
+	// buffer Used to gather write information so there is only one write syscall
+	buffer *bytes.Buffer
 }
 
 func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
+	buffer := &bytes.Buffer{}
 	return &writerLoop{
 		logger:   logger,
 		settings: settings,
@@ -101,6 +106,7 @@ func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
 		responseChan: make(chan writerLoopResponse),
 
 		currentRetryInterval: settings.RetryInterval,
+		buffer:               buffer,
 	}
 }
 
@@ -186,22 +192,27 @@ outerLoop:
 		// The Write calls below all pass through retryWriter, so they can
 		// only return an error if the write should be aborted. Thus, all we
 		// need to do when we see an error is break out of the request loop.
-		err := binary.Write(retryWriter, binary.LittleEndian, frameSize)
+		err := binary.Write(wl.buffer, binary.LittleEndian, frameSize)
 		if err != nil {
 			break
 		}
-		_, err = retryWriter.Write(frameRequest.frame.serialized)
+		_, err = wl.buffer.Write(frameRequest.frame.serialized)
 		if err != nil {
 			break
 		}
 		// Compute / write the frame's checksum
 		checksum := computeChecksum(frameRequest.frame.serialized)
-		err = binary.Write(wl.outputFile, binary.LittleEndian, checksum)
+		err = binary.Write(wl.buffer, binary.LittleEndian, checksum)
 		if err != nil {
 			break
 		}
 		// Write the frame footer's (duplicate) length
-		err = binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
+		err = binary.Write(wl.buffer, binary.LittleEndian, frameSize)
+		if err != nil {
+			break
+		}
+		_, err = retryWriter.Write(wl.buffer.Bytes())
+		wl.buffer.Reset()
 		if err != nil {
 			break
 		}
