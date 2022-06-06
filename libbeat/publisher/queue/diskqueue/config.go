@@ -73,14 +73,11 @@ type Settings struct {
 	MaxRetryInterval time.Duration
 
 	// Schema Version specifies which on-disk format, serialization, and encryption to use.
-	// 0, 1, or 2 are valid options
+	// 0, 1, 2, or 3 are valid options
 	SchemaVersion uint32
 
 	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
 	EncryptionKey []byte
-
-	// UseCompression controls compression if SchemaVersion 2 is used.
-	UseCompression bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable
@@ -214,6 +211,8 @@ func (settings Settings) maxValidFrameSize() uint64 {
 		return settings.MaxSegmentSize - segmentHeaderSizeV1
 	case 2:
 		return settings.MaxSegmentSize - segmentHeaderSizeV2
+	case 3:
+		return settings.MaxSegmentSize - segmentHeaderSizeV3
 	default:
 		return uint64(0)
 	}

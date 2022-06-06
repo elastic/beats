@@ -268,7 +268,9 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	encoder := newEventEncoder()
-	encoder.SetCompression(dq.settings.UseCompression)
+	if dq.settings.SchemaVersion == 3 {
+		encoder.useCompression = true
+	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,

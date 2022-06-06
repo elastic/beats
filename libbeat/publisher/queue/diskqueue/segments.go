@@ -141,6 +141,12 @@ const segmentHeaderSizeV1 = 8
 // segmentHeaderSizeV2 schemaVersion 2 header size uint32 for version
 const segmentHeaderSizeV2 = 4
 
+// segmentHeaderSizeV3 schemaVersion 3 header size uint32 for version
+const segmentHeaderSizeV3 = 4
+
+// maxSegmentVersion is the highest supported version
+const maxSegmentVersion = 3
+
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
 
@@ -201,6 +207,8 @@ func (segment *queueSegment) headerSize() uint64 {
 		return segmentHeaderSizeV1
 	case 2:
 		return segmentHeaderSizeV2
+	case 3:
+		return segmentHeaderSizeV3
 	default:
 		return uint64(0)
 	}
@@ -229,7 +237,7 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 		return nil, fmt.Errorf("couldn't read segment version: %w", err)
 	}
 
-	if segment.schemaVersion > 2 {
+	if segment.schemaVersion > maxSegmentVersion {
 		file.Close()
 		return nil, fmt.Errorf("unknown segment version %d: %w", segment.schemaVersion, err)
 	}
@@ -246,7 +254,7 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 	sr.src = file
 	sr.version = segment.schemaVersion
 
-	if sr.version != 2 {
+	if sr.version == 0 || sr.version == 1 {
 		return sr, nil
 	}
 
@@ -276,7 +284,7 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 		return nil, err
 	}
 
-	if sw.version != 2 {
+	if sw.version == 0 || sw.version == 1 {
 		return sw, nil
 	}
 
@@ -399,7 +407,7 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 		if err != nil {
 			return nil, err
 		}
-	case 2:
+	case 2, 3:
 	default:
 		return nil, fmt.Errorf("unrecognized schema version %d", header.version)
 	}
@@ -432,35 +440,47 @@ type segmentReader struct {
 }
 
 func (r *segmentReader) Read(p []byte) (int, error) {
-	if r.version != 2 {
+	switch r.version {
+	case 0, 1:
 		return r.src.Read(p)
+	case 2, 3:
+		return r.er.Read(p)
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", r.version)
 	}
-	return r.er.Read(p)
 }
 
 func (r *segmentReader) Close() error {
-	if r.version != 2 {
+	switch r.version {
+	case 0, 1:
 		return r.src.Close()
+	case 2, 3:
+		return r.er.Close()
+	default:
+		return fmt.Errorf("unsupported schema version: %d", r.version)
 	}
-	return r.er.Close()
 }
 
 func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
-	if r.version != 2 {
+	switch r.version {
+	case 0, 1:
 		return r.src.Seek(offset, whence)
+	case 2, 3:
+		//can't seek before segment header
+		if (offset + int64(whence)) < segmentHeaderSizeV2 {
+			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
+		}
+		if _, err := r.src.Seek(segmentHeaderSizeV2, io.SeekStart); err != nil {
+			return 0, err
+		}
+		if err := r.er.Reset(); err != nil {
+			return 0, err
+		}
+		written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSizeV2)
+		return written + segmentHeaderSizeV2, err
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", r.version)
 	}
-	//can't seek before segment header
-	if (offset + int64(whence)) < segmentHeaderSizeV2 {
-		return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
-	}
-	if _, err := r.src.Seek(segmentHeaderSizeV2, io.SeekStart); err != nil {
-		return 0, err
-	}
-	if err := r.er.Reset(); err != nil {
-		return 0, err
-	}
-	written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSizeV2)
-	return written + segmentHeaderSizeV2, err
 }
 
 type segmentWriter struct {
@@ -470,25 +490,34 @@ type segmentWriter struct {
 }
 
 func (w *segmentWriter) Write(p []byte) (int, error) {
-	if w.version != 2 {
+	switch w.version {
+	case 0, 1:
 		return w.dst.Write(p)
+	case 2, 3:
+		return w.ew.Write(p)
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", w.version)
 	}
-	return w.ew.Write(p)
 }
 
 func (w *segmentWriter) Close() error {
-	if w.version != 2 {
+	switch w.version {
+	case 0, 1:
 		return w.dst.Close()
+	case 2, 3:
+		return w.ew.Close()
+	default:
+		return fmt.Errorf("unsupported schema version: %d", w.version)
 	}
-	return w.ew.Close()
 }
 
 func (w *segmentWriter) Seek(offset int64, whence int) (int64, error) {
-	if w.version != 2 {
+	switch w.version {
+	case 0, 1:
 		return w.dst.Seek(offset, whence)
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", w.version)
 	}
-	// Not something we can do with a stream, we can't re-write.
-	return 0, nil
 }
 
 func (w *segmentWriter) Sync() error {
@@ -504,20 +533,18 @@ func (w *segmentWriter) WriteHeader() error {
 		return err
 	}
 
-	// Version 0 & 2 don't have a count
-	if w.version == 0 || w.version == 2 {
-		return nil
-	}
-
-	if err := binary.Write(w.dst, binary.LittleEndian, uint32(0)); err != nil {
-		return err
+	// Version 1 has count
+	if w.version == 1 {
+		if err := binary.Write(w.dst, binary.LittleEndian, uint32(0)); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func (w *segmentWriter) UpdateCount(count uint32) error {
-	// Version 0 & 2 don't record count
+	// Only Version 1 stores count
 	if w.version != 1 {
 		return nil
 	}

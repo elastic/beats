@@ -443,6 +443,8 @@ func (dq *diskQueue) enqueueWriteFrame(frame *writeFrame) {
 			newSegmentSize = segmentHeaderSizeV1
 		case 2:
 			newSegmentSize = segmentHeaderSizeV2
+		case 3:
+			newSegmentSize = segmentHeaderSizeV3
 		}
 	}
 

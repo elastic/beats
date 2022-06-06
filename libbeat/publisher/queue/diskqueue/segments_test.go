@@ -110,6 +110,12 @@ func TestSeek(t *testing.T) {
 			headerSize:    segmentHeaderSizeV2,
 			plaintexts:    [][]byte{[]byte("abc"), []byte("defg")},
 		},
+		"version 3": {
+			id:            3,
+			schemaVersion: uint32(2),
+			headerSize:    segmentHeaderSizeV3,
+			plaintexts:    [][]byte{[]byte("abc"), []byte("defg")},
+		},
 	}
 	dir, err := os.MkdirTemp("", t.Name())
 	assert.Nil(t, err)

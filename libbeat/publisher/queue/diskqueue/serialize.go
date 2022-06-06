@@ -128,10 +128,6 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 	return result, nil
 }
 
-func (e *eventEncoder) SetCompression(val bool) {
-	e.useCompression = val
-}
-
 func newEventDecoder() *eventDecoder {
 	d := &eventDecoder{}
 	d.reset()
@@ -195,8 +191,4 @@ func (d *eventDecoder) Decode() (publisher.Event, error) {
 			Meta:      to.Meta,
 		},
 	}, nil
-}
-
-func (d *eventDecoder) SetCompression(val bool) {
-	d.useCompression = val
 }

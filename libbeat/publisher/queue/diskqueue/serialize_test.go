@@ -43,7 +43,7 @@ func TestSerialize(t *testing.T) {
 
 	for _, test := range testCases {
 		encoder := newEventEncoder()
-		encoder.SetCompression(test.useCompression)
+		encoder.useCompression = test.useCompression
 		event := publisher.Event{
 			Content: beat.Event{
 				Fields: mapstr.M{
@@ -58,7 +58,7 @@ func TestSerialize(t *testing.T) {
 
 		// Use decoder to decode the serialized bytes.
 		decoder := newEventDecoder()
-		decoder.SetCompression(test.useCompression)
+		decoder.useCompression = (test.useCompression)
 		buf := decoder.Buffer(len(serialized))
 		copy(buf, serialized)
 		decoded, err := decoder.Decode()

@@ -71,7 +71,6 @@ type readerLoop struct {
 
 func newReaderLoop(settings Settings) *readerLoop {
 	decoder := newEventDecoder()
-	decoder.SetCompression(settings.UseCompression)
 	return &readerLoop{
 		settings: settings,
 
@@ -107,6 +106,9 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		return readerLoopResponse{err: err}
 	}
 	defer handle.Close()
+	if request.segment.schemaVersion == 3 {
+		rl.decoder.useCompression = true
+	}
 	_, err = handle.Seek(int64(request.startPosition), io.SeekStart)
 	if err != nil {
 		return readerLoopResponse{err: err}
