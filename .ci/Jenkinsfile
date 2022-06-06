@@ -38,10 +38,10 @@ pipeline {
     }
 	  stage('Lint'){
       steps {
-        withGithubNotify(context: "Lint") {
+        withGithubNotify(context: "Check") {
           dir("${BASE_DIR}"){
             withMageEnv(version: "${env.GO_VERSION}"){
-              sh(label: 'Mage lint', script: 'mage -v lint')
+              sh(label: 'Mage check', script: 'mage -v check')
             }
           }
         }
