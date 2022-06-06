@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix an issue that could lead Windows service timeouts. {issue}31810[31810]
 
 *Auditbeat*
 
