@@ -21,7 +21,6 @@
 package tools
 
 import (
+	_ "github.com/elastic/go-licenser"
 	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
 )
