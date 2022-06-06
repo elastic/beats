@@ -1,5 +1,5 @@
 # Module: gcp
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.16/metricbeat-module-gcp.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.17/metricbeat-module-gcp.html
 
 - module: gcp
   metricsets:

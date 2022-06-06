@@ -2,8 +2,6 @@
 
 ## Caveats
 
-* Module is to be considered _beta_.
-* Field names will be changing for 7.0 to comply with Elastic Common Schema (ECS).
 * Original Suricata event shoved as is `suricata.eve.`
 
 ## How to try the module from source

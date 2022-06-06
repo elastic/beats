@@ -25,19 +25,49 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 )
 
-func TestMonitor(t *testing.T) {
-	serverMonConf := mockPluginConf(t, "", "@every 1ms", "http://example.net")
+// TestMonitorBasic tests a basic config
+func TestMonitorBasic(t *testing.T) {
+	testMonitorConfig(
+		t,
+		mockPluginConf(t, "myId", "myName", "@every 1ms", "http://example.net"),
+		mockEventMonitorValidator("myId", "myName"),
+	)
+}
+
+// TestMonitorBasic tests a config that errors out at plugin creation, but still has stdfields defined.
+// This should cause the monitor to run, but only produce error documents
+func TestMonitorCfgError(t *testing.T) {
+	testMonitorConfig(
+		t,
+		mockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
+		lookslike.Compose(
+			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
+			lookslike.MustCompile(common.MapStr{
+				"error": common.MapStr{
+					"message": isdef.IsStringContaining("missing required field"),
+					"type":    "io",
+				},
+			}),
+		),
+	)
+}
+
+func testMonitorConfig(t *testing.T, conf *common.Config, eventValidator validator.Validator) {
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched.Add, nil, false)
+	mon, err := newMonitor(conf, reg, pipelineConnector, sched.Add, nil, false)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -56,7 +86,7 @@ func TestMonitor(t *testing.T) {
 			pcClient.Close()
 
 			for _, event := range pcClient.Publishes() {
-				testslike.Test(t, mockEventMonitorValidator(""), event.Fields)
+				testslike.Test(t, eventValidator, event.Fields)
 			}
 		} else {
 			// Let's yield this goroutine so we don't spin

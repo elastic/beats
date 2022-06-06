@@ -1,5 +1,5 @@
 # Module: mongodb
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-mongodb.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-mongodb.html
 
 - module: mongodb
   # All logs

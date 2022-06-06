@@ -67,6 +67,7 @@
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "23",
+      "opcode": "Info",
       "process": {
         "pid": 664,
         "thread": {
@@ -77,7 +78,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 612,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }
@@ -143,6 +147,7 @@
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "23",
+      "opcode": "Info",
       "process": {
         "pid": 664,
         "thread": {
@@ -153,7 +158,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }
@@ -218,6 +226,7 @@
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_id": "23",
+      "opcode": "Info",
       "process": {
         "pid": 1188,
         "thread": {
@@ -228,7 +237,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2243,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }

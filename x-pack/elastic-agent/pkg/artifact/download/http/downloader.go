@@ -12,18 +12,31 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"strings"
+	"time"
 
+	"github.com/docker/go-units"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
 	packagePermissions = 0660
+
+	// downloadProgressIntervalPercentage defines how often to report the current download progress when percentage
+	// of time has passed in the overall interval for the complete download to complete. 5% is a good default, as
+	// the default timeout is 10 minutes and this will have it log every 30 seconds.
+	downloadProgressIntervalPercentage = 0.05
+
+	// warningProgressIntervalPercentage defines how often to log messages as a warning once the amount of time
+	// passed is this percentage or more of the total allotted time to download.
+	warningProgressIntervalPercentage = 0.75
 )
 
 var headers = map[string]string{
@@ -32,12 +45,13 @@ var headers = map[string]string{
 
 // Downloader is a downloader able to fetch artifacts from elastic.co web page.
 type Downloader struct {
+	log    progressLogger
 	config *artifact.Config
 	client http.Client
 }
 
 // NewDownloader creates and configures Elastic Downloader
-func NewDownloader(config *artifact.Config) (*Downloader, error) {
+func NewDownloader(log progressLogger, config *artifact.Config) (*Downloader, error) {
 	client, err := config.HTTPTransportSettings.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
 	)
@@ -46,12 +60,13 @@ func NewDownloader(config *artifact.Config) (*Downloader, error) {
 	}
 
 	client.Transport = withHeaders(client.Transport, headers)
-	return NewDownloaderWithClient(config, *client), nil
+	return NewDownloaderWithClient(log, config, *client), nil
 }
 
 // NewDownloaderWithClient creates Elastic Downloader with specific client used
-func NewDownloaderWithClient(config *artifact.Config, client http.Client) *Downloader {
+func NewDownloaderWithClient(log progressLogger, config *artifact.Config, client http.Client) *Downloader {
 	return &Downloader{
+		log:    log,
 		config: config,
 		client: client,
 	}
@@ -156,10 +171,155 @@ func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, f
 		return "", errors.New(fmt.Sprintf("call to '%s' returned unsuccessful status code: %d", sourceURI, resp.StatusCode), errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}
 
-	_, err = io.Copy(destinationFile, resp.Body)
-	if err != nil {
-		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+	fileSize := -1
+	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
+		if length, err := strconv.Atoi(contentLength); err == nil {
+			fileSize = length
+		}
 	}
 
+	reportCtx, reportCancel := context.WithCancel(ctx)
+	dp := newDownloadProgressReporter(e.log, sourceURI, e.config.HTTPTransportSettings.Timeout, fileSize)
+	dp.Report(reportCtx)
+	_, err = io.Copy(destinationFile, io.TeeReader(resp.Body, dp))
+	if err != nil {
+		reportCancel()
+		dp.ReportFailed(err)
+		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+	}
+	reportCancel()
+	dp.ReportComplete()
+
 	return fullPath, nil
+}
+
+type downloadProgressReporter struct {
+	log         progressLogger
+	sourceURI   string
+	timeout     time.Duration
+	interval    time.Duration
+	warnTimeout time.Duration
+	length      float64
+
+	downloaded atomic.Int
+	started    time.Time
+}
+
+func newDownloadProgressReporter(log progressLogger, sourceURI string, timeout time.Duration, length int) *downloadProgressReporter {
+	return &downloadProgressReporter{
+		log:         log,
+		sourceURI:   sourceURI,
+		timeout:     timeout,
+		interval:    time.Duration(float64(timeout) * downloadProgressIntervalPercentage),
+		warnTimeout: time.Duration(float64(timeout) * warningProgressIntervalPercentage),
+		length:      float64(length),
+	}
+}
+
+func (dp *downloadProgressReporter) Write(b []byte) (int, error) {
+	n := len(b)
+	dp.downloaded.Add(n)
+	return n, nil
+}
+
+func (dp *downloadProgressReporter) Report(ctx context.Context) {
+	started := time.Now()
+	dp.started = started
+	sourceURI := dp.sourceURI
+	log := dp.log
+	length := dp.length
+	warnTimeout := dp.warnTimeout
+	interval := dp.interval
+
+	go func() {
+		t := time.NewTimer(interval)
+		defer t.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-t.C:
+				now := time.Now()
+				timePast := now.Sub(started)
+				downloaded := float64(dp.downloaded.Load())
+				bytesPerSecond := downloaded / float64(timePast/time.Second)
+
+				var msg string
+				var args []interface{}
+				if length > 0 {
+					// length of the download is known, so more detail can be provided
+					percentComplete := downloaded / length * 100.0
+					msg = "download progress from %s is %s/%s (%.2f%% complete) @ %sps"
+					args = []interface{}{
+						sourceURI, units.HumanSize(downloaded), units.HumanSize(length), percentComplete, units.HumanSize(bytesPerSecond),
+					}
+				} else {
+					// length unknown so provide the amount downloaded and the speed
+					msg = "download progress from %s has fetched %s @ %sps"
+					args = []interface{}{
+						sourceURI, units.HumanSize(downloaded), units.HumanSize(bytesPerSecond),
+					}
+				}
+
+				log.Infof(msg, args...)
+				if timePast >= warnTimeout {
+					// duplicate to warn when over the warnTimeout; this still has it logging to info that way if
+					// they are filtering the logs to info they still see the messages when over the warnTimeout, but
+					// when filtering only by warn they see these messages only
+					log.Warnf(msg, args...)
+				}
+			}
+		}
+	}()
+}
+
+func (dp *downloadProgressReporter) ReportComplete() {
+	now := time.Now()
+	timePast := now.Sub(dp.started)
+	downloaded := float64(dp.downloaded.Load())
+	bytesPerSecond := downloaded / float64(timePast/time.Second)
+	msg := "download from %s completed in %s @ %sps"
+	args := []interface{}{
+		dp.sourceURI, units.HumanDuration(timePast), units.HumanSize(bytesPerSecond),
+	}
+	dp.log.Infof(msg, args...)
+	if timePast >= dp.warnTimeout {
+		// see reason in `Report`
+		dp.log.Warnf(msg, args...)
+	}
+}
+
+func (dp *downloadProgressReporter) ReportFailed(err error) {
+	now := time.Now()
+	timePast := now.Sub(dp.started)
+	downloaded := float64(dp.downloaded.Load())
+	bytesPerSecond := downloaded / float64(timePast/time.Second)
+	var msg string
+	var args []interface{}
+	if dp.length > 0 {
+		// length of the download is known, so more detail can be provided
+		percentComplete := downloaded / dp.length * 100.0
+		msg = "download from %s failed at %s/%s (%.2f%% complete) @ %sps: %s"
+		args = []interface{}{
+			dp.sourceURI, units.HumanSize(downloaded), units.HumanSize(dp.length), percentComplete, units.HumanSize(bytesPerSecond), err,
+		}
+	} else {
+		// length unknown so provide the amount downloaded and the speed
+		msg = "download from %s failed at %s @ %sps: %s"
+		args = []interface{}{
+			dp.sourceURI, units.HumanSize(downloaded), units.HumanSize(bytesPerSecond), err,
+		}
+	}
+	dp.log.Infof(msg, args...)
+	if timePast >= dp.warnTimeout {
+		// see reason in `Report`
+		dp.log.Warnf(msg, args...)
+	}
+}
+
+// progressLogger is a logger that only needs to implement Infof and Warnf, as those are the only functions
+// that the downloadProgressReporter uses.
+type progressLogger interface {
+	Infof(format string, args ...interface{})
+	Warnf(format string, args ...interface{})
 }

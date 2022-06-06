@@ -1,5 +1,5 @@
 # Module: kafka
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-kafka.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-kafka.html
 
 - module: kafka
   # All logs

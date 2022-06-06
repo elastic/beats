@@ -795,7 +795,7 @@ function url_wrapper(dst, src, fn) {
         if (value != null && (result = fn(value))!== undefined) {
             evt.Put(FIELDS_PREFIX + dst, result);
         } else {
-            console.error(fn.name + " failed for '" + value + "'");
+            console.debug(fn.name + " failed for '" + value + "'");
         }
     };
 }

@@ -1,5 +1,5 @@
 # Module: gcp
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-gcp.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-gcp.html
 
 - module: gcp
   vpcflow:

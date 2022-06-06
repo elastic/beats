@@ -85,16 +85,56 @@ func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
 				errors.M("backup_path", backFilename))
 		}
 	}
-	defer fd.Close()
+	if err := fd.Close(); err != nil {
+		return errors.New(err, fmt.Sprintf("could not close target file after checking for access %s", r.target),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, r.target))
+	}
 
-	if _, err := fd.Write(r.replaceWith); err != nil {
-		if err := file.SafeFileRotate(r.target, backFilename); err != nil {
-			return errors.New(err,
-				fmt.Sprintf("could not rollback %s to %s", backFilename, r.target),
+	// create a temporary file with the new changes, if successful, will replace the target file.
+	tmpFile := r.target + ".tmp"
+
+	// Always clean up the temporary file and ignore errors.
+	defer os.Remove(tmpFile)
+
+	fdt, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perms)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not save to %s", tmpFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, tmpFile))
+	}
+
+	if _, err := fdt.Write(r.replaceWith); err != nil {
+		if err := fdt.Close(); err != nil {
+			return errors.New(err, fmt.Sprintf("could not close temporary file %s", tmpFile),
 				errors.TypeFilesystem,
-				errors.M(errors.MetaKeyPath, r.target),
-				errors.M("backup_path", backFilename))
+				errors.M(errors.MetaKeyPath, tmpFile))
 		}
+		return errors.New(err, fmt.Sprintf("could not succefully write new changes in temporary file %s", tmpFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, tmpFile))
+	}
+
+	if err := fdt.Sync(); err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not sync temporary file %s", tmpFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, tmpFile))
+	}
+
+	if err := fdt.Close(); err != nil {
+		return errors.New(err, fmt.Sprintf("could not close temporary file %s", tmpFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, tmpFile))
+	}
+
+	if err := file.SafeFileRotate(r.target, tmpFile); err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not replace target file %s with %s", r.target, tmpFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, r.target),
+			errors.M("backup_path", backFilename))
 	}
 
 	if err := acl.Chmod(r.target, perms); err != nil {
@@ -104,11 +144,5 @@ func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
 			errors.M(errors.MetaKeyPath, r.target))
 	}
 
-	if err := fd.Sync(); err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not sync target file %s", r.target),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, r.target))
-	}
 	return nil
 }

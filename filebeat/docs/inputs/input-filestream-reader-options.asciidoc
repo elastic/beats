@@ -164,11 +164,11 @@ The multiline message is stored under the key `msg`.
   ...
   parsers:
     - ndjson:
-      keys_under_root: true
-      message_key: msg
+        target: ""
+        message_key: msg
     - multiline:
-      type: counter
-      lines_count: 3
+        type: counter
+        lines_count: 3
 ----
 
 See the available parser settings in detail below.
@@ -197,18 +197,17 @@ Example configuration:
 [source,yaml]
 ----
 - ndjson:
-  keys_under_root: true
-  add_error_key: true
-  message_key: log
+    target: ""
+    add_error_key: true
+    message_key: log
 ----
 
-*`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key
-in the output document. If you enable this setting, the keys are copied top
-level in the output document. The default is false.
+*`target`*:: The name of the new JSON object that should contain the parsed key value pairs. If you
+leave it empty, the new keys will go under root.
 
-*`overwrite_keys`*:: If `keys_under_root` and this setting are enabled, then the
-values from the decoded JSON object overwrite the fields that {beatname_uc}
-normally adds (type, source, offset, etc.) in case of conflicts.
+*`overwrite_keys`*:: Values from the decoded JSON object overwrite the fields that {beatname_uc}
+normally adds (type, source, offset, etc.) in case of conflicts. Disable it if you want
+to keep previously added values.
 
 *`expand_keys`*:: If this setting is enabled, {beatname_uc} will recursively
 de-dot keys in the decoded JSON, and expand them into a hierarchical object
@@ -256,5 +255,5 @@ all containers under the default Kubernetes logs path:
     - "/var/log/containers/*.log"
   parsers:
     - container:
-      stream: stdout
+        stream: stdout
 ----

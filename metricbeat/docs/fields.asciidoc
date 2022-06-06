@@ -36109,7 +36109,7 @@ type: double
 *`kubernetes.node.network.rx.bytes`*::
 +
 --
-Received bytes
+Received bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -36121,7 +36121,7 @@ format: bytes
 *`kubernetes.node.network.rx.errors`*::
 +
 --
-Rx errors
+Rx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -36132,7 +36132,7 @@ type: double
 *`kubernetes.node.network.tx.bytes`*::
 +
 --
-Transmitted bytes
+Transmitted bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -36144,7 +36144,7 @@ format: bytes
 *`kubernetes.node.network.tx.errors`*::
 +
 --
-Tx errors
+Tx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -56532,7 +56532,7 @@ type: long
 *`zookeeper.mntr.followers`*::
 +
 --
-Number of followers seen by the current host.
+Number of followers seen by the current host (Up to ZooKeeper 3.5.9).
 
 
 type: long
@@ -56675,6 +56675,16 @@ type: long
 +
 --
 Number of znodes reported by the local ZooKeeper process.
+
+
+type: long
+
+--
+
+*`zookeeper.mntr.learners`*::
++
+--
+Number of learners (either followers or observers) seen by the current host (From ZooKeeper 3.6.0)
 
 
 type: long

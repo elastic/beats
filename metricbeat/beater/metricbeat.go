@@ -227,6 +227,13 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		modules.Stop()
 	}()
 
+	// Start the manager after all the reload hooks are configured,
+	// the Manager is stopped at the end of the execution.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
+
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
 		moduleReloader := cfgfile.NewReloader(b.Publisher, bt.config.ConfigModules)
@@ -256,6 +263,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	wg.Wait()
+
 	return nil
 }
 

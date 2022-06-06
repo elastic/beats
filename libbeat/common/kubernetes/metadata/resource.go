@@ -120,7 +120,8 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 				case "Deployment",
 					"ReplicaSet",
 					"StatefulSet",
-					"DaemonSet":
+					"DaemonSet",
+					"Job":
 					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
 				}
 			}

@@ -74,14 +74,14 @@ For this example, imagine that an application generates the following messages:
 "789 - App02 - Database is refreshing tables"
 ----
 
-Use the `dissect` processor to split each message into two fields, for example,
+Use the `dissect` processor to split each message into three fields, for example, `service.pid`,
 `service.name` and `service.status`:
 
 [source,yaml]
 ----
 processors:
   - dissect:
-      tokenizer: '"%{pid|integer} - %{service.name} - %{service.status}"'
+      tokenizer: '"%{service.pid|integer} - %{service.name} - %{service.status}"'
       field: "message"
       target_prefix: ""
 ----
@@ -98,7 +98,7 @@ This configuration produces fields like:
 ----
 
 `service.name` is an ECS {ref}/keyword.html[keyword field], which means that you
-can use it in {es} for filtering, sorting, and aggregations. 
+can use it in {es} for filtering, sorting, and aggregations.
 
 When possible, use ECS-compatible field names. For more information, see the
 {ecs-ref}/index.html[Elastic Common Schema] documentation.

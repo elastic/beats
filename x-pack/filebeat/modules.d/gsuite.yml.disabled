@@ -1,5 +1,5 @@
 # Module: gsuite
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-gsuite.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-gsuite.html
 
 # Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
 - module: gsuite

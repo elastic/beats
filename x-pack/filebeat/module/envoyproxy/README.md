@@ -2,10 +2,6 @@
 
 This is a filebeat module for Envoy proxy access log. 
 
-## Caveats
-
-* Module is to be considered _beta_.
-
 ## Download and install Filebeat
 
 Grab the filebeat binary from elastic.co, and install it by following the instructions.

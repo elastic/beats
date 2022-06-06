@@ -3,6 +3,7 @@ mprotect
 set_robust_list
 tgkill
 time
+rseq
 
 # cgo os/user
 access

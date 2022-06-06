@@ -23,7 +23,7 @@ func CustomizePackaging() {
 		// TODO: this could be moved to dev-tools/packaging/packages.yml for the next release
 		var mode os.FileMode = 0644
 		// If distFile is osqueryd binary then it should be executable
-		if distFile == distro.OsquerydFilename() {
+		if distFile == distro.OsquerydFilenameForOS(args.OS) {
 			mode = 0750
 		}
 		arch := defaultArch

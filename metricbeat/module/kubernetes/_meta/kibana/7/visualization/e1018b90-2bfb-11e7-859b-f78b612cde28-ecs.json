@@ -57,11 +57,9 @@
                                 "type": "sum"
                             }
                         ],
-                        "override_index_pattern": 1,
                         "point_size": 1,
                         "seperate_axis": 0,
                         "series_interval": "10s",
-                        "series_time_field": "@timestamp",
                         "split_color_mode": "gradient",
                         "split_mode": "everything",
                         "stacked": "none"

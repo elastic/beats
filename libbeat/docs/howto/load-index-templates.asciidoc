@@ -294,7 +294,7 @@ ifdef::deb_os,rpm_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::deb_os,rpm_os[]
 
@@ -303,7 +303,7 @@ ifdef::mac_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::mac_os[]
 
@@ -312,7 +312,7 @@ ifdef::linux_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::linux_os[]
 
@@ -323,6 +323,6 @@ endif::win_only[]
 
 ["source","sh",subs="attributes"]
 ----
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{version}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_index_template/{beatname_lc}-{version}
 ----
 endif::win_os[]

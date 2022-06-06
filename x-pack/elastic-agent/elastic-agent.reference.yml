@@ -11,8 +11,9 @@ outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200]
-    username: elastic
-    password: changeme
+    api_key: "example-key"
+    #username: elastic
+    #password: changeme
 
 inputs:
   - type: system/metrics
@@ -49,6 +50,9 @@ inputs:
 
 #     # optional values
 #     #protocol: "https"
+#     #service_token: "example-token"
+#     # Note that fleet-server basic auth is deprecated and will be removed in 8.0
+#     # service_token should be used instead.
 #     #username: "elastic"
 #     #password: "changeme"
 #     #path: ""

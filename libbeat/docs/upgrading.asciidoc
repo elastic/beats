@@ -330,7 +330,7 @@ layer. See <<enable-ecs-compatibility>>.
 +
 ["source","sh",subs="attributes"]
 ----
-DELETE /_template/metricbeat-{version}
+DELETE /_index_template/metricbeat-{version}
 ----
 +
 Because the index template was loaded without the compatibility layer enabled,

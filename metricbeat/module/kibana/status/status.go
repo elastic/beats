@@ -20,6 +20,7 @@ package status
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -64,6 +65,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
 
 	return &MetricSet{
 		ms,

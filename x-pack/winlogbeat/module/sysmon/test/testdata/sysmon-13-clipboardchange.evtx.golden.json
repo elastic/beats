@@ -48,6 +48,7 @@
         "Session": "1"
       },
       "event_id": "24",
+      "opcode": "Info",
       "process": {
         "pid": 3800,
         "thread": {
@@ -58,7 +59,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 10757412,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }

@@ -6,11 +6,13 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -20,7 +22,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,8 +32,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
-const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
-const totalListingObjects = 10000
+const (
+	cloudtrailTestFile            = "testdata/aws-cloudtrail.json.gz"
+	totalListingObjects           = 10000
+	totalListingObjectsForInputS3 = totalListingObjects / 5
+)
 
 type constantSQS struct {
 	msgs []sqs.Message
@@ -52,11 +56,11 @@ func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sq
 	return c.msgs, nil
 }
 
-func (_ *constantSQS) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
 	return nil
 }
 
-func (_ *constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
 	return nil
 }
 
@@ -91,16 +95,16 @@ func (c *s3PagerConstant) Err() error {
 	return nil
 }
 
-func newS3PagerConstant() *s3PagerConstant {
+func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	lastModified := time.Now()
 	ret := &s3PagerConstant{
 		currentIndex: 0,
 	}
 
-	for i := 0; i < totalListingObjects; i++ {
+	for i := 0; i < totalListingObjectsForInputS3; i++ {
 		ret.objects = append(ret.objects, s3.Object{
-			Key:          aws.String(fmt.Sprintf("key-%d.json.gz", i)),
-			ETag:         aws.String(fmt.Sprintf("etag-%d", i)),
+			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
+			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
 			LastModified: aws.Time(lastModified),
 		})
 	}
@@ -211,7 +215,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -234,7 +238,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		"Time (sec)",
 		"CPUs",
 	}
-	var data [][]string
+	data := make([][]string, 0)
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]),
@@ -256,8 +260,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics(metricRegistry, "test_id")
-		s3API := newConstantS3(t)
-		s3API.pagerConstant = newS3PagerConstant()
+
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
 			event.Private.(*eventACKTracker).ACK()
 		})
@@ -271,14 +274,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			t.Fatalf("Failed to access store: %v", err)
 		}
 
-		err = store.Set(awsS3WriteCommitPrefix+"bucket", &commitWriteState{time.Time{}})
-		if err != nil {
-			t.Fatalf("Failed to reset store: %v", err)
-		}
-
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", "key-", "region", numberOfWorkers, time.Second)
-
+		b.ResetTimer()
+		start := time.Now()
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
@@ -289,13 +286,42 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			cancel()
 		}()
 
-		b.ResetTimer()
-		start := time.Now()
-		if err := s3Poller.Poll(ctx); err != nil {
-			if !errors.Is(err, context.DeadlineExceeded) {
+		errChan := make(chan error)
+		wg := new(sync.WaitGroup)
+		for i := 0; i < 5; i++ {
+			wg.Add(1)
+			go func(i int, wg *sync.WaitGroup) {
+				defer wg.Done()
+				listPrefix := fmt.Sprintf("list_prefix_%d", i)
+				s3API := newConstantS3(t)
+				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
+				if err != nil {
+					errChan <- err
+					return
+				}
+
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", numberOfWorkers, time.Second)
+
+				if err := s3Poller.Poll(ctx); err != nil {
+					if !errors.Is(err, context.DeadlineExceeded) {
+						errChan <- err
+					}
+				}
+			}(i, wg)
+		}
+
+		wg.Wait()
+		select {
+		case err := <-errChan:
+			if err != nil {
 				t.Fatal(err)
 			}
+		default:
+
 		}
+
 		b.StopTimer()
 		elapsed := time.Since(start)
 
@@ -321,7 +347,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),
@@ -339,22 +365,32 @@ func TestBenchmarkInputS3(t *testing.T) {
 
 	headers := []string{
 		"Number of workers",
+		"Objects listed total",
 		"Objects listed per sec",
+		"Objects processed total",
 		"Objects processed per sec",
+		"Objects acked total",
 		"Objects acked per sec",
+		"Events total",
 		"Events per sec",
+		"S3 Bytes total",
 		"S3 Bytes per sec",
 		"Time (sec)",
 		"CPUs",
 	}
-	var data [][]string
+	data := make([][]string, 0)
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["number_of_workers"]),
+			fmt.Sprintf("%v", r.Extra["objects_listed"]),
 			fmt.Sprintf("%v", r.Extra["objects_listed_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["objects_processed"]),
 			fmt.Sprintf("%v", r.Extra["objects_processed_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["objects_acked"]),
 			fmt.Sprintf("%v", r.Extra["objects_acked_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["events"]),
 			fmt.Sprintf("%v", r.Extra["events_per_sec"]),
+			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes"]))),
 			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes_per_sec"]))),
 			fmt.Sprintf("%v", r.Extra["sec"]),
 			fmt.Sprintf("%v", runtime.GOMAXPROCS(0)),

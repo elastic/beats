@@ -9,7 +9,7 @@ processors:
     - '%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-)
       +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app})
       +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid})
-      +\[%{GREEDYDATA:syslog5424_sd}\]$'
+      +\[%{GREEDYDATA:syslog5424_sd}\]'
 - kv:
     field: syslog5424_sd
     field_split: '; '

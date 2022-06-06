@@ -163,12 +163,27 @@ func newMonitorUnsafe(
 		return p.Close()
 	}
 
+	// If we've hit an error at this point, still run on schedule, but always return an error.
+	// This way the error is clearly communicated through to kibana.
+	// Since the error is not recoverable in these instances, the user will need to reconfigure
+	// the monitor, which will destroy and recreate it in heartbeat, thus clearing this error.
+	//
+	// Note: we do this at this point, and no earlier, because at a minimum we need the
+	// standard monitor fields (id, name and schedule) to deliver an error to kibana in a way
+	// that it can render.
+	if err != nil {
+		// Note, needed to hoist err to this scope, not just to add a prefix
+		fullErr := fmt.Errorf("job could not be initialized: %s", err)
+		// A placeholder job that always returns an error
+
+		logp.L().Error(fullErr)
+		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
+			return nil, fullErr
+		}}
+	}
+
 	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
 	m.endpoints = p.Endpoints
-
-	if err != nil {
-		return m, fmt.Errorf("job err %v", err)
-	}
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
@@ -224,9 +239,9 @@ func (m *Monitor) Start() {
 
 	for _, t := range m.configuredJobs {
 		if m.runOnce {
-			client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+			client, err := pipeline.NewSyncClient(logp.L(), t.monitor.pipelineConnector, beat.ClientConfig{})
 			if err != nil {
-				logp.Err("could not start monitor: %v", err)
+				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
@@ -239,7 +254,7 @@ func (m *Monitor) Start() {
 		} else {
 			client, err := m.pipelineConnector.Connect()
 			if err != nil {
-				logp.Err("could not start monitor: %v", err)
+				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
@@ -271,7 +286,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.Error(fmt.Errorf("error closing monitor %s: %w", m.String(), err))
+			logp.L().Error("error closing monitor %s: %w", m.String(), err)
 		}
 	}
 

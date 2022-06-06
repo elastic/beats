@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/timed"
@@ -76,6 +77,7 @@ type fileWatcher struct {
 	scanner         loginp.FSScanner
 	log             *logp.Logger
 	events          chan loginp.FSEvent
+	sameFileFunc    func(os.FileInfo, os.FileInfo) bool
 }
 
 func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
@@ -109,6 +111,7 @@ func newScannerWatcher(paths []string, c *common.Config) (loginp.FSWatcher, erro
 		prev:            make(map[string]os.FileInfo, 0),
 		scanner:         scanner,
 		events:          make(chan loginp.FSEvent),
+		sameFileFunc:    os.SameFile,
 	}, nil
 }
 
@@ -126,7 +129,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	// run initial scan before starting regular
 	w.watch(ctx)
 
-	timed.Periodic(ctx, w.interval, func() error {
+	_ = timed.Periodic(ctx, w.interval, func() error {
 		w.watch(ctx)
 
 		return nil
@@ -142,12 +145,16 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	for path, info := range paths {
 
+		// if the scanner found a new path or an existing path
+		// with a different file, it is a new file
 		prevInfo, ok := w.prev[path]
-		if !ok {
-			newFiles[path] = paths[path]
+		if !ok || !w.sameFileFunc(prevInfo, info) {
+			newFiles[path] = info
 			continue
 		}
 
+		// if the two infos belong to the same file and it has been modified
+		// if the size is smaller than before, it is truncated, if bigger, it is a write event
 		if prevInfo.ModTime() != info.ModTime() {
 			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
 				select {
@@ -172,7 +179,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// either because they have been deleted or renamed
 	for removedPath, removedInfo := range w.prev {
 		for newPath, newInfo := range newFiles {
-			if os.SameFile(removedInfo, newInfo) {
+			if w.sameFileFunc(removedInfo, newInfo) {
 				select {
 				case <-ctx.Done():
 					return
@@ -292,13 +299,13 @@ func (s *fileScanner) resolveRecursiveGlobs(c fileScannerConfig) error {
 
 // normalizeGlobPatterns calls `filepath.Abs` on all the globs from config
 func (s *fileScanner) normalizeGlobPatterns() error {
-	var paths []string
-	for _, path := range s.paths {
+	paths := make([]string, len(s.paths))
+	for i, path := range s.paths {
 		pathAbs, err := filepath.Abs(path)
 		if err != nil {
-			return fmt.Errorf("failed to get the absolute path for %s: %v", path, err)
+			return fmt.Errorf("failed to get the absolute path for %s: %w", path, err)
 		}
-		paths = append(paths, pathAbs)
+		paths[i] = pathAbs
 	}
 	s.paths = paths
 	return nil
@@ -308,6 +315,7 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 // match the configured paths.
 func (s *fileScanner) GetFiles() map[string]os.FileInfo {
 	pathInfo := map[string]os.FileInfo{}
+	uniqFileID := map[string]os.FileInfo{}
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -323,7 +331,7 @@ func (s *fileScanner) GetFiles() map[string]os.FileInfo {
 
 			// If symlink is enabled, it is checked that original is not part of same input
 			// If original is harvested by other input, states will potentially overwrite each other
-			if s.isOriginalAndSymlinkConfigured(file, pathInfo) {
+			if s.isOriginalAndSymlinkConfigured(file, uniqFileID) {
 				continue
 			}
 
@@ -377,20 +385,19 @@ func (s *fileScanner) shouldSkipFile(file string) bool {
 	return false
 }
 
-func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, paths map[string]os.FileInfo) bool {
+func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, uniqFileID map[string]os.FileInfo) bool {
 	if s.symlinks {
 		fileInfo, err := os.Stat(file)
 		if err != nil {
 			s.log.Debugf("stat(%s) failed: %s", file, err)
 			return false
 		}
-
-		for _, finfo := range paths {
-			if os.SameFile(finfo, fileInfo) {
-				s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
-				return true
-			}
+		fileID := file_helper.GetOSState(fileInfo).String()
+		if finfo, exists := uniqFileID[fileID]; exists {
+			s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
+			return true
 		}
+		uniqFileID[fileID] = fileInfo
 	}
 	return false
 }

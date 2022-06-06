@@ -13,6 +13,8 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/libbeat/common/proc"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
@@ -134,6 +136,15 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	if err != nil {
 		return err
 	}
+
+	// Hook to JobObject on windows, noop on other platforms.
+	// This ties the application processes lifespan to the agent's.
+	// Fixes the orphaned beats processes left behind situation
+	// after the agent process gets killed.
+	if err := proc.JobObject.Assign(a.state.ProcessInfo.Process); err != nil {
+		a.logger.Errorf("application process failed job assign: %v", err)
+	}
+
 	// write connect info to stdin
 	go a.writeToStdin(a.srvState, a.state.ProcessInfo.Stdin)
 

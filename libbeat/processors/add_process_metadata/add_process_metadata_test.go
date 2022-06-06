@@ -71,7 +71,6 @@ func TestAddProcessMetadata(t *testing.T) {
 
 	// mock of the cgroup processCgroupPaths
 	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
-
 		testMap := map[int]cgroup.PathList{
 			1: {
 				V1: map[string]cgroup.ControllerPath{
@@ -144,6 +143,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
 					"ppid":       0,
+					"parent": common.MapStr{
+						"pid": 0,
+					},
 					"start_time": startTime,
 				},
 				"container": common.MapStr{
@@ -225,6 +227,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
 						"ppid":       0,
+						"parent": common.MapStr{
+							"pid": 0,
+						},
 						"start_time": startTime,
 					},
 					"container": common.MapStr{
@@ -253,6 +258,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
 						"ppid":       0,
+						"parent": common.MapStr{
+							"pid": 0,
+						},
 						"start_time": startTime,
 						"env": map[string]string{
 							"HOME":       "/",
@@ -288,6 +296,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
 						"ppid":       0,
+						"parent": common.MapStr{
+							"pid": 0,
+						},
 						"start_time": startTime,
 						"env": map[string]string{
 							"HOME":       "/",
@@ -482,6 +493,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
 					"ppid":       0,
+					"parent": common.MapStr{
+						"pid": 0,
+					},
 					"start_time": startTime,
 				},
 				"container": common.MapStr{
@@ -601,6 +615,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
 					"ppid":       0,
+					"parent": common.MapStr{
+						"pid": 0,
+					},
 					"start_time": startTime,
 				},
 			},
@@ -721,7 +738,7 @@ func TestUsingCache(t *testing.T) {
 			selfPID: testStruct,
 		}
 
-		//testMap :=
+		// testMap :=
 		return testMap[pid], nil
 	}
 
@@ -730,7 +747,6 @@ func TestUsingCache(t *testing.T) {
 		"include_fields": []string{"container.id"},
 		"target":         "meta",
 	})
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1000,7 +1016,7 @@ func TestV2CID(t *testing.T) {
 	processCgroupPaths = func(_ string, _ int) (cgroup.PathList, error) {
 		testMap := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
-				"cpu": cgroup.ControllerPath{IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
+				"cpu": {IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
 			},
 		}
 		return testMap, nil

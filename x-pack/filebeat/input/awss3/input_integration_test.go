@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"gopkg.in/yaml.v2"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
@@ -29,7 +30,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
-	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -373,11 +373,6 @@ func drainSQS(t *testing.T, region string, queueURL string) {
 	t.Logf("Drained %d SQS messages.", deletedCount)
 }
 
-func TestGetBucketNameFromARN(t *testing.T) {
-	bucketName := getBucketNameFromARN("arn:aws:s3:::my_corporate_bucket")
-	assert.Equal(t, "my_corporate_bucket", bucketName)
-}
-
 func TestGetRegionForBucketARN(t *testing.T) {
 	logp.TestingSetup()
 
@@ -442,13 +437,6 @@ func TestPaginatorListPrefix(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, objects)
-}
-
-func TestGetProviderFromDomain(t *testing.T) {
-	assert.Equal(t, "aws", getProviderFromDomain("", ""))
-	assert.Equal(t, "aws", getProviderFromDomain("c2s.ic.gov", ""))
-	assert.Equal(t, "abc", getProviderFromDomain("abc.com", "abc"))
-	assert.Equal(t, "xyz", getProviderFromDomain("oraclecloud.com", "xyz"))
 }
 
 func TestInputRunSNS(t *testing.T) {

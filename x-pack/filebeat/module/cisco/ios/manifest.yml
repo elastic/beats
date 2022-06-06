@@ -10,6 +10,8 @@ var:
     default: localhost
   - name: syslog_port
     default: 9002
+  - name: syslog_protocol
+    default: udp
   - name: input
     default: syslog
 

@@ -1,5 +1,5 @@
 # Module: ibmmq
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-ibmmq.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-ibmmq.html
 
 - module: ibmmq
   # All logs

@@ -1,5 +1,5 @@
 # Module: santa
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-santa.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-santa.html
 
 - module: santa
   log:

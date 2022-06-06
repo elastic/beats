@@ -152,28 +152,31 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 	return multierr.Combine(errs...)
 }
 
+type escapePosition struct {
+	start, end int
+}
+
 // replaceEscapes replaces the escaped characters contained in v with their
 // unescaped value.
-func replaceEscapes(v string, startOffset int, escapes []int) string {
+func replaceEscapes(v string, startOffset int, escapes []escapePosition) string {
 	if len(escapes) == 0 {
 		return v
 	}
 
 	// Adjust escape offsets relative to the start offset of v.
 	for i := 0; i < len(escapes); i++ {
-		escapes[i] = escapes[i] - startOffset
+		escapes[i].start = escapes[i].start - startOffset
+		escapes[i].end = escapes[i].end - startOffset
 	}
 
 	var buf strings.Builder
-	var end int
+	var prevEnd int
 
 	// Iterate over escapes and replace them.
-	for i := 0; i < len(escapes); i += 2 {
-		start := escapes[i]
-		buf.WriteString(v[end:start])
+	for _, escape := range escapes {
+		buf.WriteString(v[prevEnd:escape.start])
 
-		end = escapes[i+1]
-		value := v[start:end]
+		value := v[escape.start:escape.end]
 
 		switch value {
 		case `\n`:
@@ -186,8 +189,10 @@ func replaceEscapes(v string, startOffset int, escapes []int) string {
 				buf.WriteString(value[1:])
 			}
 		}
+
+		prevEnd = escape.end
 	}
-	buf.WriteString(v[end:])
+	buf.WriteString(v[prevEnd:])
 
 	return buf.String()
 }
