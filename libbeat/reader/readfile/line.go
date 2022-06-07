@@ -235,7 +235,7 @@ func (r *LineReader) skipUntilNewLine() (int, error) {
 
 			if idx != -1 {
 				r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
-				skipped += idx
+				skipped += idx + len(r.nl)
 			} else {
 				skipped += n
 			}
