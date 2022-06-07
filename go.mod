@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/docker/docker v20.10.12+incompatible
 	github.com/docker/go-connections v0.4.0
-	github.com/elastic/elastic-agent-libs v0.0.0-20220303160015-5b4e674da3dd
+	github.com/elastic/elastic-agent-libs v0.2.5
 	github.com/magefile/mage v1.12.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
@@ -15,10 +15,11 @@ require (
 )
 
 require (
-	github.com/containerd/containerd v1.5.7 // indirect
+	github.com/containerd/containerd v1.5.10 // indirect
 	github.com/docker/distribution v2.8.0+incompatible // indirect
-	github.com/elastic/go-ucfg v0.8.4
+	github.com/elastic/go-licenser v0.4.0
+	github.com/elastic/go-ucfg v0.8.5
 	github.com/morikuni/aec v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
+	go.elastic.co/go-licence-detector v0.5.0
 	gopkg.in/yaml.v2 v2.4.0
 )
