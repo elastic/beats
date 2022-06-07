@@ -31,14 +31,17 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        dir("${BASE_DIR}"){
+          setEnvVar('GO_VERSION', readFile(".go-version").trim())
+        }
       }
     }
 	  stage('Lint'){
       steps {
-        withGithubNotify(context: "Lint") {
+        withGithubNotify(context: "Check") {
           dir("${BASE_DIR}"){
-            withMageEnv(){
-              sh(label: 'Mage lint', script: 'mage -v lint')
+            withMageEnv(version: "${env.GO_VERSION}"){
+              sh(label: 'Mage check', script: 'mage -v check')
             }
           }
         }

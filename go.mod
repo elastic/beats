@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/elastic/elastic-agent-libs v0.2.2
+	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.1
 	github.com/elastic/go-windows v1.0.1
