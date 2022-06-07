@@ -1,4 +1,4 @@
-all : schemaV0.svg frameV0.svg schemaV1.svg frameV1.svg schemaV2.svg frameV2.svg
+all : schemaV0.svg frameV0.svg schemaV1.svg frameV1.svg schemaV2.svg frameV2.svg schemaV3.svg frameV3.svg
 
 .PHONY : clean
 
