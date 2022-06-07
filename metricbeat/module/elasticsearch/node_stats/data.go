@@ -262,7 +262,7 @@ var (
 				"total":          c.Dict("total", totalMemoryPressureSchema),
 				"limit_in_bytes": c.Int("limit_in_bytes"),
 			}),
-		}),
+		}, c.DictOptional),
 		"ingest": c.Dict("ingest", s.Schema{
 			"total": c.Dict("total", s.Schema{
 				"count":          c.Int("count"),
