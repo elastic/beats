@@ -104,16 +104,15 @@ func (p *TimestampPrecision) Unpack(v string) error {
 
 // SetTimestampPrecision sets the precision of timestamps in the Beat.
 // It is only supposed to be called during init because it changes
-// the format of the timestamps globally.
+// the format of the timestamps globally. Calling it with a nil value
+// resets it to the default format.
 func SetTimestampPrecision(c *conf.C) error {
-	if c == nil {
-		return nil
-	}
-
 	p := defaultTimestampConfig()
-	err := c.Unpack(&p)
-	if err != nil {
-		return fmt.Errorf("failed to set timestamp precision: %w", err)
+
+	if c != nil {
+		if err := c.Unpack(&p); err != nil {
+			return fmt.Errorf("failed to set timestamp precision: %w", err)
+		}
 	}
 
 	tsFmt = precisions[p.Precision]
