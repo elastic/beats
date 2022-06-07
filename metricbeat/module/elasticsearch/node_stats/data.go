@@ -357,7 +357,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		event := mb.Event{}
 
-		event.RootFields = common.MapStr{}
+		event.RootFields = mapstr.M{}
 		_, err = event.RootFields.Put("service.name", elasticsearch.ModuleName)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("unable to put field service.name: %w", err))
