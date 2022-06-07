@@ -1,38 +1,6 @@
 # README
 
-This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with VisualStudioCode. Other IDE can be used, here we only provide instructions for VisulStudioCode.
-
-A common requirement for both remote debugging in docker or kubernetes is to have a file `.vscode/launch.json` on your local machine. 
-
-Important Notice: Replace `<absolute path>` in the following config with the absolute path of the root folder.
-
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Connect to server",
-            "type": "go",
-            "request": "attach",
-            "mode": "remote",
-            "debugAdapter": "dlv-dap",
-            "port": 56268,
-            "host": "127.0.0.1",
-            "showLog": true,
-            "trace": "trace",
-            "cwd": "${workspaceFolder}",
-            "substitutePath": [
-                { 
-	                "from": "${workspaceFolder}",
-					"to": "<absolute path>"     
-                }
-            ]
-        }
-      
-    ]
-}
-```
-
+This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with your local IDE. 
 
 ## Steps to run on docker:
 
@@ -54,13 +22,15 @@ GOOS=linux GOARCH=amd64 go build -gcflags "-N -l" -o metricbeat main.go
 docker build -t metricbeat-debugger-image -f Dockerfile.debug .
 ```
 
-3. run container
+3. run docker container
 
 ```bash
 docker run -p 56268:56268 --network elastic-package-stack_default -v $(pwd)/metric.docker.yml:/usr/share/metricbeat/metricbeat.yml metricbeat-debugger-image -c /usr/share/metricbeat/metricbeat.yml -e
 ```
 
-4. Run debugger from VisualStudio Code via `.vscode/launch.json`. Remember to add first some breakpoints
+You can customize the metricbeat configuration by mounting a different file instead of `$(pwd)/metric.docker.yml`.
+
+4. Attach to the remote debugger via your local IDE. Follow [Attach to remote debugger](./README.md#attach-to-remote-debugger-via-your-local-ide)
 
 
 ## Steps to run on kubernetes:
@@ -115,6 +85,8 @@ Namely you need:
 - add `imagePullPolicy` to pull the image from inside Kind
 - add a `ports` to expose the port in order to remote debug from laptop
 
+Compared to the docker example, here the metricbeat config is provided in the kubernetes manifest and mounted as a volume.
+
 5. Port forward from k8s to localhost
 
 ```bash
@@ -123,4 +95,42 @@ kubectl port-forward <pod-name> 56268:56268
 
 where `<pod-name>` is the name of the pod running on k8s
 
-6. Run debugger from VisualStudio Code via `.vscode/launch.json`. Remember to add first some breakpoints. For example you can put a breakpoint at `metricbeat/cmd/root.go` at line 74 to stop at the very beginning of the metricbeat command
+6. Attach to the remote debugger via your local IDE. Follow [Attach to remote debugger](./README.md#attach-to-remote-debugger-via-your-local-ide)
+
+
+## Attach to remote debugger via your local IDE
+
+### Visual Studio Code
+In order to attach to the remote debugger running on docker container or a k8s pod you need to provide a file `.vscode/launch.json` on your local machine with some configurations.
+
+You can use the following template, but remember to replace `<absolute path>` with the absolute path of the root folder of your project.
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Connect to server",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "debugAdapter": "dlv-dap",
+            "port": 56268,
+            "host": "127.0.0.1",
+            "showLog": true,
+            "trace": "trace",
+            "cwd": "${workspaceFolder}",
+            "substitutePath": [
+                { 
+	                "from": "${workspaceFolder}",
+					        "to": "<absolute path>"     
+                }
+            ]
+        }
+      
+    ]
+}
+```
+
+## Goland/IntelliJ
+More info at [here](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#attach-to-a-process-on-a-remote-machine)
