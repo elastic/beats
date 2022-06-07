@@ -31588,6 +31588,36 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+--
+
+
+
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
 +

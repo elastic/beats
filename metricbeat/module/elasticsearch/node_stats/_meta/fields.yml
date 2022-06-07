@@ -4,6 +4,20 @@
     Statistics about each node in a Elasticsearch cluster
   release: ga
   fields:
+    - name: ingest
+      type: group
+      fields:
+        - name: total
+          type: group
+          fields:
+            - name: count
+              type: long
+            - name: time_in_millis
+              type: long
+            - name: current
+              type: long
+            - name: failed
+              type: long
     - name: indices
       type: group
       fields:
