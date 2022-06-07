@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"bytes"
+	"crypto/aes"
 	"io"
 	"testing"
 
@@ -37,6 +38,7 @@ func TestEncryptionRoundTrip(t *testing.T) {
 		pr, pw := io.Pipe()
 		src := bytes.NewReader(tc.plaintext)
 		var dst bytes.Buffer
+		var teeBuf bytes.Buffer
 		key := []byte("kkkkkkkkkkkkkkkk")
 
 		go func() {
@@ -48,10 +50,16 @@ func TestEncryptionRoundTrip(t *testing.T) {
 			ew.Close()
 		}()
 
-		er, err := NewEncryptionReader(pr, key)
+		tr := io.TeeReader(pr, &teeBuf)
+		er, err := NewEncryptionReader(io.NopCloser(tr), key)
 		assert.Nil(t, err, name)
 		_, err = io.Copy(&dst, er)
 		assert.Nil(t, err, name)
+		// Check round trip worked
 		assert.Equal(t, tc.plaintext, dst.Bytes(), name)
+		// Check that iv & cipher text were written
+		assert.Equal(t, len(tc.plaintext)+aes.BlockSize, teeBuf.Len(), name)
+		// Check that cipher text and plaintext don't match
+		assert.NotEqual(t, tc.plaintext, teeBuf.Bytes()[aes.BlockSize:], name)
 	}
 }
