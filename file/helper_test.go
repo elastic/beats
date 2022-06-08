@@ -29,7 +29,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// nolint: gosec // file permissions are valid for test purposes
 func TestSafeFileRotateExistingFile(t *testing.T) {
 	tempdir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)

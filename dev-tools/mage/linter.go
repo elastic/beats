@@ -124,7 +124,7 @@ func (Linter) Install() error {
 	defer installScript.Close()
 
 	log.Println("Downloading the linter installation script...")
-	// nolint: noctx // valid use since there is no context
+	//nolint:noctx // valid use since there is no context
 	resp, err := http.Get(linterInstallURL)
 	if err != nil {
 		return fmt.Errorf("cannot download the linter installation script from %q: %w", linterInstallURL, err)

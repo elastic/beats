@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // nolint: gosec // we want to expose it
+	_ "net/http/pprof" //nolint:gosec // we want to expose it
 	"os"
 	"os/signal"
 	"runtime"

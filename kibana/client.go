@@ -110,7 +110,7 @@ func extractMessage(result []byte) error {
 		}
 	}
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return nil // nolint: nilerr // we suppress some malformed errors on purpose
+		return nil //nolint:nilerr // we suppress some malformed errors on purpose
 	}
 
 	if !kibanaResult.Success {

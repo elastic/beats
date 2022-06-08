@@ -51,8 +51,8 @@ func NewClient(c Config, network, host string, defaultPort int) (*Client, error)
 	// do some sanity checks regarding network and Config matching +
 	// address being parseable
 	switch network {
-	case "tcp", "tcp4", "tcp6": // nolint: goconst // we do not win anything by making tcp a const
-	case "udp", "udp4", "udp6": // nolint: goconst // we do not win anything by making udp a const
+	case "tcp", "tcp4", "tcp6":
+	case "udp", "udp4", "udp6":
 		if c.TLS == nil && c.Proxy == nil {
 			break
 		}
