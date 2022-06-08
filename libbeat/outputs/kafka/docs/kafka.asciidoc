@@ -36,7 +36,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 [[kafka-compatibility]]
 ==== Compatibility
 
-This output can connect to Kafka version 0.8.2.0 and up. Older versions
+This output can connect to Kafka version 0.8.2.0 and later. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options
