@@ -57,6 +57,7 @@ type journeyEnricher struct {
 }
 
 func newJourneyEnricher(senr *streamEnricher) *journeyEnricher {
+	fmt.Printf("NEW JE\n")
 	return &journeyEnricher{
 		checkGroup:     makeUuid(),
 		streamEnricher: senr,

@@ -41,7 +41,7 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 }
 
 func TestJourneyEnricher(t *testing.T) {
-	var stdFields = stdfields.StdMonitorFields{
+	var sFields = stdfields.StdMonitorFields{
 		ID:   "myproject",
 		Name: "myproject",
 		Type: "browser",
@@ -91,18 +91,18 @@ func TestJourneyEnricher(t *testing.T) {
 
 	legacyProjValidator := func() validator.Validator {
 		return lookslike.MustCompile(mapstr.M{
-			"monitor.project.id":   stdFields.ID,
-			"monitor.project.name": stdFields.Name,
-			"monitor.id":           fmt.Sprintf("%s-%s", stdFields.ID, journey.ID),
-			"monitor.name":         fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-			"monitor.type":         stdFields.Type,
+			"monitor.project.id":   sFields.ID,
+			"monitor.project.name": sFields.Name,
+			"monitor.id":           fmt.Sprintf("%s-%s", sFields.ID, journey.ID),
+			"monitor.name":         fmt.Sprintf("%s - %s", sFields.Name, journey.Name),
+			"monitor.type":         sFields.Type,
 		})
 	}
 	projValidator := func() validator.Validator {
 		return lookslike.MustCompile(mapstr.M{
-			"monitor.id":   stdFields.ID,
-			"monitor.name": stdFields.Name,
-			"monitor.type": stdFields.Type,
+			"monitor.id":   sFields.ID,
+			"monitor.name": sFields.Name,
+			"monitor.type": sFields.Type,
 		})
 	}
 	commonValidator := func(se *SynthEvent) validator.Validator {
@@ -126,8 +126,7 @@ func TestJourneyEnricher(t *testing.T) {
 		return lookslike.Compose(v...)
 	}
 
-	check := func(t *testing.T, se *SynthEvent, sFields stdfields.StdMonitorFields) {
-		je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: sFields}}
+	check := func(t *testing.T, se *SynthEvent, je *journeyEnricher) {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
 			enrichErr := je.enrich(e, se)
@@ -166,9 +165,10 @@ func TestJourneyEnricher(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stdFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
+			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
+			je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: sFields}}
 			for _, se := range synthEvents {
-				check(t, se, stdFields)
+				check(t, se, je)
 			}
 		})
 	}
@@ -401,10 +401,11 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		cmdStatus,
 	}
 
+	stdFields := stdfields.StdMonitorFields{}
+	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := stdfields.StdMonitorFields{}
-		je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
+
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se)
 
@@ -462,11 +463,11 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 
 	hasCmdStatus := false
 
+	stdFields := stdfields.StdMonitorFields{}
+	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := stdfields.StdMonitorFields{}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 			enrichErr := je.enrich(e, se)
 
 			if se != nil && se.Type == CmdStatus {
