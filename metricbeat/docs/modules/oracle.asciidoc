@@ -58,6 +58,18 @@ If the listener is not running, use the command to start:
 
 Then, Metricbeat can be launched.
 
+*Host Configuration*
+
+The following two types of host configurations are supported:
+
+1. Old style host configuration for backwards compatibility: `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
+
+2. DSN host configuration: `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
+
+DSN host configuration is the recommended way to configure the Oracle Metricbeat Module as it supports the usage of special characters in the password.
+
+Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
+
 [float]
 == Metricsets
 
