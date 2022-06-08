@@ -21,7 +21,7 @@ func TestExecMultiplexer(t *testing.T) {
 		time++ // fake time to make events seem spaced out
 		journey := &Journey{
 			Name: fmt.Sprintf("J%d", jIdx),
-			Id:   fmt.Sprintf("j-%d", jIdx),
+			ID:   fmt.Sprintf("j-%d", jIdx),
 		}
 		testEvents = append(testEvents, &SynthEvent{
 			Journey:              journey,

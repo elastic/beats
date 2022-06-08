@@ -61,7 +61,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 				Type:                 "step/end",
 				Journey: &Journey{
 					Name: "inline",
-					Id:   "inline",
+					ID:   "inline",
 				},
 				Step: &Step{
 					Name:   "Go to home page",
