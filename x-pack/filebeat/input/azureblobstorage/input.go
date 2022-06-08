@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !aix
+// +build !aix
+
 package azureblobstorage
 
 import (
@@ -38,7 +41,7 @@ type azurebsInput struct {
 
 type blobClientObj struct {
 	client *azblob.BlockBlobClient
-	blobs  []*azblob.BlobItemInternal
+	blob   *azblob.BlobItemInternal
 }
 
 func Plugin(log *logp.Logger, store beater.StateStore) v2.Plugin {
@@ -47,11 +50,13 @@ func Plugin(log *logp.Logger, store beater.StateStore) v2.Plugin {
 		Stability:  feature.Experimental,
 		Deprecated: false,
 		Info:       "Collect logs from Azure Blob Storage",
+		Doc:        "Collect logs from Azure Blob Storage Service",
 		Manager:    &azurebsInputManager{store: store, log: log},
 	}
 }
 
 func (im *azurebsInputManager) Init(grp unison.Group, mode v2.Mode) error {
+	im.log.Infof("azureblobstorage input mode %s", mode.String())
 	return nil
 }
 
@@ -93,14 +98,22 @@ func (input *azurebsInput) Test(ctx v2.TestContext) error {
 func (input *azurebsInput) Run(inputCtx v2.Context, pipeline beat.Pipeline) error {
 	var err error
 	ctx := context.Background()
+	log := inputCtx.Logger.With("name", inputName).With("account_name", input.config.AccountName)
+	input.log = log
 
 	persistentStore, err := input.store.Access()
 	if err != nil {
 		return fmt.Errorf("cannot connect to persistent storage %v", err)
 	}
+
 	defer persistentStore.Close()
 
-	input.collect(ctx, persistentStore)
+	input.log.Info("Running azure blob storage for account %s", input.config.AccountName)
+
+	err = input.collect(ctx, persistentStore)
+	if err != nil {
+		return err
+	}
 
 	ctx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
@@ -111,6 +124,5 @@ func (input *azurebsInput) Run(inputCtx v2.Context, pipeline beat.Pipeline) erro
 		}
 	}()
 	defer cancelInputCtx()
-	input.log.Info("Running azure blob storage")
 	return nil
 }
