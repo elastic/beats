@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
@@ -145,7 +146,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -175,8 +176,12 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 	var pipelines []PipelineStats
 	for pipelineID, pipeline := range nodeStats.Pipelines {
-		pipeline.ID = pipelineID
-		pipelines = append(pipelines, pipeline)
+		if pipeline.Hash != "" && pipeline.Vertices != nil {
+			pipeline.ID = pipelineID
+			pipelines = append(pipelines, pipeline)
+		} else {
+			logger.Debug("Pipeline document was discarded due to missing properties. This can happen when the Logstash API is polled before the pipeline setup has completed.")
+		}
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
