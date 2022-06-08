@@ -66,6 +66,8 @@ Kafka protocol version that {beatname_lc} will request when connecting. Defaults
 
 Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
 
+The protocol version controls the Kafka client features available to {beatname_lc}, it does not prevent {beatname_lc} from connecting to Kafka versions newer than the protocol version.
+
 See <<kafka-compatibility>> for information on supported versions.
 
 ===== `username`
