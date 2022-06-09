@@ -3318,14 +3318,32 @@ processors:
           }
         }
 
-        void splitSidList(def sids, def params, def ctx) {
-          ArrayList al = new ArrayList();
-          def sidList = sids.splitOnToken(" ");
-          ctx.winlog.event_data.put("SidList", sidList);
-          for (def i = 0; i < sidList.length; i++ ) {
-            al.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ",""), params));
+        def split(String s) {
+          def f = new ArrayList();
+          int last = 0;
+          for (; last < s.length() && Character.isWhitespace(s.charAt(last)); last++) {}
+          for (def i = last; i < s.length(); i++) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+              continue;
+            }
+            f.add(s.substring(last, i));
+            for (; i < s.length() && Character.isWhitespace(s.charAt(i)); i++) {}
+            last = i;
           }
-          ctx.winlog.event_data.put("SidListDesc", al);
+          f.add(s.substring(last));
+          return f;
+        }
+
+        void splitSidList(def sids, def params, def ctx) {
+          ArrayList list = new ArrayList();
+          ArrayList desc = new ArrayList();
+          def sidList = split(sids);
+          for (def i = 0; i < sidList.length; i++) {
+            list.add(sidList[i]);
+            desc.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", ""), params));
+          }
+          ctx.winlog.event_data.put("SidList", list);
+          ctx.winlog.event_data.put("SidListDesc", desc);
         }
 
         if (ctx?.event?.code == null ||
