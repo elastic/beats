@@ -338,6 +338,21 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errEmptyTemplateResult.Error(),
 		},
 		{
+			name:        "func hexDecode string",
+			value:       `[[hexDecode "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "\xb0\xa9*\b\xa9\xb4\x88:\xa3\xaa-\tW\xbe\x12\xa6x\xcb۳-\xc5\xdb\t\xfeh#\x9a\t\x87/\x96",
+		},
+		{
+			name:          "func hexDecode empty string",
+			value:         `[[hexDecode ""]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
 			name: "func join",
 			value: `[[join .last_response.body.strarr ","]] [[join .last_response.body.iarr ","]] ` +
 				`[[join .last_response.body.narr ","]] [[join .last_response.body.singlevalstr ","]] ` +
