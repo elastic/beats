@@ -327,7 +327,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 						for j := 0; j < batch.Count(); j++ {
 							events.Done()
 						}
-						batch.ACK()
+						batch.Done()
 					}
 				}()
 			}
