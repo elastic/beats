@@ -138,7 +138,7 @@ func (rc *readerConfig) Validate() error {
 		return fmt.Errorf("max_bytes <%v> must be greater than 0", rc.MaxBytes)
 	}
 
-	if rc.ExpandEventListFromField != "" && rc.ContentType != "" && rc.ContentType != "application/json" {
+	if rc.ExpandEventListFromField != "" && rc.ContentType != "" && rc.ContentType != contentTypeJSON {
 		return fmt.Errorf("content_type must be `application/json` when expand_event_list_from_field is used")
 	}
 

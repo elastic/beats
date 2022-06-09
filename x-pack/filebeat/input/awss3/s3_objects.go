@@ -219,13 +219,46 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 			}
 			continue
 		}
-
-		data, _ := item.MarshalJSON()
-		evt := p.createEvent(string(data), offset)
-		p.publish(p.acker, &evt)
+		messages := p.parseMultipleMessages(item)
+		for _, item := range messages {
+			evt := p.createEvent(item, offset)
+			p.publish(p.acker, &evt)
+		}
 	}
-
 	return nil
+}
+
+// parseMultipleMessages will split the single message if it is a JSON array
+func (p *s3ObjectProcessor) parseMultipleMessages(bMessage []byte) []string {
+	var mapObject mapstr.M
+	var messages []string
+	// check if the message is a "records" object containing a list of events
+	err := json.Unmarshal(bMessage, &mapObject)
+	if err == nil {
+		js, err := json.Marshal(mapObject)
+		if err != nil {
+			p.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
+		}
+		return append(messages, string(js))
+	}
+	p.log.Debugf("deserializing message into object returning error: %s", err)
+	// in some cases the message is an array
+	var arrayObject []mapstr.M
+	err = json.Unmarshal(bMessage, &arrayObject)
+	if err != nil {
+		// return entire message
+		p.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+		return append(messages, string(bMessage))
+	}
+	p.log.Debugf("deserializing multiple messages to an array")
+	for _, ms := range arrayObject {
+		js, err := json.Marshal(ms)
+		if err != nil {
+			p.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+		}
+		messages = append(messages, string(js))
+	}
+	return messages
 }
 
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
