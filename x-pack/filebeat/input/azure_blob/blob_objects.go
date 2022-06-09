@@ -20,7 +20,7 @@ import (
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -111,15 +111,14 @@ func (p *azureBlobProcessor) ProcessBlobObject() error {
 	// Request object (download).
 	contentType, body, err := p.download()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get Azure Blob (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed to get Azure Blob (elapsed_time_ns=%d): %w", time.Since(start).Nanoseconds(), err)
 	}
 	defer body.Close()
 	// p.s3Metadata = meta
 
 	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
 	if err != nil {
-		return errors.Wrap(err, "failed checking for gzip content")
+		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
@@ -135,8 +134,7 @@ func (p *azureBlobProcessor) ProcessBlobObject() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "failed reading Azure Blob (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed reading Azure Blob (elapsed_time_ns=%d): %w", time.Since(start).Nanoseconds(), err)
 	}
 
 	return nil

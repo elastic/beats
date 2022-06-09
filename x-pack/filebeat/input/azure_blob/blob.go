@@ -6,13 +6,15 @@ package azure_blob
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"sync"
 	"time"
 
+	"errors"
+
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -108,7 +110,6 @@ func (p *blobPoller) handlePurgingLock(info blobObjectInfo, isStored bool) {
 
 func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPayload) error {
 	var errs []error
-	p.log.Info("Number of objects, processObject Func: ", len(blobObjectPayloadChan))
 	for blobObjectPayload := range blobObjectPayloadChan {
 		// Process S3 object (download, parse, create events).
 		err := blobObjectPayload.blobObjectHandler.ProcessBlobObject()
@@ -122,9 +123,7 @@ func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPaylo
 		if err != nil {
 			blob_name := blobObjectPayload.blobObjectInfo.blob_name
 			container_name := blobObjectPayload.blobObjectInfo.container_name
-			errs = append(errs, errors.Wrapf(err,
-				"failed processing Azure Blob event for object name %q in container %q",
-				blob_name, container_name))
+			errs = append(errs, fmt.Errorf("failed processing Azure Blob event for object name %q in container %q: %w", blob_name, container_name, err))
 
 			p.handlePurgingLock(info, false)
 			continue
@@ -142,12 +141,10 @@ func (p *blobPoller) ProcessObject(blobObjectPayloadChan <-chan *blobObjectPaylo
 
 func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan chan<- *blobObjectPayload) {
 	defer func() {
-		p.log.Info("GetBlobObjects ended")
 		close(blobObjectPayloadChan)
 	}()
 
 	blobMarker := azblob.Marker{}
-	p.log.Info("Blob Marker Start: ", blobMarker, "  --  ", blobMarker.NotDone())
 	for blobMarker.NotDone() {
 		listingID, err := uuid.NewV4()
 		if err != nil {
@@ -167,7 +164,6 @@ func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan c
 			break
 		}
 		blobMarker = page.NextMarker
-		p.log.Info("Blob Marker: ", blobMarker, "  --  ", blobMarker.NotDone())
 
 		totProcessableObjects := 0
 		totListedObjects := len(page.Segment.BlobItems)
@@ -230,12 +226,6 @@ func (p *blobPoller) GetBlobObjects(ctx context.Context, blobObjectPayloadChan c
 			blobObjectPayloadChan <- blobObjectPayload
 		}
 	}
-
-	// if err := paginator.Err(); err != nil {
-	// 	p.log.Warnw("Error when paginating listing.", "error", err)
-	// }
-
-	return
 }
 
 func (p *blobPoller) Purge() {
@@ -302,8 +292,6 @@ func (p *blobPoller) Purge() {
 		p.workersListingMap.Delete(listingID)
 		p.states.DeleteListing(listingID)
 	}
-
-	return
 }
 
 func (p *blobPoller) Poll(ctx context.Context) error {
@@ -311,7 +299,6 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 	// honoring the number in config opposed to a simpler loop that does one
 	//  listing, sequentially processes every object and then does another listing
 	workerWg := new(sync.WaitGroup)
-	p.log.Info("Starting Poll Loop")
 	for ctx.Err() == nil {
 		// Determine how many S3 workers are available.
 		workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
@@ -329,7 +316,6 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 		go func() {
 			defer func() {
 				workerWg.Done()
-				p.log.Info("GetBlobObjects complete")
 			}()
 
 			p.GetBlobObjects(ctx, s3ObjectPayloadChan)
@@ -338,23 +324,21 @@ func (p *blobPoller) Poll(ctx context.Context) error {
 
 		workerWg.Add(workers)
 		for i := 0; i < workers; i++ {
-			p.log.Infof("Worker %d started.", i)
 			go func() {
 				defer func() {
 					workerWg.Done()
 					p.workerSem.Release(1)
-					p.log.Infof("ProcessObject Worker #%d Complete", i)
 				}()
 				if err := p.ProcessObject(s3ObjectPayloadChan); err != nil {
 					p.log.Warnw("Failed processing Blob listing.", "error", err)
 				}
-				return
 			}()
 		}
 
-		p.log.Info("Waiting for timer")
-		timed.Wait(ctx, p.blobPollInterval)
-
+		if err := timed.Wait(ctx, p.blobPollInterval); err != nil {
+			p.log.Errorf("Error while waiting %d seconds.  Exiting.", p.blobPollInterval)
+			return err
+		}
 	}
 
 	// Wait for all workers to finish.
