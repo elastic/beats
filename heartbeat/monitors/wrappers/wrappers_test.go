@@ -571,6 +571,7 @@ func TestProjectBrowserJob(t *testing.T) {
 	sFields := testBrowserMonFields
 	sFields.ID = projectMonitorValues.id
 	sFields.Name = projectMonitorValues.name
+	sFields.Origin = "my-origin"
 	urlStr := "http://foo.com"
 	urlU, _ := url.Parse(urlStr)
 
@@ -579,6 +580,7 @@ func TestProjectBrowserJob(t *testing.T) {
 			"type":        "browser",
 			"id":          projectMonitorValues.id,
 			"name":        projectMonitorValues.name,
+			"origin":      "my-origin",
 			"check_group": projectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
 				"gte": hbtestllext.IsTime,
