@@ -2088,6 +2088,22 @@ processors:
           "0x40000000": ADS_RIGHT_GENERIC_WRITE
           "0x80000000": ADS_RIGHT_GENERIC_READ
       source: |-
+        def split(String s) {
+          def f = new ArrayList();
+          int last = 0;
+          for (; last < s.length() && Character.isWhitespace(s.charAt(last)); last++) {}
+          for (def i = last; i < s.length(); i++) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+              continue;
+            }
+            f.add(s.substring(last, i));
+            for (; i < s.length() && Character.isWhitespace(s.charAt(i)); i++) {}
+            last = i;
+          }
+          f.add(s.substring(last));
+          return f;
+        }
+
         if (ctx?.winlog?.event_data?.FailureReason != null) {
           def code = ctx.winlog.event_data.FailureReason.replace("%%","");
           if (params.descriptions.containsKey(code)) {
@@ -2116,7 +2132,7 @@ processors:
         }
         if (ctx?.winlog?.event_data?.AccessList != null) {
           ArrayList results = new ArrayList();
-          for (elem in ctx.winlog.event_data.AccessList.splitOnToken(" ")) {
+          for (elem in split(ctx.winlog.event_data.AccessList)) {
             def code = elem.replace("%%","").trim();
             if (params.descriptions.containsKey(code)) {
               results.add(params.descriptions[code]);
@@ -2127,17 +2143,31 @@ processors:
           }
         }
         if (ctx?.winlog?.event_data?.AccessMask != null) {
-          ArrayList results = new ArrayList();
-          Long accessMask = Long.decode(ctx.winlog.event_data.AccessMask);
+          ArrayList list = new ArrayList();
+          long accessMask;
+          for (elem in split(ctx.winlog.event_data.AccessMask)) {
+            if (elem.length() == 0) {
+              continue;
+            }
+            list.add(elem);
+            def code = elem.replace("%%","").trim();
+            accessMask |= Long.decode(code).longValue();
+          }
+          if (list.length > 0) {
+            ctx.winlog.event_data.put("AccessMask", list);
+          }
+
+          ArrayList desc = new ArrayList();
           for (entry in params.AccessMaskDescriptions.entrySet()) {
             Long accessFlag = Long.decode(entry.getKey());
-            if ((accessMask.longValue() & accessFlag.longValue()) == accessFlag.longValue()) {
-              results.add(entry.getValue());
+            if ((accessMask & accessFlag.longValue()) == accessFlag.longValue()) {
+              desc.add(entry.getValue());
             }
           }
-          if (results.length > 0) {
-            ctx.winlog.event_data.put("AccessMaskDescription", results);
+          if (desc.length > 0) {
+            ctx.winlog.event_data.put("AccessMaskDescription", desc);
           }
+          ArrayList results = new ArrayList();
         }
   - script:
       lang: painless
