@@ -6,9 +6,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Move pacakges from Metricbeat: `internal/metrics/cpu` and `internal/metrics/memory`. #27
-- Add `D` process states. #32
-
 ### Changed
 
 ### Deprecated
@@ -16,6 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 ### Fixed
+
+## [0.4.1]
+
+### Added
+
+- Add `D` process states. #32
+- Move `cpu` from Metricbeat to support CPU info on Linux. #36
 
 ## [0.4.0]
 

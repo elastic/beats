@@ -50,11 +50,26 @@ type MetricOpts struct {
 	NormalizedPercentages bool
 }
 
+// CPUInfo manages the CPU information from /proc/cpuinfo
+// If a given value isn't available on a given platformn
+// the value will be the type's zero-value
+type CPUInfo struct {
+	ModelName   string
+	ModelNumber string
+	Mhz         float64
+	PhysicalID  int
+	CoreID      int
+}
+
 // CPUMetrics carries global and per-core CPU metrics
 type CPUMetrics struct {
 	totals CPU
+
 	// list carries the same data, broken down by CPU
 	list []CPU
+
+	// CPUInfo carries some data from /proc/cpuinfo
+	CPUInfo []CPUInfo
 }
 
 // Total returns the total CPU time in ticks as scraped by the API
@@ -116,6 +131,13 @@ func (m *Monitor) FetchCores() ([]Metrics, error) {
 			previousSample: lastMetric,
 			isTotals:       false,
 		}
+
+		// Only add CPUInfo metric if it's available
+		// Remove this if statement once CPUInfo is supported
+		// by all systems
+		if len(metric.CPUInfo) != 0 {
+			coreMetrics[i].cpuInfo = metric.CPUInfo[i]
+		}
 	}
 	m.lastSample = metric
 	return coreMetrics, nil
@@ -126,6 +148,7 @@ type Metrics struct {
 	previousSample CPU
 	currentSample  CPU
 	count          int
+	cpuInfo        CPUInfo
 	isTotals       bool
 }
 
@@ -156,6 +179,7 @@ func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 		_, _ = formattedMetrics.Put("total.norm.pct", createTotal(metric.previousSample, metric.currentSample, timeDelta, 1))
 	}
 
+	// /proc/stat metrics
 	reportOptMetric("user", metric.currentSample.User, metric.previousSample.User, normCPU)
 	reportOptMetric("system", metric.currentSample.Sys, metric.previousSample.Sys, normCPU)
 	reportOptMetric("idle", metric.currentSample.Idle, metric.previousSample.Idle, normCPU)
@@ -164,6 +188,22 @@ func (metric Metrics) Format(opts MetricOpts) (mapstr.M, error) {
 	reportOptMetric("iowait", metric.currentSample.Wait, metric.previousSample.Wait, normCPU)
 	reportOptMetric("softirq", metric.currentSample.SoftIrq, metric.previousSample.SoftIrq, normCPU)
 	reportOptMetric("steal", metric.currentSample.Stolen, metric.previousSample.Stolen, normCPU)
+
+	// Only add CPU info metrics if we're returning information by core
+	// (isTotals is false)
+	if !metric.isTotals {
+		// Some platforms do not report those metrics, so metric.cpuInfo
+		// is empty, if that happens we do not add the empty metrics to the
+		// final event.
+		if metric.cpuInfo != (CPUInfo{}) {
+			// /proc/cpuinfo metrics
+			formattedMetrics["model_number"] = metric.cpuInfo.ModelNumber
+			formattedMetrics["model_name"] = metric.cpuInfo.ModelName
+			formattedMetrics["mhz"] = metric.cpuInfo.Mhz
+			formattedMetrics["core_id"] = metric.cpuInfo.CoreID
+			formattedMetrics["physical_id"] = metric.cpuInfo.PhysicalID
+		}
+	}
 
 	return formattedMetrics, nil
 }

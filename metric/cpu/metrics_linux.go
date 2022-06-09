@@ -62,3 +62,7 @@ func parseCPULine(line string) (CPU, error) {
 
 	return cpuData, errs.Err()
 }
+
+func scanCPUInfoFile(scanner *bufio.Scanner) ([]CPUInfo, error) {
+	return cpuinfoScanner(scanner)
+}
