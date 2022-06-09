@@ -22,6 +22,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
 	// mage:import
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
@@ -71,5 +72,14 @@ func CheckLicenseHeaders() error {
 	return licenser(
 		licenser.Check(),
 		licenser.License("ASL2"),
+	)
+}
+
+// Notice generates a NOTICE.txt file for the module.
+func Notice() error {
+	return mage.GenerateNotice(
+		filepath.Join("dev-tools", "templates", "notice", "overrides.json"),
+		filepath.Join("dev-tools", "templates", "notice", "rules.json"),
+		filepath.Join("dev-tools", "templates", "notice", "NOTICE.txt.tmpl"),
 	)
 }
