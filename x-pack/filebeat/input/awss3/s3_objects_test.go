@@ -131,6 +131,10 @@ func TestS3ObjectProcessor(t *testing.T) {
 		testProcessS3ObjectError(t, "testdata/events-array.json", "application/json", 0, sel)
 	})
 
+	t.Run("split root array", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/array.json", "application/json", 2)
+	})
+
 	t.Run("events have a unique repeatable _id", func(t *testing.T) {
 		// Hash of bucket ARN, object key, object versionId, and log offset.
 		events := testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
