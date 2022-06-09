@@ -62,11 +62,11 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka protocol version that {beatname_lc} will request when connecting. Defaults to 1.0.0.
+Kafka protocol version that {beatname_uc} will request when connecting. Defaults to 1.0.0.
 
 Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
 
-The protocol version controls the Kafka client features available to {beatname_lc}, it does not prevent {beatname_lc} from connecting to Kafka versions newer than the protocol version.
+The protocol version controls the Kafka client features available to {beatname_uc}; it does not prevent {beatname_uc} from connecting to Kafka versions newer than the protocol version.
 
 See <<kafka-compatibility>> for information on supported versions.
 
