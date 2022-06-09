@@ -89,23 +89,7 @@ func TestJourneyEnricher(t *testing.T) {
 		journeyEnd,
 	}
 
-	legacyProjValidator := func() validator.Validator {
-		return lookslike.MustCompile(mapstr.M{
-			"monitor.project.id":   sFields.ID,
-			"monitor.project.name": sFields.Name,
-			"monitor.id":           fmt.Sprintf("%s-%s", sFields.ID, journey.ID),
-			"monitor.name":         fmt.Sprintf("%s - %s", sFields.Name, journey.Name),
-			"monitor.type":         sFields.Type,
-		})
-	}
-	projValidator := func() validator.Validator {
-		return lookslike.MustCompile(mapstr.M{
-			"monitor.id":   sFields.ID,
-			"monitor.name": sFields.Name,
-			"monitor.type": sFields.Type,
-		})
-	}
-	commonValidator := func(se *SynthEvent) validator.Validator {
+	valid := func(se *SynthEvent) validator.Validator {
 		var v []validator.Validator
 
 		// We need an expectation for each input plus a final
@@ -133,17 +117,8 @@ func TestJourneyEnricher(t *testing.T) {
 			if se.Error != nil {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
-			if !sFields.IsLegacyBrowserSource {
-				sv, _ := e.Fields.GetValue("monitor.project")
-				require.Nil(t, sv)
-				fmt.Printf("PXXPROX %v\n", projValidator())
-				//testslike.Test(t, projValidator(), e.Fields)
-			} else {
-				fmt.Printf("PPROX %v\n", legacyProjValidator())
-				fmt.Printf("EPROJ %v\n\n", e.Fields)
-				//testslike.Test(t, legacyProjValidator(), e.Fields)
-			}
-			testslike.Test(t, commonValidator(se), e.Fields)
+
+			testslike.Test(t, valid(se), e.Fields)
 
 			require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
 		})
