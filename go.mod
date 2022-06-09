@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/containerd/containerd v1.5.10 // indirect
+	github.com/containerd/containerd v1.5.13 // indirect
 	github.com/docker/distribution v2.8.0+incompatible // indirect
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-ucfg v0.8.5
