@@ -75,13 +75,13 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(sf stdfields.StdMonitorFields, hashURLIntoID bool) jobs.JobWrapper {
+func addMonitorMeta(sFields stdfields.StdMonitorFields, hashURLIntoID bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := job(event)
 
-			id := sf.ID
-			name := sf.Name
+			id := sFields.ID
+			name := sFields.Name
 			// If multiple jobs are listed for this monitor, we can't have a single ID, so we hash the
 			// unique URLs to create unique suffixes for the monitor.
 			if hashURLIntoID {
@@ -91,14 +91,14 @@ func addMonitorMeta(sf stdfields.StdMonitorFields, hashURLIntoID bool) jobs.JobW
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
-				id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
+				id = fmt.Sprintf("%s-%x", sFields.ID, urlHash)
 			}
 
 			fields := mapstr.M{
-				"type": sf.Type,
+				"type": sFields.Type,
 			}
 
-			if !sf.IsLegacyBrowserSource {
+			if !sFields.IsLegacyBrowserSource {
 				fields["id"] = id
 				fields["name"] = name
 			} else {
@@ -109,20 +109,20 @@ func addMonitorMeta(sf stdfields.StdMonitorFields, hashURLIntoID bool) jobs.JobW
 				// 	 project monitors
 				journeyId, err := event.GetValue("monitor.id")
 				if err == nil {
-					fields["id"] = fmt.Sprintf("%s-%s", sf.ID, journeyId)
+					fields["id"] = fmt.Sprintf("%s-%s", sFields.ID, journeyId)
 				}
 				journeyName, err := event.GetValue("monitor.name")
 				if err == nil {
-					fields["name"] = fmt.Sprintf("%s - %s", sf.Name, journeyName)
+					fields["name"] = fmt.Sprintf("%s - %s", sFields.Name, journeyName)
 				}
 				fields["project"] = mapstr.M{
-					"id":   sf.ID,
-					"name": sf.Name,
+					"id":   sFields.ID,
+					"name": sFields.Name,
 				}
 			}
 
-			if sf.Origin != "" {
-				fields["origin"] = sf.Origin
+			if sFields.Origin != "" {
+				fields["origin"] = sFields.Origin
 			}
 
 			eventext.MergeEventFields(event, mapstr.M{"monitor": fields})

@@ -47,7 +47,7 @@ import (
 
 type testDef struct {
 	name         string
-	stdFields    stdfields.StdMonitorFields
+	sFields      stdfields.StdMonitorFields
 	jobs         []jobs.Job
 	want         []validator.Validator
 	metaWant     []validator.Validator
@@ -70,7 +70,7 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.stdFields)
+		wrapped := WrapCommon(tt.jobs, tt.sFields)
 
 		core, observedLogs := observer.New(zapcore.InfoLevel)
 		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
@@ -466,6 +466,10 @@ type BrowserMonitor struct {
 	id         string
 	name       string
 	checkGroup string
+	// Used for testing legacy zip_url and local monitors
+	// where the top-level id/name are used to populate monitor.project
+	legacyProjectId   string
+	legacyProjectName string
 }
 
 var inlineMonitorValues = BrowserMonitor{
@@ -482,8 +486,6 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
 				"type":        "browser",
-				"id":          inlineMonitorValues.id,
-				"name":        inlineMonitorValues.name,
 				"check_group": inlineMonitorValues.checkGroup,
 			},
 		})
@@ -494,10 +496,12 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 // Browser inline jobs monitor information should not be altered
 // by the wrappers as they are handled separately in synth enricher
 func TestInlineBrowserJob(t *testing.T) {
-	fields := testBrowserMonFields
+	sFields := testBrowserMonFields
+	sFields.ID = inlineMonitorValues.id
+	sFields.Name = inlineMonitorValues.name
 	testCommonWrap(t, testDef{
 		"simple",
-		fields,
+		sFields,
 		[]jobs.Job{makeInlineBrowserJob(t, "http://foo.com")},
 		[]validator.Validator{
 			lookslike.Strict(
@@ -526,7 +530,16 @@ var projectMonitorValues = BrowserMonitor{
 	checkGroup: "journey-1-check-group",
 }
 
-func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error) jobs.Job {
+// Used for testing legacy zip_url / local monitorss
+var legacyProjectMonitorValues = BrowserMonitor{
+	id:                "journey-1",
+	name:              "Journey 1",
+	checkGroup:        "acheckgroup",
+	legacyProjectId:   "my-project",
+	legacyProjectName: "My Project",
+}
+
+func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error, bm BrowserMonitor) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
@@ -534,9 +547,9 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
 				"type":        "browser",
-				"id":          projectMonitorValues.id,
-				"name":        projectMonitorValues.name,
-				"check_group": projectMonitorValues.checkGroup,
+				"id":          bm.id,
+				"name":        bm.name,
+				"check_group": bm.checkGroup,
 			},
 		})
 		if summary {
@@ -555,9 +568,12 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 }
 
 func TestProjectBrowserJob(t *testing.T) {
-	fields := testBrowserMonFields
+	sFields := testBrowserMonFields
+	sFields.ID = projectMonitorValues.id
+	sFields.Name = projectMonitorValues.name
 	urlStr := "http://foo.com"
 	urlU, _ := url.Parse(urlStr)
+
 	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
 		"monitor": map[string]interface{}{
 			"type":        "browser",
@@ -571,10 +587,11 @@ func TestProjectBrowserJob(t *testing.T) {
 		},
 		"url": URLFields(urlU),
 	})
+
 	testCommonWrap(t, testDef{
 		"simple", // has no summary fields!
-		fields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil)},
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, projectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -586,8 +603,8 @@ func TestProjectBrowserJob(t *testing.T) {
 	})
 	testCommonWrap(t, testDef{
 		"with up summary",
-		fields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil)},
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil, projectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -603,8 +620,8 @@ func TestProjectBrowserJob(t *testing.T) {
 	})
 	testCommonWrap(t, testDef{
 		"with down summary",
-		fields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, fmt.Errorf("testerr"))},
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, fmt.Errorf("testerr"), projectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -618,6 +635,43 @@ func TestProjectBrowserJob(t *testing.T) {
 							"message": "testerr",
 						},
 					}),
+				))},
+		nil,
+		nil,
+	})
+
+	legacySFields := testBrowserMonFields
+	legacySFields.ID = legacyProjectMonitorValues.legacyProjectId
+	legacySFields.Name = legacyProjectMonitorValues.legacyProjectName
+	legacySFields.IsLegacyBrowserSource = true
+
+	expectedLegacyMonFields := lookslike.MustCompile(map[string]interface{}{
+		"monitor": map[string]interface{}{
+			"type": "browser",
+			"id":   fmt.Sprintf("%s-%s", legacyProjectMonitorValues.legacyProjectId, legacyProjectMonitorValues.id),
+			"name": fmt.Sprintf("%s - %s", legacyProjectMonitorValues.legacyProjectName, legacyProjectMonitorValues.name),
+			"project": mapstr.M{
+				"id":   legacyProjectMonitorValues.legacyProjectId,
+				"name": legacyProjectMonitorValues.legacyProjectName,
+			},
+			"check_group": legacyProjectMonitorValues.checkGroup,
+			"timespan": mapstr.M{
+				"gte": hbtestllext.IsTime,
+				"lt":  hbtestllext.IsTime,
+			},
+		},
+		"url": URLFields(urlU),
+	})
+
+	testCommonWrap(t, testDef{
+		"legacy", // has no summary fields!
+		legacySFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, legacyProjectMonitorValues)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedLegacyMonFields,
 				))},
 		nil,
 		nil,
