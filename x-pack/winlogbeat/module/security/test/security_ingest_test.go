@@ -22,9 +22,12 @@ import (
 var ignoreFields = []string{
 	"event.ingested",
 	"message",
+
+	// This list is constructed through iteration over a Java hashmap
+	// and so is not consistently ordered.
+	"winlog.event_data.TicketOptionsDescription",
 }
 
 func TestSecurityIngest(t *testing.T) {
-	t.Skip("failing with pipeline errors")
 	module.TestIngestPipeline(t, "security", "testdata/collection/*.evtx.golden.json", module.WithFieldFilter(ignoreFields))
 }
