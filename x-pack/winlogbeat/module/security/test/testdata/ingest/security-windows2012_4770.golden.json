@@ -58,8 +58,8 @@
         "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
         "TicketOptions": "0x10002",
         "TicketOptionsDescription": [
-          "Name-canonicalize",
-          "Renew"
+          "Renew",
+          "Name-canonicalize"
         ]
       },
       "event_id": "4770",

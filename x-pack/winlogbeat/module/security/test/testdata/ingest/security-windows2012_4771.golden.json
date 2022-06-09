@@ -58,10 +58,10 @@
         "TargetUserName": "MPUIG",
         "TicketOptions": "0x40810010",
         "TicketOptionsDescription": [
-          "Forwardable",
           "Renewable-ok",
+          "Name-canonicalize",
           "Renewable",
-          "Name-canonicalize"
+          "Forwardable"
         ]
       },
       "event_id": "4771",

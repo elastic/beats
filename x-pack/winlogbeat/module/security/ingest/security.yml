@@ -818,10 +818,15 @@ processors:
         }
         Long newUacValue = Long.decode(ctx.winlog.event_data.NewUacValue);
         ArrayList uacResult = new ArrayList();
-        for (entry in params.entrySet()) {
-          Long flag = Long.decode(entry.getKey());
-          if ((newUacValue.longValue() & flag.longValue()) == flag.longValue()) {
-            uacResult.add(entry.getValue());
+        def[] w = new def[] { null };
+        for (long b = 0; b < 32; b++) {
+          long flag = 1L << b;
+          if ((newUacValue.longValue() & flag) == flag) {
+            w[0] = flag;
+            def desc = params[String.format("0x%08X", w)];
+            if (desc != null) {
+              uacResult.add(desc);
+            }
           }
         }
         if (uacResult.length == 0) {
@@ -873,10 +878,15 @@ processors:
         }
         Long tOpts = Long.decode(ctx.winlog.event_data.TicketOptions);
         ArrayList tDescs = new ArrayList();
-        for (entry in params.entrySet()) {
-          Long flag = Long.decode(entry.getKey());
-          if ((tOpts.longValue() & flag.longValue()) == flag.longValue()) {
-            tDescs.add(entry.getValue());
+        def[] w = new def[] { null };
+        for (long b = 0; b < 32; b++) {
+          long flag = 1L << b;
+          if ((tOpts.longValue() & flag) == flag) {
+            w[0] = flag;
+            def desc = params[String.format("0x%08X", w)];
+            if (desc != null) {
+              tDescs.add(desc);
+            }
           }
         }
         if (tDescs.length == 0) {
@@ -2158,10 +2168,15 @@ processors:
           }
 
           ArrayList desc = new ArrayList();
-          for (entry in params.AccessMaskDescriptions.entrySet()) {
-            Long accessFlag = Long.decode(entry.getKey());
-            if ((accessMask & accessFlag.longValue()) == accessFlag.longValue()) {
-              desc.add(entry.getValue());
+          def[] w = new def[] { null };
+          for (long b = 0; b < 32; b++) {
+            long flag = 1L << b;
+            if ((accessMask & flag) == flag) {
+              w[0] = flag;
+              def fDesc = params.AccessMaskDescriptions[String.format("0x%08X", w)];
+              if (fDesc != null) {
+                desc.add(fDesc);
+              }
             }
           }
           if (desc.length > 0) {

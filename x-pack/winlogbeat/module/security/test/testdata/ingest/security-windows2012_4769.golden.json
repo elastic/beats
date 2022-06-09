@@ -61,9 +61,9 @@
         "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
         "TicketOptions": "0x40810000",
         "TicketOptionsDescription": [
-          "Forwardable",
+          "Name-canonicalize",
           "Renewable",
-          "Name-canonicalize"
+          "Forwardable"
         ],
         "TransmittedServices": "-"
       },

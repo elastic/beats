@@ -63,10 +63,10 @@
         "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
         "TicketOptions": "0x40810010",
         "TicketOptionsDescription": [
-          "Forwardable",
           "Renewable-ok",
+          "Name-canonicalize",
           "Renewable",
-          "Name-canonicalize"
+          "Forwardable"
         ]
       },
       "event_id": "4768",

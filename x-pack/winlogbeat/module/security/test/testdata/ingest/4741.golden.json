@@ -55,8 +55,8 @@
         "HomePath": "-",
         "LogonHours": "%%1793",
         "NewUACList": [
-          "ENCRYPTED_TEXT_PWD_ALLOWED",
-          "SCRIPT"
+          "SCRIPT",
+          "ENCRYPTED_TEXT_PWD_ALLOWED"
         ],
         "NewUacValue": "0x85",
         "OldUacValue": "0x0",
