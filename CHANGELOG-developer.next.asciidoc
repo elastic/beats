@@ -63,6 +63,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Remove `common.MapStr` and use `mapstr.M` from `github.com/elastic/elastic-agent-libs` instead. {pull}31420[31420]
 - Remove `queue.Consumer`. Queues can now be read via a `Get` call directly on the queue object. {pull}31502[31502]
 - The `queue.Batch` API now provides access to individual events instead of an array. {pull}31699[31699]
+- Rename `queue.Batch.ACK()` to `queue.Batch.Done()`. {pull}31903[31903]
 
 ==== Bugfixes
 
