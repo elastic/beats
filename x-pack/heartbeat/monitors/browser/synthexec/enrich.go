@@ -23,12 +23,8 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je          *journeyEnricher
-	sFields     stdfields.StdMonitorFields
-	projectInfo struct {
-		id   string
-		name string
-	}
+	je      *journeyEnricher
+	sFields stdfields.StdMonitorFields
 }
 
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
