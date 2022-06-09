@@ -192,36 +192,8 @@
   },
   {
     "@timestamp": "2020-05-15T08:33:26.393089Z",
-    "_temp": {
-      "details": [
-        {
-          "related_command": "Import-LocalizedData",
-          "type": "CommandInvocation",
-          "value": "\"Import-LocalizedData\""
-        },
-        {
-          "name": "\"FileName\"",
-          "related_command": "Import-LocalizedData",
-          "type": "ParameterBinding",
-          "value": "\"ArchiveResources\""
-        },
-        {
-          "name": "\"BindingVariable\"",
-          "related_command": "Import-LocalizedData",
-          "type": "ParameterBinding",
-          "value": "\"LocalizedData\""
-        }
-      ],
-      "user_parts": [
-        "VAGRANT",
-        "vagrant"
-      ]
-    },
     "ecs": {
       "version": "1.12.0"
-    },
-    "error": {
-      "message": "[scripting] Regular expression considered too many characters, pattern: [^(.+)\\\\((.+)\\\\)\\\\:\\\\s*(.+)?$], limit factor: [6], char limit: [1386], count: [1387], wrapped: [NonTerminatingError(Import-LocalizedData): \\\"Cannot find the W...], this limit can be changed by changed by the [script.painless.regex.limit-factor] setting"
     },
     "event": {
       "action": "Pipeline Execution Details",
@@ -243,6 +215,30 @@
     "message": "Pipeline execution details for command line: Import-LocalizedData  LocalizedData -filename ArchiveResources\n. \n\nContext Information: \n\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=141\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine=Import-LocalizedData  LocalizedData -filename ArchiveResources\n \n\nDetails: \nCommandInvocation(Import-LocalizedData): \"Import-LocalizedData\"\nParameterBinding(Import-LocalizedData): name=\"FileName\"; value=\"ArchiveResources\"\nParameterBinding(Import-LocalizedData): name=\"BindingVariable\"; value=\"LocalizedData\"\nNonTerminatingError(Import-LocalizedData): \"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\"",
     "powershell": {
       "command": {
+        "invocation_details": [
+          {
+            "related_command": "Import-LocalizedData",
+            "type": "CommandInvocation",
+            "value": "\"Import-LocalizedData\""
+          },
+          {
+            "name": "\"FileName\"",
+            "related_command": "Import-LocalizedData",
+            "type": "ParameterBinding",
+            "value": "\"ArchiveResources\""
+          },
+          {
+            "name": "\"BindingVariable\"",
+            "related_command": "Import-LocalizedData",
+            "type": "ParameterBinding",
+            "value": "\"LocalizedData\""
+          },
+          {
+            "related_command": "Import-LocalizedData",
+            "type": "NonTerminatingError",
+            "value": "\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
+          }
+        ],
         "value": "Import-LocalizedData  LocalizedData -filename ArchiveResources"
       },
       "engine": {
@@ -257,6 +253,13 @@
       "total": 1
     },
     "process": {
+      "args": [
+        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "-noexit",
+        "-command",
+        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
+      ],
+      "args_count": 4,
       "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
       "entity_id": "aae5217d-054f-435f-9968-4b5bebf12116",
       "title": "ConsoleHost"
@@ -274,21 +277,6 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_data": {
-        "DetailSequence": "1",
-        "DetailTotal": "1",
-        "ScriptName": "",
-        "SequenceNumber": "141",
-        "UserId": "VAGRANT\\vagrant",
-        "param1": "Import-LocalizedData  LocalizedData -filename ArchiveResources",
-        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=141\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine=Import-LocalizedData  LocalizedData -filename ArchiveResources",
-        "param3": [
-          "CommandInvocation(Import-LocalizedData): \"Import-LocalizedData\"",
-          "ParameterBinding(Import-LocalizedData): name=\"FileName\"; value=\"ArchiveResources\"",
-          "ParameterBinding(Import-LocalizedData): name=\"BindingVariable\"; value=\"LocalizedData\"",
-          "NonTerminatingError(Import-LocalizedData): \"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
-        ]
-      },
       "event_id": "800",
       "keywords": [
         "Classic"
@@ -301,24 +289,8 @@
   },
   {
     "@timestamp": "2020-05-15T08:33:26.393089Z",
-    "_temp": {
-      "details": [
-        {
-          "related_command": "Out-Default",
-          "type": "CommandInvocation",
-          "value": "\"Out-Default\""
-        }
-      ],
-      "user_parts": [
-        "VAGRANT",
-        "vagrant"
-      ]
-    },
     "ecs": {
       "version": "1.12.0"
-    },
-    "error": {
-      "message": "[scripting] Regular expression considered too many characters, pattern: [^(.+)\\\\((.+)\\\\)\\\\:\\\\s*(.+)?$], limit factor: [6], char limit: [1470], count: [1471], wrapped: [ParameterBinding(Out-Default): name=\\\"InputObject\\\"; value=\\\"Can...], this limit can be changed by changed by the [script.painless.regex.limit-factor] setting"
     },
     "event": {
       "action": "Pipeline Execution Details",
@@ -339,6 +311,21 @@
     },
     "message": "Pipeline execution details for command line: . \n\nContext Information: \n\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=143\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine= \n\nDetails: \nCommandInvocation(Out-Default): \"Out-Default\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\"",
     "powershell": {
+      "command": {
+        "invocation_details": [
+          {
+            "related_command": "Out-Default",
+            "type": "CommandInvocation",
+            "value": "\"Out-Default\""
+          },
+          {
+            "name": "\"InputObject\"",
+            "related_command": "Out-Default",
+            "type": "ParameterBinding",
+            "value": "\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
+          }
+        ]
+      },
       "engine": {
         "version": "5.1.17763.1007"
       },
@@ -351,6 +338,13 @@
       "total": 1
     },
     "process": {
+      "args": [
+        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "-noexit",
+        "-command",
+        "'C:\\Gopath\\src\\github.com\\elastic\\beats'"
+      ],
+      "args_count": 4,
       "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'",
       "entity_id": "aae5217d-054f-435f-9968-4b5bebf12116",
       "title": "ConsoleHost"
@@ -368,19 +362,6 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_data": {
-        "CommandLine": "",
-        "DetailSequence": "1",
-        "DetailTotal": "1",
-        "ScriptName": "",
-        "SequenceNumber": "143",
-        "UserId": "VAGRANT\\vagrant",
-        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=143\n\n\tUserId=VAGRANT\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=aae5217d-054f-435f-9968-4b5bebf12116\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noexit -command 'C:\\Gopath\\src\\github.com\\elastic\\beats'\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=a87e8389-57c7-4997-95ff-f82f644965bf\n\tPipelineId=71\n\tScriptName=\n\tCommandLine=",
-        "param3": [
-          "CommandInvocation(Out-Default): \"Out-Default\"",
-          "ParameterBinding(Out-Default): name=\"InputObject\"; value=\"Cannot find the Windows PowerShell data file 'ArchiveResources.psd1' in directory 'C:\\Gopath\\src\\github.com\\elastic\\beats\\x-pack\\winlogbeat\\en-US\\', or in any parent culture directories.\""
-        ]
-      },
       "event_id": "800",
       "keywords": [
         "Classic"

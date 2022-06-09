@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
+- Powershell: Fix processing of parameter details. {pull}31833[31833]
 
 *Functionbeat*
 

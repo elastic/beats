@@ -25,6 +25,5 @@ var ignoreFields = []string{
 }
 
 func TestPowerShellIngest(t *testing.T) {
-	t.Skip("failing with pipeline errors")
 	module.TestIngestPipeline(t, "routing", "testdata/collection/*.evtx.golden.json", module.WithFieldFilter(ignoreFields))
 }
