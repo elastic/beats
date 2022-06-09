@@ -146,7 +146,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger, discardPartialPipelineDocuments bool) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -176,11 +176,11 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 
 	var pipelines []PipelineStats
 	for pipelineID, pipeline := range nodeStats.Pipelines {
-		if pipeline.Hash != "" && pipeline.Vertices != nil {
+		if discardPartialPipelineDocuments && (pipeline.Hash == "" || pipeline.Vertices == nil) {
+			logger.Debug("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed.")
+		} else {
 			pipeline.ID = pipelineID
 			pipelines = append(pipelines, pipeline)
-		} else {
-			logger.Debug("Pipeline document was discarded due to missing properties. This can happen when the Logstash API is polled before the pipeline setup has completed.")
 		}
 	}
 

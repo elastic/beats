@@ -28,6 +28,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/require"
 
@@ -35,19 +36,38 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	files, err := filepath.Glob("./_meta/test/node_stats.*.json")
+	// Versions without a pipeline hash
+	filesWithoutPipelineHash, err := filepath.Glob("./_meta/test/node_stats.{641|650|700}.json")
 	require.NoError(t, err)
+
+	EventMappingForFiles(t, filesWithoutPipelineHash, false, 1, 0)
+
+	// Versions with a pipeline hash
+	filesWithPipelineHash, err := filepath.Glob("./_meta/test/node_stats.{710|840}.json")
+	require.NoError(t, err)
+
+	EventMappingForFiles(t, filesWithPipelineHash, true, 1, 0)
+
+	// Versions with a pipeline hash, but they are missing (partial documents - can happen when the node stats API is polled before pipeline setup is complete)
+	filesWithPartialPipelineDocuments, err := filepath.Glob("./_meta/test/node_stats_partial.840.json")
+	require.NoError(t, err)
+
+	EventMappingForFiles(t, filesWithPartialPipelineDocuments, true, 0, 0)
+}
+
+func EventMappingForFiles(t *testing.T, files []string, discardPartialPipelineDocuments bool, expectedEvents int, expectedErrors int) {
+	logger := logp.NewLogger("logstash.node_stats")
 
 	for _, f := range files {
 		input, err := ioutil.ReadFile(f)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input, true)
+		err = eventMapping(reporter, input, true, logger, discardPartialPipelineDocuments)
 
 		require.NoError(t, err, f)
-		require.True(t, len(reporter.GetEvents()) >= 1, f)
-		require.Equal(t, 0, len(reporter.GetErrors()), f)
+		require.True(t, len(reporter.GetEvents()) >= expectedEvents, f)
+		require.Equal(t, expectedErrors, len(reporter.GetErrors()), f)
 	}
 }
 
