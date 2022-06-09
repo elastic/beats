@@ -15,6 +15,10 @@ issues:
   # Set to 0 to disable.
   # Default: 50
   max-issues-per-linter: 0
+  exclude-rules:
+    # From mage we are priting to the console to ourselves
+    - path: (.*magefile.go|.*dev-tools/mage/.*)
+      linters: forbidigo
 
 output:
   sort-results: true
