@@ -50,9 +50,13 @@ Then, Metricbeat can be launched.
 
 The following two types of host configurations are supported:
 
-1. Old style host configuration for backwards compatibility: `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
+1. Old style host configuration for backwards compatibility:
+    a. `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
+    b. `hosts: ["user/password@0.0.0.0:1521/ORCLPDB1.localdomain as sysdba"]`
 
-2. DSN host configuration: `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
+2. DSN host configuration:
+    a. `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
+    b. `hosts: ['user="user" password="password" connectString="host:port/service_name" sysdba=true']`
 
 DSN host configuration is the recommended way to configure the Oracle Metricbeat Module as it supports the usage of special characters in the password.
 
