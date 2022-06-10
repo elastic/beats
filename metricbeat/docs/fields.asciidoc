@@ -2827,6 +2827,24 @@ type: double
 
 --
 
+*`aws.applicationelb.metrics.HealthyHostCount.max`*::
++
+--
+The number of targets that are considered healthy.
+
+type: long
+
+--
+
+*`aws.applicationelb.metrics.UnHealthyHostCount.max`*::
++
+--
+The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
 [float]
 === networkelb
 
@@ -31763,6 +31781,36 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+--
+
+
+
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
 +
@@ -32446,6 +32494,134 @@ type: long
 +
 --
 type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.limit_in_bytes`*::
++
+--
+type: long
+
+format: bytes
 
 --
 

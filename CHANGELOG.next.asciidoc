@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
+- add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 
 *Packetbeat*
 

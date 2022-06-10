@@ -21,5 +21,5 @@ var ignoreFields = []string{
 }
 
 func TestSecurity(t *testing.T) {
-	module.TestPipeline(t, "testdata/*.evtx", module.WithFieldFilter(ignoreFields))
+	module.TestCollectionPipeline(t, "testdata/collection/*.evtx", module.WithFieldFilter(ignoreFields))
 }

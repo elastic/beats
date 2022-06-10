@@ -3,8 +3,14 @@
     "aws": {
         "applicationelb": {
             "metrics": {
+                "HealthyHostCount": {
+                    "max": 1
+                },
                 "RequestCount": {
                     "sum": 0
+                },
+                "UnHealthyHostCount": {
+                    "max": 0
                 }
             }
         },
@@ -12,9 +18,12 @@
             "namespace": "AWS/ApplicationELB"
         },
         "dimensions": {
-            "AvailabilityZone": "us-east-1b",
-            "LoadBalancer": "app/filebeat-aws-elb-test-lb/28cbae7655c8af5b",
-            "TargetGroup": "targetgroup/test-lb-instances/acc57bfd8306b90e"
+            "AvailabilityZone": "eu-central-1b",
+            "LoadBalancer": "app/filebeat-aws-elb-test-lb/72ec8ce7e72936c8",
+            "TargetGroup": "targetgroup/test-lb-instances/77cfbdc02308672e"
+        },
+        "tags": {
+            "Name": "filebeat-aws-elb-test-lb"
         }
     },
     "cloud": {
@@ -23,7 +32,7 @@
             "name": "elastic-beats"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.elb",
