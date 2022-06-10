@@ -151,7 +151,7 @@ func (s *Step) ToMap() mapstr.M {
 
 type Journey struct {
 	Name string   `json:"name"`
-	Id   string   `json:"id"`
+	ID   string   `json:"id"`
 	Tags []string `json:"tags"`
 }
 
@@ -159,12 +159,12 @@ func (j Journey) ToMap() mapstr.M {
 	if len(j.Tags) > 0 {
 		return mapstr.M{
 			"name": j.Name,
-			"id":   j.Id,
+			"id":   j.ID,
 			"tags": j.Tags,
 		}
 	}
 	return mapstr.M{
 		"name": j.Name,
-		"id":   j.Id,
+		"id":   j.ID,
 	}
 }

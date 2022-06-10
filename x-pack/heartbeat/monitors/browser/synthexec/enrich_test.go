@@ -16,6 +16,7 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -40,15 +41,14 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 }
 
 func TestJourneyEnricher(t *testing.T) {
-	var stdFields = StdProjectFields{
-		Id:       "myproject",
-		Name:     "myproject",
-		Type:     "browser",
-		IsInline: false,
+	var sFields = stdfields.StdMonitorFields{
+		ID:   "myproject",
+		Name: "myproject",
+		Type: "browser",
 	}
 	journey := &Journey{
 		Name: "A Journey Name",
-		Id:   "my-journey-id",
+		ID:   "my-journey-id",
 	}
 	syntherr := &SynthError{
 		Message: "my-errmsg",
@@ -89,23 +89,7 @@ func TestJourneyEnricher(t *testing.T) {
 		journeyEnd,
 	}
 
-	projectValidator := func() validator.Validator {
-		return lookslike.MustCompile(mapstr.M{
-			"monitor.project.id":   stdFields.Id,
-			"monitor.project.name": stdFields.Name,
-			"monitor.id":           fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
-			"monitor.name":         fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-			"monitor.type":         stdFields.Type,
-		})
-	}
-	inlineValidator := func() validator.Validator {
-		return lookslike.MustCompile(mapstr.M{
-			"monitor.id":   stdFields.Id,
-			"monitor.name": stdFields.Name,
-			"monitor.type": stdFields.Type,
-		})
-	}
-	commonValidator := func(se *SynthEvent) validator.Validator {
+	valid := func(se *SynthEvent) validator.Validator {
 		var v []validator.Validator
 
 		// We need an expectation for each input plus a final
@@ -126,46 +110,40 @@ func TestJourneyEnricher(t *testing.T) {
 		return lookslike.Compose(v...)
 	}
 
-	je := &journeyEnricher{}
-	check := func(t *testing.T, se *SynthEvent, ssf StdProjectFields) {
+	check := func(t *testing.T, se *SynthEvent, je *journeyEnricher) {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, ssf)
+			enrichErr := je.enrich(e, se)
 			if se.Error != nil {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
-			if ssf.IsInline {
-				sv, _ := e.Fields.GetValue("monitor.project")
-				require.Nil(t, sv)
-				testslike.Test(t, inlineValidator(), e.Fields)
-			} else {
-				testslike.Test(t, projectValidator(), e.Fields)
-			}
-			testslike.Test(t, commonValidator(se), e.Fields)
+
+			testslike.Test(t, valid(se), e.Fields)
 
 			require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
 		})
 	}
 
 	tests := []struct {
-		name     string
-		isInline bool
+		name                  string
+		IsLegacyBrowserSource bool
 	}{
 		{
-			name:     "project monitor",
-			isInline: false,
+			name:                  "legacy project monitor",
+			IsLegacyBrowserSource: true,
 		},
 		{
-			name:     "inline monitor",
-			isInline: true,
+			name:                  "modern monitor",
+			IsLegacyBrowserSource: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stdFields.IsInline = tt.isInline
+			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
+			je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: sFields}}
 			for _, se := range synthEvents {
-				check(t, se, stdFields)
+				check(t, se, je)
 			}
 		})
 	}
@@ -362,7 +340,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 func TestNoSummaryOnAfterHook(t *testing.T) {
 	journey := &Journey{
 		Name: "A journey that fails after completing",
-		Id:   "my-bad-after-all-hook",
+		ID:   "my-bad-after-all-hook",
 	}
 	journeyStart := &SynthEvent{
 		Type:                 JourneyStart,
@@ -398,13 +376,13 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		cmdStatus,
 	}
 
-	je := &journeyEnricher{}
-
+	stdFields := stdfields.StdMonitorFields{}
+	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StdProjectFields{IsInline: false}
+
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields)
+			enrichErr := je.enrich(e, se)
 
 			if se != nil && se.Type == CmdStatus {
 				t.Run("no summary in cmd/status", func(t *testing.T) {
@@ -435,7 +413,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	journey := &Journey{
 		Name: "A journey that never emits journey/end but exits successfully",
-		Id:   "no-journey-end-but-success",
+		ID:   "no-journey-end-but-success",
 	}
 	journeyStart := &SynthEvent{
 		Type:                 "journey/start",
@@ -458,15 +436,14 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		cmdStatus,
 	}
 
-	je := &journeyEnricher{}
-
 	hasCmdStatus := false
 
+	stdFields := stdfields.StdMonitorFields{}
+	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StdProjectFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields)
+			enrichErr := je.enrich(e, se)
 
 			if se != nil && se.Type == CmdStatus {
 				hasCmdStatus = true
