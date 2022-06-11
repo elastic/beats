@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/require"
 
@@ -36,34 +37,38 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	// Versions without a pipeline hash
-	filesWithoutPipelineHash, err := filepath.Glob("./_meta/test/node_stats.{641|650|700}.json")
-	require.NoError(t, err)
-
-	EventMappingForFiles(t, filesWithoutPipelineHash, false, 1, 0)
-
-	// Versions with a pipeline hash
-	filesWithPipelineHash, err := filepath.Glob("./_meta/test/node_stats.{710|840}.json")
-	require.NoError(t, err)
-
-	EventMappingForFiles(t, filesWithPipelineHash, true, 1, 0)
-
-	// Versions with a pipeline hash, but they are missing (partial documents - can happen when the node stats API is polled before pipeline setup is complete)
-	filesWithPartialPipelineDocuments, err := filepath.Glob("./_meta/test/node_stats_partial.840.json")
-	require.NoError(t, err)
-
-	EventMappingForFiles(t, filesWithPartialPipelineDocuments, true, 0, 0)
+	// 6.4.1
+	sixFourOneGlob := "./_meta/test/node_stats.641.json"
+	EventMappingForFiles(t, sixFourOneGlob, version.MustNew("6.4.1"), 1, 0)
+	// 6.5.0
+	sixFiveZeroGlob := "./_meta/test/node_stats.650.json"
+	EventMappingForFiles(t, sixFiveZeroGlob, version.MustNew("6.5.0"), 1, 0)
+	// 7.0.0
+	sevenZeroZeroGlob := "./_meta/test/node_stats.700.json"
+	EventMappingForFiles(t, sevenZeroZeroGlob, version.MustNew("7.0.0"), 1, 0)
+	// 7.1.0
+	sevenOneZeroGlob := "./_meta/test/node_stats.710.json"
+	EventMappingForFiles(t, sevenOneZeroGlob, version.MustNew("7.1.0"), 1, 0)
+	// 8.4.0
+	eightFourZeroGlob := "./_meta/test/node_stats.840.json"
+	EventMappingForFiles(t, eightFourZeroGlob, version.MustNew("8.4.0"), 1, 0)
+	// 8.4.0 - partial
+	eightFourZeroPartialGlob := "./_meta/test/node_stats_partial.840.json"
+	EventMappingForFiles(t, eightFourZeroPartialGlob, version.MustNew("8.4.0"), 0, 0)
 }
 
-func EventMappingForFiles(t *testing.T, files []string, discardPartialPipelineDocuments bool, expectedEvents int, expectedErrors int) {
+func EventMappingForFiles(t *testing.T, fileGlob string, logstashVersion *version.V, expectedEvents int, expectedErrors int) {
 	logger := logp.NewLogger("logstash.node_stats")
+
+	files, err := filepath.Glob(fileGlob)
+	require.NoError(t, err)
 
 	for _, f := range files {
 		input, err := ioutil.ReadFile(f)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input, true, logger, discardPartialPipelineDocuments)
+		err = eventMapping(reporter, input, true, logger, logstashVersion)
 
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= expectedEvents, f)

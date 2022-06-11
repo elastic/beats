@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
@@ -146,7 +147,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger, discardPartialPipelineDocuments bool) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger, logstashVersion *version.V) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -175,9 +176,12 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 	}
 
 	var pipelines []PipelineStats
+	// The version from which we expect the node stats API to return a hash with pipeline documents
+	var PipelineDocumentsContainHashVersion = version.MustNew("7.3.0")
+	pipelineDocumentsShouldContainHash := elastic.IsFeatureAvailable(logstashVersion, PipelineDocumentsContainHashVersion)
 	for pipelineID, pipeline := range nodeStats.Pipelines {
-		if discardPartialPipelineDocuments && (pipeline.Hash == "" || pipeline.Vertices == nil) {
-			logger.Debug("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed.")
+		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil) {
+			logger.Warn("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed.")
 		} else {
 			pipeline.ID = pipelineID
 			pipelines = append(pipelines, pipeline)
