@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
-	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // init registers the MetricSet with the central registry.
@@ -51,7 +50,6 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	LogstashVersion *version.V
 }
 
 // New create a new instance of the MetricSet
@@ -61,14 +59,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	logstashVersion, err := ms.GetVersion()
-	if err != nil {
-		return nil, err
-	}
-
 	return &MetricSet{
-		MetricSet:       ms,
-		LogstashVersion: logstashVersion,
+		MetricSet: ms,
 	}, nil
 }
 
@@ -85,7 +77,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if err = eventMapping(r, content, m.XPackEnabled, m.Logger(), m.LogstashVersion); err != nil {
+	if err = eventMapping(r, content, m.XPackEnabled, m.Logger()); err != nil {
 		return err
 	}
 

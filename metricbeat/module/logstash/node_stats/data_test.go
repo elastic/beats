@@ -21,15 +21,14 @@
 package node_stats
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/require"
 
@@ -37,39 +36,33 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	// 6.4.1
-	sixFourOneGlob := "./_meta/test/node_stats.641.json"
-	EventMappingForFiles(t, sixFourOneGlob, version.MustNew("6.4.1"), 1, 0)
-	// 6.5.0
-	sixFiveZeroGlob := "./_meta/test/node_stats.650.json"
-	EventMappingForFiles(t, sixFiveZeroGlob, version.MustNew("6.5.0"), 1, 0)
-	// 7.0.0
-	sevenZeroZeroGlob := "./_meta/test/node_stats.700.json"
-	EventMappingForFiles(t, sevenZeroZeroGlob, version.MustNew("7.0.0"), 1, 0)
-	// 7.1.0
-	sevenOneZeroGlob := "./_meta/test/node_stats.710.json"
-	EventMappingForFiles(t, sevenOneZeroGlob, version.MustNew("7.1.0"), 1, 0)
-	// 8.4.0
-	eightFourZeroGlob := "./_meta/test/node_stats.840.json"
-	EventMappingForFiles(t, eightFourZeroGlob, version.MustNew("8.4.0"), 1, 0)
-	// 8.4.0 - partial
-	eightFourZeroPartialGlob := "./_meta/test/node_stats_partial.840.json"
-	EventMappingForFiles(t, eightFourZeroPartialGlob, version.MustNew("8.4.0"), 0, 0)
+	// Contain pipeline hash
+	containVersions := []string{}
+	containVersions = append(containVersions, "710")
+	containVersions = append(containVersions, "840")
+	EventMappingForFiles(t, containVersions, 1, 0)
+	// Don't contain pipeline hash
+	dontContainVersions := []string{}
+	dontContainVersions = append(dontContainVersions, "641")
+	dontContainVersions = append(dontContainVersions, "650")
+	dontContainVersions = append(dontContainVersions, "700")
+	EventMappingForFiles(t, dontContainVersions, 1, 0)
+	// Don't contain pipeline hash but should (partial)
+	partialVersions := []string{}
+	partialVersions = append(partialVersions, "840_partial")
+	EventMappingForFiles(t, partialVersions, 0, 0)
 }
 
-func EventMappingForFiles(t *testing.T, fileGlob string, logstashVersion *version.V, expectedEvents int, expectedErrors int) {
+func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents int, expectedErrors int) {
 	logger := logp.NewLogger("logstash.node_stats")
 
-	files, err := filepath.Glob(fileGlob)
-	require.NoError(t, err)
-
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
+	for _, f := range fixtureVersions {
+		path := fmt.Sprintf("./_meta/test/node_stats.%s.json", f)
+		input, err := ioutil.ReadFile(path)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input, true, logger, logstashVersion)
-
+		err = eventMapping(reporter, input, true, logger)
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= expectedEvents, f)
 		require.Equal(t, expectedErrors, len(reporter.GetErrors()), f)

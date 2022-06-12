@@ -136,7 +136,7 @@ func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 // CheckPipelineGraphAPIsAvailable returns an error if pipeline graph APIs are not
 // available in the version of the Logstash node.
 func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
-	logstashVersion, err := m.GetVersion()
+	logstashVersion, err := m.getVersion()
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID str
 	return clusterUUID
 }
 
-func (m *MetricSet) GetVersion() (*version.V, error) {
+func (m *MetricSet) getVersion() (*version.V, error) {
 	const rootPath = "/"
 	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {

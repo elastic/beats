@@ -147,7 +147,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger, logstashVersion *version.V) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -176,9 +176,13 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 	}
 
 	var pipelines []PipelineStats
-	// The version from which we expect the node stats API to return a hash with pipeline documents
+
+	// The version from which we expect the node stats API to return a hash with pipeline documents. This is really just a formality so that
+	// unit tests with much older fixture versions still work.
 	var PipelineDocumentsContainHashVersion = version.MustNew("7.3.0")
-	pipelineDocumentsShouldContainHash := elastic.IsFeatureAvailable(logstashVersion, PipelineDocumentsContainHashVersion)
+	var StatsVersion = version.MustNew(nodeStats.Version)
+	pipelineDocumentsShouldContainHash := !StatsVersion.LessThan(PipelineDocumentsContainHashVersion)
+
 	for pipelineID, pipeline := range nodeStats.Pipelines {
 		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil) {
 			logger.Warn("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed.")
