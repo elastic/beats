@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Modify npipe package to directly get the user SID.
+
 ### Deprecated
 
 ### Removed
