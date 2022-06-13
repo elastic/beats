@@ -8,79 +8,76 @@
 package proc
 
 import (
-	"fmt"
+	"io/ioutil"
+	"os"
+	"syscall"
 	"testing"
+	"testing/fstest"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var ino = "26041992"
+var nsIno = uint64(26041992)
 
-func TestParseNamespaceIno(t *testing.T) {
+func TestNamespaceFS(t *testing.T) {
+	pid := "1"
 	testCases := []struct {
-		nsLink string
-		assert func(string, error)
+		fstest fstest.MapFS
+		assert func(NamespaceInfo, error)
 	}{
 		{
-			fmt.Sprintf("pid:[%s]", ino),
-			func(result string, err error) {
+			fstest.MapFS{
+				"proc/1/ns/pid": {
+					Sys: dummyStat(t, nsIno),
+				},
+			},
+			func(result NamespaceInfo, err error) {
 				assert.Nil(t, err)
-				assert.Equal(t, result, "26041992")
+				assert.Equal(t, result.Ino, nsIno)
 			}},
 		{
-			fmt.Sprintf("pid:%s", ino),
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			fmt.Sprintf("pid:[%s", ino),
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			fmt.Sprintf("pid:%s]", ino),
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			fmt.Sprintf("pid[%s]", ino),
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			fmt.Sprintf("pid%s", ino),
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			fmt.Sprintf("pid:[%s]:[%s]", ino, ino),
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			"",
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			"pid:",
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			"pid:[]",
-			func(result string, err error) {
-				assert.Error(t, err)
-			}},
-		{
-			"pid:[mock]",
-			func(result string, err error) {
+			fstest.MapFS{
+				"proc/2/ns/pid": {
+					Sys: dummyStat(t, nsIno),
+				},
+			},
+			func(result NamespaceInfo, err error) {
 				assert.Error(t, err)
 			}},
 	}
 
 	for _, testCase := range testCases {
-		result, err := parseNamespaceIno(testCase.nsLink)
+		result, err := ReadNamespaceFS(testCase.fstest, pid)
 		testCase.assert(result, err)
 	}
+}
+
+// Used in order to get a mocked syscall.Stat_t structure with assigned ino
+func dummyStat(t *testing.T, ino uint64) *syscall.Stat_t {
+
+	f, err := ioutil.TempFile("", "dummy")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	name := f.Name()
+	defer func() {
+		f.Close()
+		os.Remove(f.Name())
+	}()
+
+	info, err := os.Stat(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mockDsStat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		t.Fatal(err)
+	}
+
+	mockDsStat.Ino = ino
+
+	return mockDsStat
+
 }

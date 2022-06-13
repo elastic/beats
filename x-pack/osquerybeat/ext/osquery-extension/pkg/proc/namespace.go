@@ -6,64 +6,64 @@ package proc
 
 import (
 	"errors"
+	"io/fs"
+	"os"
 	"path/filepath"
-	"strconv"
-	"strings"
+	"syscall"
 )
 
 var (
-	ErrInvalidProcNsPidContent   = errors.New("invalid /proc/ns/pid content")
-	ErrInvalidProcNsPidInoNumber = errors.New("invalid /proc/ns/pid ino number")
+	ErrInvalidProcNsPidStatContent       = errors.New("invalid /proc/ns/pid stat content")
+	ErrInvalidProcNsPidStatParsedContent = errors.New("invalid /proc/ns/pid stat parsed content")
 )
 
 type NamespaceInfo struct {
-	Ino string
+	Ino uint64
 }
 
-// ReadStat reads process namespace information from /proc/<pid>/ns/pid.
-// Due to https://github.com/golang/go/issues/49580 implementing without FS.
+// ReadNamespace reads process namespace information from /proc/<pid>/ns/pid.
 func ReadNamespace(root string, pid string) (nsInfo NamespaceInfo, err error) {
+	return ReadNamespaceFS(os.DirFS(root), pid)
+}
 
-	// ReadLink content in order to pull the namespace ino
-	nsLink, err := ReadLink(root, pid, filepath.Join("ns", "pid"))
+func ReadNamespaceFS(fsys fs.FS, pid string) (nsInfo NamespaceInfo, err error) {
+
+	// Get the namespace stat
+	nsStat, err := getNamespaceStat(fsys, pid)
 	if err != nil {
 		return
 	}
 
-	// Parse the namespace ino from link content
-	nsIno, err := parseNamespaceIno(nsLink)
-	if err != nil {
-		return
-	}
-
-	// Set the parsed ino
-	nsInfo.Ino = nsIno
+	// Set the namespace ino
+	nsInfo.Ino = nsStat.Ino
 
 	return nsInfo, nil
+
 }
 
-func parseNamespaceIno(nsLink string) (string, error) {
-	// Proc ns pid link example
-	// pid:[4026532605]
+func getNamespaceStat(fsys fs.FS, pid string) (*syscall.Stat_t, error) {
 
-	// Split the link content into two parts
-	details := strings.Split(nsLink, ":")
+	// Path for the ns pid file
+	fn := filepath.Join("proc", pid, filepath.Join("ns", "pid"))
 
-	// Fail if more than two parts and ino isn't wrapped as expected
-	if len(details) != 2 ||
-		!strings.HasSuffix(details[1], "]") ||
-		!strings.HasPrefix(details[1], "[") {
-		return "", ErrInvalidProcNsPidContent
+	// Calling stat on the ns pid file
+	stat, err := fs.Stat(fsys, fn)
+	if err != nil {
+		return nil, err
 	}
 
-	// Slice the wrapping from the ino
-	ino := details[1][1 : len(details[1])-1]
-
-	// Check if ino is number
-	_, err := strconv.Atoi(ino)
-	if len(ino) == 0 || err != nil {
-		return "", ErrInvalidProcNsPidInoNumber
+	// Pull stat data
+	dataSource := stat.Sys()
+	if dataSource == nil {
+		return nil, ErrInvalidProcNsPidStatContent
 	}
 
-	return ino, nil
+	// Convert pulled stat data into stat structure
+	dsStat, ok := dataSource.(*syscall.Stat_t)
+	if !ok {
+		return nil, ErrInvalidProcNsPidStatParsedContent
+	}
+
+	return dsStat, nil
+
 }
