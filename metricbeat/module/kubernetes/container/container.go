@@ -73,11 +73,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 
-	newTimeout := base.Module().Config().Period * 2
-	if util.PerfMetrics.Timeout < newTimeout {
-		util.PerfMetrics = util.NewPerfMetricsCache(newTimeout)
-	}
-	
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,

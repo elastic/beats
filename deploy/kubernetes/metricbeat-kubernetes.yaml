@@ -110,6 +110,7 @@ data:
           system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)'
   kubernetes.yml: |-
     - module: kubernetes
+      cache_expiration_time: 22s
       metricsets:
         - node
         - system
@@ -157,12 +158,18 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.3.0-SNAPSHOT
+        # image: docker.elastic.co/beats/metricbeat:8.3.0-SNAPSHOT
+        image: metricbeat-debugger-image:latest
+        imagePullPolicy: Never
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
           "-system.hostfs=/hostfs",
         ]
+        ports:
+        - containerPort: 56268
+          hostPort: 56268
+          protocol: TCP
         env:
         - name: ELASTICSEARCH_HOST
           value: elasticsearch

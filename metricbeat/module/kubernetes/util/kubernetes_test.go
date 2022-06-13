@@ -20,10 +20,12 @@ package util
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -38,6 +40,81 @@ import (
 var (
 	logger = logp.NewLogger("kubernetes")
 )
+
+func TestGetValidatedConfig(t *testing.T) {
+	tests := []struct{
+		addMetadata bool
+		cacheExpirationTime time.Duration
+		period time.Duration
+		cacheTimeout time.Duration
+		resultCacheExpirationTime time.Duration
+		errorMessage string
+	}{
+		// {
+		// 	addMetadata: false,
+		// 	cacheExpirationTime: 0 * time.Second,
+		// 	period: 0 * time.Second,
+		// 	cacheTimeout: 0 * time.Second,
+		// 	resultCacheExpirationTime: 0 * time.Second,
+		// 	errorMessage: "CacheExpirationTime needs to be strictly greater than 0. Currently: 0s",
+		// },
+		{
+			addMetadata: false,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 20 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second,
+			errorMessage: "CacheExpirationTime needs to be strictly greater than 0. Currently: 0s",
+		},
+		// {
+		// 	addMetadata: false,
+		// 	cacheExpirationTime: 0 * time.Second,
+		// 	period: 10 * time.Second,
+		// 	cacheTimeout: 0 * time.Second,
+		// 	resultCacheExpirationTime: 0 * time.Second,
+		// 	errorMessage: "Metadata enriching is disabled",
+		// },
+		// {
+		// 	addMetadata: true,
+		// 	cacheExpirationTime: 0 * time.Second,
+		// 	period: 10 * time.Second,
+		// 	cacheTimeout: 0 * time.Second,
+		// 	resultCacheExpirationTime: 50 * time.Second,
+		// 	errorMessage: "",
+		// },
+		// {
+		// 	addMetadata: false,
+		// 	cacheExpirationTime: 0 * time.Second,
+		// 	period: 10 * time.Second,
+		// 	cacheTimeout: 20 * time.Second,
+		// 	resultCacheExpirationTime: 0 * time.Second,
+		// 	errorMessage: "",  // ???
+		// },
+	}
+
+	for _, test := range tests {
+		config := &kubernetesConfig{
+			CacheExpirationTime: test.cacheExpirationTime,
+			AddMetadata: test.addMetadata,
+		}
+		moduleConfig := mb.ModuleConfig{
+			Period: test.period,
+		}
+	
+		config, err := ValidateConfig(config, moduleConfig, test.cacheTimeout)
+	
+		if len(test.errorMessage) > 0 {
+			assert.NotNil(t, err)
+			assert.Equal(t, test.errorMessage, err.Error())
+			assert.Nil(t, config)
+		} else {
+			assert.Nil(t, err)
+			assert.NotNil(t, config)
+
+			assert.Equal(t, test.resultCacheExpirationTime, config.CacheExpirationTime)
+		}
+	}
+}
 
 func TestBuildMetadataEnricher(t *testing.T) {
 	watcher := mockWatcher{}

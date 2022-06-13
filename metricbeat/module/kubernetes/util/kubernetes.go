@@ -18,6 +18,7 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -53,8 +54,9 @@ type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 
-	Node       string        `config:"node"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	Node                string        `config:"node"`
+	SyncPeriod          time.Duration `config:"sync_period"`
+	CacheExpirationTime time.Duration `config:"cache_expiration_time"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
@@ -82,11 +84,13 @@ func NewResourceMetadataEnricher(
 	res kubernetes.Resource,
 	nodeScope bool) Enricher {
 
-	config := ValidatedConfig(base)
-	if config == nil {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
+
+	PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
 
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, nodeScope)
 
@@ -183,11 +187,13 @@ func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	nodeScope bool) Enricher {
 
-	config := ValidatedConfig(base)
-	if config == nil {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
+
+	PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
 
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
 	if watcher == nil {
@@ -329,21 +335,55 @@ func GetDefaultDisabledMetaConfig() *kubernetesConfig {
 	}
 }
 
-func ValidatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
-	config := kubernetesConfig{
+func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
+	config, err := GetConfig(base)
+	if err != nil {
+		logp.Err("Error while getting config: %v", err)
+		return nil, err
+	}
+
+	moduleConfig := base.Module().Config()
+	cacheTimeout := PerfMetrics.Timeout
+	config, err = ValidateConfig(config, moduleConfig, cacheTimeout)
+	if err != nil {
+		logp.Err("Error while validating config: %v", err)
+		return nil, err
+	}
+	return config, nil
+}
+
+func ValidateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cacheTimeout time.Duration) (*kubernetesConfig, error) {
+	if config.CacheExpirationTime <= 0 && cacheTimeout < moduleConfig.Period*5 {
+		config.CacheExpirationTime = moduleConfig.Period * 5
+	}
+
+	if config.CacheExpirationTime == 0 {
+		return nil, fmt.Errorf("CacheExpirationTime needs to be strictly greater than 0. Currently: %s",
+			config.CacheExpirationTime.String())
+	}
+
+	if config.CacheExpirationTime > 0 && config.CacheExpirationTime <= moduleConfig.Period {
+		return nil, fmt.Errorf("CacheExpirationTime needs to be strictly greater than Module.Period. Currently: %s <= %v",
+			config.CacheExpirationTime.String(), moduleConfig.Period)
+	}
+
+	if !config.AddMetadata {
+		return nil, errors.New("Metadata enriching is disabled")
+	}
+	return config, nil
+}
+
+func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
+	config := &kubernetesConfig{
 		AddMetadata:         true,
 		SyncPeriod:          time.Minute * 10,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil
+		return nil, errors.New("Error unpacking configs")
 	}
 
-	// Return nil if metadata enriching is disabled:
-	if !config.AddMetadata {
-		return nil
-	}
-	return &config
+	return config, nil
 }
 
 func getString(m mapstr.M, key string) string {
