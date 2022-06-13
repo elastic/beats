@@ -84,7 +84,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 			for i := 0; i < batch.Count(); i++ {
 				events = append(events, batch.Event(i))
 			}
-			batch.ACK()
+			batch.Done()
 		}
 
 		// verify

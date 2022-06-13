@@ -90,6 +90,6 @@ func (batch *diskQueueBatch) Event(i int) interface{} {
 	return batch.frames[i].event
 }
 
-func (batch *diskQueueBatch) ACK() {
+func (batch *diskQueueBatch) Done() {
 	batch.queue.acks.addFrames(batch.frames)
 }
