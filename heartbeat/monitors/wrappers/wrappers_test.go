@@ -539,6 +539,7 @@ var legacyProjectMonitorValues = BrowserMonitor{
 	legacyProjectName: "My Project",
 }
 
+//nolint: unparam // it's a test helper
 func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error, bm BrowserMonitor) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
