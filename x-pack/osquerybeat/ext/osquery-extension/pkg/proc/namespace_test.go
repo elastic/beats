@@ -54,7 +54,6 @@ func TestNamespaceFS(t *testing.T) {
 
 // Used in order to get a mocked syscall.Stat_t structure with assigned ino
 func dummyStat(t *testing.T, ino uint64) *syscall.Stat_t {
-
 	f, err := ioutil.TempFile("", "dummy")
 	if err != nil {
 		t.Fatal(err)
@@ -79,5 +78,4 @@ func dummyStat(t *testing.T, ino uint64) *syscall.Stat_t {
 	mockDsStat.Ino = ino
 
 	return mockDsStat
-
 }

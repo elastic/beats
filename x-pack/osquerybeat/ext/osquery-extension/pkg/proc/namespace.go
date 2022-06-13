@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !windows
+// +build !windows
+
 package proc
 
 import (
@@ -27,7 +30,6 @@ func ReadNamespace(root string, pid string) (nsInfo NamespaceInfo, err error) {
 }
 
 func ReadNamespaceFS(fsys fs.FS, pid string) (nsInfo NamespaceInfo, err error) {
-
 	// Get the namespace stat
 	nsStat, err := getNamespaceStat(fsys, pid)
 	if err != nil {
@@ -38,11 +40,9 @@ func ReadNamespaceFS(fsys fs.FS, pid string) (nsInfo NamespaceInfo, err error) {
 	nsInfo.Ino = nsStat.Ino
 
 	return nsInfo, nil
-
 }
 
 func getNamespaceStat(fsys fs.FS, pid string) (*syscall.Stat_t, error) {
-
 	// Path for the ns pid file
 	fn := filepath.Join("proc", pid, filepath.Join("ns", "pid"))
 
@@ -65,5 +65,4 @@ func getNamespaceStat(fsys fs.FS, pid string) (*syscall.Stat_t, error) {
 	}
 
 	return dsStat, nil
-
 }
