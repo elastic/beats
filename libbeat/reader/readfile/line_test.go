@@ -373,6 +373,7 @@ func TestMaxBytesLimit(t *testing.T) {
 		b, n, err := reader.Next()
 		if err != nil {
 			if err == io.EOF {
+				readLen += n
 				break
 			} else {
 				t.Fatal("unexpected error:", err)

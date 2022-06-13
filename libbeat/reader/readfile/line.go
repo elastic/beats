@@ -88,7 +88,10 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
-			return nil, 0, err
+			// return and reset consumed bytes count
+			sz := r.byteCount
+			r.byteCount = 0
+			return nil, sz, err
 		}
 
 		// Check last decoded byte really being newline also unencoded
