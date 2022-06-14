@@ -8,12 +8,11 @@ import (
 	"testing"
 	"time"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 )
 
 func TestGetStartPosition(t *testing.T) {
@@ -120,7 +119,7 @@ func TestGetStartPosition(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	logEvent := types.FilteredLogEvent{
+	logEvent := &types.FilteredLogEvent{
 		EventId:       awssdk.String("id-1"),
 		IngestionTime: awssdk.Int64(1590000000000),
 		LogStreamName: awssdk.String("logStreamName1"),
@@ -149,7 +148,7 @@ func TestCreateEvent(t *testing.T) {
 			"region":   "us-east-1",
 		},
 	}
-	event := createEvent(logEvent, "logGroup1", "us-east-1")
+	event := createEvent(*logEvent, "logGroup1", "us-east-1")
 	err := event.Fields.Delete("event.ingested")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedEventFields, event.Fields)

@@ -7,6 +7,7 @@ package ec2
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 )
 
@@ -18,6 +19,6 @@ type mockEC2Client struct {
 	numResults int
 }
 
-func (m *mockEC2Client)DescribeInstances(context.Context, *ec2.DescribeInstancesInput, ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error){
+func (m *mockEC2Client) DescribeInstances(context.Context, *ec2.DescribeInstancesInput, ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
 	return nil, fmt.Errorf("not implemented")
 }

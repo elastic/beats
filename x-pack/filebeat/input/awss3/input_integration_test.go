@@ -19,14 +19,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -36,7 +33,10 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -309,7 +309,7 @@ func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{
 func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string) {
 	t.Helper()
 
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -337,7 +337,7 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 }
 
 func drainSQS(t *testing.T, region string, queueURL string) {
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -383,12 +383,12 @@ func TestGetRegionForBucketARN(t *testing.T) {
 	// Terraform is used to set up S3 and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
-	awsConfig, err := external.LoadDefaultAWSConfig()
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
 
 	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
@@ -411,13 +411,13 @@ func TestPaginatorListPrefix(t *testing.T) {
 		"testdata/log.txt", // Skipped (no match).
 	)
 
-	awsConfig, err := external.LoadDefaultAWSConfig()
-	awsConfig.Region = tfConfig.AWSRegion
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
+	cfg.Region = tfConfig.AWSRegion
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
 
 	s3API := &awsS3API{
 		client: s3Client,

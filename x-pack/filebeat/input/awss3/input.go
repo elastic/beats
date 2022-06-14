@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"net/url"
 	"strings"
 

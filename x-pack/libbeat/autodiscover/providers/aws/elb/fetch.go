@@ -6,8 +6,9 @@ package elb
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	"sync"
+
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"go.uber.org/multierr"

@@ -189,7 +189,6 @@ func (p *fetchRequest) fetchInstances(instance ec2types.Instance) {
 	describeInstancesInput := &ec2.DescribeInstancesInput{InstanceIds: []string{awsauto.SafeString(instance.InstanceId)}}
 	paginator := ec2.NewDescribeInstancesPaginator(p.client, describeInstancesInput)
 
-
 	for {
 		select {
 		case <-p.context.Done():

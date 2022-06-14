@@ -5,8 +5,9 @@
 package ec2
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/stretchr/testify/require"
 )

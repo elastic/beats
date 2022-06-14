@@ -84,7 +84,7 @@ func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) 
 
 	awsConfig, err = awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "InitializeAWSConfig failed")
+		return nil, fmt.Errorf("InitializeAWSConfig failed: %w", err)
 	}
 	awsConfig.Region = config.RegionName
 
@@ -257,7 +257,7 @@ func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, log
 	// make API request
 	logsGroups, err := svc.DescribeLogGroups(context.TODO(), filterLogEventsInput)
 	if err != nil {
-		return nil, errors.Wrap(err, "aws describe log groups request returned an error")
+		return nil, fmt.Errorf("aws describe log groups request returned an error: %w", err)
 	}
 
 	var logGroupNames []string

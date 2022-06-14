@@ -6,9 +6,9 @@ package ec2
 
 import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
-	
-	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
