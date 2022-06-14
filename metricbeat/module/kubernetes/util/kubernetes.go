@@ -353,18 +353,30 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 }
 
 func ValidateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cacheTimeout time.Duration) (*kubernetesConfig, error) {
-	if config.CacheExpirationTime <= 0 && cacheTimeout < moduleConfig.Period*5 {
-		config.CacheExpirationTime = moduleConfig.Period * 5
+	// NOTE: minumum cache expiration time > period avoid that the cache expires just
+	// before next scraping time. Period * 2 is arbitrary but it a good buffer to avoid
+	// that a late scraping run would affect the metrics (for the absence of entries in the cache)
+	minCacheExpirationTime := moduleConfig.Period * 2
+
+	if config.CacheExpirationTime <= 0 {
+		if cacheTimeout <= minCacheExpirationTime {
+			config.CacheExpirationTime = minCacheExpirationTime
+			logp.Debug("Setting CacheExpirationTime = minCacheExpirationTime. CacheExpirationTime: %s", config.CacheExpirationTime.String())
+
+		} else {
+			config.CacheExpirationTime = cacheTimeout
+			logp.Debug("Setting CacheExpirationTime = DefaultCacheTimeout. CacheExpirationTime: %s", config.CacheExpirationTime.String())
+		}
 	}
 
 	if config.CacheExpirationTime == 0 {
-		return nil, fmt.Errorf("CacheExpirationTime needs to be strictly greater than 0. Currently: %s",
+		return nil, fmt.Errorf("CacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: %s",
 			config.CacheExpirationTime.String())
 	}
 
-	if config.CacheExpirationTime > 0 && config.CacheExpirationTime <= moduleConfig.Period {
-		return nil, fmt.Errorf("CacheExpirationTime needs to be strictly greater than Module.Period. Currently: %s <= %v",
-			config.CacheExpirationTime.String(), moduleConfig.Period)
+	if config.CacheExpirationTime > 0 && config.CacheExpirationTime < minCacheExpirationTime {
+		return nil, fmt.Errorf("CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: %s < %v",
+			config.CacheExpirationTime.String(), minCacheExpirationTime)
 	}
 
 	if !config.AddMetadata {

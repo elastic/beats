@@ -50,46 +50,134 @@ func TestGetValidatedConfig(t *testing.T) {
 		resultCacheExpirationTime time.Duration
 		errorMessage string
 	}{
-		// {
-		// 	addMetadata: false,
-		// 	cacheExpirationTime: 0 * time.Second,
-		// 	period: 0 * time.Second,
-		// 	cacheTimeout: 0 * time.Second,
-		// 	resultCacheExpirationTime: 0 * time.Second,
-		// 	errorMessage: "CacheExpirationTime needs to be strictly greater than 0. Currently: 0s",
-		// },
+		{
+			addMetadata: false,
+			cacheExpirationTime: 0 * time.Second,
+			period: 0 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
+			errorMessage: "CacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: 0s",
+		},
+		{
+			addMetadata: false,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second,  // NOT VALIDATED because addMetadata = False
+			errorMessage: "Metadata enriching is disabled",
+		},
 		{
 			addMetadata: false,
 			cacheExpirationTime: 0 * time.Second,
 			period: 10 * time.Second,
 			cacheTimeout: 20 * time.Second,
-			resultCacheExpirationTime: 0 * time.Second,
-			errorMessage: "CacheExpirationTime needs to be strictly greater than 0. Currently: 0s",
+			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
+			errorMessage: "Metadata enriching is disabled",
 		},
-		// {
-		// 	addMetadata: false,
-		// 	cacheExpirationTime: 0 * time.Second,
-		// 	period: 10 * time.Second,
-		// 	cacheTimeout: 0 * time.Second,
-		// 	resultCacheExpirationTime: 0 * time.Second,
-		// 	errorMessage: "Metadata enriching is disabled",
-		// },
-		// {
-		// 	addMetadata: true,
-		// 	cacheExpirationTime: 0 * time.Second,
-		// 	period: 10 * time.Second,
-		// 	cacheTimeout: 0 * time.Second,
-		// 	resultCacheExpirationTime: 50 * time.Second,
-		// 	errorMessage: "",
-		// },
-		// {
-		// 	addMetadata: false,
-		// 	cacheExpirationTime: 0 * time.Second,
-		// 	period: 10 * time.Second,
-		// 	cacheTimeout: 20 * time.Second,
-		// 	resultCacheExpirationTime: 0 * time.Second,
-		// 	errorMessage: "",  // ???
-		// },
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 0 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
+			errorMessage: "CacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: 0s",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 20 * time.Second,  // automatically configured = 2 * period
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 10 * time.Second,
+			resultCacheExpirationTime: 20 * time.Second, // automatically configured = 2 * period
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 20 * time.Second,
+			resultCacheExpirationTime: 20 * time.Second, // automatically configured = 2 * period
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 15 * time.Second,
+			cacheTimeout: 20 * time.Second,
+			resultCacheExpirationTime: 30 * time.Second, // automatically configured = 2 * period
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Minute,
+			cacheTimeout: 2 * time.Minute,
+			resultCacheExpirationTime: 20 * time.Minute,  // automatically configured = 2 * period
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 0 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 30 * time.Second,
+			resultCacheExpirationTime: 30 * time.Second, // automatically configured = cache timeout
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 20 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 20 * time.Second, // valid cache expiration. No modification
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 2 * time.Minute,
+			period: 10 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 2 * time.Minute, // valid cache expiration. No modification
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 50 * time.Minute,
+			period: 10 * time.Minute,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 50 * time.Minute, // valid cache expiration. No modification
+			errorMessage: "",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 10 * time.Second,
+			period: 10 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second,
+			errorMessage: "CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 10s < 20s",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 20 * time.Second,
+			period: 15 * time.Second,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second,
+			errorMessage: "CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 20s < 30s",
+		},
+		{
+			addMetadata: true,
+			cacheExpirationTime: 2 * time.Minute,
+			period: 10 * time.Minute,
+			cacheTimeout: 0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second,
+			errorMessage: "CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 2m0s < 20m0s",
+		},
 	}
 
 	for _, test := range tests {
@@ -100,11 +188,12 @@ func TestGetValidatedConfig(t *testing.T) {
 		moduleConfig := mb.ModuleConfig{
 			Period: test.period,
 		}
-	
+
 		config, err := ValidateConfig(config, moduleConfig, test.cacheTimeout)
-	
+
 		if len(test.errorMessage) > 0 {
 			assert.NotNil(t, err)
+
 			assert.Equal(t, test.errorMessage, err.Error())
 			assert.Nil(t, config)
 		} else {
