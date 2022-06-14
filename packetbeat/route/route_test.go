@@ -20,6 +20,7 @@ package route
 
 import (
 	"bytes"
+	"fmt"
 	"runtime"
 	"strings"
 	"syscall"
@@ -29,25 +30,32 @@ import (
 )
 
 func TestDefault(t *testing.T) {
-	for _, family := range []int{syscall.AF_INET /*, syscall.AF_INET6*/} {
+	for _, family := range []int{syscall.AF_INET, syscall.AF_INET6} {
 		wantIface, wantIndex, wantErr := defaultRoute(family)
 		if wantErr != nil && wantErr != ErrNotFound {
 			t.Errorf("unexpected error from defaultRoute(%d): %v", family, wantErr)
 			continue
 		}
 		iface, index, err := Default(family)
-		switch wantErr {
-		case nil:
-			if err != nil {
-				t.Errorf("unexpected error from Default(%d): %v", family, err)
-			}
-		case ErrNotFound:
-			if err == nil || !strings.HasPrefix(err.Error(), "no route found") {
-				t.Errorf("expected not found error from Default(%d): %v", family, err)
-			}
+		if err != wantErr {
+			t.Errorf("unexpected error from Default(%d): got:%v want:%v", family, err, wantErr)
+		}
+		if wantErr != nil {
+			continue
 		}
 		if !sameName(iface, wantIface) {
-			t.Errorf("unexpected interface for family %d: got:%s want:%s", family, iface, wantIface)
+			if family == syscall.AF_INET6 && runtime.GOOS == "windows" {
+				// Windows interface naming is a dog's breakfast; on some
+				// builders the transport name obtained from getmac is not
+				// based on the LUID.
+				b, err := run("getmac")
+				if err != nil {
+					b = []byte(fmt.Sprintf("\nunable to recover getmac information: %v", err))
+				}
+				t.Logf("unexpected interface for family %d: got:%s want:%s\n%s", family, iface, wantIface, b)
+			} else {
+				t.Errorf("unexpected interface for family %d: got:%s want:%s", family, iface, wantIface)
+			}
 		}
 		if index != wantIndex {
 			t.Errorf("unexpected interface for family %d: got:%d want:%d", family, index, wantIndex)
@@ -55,12 +63,16 @@ func TestDefault(t *testing.T) {
 	}
 }
 
-func sameName(a, b string) bool {
+func sameName(got, want string) bool {
 	if runtime.GOOS == "windows" {
-		// ¯\_(ツ)_/¯
-		return strings.EqualFold(a, b)
+		// Rely only on the GUID of the device since the device tree
+		// may not be consistent (or present).
+		idx := strings.Index(want, "_") // Replace this with strings.Cut.
+		if idx > -1 {
+			want = want[idx+1:]
+		}
 	}
-	return a == b
+	return got == want
 }
 
 // This wart exists because golangci-lint does not aggregate across

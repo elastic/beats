@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//nolint:unused,structcheck,varcheck // How many ways to check for unused? (╯°□°）╯︵ ┻━┻
+//nolint:unused,structcheck // How many ways to check for unused? (╯°□°）╯︵ ┻━┻ Fields kept for documentation.
 package route
 
 import (
@@ -28,29 +28,24 @@ import (
 )
 
 var (
+	// For details of the APIs used, see:
+	// https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getbestinterfaceex
+	// https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
 	libiphlpapi          = windows.NewLazySystemDLL("Iphlpapi.dll")
 	getBestInterfaceEx   = libiphlpapi.NewProc("GetBestInterfaceEx")
-	getInterfaceInfo     = libiphlpapi.NewProc("GetInterfaceInfo")
 	getAdaptersAddresses = libiphlpapi.NewProc("GetAdaptersAddresses")
 )
 
 // Default returns the interface and netstat device index of the network interface
 // used for the first identified default route for the specified address family.
-// Valid values for af are syscall.AF_INET and syscall.AF_INET6.
+// Valid values for af are syscall.AF_INET and syscall.AF_INET6. The iface name
+// returned will include only the GUID of the device.
 func Default(af int) (name string, index int, err error) {
 	switch af {
 	case windows.AF_INET, windows.AF_INET6:
 	default:
 		return "", -1, errors.New("invalid family")
 	}
-
-	// https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getbestinterfaceex
-	// https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getinterfaceinfo
-	//
-	// FIXME: This may not correctly work with IPv6 (when the interface is only available for IPv4),
-	// for the API to obtain this see:
-	// https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
-	// Types are declared below, but calls need to be put in place.
 
 	type sockaddr struct {
 		Family uint16
@@ -62,29 +57,46 @@ func Default(af int) (name string, index int, err error) {
 	ret, _, err := getBestInterfaceEx.Call(uintptr(unsafe.Pointer(family)), uintptr(unsafe.Pointer(&idx)))
 	runtime.KeepAlive(family)
 	if ret != windows.NO_ERROR {
+		if syscall.Errno(ret) == windows.ERROR_NOT_FOUND {
+			err = ErrNotFound
+		}
 		return "", -1, err
 	}
-	var dwOutBufLen int32
-	ret, _, err = getInterfaceInfo.Call(0, uintptr(unsafe.Pointer(&dwOutBufLen)))
-	switch syscall.Errno(ret) {
-	case windows.ERROR_INSUFFICIENT_BUFFER, windows.NO_ERROR:
-	default:
-		return "", -1, err
+
+	const (
+		workingBufferSize = 15000
+		maxTries          = 3
+	)
+	var buf []byte
+	outBufLen := workingBufferSize
+loop:
+	for i := 0; i < maxTries; i++ {
+		buf = make([]byte, outBufLen)
+		ret, _, err = getAdaptersAddresses.Call(uintptr(af), 0, 0, uintptr(unsafe.Pointer(&buf[0])), uintptr(unsafe.Pointer(&outBufLen)))
+		runtime.KeepAlive(outBufLen)
+		switch syscall.Errno(ret) {
+		case windows.ERROR_BUFFER_OVERFLOW:
+			continue
+		case windows.NO_ERROR:
+			break loop
+		case windows.ERROR_NO_DATA:
+			return "", -1, ErrNotFound
+		default:
+			return "", -1, err
+		}
 	}
-	if dwOutBufLen == 0 {
-		return "", -1, ErrNotFound
-	}
-	buf := make([]byte, dwOutBufLen)
-	ret, _, err = getInterfaceInfo.Call(uintptr(unsafe.Pointer(&buf[0])), uintptr(unsafe.Pointer(&dwOutBufLen)))
-	runtime.KeepAlive(dwOutBufLen)
-	if ret != windows.NO_ERROR {
-		return "", -1, err
-	}
-	pIfTable := (*ipInterfaceInfo)(unsafe.Pointer(&buf[0]))
-	adapters := unsafe.Slice(&pIfTable.adapter, pIfTable.numAdapters)
-	for _, a := range adapters {
-		if a.index == idx {
-			return windows.UTF16ToString(a.name[:]), int(idx), nil
+
+	addresses := (*ipAdapterAddressesLH)(unsafe.Pointer(&buf[0]))
+	for ; addresses != nil; addresses = addresses.next {
+		switch af {
+		case windows.AF_INET:
+			if addresses.ifIndex != 0 && addresses.ifIndex == idx {
+				return windows.BytePtrToString(addresses.adapterName), int(idx), nil
+			}
+		case windows.AF_INET6:
+			if addresses.ipv6IfIndex != 0 && addresses.ipv6IfIndex == idx {
+				return windows.BytePtrToString(addresses.adapterName), int(idx), nil
+			}
 		}
 	}
 	return "", -1, ErrNotFound
@@ -107,64 +119,65 @@ const maxAdapterName = 128
 
 // https://docs.microsoft.com/en-us/windows/win32/api/iptypes/ns-iptypes-ip_adapter_addresses_lh
 type ipAdapterAddressesLH struct {
-	alignment              uint64
+	length                 uint32
+	ifIndex                uint32
 	next                   *ipAdapterAddressesLH
 	adapterName            *byte
-	FirstUnicastAddress    *windows.IpAdapterUnicastAddress
-	FirstAnycastAddress    *windows.IpAdapterAnycastAddress
-	FirstMulticastAddress  *windows.IpAdapterMulticastAddress
-	FirstDnsServerAddress  *windows.IpAdapterDnsServerAdapter
-	DnsSuffix              *uint16
-	Description            *uint16
-	FriendlyName           *uint16
-	PhysicalAddress        [syscall.MAX_ADAPTER_ADDRESS_LENGTH]byte
-	PhysicalAddressLength  uint32
-	Flags                  uint32
-	Mtu                    uint32
-	IfType                 uint32
-	OperStatus             uint32
-	Ipv6IfIndex            uint32
-	ZoneIndices            [16]uint32
-	FirstPrefix            *windows.IpAdapterPrefix
-	TransmitLinkSpeed      uint64
-	ReceiveLinkSpeed       uint64
-	FirstWinsServerAddress *ipAdapterWinsServerAddressLH
-	FirstGatewayAddress    *ipAdapterGatewayAddressLH
-	Ipv4Metric             uint32
-	Ipv6Metric             uint32
-	Luid                   uint64
-	Dhcpv4Server           socketAddress
-	CompartmentId          uint32
-	NetworkGuid            guid
-	ConnectionType         uint32
-	TunnelType             uint32
-	Dhcpv6Server           socketAddress
-	Dhcpv6ClientDuid       [maxDHCPv6DUIDLength]byte
-	Dhcpv6ClientDuidLength uint32
-	Dhcpv6Iaid             uint32
-	FirstDnsSuffix         *ipAdapterDNSSuffix
+	firstUnicastAddress    *windows.IpAdapterUnicastAddress
+	firstAnycastAddress    *windows.IpAdapterAnycastAddress
+	firstMulticastAddress  *windows.IpAdapterMulticastAddress
+	firstDnsServerAddress  *windows.IpAdapterDnsServerAdapter
+	dnsSuffix              *uint16
+	description            *uint16
+	friendlyName           *uint16
+	physicalAddress        [syscall.MAX_ADAPTER_ADDRESS_LENGTH]byte
+	physicalAddressLength  uint32
+	flags                  uint32
+	mtu                    uint32
+	ifType                 uint32
+	operStatus             uint32
+	ipv6IfIndex            uint32
+	zoneIndices            [16]uint32
+	firstPrefix            *windows.IpAdapterPrefix
+	transmitLinkSpeed      uint64
+	receiveLinkSpeed       uint64
+	firstWinsServerAddress *ipAdapterWinsServerAddressLH
+	firstGatewayAddress    *ipAdapterGatewayAddressLH
+	ipv4Metric             uint32
+	ipv6Metric             uint32
+	luid                   uint64
+	dhcpv4Server           socketAddress
+	compartmentId          uint32
+	networkGuid            guid
+	connectionType         uint32
+	tunnelType             uint32
+	dhcpv6Server           socketAddress
+	dhcpv6ClientDuid       [maxDHCPv6DUIDLength]byte
+	dhcpv6ClientDuidLength uint32
+	dhcpv6Iaid             uint32
+	firstDnsSuffix         *ipAdapterDNSSuffix
 }
 
 // https://doxygen.reactos.org/d2/d14/iptypes_8h_source.html#l00176
 type ipAdapterWinsServerAddressLH struct {
-	Alignment uint64
+	alignment uint64
 	next      *ipAdapterWinsServerAddressLH
-	Address   socketAddress
+	address   socketAddress
 }
 
 // https://doxygen.reactos.org/d2/d14/iptypes_8h_source.html#l00190
 type ipAdapterGatewayAddressLH struct {
-	Alignment uint64
+	alignment uint64
 	next      *ipAdapterGatewayAddressLH
-	Address   socketAddress
+	address   socketAddress
 }
 
 // https://doxygen.reactos.org/d8/d15/scsiwmi_8h_source.html#l00050
 type guid struct {
-	Data1 uint32
-	Data2 uint16
-	Data3 uint16
-	Data4 [8]byte
+	data1 uint32
+	data2 uint16
+	data3 uint16
+	data4 [8]byte
 }
 
 // https://doxygen.reactos.org/d1/db0/ws2def_8h_source.html#l00374
@@ -176,7 +189,7 @@ type socketAddress struct {
 // https://doxygen.reactos.org/d2/d14/iptypes_8h_source.html#l00204
 type ipAdapterDNSSuffix struct {
 	next   *ipAdapterDNSSuffix
-	String [maxDNSSuffixStringLength]uint16
+	string [maxDNSSuffixStringLength]uint16
 }
 
 const (
