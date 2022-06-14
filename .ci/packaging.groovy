@@ -442,10 +442,7 @@ def runE2ETests(){
   }
   echo 'runE2E will run now in a sync mode to validate packages can be published.'
   runE2E(runTestsSuites: suites,
-<<<<<<< HEAD
          testMatrixFile: '.ci/.e2e-tests-beats.yaml',
-=======
->>>>>>> 2241413626 (ci: e2e-testing should fail the build (#31135))
          beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
          gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
          gitHubCheckRepo: env.REPO,
