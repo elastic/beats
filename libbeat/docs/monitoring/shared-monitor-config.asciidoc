@@ -34,7 +34,7 @@ configuration option contains the following fields:
 
 ==== `monitoring.cluster_uuid`
 
-The `monitoring.cluster_uuid` config identifies the Elasticsearch cluster udner which the monitoring data will appear in Stack Monitoring UI. 
+The `monitoring.cluster_uuid` config identifies the {es} cluster under which the monitoring data will appear in the Stack Monitoring UI. 
 
 ===== `api_key`
 
