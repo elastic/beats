@@ -18,6 +18,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -211,16 +212,15 @@ func runCmd(
 		jsonReader.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
-		var cmdError *SynthError = nil
+		var cmdError *ecserr.ECSErr = nil
 		if err != nil {
-			errMessage := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
-			cmdError = &SynthError{Name: "cmdexit", Message: errMessage}
+			cmdError = ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String())
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 		}
 
 		mpx.writeSynthEvent(&SynthEvent{
 			Type:                 CmdStatus,
-			Error:                cmdError,
+			Error:                ECSErrToSynthError(cmdError),
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 		})
 

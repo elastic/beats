@@ -47,7 +47,7 @@ type SynthErrType string
 
 func NewBadCmdStatusErr(exitCode int, cmd string) *ECSErr {
 	return NewECSErr(
-		ETYPE_IO,
+		"IO",
 		"BAD_CMD_STATUS",
 		fmt.Sprintf("command '%s' exited unexpectedly with code: %d", cmd, exitCode),
 	)

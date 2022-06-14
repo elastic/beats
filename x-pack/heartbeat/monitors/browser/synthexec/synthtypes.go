@@ -133,7 +133,7 @@ func (se *SynthError) toMap() mapstr.M {
 func (se *SynthError) toECSErr() *ecserr.ECSErr {
 	// Type is more ECS friendly, so we prefer it
 	t := se.Type
-	if t != "" {
+	if t == "" {
 		// Legacy support for the 'name' field
 		t = se.Name
 
@@ -144,6 +144,17 @@ func (se *SynthError) toECSErr() *ecserr.ECSErr {
 		se.Message,
 		se.Stack,
 	)
+}
+
+// ECSErrToSynthError does a simple type conversion. Hopefully at
+// some point we can move away from SynthError.
+func ECSErrToSynthError(ee *ecserr.ECSErr) *SynthError {
+	return &SynthError{
+		Type:    ee.Type,
+		Code:    ee.Code,
+		Message: ee.Message,
+		Stack:   ee.StackTrace,
+	}
 }
 
 func (se *SynthError) Error() string {
