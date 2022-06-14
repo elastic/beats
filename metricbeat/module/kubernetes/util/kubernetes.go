@@ -344,7 +344,7 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 
 	moduleConfig := base.Module().Config()
 	cacheTimeout := PerfMetrics.Timeout
-	config, err = ValidateConfig(config, moduleConfig, cacheTimeout)
+	config, err = validateConfig(config, moduleConfig, cacheTimeout)
 	if err != nil {
 		logp.Err("Error while validating config: %v", err)
 		return nil, err
@@ -352,8 +352,8 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	return config, nil
 }
 
-func ValidateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cacheTimeout time.Duration) (*kubernetesConfig, error) {
-	// NOTE: minumum cache expiration time > period avoid that the cache expires just
+func validateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cacheTimeout time.Duration) (*kubernetesConfig, error) {
+	// NOTE: minimum cache expiration time > period avoid that the cache expires just
 	// before next scraping time. Period * 2 is arbitrary but it a good buffer to avoid
 	// that a late scraping run would affect the metrics (for the absence of entries in the cache)
 	minCacheExpirationTime := moduleConfig.Period * 2
@@ -361,26 +361,26 @@ func ValidateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cach
 	if config.CacheExpirationTime <= 0 {
 		if cacheTimeout <= minCacheExpirationTime {
 			config.CacheExpirationTime = minCacheExpirationTime
-			logp.Debug("Setting CacheExpirationTime = minCacheExpirationTime. CacheExpirationTime: %s", config.CacheExpirationTime.String())
+			logp.Debug("setting CacheExpirationTime = minCacheExpirationTime. CacheExpirationTime: %s", config.CacheExpirationTime.String())
 
 		} else {
 			config.CacheExpirationTime = cacheTimeout
-			logp.Debug("Setting CacheExpirationTime = DefaultCacheTimeout. CacheExpirationTime: %s", config.CacheExpirationTime.String())
+			logp.Debug("setting CacheExpirationTime = DefaultCacheTimeout. CacheExpirationTime: %s", config.CacheExpirationTime.String())
 		}
 	}
 
 	if config.CacheExpirationTime == 0 {
-		return nil, fmt.Errorf("CacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: %s",
+		return nil, fmt.Errorf("cacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: %s",
 			config.CacheExpirationTime.String())
 	}
 
 	if config.CacheExpirationTime > 0 && config.CacheExpirationTime < minCacheExpirationTime {
-		return nil, fmt.Errorf("CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: %s < %v",
+		return nil, fmt.Errorf("cacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: %s < %v",
 			config.CacheExpirationTime.String(), minCacheExpirationTime)
 	}
 
 	if !config.AddMetadata {
-		return nil, errors.New("Metadata enriching is disabled")
+		return nil, errors.New("metadata enriching is disabled")
 	}
 	return config, nil
 }
@@ -392,7 +392,7 @@ func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.New("Error unpacking configs")
+		return nil, errors.New("error unpacking configs")
 	}
 
 	return config, nil

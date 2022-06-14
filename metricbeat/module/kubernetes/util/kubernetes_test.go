@@ -25,12 +25,13 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -42,154 +43,154 @@ var (
 )
 
 func TestGetValidatedConfig(t *testing.T) {
-	tests := []struct{
-		addMetadata bool
-		cacheExpirationTime time.Duration
-		period time.Duration
-		cacheTimeout time.Duration
+	tests := []struct {
+		addMetadata               bool
+		cacheExpirationTime       time.Duration
+		period                    time.Duration
+		cacheTimeout              time.Duration
 		resultCacheExpirationTime time.Duration
-		errorMessage string
+		errorMessage              string
 	}{
 		{
-			addMetadata: false,
-			cacheExpirationTime: 0 * time.Second,
-			period: 0 * time.Second,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               false,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    0 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
-			errorMessage: "CacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: 0s",
+			errorMessage:              "cacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: 0s",
 		},
 		{
-			addMetadata: false,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 0 * time.Second,
-			resultCacheExpirationTime: 0 * time.Second,  // NOT VALIDATED because addMetadata = False
-			errorMessage: "Metadata enriching is disabled",
-		},
-		{
-			addMetadata: false,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 20 * time.Second,
+			addMetadata:               false,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
-			errorMessage: "Metadata enriching is disabled",
+			errorMessage:              "metadata enriching is disabled",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 0 * time.Second,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               false,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              20 * time.Second,
 			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
-			errorMessage: "CacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: 0s",
+			errorMessage:              "metadata enriching is disabled",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 0 * time.Second,
-			resultCacheExpirationTime: 20 * time.Second,  // automatically configured = 2 * period
-			errorMessage: "",
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    0 * time.Second,
+			cacheTimeout:              0 * time.Second,
+			resultCacheExpirationTime: 0 * time.Second, // NOT VALIDATED because addMetadata = False
+			errorMessage:              "cacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: 0s",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 10 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 20 * time.Second, // automatically configured = 2 * period
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 20 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              10 * time.Second,
 			resultCacheExpirationTime: 20 * time.Second, // automatically configured = 2 * period
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 15 * time.Second,
-			cacheTimeout: 20 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              20 * time.Second,
+			resultCacheExpirationTime: 20 * time.Second, // automatically configured = 2 * period
+			errorMessage:              "",
+		},
+		{
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    15 * time.Second,
+			cacheTimeout:              20 * time.Second,
 			resultCacheExpirationTime: 30 * time.Second, // automatically configured = 2 * period
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Minute,
-			cacheTimeout: 2 * time.Minute,
-			resultCacheExpirationTime: 20 * time.Minute,  // automatically configured = 2 * period
-			errorMessage: "",
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Minute,
+			cacheTimeout:              2 * time.Minute,
+			resultCacheExpirationTime: 20 * time.Minute, // automatically configured = 2 * period
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 0 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 30 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       0 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              30 * time.Second,
 			resultCacheExpirationTime: 30 * time.Second, // automatically configured = cache timeout
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 20 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       20 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 20 * time.Second, // valid cache expiration. No modification
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 2 * time.Minute,
-			period: 10 * time.Second,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       2 * time.Minute,
+			period:                    10 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 2 * time.Minute, // valid cache expiration. No modification
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 50 * time.Minute,
-			period: 10 * time.Minute,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       50 * time.Minute,
+			period:                    10 * time.Minute,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 50 * time.Minute, // valid cache expiration. No modification
-			errorMessage: "",
+			errorMessage:              "",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 10 * time.Second,
-			period: 10 * time.Second,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       10 * time.Second,
+			period:                    10 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 0 * time.Second,
-			errorMessage: "CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 10s < 20s",
+			errorMessage:              "cacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 10s < 20s",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 20 * time.Second,
-			period: 15 * time.Second,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       20 * time.Second,
+			period:                    15 * time.Second,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 0 * time.Second,
-			errorMessage: "CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 20s < 30s",
+			errorMessage:              "cacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 20s < 30s",
 		},
 		{
-			addMetadata: true,
-			cacheExpirationTime: 2 * time.Minute,
-			period: 10 * time.Minute,
-			cacheTimeout: 0 * time.Second,
+			addMetadata:               true,
+			cacheExpirationTime:       2 * time.Minute,
+			period:                    10 * time.Minute,
+			cacheTimeout:              0 * time.Second,
 			resultCacheExpirationTime: 0 * time.Second,
-			errorMessage: "CacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 2m0s < 20m0s",
+			errorMessage:              "cacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: 2m0s < 20m0s",
 		},
 	}
 
 	for _, test := range tests {
 		config := &kubernetesConfig{
 			CacheExpirationTime: test.cacheExpirationTime,
-			AddMetadata: test.addMetadata,
+			AddMetadata:         test.addMetadata,
 		}
 		moduleConfig := mb.ModuleConfig{
 			Period: test.period,
 		}
 
-		config, err := ValidateConfig(config, moduleConfig, test.cacheTimeout)
+		config, err := validateConfig(config, moduleConfig, test.cacheTimeout)
 
 		if len(test.errorMessage) > 0 {
 			assert.NotNil(t, err)
