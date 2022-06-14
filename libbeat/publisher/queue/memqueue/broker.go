@@ -96,9 +96,9 @@ type Settings struct {
 }
 
 type batch struct {
-	queue   *broker
-	entries []queueEntry
-	ackChan chan batchAckMsg
+	queue    *broker
+	entries  []queueEntry
+	doneChan chan batchDoneMsg
 }
 
 // batchACKState stores the metadata associated with a batch of events sent to
@@ -106,7 +106,7 @@ type batch struct {
 // ackChan and received by
 type batchACKState struct {
 	next         *batchACKState
-	ackChan      chan batchAckMsg
+	doneChan     chan batchDoneMsg
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
 }
@@ -250,9 +250,9 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
 	return &batch{
-		queue:   b,
-		entries: resp.entries,
-		ackChan: resp.ackChan,
+		queue:    b,
+		entries:  resp.entries,
+		doneChan: resp.ackChan,
 	}, nil
 }
 
@@ -277,7 +277,7 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
 		return &batchACKState{
-			ackChan: make(chan batchAckMsg, 1),
+			doneChan: make(chan batchDoneMsg, 1),
 		}
 	},
 }
@@ -335,11 +335,11 @@ func (l *chanList) front() *batchACKState {
 	return l.head
 }
 
-func (l *chanList) nextBatchChannel() chan batchAckMsg {
+func (l *chanList) nextBatchChannel() chan batchDoneMsg {
 	if l.head == nil {
 		return nil
 	}
-	return l.head.ackChan
+	return l.head.doneChan
 }
 
 func (l *chanList) pop() *batchACKState {
@@ -384,6 +384,6 @@ func (b *batch) Event(i int) interface{} {
 	return b.entries[i].event
 }
 
-func (b *batch) ACK() {
-	b.ackChan <- batchAckMsg{}
+func (b *batch) Done() {
+	b.doneChan <- batchDoneMsg{}
 }
