@@ -100,12 +100,12 @@ func (er *EncryptionReader) Reset() error {
 
 //EncryptionWriter allows writing to a AES-128-CTR stream
 type EncryptionWriter struct {
-	dst    io.WriteCloser
+	dst    WriteCloseSyncer
 	stream cipher.Stream
 }
 
 //NewEncryptionWriter returns a new AES-128-CTR stream encryptor
-func NewEncryptionWriter(w io.WriteCloser, key []byte) (*EncryptionWriter, error) {
+func NewEncryptionWriter(w WriteCloseSyncer, key []byte) (*EncryptionWriter, error) {
 	if len(key) != KeySize {
 		return nil, fmt.Errorf("key must be %d bytes long", KeySize)
 	}
@@ -149,4 +149,8 @@ func (ew *EncryptionWriter) Write(buf []byte) (int, error) {
 
 func (ew *EncryptionWriter) Close() error {
 	return ew.dst.Close()
+}
+
+func (ew *EncryptionWriter) Sync() error {
+	return ew.dst.Sync()
 }

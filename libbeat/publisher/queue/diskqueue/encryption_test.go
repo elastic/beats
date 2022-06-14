@@ -43,7 +43,7 @@ func TestEncryptionRoundTrip(t *testing.T) {
 
 		go func() {
 			//NewEncryptionWriter writes iv, so needs to be in go routine
-			ew, err := NewEncryptionWriter(pw, key)
+			ew, err := NewEncryptionWriter(NopWriteCloseSyncer(pw), key)
 			assert.Nil(t, err, name)
 			_, err = io.Copy(ew, src)
 			assert.Nil(t, err, name)

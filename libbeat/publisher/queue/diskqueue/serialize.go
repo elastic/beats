@@ -25,8 +25,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pierrec/lz4"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -39,8 +37,6 @@ import (
 type eventEncoder struct {
 	buf    bytes.Buffer
 	folder *gotype.Iterator
-	// Use Compression
-	useCompression bool
 }
 
 type eventDecoder struct {
@@ -54,9 +50,6 @@ type eventDecoder struct {
 	useJSON bool
 
 	unfolder *gotype.Unfolder
-
-	// Use Compression
-	useCompression bool
 }
 
 type entry struct {
@@ -114,15 +107,6 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 		return nil, err
 	}
 
-	// Copy the encoded bytes to a new array owned by the caller.
-	if e.useCompression {
-		result := make([]byte, lz4.CompressBlockBound(e.buf.Len()))
-		n, err := lz4.CompressBlock(e.buf.Bytes(), result, nil)
-		if err != nil {
-			return nil, err
-		}
-		return result[:n], nil
-	}
 	result := make([]byte, e.buf.Len())
 	copy(result, e.buf.Bytes())
 	return result, nil
@@ -162,15 +146,6 @@ func (d *eventDecoder) Decode() (publisher.Event, error) {
 		return publisher.Event{}, err
 	}
 	defer d.unfolder.Reset()
-
-	if d.useCompression {
-		out := make([]byte, 10*len(d.buf))
-		n, err := lz4.UncompressBlock(d.buf, out)
-		if err != nil {
-			return publisher.Event{}, err
-		}
-		d.buf = out[:n]
-	}
 
 	if d.useJSON {
 		err = d.jsonParser.Parse(d.buf)

@@ -49,14 +49,47 @@ var (
 )
 
 //makeEvent creates a sample event, using a random message from msg above
-func makeEvent() publisher.Event {
-	return publisher.Event{
-		Content: beat.Event{
-			Timestamp: eventTime,
-			Fields: mapstr.M{
-				"message": msgs[rand.Intn(len(msgs))],
+func makeEvent(kind string) publisher.Event {
+	switch kind {
+	// 81 bytes
+	case "small":
+		return publisher.Event{
+			Content: beat.Event{
+				Timestamp: eventTime,
+				Fields: mapstr.M{
+					"message": msgs[3],
+				},
 			},
-		},
+		}
+	// 865 bytes
+	case "medium":
+		return publisher.Event{
+			Content: beat.Event{
+				Timestamp: eventTime,
+				Fields: mapstr.M{
+					"message": msgs[5],
+				},
+			},
+		}
+	// 2324 bytes
+	case "large":
+		return publisher.Event{
+			Content: beat.Event{
+				Timestamp: eventTime,
+				Fields: mapstr.M{
+					"message": msgs[2],
+				},
+			},
+		}
+	default:
+		return publisher.Event{
+			Content: beat.Event{
+				Timestamp: eventTime,
+				Fields: mapstr.M{
+					"message": msgs[rand.Intn(len(msgs))],
+				},
+			},
+		}
 	}
 }
 
@@ -92,9 +125,9 @@ func cleanup(q *diskQueue) {
 	}
 }
 
-func publishEvents(p queue.Producer, num int) {
+func publishEvents(p queue.Producer, num int, kind string) {
 	for i := 0; i < num; i++ {
-		ok := p.Publish(makeEvent())
+		ok := p.Publish(makeEvent(kind))
 		if !ok {
 			panic("didn't publish")
 		}
@@ -119,21 +152,21 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 //produceAndConsume generates and publishes events in a go routine, in
 // the main go routine it consumes and acks them.  This interleaves
 // publish and consume.
-func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	go publishEvents(p, num_events)
+func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, kind string) error {
+	go publishEvents(p, num_events, kind)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 //produceThenConsume generates and publishes events, when all events
 // are published it consumes and acks them.
-func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	publishEvents(p, num_events)
+func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, kind string) error {
+	publishEvents(p, num_events, kind)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 //benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
-func benchmarkQueue(num_events int, batch_size int, schemaVersion int, async bool, b *testing.B) {
+func benchmarkQueue(num_events int, batch_size int, schemaVersion int, async bool, kind string, b *testing.B) {
 	b.ResetTimer()
 	var err error
 
@@ -143,12 +176,12 @@ func benchmarkQueue(num_events int, batch_size int, schemaVersion int, async boo
 		q, p := setup(schemaVersion)
 		b.StartTimer()
 		if async {
-			if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
+			if err = produceAndConsume(p, q, num_events, batch_size, kind); err != nil {
 				cleanup(q)
 				break
 			}
 		} else {
-			if err = produceThenConsume(p, q, num_events, batch_size); err != nil {
+			if err = produceThenConsume(p, q, num_events, batch_size, kind); err != nil {
 				cleanup(q)
 				break
 			}
@@ -161,15 +194,16 @@ func benchmarkQueue(num_events int, batch_size int, schemaVersion int, async boo
 }
 
 // Actual benchmark calls follow
-func BenchmarkV1Async1k(b *testing.B) { benchmarkQueue(1000, 10, 1, true, b) }
-func BenchmarkV1Async1M(b *testing.B) { benchmarkQueue(1000000, 1000, 1, true, b) }
-func BenchmarkV2Async1k(b *testing.B) { benchmarkQueue(1000, 10, 2, true, b) }
-func BenchmarkV2Async1M(b *testing.B) { benchmarkQueue(1000000, 1000, 2, true, b) }
-func BenchmarkV3Async1k(b *testing.B) { benchmarkQueue(1000, 10, 3, true, b) }
-func BenchmarkV3Async1M(b *testing.B) { benchmarkQueue(1000000, 1000, 3, true, b) }
-func BenchmarkV1Sync1k(b *testing.B)  { benchmarkQueue(1000, 10, 1, false, b) }
-func BenchmarkV1Sync1M(b *testing.B)  { benchmarkQueue(1000000, 1000, 1, false, b) }
-func BenchmarkV2Sync1k(b *testing.B)  { benchmarkQueue(1000, 10, 2, false, b) }
-func BenchmarkV2Sync1M(b *testing.B)  { benchmarkQueue(1000000, 1000, 2, false, b) }
-func BenchmarkV3Sync1k(b *testing.B)  { benchmarkQueue(1000, 10, 3, false, b) }
-func BenchmarkV3Sync1M(b *testing.B)  { benchmarkQueue(1000000, 1000, 3, false, b) }
+func BenchmarkV1Async1k(b *testing.B)  { benchmarkQueue(1000, 10, 1, true, "random", b) }
+func BenchmarkV1Async1M(b *testing.B)  { benchmarkQueue(1000000, 1000, 1, true, "random", b) }
+func BenchmarkV2Async1k(b *testing.B)  { benchmarkQueue(1000, 10, 2, true, "random", b) }
+func BenchmarkV2Async1M(b *testing.B)  { benchmarkQueue(1000000, 1000, 2, true, "random", b) }
+func BenchmarkV3Async1k(b *testing.B)  { benchmarkQueue(1000, 10, 3, true, "random", b) }
+func BenchmarkV3Async1M(b *testing.B)  { benchmarkQueue(1000000, 1000, 3, true, "random", b) }
+func BenchmarkV1Sync1k(b *testing.B)   { benchmarkQueue(1000, 10, 1, false, "random", b) }
+func BenchmarkV1Sync1M(b *testing.B)   { benchmarkQueue(1000000, 1000, 1, false, "random", b) }
+func BenchmarkV2Sync1k(b *testing.B)   { benchmarkQueue(1000, 10, 2, false, "random", b) }
+func BenchmarkV2Sync1M(b *testing.B)   { benchmarkQueue(1000000, 1000, 2, false, "random", b) }
+func BenchmarkV3Sync1k(b *testing.B)   { benchmarkQueue(1000, 10, 3, false, "random", b) }
+func BenchmarkV3Sync1M(b *testing.B)   { benchmarkQueue(1000000, 1000, 3, false, "random", b) }
+func BenchmarkV1SyncSize(b *testing.B) { benchmarkQueue(100000, 1000, 1, false, "medium", b) }

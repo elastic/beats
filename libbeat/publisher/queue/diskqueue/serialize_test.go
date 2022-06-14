@@ -30,20 +30,15 @@ import (
 // A test to make sure serialization works correctly on multi-byte characters.
 func TestSerialize(t *testing.T) {
 	testCases := []struct {
-		name           string
-		value          string
-		useCompression bool
+		name  string
+		value string
 	}{
 		{name: "Ascii only", value: "{\"name\": \"Momotaro\"}"},
 		{name: "Multi-byte", value: "{\"name\": \"桃太郎\"}"},
-		{name: "Compressed Ascii only", value: "{\"name\": \"Momotaro\"}", useCompression: true},
-		{name: "Compressed Multi-byte", value: "{\"name\": \"桃太郎\"}", useCompression: true},
-		{name: "Compressed high repeat", value: "{\"name\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}", useCompression: true},
 	}
 
 	for _, test := range testCases {
 		encoder := newEventEncoder()
-		encoder.useCompression = test.useCompression
 		event := publisher.Event{
 			Content: beat.Event{
 				Fields: mapstr.M{
@@ -58,7 +53,6 @@ func TestSerialize(t *testing.T) {
 
 		// Use decoder to decode the serialized bytes.
 		decoder := newEventDecoder()
-		decoder.useCompression = (test.useCompression)
 		buf := decoder.Buffer(len(serialized))
 		copy(buf, serialized)
 		decoded, err := decoder.Decode()

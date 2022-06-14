@@ -46,6 +46,11 @@ func TestSchemasRoundTrip(t *testing.T) {
 			schemaVersion: uint32(2),
 			plaintext:     []byte("abc"),
 		},
+		"version 3": {
+			id:            2,
+			schemaVersion: uint32(2),
+			plaintext:     []byte("abc"),
+		},
 	}
 	dir, err := os.MkdirTemp("", t.Name())
 	assert.Nil(t, err)
@@ -85,7 +90,7 @@ func TestSchemasRoundTrip(t *testing.T) {
 	}
 }
 
-func TestSeek(t *testing.T) {
+func TestSegmentReaderSeek(t *testing.T) {
 	tests := map[string]struct {
 		id            segmentID
 		schemaVersion uint32

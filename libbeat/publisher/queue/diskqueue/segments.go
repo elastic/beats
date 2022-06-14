@@ -132,6 +132,12 @@ type segmentHeader struct {
 	frameCount uint32
 }
 
+type WriteCloseSyncer interface {
+	io.Writer
+	io.Closer
+	Sync() error
+}
+
 // segmentHeaderSizeV0 schemaVersion 0 header size, uint32 for version
 const segmentHeaderSizeV0 = 4
 
@@ -258,12 +264,18 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 		return sr, nil
 	}
 
-	sr.er, err = NewEncryptionReader(sr.src, queueSettings.EncryptionKey)
-	if err != nil {
-		sr.src.Close()
-		return nil, fmt.Errorf("couldn't create encryption reader: %w", err)
+	if sr.version == 2 || sr.version == 3 {
+		sr.er, err = NewEncryptionReader(sr.src, queueSettings.EncryptionKey)
+		if err != nil {
+			sr.src.Close()
+			return nil, fmt.Errorf("couldn't create encryption reader: %w", err)
+		}
+	}
+	if sr.version == 3 {
+		sr.cr = NewCompressionReader(sr.er)
 	}
 	return sr, nil
+
 }
 
 // Should only be called from the writer loop.
@@ -288,10 +300,16 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 		return sw, nil
 	}
 
-	sw.ew, err = NewEncryptionWriter(sw.dst, queueSettings.EncryptionKey)
-	if err != nil {
-		sw.dst.Close()
-		return nil, fmt.Errorf("couldn't create encryption writer: %w", err)
+	if sw.version == 2 || sw.version == 3 {
+		sw.ew, err = NewEncryptionWriter(sw.dst, queueSettings.EncryptionKey)
+		if err != nil {
+			sw.dst.Close()
+			return nil, fmt.Errorf("couldn't create encryption writer: %w", err)
+		}
+	}
+
+	if sw.version == 3 {
+		sw.cw = NewCompressionWriter(sw.ew)
 	}
 
 	return sw, nil
@@ -436,6 +454,7 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 type segmentReader struct {
 	src     io.ReadSeekCloser
 	er      *EncryptionReader
+	cr      *CompressionReader
 	version uint32
 }
 
@@ -443,8 +462,10 @@ func (r *segmentReader) Read(p []byte) (int, error) {
 	switch r.version {
 	case 0, 1:
 		return r.src.Read(p)
-	case 2, 3:
+	case 2:
 		return r.er.Read(p)
+	case 3:
+		return r.cr.Read(p)
 	default:
 		return 0, fmt.Errorf("unsupported schema version: %d", r.version)
 	}
@@ -454,8 +475,10 @@ func (r *segmentReader) Close() error {
 	switch r.version {
 	case 0, 1:
 		return r.src.Close()
-	case 2, 3:
+	case 2:
 		return r.er.Close()
+	case 3:
+		return r.cr.Close()
 	default:
 		return fmt.Errorf("unsupported schema version: %d", r.version)
 	}
@@ -465,7 +488,7 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 	switch r.version {
 	case 0, 1:
 		return r.src.Seek(offset, whence)
-	case 2, 3:
+	case 2:
 		//can't seek before segment header
 		if (offset + int64(whence)) < segmentHeaderSizeV2 {
 			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
@@ -478,6 +501,22 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 		}
 		written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSizeV2)
 		return written + segmentHeaderSizeV2, err
+	case 3:
+		//can't seek before segment header
+		if (offset + int64(whence)) < segmentHeaderSizeV3 {
+			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
+		}
+		if _, err := r.src.Seek(segmentHeaderSizeV3, io.SeekStart); err != nil {
+			return 0, err
+		}
+		if err := r.er.Reset(); err != nil {
+			return 0, err
+		}
+		if err := r.cr.Reset(); err != nil {
+			return 0, err
+		}
+		written, err := io.CopyN(io.Discard, r.cr, (offset+int64(whence))-segmentHeaderSizeV3)
+		return written + segmentHeaderSizeV3, err
 	default:
 		return 0, fmt.Errorf("unsupported schema version: %d", r.version)
 	}
@@ -486,6 +525,7 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 type segmentWriter struct {
 	dst     *os.File
 	ew      *EncryptionWriter
+	cw      *CompressionWriter
 	version uint32
 }
 
@@ -493,8 +533,10 @@ func (w *segmentWriter) Write(p []byte) (int, error) {
 	switch w.version {
 	case 0, 1:
 		return w.dst.Write(p)
-	case 2, 3:
+	case 2:
 		return w.ew.Write(p)
+	case 3:
+		return w.cw.Write(p)
 	default:
 		return 0, fmt.Errorf("unsupported schema version: %d", w.version)
 	}
@@ -504,8 +546,10 @@ func (w *segmentWriter) Close() error {
 	switch w.version {
 	case 0, 1:
 		return w.dst.Close()
-	case 2, 3:
+	case 2:
 		return w.ew.Close()
+	case 3:
+		return w.cw.Close()
 	default:
 		return fmt.Errorf("unsupported schema version: %d", w.version)
 	}
@@ -521,7 +565,16 @@ func (w *segmentWriter) Seek(offset int64, whence int) (int64, error) {
 }
 
 func (w *segmentWriter) Sync() error {
-	return w.dst.Sync()
+	switch w.version {
+	case 0, 1:
+		return w.dst.Sync()
+	case 2:
+		return w.ew.Sync()
+	case 3:
+		return w.cw.Sync()
+	default:
+		return fmt.Errorf("unsupported schema version: %d", w.version)
+	}
 }
 
 func (w *segmentWriter) WriteHeader() error {

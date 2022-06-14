@@ -106,9 +106,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		return readerLoopResponse{err: err}
 	}
 	defer handle.Close()
-	if request.segment.schemaVersion == 3 {
-		rl.decoder.useCompression = true
-	}
+
 	_, err = handle.Seek(int64(request.startPosition), io.SeekStart)
 	if err != nil {
 		return readerLoopResponse{err: err}
