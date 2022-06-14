@@ -352,6 +352,11 @@ default credentials from the environment will be attempted via ADC. For more inf
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [float]
+==== `auth.oauth2.google.delegated_account`
+
+Email of the delegated account used to create the credentials (usually an admin).
+
+[float]
 ==== `request.url`
 
 The URL of the HTTP API. Required.

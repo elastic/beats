@@ -3,9 +3,53 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.4]]
+=== Beats version 7.17.4
+https://github.com/elastic/beats/compare/v7.17.3\...v7.17.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
+- Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
+
+*Filebeat*
+
+- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
+- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+
+*Packetbeat*
+
+- Use /proc/<pid>/comm for linux process names where possible. {pull}31527[31527]
+- Move "protocol" term from event.category to event.type in SIP events. {pull}31599[31599]
+
+*Winlogbeat*
+
+- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
+- Fix resource handle leak during event log enrichment. {pull}31504[31504]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.17.9 {issue}31350[31350]
+
+*Filebeat*
+
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
+- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
+
+*Winlogbeat*
+
+- Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
+
 [[release-notes-7.17.3]]
 === Beats version 7.17.3
-https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
+https://github.com/elastic/beats/compare/v7.17.2\...v7.17.3[View commits]
 
 ==== Bugfixes
 
@@ -27,7 +71,7 @@ https://github.com/elastic/beats/compare/v7.17.2...v7.17.3[View commits]
 
 [[release-notes-7.17.2]]
 === Beats version 7.17.2
-https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]
+https://github.com/elastic/beats/compare/v7.17.1\...v7.17.2[View commits]
 
 ==== Bugfixes
 
@@ -76,7 +120,7 @@ https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]
 
 [[release-notes-7.17.1]]
 === Beats version 7.17.1
-https://github.com/elastic/beats/compare/v7.17.0...v7.17.1[View commits]
+https://github.com/elastic/beats/compare/v7.17.0\...v7.17.1[View commits]
 
 ==== Bugfixes
 
@@ -119,7 +163,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v7.17.1[View commits]
 
 [[release-notes-7.17.0]]
 === Beats version 7.17.0
-https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
+https://github.com/elastic/beats/compare/v7.16.3\...v7.17.0[View commits]
 
 ==== Breaking changes
 
@@ -194,7 +238,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 
 [[release-notes-7.16.3]]
 === Beats version 7.16.3
-https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
+https://github.com/elastic/beats/compare/v7.16.2\...v7.16.3[View commits]
 
 ==== Bugfixes
 
@@ -204,7 +248,7 @@ https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
 
 [[release-notes-7.16.2]]
 === Beats version 7.16.2
-https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
+https://github.com/elastic/beats/compare/v7.16.1\...v7.16.2[View commits]
 
 ==== Bugfixes
 
@@ -225,7 +269,7 @@ https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
 
 [[release-notes-7.16.1]]
 === Beats version 7.16.1
-https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]
+https://github.com/elastic/beats/compare/v7.16.0\...v7.16.1[View commits]
 
 ==== Bugfixes
 
@@ -241,7 +285,7 @@ https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]
 
 [[release-notes-7.16.0]]
 === Beats version 7.16.0
-https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
+https://github.com/elastic/beats/compare/v7.15.2\...v7.16.0[View commits]
 
 ==== Breaking changes
 
@@ -407,7 +451,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 [[release-notes-7.15.2]]
 === Beats version 7.15.2
-https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
+https://github.com/elastic/beats/compare/v7.15.1\...v7.15.2[View commits]
 
 ==== Bugfixes
 
@@ -438,7 +482,7 @@ https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
 
 [[release-notes-7.15.1]]
 === Beats version 7.15.1
-https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
+https://github.com/elastic/beats/compare/v7.15.0\...v7.15.1[View commits]
 
 ==== Bugfixes
 
@@ -453,7 +497,7 @@ https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
 
 [[release-notes-7.15.0]]
 === Beats version 7.15.0
-https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
+https://github.com/elastic/beats/compare/v7.14.2\...v7.15.0[View commits]
 
 ==== Breaking changes
 
@@ -546,7 +590,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 
 [[release-notes-7.14.2]]
 === Beats version 7.14.2
-https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
+https://github.com/elastic/beats/compare/v7.14.1\...v7.14.2[View commits]
 
 ==== Bugfixes
 
@@ -558,7 +602,7 @@ https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
 
 [[release-notes-7.14.1]]
 === Beats version 7.14.1
-https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
+https://github.com/elastic/beats/compare/v7.14.0\...v7.14.1[View commits]
 
 ==== Bugfixes
 
@@ -588,7 +632,7 @@ https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
 
 [[release-notes-7.14.0]]
 === Beats version 7.14.0
-https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
+https://github.com/elastic/beats/compare/v7.13.4\...v7.14.0[View commits]
 
 ==== Breaking changes
 
@@ -757,7 +801,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 [[release-notes-7.13.4]]
 === Beats version 7.13.4
-https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
+https://github.com/elastic/beats/compare/v7.13.3\...v7.13.4[View commits]
 
 ==== Bugfixes
 
@@ -778,7 +822,7 @@ https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
 
 [[release-notes-7.13.3]]
 === Beats version 7.13.3
-https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
+https://github.com/elastic/beats/compare/v7.13.2\...v7.13.3[View commits]
 
 ==== Bugfixes
 
@@ -791,7 +835,7 @@ https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
 
 [[release-notes-7.13.2]]
 === Beats version 7.13.2
-https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
+https://github.com/elastic/beats/compare/v7.13.1\...v7.13.2[View commits]
 
 ==== Bugfixes
 
@@ -816,7 +860,7 @@ https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
 
 [[release-notes-7.13.1]]
 === Beats version 7.13.1
-https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
+https://github.com/elastic/beats/compare/v7.13.0\...v7.13.1[View commits]
 
 ==== Bugfixes
 
@@ -831,7 +875,7 @@ https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
 
 [[release-notes-7.13.0]]
 === Beats version 7.13.0
-https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
+https://github.com/elastic/beats/compare/v7.12.1\...v7.13.0[View commits]
 
 ==== Breaking changes
 
@@ -952,7 +996,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 [[release-notes-7.12.1]]
 === Beats version 7.12.1
-https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
+https://github.com/elastic/beats/compare/v7.12.0\...v7.12.1[View commits]
 
 ==== Breaking changes
 
@@ -1007,7 +1051,7 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 
 [[release-notes-7.12.0]]
 === Beats version 7.12.0
-https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
+https://github.com/elastic/beats/compare/v7.11.2\...v7.12.0[View commits]
 
 ==== Breaking changes
 
@@ -1168,7 +1212,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 [[release-notes-7.11.2]]
 === Beats version 7.11.2
-https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
+https://github.com/elastic/beats/compare/v7.11.1\...v7.11.2[View commits]
 
 ==== Bugfixes
 
@@ -1188,7 +1232,7 @@ https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
 
 [[release-notes-7.11.1]]
 === Beats version 7.11.1
-https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
+https://github.com/elastic/beats/compare/v7.11.0\...v7.11.1[View commits]
 
 ==== Bugfixes
 
@@ -1203,7 +1247,7 @@ https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
 
 [[release-notes-7.11.0]]
 === Beats version 7.11.0
-https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
+https://github.com/elastic/beats/compare/v7.10.2\...v7.11.0[View commits]
 
 ==== Breaking changes
 

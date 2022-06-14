@@ -3097,6 +3097,24 @@ type: double
 
 --
 
+*`aws.applicationelb.metrics.HealthyHostCount.max`*::
++
+--
+The number of targets that are considered healthy.
+
+type: long
+
+--
+
+*`aws.applicationelb.metrics.UnHealthyHostCount.max`*::
++
+--
+The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
 [float]
 === networkelb
 
