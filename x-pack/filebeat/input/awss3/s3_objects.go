@@ -22,8 +22,9 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
+
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -159,7 +160,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
+		return errors.Wrapf(err, "failed reading s3 object (elapsed_time_ns=%d)",
 			time.Since(start).Nanoseconds())
 	}
 
@@ -208,22 +209,28 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	for dec.More() && p.ctx.Err() == nil {
 		offset := dec.InputOffset()
 
-		var item json.RawMessage
-		if err := dec.Decode(&item); err != nil {
+		var message json.RawMessage
+		if err := dec.Decode(&message); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
 
-		if p.readerConfig.ExpandEventListFromField != "" {
-			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
+		if p.readerConfig.ExpandEventListFromField == ".[]" {
+			messages := p.parseMultipleMessages(message)
+			for _, item := range messages {
+				evt := p.createEvent(item, offset)
+				p.publish(p.acker, &evt)
+			}
+			continue
+		} else if p.readerConfig.ExpandEventListFromField != "" {
+			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, message, offset, p.s3ObjHash); err != nil {
 				return err
 			}
 			continue
 		}
-		messages := p.parseMultipleMessages(item)
-		for _, item := range messages {
-			evt := p.createEvent(item, offset)
-			p.publish(p.acker, &evt)
-		}
+
+		data, _ := message.MarshalJSON()
+		evt := p.createEvent(string(data), offset)
+		p.publish(p.acker, &evt)
 	}
 	return nil
 }

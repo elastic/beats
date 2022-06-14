@@ -132,7 +132,8 @@ func TestS3ObjectProcessor(t *testing.T) {
 	})
 
 	t.Run("split root array", func(t *testing.T) {
-		testProcessS3Object(t, "testdata/array.json", "application/json", 2)
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ".[]"}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 2, sel)
 	})
 
 	t.Run("events have a unique repeatable _id", func(t *testing.T) {
