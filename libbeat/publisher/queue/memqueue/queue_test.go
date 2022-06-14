@@ -120,7 +120,7 @@ func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, te
 	queueMetricsAreValid(t, testQueue, 5, settings.Events, 5, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
 
 	// Test metrics after ack
-	batch.ACK()
+	batch.Done()
 
 	queueMetricsAreValid(t, testQueue, 0, settings.Events, 0, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
 
