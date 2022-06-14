@@ -82,7 +82,7 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		senr := streamEnricher{sFields: sFields}
+		senr := newStreamEnricher(sFields, mpx.writeSynthEvent)
 		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
 	}
 }
@@ -219,7 +219,7 @@ func runCmd(
 		}
 
 		mpx.writeSynthEvent(&SynthEvent{
-			Type:                 "cmd/status",
+			Type:                 CmdStatus,
 			Error:                cmdError,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 		})

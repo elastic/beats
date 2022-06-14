@@ -10,14 +10,23 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const JourneyStart = "journey/start"
-const JourneyEnd = "journey/end"
-const CmdStatus = "cmd/status"
+const (
+	JourneyStart       = "journey/start"
+	JourneyEnd         = "journey/end"
+	JourneyNetworkInfo = "journey/network_info"
+	StepStart          = "step/start"
+	StepEnd            = "step/end"
+	CmdStatus          = "cmd/status"
+	StepScreenshot     = "step/screenshot"
+	StepScreenshotRef  = "step/screenshot_ref"
+	ScreenshotBlock    = "screenshot/block"
+)
 
 type SynthEvent struct {
 	Id                   string      `json:"_id"`
@@ -98,9 +107,14 @@ func (se SynthEvent) Timestamp() time.Time {
 	return time.Unix(int64(wholeSeconds), int64(nanos))
 }
 
+// SynthError describes an error coming out of the synthetics agent
+// At some point we should deprecate this in favor of ECSErr and unify the behavior
+// to just follow ECS schema everywhere.
 type SynthError struct {
+	Type    string `json:"type"`
 	Name    string `json:"name"`
 	Message string `json:"message"`
+	Code    string `json:"code"`
 	Stack   string `json:"stack"`
 }
 
@@ -114,6 +128,26 @@ func (se *SynthError) toMap() mapstr.M {
 		"message": se.Message,
 		"stack":   se.Stack,
 	}
+}
+
+func (se *SynthError) toECSErr() *ecserr.ECSErr {
+	// Type is more ECS friendly, so we prefer it
+	t := se.Type
+	if t != "" {
+		// Legacy support for the 'name' field
+		t = se.Name
+
+	}
+	return ecserr.NewECSErr(
+		t,
+		se.Code,
+		se.Message,
+		se.Stack,
+	)
+}
+
+func (se *SynthError) Error() string {
+	return se.toECSErr().Error()
 }
 
 type DurationUs struct {

@@ -147,10 +147,10 @@ Loop:
 	})
 
 	expectedEventTypes := []string{
-		"journey/start",
-		"step/end",
-		"journey/end",
-		"cmd/status",
+		JourneyStart,
+		StepEnd,
+		JourneyEnd,
+		CmdStatus,
 	}
 	for _, typ := range expectedEventTypes {
 		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {

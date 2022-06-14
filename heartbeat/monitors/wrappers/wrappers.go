@@ -18,6 +18,7 @@
 package wrappers
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -199,7 +201,14 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 				},
 			}
 			if err != nil {
-				fields["error"] = look.Reason(err)
+				var asECS *ecserr.ECSErr
+				if errors.As(err, &asECS) {
+					// Override the message of the error in the event it was wrapped
+					asECS.Message = err.Error()
+					fields["error"] = asECS
+				} else {
+					fields["error"] = look.Reason(err)
+				}
 			}
 			eventext.MergeEventFields(event, fields)
 			return cont, nil

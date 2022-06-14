@@ -23,8 +23,13 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je      *journeyEnricher
-	sFields stdfields.StdMonitorFields
+	je        *journeyEnricher
+	sFields   stdfields.StdMonitorFields
+	evtWriter func(se *SynthEvent)
+}
+
+func newStreamEnricher(sFields stdfields.StdMonitorFields, evtWriter func(se *SynthEvent)) *streamEnricher {
+	return &streamEnricher{sFields: sFields, evtWriter: evtWriter}
 }
 
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
@@ -42,7 +47,7 @@ type journeyEnricher struct {
 	journey         *Journey
 	checkGroup      string
 	errorCount      int
-	firstError      error
+	error           error
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
@@ -77,7 +82,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
-			je.firstError = nil
+			je.error = nil
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
@@ -100,8 +105,8 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
 		je.errorCount++
-		if je.firstError == nil {
-			je.firstError = jobErr
+		if je.error == nil {
+			je.error = jobErr
 		}
 	}
 
@@ -111,20 +116,17 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
+			je.error = se.Error.toECSErr()
 			return je.createSummary(event)
 		}
 	case JourneyEnd:
 		je.journeyComplete = true
 		return je.createSummary(event)
-	case "step/end":
+	case StepEnd:
 		je.stepCount++
-	case "step/screenshot":
-		fallthrough
-	case "step/screenshot_ref":
-		fallthrough
-	case "screenshot/block":
+	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
 		add_data_stream.SetEventDataset(event, "browser.screenshot")
-	case "journey/network_info":
+	case JourneyNetworkInfo:
 		add_data_stream.SetEventDataset(event, "browser.network")
 	}
 
@@ -191,12 +193,12 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	}
 
 	if je.journeyComplete {
-		return je.firstError
+		return je.error
 	}
 
-	return fmt.Errorf("journey did not finish executing, %d steps ran", je.stepCount)
+	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
 
 func stepError(e *SynthError) error {
-	return fmt.Errorf("error executing step: %s", e.String())
+	return fmt.Errorf("error executing step: %w", e.toECSErr())
 }

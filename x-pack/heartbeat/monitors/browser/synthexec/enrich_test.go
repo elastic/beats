@@ -141,7 +141,8 @@ func TestJourneyEnricher(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
-			je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: sFields}}
+
+			je := makeTestJourneyEnricher(sFields)
 			for _, se := range synthEvents {
 				check(t, se, je)
 			}
@@ -377,7 +378,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 	}
 
 	stdFields := stdfields.StdMonitorFields{}
-	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
+	je := makeTestJourneyEnricher(stdFields)
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
 
@@ -439,7 +440,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	hasCmdStatus := false
 
 	stdFields := stdfields.StdMonitorFields{}
-	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
+	je := makeTestJourneyEnricher(stdFields)
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
@@ -515,7 +516,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
 			errorCount:      1,
-			firstError:      fmt.Errorf("journey errored"),
+			error:           fmt.Errorf("journey errored"),
 		},
 		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
@@ -600,4 +601,8 @@ func TestCreateSummaryEvent(t *testing.T) {
 			}
 		})
 	}
+}
+
+func makeTestJourneyEnricher(sFields stdfields.StdMonitorFields) *journeyEnricher {
+	return &journeyEnricher{streamEnricher: newStreamEnricher(sFields, func(se *SynthEvent) {})}
 }
