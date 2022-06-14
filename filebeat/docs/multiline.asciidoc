@@ -29,6 +29,19 @@ The following example shows how to configure {beatname_uc} to handle a multiline
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: '^\['
+    negate: true
+    match: after
+
+-------------------------------------------------------------------------------------
+
+If you still use `log` input, there is no need to use `parsers`.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
 multiline.type: pattern
 multiline.pattern: '^\['
 multiline.negate: true
@@ -106,7 +119,19 @@ Exception in thread "main" java.lang.NullPointerException
         at com.example.myproject.Bootstrap.main(Bootstrap.java:14)
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration with `filestream`:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: '^[[:space:]]'
+    negate: false
+    match: after
+-------------------------------------------------------------------------------------
+
+Using `log` input:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -132,6 +157,18 @@ Caused by: java.lang.NullPointerException
 -------------------------------------------------------------------------------------
 
 To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
+    negate: false
+    match: after
+-------------------------------------------------------------------------------------
+
+Using `log` input:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -162,6 +199,18 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: '\\$'
+    negate: false
+    match: before
+-------------------------------------------------------------------------------------
+
+Using `log` input:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
 multiline.type: pattern
 multiline.pattern: '\\$'
 multiline.negate: false
@@ -183,6 +232,18 @@ specific activity, as in this example:
 -------------------------------------------------------------------------------------
 
 To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    negate: true
+    match: after
+-------------------------------------------------------------------------------------
+
+Using `log` input:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -208,6 +269,19 @@ Sometimes your application logs contain events, that begin and end with custom m
 -------------------------------------------------------------------------------------
 
 To consolidate this as a single event in {beatname_uc}, use the following multiline configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: 'Start new event'
+    negate: true
+    match: after
+    flush_pattern: 'End event'
+-------------------------------------------------------------------------------------
+
+Using `log` input:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
