@@ -19,6 +19,7 @@ package node_stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -185,7 +186,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 
 	for pipelineID, pipeline := range nodeStats.Pipelines {
 		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil) {
-			logger.Warn("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed.")
+			logger.Warn(fmt.Sprintf("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed. Pipeline ID: %s", pipelineID))
 		} else {
 			pipeline.ID = pipelineID
 			pipelines = append(pipelines, pipeline)
