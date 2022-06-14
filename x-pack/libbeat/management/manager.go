@@ -204,7 +204,7 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
-	if errs := cm.apply(blocks); errs != nil {
+	if err := cm.apply(blocks); err != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
 		cm.logger.Errorf("failed applying config blocks: %v", err)

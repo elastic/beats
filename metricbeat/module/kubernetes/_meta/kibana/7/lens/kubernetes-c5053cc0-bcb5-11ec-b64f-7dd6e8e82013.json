@@ -1,0 +1,94 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "b23da578-55ca-4199-9298-1e54b87997ac": {
+                            "columnOrder": [
+                                "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae"
+                            ],
+                            "columns": {
+                                "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Services",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.service.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "e87268d2-2115-4649-8ab9-0fe3f2b48065",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_service"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_service"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae",
+                "layerId": "b23da578-55ca-4199-9298-1e54b87997ac",
+                "layerType": "data",
+                "size": "xl",
+                "textAlign": "center",
+                "titlePosition": "bottom"
+            }
+        },
+        "title": "Total Number of Services [Metricbeat Kubernetes]",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-c5053cc0-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-b23da578-55ca-4199-9298-1e54b87997ac",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "e87268d2-2115-4649-8ab9-0fe3f2b48065",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-11T10:39:24.896Z",
+    "version": "WzEyMTcsMV0="
+}

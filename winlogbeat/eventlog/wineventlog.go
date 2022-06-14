@@ -302,7 +302,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
-	var records []Record //nolint:prealloc // This linter gives bad advice and does not take into account conditionals in loops.
+	var records []Record
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)

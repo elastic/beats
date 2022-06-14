@@ -5,6 +5,7 @@
 package browser
 
 import (
+	"encoding/json"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -43,8 +44,6 @@ func TestValidLocal(t *testing.T) {
 	s, e := NewProject(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	_, ok := s.InlineSource()
-	require.False(t, ok)
 
 	source.GoOffline()
 	defer source.GoOnline()
@@ -76,9 +75,7 @@ func TestValidInline(t *testing.T) {
 	s, e := NewProject(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	sSrc, ok := s.InlineSource()
-	require.True(t, ok)
-	require.Equal(t, script, sSrc)
+	require.Equal(t, script, s.projectCfg.Source.Inline.Script)
 	require.Equal(t, "", s.Workdir())
 	require.Equal(t, testParams, s.Params())
 
@@ -123,6 +120,14 @@ func TestEmptySource(t *testing.T) {
 }
 
 func TestExtraArgs(t *testing.T) {
+	playWrightOpts := map[string]interface{}{
+		"simpleOption": "simpleValue",
+		"extraHTTPHeaders": map[string]interface{}{
+			"foo": "bar",
+		},
+	}
+	playwrightOptsJsonBytes, err := json.Marshal(playWrightOpts)
+	require.NoError(t, err)
 	tests := []struct {
 		name string
 		cfg  *Config
@@ -181,6 +186,13 @@ func TestExtraArgs(t *testing.T) {
 			"capabilities",
 			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}},
 			[]string{"--capability", "trace", "ssblocks"},
+		},
+		{
+			"playwright options",
+			&Config{
+				PlaywrightOpts: playWrightOpts,
+			},
+			[]string{"--playwright-options", string(playwrightOptsJsonBytes)},
 		},
 		{
 			"kitchen sink",

@@ -2827,6 +2827,24 @@ type: double
 
 --
 
+*`aws.applicationelb.metrics.HealthyHostCount.max`*::
++
+--
+The number of targets that are considered healthy.
+
+type: long
+
+--
+
+*`aws.applicationelb.metrics.UnHealthyHostCount.max`*::
++
+--
+The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
 [float]
 === networkelb
 
@@ -31763,6 +31781,36 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+--
+
+
+
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
 +
@@ -32446,6 +32494,134 @@ type: long
 +
 --
 type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.limit_in_bytes`*::
++
+--
+type: long
+
+format: bytes
 
 --
 
@@ -41644,6 +41820,154 @@ alias to: service.id
 +
 --
 type: keyword
+
+--
+
+[float]
+=== cluster_actions
+
+Kibana cluster actions metrics.
+
+
+
+
+*`kibana.cluster_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_actions.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_actions.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_actions.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== cluster_rules
+
+Kibana cluster rule metrics.
+
+
+
+
+*`kibana.cluster_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_rules.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_rules.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_rules.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== node_actions
+
+Kibana node actions metrics.
+
+
+
+
+*`kibana.node_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_actions.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
+=== node_rules
+
+Kibana node rule metrics.
+
+
+
+
+*`kibana.node_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_rules.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.timeouts`*::
++
+--
+type: long
 
 --
 
@@ -56514,6 +56838,67 @@ Total number of times messages have been written to disk by this queue since it 
 
 
 type: long
+
+--
+
+[float]
+=== shovel
+
+shovel
+
+
+
+*`rabbitmq.shovel.name`*::
++
+--
+The name of the shovel with non-ASCII characters escaped as in C.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.vhost`*::
++
+--
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+type: alias
+
+alias to: rabbitmq.vhost
+
+--
+
+*`rabbitmq.shovel.node`*::
++
+--
+Node name.
+
+
+type: alias
+
+alias to: rabbitmq.node.name
+
+--
+
+*`rabbitmq.shovel.state`*::
++
+--
+The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.type`*::
++
+--
+The type of the shovel. Either 'static' or 'dynamic'.
+
+
+type: keyword
 
 --
 

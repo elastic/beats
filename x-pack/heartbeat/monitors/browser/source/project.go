@@ -109,7 +109,6 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-	//nolint:gosec //for permission
 	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, 0755)
 	if err != nil {
 		return err

@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "rabbitmq.shovel",
+        "duration": 115000,
+        "module": "rabbitmq"
+    },
+    "metricset": {
+        "name": "shovel",
+        "period": 10000
+    },
+    "rabbitmq": {
+        "node": {
+            "name": "rabbit@localhost"
+        },
+        "shovel": {
+            "name": "testshovel",
+            "state": "running",
+            "type": "dynamic"
+        },
+        "vhost": "/"
+    },
+    "service": {
+        "address": "127.0.0.1:60847",
+        "type": "rabbitmq"
+    }
+}

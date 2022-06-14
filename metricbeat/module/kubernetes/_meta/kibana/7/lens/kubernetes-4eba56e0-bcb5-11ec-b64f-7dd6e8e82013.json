@@ -1,0 +1,282 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "28060f62-4880-4b1c-aef2-fe42f9df0c64": {
+                            "columnOrder": [
+                                "6efc3318-f2d7-4e8b-ad3c-138a8cf9522d",
+                                "b0d6d768-94b4-4a60-8703-d4e2f7a04df2",
+                                "7ccec911-2e78-4c28-ade7-94447ebb88b2",
+                                "802c8bea-aecf-4d1b-9b54-84d527d1fc18",
+                                "370e0d18-2e9c-46ae-9174-9fed8a48bf49",
+                                "968ccc98-9aab-42e0-9ae1-bb2767d38edb",
+                                "d9dbaa39-4e9e-41a9-b6ce-dbe76d4e865e",
+                                "f17d0cb7-9045-4bc8-a26a-0777b34a90e6",
+                                "f146f523-db5b-4965-8486-615c98de32f7"
+                            ],
+                            "columns": {
+                                "370e0d18-2e9c-46ae-9174-9fed8a48bf49": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.node-role_kubernetes_io/control-plane: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Control Plane",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.node-role_kubernetes_io/control-plane"
+                                },
+                                "6efc3318-f2d7-4e8b-ad3c-138a8cf9522d": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Node",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.name"
+                                },
+                                "7ccec911-2e78-4c28-ade7-94447ebb88b2": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.kubernetes_io/os: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Operating System",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.kubernetes_io/os"
+                                },
+                                "802c8bea-aecf-4d1b-9b54-84d527d1fc18": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.kubernetes_io/hostname: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Hostname",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.kubernetes_io/hostname"
+                                },
+                                "968ccc98-9aab-42e0-9ae1-bb2767d38edb": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.ready: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Ready",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.status.ready"
+                                },
+                                "b0d6d768-94b4-4a60-8703-d4e2f7a04df2": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.labels.kubernetes_io/arch: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Architecture",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.labels.kubernetes_io/arch"
+                                },
+                                "d9dbaa39-4e9e-41a9-b6ce-dbe76d4e865e": {
+                                    "customLabel": true,
+                                    "dataType": "boolean",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.unschedulable: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Unschedulable",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.node.status.unschedulable"
+                                },
+                                "f146f523-db5b-4965-8486-615c98de32f7": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.memory_pressure: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Memory Pressure",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.status.memory_pressure"
+                                },
+                                "f17d0cb7-9045-4bc8-a26a-0777b34a90e6": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.status.disk_pressure: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Disk Pressure",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.status.disk_pressure"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "35ac07a8-9e0e-4d3f-b297-6ba228415322",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": [
+                            "node",
+                            "state_node"
+                        ],
+                        "type": "phrases"
+                    },
+                    "query": {
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "node"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_node"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "6efc3318-f2d7-4e8b-ad3c-138a8cf9522d",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "b0d6d768-94b4-4a60-8703-d4e2f7a04df2",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "7ccec911-2e78-4c28-ade7-94447ebb88b2",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "370e0d18-2e9c-46ae-9174-9fed8a48bf49",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "802c8bea-aecf-4d1b-9b54-84d527d1fc18",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "968ccc98-9aab-42e0-9ae1-bb2767d38edb",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "d9dbaa39-4e9e-41a9-b6ce-dbe76d4e865e",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "f17d0cb7-9045-4bc8-a26a-0777b34a90e6",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "f146f523-db5b-4965-8486-615c98de32f7",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "28060f62-4880-4b1c-aef2-fe42f9df0c64",
+                "layerType": "data"
+            }
+        },
+        "title": "Node Informations by Labels [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-4eba56e0-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-28060f62-4880-4b1c-aef2-fe42f9df0c64",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "35ac07a8-9e0e-4d3f-b297-6ba228415322",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-23T15:01:04.709Z",
+    "version": "WzYxNTcsMV0="
+}
