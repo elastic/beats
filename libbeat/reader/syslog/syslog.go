@@ -28,6 +28,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// Note: When re-generating these files, it may be necessary to remove the
+//       //line: directives from the *_gen.go files. Otherwise, code coverage
+//       may fail to build due to an error similar to:
+//
+//         cover: inconsistent NumStmt: changed from 2 to 1
+//
 //go:generate ragel -Z -G2 -o rfc3164_gen.go parser/parser_rfc3164.rl
 //go:generate ragel -Z -G2 -o rfc5424_gen.go parser/parser_rfc5424.rl
 
