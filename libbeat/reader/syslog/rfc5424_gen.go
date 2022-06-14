@@ -26,7 +26,6 @@ const rfc5424_error int = 0
 
 const rfc5424_en_main int = 1
 
-
 type machineState struct {
 	sdID           string
 	sdParamName    string
@@ -559,7 +558,6 @@ func parseRFC5424(data string) (message, error) {
 			errs = multierr.Append(errs, &ErrValidation{Err: err, Pos: tok + 1})
 		}
 
-
 		tok = p
 
 		goto st22
@@ -686,13 +684,11 @@ func parseRFC5424(data string) (message, error) {
 
 				tok = p
 
-
 				m.setMsg(data[tok:p])
 
 			case 29:
 
 				m.setRawSDValue(data[tok:p])
-
 
 				m.setMsg(data[tok:p])
 
@@ -704,7 +700,6 @@ func parseRFC5424(data string) (message, error) {
 		}
 	}
 
-
 	return m, errs
 }
 
@@ -713,7 +708,6 @@ const check_first_final int = 10
 const check_error int = 0
 
 const check_en_main int = 1
-
 
 // isRFC5424 returns true if data is formatted as an RFC 5424 syslog message.
 func isRFC5424(data string) bool {
@@ -890,7 +884,6 @@ func isRFC5424(data string) bool {
 		}
 	}
 
-
 	return isRFC5424
 }
 
@@ -899,7 +892,6 @@ const parse_sd_first_final int = 73
 const parse_sd_error int = 0
 
 const parse_sd_en_main int = 1
-
 
 // parseStructuredData performs a best effort parsing of the raw structured data value
 // extracted from the syslog message. If the raw structured data value is an empty
@@ -1849,7 +1841,6 @@ func parseStructuredData(data string) map[string]interface{} {
 			subMap[s.sdParamName] = removeBytes(data[tok:p], s.sdValueEscapes, p)
 		}
 
-
 		s.sdValueEscapes = nil
 
 		goto st40
@@ -1885,7 +1876,6 @@ func parseStructuredData(data string) map[string]interface{} {
 	tr41:
 
 		tok = p
-
 
 		s.sdValueEscapes = append(s.sdValueEscapes, p)
 
@@ -2804,7 +2794,6 @@ func parseStructuredData(data string) map[string]interface{} {
 		{
 		}
 	}
-
 
 	if len(structuredData) == 0 {
 		return nil

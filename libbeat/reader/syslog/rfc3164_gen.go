@@ -30,7 +30,6 @@ const rfc3164_parser_error int = 0
 
 const rfc3164_parser_en_main int = 1
 
-
 // parseRFC3164 parses an RFC 3164-formatted syslog message. loc is used to enrich
 // timestamps that lack a time zone.
 func parseRFC3164(data string, loc *time.Location) (message, error) {
@@ -346,7 +345,6 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 	tr42:
 
 		m.setContent(data[tok:p])
-
 
 		tok = p
 
@@ -896,7 +894,6 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		{
 		}
 	}
-
 
 	return m, errs
 }
