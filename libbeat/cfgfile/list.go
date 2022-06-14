@@ -85,7 +85,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, runner := range stopList {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
-		go runner.Stop()
+		runner.Stop() // we need to wait this to finish before starting new inputs
 		moduleStops.Add(1)
 	}
 

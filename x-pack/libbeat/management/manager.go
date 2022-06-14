@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
-	"github.com/hashicorp/go-multierror"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -20,6 +20,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
@@ -179,6 +180,19 @@ func (cm *Manager) updateStatusWithError(err error) {
 	cm.UpdateStatus(lbmanagement.Failed, err.Error())
 }
 
+func getAllCauses(multiErr *multierror.MultiError) []error {
+	rootErrors := []error{}
+
+	for _, err := range multiErr.Errors {
+		if castErr, isMultiError := err.(*multierror.MultiError); isMultiError {
+			rootErrors = append(rootErrors, getAllCauses(castErr)...)
+			continue
+		}
+		rootErrors = append(rootErrors, err)
+	}
+
+	return rootErrors
+}
 func (cm *Manager) OnConfig(s string) {
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
@@ -204,7 +218,31 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
-	if err := cm.apply(blocks); err != nil {
+	mustHandleErr := func(err error) bool {
+		if err == nil { //just in case, probably not needed
+			return false
+		}
+		if multiErr, isMultiError := err.(*multierror.MultiError); isMultiError {
+			// We ignore errors of type common.ErrInputNotFinished, so if those are
+			// the only errors, we can move on.
+			rootErrors := getAllCauses(multiErr)
+			for _, err := range rootErrors {
+				if errors.Is(err, &(common.ErrInputNotFinished{})) {
+					cm.logger.Debugf("foo ============== <%s> err.Is(ErrInputNotFinished): %#v", id, err)
+					continue
+				}
+			}
+			return false
+		}
+
+		return true
+	}
+
+	// cm.apply can return a multierror.MultiError containing others multierror.MultiError
+	// inside it, those errors will wrap the real errors. If the real erros are
+	// ONLY 'common.ErrInputNotFinished' we can ignore them, otherwise they
+	//  must be reported
+	if err := cm.apply(blocks); err != nil && mustHandleErr(err) {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
 		cm.logger.Errorf("failed applying config blocks: %v", err)
@@ -262,11 +300,11 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 		return err
 	}
 
-	var errors *multierror.Error
+	var errors []error
 	// Reload configs
 	for _, b := range blocks {
 		if err := cm.reload(b.Type, b.Blocks); err != nil {
-			errors = multierror.Append(errors, err)
+			errors = append(errors, err)
 		}
 		missing[b.Type] = false
 	}
@@ -275,12 +313,16 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 	for name, isMissing := range missing {
 		if isMissing {
 			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
-				errors = multierror.Append(errors, err)
+				errors = append(errors, err)
 			}
 		}
 	}
 
-	return errors.ErrorOrNil()
+	if len(errors) != 0 {
+		return &multierror.MultiError{Errors: errors}
+	}
+
+	return nil
 }
 
 func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {

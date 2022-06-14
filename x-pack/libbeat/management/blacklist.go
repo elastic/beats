@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/go-multierror"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -44,6 +44,7 @@ func (f *ConfigBlacklistSettings) Unpack(from interface{}) error {
 }
 
 // NewConfigBlacklist filters configs from CM according to a given blacklist
+// TODO: return a slice of errors
 func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	list := ConfigBlacklist{
 		patterns: map[string]match.Matcher{},
@@ -63,15 +64,19 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 
 // Detect an error if any of the given config blocks is blacklisted
 func (c *ConfigBlacklist) Detect(configBlocks ConfigBlocks) error {
-	var err *multierror.Error
+	var err []error
 	for _, configs := range configBlocks {
 		for _, block := range configs.Blocks {
 			if c.isBlacklisted(configs.Type, block) {
-				err = multierror.Append(err, fmt.Errorf("Config for '%s' is blacklisted", configs.Type))
+				err = append(err, fmt.Errorf("Config for '%s' is blacklisted", configs.Type))
 			}
 		}
 	}
-	return err.ErrorOrNil()
+
+	if len(err) != 0 {
+		return &multierror.MultiError{Errors: err}
+	}
+	return nil
 }
 
 func (c *ConfigBlacklist) isBlacklisted(blockType string, block *ConfigBlock) bool {

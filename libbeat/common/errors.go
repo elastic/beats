@@ -30,3 +30,9 @@ type ErrInputNotFinished struct {
 func (e *ErrInputNotFinished) Error() string {
 	return fmt.Sprintf("Can only start an input when all related states are finished: %+v", e.State)
 }
+
+// Is returns true when err is of type ErrInputNotFinished
+func (e *ErrInputNotFinished) Is(err error) bool {
+	_, ok := err.(*ErrInputNotFinished)
+	return ok
+}
