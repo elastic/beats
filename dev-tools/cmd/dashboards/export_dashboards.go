@@ -25,9 +25,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 var (
@@ -79,7 +80,7 @@ func main() {
 		Path:      u.Path,
 		SpaceID:   *spaceID,
 		Transport: transport,
-	}, "Beat Development Tools")
+	}, "Beat Development Tools", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}

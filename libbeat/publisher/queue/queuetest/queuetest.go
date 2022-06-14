@@ -18,8 +18,12 @@
 package queuetest
 
 import (
+	"errors"
+	"io"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -30,15 +34,17 @@ type QueueFactory func(t *testing.T) queue.Queue
 
 type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()
 
+type testCase struct {
+	name                 string
+	producers, consumers workerFactory
+}
+
 func TestSingleProducerConsumer(
 	t *testing.T,
 	events, batchSize int,
-	factory QueueFactory,
+	queueFactory QueueFactory,
 ) {
-	tests := []struct {
-		name                 string
-		producers, consumers workerFactory
-	}{
+	tests := []testCase{
 		{
 			"single producer, consumer without ack, complete batches",
 			makeProducer(events, false, countEvent),
@@ -62,44 +68,15 @@ func TestSingleProducerConsumer(
 		},
 	}
 
-	for _, test := range tests {
-		verbose := testing.Verbose()
-		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
-			if !verbose {
-				t.Parallel()
-			}
-
-			log := NewTestLogger(t)
-			log.Debug("run test: ", test.name)
-
-			queue := factory(t)
-			defer func() {
-				err := queue.Close()
-				if err != nil {
-					t.Error(err)
-				}
-			}()
-
-			var wg sync.WaitGroup
-
-			go test.producers(&wg, nil, log, queue)()
-			go test.consumers(&wg, nil, log, queue)()
-
-			wg.Wait()
-		}))
-	}
-
+	runTestCases(t, tests, queueFactory)
 }
 
 func TestMultiProducerConsumer(
 	t *testing.T,
 	events, batchSize int,
-	factory QueueFactory,
+	queueFactory QueueFactory,
 ) {
-	tests := []struct {
-		name                 string
-		producers, consumers workerFactory
-	}{
+	tests := []testCase{
 		{
 			"2 producers, 1 consumer, without ack, complete batches",
 			multiple(
@@ -210,6 +187,10 @@ func TestMultiProducerConsumer(
 		},
 	}
 
+	runTestCases(t, tests, queueFactory)
+}
+
+func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 	for _, test := range tests {
 		verbose := testing.Verbose()
 		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
@@ -220,7 +201,7 @@ func TestMultiProducerConsumer(
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			queue := factory(t)
+			queue := queueFactory(t)
 			defer func() {
 				err := queue.Close()
 				if err != nil {
@@ -232,10 +213,26 @@ func TestMultiProducerConsumer(
 
 			go test.producers(&wg, nil, log, queue)()
 			go test.consumers(&wg, nil, log, queue)()
-
+			go testFetchMetrics(t, queue)
 			wg.Wait()
 		}))
 	}
+}
+
+func testFetchMetrics(t *testing.T, mon queue.Queue) {
+	_, err := mon.Metrics()
+	if errors.Is(err, queue.ErrMetricsNotImplemented) {
+		return
+	}
+
+	metrics, err := mon.Metrics()
+	// EOF is returned if the queue is closing, so the only "good" error is that
+	if err != nil {
+		assert.ErrorIs(t, err, io.EOF)
+	}
+
+	assert.True(t, metrics.EventCount.Exists() || metrics.ByteCount.Exists())
+
 }
 
 func multiple(
@@ -292,7 +289,7 @@ func makeProducer(
 			})
 			for i := 0; i < maxEvents; i++ {
 				log.Debug("publish event", i)
-				producer.Publish(makeEvent(makeFields(i)))
+				producer.Publish(MakeEvent(makeFields(i)))
 			}
 
 			ackWG.Wait()
@@ -312,44 +309,30 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 
 			var events sync.WaitGroup
 
-			consumers := make([]queue.Consumer, numConsumers)
-			for i := range consumers {
-				consumers[i] = b.Consumer()
-			}
-
 			log.Debugf("consumer: wait for %v events\n", maxEvents)
 			events.Add(maxEvents)
 
-			for _, c := range consumers {
-				c := c
+			for i := 0; i < numConsumers; i++ {
+				b := b
 
-				wg.Add(1)
 				go func() {
-					defer wg.Done()
-
 					for {
-						batch, err := c.Get(batchSize)
+						batch, err := b.Get(batchSize)
 						if err != nil {
 							return
 						}
 
-						collected := batch.Events()
-						log.Debug("consumer: process batch", len(collected))
+						log.Debug("consumer: process batch", batch.Count())
 
-						for range collected {
+						for j := 0; j < batch.Count(); j++ {
 							events.Done()
 						}
-						batch.ACK()
+						batch.Done()
 					}
 				}()
 			}
 
 			events.Wait()
-
-			// disconnect consumers
-			for _, c := range consumers {
-				c.Close()
-			}
 		}
 	}
 }

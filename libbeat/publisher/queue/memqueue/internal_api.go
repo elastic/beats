@@ -17,12 +17,10 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher"
-
 // producer -> broker API
 
 type pushRequest struct {
-	event *publisher.Event
+	event interface{}
 	seq   uint32
 	state *produceState
 }
@@ -44,8 +42,22 @@ type getRequest struct {
 }
 
 type getResponse struct {
-	ackChan chan batchAckMsg
+	ackChan chan batchDoneMsg
 	entries []queueEntry
 }
 
-type batchAckMsg struct{}
+type batchDoneMsg struct{}
+
+// Metrics API
+
+type metricsRequest struct {
+	responseChan chan memQueueMetrics
+}
+
+// memQueueMetrics tracks metrics that are returned by the individual memory queue implementations
+type memQueueMetrics struct {
+	// the size of items in the queue
+	currentQueueSize int
+	// the number of items that have been read by a consumer but not yet ack'ed
+	occupiedRead int
+}

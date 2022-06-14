@@ -32,6 +32,7 @@ type Config struct {
 	Throttling        interface{}                   `config:"throttling"`
 	Screenshots       string                        `config:"screenshots"`
 	SyntheticsArgs    []string                      `config:"synthetics_args"`
+	PlaywrightOpts    map[string]interface{}        `config:"playwright_options"`
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
 }

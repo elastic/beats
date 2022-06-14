@@ -91,7 +91,6 @@ func newAppendPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &append, nil
 }
 
-//nolint:dupl // Bad linter! Claims duplication with newSet. The duplication exists but is not resolvable without parameterised types.
 func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 	c := &appendConfig{}
 	if err := cfg.Unpack(c); err != nil {

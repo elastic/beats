@@ -723,7 +723,7 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500) //nolint:gosec // Bad linter! Not a crypto context.
+		w.WriteHeader(rand.Intn(100) + 500)
 		count += 1
 	}
 }
@@ -813,7 +813,7 @@ func paginationHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
 		case 1:
-			if r.URL.Query().Get("page") != "bar" { //nolint:goconst // Bad linter! Tests should be explicit and local.
+			if r.URL.Query().Get("page") != "bar" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return

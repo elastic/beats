@@ -15,9 +15,10 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
@@ -159,11 +160,11 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, err
 
 // switchToAssumeRoleProvider TODO (this function seems deprecated and replaced by addStaticCredentialsProviderToAwsConfig) switches the credentials provider in the awsConfig to the `AssumeRoleProvider`.
 func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
-//	logger := logp.NewLogger("switchToAssumeRoleProvider")
-//	logger.Debug("Switching credentials provider to AssumeRoleProvider")
-//	stsSvc := sts.New(awsConfig)
-//	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-//	awsConfig.Credentials = stsCredProvider
+	//	logger := logp.NewLogger("switchToAssumeRoleProvider")
+	//	logger.Debug("Switching credentials provider to AssumeRoleProvider")
+	//	stsSvc := sts.New(awsConfig)
+	//	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+	//	awsConfig.Credentials = stsCredProvider
 	return awsConfig
 }
 

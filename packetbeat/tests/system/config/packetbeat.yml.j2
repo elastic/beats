@@ -248,3 +248,7 @@ output.file:
   rotate_every_kb: {{ rotate_every_kb | default(1000) }}
   #number_of_files: 7
 {%- endif %}
+
+{% if timestamp_precision %}
+timestamp.precision: {{ timestamp_precision }}
+{%- endif %}

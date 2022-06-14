@@ -77,7 +77,6 @@ func newSetResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &set, nil
 }
 
-//nolint:dupl // Bad linter! Claims duplication with newAppend. The duplication exists but is not resolvable without parameterised types.
 func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 	c := &setConfig{}
 	if err := cfg.Unpack(c); err != nil {

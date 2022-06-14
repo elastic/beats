@@ -126,7 +126,7 @@ func generateConfig(pkgFlavor PackagingFlavor, ct devtools.ConfigFileType, spec 
 	case XPackPackaging:
 		args = XPackConfigFileParams()
 	default:
-		panic(fmt.Errorf("Invalid packaging flavor (either oss or xpack): %v", pkgFlavor))
+		panic(fmt.Errorf("invalid packaging flavor (either oss or xpack): %v", pkgFlavor))
 	}
 
 	// PackageDir isn't exported but we can grab it's value this way.

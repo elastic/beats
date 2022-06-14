@@ -2,7 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:dupl,goconst // Bad linter! Tests should be explicit and local.
 package httpjson
 
 import (
@@ -212,7 +211,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	transform, err := newAppendResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend := transform.(*appendt) //nolint:errcheck // Bad linter! Panic is a check.
+	testAppend := transform.(*appendt)
 
 	trCtx := emptyTransformContext()
 	tr := transformable{}
@@ -242,7 +241,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend = transform.(*appendt) //nolint:errcheck // Bad linter! Panic is a check.
+	testAppend = transform.(*appendt)
 
 	tr = transformable{}
 
@@ -263,7 +262,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend = transform.(*appendt) //nolint:errcheck // Bad linter! Panic is a check.
+	testAppend = transform.(*appendt)
 
 	tr = transformable{}
 

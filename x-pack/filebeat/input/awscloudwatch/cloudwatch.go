@@ -14,10 +14,10 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
-
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type cloudwatchPoller struct {
@@ -92,11 +92,7 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 	p.log.Debug("done sleeping")
 
 	p.log.Debugf("Processing #%v events", len(logEvents))
-	if err = logProcessor.processLogEvents(logEvents, logGroup, p.region); err != nil {
-		err = fmt.Errorf("processLogEvents failed: [%w]", err)
-		p.log.Error(err)
-	}
-
+	logProcessor.processLogEvents(logEvents, logGroup, p.region)
 	return nil
 }
 
@@ -109,7 +105,9 @@ func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTim
 	}
 
 	if len(p.logStreams) > 0 {
-		filterLogEventsInput.LogStreamNames = p.logStreams
+		for _, stream := range p.logStreams {
+			filterLogEventsInput.LogStreamNames = append(filterLogEventsInput.LogStreamNames, *stream)
+		}
 	}
 
 	if p.logStreamPrefix != "" {

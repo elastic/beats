@@ -23,13 +23,14 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -80,7 +81,8 @@ func makeShipper(
 
 	opts := []grpc.DialOption{
 		grpc.WithConnectParams(grpc.ConnectParams{
-			Backoff: backoff.DefaultConfig,
+			Backoff:           backoff.DefaultConfig,
+			MinConnectTimeout: config.Timeout,
 		}),
 		grpc.WithTransportCredentials(creds),
 	}
@@ -113,9 +115,8 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	st.NewBatch(len(events))
 
-	dropped := 0
-
-	grpcEvents := make([]*sc.Event, 0, len(events))
+	nonDroppedEvents := make([]publisher.Event, 0, len(events))
+	convertedEvents := make([]*sc.Event, 0, len(events))
 
 	c.log.Debugf("converting %d events to protobuf...", len(events))
 
@@ -124,19 +125,17 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		meta, err := convertMapStr(e.Content.Meta)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
-			c.log.Errorf("%d/%d failed to convert event metadata to protobuf: %w", i+1, len(events), err)
-			dropped++
+			c.log.Errorf("%d/%d failed to convert event metadata to protobuf, dropped: %w", i+1, len(events), err)
 			continue
 		}
 
 		fields, err := convertMapStr(e.Content.Fields)
 		if err != nil {
-			c.log.Errorf("%d/%d failed to convert event fields to protobuf: %w", i+1, len(events), err)
-			dropped++
+			c.log.Errorf("%d/%d failed to convert event fields to protobuf, dropped: %w", i+1, len(events), err)
 			continue
 		}
 
-		grpcEvents = append(grpcEvents, &sc.Event{
+		convertedEvents = append(convertedEvents, &sc.Event{
 			Timestamp: timestamppb.New(e.Content.Timestamp),
 			Metadata:  meta.GetStructValue(),
 			Fields:    fields.GetStructValue(),
@@ -154,30 +153,50 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 				Namespace: "default",
 			},
 		})
+
+		nonDroppedEvents = append(nonDroppedEvents, e)
 	}
 
-	c.log.Debugf("%d events converted to protobuf, %d dropped", len(grpcEvents), dropped)
+	droppedCount := len(events) - len(nonDroppedEvents)
+
+	st.Dropped(droppedCount)
+	c.log.Debugf("%d events converted to protobuf, %d dropped", len(nonDroppedEvents), droppedCount)
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
-	_, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
-		Events: grpcEvents,
+	resp, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
+		Events: convertedEvents,
 	})
 
-	if err != nil {
-		if status.Code(err) == codes.ResourceExhausted {
-			c.log.Warn("shipper's queue is full, more events cannot be accepted")
-			batch.Cancelled()
-		} else {
-			batch.Retry()
-		}
-		return fmt.Errorf("failed to publish the batch to the shipper: %w", err)
+	if status.Code(err) != codes.OK || resp == nil {
+		batch.Cancelled()         // does not decrease the TTL
+		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
+		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
+		return nil
 	}
 
-	batch.ACK()
+	// with a correct server implementation should never happen, this error is not recoverable
+	if len(resp.Results) > len(nonDroppedEvents) {
+		return fmt.Errorf(
+			"server returned unexpected results, expected maximum %d items, got %d",
+			len(nonDroppedEvents),
+			len(resp.Results),
+		)
+	}
 
-	st.Dropped(dropped)
-	st.Acked(len(events) - dropped)
+	// the server is supposed to retain the order of the initial events in the response
+	// judging by the size of the result list we can determine what part of the initial
+	// list was accepted and we can send the rest of the list for a retry
+	retries := nonDroppedEvents[len(resp.Results):]
+	if len(retries) == 0 {
+		batch.ACK()
+		st.Acked(len(nonDroppedEvents))
+		c.log.Debugf("%d events have been acknowledged, %d dropped", len(nonDroppedEvents), droppedCount)
+	} else {
+		batch.RetryEvents(retries) // decreases TTL unless guaranteed delivery
+		st.Failed(len(retries))
+		c.log.Debugf("%d events have been acknowledged, %d sent for retry, %d dropped", len(resp.Results), len(retries), droppedCount)
+	}
 
 	return nil
 }

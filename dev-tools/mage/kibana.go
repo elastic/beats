@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -41,7 +42,7 @@ func KibanaDashboards(moduleDirs ...string) error {
 	// X-Pack Beats only add dashboards with modules (this will require a
 	// change if we have X-Pack only Beats).
 	cp := &CopyTask{Source: OSSBeatDir("_meta/kibana"), Dest: kibanaBuildDir}
-	if err := cp.Execute(); err != nil && !os.IsNotExist(errors.Cause(err)) {
+	if err := cp.Execute(); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 

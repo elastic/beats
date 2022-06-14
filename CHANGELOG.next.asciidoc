@@ -4,22 +4,22 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- Update to Go 1.17.9 {issue}31350[31350]
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Add a new `salesforce` module to collect data from salesforce. {pull}31486[31486]
+
 *Heartbeat*
 
-- Restrict setuid to containerized environments. {pull}30869[30869]
 
 *Metricbeat*
 
@@ -37,40 +37,35 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Fix group write permissions on runtime directories. {pull}30869[30869]
-- Store syslog version as string. {pull}31446[31446]
-- Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
+- Allow loading secrets that contain commas from the keystore {pull}31694{pull}.
+- Fix Windows service timeouts when the "TCP/IP NetBIOS Helper" service is disabled. {issue}31810[31810] {pull}31835[31835]
 
 *Auditbeat*
 
+- Fix audit status collection on kernels prior to version 5.9. {issue}31616[31616] {pull}31710[31710]
 
 *Filebeat*
 
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
-- Netflow: replace invalid field value. {pull}31295[31295]
-- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
-- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
-- Duplicate awscloudwatch.* fields to aws.cloudwatch.* in aws-cloudwatch input. {pull}31488[31488]
-- aws-s3 input: Stop SQS keep-alive routine on InvalidParameterValue error. {issue}30675[30675] {pull}31499[31499]
-- Supporting the double digit date parsing in ingest pipeline for oracle logs {pull}31514[31514]
+- Fix type mapping of client.as.number in okta module. {pull}31676[31676]
+- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
 
 *Heartbeat*
-- Fix unintentional use of no-op logger. {pull}31543[31543]
 
+- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 *Metricbeat*
 
-- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
+- make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
+- add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 
 *Packetbeat*
 
-- Use /proc/<pid>/comm for linux process names where possible. {pull}31527[31527]
 
 *Winlogbeat*
 
-- Fix resource handle leak during event log enrichment. {pull}31504[31504]
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
 
 *Functionbeat*
@@ -83,6 +78,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 ==== Added
 
 *Affecting all Beats*
+
+- Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
 
 
 *Auditbeat*
@@ -101,10 +98,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Support SASL/SCRAM authentication in the Kafka input. {pull}31167[31167]
 - checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
 - Add URL Encode template function for httpjson input. {pull}30962[30962]
-- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
 - Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
-- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
-- Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
+- Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
+- Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
+- Change threatintel module from beta to GA. {pull}31693[31693]
+- Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
+- Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
+- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
 
 *Auditbeat*
 
@@ -116,12 +116,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+- Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
+- Add ARM64 seccomp profile. {issue}31285[31285] {pull}31422[31422]
+- Add new `playwright_options` config for browser monitors. {issue}28197[28196] {pull}31737[31737]
+
 
 *Metricbeat*
 
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Add new Kubernetes module dashboards {pull}31591[31591]
+- system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
+- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
 
 *Packetbeat*
 
@@ -146,6 +152,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Heartbeat*
+- Bump node.js version for synthetics to 16.15.0. {pull}31675[31675]
 
 *Metricbeat*
 

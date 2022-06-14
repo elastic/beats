@@ -37,8 +37,13 @@ type StdMonitorFields struct {
 	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
 	Timeout           time.Duration      `config:"timeout"`
 	Service           ServiceFields      `config:"service"`
+	Origin            string             `config:"origin"`
 	LegacyServiceName string             `config:"service_name"`
-	Enabled           bool               `config:"enabled"`
+	// Used by zip_url and local monitors
+	// kibana originating monitors only run one journey at a time
+	// and just use the `fields` syntax / manually set monitor IDs
+	IsLegacyBrowserSource bool
+	Enabled               bool `config:"enabled"`
 }
 
 func ConfigToStdMonitorFields(config *conf.C) (StdMonitorFields, error) {

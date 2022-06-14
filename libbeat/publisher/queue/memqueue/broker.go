@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"io"
 	"sync"
 	"time"
 
@@ -25,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 const (
@@ -75,6 +77,12 @@ type broker struct {
 	// if needed.
 	ackListener queue.ACKListener
 
+	// This channel is used to request/return metrics where such metrics require insight into
+	// the actual eventloop itself. This seems like it might be overkill, but it seems that
+	// all communication between the broker and the eventloops
+	// happens via channels, so we're doing it this way.
+	metricChan chan metricsRequest
+
 	// wait group for worker shutdown
 	wg sync.WaitGroup
 }
@@ -87,12 +95,18 @@ type Settings struct {
 	InputQueueSize int
 }
 
+type batch struct {
+	queue    *broker
+	entries  []queueEntry
+	doneChan chan batchDoneMsg
+}
+
 // batchACKState stores the metadata associated with a batch of events sent to
 // a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
 // ackChan and received by
 type batchACKState struct {
 	next         *batchACKState
-	ackChan      chan batchAckMsg
+	doneChan     chan batchDoneMsg
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
 }
@@ -177,6 +191,7 @@ func NewQueue(
 		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,
+		metricChan:  make(chan metricsRequest),
 	}
 
 	var eventLoop interface {
@@ -223,24 +238,51 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *broker) Consumer() queue.Consumer {
-	return newConsumer(b)
+func (b *broker) Get(count int) (queue.Batch, error) {
+	responseChan := make(chan getResponse, 1)
+	select {
+	case <-b.done:
+		return nil, io.EOF
+	case b.getChan <- getRequest{
+		entryCount: count, responseChan: responseChan}:
+	}
+
+	// if request has been sent, we have to wait for a response
+	resp := <-responseChan
+	return &batch{
+		queue:    b,
+		entries:  resp.entries,
+		doneChan: resp.ackChan,
+	}, nil
 }
 
 func (b *broker) Metrics() (queue.Metrics, error) {
-	return queue.Metrics{}, queue.ErrMetricsNotImplemented
+
+	responseChan := make(chan memQueueMetrics, 1)
+	select {
+	case <-b.done:
+		return queue.Metrics{}, io.EOF
+	case b.metricChan <- metricsRequest{
+		responseChan: responseChan}:
+	}
+	resp := <-responseChan
+
+	return queue.Metrics{
+		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
+		EventLimit:            opt.UintWith(uint64(b.bufSize)),
+		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
+	}, nil
 }
 
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
 		return &batchACKState{
-			ackChan: make(chan batchAckMsg, 1),
+			doneChan: make(chan batchDoneMsg, 1),
 		}
 	},
 }
 
 func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	//nolint: errcheck // Return value doesn't need to be checked before conversion.
 	ch := ackChanPool.Get().(*batchACKState)
 	ch.next = nil
 	ch.start = start
@@ -293,11 +335,11 @@ func (l *chanList) front() *batchACKState {
 	return l.head
 }
 
-func (l *chanList) channel() chan batchAckMsg {
+func (l *chanList) nextBatchChannel() chan batchDoneMsg {
 	if l.head == nil {
 		return nil
 	}
-	return l.head.ackChan
+	return l.head.doneChan
 }
 
 func (l *chanList) pop() *batchACKState {
@@ -332,4 +374,16 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 		actual = minInputQueueSize
 	}
 	return actual
+}
+
+func (b *batch) Count() int {
+	return len(b.entries)
+}
+
+func (b *batch) Event(i int) interface{} {
+	return b.entries[i].event
+}
+
+func (b *batch) Done() {
+	b.doneChan <- batchDoneMsg{}
 }

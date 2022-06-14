@@ -25,12 +25,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	util "github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/memory"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
@@ -112,7 +112,7 @@ func computeEfficiency(scanName string, stealName string, fieldName string, raw 
 	stealVal, stealOk := raw[stealName]
 	if scanVal != 0 && stealOk {
 		inMap[fieldName] = mapstr.M{
-			"pct": common.Round(float64(stealVal)/float64(scanVal), common.DefaultDecimalPlacesCount),
+			"pct": util.Round(float64(stealVal) / float64(scanVal)),
 		}
 	}
 
@@ -144,7 +144,7 @@ func getHugePages(hostfs resolve.Resolver) (mapstr.M, error) {
 		if total > 0 {
 			perc = float64(total-free+reserved) / float64(total)
 		}
-		thp.Put("used.pct", common.Round(perc, common.DefaultDecimalPlacesCount))
+		thp.Put("used.pct", util.Round(perc))
 
 		if !okTotalSize && okDefaultSize {
 			thp.Put("used.bytes", (total-free+reserved)*defaultSize)
