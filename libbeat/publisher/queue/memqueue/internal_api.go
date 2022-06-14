@@ -42,11 +42,11 @@ type getRequest struct {
 }
 
 type getResponse struct {
-	ackChan chan batchAckMsg
+	ackChan chan batchDoneMsg
 	entries []queueEntry
 }
 
-type batchAckMsg struct{}
+type batchDoneMsg struct{}
 
 // Metrics API
 

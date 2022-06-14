@@ -29,7 +29,7 @@ type retryer interface {
 type ttlBatch struct {
 	// The callback to inform the queue (and possibly the producer)
 	// that this batch has been acknowledged.
-	ack func()
+	done func()
 
 	// The internal hook back to the eventConsumer, used to implement the
 	// publisher.Batch retry interface.
@@ -61,7 +61,7 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	}
 
 	b := &ttlBatch{
-		ack:     original.ACK,
+		done:    original.Done,
 		retryer: retryer,
 		ttl:     ttl,
 		events:  events,
@@ -74,11 +74,11 @@ func (b *ttlBatch) Events() []publisher.Event {
 }
 
 func (b *ttlBatch) ACK() {
-	b.ack()
+	b.done()
 }
 
 func (b *ttlBatch) Drop() {
-	b.ack()
+	b.done()
 }
 
 func (b *ttlBatch) Retry() {
