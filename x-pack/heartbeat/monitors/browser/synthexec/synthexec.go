@@ -257,8 +257,8 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	return nil
 }
 
-var stdoutToSynthEvent = lineToSynthEventFactory("stdout")
-var stderrToSynthEvent = lineToSynthEventFactory("stderr")
+var stdoutToSynthEvent = lineToSynthEventFactory(Stdout)
+var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 
 // lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {

@@ -161,7 +161,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			"stderr",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type: "stderr",
+				Type: Stderr,
 				Payload: mapstr.M{
 					"message": "Error from synthetics",
 				},
@@ -173,7 +173,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 						"payload": mapstr.M{
 							"message": "Error from synthetics",
 						},
-						"type":            "stderr",
+						"type":            Stderr,
 						"package_version": "1.0.0",
 						"index":           0,
 					},
@@ -185,7 +185,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			"stdout",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type: "stdout",
+				Type: Stdout,
 				Payload: mapstr.M{
 					"message": "debug output",
 				},
@@ -197,7 +197,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 						"payload": mapstr.M{
 							"message": "debug output",
 						},
-						"type":            "stdout",
+						"type":            Stdout,
 						"package_version": "1.0.0",
 						"index":           0,
 					},

@@ -120,22 +120,13 @@ Loop:
 		}
 	}
 
-	eventsWithType := func(typ string) (matched []*SynthEvent) {
-		for _, se := range synthEvents {
-			if se.Type == typ {
-				matched = append(matched, se)
-			}
-		}
-		return
-	}
-
 	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
-		stdoutEvents := eventsWithType("stdout")
+		stdoutEvents := eventsWithType(Stdout, synthEvents)
 		require.Len(t, stdoutEvents, 1)
 		require.Equal(t, stdinStr, stdoutEvents[0].Payload["message"])
 	})
 	t.Run("has echo'd two lines to stderr", func(t *testing.T) {
-		stdoutEvents := eventsWithType("stderr")
+		stdoutEvents := eventsWithType("stderr", synthEvents)
 		require.Len(t, stdoutEvents, 2)
 		require.Equal(t, "Stderr 1", stdoutEvents[0].Payload["message"])
 		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
@@ -154,9 +145,57 @@ Loop:
 	}
 	for _, typ := range expectedEventTypes {
 		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {
-			require.GreaterOrEqual(t, len(eventsWithType(typ)), 1)
+			require.GreaterOrEqual(t, len(eventsWithType(typ, synthEvents)), 1)
 		})
 	}
+}
+
+func TestRunBadExitCodeCmd(t *testing.T) {
+	cmd := exec.Command("go", "run", "./main.go", "exit")
+	_, filename, _, _ := runtime.Caller(0)
+	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+
+	stdinStr := "MY_STDIN"
+
+	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
+	require.NoError(t, err)
+
+	var synthEvents []*SynthEvent
+	timeout := time.NewTimer(time.Minute)
+Loop:
+	for {
+		select {
+		case se := <-mpx.SynthEvents():
+			if se == nil {
+				break Loop
+			}
+			synthEvents = append(synthEvents, se)
+		case <-timeout.C:
+			require.Fail(t, "timeout expired for testing runCmd!")
+		}
+	}
+
+	// go run outputs "exit status 123" to stderr so we have two messages
+	require.Len(t, synthEvents, 2)
+
+	t.Run("has a stderr line", func(t *testing.T) {
+		stderrEvents := eventsWithType(Stderr, synthEvents)
+		require.Len(t, stderrEvents, 1)
+		require.Equal(t, "exit status 123", stderrEvents[0].Payload["message"])
+	})
+	t.Run("has a cmd status event", func(t *testing.T) {
+		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
+		require.Len(t, stdoutEvents, 1)
+	})
+}
+
+func eventsWithType(typ string, synthEvents []*SynthEvent) (matched []*SynthEvent) {
+	for _, se := range synthEvents {
+		if se.Type == typ {
+			matched = append(matched, se)
+		}
+	}
+	return
 }
 
 func TestProjectCommandFactory(t *testing.T) {

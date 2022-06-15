@@ -26,6 +26,8 @@ const (
 	StepScreenshot     = "step/screenshot"
 	StepScreenshotRef  = "step/screenshot_ref"
 	ScreenshotBlock    = "screenshot/block"
+	Stdout             = "stdout"
+	Stderr             = "stderr"
 )
 
 type SynthEvent struct {
