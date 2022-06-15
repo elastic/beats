@@ -90,7 +90,9 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
+	if PerfMetrics.Timeout < config.CacheExpirationTime {
+		PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
+	}
 
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, nodeScope)
 
@@ -193,7 +195,9 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
+	if PerfMetrics.Timeout < config.CacheExpirationTime {
+		PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
+	}
 
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
 	if watcher == nil {
@@ -359,7 +363,7 @@ func validateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cach
 	minCacheExpirationTime := moduleConfig.Period * 2
 
 	if config.CacheExpirationTime <= 0 {
-		if cacheTimeout <= minCacheExpirationTime {
+		if cacheTimeout < minCacheExpirationTime {
 			config.CacheExpirationTime = minCacheExpirationTime
 			logp.Debug("setting CacheExpirationTime = minCacheExpirationTime. CacheExpirationTime: %s", config.CacheExpirationTime.String())
 
