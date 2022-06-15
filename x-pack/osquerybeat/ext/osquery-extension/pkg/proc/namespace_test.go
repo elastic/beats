@@ -8,7 +8,6 @@
 package proc
 
 import (
-	"io/ioutil"
 	"os"
 	"syscall"
 	"testing"
@@ -54,16 +53,7 @@ func TestNamespaceFS(t *testing.T) {
 
 // Used in order to get a mocked syscall.Stat_t structure with assigned ino
 func dummyStat(t *testing.T, ino uint64) *syscall.Stat_t {
-	f, err := ioutil.TempFile("", "dummy")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	name := f.Name()
-	defer func() {
-		f.Close()
-		os.Remove(f.Name())
-	}()
+	name := t.TempDir()
 
 	info, err := os.Stat(name)
 	if err != nil {
