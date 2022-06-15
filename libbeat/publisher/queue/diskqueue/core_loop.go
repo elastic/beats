@@ -277,7 +277,7 @@ func (dq *diskQueue) handleShutdown() {
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
 	// We won't be updating the position anymore, so we can close the file.
-	dq.acks.positionFile.Sync()
+	dq.acks.positionFile.Sync() //nolint:errcheck //No error recovery path
 	dq.acks.positionFile.Close()
 	dq.acks.lock.Unlock()
 
@@ -436,7 +436,14 @@ func (dq *diskQueue) enqueueWriteFrame(frame *writeFrame) {
 		dq.segments.nextID++
 		// Reset the on-disk size to its initial value, the file's header size
 		// with no frame data.
-		newSegmentSize = segmentHeaderSize
+		switch dq.settings.SchemaVersion {
+		case 0:
+			newSegmentSize = segmentHeaderSizeV0
+		case 1:
+			newSegmentSize = segmentHeaderSizeV1
+		case 2:
+			newSegmentSize = segmentHeaderSizeV2
+		}
 	}
 
 	dq.segments.writingSegmentSize = newSegmentSize

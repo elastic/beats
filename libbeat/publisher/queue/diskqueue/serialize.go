@@ -107,11 +107,8 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 		return nil, err
 	}
 
-	// Copy the encoded bytes to a new array owned by the caller.
-	bytes := e.buf.Bytes()
-	result := make([]byte, len(bytes))
-	copy(result, bytes)
-
+	result := make([]byte, e.buf.Len())
+	copy(result, e.buf.Bytes())
 	return result, nil
 }
 

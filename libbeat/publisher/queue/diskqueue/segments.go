@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -91,14 +92,9 @@ type queueSegment struct {
 	// A segment id is globally unique within its originating queue.
 	id segmentID
 
-	// If this segment was loaded from a previous session, schemaVersion
-	// points to the file schema version that was read from its header.
-	// This is only used by queueSegment.headerSize(), which is used in
-	// maybeReadPending to calculate the position of the first data frame,
-	// and by queueSegment.shouldUseJSON(), which is used in the reader
-	// loop to detect old segments that used JSON encoding instead of
-	// the current CBOR.
-	schemaVersion *uint32
+	// schemaVersion is used to determine on disk format, data serialization,
+	// and encryption
+	schemaVersion uint32
 
 	// The number of bytes occupied by this segment on-disk, as of the most
 	// recent completed writerLoop request.
@@ -125,7 +121,7 @@ type queueSegment struct {
 }
 
 type segmentHeader struct {
-	// The schema version for this segment file. Current schema version is 1.
+	// The schema version for this segment file
 	version uint32
 
 	// If the segment file has been completely written, this field contains
@@ -136,13 +132,23 @@ type segmentHeader struct {
 	frameCount uint32
 }
 
-const currentSegmentVersion = 1
+type WriteCloseSyncer interface {
+	io.Writer
+	io.Closer
+	Sync() error
+}
 
-// Segment headers are currently a 4-byte version plus a 4-byte frame count.
-// In contexts where the segment may have been created by an earlier version,
-// instead use (queueSegment).headerSize() which accounts for the schema
-// version of the target segment.
-const segmentHeaderSize = 8
+// segmentHeaderSizeV0 schemaVersion 0 header size, uint32 for version
+const segmentHeaderSizeV0 = 4
+
+// segmentHeaderSizeV1 schemaVersion 1 header size, uint32 for version, uint32 for count
+const segmentHeaderSizeV1 = 8
+
+// segmentHeaderSizeV2 schemaVersion 2 header size uint32 for version
+const segmentHeaderSizeV2 = 4
+
+// maxSegmentVersion is the highest supported version
+const maxSegmentVersion = 2
 
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
@@ -182,7 +188,7 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 				}
 				segments = append(segments, &queueSegment{
 					id:            segmentID(id),
-					schemaVersion: &header.version,
+					schemaVersion: header.version,
 					frameCount:    header.frameCount,
 					byteCount:     uint64(file.Size()),
 				})
@@ -197,11 +203,16 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 // been written to disk yet) of this segment file's header region. The
 // segment's first data frame begins immediately after the header.
 func (segment *queueSegment) headerSize() uint64 {
-	if segment.schemaVersion != nil && *segment.schemaVersion < 1 {
-		// Schema 0 had nothing except the 4-byte version.
-		return 4
+	switch segment.schemaVersion {
+	case 0:
+		return segmentHeaderSizeV0
+	case 1:
+		return segmentHeaderSizeV1
+	case 2:
+		return segmentHeaderSizeV2
+	default:
+		return uint64(0)
 	}
-	return segmentHeaderSize
 }
 
 // The initial release of the disk queue used JSON to encode events
@@ -209,46 +220,88 @@ func (segment *queueSegment) headerSize() uint64 {
 // with encoding multi-byte characters, and for lower encoding
 // overhead.
 func (segment *queueSegment) shouldUseJSON() bool {
-	return segment.schemaVersion != nil && *segment.schemaVersion == 0
+	return segment.schemaVersion == 0
 }
 
 // Should only be called from the reader loop. If successful, returns an open
 // file handle positioned at the beginning of the segment's data region.
-func (segment *queueSegment) getReader(
-	queueSettings Settings,
-) (*os.File, error) {
+func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"couldn't open segment %d: %w", segment.id, err)
 	}
-	// We don't need the header contents here, we just want to advance past the
-	// header region, so discard the return value.
-	_, err = readSegmentHeader(file)
+	err = binary.Read(file, binary.LittleEndian, &segment.schemaVersion)
 	if err != nil {
 		file.Close()
-		return nil, fmt.Errorf("couldn't read segment header: %w", err)
+		return nil, fmt.Errorf("couldn't read segment version: %w", err)
 	}
 
-	return file, nil
+	if segment.schemaVersion > maxSegmentVersion {
+		file.Close()
+		return nil, fmt.Errorf("unknown segment version %d: %w", segment.schemaVersion, err)
+	}
+
+	if segment.schemaVersion == 1 {
+		err = binary.Read(file, binary.LittleEndian, &segment.frameCount)
+		if err != nil {
+			file.Close()
+			return nil, fmt.Errorf("couldn't read segment frame count: %w", err)
+		}
+	}
+
+	sr := &segmentReader{}
+	sr.src = file
+	sr.version = segment.schemaVersion
+
+	if sr.version == 0 || sr.version == 1 {
+		return sr, nil
+	}
+
+	if sr.version == 2 {
+		sr.er, err = NewEncryptionReader(sr.src, queueSettings.EncryptionKey)
+		if err != nil {
+			sr.src.Close()
+			return nil, fmt.Errorf("couldn't create encryption reader: %w", err)
+		}
+	}
+
+	return sr, nil
+
 }
 
 // Should only be called from the writer loop.
-func (segment *queueSegment) getWriter(
-	queueSettings Settings,
-) (*os.File, error) {
+func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return nil, err
 	}
-	err = writeSegmentHeader(file, 0)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't write segment header: %w", err)
+
+	sw := &segmentWriter{}
+	sw.dst = file
+
+	segment.schemaVersion = queueSettings.SchemaVersion
+	sw.version = queueSettings.SchemaVersion
+
+	if err := sw.WriteHeader(); err != nil {
+		return nil, err
 	}
 
-	return file, nil
+	if sw.version == 0 || sw.version == 1 {
+		return sw, nil
+	}
+
+	if sw.version == 2 {
+		sw.ew, err = NewEncryptionWriter(sw.dst, queueSettings.EncryptionKey)
+		if err != nil {
+			sw.dst.Close()
+			return nil, fmt.Errorf("couldn't create encryption writer: %w", err)
+		}
+	}
+
+	return sw, nil
 }
 
 // getWriterWithRetry tries to create a file handle for writing via
@@ -257,7 +310,7 @@ func (segment *queueSegment) getWriter(
 // creating a queue segment from the writer loop.
 func (segment *queueSegment) getWriterWithRetry(
 	queueSettings Settings, retry func(err error, firstTime bool) bool,
-) (*os.File, error) {
+) (*segmentWriter, error) {
 	firstTime := true
 	file, err := segment.getWriter(queueSettings)
 	for err != nil && retry(err, firstTime) {
@@ -309,7 +362,7 @@ func readSegmentHeaderWithFrameCount(path string) (*segmentHeader, error) {
 		err = binary.Read(reader, binary.LittleEndian, &frameLength)
 		if err != nil {
 			// EOF at a frame boundary means we successfully scanned all frames.
-			if err == io.EOF && header.frameCount > 0 {
+			if errors.Is(err, io.EOF) && header.frameCount > 0 {
 				return header, nil
 			}
 			// All other errors mean we are done scanning, exit the loop.
@@ -354,34 +407,18 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	if err != nil {
 		return nil, err
 	}
-	if header.version > currentSegmentVersion {
-		return nil, fmt.Errorf("unrecognized schema version %d", header.version)
-	}
-	if header.version >= 1 {
+	switch header.version {
+	case 0:
+	case 1:
 		err = binary.Read(in, binary.LittleEndian, &header.frameCount)
 		if err != nil {
 			return nil, err
 		}
+	case 2:
+	default:
+		return nil, fmt.Errorf("unrecognized schema version %d", header.version)
 	}
 	return header, nil
-}
-
-// writeSegmentHeader seeks to the beginning of the given file handle and
-// writes a segment header with the current schema version, containing the
-// given frameCount.
-func writeSegmentHeader(out *os.File, frameCount uint32) error {
-	_, err := out.Seek(0, io.SeekStart)
-	if err != nil {
-		return err
-	}
-
-	version := uint32(currentSegmentVersion)
-	err = binary.Write(out, binary.LittleEndian, version)
-	if err != nil {
-		return err
-	}
-	err = binary.Write(out, binary.LittleEndian, frameCount)
-	return err
 }
 
 // The number of bytes occupied by all the queue's segment files. This
@@ -401,4 +438,135 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 		total += segment.byteCount
 	}
 	return total
+}
+
+type segmentReader struct {
+	src     io.ReadSeekCloser
+	er      *EncryptionReader
+	version uint32
+}
+
+func (r *segmentReader) Read(p []byte) (int, error) {
+	switch r.version {
+	case 0, 1:
+		return r.src.Read(p)
+	case 2:
+		return r.er.Read(p)
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", r.version)
+	}
+}
+
+func (r *segmentReader) Close() error {
+	switch r.version {
+	case 0, 1:
+		return r.src.Close()
+	case 2:
+		return r.er.Close()
+	default:
+		return fmt.Errorf("unsupported schema version: %d", r.version)
+	}
+}
+
+func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
+	switch r.version {
+	case 0, 1:
+		return r.src.Seek(offset, whence)
+	case 2:
+		//can't seek before segment header
+		if (offset + int64(whence)) < segmentHeaderSizeV2 {
+			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
+		}
+		if _, err := r.src.Seek(segmentHeaderSizeV2, io.SeekStart); err != nil {
+			return 0, err
+		}
+		if err := r.er.Reset(); err != nil {
+			return 0, err
+		}
+		written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSizeV2)
+		return written + segmentHeaderSizeV2, err
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", r.version)
+	}
+}
+
+type segmentWriter struct {
+	dst     *os.File
+	ew      *EncryptionWriter
+	version uint32
+}
+
+func (w *segmentWriter) Write(p []byte) (int, error) {
+	switch w.version {
+	case 0, 1:
+		return w.dst.Write(p)
+	case 2:
+		return w.ew.Write(p)
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", w.version)
+	}
+}
+
+func (w *segmentWriter) Close() error {
+	switch w.version {
+	case 0, 1:
+		return w.dst.Close()
+	case 2:
+		return w.ew.Close()
+	default:
+		return fmt.Errorf("unsupported schema version: %d", w.version)
+	}
+}
+
+func (w *segmentWriter) Seek(offset int64, whence int) (int64, error) {
+	switch w.version {
+	case 0, 1:
+		return w.dst.Seek(offset, whence)
+	default:
+		return 0, fmt.Errorf("unsupported schema version: %d", w.version)
+	}
+}
+
+func (w *segmentWriter) Sync() error {
+	switch w.version {
+	case 0, 1:
+		return w.dst.Sync()
+	case 2:
+		return w.ew.Sync()
+	default:
+		return fmt.Errorf("unsupported schema version: %d", w.version)
+	}
+}
+
+func (w *segmentWriter) WriteHeader() error {
+	if _, err := w.dst.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	if err := binary.Write(w.dst, binary.LittleEndian, w.version); err != nil {
+		return err
+	}
+
+	// Version 1 has count
+	if w.version == 1 {
+		if err := binary.Write(w.dst, binary.LittleEndian, uint32(0)); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (w *segmentWriter) UpdateCount(count uint32) error {
+	// Only Version 1 stores count
+	if w.version != 1 {
+		return nil
+	}
+
+	// Seek to count on disk
+	if _, err := w.dst.Seek(4, io.SeekStart); err != nil {
+		return err
+	}
+
+	return binary.Write(w.dst, binary.LittleEndian, count)
 }

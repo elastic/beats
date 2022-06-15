@@ -122,7 +122,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 	}
 
 	settings := DefaultSettings()
-	settings.MaxSegmentSize = 1000 + segmentHeaderSize
+	settings.MaxSegmentSize = 1000 + segmentHeaderSizeV1
 	settings.MaxBufferSize = 10000
 	for description, test := range testCases {
 		dq := &diskQueue{
@@ -480,7 +480,7 @@ func TestMaybeReadPending(t *testing.T) {
 		"read one full segment": {
 			segments: diskQueueSegments{
 				reading: []*queueSegment{
-					{id: 1, byteCount: 1000},
+					{id: 1, byteCount: 1000, schemaVersion: 1},
 				},
 				// The next read request should start with frame 5
 				nextReadFrameID: 5,
@@ -525,10 +525,10 @@ func TestMaybeReadPending(t *testing.T) {
 		"ignore writing segments if reading is available": {
 			segments: diskQueueSegments{
 				reading: []*queueSegment{
-					{id: 1, byteCount: 1000},
+					{id: 1, byteCount: 1000, schemaVersion: 1},
 				},
 				writing: []*queueSegment{
-					{id: 2, byteCount: 1000},
+					{id: 2, byteCount: 1000, schemaVersion: 1},
 				},
 			},
 			expectedRequest: &readerLoopRequest{
@@ -566,8 +566,8 @@ func TestMaybeReadPending(t *testing.T) {
 		"skip the first reading segment if it's already been fully read": {
 			segments: diskQueueSegments{
 				reading: []*queueSegment{
-					{id: 1, byteCount: 1000},
-					{id: 2, byteCount: 500},
+					{id: 1, byteCount: 1000, schemaVersion: 1},
+					{id: 2, byteCount: 500, schemaVersion: 1},
 				},
 				nextReadPosition: 1000,
 			},
@@ -594,7 +594,7 @@ func TestMaybeReadPending(t *testing.T) {
 					{
 						id:            1,
 						byteCount:     1000,
-						schemaVersion: makeUint32Ptr(0)},
+						schemaVersion: 0},
 				},
 				// The next read request should start with frame 5
 				nextReadFrameID: 5,
@@ -969,12 +969,8 @@ func makeWriteFrameWithSize(size int) *writeFrame {
 	return &writeFrame{serialized: make([]byte, size-frameMetadataSize)}
 }
 
-func makeUint32Ptr(value uint32) *uint32 {
-	return &value
-}
-
 func segmentWithSize(size int) *queueSegment {
-	if size < segmentHeaderSize {
+	if size < segmentHeaderSizeV1 {
 		// Can't have a segment smaller than the segment header
 		return nil
 	}

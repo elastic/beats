@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"encoding/binary"
-	"os"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -88,7 +87,7 @@ type writerLoop struct {
 
 	// The file handle corresponding to currentSegment. When currentSegment
 	// changes, this handle is closed and a new one is created.
-	outputFile *os.File
+	outputFile *segmentWriter
 
 	currentRetryInterval time.Duration
 }
@@ -112,8 +111,8 @@ func (wl *writerLoop) run() {
 			// The request channel is closed, we are done. If there is an active
 			// segment file, finalize its frame count and close it.
 			if wl.outputFile != nil {
-				writeSegmentHeader(wl.outputFile, wl.currentSegment.frameCount)
-				wl.outputFile.Sync()
+				wl.outputFile.UpdateCount(wl.currentSegment.frameCount) //nolint:errcheck //No error recovery path
+				wl.outputFile.Sync()                                    //nolint:errcheck //No error recovery path
 				wl.outputFile.Close()
 				wl.outputFile = nil
 			}
@@ -156,9 +155,8 @@ outerLoop:
 			if wl.outputFile != nil {
 				// Update the header with the frame count (including the ones we
 				// just wrote), try to sync to disk, then close the file.
-				writeSegmentHeader(wl.outputFile,
-					wl.currentSegment.frameCount+curSegmentResponse.framesWritten)
-				wl.outputFile.Sync()
+				wl.outputFile.UpdateCount(wl.currentSegment.frameCount + curSegmentResponse.framesWritten) //nolint:errcheck //No error recovery path
+				wl.outputFile.Sync()                                                                       //nolint:errcheck //No error recovery path
 				wl.outputFile.Close()
 				wl.outputFile = nil
 				// We are done with this segment, add the totals to the response and
@@ -228,7 +226,7 @@ outerLoop:
 		}
 	}
 	// Try to sync the written data to disk.
-	wl.outputFile.Sync()
+	_ = wl.outputFile.Sync()
 
 	// If the queue has an ACK listener, notify it the frames were written.
 	if wl.settings.WriteToDiskListener != nil {
