@@ -97,28 +97,9 @@ func TestJsonToSynthEvent(t *testing.T) {
 
 func TestRunCmd(t *testing.T) {
 	cmd := exec.Command("go", "run", "./main.go")
-	_, filename, _, _ := runtime.Caller(0)
-	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
 
 	stdinStr := "MY_STDIN"
-
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
-	require.NoError(t, err)
-
-	var synthEvents []*SynthEvent
-	timeout := time.NewTimer(time.Minute)
-Loop:
-	for {
-		select {
-		case se := <-mpx.SynthEvents():
-			if se == nil {
-				break Loop
-			}
-			synthEvents = append(synthEvents, se)
-		case <-timeout.C:
-			require.Fail(t, "timeout expired for testing runCmd!")
-		}
-	}
+	synthEvents := runAndCollect(t, cmd, stdinStr)
 
 	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
 		stdoutEvents := eventsWithType(Stdout, synthEvents)
@@ -152,28 +133,7 @@ Loop:
 
 func TestRunBadExitCodeCmd(t *testing.T) {
 	cmd := exec.Command("go", "run", "./main.go", "exit")
-	_, filename, _, _ := runtime.Caller(0)
-	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
-
-	stdinStr := "MY_STDIN"
-
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
-	require.NoError(t, err)
-
-	var synthEvents []*SynthEvent
-	timeout := time.NewTimer(time.Minute)
-Loop:
-	for {
-		select {
-		case se := <-mpx.SynthEvents():
-			if se == nil {
-				break Loop
-			}
-			synthEvents = append(synthEvents, se)
-		case <-timeout.C:
-			require.Fail(t, "timeout expired for testing runCmd!")
-		}
-	}
+	synthEvents := runAndCollect(t, cmd, "")
 
 	// go run outputs "exit status 123" to stderr so we have two messages
 	require.Len(t, synthEvents, 2)
@@ -187,6 +147,32 @@ Loop:
 		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
 		require.Len(t, stdoutEvents, 1)
 	})
+}
+
+func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string) []*SynthEvent {
+	_, filename, _, _ := runtime.Caller(0)
+	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+
+	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
+	require.NoError(t, err)
+
+	var synthEvents []*SynthEvent
+	timeout := time.NewTimer(time.Minute)
+
+Loop:
+	for {
+		select {
+		case se := <-mpx.SynthEvents():
+			if se == nil {
+				break Loop
+			}
+			synthEvents = append(synthEvents, se)
+		case <-timeout.C:
+			require.Fail(t, "timeout expired for testing runCmd!")
+		}
+	}
+
+	return synthEvents
 }
 
 func eventsWithType(typ string, synthEvents []*SynthEvent) (matched []*SynthEvent) {
