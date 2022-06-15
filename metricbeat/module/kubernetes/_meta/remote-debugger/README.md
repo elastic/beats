@@ -1,6 +1,6 @@
 # README
 
-This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with your local IDE. 
+This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with your local IDE.
 
 ## Steps to run on docker:
 
@@ -87,15 +87,21 @@ Namely you need:
 
 Compared to the docker example, here the metricbeat config is provided in the kubernetes manifest and mounted as a volume.
 
-5. Port forward from k8s to localhost
+5. Apply the changes in kubernetes to run the metricbeat
 
 ```bash
-kubectl port-forward <pod-name> 56268:56268
+kubectl apply -f metricbeat-kubernetes.yaml
+```
+
+6. Port forward from k8s to localhost
+
+```bash
+kubectl port-forward -n kube-system <pod-name> 56268:56268
 ```
 
 where `<pod-name>` is the name of the pod running on k8s
 
-6. Attach to the remote debugger via your local IDE. Follow [Attach to remote debugger](./README.md#attach-to-remote-debugger-via-your-local-ide)
+7. Attach to the remote debugger via your local IDE. Follow [Attach to remote debugger](./README.md#attach-to-remote-debugger-via-your-local-ide)
 
 
 ## Attach to remote debugger via your local IDE
@@ -121,13 +127,13 @@ You can use the following template, but remember to replace `<absolute path>` wi
             "trace": "trace",
             "cwd": "${workspaceFolder}",
             "substitutePath": [
-                { 
+                {
 	                "from": "${workspaceFolder}",
-					        "to": "<absolute path>"     
+					        "to": "<absolute path>"
                 }
             ]
         }
-      
+
     ]
 }
 ```
