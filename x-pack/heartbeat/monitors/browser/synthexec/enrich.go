@@ -116,7 +116,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
-			je.error = se.Error.toECSErr()
+			if se.Error != nil {
+				je.error = se.Error.toECSErr()
+			}
 			return je.createSummary(event)
 		}
 	case JourneyEnd:
