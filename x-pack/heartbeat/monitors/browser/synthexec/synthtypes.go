@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// These constants define all known synthetics event types
 const (
 	JourneyStart       = "journey/start"
 	JourneyEnd         = "journey/end"
@@ -26,8 +27,8 @@ const (
 	StepScreenshot     = "step/screenshot"
 	StepScreenshotRef  = "step/screenshot_ref"
 	ScreenshotBlock    = "screenshot/block"
-	Stdout             = "stdout"
-	Stderr             = "stderr"
+	Stdout             = "stdout" // special type for non-JSON content read off stdout
+	Stderr             = "stderr" // special type for content read off stderr
 )
 
 type SynthEvent struct {
