@@ -30,6 +30,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -39,6 +40,125 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestToShipperEvent(t *testing.T) {
+	ts := time.Now().Truncate(time.Second)
+
+	cases := []struct {
+		name   string
+		value  publisher.Event
+		exp    *sc.Event
+		expErr string
+	}{
+		{
+			name: "successfully converts an event without source and data stream",
+			value: publisher.Event{
+				Content: beat.Event{
+					Timestamp: ts,
+					Meta: mapstr.M{
+						"metafield": 42,
+					},
+					Fields: mapstr.M{
+						"field": "117",
+					},
+				},
+			},
+			exp: &sc.Event{
+				Timestamp:  timestamppb.New(ts),
+				Source:     &sc.Source{},
+				DataStream: &sc.DataStream{},
+				Metadata: protoStruct(t, map[string]interface{}{
+					"metafield": 42,
+				}),
+				Fields: protoStruct(t, map[string]interface{}{
+					"field": "117",
+				}),
+			},
+		},
+		{
+			name: "successfully converts an event with source and data stream",
+			value: publisher.Event{
+				Content: beat.Event{
+					Timestamp: ts,
+					Meta: mapstr.M{
+						"metafield": 42,
+						"input_id":  "input",
+						"stream_id": "stream",
+					},
+					Fields: mapstr.M{
+						"field": "117",
+						"data_stream": mapstr.M{
+							"type":      "ds-type",
+							"namespace": "ds-namespace",
+							"dataset":   "ds-dataset",
+						},
+					},
+				},
+			},
+			exp: &sc.Event{
+				Timestamp: timestamppb.New(ts),
+				Source: &sc.Source{
+					InputId:  "input",
+					StreamId: "stream",
+				},
+				DataStream: &sc.DataStream{
+					Type:      "ds-type",
+					Namespace: "ds-namespace",
+					Dataset:   "ds-dataset",
+				},
+				Metadata: protoStruct(t, map[string]interface{}{
+					"metafield": 42,
+					"input_id":  "input",
+					"stream_id": "stream",
+				}),
+				Fields: protoStruct(t, map[string]interface{}{
+					"field": "117",
+					"data_stream": map[string]interface{}{
+						"type":      "ds-type",
+						"namespace": "ds-namespace",
+						"dataset":   "ds-dataset",
+					},
+				}),
+			},
+		},
+		{
+			name: "returns error if failed to convert metadata",
+			value: publisher.Event{
+				Content: beat.Event{
+					Timestamp: ts,
+					Meta: mapstr.M{
+						"metafield": ts, // timestamp is a wrong type
+					},
+				},
+			},
+			expErr: "failed to convert event metadata",
+		},
+		{
+			name: "returns error if failed to convert fields",
+			value: publisher.Event{
+				Content: beat.Event{
+					Timestamp: ts,
+					Fields: mapstr.M{
+						"field": ts, // timestamp is a wrong type
+					},
+				},
+			},
+			expErr: "failed to convert event fields",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			converted, err := toShipperEvent(tc.value)
+			if tc.expErr != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expErr)
+				require.Nil(t, converted)
+				return
+			}
+			requireEqualProto(t, tc.exp, converted)
+		})
+	}
+}
 
 func TestConvertMapStr(t *testing.T) {
 	cases := []struct {
@@ -54,7 +174,7 @@ func TestConvertMapStr(t *testing.T) {
 		{
 			name:  "empty map returns empty struct",
 			value: mapstr.M{},
-			exp:   protoStruct(t, nil),
+			exp:   protoStructValue(t, nil),
 		},
 		{
 			name: "returns error when type is not supported",
@@ -76,7 +196,7 @@ func TestConvertMapStr(t *testing.T) {
 					},
 				},
 			},
-			exp: protoStruct(t, map[string]interface{}{
+			exp: protoStructValue(t, map[string]interface{}{
 				"key1": "string",
 				"key2": 42,
 				"key3": 42.2,
@@ -275,9 +395,13 @@ func TestPublish(t *testing.T) {
 	})
 }
 
-func protoStruct(t *testing.T, values map[string]interface{}) *structpb.Value {
+func protoStruct(t *testing.T, values map[string]interface{}) *structpb.Struct {
 	s, err := structpb.NewStruct(values)
 	require.NoError(t, err)
+	return s
+}
+func protoStructValue(t *testing.T, values map[string]interface{}) *structpb.Value {
+	s := protoStruct(t, values)
 	return structpb.NewStructValue(s)
 }
 
