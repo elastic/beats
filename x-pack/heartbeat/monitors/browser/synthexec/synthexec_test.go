@@ -195,7 +195,7 @@ func eventsWithType(typ string, synthEvents []*SynthEvent) (matched []*SynthEven
 			matched = append(matched, se)
 		}
 	}
-	return
+	return matched
 }
 
 func TestProjectCommandFactory(t *testing.T) {
