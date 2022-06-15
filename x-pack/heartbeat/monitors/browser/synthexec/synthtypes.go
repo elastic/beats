@@ -138,22 +138,31 @@ func (se *SynthError) toECSErr() *ecserr.ECSErr {
 		t = se.Name
 
 	}
-	return ecserr.NewECSErr(
+
+	var stack *string
+	if se.Stack != "" {
+		stack = &se.Stack
+	}
+	return ecserr.NewECSErrWithStack(
 		t,
 		se.Code,
 		se.Message,
-		se.Stack,
+		stack,
 	)
 }
 
 // ECSErrToSynthError does a simple type conversion. Hopefully at
 // some point we can move away from SynthError.
 func ECSErrToSynthError(ee *ecserr.ECSErr) *SynthError {
+	var stack string
+	if ee.StackTrace != nil {
+		stack = *ee.StackTrace
+	}
 	return &SynthError{
 		Type:    ee.Type,
 		Code:    ee.Code,
 		Message: ee.Message,
-		Stack:   ee.StackTrace,
+		Stack:   stack,
 	}
 }
 

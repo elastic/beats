@@ -2,27 +2,30 @@ package ecserr
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/gofrs/uuid"
 )
 
+// ECSErr represents an error per the ECS specification
 type ECSErr struct {
-	ID         uuid.UUID `json:"id"`
-	Message    string    `json:"message"`
-	Code       string    `json:"code"`
-	StackTrace string    `json:"stack_trace"`
-	Type       string    `json:"type"`
+	Type    string `json:"type"`
+	Code    string `json:"code"`
+	Message string `json:"message"`
+	// StackTrace is optional, since it's more rare, it's nicer to
+	// have it JSON serialize to null.
+	// The other fields are not pointers since they should be there most of
+	// the time.
+	StackTrace *string `json:"stack_trace"`
 }
 
-func NewECSErr(typ string, code string, message string, stackTrace ...string) *ECSErr {
-	id, _ := uuid.NewV4()
+func NewECSErr(typ string, code string, message string) *ECSErr {
+	return NewECSErrWithStack(typ, code, message, nil)
+}
+
+func NewECSErrWithStack(typ string, code string, message string, stackTrace *string) *ECSErr {
 	return &ECSErr{
-		ID:         id,
 		Type:       typ,
 		Code:       code,
 		Message:    message,
-		StackTrace: strings.Join(stackTrace, "\n"),
+		StackTrace: stackTrace,
 	}
 }
 
@@ -36,7 +39,7 @@ func (e *ECSErr) Error() string {
 
 func (e *ECSErr) String() string {
 	// This can be fancy, see note in Error()
-	return fmt.Sprintf("error %s (type='%s', code='%s', id='%s' stacktrace='%s')", e.Message, e.Type, e.Code, e.ID.String(), e.StackTrace)
+	return fmt.Sprintf("error %s (type='%s', code='%s')", e.Message, e.Type, e.Code)
 }
 
 const (
@@ -47,7 +50,7 @@ type SynthErrType string
 
 func NewBadCmdStatusErr(exitCode int, cmd string) *ECSErr {
 	return NewECSErr(
-		"IO",
+		ETYPE_IO,
 		"BAD_CMD_STATUS",
 		fmt.Sprintf("command '%s' exited unexpectedly with code: %d", cmd, exitCode),
 	)
