@@ -10,7 +10,8 @@
 {{header "Network device"}}
 
 # Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# keyword to sniff on all connected interfaces. On all platforms, you
+# can use "default_route" to sniff on the device carrying the default route.
 packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 # The network CIDR blocks that are considered "internal" networks for
