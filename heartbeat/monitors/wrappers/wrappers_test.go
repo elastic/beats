@@ -692,6 +692,7 @@ func TestECSErrors(t *testing.T) {
 
 	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields)
 	event := &beat.Event{}
-	j[0](event)
+	_, err := j[0](event)
+	require.NoError(t, err)
 	require.Equal(t, event.Fields["error"], expectedEcsErr)
 }

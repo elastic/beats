@@ -23,13 +23,12 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je        *journeyEnricher
-	sFields   stdfields.StdMonitorFields
-	evtWriter func(se *SynthEvent)
+	je      *journeyEnricher
+	sFields stdfields.StdMonitorFields
 }
 
-func newStreamEnricher(sFields stdfields.StdMonitorFields, evtWriter func(se *SynthEvent)) *streamEnricher {
-	return &streamEnricher{sFields: sFields, evtWriter: evtWriter}
+func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
+	return &streamEnricher{sFields: sFields}
 }
 
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {

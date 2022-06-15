@@ -604,5 +604,5 @@ func TestCreateSummaryEvent(t *testing.T) {
 }
 
 func makeTestJourneyEnricher(sFields stdfields.StdMonitorFields) *journeyEnricher {
-	return &journeyEnricher{streamEnricher: newStreamEnricher(sFields, func(se *SynthEvent) {})}
+	return &journeyEnricher{streamEnricher: newStreamEnricher(sFields)}
 }
