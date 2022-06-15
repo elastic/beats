@@ -55,31 +55,34 @@ func mustParseTime(layout, value string, loc *time.Location) time.Time {
 
 func TestMessage_SetTimestampBSD(t *testing.T) {
 	cases := map[string]struct {
-		In      string
-		InLoc   *time.Location
-		Want    time.Time
-		WantErr string
+		in      string
+		inLoc   *time.Location
+		want    time.Time
+		wantErr string
 	}{
 		"bsd-timestamp": {
-			In:    "Oct 1 22:04:15",
-			InLoc: time.Local,
-			Want:  mustParseTime(time.Stamp, "Oct 1 22:04:15", time.Local),
+			in:    "Oct 1 22:04:15",
+			inLoc: time.Local,
+			want:  mustParseTime(time.Stamp, "Oct 1 22:04:15", time.Local),
 		},
 		"loc-nil": {
-			In:    "Oct 1 22:04:15",
-			InLoc: nil,
-			Want:  mustParseTime(time.Stamp, "Oct 1 22:04:15", time.Local),
+			in:    "Oct 1 22:04:15",
+			inLoc: nil,
+			want:  mustParseTime(time.Stamp, "Oct 1 22:04:15", time.Local),
 		},
 		"invalid-timestamp-1": {
-			In:    "1985-04-12T23:20:50.52Z",
-			InLoc: time.Local,
+			in:      "1985-04-12T23:20:50.52Z",
+			inLoc:   time.Local,
+			wantErr: `parsing time "1985-04-12T23:20:50.52Z" as "Jan _2 15:04:05": cannot parse "1985-04-12T23:20:50.52Z" as "Jan"`,
 		},
 		"invalid-timestamp-2": {
-			In:    "test-value",
-			InLoc: time.Local,
+			in:      "test-value",
+			inLoc:   time.Local,
+			wantErr: `parsing time "test-value" as "Jan _2 15:04:05": cannot parse "test-value" as "Jan"`,
 		},
 		"empty": {
-			In: "",
+			in:      "",
+			wantErr: `parsing time "" as "Jan _2 15:04:05": cannot parse "" as "Jan"`,
 		},
 	}
 
@@ -89,13 +92,14 @@ func TestMessage_SetTimestampBSD(t *testing.T) {
 			t.Parallel()
 
 			var m message
-			gotErr := m.setTimestampBSD(tc.In, tc.InLoc)
+			gotErr := m.setTimestampBSD(tc.in, tc.inLoc)
 
-			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, gotErr, tc.wantErr)
 				assert.True(t, m.timestamp.IsZero())
 			} else {
-				assert.Equal(t, tc.Want, m.timestamp)
+				assert.Equal(t, tc.want, m.timestamp)
+				assert.NoError(t, gotErr)
 			}
 		})
 	}
@@ -103,38 +107,41 @@ func TestMessage_SetTimestampBSD(t *testing.T) {
 
 func TestMessage_SetTimestampRFC3339(t *testing.T) {
 	cases := map[string]struct {
-		In      string
-		Want    time.Time
-		WantErr string
+		in      string
+		want    time.Time
+		wantErr string
 	}{
 		"rfc3339-timestamp": {
-			In:   "1985-04-12T23:20:50.52Z",
-			Want: mustParseTime(time.RFC3339Nano, "1985-04-12T23:20:50.52Z", nil),
+			in:   "1985-04-12T23:20:50.52Z",
+			want: mustParseTime(time.RFC3339Nano, "1985-04-12T23:20:50.52Z", nil),
 		},
 		"rfc3339-timestamp-with-tz": {
-			In:   "1985-04-12T19:20:50.52-04:00",
-			Want: mustParseTime(time.RFC3339Nano, "1985-04-12T19:20:50.52-04:00", nil),
+			in:   "1985-04-12T19:20:50.52-04:00",
+			want: mustParseTime(time.RFC3339Nano, "1985-04-12T19:20:50.52-04:00", nil),
 		},
 		"rfc3339-timestamp-with-milliseconds": {
-			In:   "2003-10-11T22:14:15.123Z",
-			Want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123Z", nil),
+			in:   "2003-10-11T22:14:15.123Z",
+			want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123Z", nil),
 		},
 		"rfc3339-timestamp-with-microseconds": {
-			In:   "2003-10-11T22:14:15.123456Z",
-			Want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456Z", nil),
+			in:   "2003-10-11T22:14:15.123456Z",
+			want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456Z", nil),
 		},
 		"rfc3339-timestamp-with-microseconds-with-tz": {
-			In:   "2003-10-11T22:14:15.123456-06:00",
-			Want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00", nil),
+			in:   "2003-10-11T22:14:15.123456-06:00",
+			want: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00", nil),
 		},
 		"invalid-timestamp-1": {
-			In: "Oct 1 22:04:15",
+			in:      "Oct 1 22:04:15",
+			wantErr: `parsing time "Oct 1 22:04:15" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "Oct 1 22:04:15" as "2006"`,
 		},
 		"invalid-timestamp-2": {
-			In: "test-value",
+			in:      "test-value",
+			wantErr: `parsing time "test-value" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "test-value" as "2006"`,
 		},
 		"empty": {
-			In: "",
+			in:      "",
+			wantErr: `parsing time "" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "" as "2006"`,
 		},
 	}
 
@@ -144,13 +151,14 @@ func TestMessage_SetTimestampRFC3339(t *testing.T) {
 			t.Parallel()
 
 			var m message
-			gotErr := m.setTimestampRFC3339(tc.In)
+			gotErr := m.setTimestampRFC3339(tc.in)
 
-			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, gotErr, tc.wantErr)
 				assert.True(t, m.timestamp.IsZero())
 			} else {
-				assert.Equal(t, tc.Want, m.timestamp)
+				assert.Equal(t, tc.want, m.timestamp)
+				assert.NoError(t, gotErr)
 			}
 		})
 	}
@@ -158,29 +166,29 @@ func TestMessage_SetTimestampRFC3339(t *testing.T) {
 
 func TestMessage_SetPriority(t *testing.T) {
 	cases := map[string]struct {
-		In           string
-		WantPriority int
-		WantFacility int
-		WantSeverity int
-		WantErr      string
+		in           string
+		wantPriority int
+		wantFacility int
+		wantSeverity int
+		wantErr      string
 	}{
 		"13": {
-			In:           "13",
-			WantPriority: 13,
-			WantFacility: 1,
-			WantSeverity: 5,
+			in:           "13",
+			wantPriority: 13,
+			wantFacility: 1,
+			wantSeverity: 5,
 		},
 		"192": {
-			In:      "192",
-			WantErr: ErrPriority.Error(),
+			in:      "192",
+			wantErr: ErrPriority.Error(),
 		},
 		"-1": {
-			In:      "-1",
-			WantErr: ErrPriority.Error(),
+			in:      "-1",
+			wantErr: ErrPriority.Error(),
 		},
 		"empty": {
-			In:      "",
-			WantErr: `invalid priority: strconv.Atoi: parsing "": invalid syntax`,
+			in:      "",
+			wantErr: `invalid priority: strconv.Atoi: parsing "": invalid syntax`,
 		},
 	}
 
@@ -190,18 +198,18 @@ func TestMessage_SetPriority(t *testing.T) {
 			t.Parallel()
 			m := message{priority: -1}
 
-			gotErr := m.setPriority(tc.In)
+			gotErr := m.setPriority(tc.in)
 
-			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, gotErr, tc.wantErr)
 				assert.Equal(t, m.priority, -1)
 				assert.Zero(t, m.facility)
 				assert.Zero(t, m.severity)
 			} else {
 				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.WantPriority, m.priority)
-				assert.Equal(t, tc.WantFacility, m.facility)
-				assert.Equal(t, tc.WantSeverity, m.severity)
+				assert.Equal(t, tc.wantPriority, m.priority)
+				assert.Equal(t, tc.wantFacility, m.facility)
+				assert.Equal(t, tc.wantSeverity, m.severity)
 			}
 		})
 	}
@@ -209,18 +217,20 @@ func TestMessage_SetPriority(t *testing.T) {
 
 func TestMessage_SetHostname(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"dash-ignored": {
-			In: "-",
+			in:   "-",
+			want: "",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -229,24 +239,25 @@ func TestMessage_SetHostname(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			var m message
 
-			m.setHostname(tc.In)
+			m.setHostname(tc.in)
 
-			assert.Equal(t, tc.Want, m.hostname)
+			assert.Equal(t, tc.want, m.hostname)
 		})
 	}
 }
 
 func TestMessage_SetMsg(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -256,25 +267,25 @@ func TestMessage_SetMsg(t *testing.T) {
 			t.Parallel()
 			var m message
 
-			m.setMsg(tc.In)
+			m.setMsg(tc.in)
 
-			assert.Equal(t, tc.Want, m.msg)
+			assert.Equal(t, tc.want, m.msg)
 		})
 	}
 }
 
 func TestMessage_SetTag(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
-		Name string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -283,27 +294,29 @@ func TestMessage_SetTag(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			var m message
 
-			m.setTag(tc.In)
+			m.setTag(tc.in)
 
-			assert.Equal(t, tc.Want, m.process)
+			assert.Equal(t, tc.want, m.process)
 		})
 	}
 }
 
 func TestMessage_SetAppName(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"dash-ignored": {
-			In: "-",
+			in:   "-",
+			want: "",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -313,9 +326,9 @@ func TestMessage_SetAppName(t *testing.T) {
 			t.Parallel()
 			var m message
 
-			m.setAppName(tc.In)
+			m.setAppName(tc.in)
 
-			assert.Equal(t, tc.Want, m.process)
+			assert.Equal(t, tc.want, m.process)
 		})
 
 	}
@@ -323,46 +336,48 @@ func TestMessage_SetAppName(t *testing.T) {
 
 func TestMessage_SetContent(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
-		Name string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
-	for _, tc := range cases {
+	for name, tc := range cases {
 		tc := tc
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			var m message
 
-			m.setContent(tc.In)
+			m.setContent(tc.in)
 
-			assert.Equal(t, tc.Want, m.pid)
+			assert.Equal(t, tc.want, m.pid)
 		})
 	}
 }
 
 func TestMessage_SetProcID(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"dash-ignored": {
-			In: "-",
+			in:   "-",
+			want: "",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -372,24 +387,25 @@ func TestMessage_SetProcID(t *testing.T) {
 			t.Parallel()
 			var m message
 
-			m.setProcID(tc.In)
+			m.setProcID(tc.in)
 
-			assert.Equal(t, tc.Want, m.pid)
+			assert.Equal(t, tc.want, m.pid)
 		})
 	}
 }
 
 func TestMessage_SetMsgID(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   "test-value",
-			Want: "test-value",
+			in:   "test-value",
+			want: "test-value",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -400,9 +416,9 @@ func TestMessage_SetMsgID(t *testing.T) {
 
 			var m message
 
-			m.setMsgID(tc.In)
+			m.setMsgID(tc.in)
 
-			assert.Equal(t, tc.Want, m.msgID)
+			assert.Equal(t, tc.want, m.msgID)
 		})
 
 	}
@@ -410,17 +426,17 @@ func TestMessage_SetMsgID(t *testing.T) {
 
 func TestMessage_SetVersion(t *testing.T) {
 	cases := map[string]struct {
-		In      string
-		Want    int
-		WantErr string
+		in      string
+		want    int
+		wantErr string
 	}{
 		"valid": {
-			In:   "100",
-			Want: 100,
+			in:   "100",
+			want: 100,
 		},
 		"empty": {
-			In:      "",
-			WantErr: "invalid version, expected an integer: strconv.Atoi: parsing \"\"",
+			in:      "",
+			wantErr: "invalid version, expected an integer: strconv.Atoi: parsing \"\"",
 		},
 	}
 
@@ -431,35 +447,37 @@ func TestMessage_SetVersion(t *testing.T) {
 
 			var m message
 
-			gotErr := m.setVersion(tc.In)
+			gotErr := m.setVersion(tc.in)
 
-			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, gotErr, tc.wantErr)
 				assert.Zero(t, m.version)
 			} else {
 				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.Want, m.version)
+				assert.Equal(t, tc.want, m.version)
 			}
 
-			assert.Equal(t, tc.Want, m.version)
+			assert.Equal(t, tc.want, m.version)
 		})
 	}
 }
 
 func TestMessage_SetRawSDValue(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want string
+		in   string
+		want string
 	}{
 		"valid": {
-			In:   `[value@1 foo="bar"]`,
-			Want: `[value@1 foo="bar"]`,
+			in:   `[value@1 foo="bar"]`,
+			want: `[value@1 foo="bar"]`,
 		},
 		"nil-value": {
-			In: "-",
+			in:   "-",
+			want: "",
 		},
 		"empty": {
-			In: "",
+			in:   "",
+			want: "",
 		},
 	}
 
@@ -470,9 +488,9 @@ func TestMessage_SetRawSDValue(t *testing.T) {
 
 			var m message
 
-			m.setRawSDValue(tc.In)
+			m.setRawSDValue(tc.in)
 
-			assert.Equal(t, tc.Want, m.rawSDValue)
+			assert.Equal(t, tc.want, m.rawSDValue)
 		})
 
 	}
@@ -480,20 +498,20 @@ func TestMessage_SetRawSDValue(t *testing.T) {
 
 func TestParseStructuredData(t *testing.T) {
 	tests := map[string]struct {
-		In   string
-		Want map[string]interface{}
+		in   string
+		want map[string]interface{}
 	}{
 		"basic": {
-			In: `[value@1 foo="bar"]`,
-			Want: map[string]interface{}{
+			in: `[value@1 foo="bar"]`,
+			want: map[string]interface{}{
 				"value@1": map[string]interface{}{
 					"foo": "bar",
 				},
 			},
 		},
 		"multi-key": {
-			In: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
-			Want: map[string]interface{}{
+			in: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
+			want: map[string]interface{}{
 				"exampleSDID@32473": map[string]interface{}{
 					"iut":         "3",
 					"eventSource": "Application",
@@ -505,8 +523,8 @@ func TestParseStructuredData(t *testing.T) {
 			},
 		},
 		"repeated-id": {
-			In: `[exampleSDID@32473 iut="3"][exampleSDID@32473 class="high"]`,
-			Want: map[string]interface{}{
+			in: `[exampleSDID@32473 iut="3"][exampleSDID@32473 class="high"]`,
+			want: map[string]interface{}{
 				"exampleSDID@32473": map[string]interface{}{
 					"iut":   "3",
 					"class": "high",
@@ -514,24 +532,24 @@ func TestParseStructuredData(t *testing.T) {
 			},
 		},
 		"repeated-id-value": {
-			In: `[exampleSDID@32473 class="low"][exampleSDID@32473 class="high"]`,
-			Want: map[string]interface{}{
+			in: `[exampleSDID@32473 class="low"][exampleSDID@32473 class="high"]`,
+			want: map[string]interface{}{
 				"exampleSDID@32473": map[string]interface{}{
 					"class": "high",
 				},
 			},
 		},
 		"non-compliant": {
-			In:   `[action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"]`,
-			Want: nil,
+			in:   `[action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"]`,
+			want: nil,
 		},
 		"empty-string": {
-			In:   ``,
-			Want: nil,
+			in:   ``,
+			want: nil,
 		},
 		"nil-value": {
-			In:   `-`,
-			Want: nil,
+			in:   `-`,
+			want: nil,
 		},
 	}
 
@@ -540,20 +558,20 @@ func TestParseStructuredData(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got := parseStructuredData(tc.In)
+			got := parseStructuredData(tc.in)
 
-			assert.Equal(t, tc.Want, got)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
 func TestMessage_Fields(t *testing.T) {
 	cases := map[string]struct {
-		In   *message
-		Want mapstr.M
+		in   *message
+		want mapstr.M
 	}{
 		"valid": {
-			In: &message{
+			in: &message{
 				timestamp:  mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00", nil),
 				facility:   1,
 				severity:   5,
@@ -566,7 +584,7 @@ func TestMessage_Fields(t *testing.T) {
 				version:    1,
 				rawSDValue: `[a b="c"]`,
 			},
-			Want: mapstr.M{
+			want: mapstr.M{
 				"log": mapstr.M{
 					"syslog": mapstr.M{
 						"priority": 13,
@@ -594,7 +612,7 @@ func TestMessage_Fields(t *testing.T) {
 			},
 		},
 		"non-compliant-sd": {
-			In: &message{
+			in: &message{
 				timestamp:  mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00", nil),
 				facility:   1,
 				severity:   5,
@@ -606,7 +624,7 @@ func TestMessage_Fields(t *testing.T) {
 				version:    1,
 				rawSDValue: `[action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"]`,
 			},
-			Want: mapstr.M{
+			want: mapstr.M{
 				"log": mapstr.M{
 					"syslog": mapstr.M{
 						"priority": 13,
@@ -629,7 +647,7 @@ func TestMessage_Fields(t *testing.T) {
 			},
 		},
 		"non-compliant-sd-with-msg": {
-			In: &message{
+			in: &message{
 				timestamp:  mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00", nil),
 				facility:   1,
 				severity:   5,
@@ -642,7 +660,7 @@ func TestMessage_Fields(t *testing.T) {
 				msg:        "This is a test message",
 				rawSDValue: `[action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"]`,
 			},
-			Want: mapstr.M{
+			want: mapstr.M{
 				"log": mapstr.M{
 					"syslog": mapstr.M{
 						"priority": 13,
@@ -671,9 +689,9 @@ func TestMessage_Fields(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got := tc.In.fields()
+			got := tc.in.fields()
 
-			assert.Equal(t, tc.Want, got)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
