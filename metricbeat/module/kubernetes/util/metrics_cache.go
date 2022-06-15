@@ -107,10 +107,6 @@ func (m *valueMap) Set(name string, val float64) {
 	m.cache.PutWithTimeout(name, val, m.timeout)
 }
 
-func (m *valueMap) SetWithTimeout(name string, val float64, timeout time.Duration) {
-	m.cache.PutWithTimeout(name, val, timeout)
-}
-
 // Start cache workers
 func (m *valueMap) Start() {
 	m.cache.StartJanitor(m.timeout)
