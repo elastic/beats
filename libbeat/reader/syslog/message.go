@@ -123,7 +123,7 @@ func (m *message) setPriority(v string) error {
 	}
 
 	// Range defined by RFC.
-	if priority < 0 || priority > 191 {
+	if priority < 0 || 191 < priority {
 		return ErrPriority
 	}
 

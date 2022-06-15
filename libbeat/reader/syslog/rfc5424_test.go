@@ -167,7 +167,7 @@ func TestParseRFC5424(t *testing.T) {
 				pid:       "1234",
 				version:   1,
 			},
-			wantErr: `parsing error at position 62: message is truncated (unexpected EOF)`,
+			wantErr: `parsing error at position 62: unexpected EOF`,
 		},
 	}
 

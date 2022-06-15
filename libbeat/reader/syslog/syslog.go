@@ -44,8 +44,8 @@ var (
 	ErrEOF = errors.New("message is truncated (unexpected EOF)")
 )
 
-// ErrValidation represents data validation errors.
-type ErrValidation struct {
+// ValidationError represents data validation errors.
+type ValidationError struct {
 	// The underlying error.
 	Err error
 	// The position of the error.
@@ -53,17 +53,17 @@ type ErrValidation struct {
 }
 
 // Error provides a descriptive error string.
-func (e ErrValidation) Error() string {
+func (e ValidationError) Error() string {
 	return fmt.Sprintf("validation error at position %d: %v", e.Pos, e.Err)
 }
 
 // Unwrap provides the underlying error.
-func (e ErrValidation) Unwrap() error {
+func (e ValidationError) Unwrap() error {
 	return e.Err
 }
 
-// ErrParsing represents parsing errors.
-type ErrParsing struct {
+// ParseError represents parsing errors.
+type ParseError struct {
 	// The underlying error.
 	Err error
 	// The position of the error.
@@ -71,12 +71,12 @@ type ErrParsing struct {
 }
 
 // Error provides a descriptive error string.
-func (e ErrParsing) Error() string {
+func (e ParseError) Error() string {
 	return fmt.Sprintf("parsing error at position %d: %v", e.Pos, e.Err)
 }
 
 // Unwrap provides the underlying error.
-func (e ErrParsing) Unwrap() error {
+func (e ParseError) Unwrap() error {
 	return e.Err
 }
 

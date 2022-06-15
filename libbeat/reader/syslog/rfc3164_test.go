@@ -106,7 +106,7 @@ func TestParseRFC3164(t *testing.T) {
 				hostname:  "test-host",
 				msg:       "this is the message",
 			},
-			wantErr: ErrPriority.Error(),
+			wantErr: `validation error at position 2: priority value out of range (expected 0..191)`,
 		},
 		"err-pri-negative": {
 			in: "<-1>Oct 11 22:14:15 test-host this is the message",
@@ -116,7 +116,7 @@ func TestParseRFC3164(t *testing.T) {
 				hostname:  "test-host",
 				msg:       "this is the message",
 			},
-			wantErr: ErrPriority.Error(),
+			wantErr: `validation error at position 2: priority value out of range (expected 0..191)`,
 		},
 		"err-pri-missing-brackets": {
 			in: "13 Oct 11 22:14:15 test-host this is the message",
@@ -134,7 +134,7 @@ func TestParseRFC3164(t *testing.T) {
 				facility: 1,
 				severity: 5,
 			},
-			wantErr: ErrEOF.Error(),
+			wantErr: `parsing error at position 5: unexpected EOF`,
 		},
 		"err-ts-invalid-bsd": {
 			in: "<13>Foo 11 22:14:15 test-host this is the message",
@@ -166,7 +166,7 @@ func TestParseRFC3164(t *testing.T) {
 				facility:  1,
 				severity:  5,
 			},
-			wantErr: `parsing error at position 26: message is truncated (unexpected EOF)`,
+			wantErr: `parsing error at position 26: unexpected EOF`,
 		},
 	}
 

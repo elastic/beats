@@ -2,6 +2,7 @@
 package syslog
 
 import (
+    "io"
     "time"
 
     "go.uber.org/multierr"

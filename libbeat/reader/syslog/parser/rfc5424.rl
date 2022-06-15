@@ -18,7 +18,7 @@
 
     action set_version {
         if err := m.setVersion(data[tok:p]); err != nil {
-            errs = multierr.Append(errs, &ErrValidation{Err: err, Pos: tok+1})
+            errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok+1})
         }
     }
 
