@@ -66,6 +66,9 @@ type osquerybeat struct {
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	// parent process watcher
+	watcher *Watcher
 }
 
 // New creates an instance of osquerybeat.
@@ -87,7 +90,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	return bt, nil
 }
 
-func (bt *osquerybeat) initContext() (context.Context, error) {
+func (bt *osquerybeat) init() (context.Context, error) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
 	if bt.cancel != nil {
@@ -95,6 +98,11 @@ func (bt *osquerybeat) initContext() (context.Context, error) {
 	}
 	var ctx context.Context
 	ctx, bt.cancel = context.WithCancel(context.Background())
+
+	if bt.watcher != nil {
+		bt.watcher.Close()
+	}
+	bt.watcher = NewWatcher(bt.log)
 	return ctx, nil
 }
 
@@ -108,11 +116,18 @@ func (bt *osquerybeat) close() {
 		bt.cancel()
 		bt.cancel = nil
 	}
+
+	// Start watching the parent process.
+	// The beat exits if the process gets orphaned.
+	if bt.watcher != nil {
+		go bt.watcher.Run()
+		bt.watcher = nil
+	}
 }
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
-	ctx, err := bt.initContext()
+	ctx, err := bt.init()
 	if err != nil {
 		return err
 	}
