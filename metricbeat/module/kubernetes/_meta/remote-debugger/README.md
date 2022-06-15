@@ -58,7 +58,7 @@ docker build -t metricbeat-debugger-image -f Dockerfile.debug .
 3. load image into Kind in order to run on kubernetes
 
 ```bash
-kind load docker-image --name kind-v1.23.5 metricbeat-debugger-image:latest
+kind load docker-image metricbeat-debugger-image:latest
 ```
 
 4. Edit `deploy/kubernetes/metricbeat-kubernetes.yaml` with these changes
