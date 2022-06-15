@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -125,7 +126,7 @@ type queueSegment struct {
 }
 
 type segmentHeader struct {
-	// The schema version for this segment file. Current schema version is 1.
+	// The schema version for this segment file. Current schema version is 2.
 	version uint32
 
 	// If the segment file has been completely written, this field contains
@@ -134,15 +135,26 @@ type segmentHeader struct {
 	// If the segment file has not been completely written, this field is zero.
 	// Only present in schema version >= 1.
 	frameCount uint32
+
+	// options holds flags to enable features, for example encryption.
+	options uint8
 }
 
-const currentSegmentVersion = 1
+type WriteCloseSyncer interface {
+	io.Writer
+	io.Closer
+	Sync() error
+}
 
-// Segment headers are currently a 4-byte version plus a 4-byte frame count.
+const currentSegmentVersion = 2
+
+// Segment headers are currently a 4-byte version, a 4-byte frame count and 1-byte options.
 // In contexts where the segment may have been created by an earlier version,
 // instead use (queueSegment).headerSize() which accounts for the schema
 // version of the target segment.
-const segmentHeaderSize = 8
+const segmentHeaderSize = 9
+
+const ENABLE_ENCRYPTION uint8 = 0x1
 
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
@@ -214,41 +226,62 @@ func (segment *queueSegment) shouldUseJSON() bool {
 
 // Should only be called from the reader loop. If successful, returns an open
 // file handle positioned at the beginning of the segment's data region.
-func (segment *queueSegment) getReader(
-	queueSettings Settings,
-) (*os.File, error) {
+func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"couldn't open segment %d: %w", segment.id, err)
 	}
-	// We don't need the header contents here, we just want to advance past the
-	// header region, so discard the return value.
-	_, err = readSegmentHeader(file)
+
+	header, err := readSegmentHeader(file)
 	if err != nil {
-		file.Close()
-		return nil, fmt.Errorf("couldn't read segment header: %w", err)
+		return nil, fmt.Errorf(
+			"couldn't header for segment %d: %w", segment.id, err)
 	}
 
-	return file, nil
+	sr := &segmentReader{}
+	sr.src = file
+
+	if (header.options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
+		sr.er, err = NewEncryptionReader(sr.src, queueSettings.EncryptionKey)
+		if err != nil {
+			sr.src.Close()
+			return nil, fmt.Errorf("couldn't create encryption reader: %w", err)
+		}
+	}
+
+	return sr, nil
 }
 
 // Should only be called from the writer loop.
-func (segment *queueSegment) getWriter(
-	queueSettings Settings,
-) (*os.File, error) {
+func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
+	var options uint8
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return nil, err
 	}
-	err = writeSegmentHeader(file, 0)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't write segment header: %w", err)
+
+	if len(queueSettings.EncryptionKey) > 0 {
+		options = options | ENABLE_ENCRYPTION
+	}
+	sw := &segmentWriter{}
+	sw.dst = file
+
+	if err := sw.WriteHeader(options); err != nil {
+		return nil, err
 	}
 
-	return file, nil
+	if (options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
+		sw.ew, err = NewEncryptionWriter(sw.dst, queueSettings.EncryptionKey)
+		if err != nil {
+			sw.dst.Close()
+			return nil, fmt.Errorf("couldn't create encryption writer: %w", err)
+		}
+	}
+
+	return sw, nil
 }
 
 // getWriterWithRetry tries to create a file handle for writing via
@@ -257,7 +290,7 @@ func (segment *queueSegment) getWriter(
 // creating a queue segment from the writer loop.
 func (segment *queueSegment) getWriterWithRetry(
 	queueSettings Settings, retry func(err error, firstTime bool) bool,
-) (*os.File, error) {
+) (*segmentWriter, error) {
 	firstTime := true
 	file, err := segment.getWriter(queueSettings)
 	for err != nil && retry(err, firstTime) {
@@ -309,7 +342,7 @@ func readSegmentHeaderWithFrameCount(path string) (*segmentHeader, error) {
 		err = binary.Read(reader, binary.LittleEndian, &frameLength)
 		if err != nil {
 			// EOF at a frame boundary means we successfully scanned all frames.
-			if err == io.EOF && header.frameCount > 0 {
+			if errors.Is(err, io.EOF) && header.frameCount > 0 {
 				return header, nil
 			}
 			// All other errors mean we are done scanning, exit the loop.
@@ -354,34 +387,25 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if header.version > currentSegmentVersion {
 		return nil, fmt.Errorf("unrecognized schema version %d", header.version)
 	}
+
 	if header.version >= 1 {
 		err = binary.Read(in, binary.LittleEndian, &header.frameCount)
 		if err != nil {
 			return nil, err
 		}
 	}
+	if header.version >= 2 {
+		err = binary.Read(in, binary.LittleEndian, &header.options)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return header, nil
-}
-
-// writeSegmentHeader seeks to the beginning of the given file handle and
-// writes a segment header with the current schema version, containing the
-// given frameCount.
-func writeSegmentHeader(out *os.File, frameCount uint32) error {
-	_, err := out.Seek(0, io.SeekStart)
-	if err != nil {
-		return err
-	}
-
-	version := uint32(currentSegmentVersion)
-	err = binary.Write(out, binary.LittleEndian, version)
-	if err != nil {
-		return err
-	}
-	err = binary.Write(out, binary.LittleEndian, frameCount)
-	return err
 }
 
 // The number of bytes occupied by all the queue's segment files. This
@@ -401,4 +425,105 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 		total += segment.byteCount
 	}
 	return total
+}
+
+type segmentReader struct {
+	src io.ReadSeekCloser
+	er  *EncryptionReader
+}
+
+func (r *segmentReader) Read(p []byte) (int, error) {
+	if r.er != nil {
+		return r.er.Read(p)
+	}
+	return r.src.Read(p)
+}
+
+func (r *segmentReader) Close() error {
+	if r.er != nil {
+		return r.er.Close()
+	}
+	return r.src.Close()
+}
+
+func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
+	if r.er != nil {
+		//can't seek before segment header
+		if (offset + int64(whence)) < segmentHeaderSize {
+			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
+		}
+		if _, err := r.src.Seek(segmentHeaderSize, io.SeekStart); err != nil {
+			return 0, err
+		}
+		if err := r.er.Reset(); err != nil {
+			return 0, err
+		}
+		written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSize)
+		return written + segmentHeaderSize, err
+	}
+	return r.src.Seek(offset, whence)
+}
+
+type segmentWriter struct {
+	dst *os.File
+	ew  *EncryptionWriter
+}
+
+func (w *segmentWriter) Write(p []byte) (int, error) {
+	if w.ew != nil {
+		return w.ew.Write(p)
+	}
+	return w.dst.Write(p)
+}
+
+func (w *segmentWriter) Close() error {
+	if w.ew != nil {
+		return w.ew.Close()
+	}
+	return w.dst.Close()
+}
+
+func (w *segmentWriter) Seek(offset int64, whence int) (int64, error) {
+	if w.ew != nil {
+		return 0, fmt.Errorf("seek not supported with encryption")
+	}
+	return w.dst.Seek(offset, whence)
+}
+
+func (w *segmentWriter) Sync() error {
+	if w.ew != nil {
+		return w.ew.Sync()
+	}
+	return w.dst.Sync()
+}
+
+func (w *segmentWriter) WriteHeader(options uint8) error {
+	if _, err := w.dst.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	//write version
+	if err := binary.Write(w.dst, binary.LittleEndian, uint32(2)); err != nil {
+		return err
+	}
+
+	//write count
+	if err := binary.Write(w.dst, binary.LittleEndian, uint32(0)); err != nil {
+		return err
+	}
+
+	//write options
+	if err := binary.Write(w.dst, binary.LittleEndian, options); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (w *segmentWriter) UpdateCount(count uint32) error {
+	// Seek to count on disk
+	if _, err := w.dst.Seek(4, io.SeekStart); err != nil {
+		return err
+	}
+	return binary.Write(w.dst, binary.LittleEndian, count)
 }

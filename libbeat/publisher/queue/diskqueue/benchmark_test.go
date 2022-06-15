@@ -64,13 +64,16 @@ func makeEvent() publisher.Event {
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup() (*diskQueue, queue.Producer) {
+func setup(encrypt bool) (*diskQueue, queue.Producer) {
 	dir, err := os.MkdirTemp("", "benchmark")
 	if err != nil {
 		panic(err)
 	}
 	s := DefaultSettings()
 	s.Path = dir
+	if encrypt {
+		s.EncryptionKey = []byte("testtesttesttest")
+	}
 	q, err := NewQueue(logp.NewLogger("benchmark"), s)
 	if err != nil {
 		os.RemoveAll(dir)
@@ -83,18 +86,23 @@ func setup() (*diskQueue, queue.Producer) {
 //clean closes the queue and deletes the temporory directory that
 // holds the queue.
 func cleanup(q *diskQueue) {
-	q.Close()
+	err := q.Close()
 	os.RemoveAll(q.settings.directoryPath())
+	if err != nil {
+		panic(err)
+	}
 }
 
-//produceAndConsume does the interesting work.  It generates events,
-// publishes them, consumes them, and ACKS them.
-func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	go func() {
-		for i := 0; i < num_events; i++ {
-			p.Publish(makeEvent())
+func publishEvents(p queue.Producer, num int) {
+	for i := 0; i < num; i++ {
+		ok := p.Publish(makeEvent())
+		if !ok {
+			panic("didn't publish")
 		}
-	}()
+	}
+}
+
+func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 	var received int
 	for {
 		batch, err := q.Get(batch_size)
@@ -104,33 +112,61 @@ func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_siz
 		batch.Done()
 		received = received + batch.Count()
 		if received == num_events {
-			break
+			return nil
 		}
 	}
-	return nil
+}
+
+//produceAndConsume generates and publishes events in a go routine, in
+// the main go routine it consumes and acks them.  This interleaves
+// publish and consume.
+func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	go publishEvents(p, num_events)
+	return getAndAckEvents(q, num_events, batch_size)
+}
+
+//produceThenConsume generates and publishes events, when all events
+// are published it consumes and acks them.
+func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	publishEvents(p, num_events)
+	return getAndAckEvents(q, num_events, batch_size)
 }
 
 //benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
-func benchmarkQueue(num_events int, batch_size int, b *testing.B) {
-	var err error
-	rand.Seed(1)
-	q, p := setup()
+func benchmarkQueue(num_events int, batch_size int, encrypt bool, async bool, b *testing.B) {
 	b.ResetTimer()
+	var err error
+
 	for n := 0; n < b.N; n++ {
-		if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
-			break
+		b.StopTimer()
+		rand.Seed(1)
+		q, p := setup(encrypt)
+		b.StartTimer()
+		if async {
+			if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
+				cleanup(q)
+				break
+			}
+		} else {
+			if err = produceThenConsume(p, q, num_events, batch_size); err != nil {
+				cleanup(q)
+				break
+			}
 		}
+		cleanup(q)
 	}
-	b.StopTimer()
-	cleanup(q)
 	if err != nil {
 		b.Errorf("Error producing/consuming events: %v", err)
 	}
 }
 
 // Actual benchmark calls follow
-func Benchmark1M_10(b *testing.B)  { benchmarkQueue(1000000, 10, b) }
-func Benchmark1M_100(b *testing.B) { benchmarkQueue(1000000, 100, b) }
-func Benchmark1M_1k(b *testing.B)  { benchmarkQueue(1000000, 1000, b) }
-func Benchmark1M_10k(b *testing.B) { benchmarkQueue(1000000, 10000, b) }
+func BenchmarkAsync1k(b *testing.B)        { benchmarkQueue(1000, 10, false, true, b) }
+func BenchmarkAsync1M(b *testing.B)        { benchmarkQueue(1000000, 1000, false, true, b) }
+func BenchmarkEncryptAsync1k(b *testing.B) { benchmarkQueue(1000, 10, true, true, b) }
+func BenchmarkEncryptAsync1M(b *testing.B) { benchmarkQueue(1000000, 1000, true, true, b) }
+func BenchmarkSync1k(b *testing.B)         { benchmarkQueue(1000, 10, false, false, b) }
+func BenchmarkSync1M(b *testing.B)         { benchmarkQueue(1000000, 1000, false, false, b) }
+func BenchmarkEncryptSync1k(b *testing.B)  { benchmarkQueue(1000, 10, true, false, b) }
+func BenchmarkEncryptSync1M(b *testing.B)  { benchmarkQueue(1000000, 1000, true, false, b) }
