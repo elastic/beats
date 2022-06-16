@@ -122,38 +122,14 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	for i, e := range events {
 
-		meta, err := convertMapStr(e.Content.Meta)
+		converted, err := toShipperEvent(e)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
-			c.log.Errorf("%d/%d failed to convert event metadata to protobuf, dropped: %w", i+1, len(events), err)
+			c.log.Errorf("%d/%d: %q, dropped", i+1, len(events), err)
 			continue
 		}
 
-		fields, err := convertMapStr(e.Content.Fields)
-		if err != nil {
-			c.log.Errorf("%d/%d failed to convert event fields to protobuf, dropped: %w", i+1, len(events), err)
-			continue
-		}
-
-		convertedEvents = append(convertedEvents, &sc.Event{
-			Timestamp: timestamppb.New(e.Content.Timestamp),
-			Metadata:  meta.GetStructValue(),
-			Fields:    fields.GetStructValue(),
-			// TODO this contains temporary values, since they are required and not available from the event at the moment
-			Input: &sc.Input{
-				Id:   "beats",
-				Name: "beats",
-				Type: "beats",
-			},
-			// TODO this contains temporary values, since they are required and not propagated at the moment
-			DataStream: &sc.DataStream{
-				// Id:        "none", // not generated at the moment
-				Type:      "shipper.output",
-				Dataset:   "generic",
-				Namespace: "default",
-			},
-		})
-
+		convertedEvents = append(convertedEvents, converted)
 		nonDroppedEvents = append(nonDroppedEvents, e)
 	}
 
@@ -171,7 +147,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	if status.Code(err) != codes.OK || resp == nil {
 		batch.Cancelled()         // does not decrease the TTL
 		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
-		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
+		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %s", len(convertedEvents), err)
 		return nil
 	}
 
@@ -238,4 +214,50 @@ func convertMapStr(m mapstr.M) (*structpb.Value, error) {
 	}
 
 	return structpb.NewStructValue(s), nil
+}
+
+func toShipperEvent(e publisher.Event) (*sc.Event, error) {
+	meta, err := convertMapStr(e.Content.Meta)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert event metadata to protobuf: %w", err)
+	}
+
+	fields, err := convertMapStr(e.Content.Fields)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert event fields to protobuf: %w", err)
+	}
+
+	source := &sc.Source{}
+	ds := &sc.DataStream{}
+
+	inputIDVal, err := e.Content.Meta.GetValue("input_id")
+	if err == nil {
+		source.InputId, _ = inputIDVal.(string)
+	}
+
+	streamIDVal, err := e.Content.Meta.GetValue("stream_id")
+	if err == nil {
+		source.StreamId, _ = streamIDVal.(string)
+	}
+
+	dsType, err := e.Content.Fields.GetValue("data_stream.type")
+	if err == nil {
+		ds.Type, _ = dsType.(string)
+	}
+	dsNamespace, err := e.Content.Fields.GetValue("data_stream.namespace")
+	if err == nil {
+		ds.Namespace, _ = dsNamespace.(string)
+	}
+	dsDataset, err := e.Content.Fields.GetValue("data_stream.dataset")
+	if err == nil {
+		ds.Dataset, _ = dsDataset.(string)
+	}
+
+	return &sc.Event{
+		Timestamp:  timestamppb.New(e.Content.Timestamp),
+		Metadata:   meta.GetStructValue(),
+		Fields:     fields.GetStructValue(),
+		Source:     source,
+		DataStream: ds,
+	}, nil
 }
