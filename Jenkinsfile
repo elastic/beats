@@ -203,7 +203,8 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true,
-                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
+                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
+                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS", githubAssignees: 'elastic/elastic-agent-data-plane')
       }
     }
   }
