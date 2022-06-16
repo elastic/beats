@@ -414,7 +414,7 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 		if err != nil {
 			return nil, err
 		}
-	case 2:
+	case 2: // do nothing
 	default:
 		return nil, fmt.Errorf("unrecognized schema version %d", header.version)
 	}
