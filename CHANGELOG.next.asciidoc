@@ -80,7 +80,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
-
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
 
 *Auditbeat*
 
