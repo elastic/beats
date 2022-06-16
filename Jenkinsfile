@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/notify-github') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
@@ -74,6 +74,7 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
+        sh 'exit 1'
         dir("${BASE_DIR}"){
           setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
         }
@@ -204,7 +205,10 @@ VERSION=${env.VERSION}-SNAPSHOT""")
         notifyBuildResult(prComment: true,
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS", githubAssignees: 'elastic/elastic-agent-data-plane')
+                          githubIssue: true,
+                          githubAssignees: 'v1v')
+                          //githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
+                          //githubAssignees: 'elastic/elastic-agent-data-plane')
       }
     }
   }
