@@ -52,11 +52,11 @@ func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineCon
 }
 
 // Reload the list of runners to match the given state
-func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
+func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error { // Step 2
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var errs multierror.Errors
+	var errs multierror.Errors // wrap hell
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
@@ -85,15 +85,19 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, runner := range stopList {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
+		r.logger.Debug("===================== Force stoppig runner: ", runner.String())
 		runner.Stop() // we need to wait this to finish before starting new inputs
 		moduleStops.Add(1)
 	}
 
+	// r.logger.Info("++++++++++++++++++++++++++++++ sleeping for 5s")
+	// time.Sleep(5 * time.Second)
+	// r.logger.Info("++++++++++++++++++++++++++++++ done sleeping")
 	// Start new runners
 	for hash, config := range startList {
-		runner, err := createRunner(r.factory, r.pipeline, config)
+		runner, err := createRunner(r.factory, r.pipeline, config) // Step 3
 		if err != nil {
-			if _, ok := err.(*common.ErrInputNotFinished); ok {
+			if _, ok := err.(*common.ErrInputNotFinished); ok { // NEEDS fixing as well
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {

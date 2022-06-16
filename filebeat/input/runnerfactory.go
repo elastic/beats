@@ -49,7 +49,7 @@ func (r *RunnerFactory) Create(
 	c *conf.C,
 ) (cfgfile.Runner, error) {
 	connector := r.outlet(pipeline)
-	p, err := New(c, connector, r.beatDone, r.registrar.GetStates())
+	p, err := New(c, connector, r.beatDone, r.registrar.GetStates()) // this gets the states "wrong"
 	if err != nil {
 		// In case of error with loading state, input is still returned
 		return p, err

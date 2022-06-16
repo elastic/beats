@@ -66,7 +66,7 @@ func DefaultBuildArgs() BuildArgs {
 
 	if DevBuild {
 		// Disable optimizations (-N) and inlining (-l) for debugging.
-		args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+		args.ExtraFlags = append(args.ExtraFlags, `-gcflags=all=-N -l`)
 	} else {
 		// Strip all debug symbols from binary (does not affect Go stack traces).
 		args.LDFlags = append(args.LDFlags, "-s")

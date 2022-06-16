@@ -85,7 +85,7 @@ func New(
 		Meta:     nil,
 	}
 	var ipt Input
-	ipt, err = f(conf, connector, context)
+	ipt, err = f(conf, connector, context) //log.NewInput is called here, context contains the "wrong data"
 	if err != nil {
 		return input, err
 	}

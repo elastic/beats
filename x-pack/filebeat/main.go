@@ -5,6 +5,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
@@ -19,7 +20,9 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
+	fmt.Println("----------------- STARTING NEW FILEBEAT ----------------------")
 	if err := cmd.Filebeat().Execute(); err != nil {
 		os.Exit(1)
 	}
+	fmt.Println("----------------- STOPPING NEW FILEBEAT ----------------------")
 }

@@ -396,6 +396,8 @@ func (h *Harvester) stop() {
 
 // Stop stops harvester and waits for completion
 func (h *Harvester) Stop() {
+	h.logger.Infof("=============================== Stopping harvester for path: %s",
+		h.config.Paths)
 	h.stop()
 	// Prevent stopWg.Wait() to be called at the same time as stopWg.Add(1)
 	h.stopLock.Lock()
@@ -613,7 +615,9 @@ func (h *Harvester) getState() file.State {
 
 func (h *Harvester) cleanup() {
 	// Mark harvester as finished
-	h.state.Finished = true
+	h.logger.Infof("Cleaning up for paths %s", h.config.Paths)
+	h.state.Finished = true //here
+	h.logger.Infof("========================== setting state.Finished = true for: '%s'", h.state.Fileinfo.Name())
 
 	h.logger.Debugf("Stopping harvester.")
 	defer h.logger.Debugf("harvester cleanup finished.")

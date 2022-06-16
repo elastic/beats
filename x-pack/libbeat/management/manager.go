@@ -7,6 +7,7 @@ package management
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 	"sync"
@@ -123,8 +124,27 @@ func (cm *Manager) Start() error {
 		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
 		return err
 	}
+
+	server := http.Server{
+		Addr:    ":3000",
+		Handler: debugHandler(cm),
+	}
+
+	cm.logger.Infof("starting debug HTTP server on: '%s'", server.Addr)
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			if err != http.ErrServerClosed {
+				cm.logger.Errorf("debug HTTP server exited with error: %s", err)
+			}
+		}
+	}()
+
 	cm.logger.Info("Ready to receive configuration")
 	return nil
+}
+
+func debugHandler(cm *Manager) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 }
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
@@ -193,7 +213,38 @@ func getAllCauses(multiErr *multierror.MultiError) []error {
 
 	return rootErrors
 }
+
+// TODO: This does not need to be part of the manager, but it needs a logger
+func (cm *Manager) mustHandleErr(err error) bool {
+	if err == nil { //just in case, probably not needed
+		return false
+	}
+	if multiErr, isMultiError := err.(*multierror.MultiError); isMultiError {
+		// We ignore errors of type common.ErrInputNotFinished, so if those are
+		// the only errors, we can move on.
+		rootErrors := getAllCauses(multiErr)
+		for _, err := range rootErrors {
+			if errors.Is(err, &(common.ErrInputNotFinished{})) {
+				cm.logger.Infof("foo ============== Ignoring ErrInputNotFinished: %#v", err)
+				continue
+			}
+		}
+		return false
+	}
+
+	return true
+}
+
+// HERE
 func (cm *Manager) OnConfig(s string) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		cm.logger.Errorf("could not generate ID: %s", err)
+	}
+
+	cm.logger.Infof("foo ============== <%s> Received config: '%s'", id.String(), s)
+	defer cm.logger.Infof("foo ============== <%s> Finished applying config:", id.String())
+
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
 	var configMap mapstr.M
@@ -218,37 +269,18 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
-	mustHandleErr := func(err error) bool {
-		if err == nil { //just in case, probably not needed
-			return false
-		}
-		if multiErr, isMultiError := err.(*multierror.MultiError); isMultiError {
-			// We ignore errors of type common.ErrInputNotFinished, so if those are
-			// the only errors, we can move on.
-			rootErrors := getAllCauses(multiErr)
-			for _, err := range rootErrors {
-				if errors.Is(err, &(common.ErrInputNotFinished{})) {
-					cm.logger.Debugf("foo ============== <%s> err.Is(ErrInputNotFinished): %#v", id, err)
-					continue
-				}
-			}
-			return false
-		}
-
-		return true
-	}
-
 	// cm.apply can return a multierror.MultiError containing others multierror.MultiError
 	// inside it, those errors will wrap the real errors. If the real erros are
 	// ONLY 'common.ErrInputNotFinished' we can ignore them, otherwise they
 	//  must be reported
-	if err := cm.apply(blocks); err != nil && mustHandleErr(err) {
+	if err := cm.apply(blocks); err != nil && cm.mustHandleErr(err) {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
 		cm.logger.Errorf("failed applying config blocks: %v", err)
 		return
 	}
 
+	cm.logger.Infof("foo ============== <%s> OnConfig finished without error", id)
 	cm.client.Status(proto.StateObserved_HEALTHY, "Running", cm.payload)
 }
 
@@ -289,7 +321,8 @@ func (cm *Manager) OnError(err error) {
 	cm.logger.Errorf("elastic-agent-client got error: %s", err)
 }
 
-func (cm *Manager) apply(blocks ConfigBlocks) error {
+// TODO: return a slice of erros
+func (cm *Manager) apply(blocks ConfigBlocks) error { // Step 1
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
 		missing[name] = true
@@ -300,6 +333,7 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 		return err
 	}
 
+	// wrap hell
 	var errors []error
 	// Reload configs
 	for _, b := range blocks {
@@ -361,8 +395,8 @@ func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {
 			configs = append(configs, config)
 		}
 
-		if err := obj.Reload(configs); err != nil {
-			cm.logger.Error(err)
+		if err := obj.Reload(configs); err != nil { // Must ignore common.ErrInputNotFinished
+			// cm.logger.Error(err) // Not logging it for now because it's not being handled, nor breaking any flow
 			return err
 		}
 	}

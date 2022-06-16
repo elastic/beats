@@ -80,7 +80,7 @@ type Input struct {
 	fileStateIdentifier file.StateIdentifier
 }
 
-// NewInput instantiates a new Log
+// NewInput instantiates a new Log -- HERE
 func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
@@ -164,7 +164,7 @@ func NewInput(
 		return nil, err
 	}
 
-	err = p.loadStates(context.States)
+	err = p.loadStates(context.States) // Trouble starts here
 	if err != nil {
 		return nil, err
 	}
@@ -182,8 +182,9 @@ func NewInput(
 // the input will be loaded and updated. All other states will not be touched.
 func (p *Input) loadStates(states []file.State) error {
 	logger := p.logger
-
+	logger.Info("=============== loadStates")
 	logger.Debugf("exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
+	logger.Infof("exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.
@@ -652,7 +653,7 @@ func (p *Input) handleIgnoreOlder(logger *logp.Logger, isNewState bool, newState
 	newState.Offset = newState.Fileinfo.Size()
 
 	// Write state for ignore_older file as none exists yet
-	newState.Finished = true
+	newState.Finished = true // here for handle_ignore_older
 	err := p.updateState(newState)
 	if err != nil {
 		return err

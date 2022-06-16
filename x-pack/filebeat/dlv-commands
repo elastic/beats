@@ -1,0 +1,15 @@
+config substitute-path /home/tiago/SDH/May/2081/beats /home/vagrant/beats
+config max-string-len 5000
+
+# b management/manager.go:214
+# b input/log/harvester.go:616
+# b registrar/registrar.go:97
+# b registrar/registrar.go:103
+# b cfgfile/list.go:86
+
+
+# b management/manager.go:256
+# (dlv) print err.Errors[0].Errors[0].error.cause
+
+b management/manager.go:233
+b management/manager.go:256
