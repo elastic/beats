@@ -57,6 +57,7 @@ pipeline {
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
         gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
+        sh 'exit 1'
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
@@ -74,7 +75,6 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
-        sh 'exit 1'
         dir("${BASE_DIR}"){
           setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
         }
