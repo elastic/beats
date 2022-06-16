@@ -167,6 +167,6 @@ func generateCacheHash(host []string) (uint64, error) {
 	return id, nil
 }
 
-func (m *module) GetPerfMetricsCache() *util.PerfMetricsCache{
+func (m *module) GetPerfMetricsCache() *util.PerfMetricsCache {
 	return m.perfMetrics
 }

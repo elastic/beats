@@ -130,8 +130,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-
-	return
 }
 
 // Close stops this metricset

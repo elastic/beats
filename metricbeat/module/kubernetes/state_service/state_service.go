@@ -122,7 +122,6 @@ func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }
 
 // Close stops this metricset

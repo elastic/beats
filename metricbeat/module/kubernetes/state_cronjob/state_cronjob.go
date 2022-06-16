@@ -122,8 +122,6 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-
-	return
 }
 
 // Close stops this metricset

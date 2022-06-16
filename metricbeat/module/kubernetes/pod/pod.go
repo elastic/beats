@@ -73,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
-	
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
