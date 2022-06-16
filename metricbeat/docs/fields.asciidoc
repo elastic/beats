@@ -54555,6 +54555,163 @@ type: double
 --
 
 [float]
+=== sysmetric
+
+Sysmetric related metrics.
+
+
+
+*`oracle.sysmetric.session_count`*::
++
+--
+Session Count.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.average_active_sessions`*::
++
+--
+Average Active Sessions.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.current_os_load`*::
++
+--
+Current OS Load.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_reads_per_sec`*::
++
+--
+Physical Reads Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_transaction_per_sec`*::
++
+--
+User Transaction Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_table_scans_per_txn`*::
++
+--
+Total Table Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_writes_per_sec`*::
++
+--
+Physical Writes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_index_scans_per_txn`*::
++
+--
+Total Index Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.host_cpu_utilization_pct`*::
++
+--
+Host CPU Utilization (%).
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.network_traffic_volume_per_sec`*::
++
+--
+Network Traffic Volume Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_rollbacks_per_sec`*::
++
+--
+User Rollbacks Per Second.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.cpu_usage_per_sec`*::
++
+--
+CPU Usage Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.db_block_changes_per_sec`*::
++
+--
+DB Block Changes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_read_total_bytes_per_sec`*::
++
+--
+Physical Read Total Bytes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.response_time_per_txn`*::
++
+--
+Response Time Per Transaction.
+
+
+type: double
+
+--
+
+[float]
 === tablespace
 
 tablespace
