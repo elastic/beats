@@ -38,7 +38,7 @@ parsers:
 
 -------------------------------------------------------------------------------------
 
-If you still use `log` input, there is no need to use `parsers`.
+If you still use the deprecated `log` input, there is no need to use `parsers`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
