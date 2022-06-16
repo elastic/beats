@@ -40,5 +40,5 @@ func TestPowerShell(t *testing.T) {
 		t.Log("ignoring winlog.opcode")
 	}
 
-	module.TestPipeline(t, "testdata/*.evtx", module.WithFieldFilter(ignoreFields))
+	module.TestCollectionPipeline(t, "testdata/collection/*.evtx", module.WithFieldFilter(ignoreFields))
 }
