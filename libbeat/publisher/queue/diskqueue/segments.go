@@ -408,7 +408,7 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 		return nil, err
 	}
 	switch header.version {
-	case 0:
+	case 0: // do nothing
 	case 1:
 		err = binary.Read(in, binary.LittleEndian, &header.frameCount)
 		if err != nil {
