@@ -156,7 +156,7 @@ Caused by: java.lang.NullPointerException
        ... 1 more
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration with `filestream`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -195,7 +195,7 @@ printf ("%10.10ld  \t %10.10ld \t %s\
   %f", w, x, y, z );
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration with `filestream`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -231,7 +231,7 @@ specific activity, as in this example:
 (/dev/disk1)]], net usable_space [34.5gb], net total_space [118.9gb], types [hfs]
 -------------------------------------------------------------------------------------
 
-To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration:
+To consolidate these lines into a single event in {beatname_uc}, use the following multiline configuration with `filestream`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ Sometimes your application logs contain events, that begin and end with custom m
 [2015-08-24 11:49:14,399] End event
 -------------------------------------------------------------------------------------
 
-To consolidate this as a single event in {beatname_uc}, use the following multiline configuration:
+To consolidate this as a single event in {beatname_uc}, use the following multiline configuration with `filestream`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
