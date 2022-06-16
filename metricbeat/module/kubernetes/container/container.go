@@ -72,11 +72,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewContainerMetadataEnricher(base, true),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetPerfMetricsCache(), true),
 		mod:           mod,
 	}, nil
 }
@@ -94,7 +93,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics, m.Logger())
+	events, err := eventMapping(body, m.mod.GetPerfMetricsCache(), m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

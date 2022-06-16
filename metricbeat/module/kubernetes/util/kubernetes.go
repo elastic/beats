@@ -56,7 +56,6 @@ type kubernetesConfig struct {
 
 	Node                string        `config:"node"`
 	SyncPeriod          time.Duration `config:"sync_period"`
-	CacheExpirationTime time.Duration `config:"cache_expiration_time"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
@@ -82,16 +81,13 @@ const selector = "kubernetes"
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
-	}
-
-	if PerfMetrics.Timeout < config.CacheExpirationTime {
-		PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
 	}
 
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, nodeScope)
@@ -128,12 +124,12 @@ func NewResourceMetadataEnricher(
 				name := r.GetObjectMeta().GetName()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
 					}
 				}
 
@@ -187,16 +183,13 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
-	}
-
-	if PerfMetrics.Timeout < config.CacheExpirationTime {
-		PerfMetrics = NewPerfMetricsCache(config.CacheExpirationTime)
 	}
 
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
@@ -236,12 +229,12 @@ func NewContainerMetadataEnricher(
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
 					}
 				}
 
@@ -346,9 +339,7 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 		return nil, err
 	}
 
-	moduleConfig := base.Module().Config()
-	cacheTimeout := PerfMetrics.Timeout
-	config, err = validateConfig(config, moduleConfig, cacheTimeout)
+	config, err = validateConfig(config)
 	if err != nil {
 		logp.Err("Error while validating config: %v", err)
 		return nil, err
@@ -356,33 +347,7 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	return config, nil
 }
 
-func validateConfig(config *kubernetesConfig, moduleConfig mb.ModuleConfig, cacheTimeout time.Duration) (*kubernetesConfig, error) {
-	// NOTE: minimum cache expiration time > period avoid that the cache expires just
-	// before next scraping time. Period * 2 is arbitrary but it a good buffer to avoid
-	// that a late scraping run would affect the metrics (for the absence of entries in the cache)
-	minCacheExpirationTime := moduleConfig.Period * 2
-
-	if config.CacheExpirationTime <= 0 {
-		if cacheTimeout < minCacheExpirationTime {
-			config.CacheExpirationTime = minCacheExpirationTime
-			logp.Debug("setting CacheExpirationTime = minCacheExpirationTime. CacheExpirationTime: %s", config.CacheExpirationTime.String())
-
-		} else {
-			config.CacheExpirationTime = cacheTimeout
-			logp.Debug("setting CacheExpirationTime = DefaultCacheTimeout. CacheExpirationTime: %s", config.CacheExpirationTime.String())
-		}
-	}
-
-	if config.CacheExpirationTime == 0 {
-		return nil, fmt.Errorf("cacheExpirationTime needs to be strictly greater than 0. CacheExpirationTime: %s",
-			config.CacheExpirationTime.String())
-	}
-
-	if config.CacheExpirationTime > 0 && config.CacheExpirationTime < minCacheExpirationTime {
-		return nil, fmt.Errorf("cacheExpirationTime needs to be greater or equal to minCacheExpirationTime. CacheExpirationTime: %s < %v",
-			config.CacheExpirationTime.String(), minCacheExpirationTime)
-	}
-
+func validateConfig(config *kubernetesConfig) (*kubernetesConfig, error) {
 	if !config.AddMetadata {
 		return nil, errors.New("metadata enriching is disabled")
 	}
