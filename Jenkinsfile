@@ -206,7 +206,8 @@ VERSION=${env.VERSION}-SNAPSHOT""")
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
                           githubIssue: true,
-                          githubAssignees: 'v1v')
+                          githubAssignees: 'v1v',
+                          githubLabels: 'Team:Elastic-Agent-Data-Plane')
                           //githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
                           //githubAssignees: 'elastic/elastic-agent-data-plane')
       }
