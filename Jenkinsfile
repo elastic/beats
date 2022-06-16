@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@test/notify-github') _
+@Library('apm@current') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
@@ -57,7 +57,6 @@ pipeline {
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
         gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
-        sh 'exit 1'
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         dir("${BASE_DIR}") {
             // We use a raw checkout to avoid the many extra objects which are brought in
@@ -205,10 +204,8 @@ VERSION=${env.VERSION}-SNAPSHOT""")
         notifyBuildResult(prComment: true,
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: true,
-                          githubAssignees: 'v1v')
-                          //githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
-                          //githubLabels: 'Team:Elastic-Agent-Data-Plane')
+                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
+                          githubLabels: 'Team:Elastic-Agent-Data-Plane')
       }
     }
   }
