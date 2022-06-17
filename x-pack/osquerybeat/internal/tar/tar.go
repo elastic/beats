@@ -7,6 +7,7 @@ package tar
 import (
 	"archive/tar"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -52,7 +53,7 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return err
@@ -61,8 +62,9 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 			continue
 		}
 
+		//nolint:gosec // file path is checked below
 		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, destinationDir) {
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
 			return fmt.Errorf("illegal file path in tar: %v", header.Name)
 		}
 
@@ -77,6 +79,7 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 				return err
 			}
 
+			//nolint:gosec // used during build only, check sums are validated beforehand, the size of distro is predicatable
 			if _, err = io.Copy(writer, tarReader); err != nil {
 				return err
 			}

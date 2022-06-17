@@ -177,43 +177,6 @@ func Run(settings Settings, bt beat.Creator) error {
 			return err
 		}
 
-		// Add basic info
-		registry := monitoring.GetNamespace("info").GetRegistry()
-		monitoring.NewString(registry, "version").Set(b.Info.Version)
-		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
-		monitoring.NewString(registry, "name").Set(b.Info.Name)
-		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
-
-		// Add more beat metadata
-		monitoring.NewString(registry, "binary_arch").Set(runtime.GOARCH)
-		monitoring.NewString(registry, "build_commit").Set(version.Commit())
-		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
-		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
-
-		if u, err := user.Current(); err != nil {
-			if _, ok := err.(user.UnknownUserIdError); ok { //nolint:errorlint // keep legacy behaviour
-				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
-				// if the user set securityContext.runAsUser to an arbitrary value.
-				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
-				monitoring.NewString(registry, "gid").Set(strconv.Itoa(os.Getgid()))
-			} else {
-				return err
-			}
-		} else {
-			monitoring.NewString(registry, "username").Set(u.Username)
-			monitoring.NewString(registry, "uid").Set(u.Uid)
-			monitoring.NewString(registry, "gid").Set(u.Gid)
-		}
-
-		// Add additional info to state registry. This is also reported to monitoring
-		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-		serviceRegistry := stateRegistry.NewRegistry("service")
-		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
-		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-		beatRegistry := stateRegistry.NewRegistry("beat")
-		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
-		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
-
 		return b.launch(settings, bt)
 	}())
 }
@@ -431,16 +394,10 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		_ = bl.unlock()
 	}()
 
-	// Set Beat ID in registry vars, in case it was loaded from meta file
-	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
-	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
-	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
-
-	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
-	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
-
 	svc.BeforeRun()
 	defer svc.Cleanup()
+
+	b.registerMetrics()
 
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
@@ -516,6 +473,53 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	b.Manager.SetStopCallback(beater.Stop)
 
 	return beater.Run(&b.Beat)
+}
+
+// registerMetrics registers metrics with the internal monitoring API. This data
+// is then exposed through the HTTP monitoring endpoint (e.g. /info and /state)
+// and/or pushed to Elasticsearch through the x-pack monitoring feature.
+func (b *Beat) registerMetrics() {
+	// info
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
+	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
+	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(infoRegistry, "hostname").Set(b.Info.Hostname)
+	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
+	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
+	monitoring.NewString(infoRegistry, "build_commit").Set(version.Commit())
+	monitoring.NewTimestamp(infoRegistry, "build_time").Set(version.BuildTime())
+	monitoring.NewBool(infoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+
+	// Add user metadata data asynchronously (on Windows the lookup can take up to 60s).
+	go func() {
+		if u, err := user.Current(); err != nil {
+			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
+			// if the user set securityContext.runAsUser to an arbitrary value.
+			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
+			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
+		} else {
+			monitoring.NewString(infoRegistry, "username").Set(u.Username)
+			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
+			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
+		}
+	}()
+
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+
+	// state.service
+	serviceRegistry := stateRegistry.NewRegistry("service")
+	monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
+	monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
+	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
+
+	// state.beat
+	beatRegistry := stateRegistry.NewRegistry("beat")
+	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+
+	// state.host
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run

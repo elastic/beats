@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -54,13 +55,6 @@ func (p *Project) Workdir() string {
 	return p.projectCfg.Source.Active().Workdir()
 }
 
-func (p *Project) InlineSource() (string, bool) {
-	if p.projectCfg.Source.Inline != nil {
-		return p.projectCfg.Source.Inline.Script, true
-	}
-	return "", false
-}
-
 func (p *Project) Params() map[string]interface{} {
 	return p.projectCfg.Params
 }
@@ -69,14 +63,18 @@ func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
 	return p.projectCfg.FilterJourneys
 }
 
-func (p *Project) Fields() synthexec.StdProjectFields {
-	_, isInline := p.InlineSource()
-	return synthexec.StdProjectFields{
-		Name:     p.projectCfg.Name,
-		Id:       p.projectCfg.Id,
-		IsInline: isInline,
-		Type:     "browser",
+func (p *Project) Fields() stdfields.StdMonitorFields {
+	sFields := stdfields.StdMonitorFields{
+		Name: p.projectCfg.Name,
+		ID:   p.projectCfg.Id,
+		Type: "browser",
 	}
+
+	if p.projectCfg.Source.Local != nil || p.projectCfg.Source.ZipUrl != nil {
+		sFields.IsLegacyBrowserSource = true
+	}
+
+	return sFields
 }
 
 func (p *Project) Close() error {
@@ -130,7 +128,9 @@ func (p *Project) extraArgs() []string {
 
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
-	if src, ok := p.InlineSource(); ok {
+	isScript := p.projectCfg.Source.Inline != nil
+	if isScript {
+		src := p.projectCfg.Source.Inline.Script
 		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.Fields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {

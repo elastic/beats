@@ -58,5 +58,8 @@ func setpgid() *syscall.SysProcAttr {
 // For clean process tree kill
 func killProcessGroup(cmd *exec.Cmd) error {
 	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-	return fmt.Errorf("kill process group %d, %w", cmd.Process.Pid, err)
+	if err != nil {
+		return fmt.Errorf("kill process group %d, %w", cmd.Process.Pid, err)
+	}
+	return nil
 }
