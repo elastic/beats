@@ -18,7 +18,6 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -121,15 +120,9 @@ func NewResourceMetadataEnricher(
 	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-<<<<<<< HEAD
 	watcher, err := GetWatcher(base, res, nodeScope)
 	if err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
-=======
-	config, err := GetValidatedConfig(base)
-	if err != nil {
-		logp.Info("Kubernetes metricset enriching is disabled")
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 		return &nilEnricher{}
 	}
 
@@ -218,15 +211,9 @@ func NewContainerMetadataEnricher(
 	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-<<<<<<< HEAD
 	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
 	if err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
-=======
-	config, err := GetValidatedConfig(base)
-	if err != nil {
-		logp.Info("Kubernetes metricset enriching is disabled")
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 		return &nilEnricher{}
 	}
 
@@ -286,106 +273,7 @@ func NewContainerMetadataEnricher(
 	return enricher
 }
 
-<<<<<<< HEAD
 func getString(m common.MapStr, key string) string {
-=======
-func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
-	if err != nil {
-		logp.Err("Error creating Kubernetes client: %s", err)
-		return nil, nil, nil
-	}
-
-	options := kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
-	}
-
-	log := logp.NewLogger(selector)
-
-	// Watch objects in the node only
-	if nodeScope {
-		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Node,
-			Client:      client,
-			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
-			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
-		}
-		options.Node, err = kubernetes.DiscoverKubernetesNode(log, nd)
-		if err != nil {
-			logp.Err("Couldn't discover kubernetes node: %s", err)
-			return nil, nil, nil
-		}
-	}
-
-	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Node)
-
-	watcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher", client, resource, options, nil)
-	if err != nil {
-		logp.Err("Error initializing Kubernetes watcher: %s", err)
-		return nil, nil, nil
-	}
-
-	nodeWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_node", client, &kubernetes.Node{}, options, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Node{}, err)
-		return watcher, nil, nil
-	}
-
-	namespaceWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-		return watcher, nodeWatcher, nil
-	}
-
-	return watcher, nodeWatcher, namespaceWatcher
-}
-
-func GetDefaultDisabledMetaConfig() *kubernetesConfig {
-	return &kubernetesConfig{
-		AddMetadata: false,
-	}
-}
-
-func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
-	config, err := GetConfig(base)
-	if err != nil {
-		logp.Err("Error while getting config: %v", err)
-		return nil, err
-	}
-
-	config, err = validateConfig(config)
-	if err != nil {
-		logp.Err("Error while validating config: %v", err)
-		return nil, err
-	}
-	return config, nil
-}
-
-func validateConfig(config *kubernetesConfig) (*kubernetesConfig, error) {
-	if !config.AddMetadata {
-		return nil, errors.New("metadata enriching is disabled")
-	}
-	return config, nil
-}
-
-func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
-	config := &kubernetesConfig{
-		AddMetadata:         true,
-		SyncPeriod:          time.Minute * 10,
-		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
-	}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.New("error unpacking configs")
-	}
-
-	return config, nil
-}
-
-func getString(m mapstr.M, key string) string {
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 	val, err := m.GetValue(key)
 	if err != nil {
 		return ""
