@@ -1,5 +1,4 @@
 # Module: oracle
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-oracle.html
 
 - module: oracle
   period: 10m
