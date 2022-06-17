@@ -62,6 +62,10 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
+<<<<<<< HEAD
+=======
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, mod.GetPerfMetricsCache(), false),
+>>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -115,6 +119,16 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
 			return nil
 		}
 	}
+<<<<<<< HEAD
 
+=======
+}
+
+// Close stops this metricset
+func (m *CronJobMetricSet) Close() error {
+	if m.enricher != nil {
+		m.enricher.Stop()
+	}
+>>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 	return nil
 }
