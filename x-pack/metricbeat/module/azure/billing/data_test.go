@@ -20,7 +20,7 @@ func TestEventMapping(t *testing.T) {
 	billingAccountId := "123"
 	startDate := date.Time{}
 
-	var charge decimal.Decimal = decimal.NewFromFloat(8.123456)
+	var charge = decimal.NewFromFloat(8.123456)
 	var prop = consumption.ForecastProperties{
 		UsageDate:        &usageDate,
 		Grain:            "",
@@ -71,7 +71,7 @@ func TestEventMapping(t *testing.T) {
 	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
 
-	events := EventsMapping(usage, startTime, endTime)
+	events := EventsMapping("sub", usage, startTime, endTime)
 	assert.Equal(t, len(events), 2)
 
 	for _, event := range events {

@@ -5,11 +5,10 @@
 package billing
 
 import (
-	"fmt"
+	"time"
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 	"github.com/shopspring/decimal"
-	"strings"
-	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -140,15 +139,4 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 	}
 
 	return events
-}
-
-// getResourceGroupFromId maps resource group from resource ID
-func getResourceGroupFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "resourceGroups" {
-			return fmt.Sprintf("%s", params[i+1])
-		}
-	}
-	return ""
 }
