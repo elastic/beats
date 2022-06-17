@@ -4,10 +4,6 @@
     Kubernetes API server metrics
   release: ga
   fields:
-    - name: request.client
-      type: keyword
-      description: >
-        Client executing requests
     - name: request.resource
       type: keyword
       description: >
