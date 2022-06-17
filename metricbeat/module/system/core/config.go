@@ -23,7 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
 )
 
 // Core metric types.
