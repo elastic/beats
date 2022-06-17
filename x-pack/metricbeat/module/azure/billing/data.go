@@ -7,12 +7,10 @@ package billing
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/shopspring/decimal"
 )
 
 func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) []mb.Event {
@@ -22,7 +20,9 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 			event := mb.Event{Timestamp: time.Now().UTC()}
 
 			// shared fields
-			_, _ = event.RootFields.Put("cloud.provider", "azure")
+			event.RootFields = mapstr.M{
+				"cloud.provider": "azure",
+			}
 
 			//
 			// legacy data format
