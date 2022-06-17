@@ -6,58 +6,103 @@ package billing
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
+	"github.com/shopspring/decimal"
 	"strings"
 	"time"
-
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-
-	"github.com/shopspring/decimal"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func EventsMapping(subscriptionId string, results Usage) []mb.Event {
+// func EventsMapping(subscriptionId string, results Usage) []mb.Event {
+func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) []mb.Event {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
-		for _, usageDetail := range results.UsageDetails {
-			event := mb.Event{
-				ModuleFields: mapstr.M{
+		for _, ud := range results.UsageDetails {
+			event := mb.Event{Timestamp: time.Now().UTC()}
+
+			//
+			// legacy data format
+			//
+			if legacy, isLegacy := ud.AsLegacyUsageDetail(); isLegacy {
+				event.ModuleFields = mapstr.M{
 					"resource": mapstr.M{
-						"type":  usageDetail.ConsumedService,
-						"group": getResourceGroupFromId(*usageDetail.InstanceID),
-						"name":  usageDetail.InstanceName,
+						"type":  legacy.ConsumedService,
+						"group": legacy.ResourceGroup,
+						"name":  legacy.ResourceName,
 					},
-					"subscription_id": usageDetail.SubscriptionGUID,
-				},
-				MetricSetFields: mapstr.M{
-					"pretax_cost":       usageDetail.PretaxCost,
-					"department_name":   usageDetail.DepartmentName,
-					"product":           usageDetail.Product,
-					"usage_start":       usageDetail.UsageStart.ToTime(),
-					"usage_end":         usageDetail.UsageEnd.ToTime(),
-					"currency":          usageDetail.Currency,
-					"billing_period_id": usageDetail.BillingPeriodID,
-					"account_name":      usageDetail.AccountName,
-				},
-				Timestamp: time.Now().UTC(),
+					"subscription_id": legacy.SubscriptionID,
+				}
+				event.MetricSetFields = mapstr.M{
+					"pretax_cost":          legacy.Cost,
+					"department_name":      legacy.InvoiceSection,
+					"product":              legacy.Product,
+					"usage_start":          startTime,
+					"usage_end":            endTime,
+					"billing_period_start": legacy.BillingPeriodStartDate.ToTime(),
+					"billing_period_end":   legacy.BillingPeriodEndDate.ToTime(),
+					"currency":             legacy.BillingCurrency,
+					"effective_price":      legacy.EffectivePrice,
+					"account_name":         legacy.BillingAccountName,
+					"account_id":           legacy.BillingAccountID,
+					"subscription_name":    legacy.SubscriptionName,
+					"unit_price":           legacy.UnitPrice,
+					"quantity":             legacy.Quantity,
+				}
+				event.RootFields = mapstr.M{}
+				event.RootFields.Put("cloud.provider", "azure")
+				event.RootFields.Put("cloud.region", legacy.ResourceLocation)
+				event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
+				event.RootFields.Put("cloud.instance.id", legacy.ResourceID)
 			}
-			event.RootFields = mapstr.M{}
-			event.RootFields.Put("cloud.provider", "azure")
-			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
-			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
-			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
+
+			//
+			// modern data format
+			//
+			if modern, isModern := ud.AsModernUsageDetail(); isModern {
+				event.ModuleFields = mapstr.M{
+					"resource": mapstr.M{
+						"type":  modern.ConsumedService,
+						"group": modern.ResourceGroup,
+						"name":  modern.InstanceName,
+					},
+					"subscription_id": modern.SubscriptionGUID,
+				}
+				event.MetricSetFields = mapstr.M{
+					"product":              modern.Product,
+					"usage_start":          startTime,
+					"usage_end":            endTime,
+					"billing_period_start": modern.BillingPeriodStartDate.ToTime(),
+					"billing_period_end":   modern.BillingPeriodEndDate.ToTime(),
+					"currency":             modern.BillingCurrencyCode,
+					"account_id":           modern.BillingAccountID,
+					"billing_account_name": modern.BillingAccountName,
+					"subscription_name":    modern.SubscriptionName,
+					"unit_price":           modern.UnitPrice,
+				}
+				event.RootFields = mapstr.M{}
+				event.RootFields.Put("cloud.provider", "azure")
+				event.RootFields.Put("cloud.region", modern.ResourceLocation)
+			}
+
 			events = append(events, event)
 		}
 	}
 
+	//
+	// Forecasts
+	//
 	groupedCosts := make(map[*string][]consumption.Forecast)
+
 	for _, forecast := range results.ForecastCosts {
 		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
 	}
+
 	for _, forecast := range results.ActualCosts {
 		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
 	}
+
 	for usageDate, items := range groupedCosts {
 		var actualCost *decimal.Decimal
 		var forecastCost *decimal.Decimal
@@ -68,10 +113,12 @@ func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 				forecastCost = item.Charge
 			}
 		}
+
 		parsedDate, err := time.Parse("2006-01-02", *usageDate)
 		if err != nil {
 			parsedDate = time.Now().UTC()
 		}
+
 		event := mb.Event{
 			RootFields: mapstr.M{
 				"cloud.provider": "azure",
@@ -87,9 +134,11 @@ func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 			},
 			Timestamp: time.Now().UTC(),
 		}
+
 		//event.ID = generateEventID(parsedDate)
 		events = append(events, event)
 	}
+
 	return events
 }
 

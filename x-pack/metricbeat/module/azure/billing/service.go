@@ -7,26 +7,24 @@ package billing
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
-
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 	"github.com/elastic/elastic-agent-libs/logp"
+	// prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	// "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 )
 
 // Service interface for the azure monitor service and mock for testing
 type Service interface {
-	GetForcast(filter string) (consumption.ForecastsListResult, error)
-	GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error)
+	GetForecast(filter string) (consumption.ForecastsListResult, error)
+	GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, metrictype consumption.Metrictype, startDate string, endDate string) (consumption.UsageDetailsListResultPage, error)
 }
 
 // BillingService service wrapper to the azure sdk for go
 type UsageService struct {
-	usageDetailsClient *prevConsumption.UsageDetailsClient
-	forcastsClient     *consumption.ForecastsClient
+	usageDetailsClient *consumption.UsageDetailsClient
+	forecastsClient    *consumption.ForecastsClient
 	context            context.Context
 	log                *logp.Logger
 }
@@ -40,26 +38,26 @@ func NewService(config azure.Config) (*UsageService, error) {
 	if err != nil {
 		return nil, err
 	}
-	forcastsClient := consumption.NewForecastsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	usageDetailsClient := prevConsumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	forecastsClient := consumption.NewForecastsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	usageDetailsClient := consumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 
-	forcastsClient.Authorizer = authorizer
+	forecastsClient.Authorizer = authorizer
 	usageDetailsClient.Authorizer = authorizer
-	service := &UsageService{
+	service := UsageService{
 		usageDetailsClient: &usageDetailsClient,
-		forcastsClient:     &forcastsClient,
+		forecastsClient:    &forecastsClient,
 		context:            context.Background(),
 		log:                logp.NewLogger("azure billing service"),
 	}
-	return service, nil
+	return &service, nil
 }
 
 // GetForcast
-func (service *UsageService) GetForcast(filter string) (consumption.ForecastsListResult, error) {
-	return service.forcastsClient.List(service.context, filter)
+func (service *UsageService) GetForecast(filter string) (consumption.ForecastsListResult, error) {
+	return service.forecastsClient.List(service.context, filter)
 }
 
 // GetUsageDetails
-func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error) {
-	return service.usageDetailsClient.List(service.context, scope, expand, filter, skiptoken, top, apply)
+func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skipToken string, top *int32, metrictype consumption.Metrictype, startDate string, endDate string) (consumption.UsageDetailsListResultPage, error) {
+	return service.usageDetailsClient.List(service.context, scope, expand, filter, skipToken, top, metrictype, startDate, endDate)
 }
