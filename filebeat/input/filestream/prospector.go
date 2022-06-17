@@ -186,6 +186,8 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+			err := updater.ResetCursor(src, state{Offset: event.Info.Size()})
+			log.Errorf("setting cursor for ignored file: %v", err)
 			return
 		}
 
