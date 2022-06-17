@@ -200,7 +200,7 @@ func (p *fileProspector) onFSEvent(
 
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
-			log.Errorf("reseting cursor on truncated file: %v", err)
+			log.Errorf("resetting cursor on truncated file: %v", err)
 		}
 		group.Restart(ctx, src)
 
