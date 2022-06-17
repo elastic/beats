@@ -76,7 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, true),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, mod.GetPerfMetricsCache(), true),
 		mod:           mod,
 	}, nil
 }
@@ -94,7 +94,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
+<<<<<<< HEAD
 	events, err := eventMapping(body, util.PerfMetrics)
+=======
+	events, err := eventMapping(body, m.mod.GetPerfMetricsCache(), m.Logger())
+>>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
