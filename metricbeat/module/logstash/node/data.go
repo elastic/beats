@@ -115,11 +115,11 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 				ModuleFields: mapstr.M{},
 			}
 
+			event.MetricSetFields.Update(fields)
+
 			if err = commonFieldsMapping(&event, fields); err != nil {
 				return err
 			}
-
-			event.MetricSetFields.Update(fields)
 
 			if clusterUUID != "" {
 				event.ModuleFields.Put("cluster.id", clusterUUID)
