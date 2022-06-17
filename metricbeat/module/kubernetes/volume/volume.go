@@ -78,7 +78,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		http:          http,
 		mod:           mod,
+<<<<<<< HEAD
 	}, nil
+=======
+	}
+
+	// add ECS orchestrator fields
+	config, err := util.GetValidatedConfig(base)
+	if err != nil {
+		logp.Info("Kubernetes metricset enriching is disabled")
+	} else {
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+		if err != nil {
+			return nil, fmt.Errorf("fail to get kubernetes client: %w", err)
+		}
+		cfg, _ := conf.NewConfigFrom(&config)
+		ecsClusterMeta, err := util.GetClusterECSMeta(cfg, client, ms.Logger())
+		if err != nil {
+			ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
+		}
+		if ecsClusterMeta != nil {
+			ms.clusterMeta = ecsClusterMeta
+		}
+	}
+	return ms, nil
+>>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 }
 
 // Fetch methods implements the data gathering and data conversion to the right

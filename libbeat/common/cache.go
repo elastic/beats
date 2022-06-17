@@ -255,7 +255,9 @@ func (c *Cache) StartJanitor(interval time.Duration) {
 
 // StopJanitor stops the goroutine created by StartJanitor.
 func (c *Cache) StopJanitor() {
-	close(c.janitorQuit)
+	if c.janitorQuit != nil {
+		close(c.janitorQuit)
+	}
 }
 
 // get returns the non-expired values from the cache.
