@@ -68,7 +68,7 @@ func (r *splitterReader) Next() (reader.Message, error) {
 			return msg, nil
 		}
 	}
-	return reader.Message{}, nil
+	return reader.Message{}, r.ctx.Err()
 }
 
 func (r *splitterReader) reading() {
@@ -102,5 +102,4 @@ func (r *splitterReader) reading() {
 func (r *splitterReader) Close() error {
 	close(r.buf)
 	return r.reader.Close()
-	// return nil
 }

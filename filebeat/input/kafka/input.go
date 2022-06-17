@@ -20,6 +20,7 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -28,8 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"errors"
 
 	"github.com/Shopify/sarama"
 
@@ -256,7 +255,7 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
-	return //nolint:nakedret //Function is required
+	return deadline, ok
 }
 
 func (c channelCtx) Done() <-chan struct{} {
@@ -312,12 +311,12 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	reader := h.createReader(claim)
 	parser := h.parsers.Create(h.ctx, reader)
-	for errors.Is(h.session.Context().Err(), nil) {
+	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
-		if errors.Is(err, io.EOF) {
+		if err == io.EOF { //nolint:errorlint // io.EOF is not wrapped.
 			return nil
 		}
-		if !errors.Is(err, nil) {
+		if err != nil {
 			return err
 		}
 		h.client.Publish(beat.Event{
