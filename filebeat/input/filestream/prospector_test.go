@@ -252,9 +252,44 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)
 
-			assert.ElementsMatch(t, test.expectedEvents, hg.events)
+			assert.ElementsMatch(t, test.expectedEvents, hg.events, "expected different harvester events")
 		})
 	}
+}
+
+func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
+	minuteAgo := time.Now().Add(-1 * time.Minute)
+
+	eventCreate := loginp.FSEvent{
+		Op:      loginp.OpCreate,
+		NewPath: "/path/to/file",
+		Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
+	}
+	eventUpdated := loginp.FSEvent{
+		Op:      loginp.OpWrite,
+		NewPath: "/path/to/file",
+		Info:    testFileInfo{"/path/to/file", 10, time.Now(), nil},
+	}
+	expectedEvents := []harvesterEvent{
+		harvesterStart("path::/path/to/file"),
+		harvesterGroupStop{},
+	}
+
+	filewatcher := &mockFileWatcher{events: []loginp.FSEvent{eventCreate}}
+	p := fileProspector{
+		filewatcher: filewatcher,
+		identifier:  mustPathIdentifier(false),
+		ignoreOlder: 10 * time.Second,
+	}
+	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+	hg := newTestHarvesterGroup()
+	testStore := newMockMetadataUpdater()
+	p.Run(ctx, testStore, hg)
+
+	assert.True(t, testStore.has("path::/path/to/file"), "file state has to be persisted")
+	filewatcher.events = append(filewatcher.events, eventUpdated)
+
+	assert.ElementsMatch(t, expectedEvents, hg.events, "expected different harvester events")
 }
 
 func TestProspectorDeletedFile(t *testing.T) {
@@ -482,6 +517,7 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
+	mu.table[s.Name()] = cur
 	return nil
 }
 
