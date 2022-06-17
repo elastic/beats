@@ -108,7 +108,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 		// if different metricsets have different periods, we will effectively set (timeout = max(Period) * 2)
 		minCacheExpirationTime := base.Config().Period * 2
 		if perfMetrics.GetTimeout() < minCacheExpirationTime {
-			perfMetrics.SetTimeout(minCacheExpirationTime)
+			perfMetrics.SetOrUpdateTimeout(minCacheExpirationTime)
 		}
 
 		m := module{

@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
+- make the internal cache PerfMetricsCache in the kubernetes module to never expire before scraping. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated.
 
 *Packetbeat*
 

@@ -59,6 +59,7 @@ func (c *PerfMetricsCache) Stop() {
 	c.ContainerCoresLimit.Stop()
 }
 
+// Returns the maximum timeout of all the caches under PerfMetricsCache
 func (c *PerfMetricsCache) GetTimeout() time.Duration {
 	var ans time.Duration = 0
 
@@ -84,7 +85,8 @@ func (c *PerfMetricsCache) GetTimeout() time.Duration {
 	return ans
 }
 
-func (c *PerfMetricsCache) SetTimeout(timeout time.Duration) {
+// Set the timeout of all the caches under PerfMetricsCache, then Stop and Start all the cache janitors
+func (c *PerfMetricsCache) SetOrUpdateTimeout(timeout time.Duration) {
 	c.NodeMemAllocatable.SetTimeout(timeout)
 	c.NodeCoresAllocatable.SetTimeout(timeout)
 	c.ContainerMemLimit.SetTimeout(timeout)
