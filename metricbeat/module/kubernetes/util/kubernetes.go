@@ -54,8 +54,8 @@ type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 
-	Node                string        `config:"node"`
-	SyncPeriod          time.Duration `config:"sync_period"`
+	Node       string        `config:"node"`
+	SyncPeriod time.Duration `config:"sync_period"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
