@@ -5,13 +5,13 @@
 package billing
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -38,7 +38,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config azure.Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// instantiate monitor client
 	billingClient, err := NewClient(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the billing client: module azure - billing metricset")
+		return nil, fmt.Errorf("error initializing the billing client: module azure - billing metricset: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -61,9 +61,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
 
+	m.log.Infof("Fetching billing data for period: %s to %s", startTime, endTime)
+
 	results, err := m.client.GetMetrics(startTime, endTime)
 	if err != nil {
-		return errors.Wrap(err, "error retrieving usage information")
+		return fmt.Errorf("error retrieving usage information: %w", err)
 	}
 
 	events := EventsMapping(m.client.Config.SubscriptionId, results, startTime, endTime)

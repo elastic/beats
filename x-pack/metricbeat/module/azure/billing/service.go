@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 	"github.com/elastic/elastic-agent-libs/logp"

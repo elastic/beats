@@ -9,9 +9,10 @@ import (
 	"time"
 
 	"github.com/Azure/go-autorest/autorest/date"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 )
 
 func TestEventMapping(t *testing.T) {

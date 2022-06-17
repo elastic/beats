@@ -7,19 +7,22 @@ package billing
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 	"github.com/shopspring/decimal"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing/consumption/mgmt/2019-10-01/consumption"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) []mb.Event {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
 		for _, ud := range results.UsageDetails {
 			event := mb.Event{Timestamp: time.Now().UTC()}
+
+			// shared fields
+			_, _ = event.RootFields.Put("cloud.provider", "azure")
 
 			//
 			// legacy data format
@@ -49,11 +52,9 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 					"unit_price":           legacy.UnitPrice,
 					"quantity":             legacy.Quantity,
 				}
-				event.RootFields = mapstr.M{}
-				event.RootFields.Put("cloud.provider", "azure")
-				event.RootFields.Put("cloud.region", legacy.ResourceLocation)
-				event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
-				event.RootFields.Put("cloud.instance.id", legacy.ResourceID)
+				_, _ = event.RootFields.Put("cloud.region", legacy.ResourceLocation)
+				_, _ = event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
+				_, _ = event.RootFields.Put("cloud.instance.id", legacy.ResourceID)
 			}
 
 			//
@@ -69,6 +70,7 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 					"subscription_id": modern.SubscriptionGUID,
 				}
 				event.MetricSetFields = mapstr.M{
+					"department_name":      modern.InvoiceSectionName,
 					"product":              modern.Product,
 					"usage_start":          startTime,
 					"usage_end":            endTime,
@@ -80,9 +82,7 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 					"subscription_name":    modern.SubscriptionName,
 					"unit_price":           modern.UnitPrice,
 				}
-				event.RootFields = mapstr.M{}
-				event.RootFields.Put("cloud.provider", "azure")
-				event.RootFields.Put("cloud.region", modern.ResourceLocation)
+				_, _ = event.RootFields.Put("cloud.region", modern.ResourceLocation)
 			}
 
 			events = append(events, event)
