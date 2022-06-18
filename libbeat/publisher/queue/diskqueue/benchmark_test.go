@@ -15,8 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// example: go test -bench=. -benchtime 3x -timeout 60m
+// Usage:
 //
+// go test -bench=1M -benchtime 1x -count 10 -timeout 600m -benchmem > results.txt
+//
+// then
+//
+// benchstat results.txt
+//
+// you can give benchstat multiple files to analyse and it will
+// compare the results between them.
+// https://pkg.go.dev/golang.org/x/perf/cmd/benchstat
+
 package diskqueue
 
 import (

@@ -76,7 +76,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		//make sure we read back what we wrote
 		assert.Equal(t, tc.plaintext, dst, name)
 
-		n, err = sr.Read(dst)
+		_, err = sr.Read(dst)
 		assert.ErrorIs(t, err, io.EOF, name)
 
 		err = sr.Close()
