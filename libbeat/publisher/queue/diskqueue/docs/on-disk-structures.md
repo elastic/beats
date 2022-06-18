@@ -55,7 +55,7 @@ of three fields.  The first field in the version number, which is an
 unsigned 32-bit integer in little-endian format.  The second field is
 a count of the number of frames in the segment, which is an unsigned
 32-bit integer in little-endian format.  The third field holds bit
-flags, which signify options.  The size of options in 8-bits in
+flags, which signify options.  The size of options is 8-bits in
 little-endian format.
 
 If the options field has the 0x1 bit set, then encryption is enabled.  In
