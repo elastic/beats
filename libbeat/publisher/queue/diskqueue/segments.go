@@ -237,7 +237,7 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 	header, err := readSegmentHeader(file)
 	if err != nil {
 		return nil, fmt.Errorf(
-			"couldn't header for segment %d: %w", segment.id, err)
+			"couldn't read header for segment %d: %w", segment.id, err)
 	}
 
 	sr := &segmentReader{}
