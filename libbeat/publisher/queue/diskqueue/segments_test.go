@@ -71,12 +71,16 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		n, err = sr.Read(dst)
 		assert.Nil(t, err, name)
 
-		err = sr.Close()
-		assert.Nil(t, err, name)
 		assert.Equal(t, len(dst), n, name)
 
 		//make sure we read back what we wrote
 		assert.Equal(t, tc.plaintext, dst, name)
+
+		n, err = sr.Read(dst)
+		assert.ErrorIs(t, err, io.EOF, name)
+
+		err = sr.Close()
+		assert.Nil(t, err, name)
 
 	}
 }
@@ -134,5 +138,53 @@ func TestSegmentReaderSeek(t *testing.T) {
 		assert.Equal(t, tc.plaintexts[1], dst, name)
 
 		sw.Close()
+	}
+}
+
+func TestSegmentReaderSeekLocations(t *testing.T) {
+	tests := map[string]struct {
+		id         segmentID
+		encrypt    bool
+		plaintexts [][]byte
+		location   int64
+	}{
+		"No Encryption": {
+			id:         0,
+			encrypt:    false,
+			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
+			location:   -1,
+		},
+		"Encryption": {
+			id:         1,
+			encrypt:    true,
+			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
+			location:   2,
+		},
+	}
+	dir, err := os.MkdirTemp("", t.Name())
+	assert.Nil(t, err)
+	//	defer os.RemoveAll(dir)
+	for name, tc := range tests {
+		settings := DefaultSettings()
+		settings.Path = dir
+		if tc.encrypt {
+			settings.EncryptionKey = []byte("keykeykeykeykeyk")
+		}
+		qs := &queueSegment{
+			id: tc.id,
+		}
+		sw, err := qs.getWriter(settings)
+		assert.Nil(t, err, name)
+		for _, plaintext := range tc.plaintexts {
+			n, err := sw.Write(plaintext)
+			assert.Nil(t, err, name)
+			assert.Equal(t, len(plaintext), n, name)
+		}
+		sw.Close()
+		sr, err := qs.getReader(settings)
+		assert.Nil(t, err, name)
+		//seek to location
+		_, err = sr.Seek(tc.location, io.SeekStart)
+		assert.NotNil(t, err, name)
 	}
 }
