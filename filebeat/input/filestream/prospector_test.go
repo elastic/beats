@@ -517,7 +517,6 @@ AGAIN:
 		if m.ctx != nil && m.ctx.Err() == nil {
 			goto AGAIN
 		}
-		fmt.Println("nincs")
 		return loginp.FSEvent{}
 	}
 	evt := m.events[m.nextIdx]
@@ -543,7 +542,6 @@ func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
 
 func (mu *mockMetadataUpdater) has(id string) bool {
 	_, ok := mu.table[id]
-	fmt.Println("has", id, ok)
 	return ok
 }
 
@@ -568,7 +566,6 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
-	fmt.Println(s, cur)
 	mu.table[s.Name()] = cur
 	return nil
 }
