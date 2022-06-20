@@ -105,6 +105,16 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		}
 	}
 
+	if je.journey != nil {
+		eventext.MergeEventFields(event, mapstr.M{
+			"monitor": mapstr.M{
+				"check_group": je.checkGroup,
+				"id":          je.journey.ID,
+				"name":        je.journey.Name,
+			},
+		})
+	}
+
 	switch se.Type {
 	case CmdStatus:
 		// If a command failed _after_ the journey was complete, as it happens
@@ -137,16 +147,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	eventext.MergeEventFields(event, se.ToMap())
 
-	if je.journey != nil {
-		eventext.MergeEventFields(event, mapstr.M{
-			"monitor": mapstr.M{
-				"check_group": je.checkGroup,
-				"id":          je.journey.ID,
-				"name":        je.journey.Name,
-			},
-		})
-	}
-
 	if je.urlFields == nil {
 		if urlFields, err := event.GetValue("url"); err == nil {
 			if ufMap, ok := urlFields.(mapstr.M); ok {
@@ -174,9 +174,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		duration := je.end.Sub(je.start)
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
-				"check_group": je.checkGroup,
-				"id":          je.journey.ID,
-				"name":        je.journey.Name,
 				"duration": mapstr.M{
 					"us": duration.Microseconds(),
 				},
