@@ -19,12 +19,13 @@ package util
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestValueMap(t *testing.T) {
-	test := newValueMap(defaultTimeout)
+	test := newValueMap(120 * time.Second)
 
 	// no value
 	assert.Equal(t, 0.0, test.Get("foo"))
@@ -35,7 +36,7 @@ func TestValueMap(t *testing.T) {
 }
 
 func TestGetWithDefault(t *testing.T) {
-	test := newValueMap(defaultTimeout)
+	test := newValueMap(120 * time.Second)
 
 	// Empty + default
 	assert.Equal(t, 0.0, test.Get("foo"))
