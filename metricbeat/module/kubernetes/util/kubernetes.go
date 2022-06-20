@@ -117,6 +117,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
 	watcher, err := GetWatcher(base, res, nodeScope)
@@ -156,12 +157,12 @@ func NewResourceMetadataEnricher(
 				name := r.GetObjectMeta().GetName()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
 					}
 				}
 
@@ -179,6 +180,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("namespace", r)
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate("replicaset", r)
+			case *kubernetes.DaemonSet:
+				m[id] = metaGen.Generate("daemonset", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
@@ -207,6 +210,7 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
 	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
@@ -241,12 +245,12 @@ func NewContainerMetadataEnricher(
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
 					}
 				}
 
@@ -364,7 +368,10 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			ecsMeta.Delete("kubernetes")
+			err = ecsMeta.Delete("kubernetes")
+			if err != nil {
+				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+			}
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
@@ -411,4 +418,18 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 		}
 	}
 	return e, err
+}
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }

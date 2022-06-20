@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -39,8 +38,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.pod")
 )
 
 // init registers the MetricSet with the central registry.
@@ -78,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, true),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, mod.GetPerfMetricsCache(), true),
 		mod:           mod,
 	}, nil
 }
@@ -96,7 +93,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	events, err := eventMapping(body, m.mod.GetPerfMetricsCache())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -117,7 +114,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }
 
 // Close stops this metricset
