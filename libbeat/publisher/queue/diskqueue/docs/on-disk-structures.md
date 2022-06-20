@@ -55,10 +55,10 @@ of three fields.  The first field in the version number, which is an
 unsigned 32-bit integer in little-endian format.  The second field is
 a count of the number of frames in the segment, which is an unsigned
 32-bit integer in little-endian format.  The third field holds bit
-flags, which signify options.  The size of options is 8-bits in
+flags, which signify options.  The size of options is 32-bits in
 little-endian format.
 
-If the options field has the 0x1 bit set, then encryption is enabled.  In
+If the options field has the first bit set, then encryption is enabled.  In
 which case, the next 128-bits are the initialization vector and the
 rest of the file is encrypted frames.  If the field is not set,
 un-encrypted frames follow the header.

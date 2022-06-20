@@ -137,7 +137,7 @@ type segmentHeader struct {
 	frameCount uint32
 
 	// options holds flags to enable features, for example encryption.
-	options uint8
+	options uint32
 }
 
 type WriteCloseSyncer interface {
@@ -152,9 +152,9 @@ const currentSegmentVersion = 2
 // In contexts where the segment may have been created by an earlier version,
 // instead use (queueSegment).headerSize() which accounts for the schema
 // version of the target segment.
-const segmentHeaderSize = 9
+const segmentHeaderSize = 12
 
-const ENABLE_ENCRYPTION uint8 = 0x1
+const ENABLE_ENCRYPTION uint32 = 0x1
 
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
@@ -256,7 +256,7 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 
 // Should only be called from the writer loop.
 func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
-	var options uint8
+	var options uint32
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
@@ -497,7 +497,7 @@ func (w *segmentWriter) Sync() error {
 	return w.dst.Sync()
 }
 
-func (w *segmentWriter) WriteHeader(options uint8) error {
+func (w *segmentWriter) WriteHeader(options uint32) error {
 	if _, err := w.dst.Seek(0, io.SeekStart); err != nil {
 		return err
 	}

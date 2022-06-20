@@ -3,8 +3,8 @@
 <text x="290" y="20" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">version (uint32)</text>
 <path d="M2,74L578,74L578,38L2,38Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
 <text x="290" y="56" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">count (uint32)</text>
-<path d="M2,110L146,110L146,74L2,74Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
-<text x="74" y="92" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">options (uint8)</text>
+<path d="M2,110L578,110L578,74L2,74Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
+<text x="290" y="92" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">options (uint32)</text>
 <path d="M2,254L578,254L578,110L2,110Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
 <text x="290" y="182" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">initialization vector (128 bits)</text>
 <path d="M2,542L578,542L578,254L2,254Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);stroke-dasharray:7.2,7.2;" />
