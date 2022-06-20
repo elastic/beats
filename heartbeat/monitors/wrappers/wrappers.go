@@ -98,7 +98,7 @@ func addMonitorMeta(sFields stdfields.StdMonitorFields, hashURLIntoID bool) jobs
 				"type": sFields.Type,
 			}
 
-			if !sFields.IsLegacyBrowserSource {
+			if !sFields.IsLegacyBrowserSource || sFields.Type != "browser" {
 				fields["id"] = id
 				fields["name"] = name
 			} else {
