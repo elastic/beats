@@ -18,7 +18,6 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -367,7 +366,10 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			ecsMeta.Delete("kubernetes")
+			err = ecsMeta.Delete("kubernetes")
+			if err != nil {
+				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+			}
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
@@ -414,4 +416,18 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 		}
 	}
 	return e, err
+}
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }
