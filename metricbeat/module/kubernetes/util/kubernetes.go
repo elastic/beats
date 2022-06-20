@@ -82,13 +82,8 @@ func NewResourceMetadataEnricher(
 	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-<<<<<<< HEAD
-	config := validatedConfig(base)
-	if config == nil {
-=======
 	config, err := GetValidatedConfig(base)
 	if err != nil {
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
@@ -183,13 +178,8 @@ func NewContainerMetadataEnricher(
 	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-<<<<<<< HEAD
-	config := validatedConfig(base)
-	if config == nil {
-=======
 	config, err := GetValidatedConfig(base)
 	if err != nil {
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
@@ -327,10 +317,6 @@ func GetDefaultDisabledMetaConfig() *kubernetesConfig {
 	}
 }
 
-<<<<<<< HEAD
-func validatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
-	config := kubernetesConfig{
-=======
 func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	config, err := GetConfig(base)
 	if err != nil {
@@ -355,7 +341,6 @@ func validateConfig(config *kubernetesConfig) (*kubernetesConfig, error) {
 
 func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	config := &kubernetesConfig{
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
 		AddMetadata:         true,
 		SyncPeriod:          time.Minute * 10,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
