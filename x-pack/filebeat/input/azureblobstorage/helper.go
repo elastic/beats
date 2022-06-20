@@ -14,14 +14,14 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func (input *azurebsInput) collect(ctx context.Context, persistentStore *statestore.Store) error {
+func (input *azurebsInput) collect(ctx context.Context, log *logp.Logger) error {
 	containers := input.fetchContainerList(ctx)
 
 	for _, v := range containers {
-		blobClientArr, err := input.fetchBlobsFromContainer(ctx, v)
+		blobClientArr, err := input.fetchBlobsFromContainer(ctx, v, log)
 		if err != nil {
 			return err
 		}
@@ -32,7 +32,7 @@ func (input *azurebsInput) collect(ctx context.Context, persistentStore *statest
 				return err
 			}
 
-			input.log.Infof("data from container %s and blob %s is : %s ", *v.Name, *x.blob.Name, strings.TrimSpace(dataBuffer.String()))
+			log.Infof("data from container %s and blob %s is : %s ", *v.Name, *x.blob.Name, strings.TrimSpace(dataBuffer.String()))
 		}
 	}
 
@@ -50,27 +50,33 @@ func (input *azurebsInput) fetchContainerList(ctx context.Context) []*azblob.Con
 	return containers
 }
 
-func (input *azurebsInput) fetchBlobsFromContainer(ctx context.Context, container *azblob.ContainerItem) ([]*blobClientObj, error) {
+func (input *azurebsInput) fetchBlobsFromContainer(ctx context.Context, container *azblob.ContainerItem, log *logp.Logger) ([]*blobClientObj, error) {
 	var blobClientArr []*blobClientObj
 
 	containerClient, err := input.client.NewContainerClient(*container.Name)
 	if err != nil {
-		input.log.Errorf("Error fetching blob client object for container : %s, error : %v", container.Name, err)
+		log.Errorf("Error fetching blob client object for container : %s, error : %v", container.Name, err)
 		return nil, err
 	}
+
 	blobPager := containerClient.ListBlobsFlat(nil)
+	// pager := containerClient.ListBlobsHierarchy("/", &azblob.ContainerListBlobsHierarchyOptions{
+	// 	Include: []azblob.ListBlobsIncludeItem{
+	// 		azblob.ListBlobsIncludeItemMetadata,
+	// 		azblob.ListBlobsIncludeItemTags,
+	// 	},
+	// })
 
 	for blobPager.NextPage(ctx) {
 		resp := blobPager.PageResponse()
-
 		for _, v := range resp.Segment.BlobItems {
 			blobURL := fmt.Sprintf("%s%s/%s", input.serviceURL, *container.Name, *v.Name)
 
-			blobClient, err := fetchBlobClients(blobURL, input.credential, input.log)
+			blobClient, err := fetchBlobClients(blobURL, input.credential, log)
 			if err != nil {
 				return nil, err
 			}
-
+			//v.Properties.las
 			blobClientArr = append(blobClientArr, &blobClientObj{
 				client: blobClient,
 				blob:   v,

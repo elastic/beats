@@ -13,6 +13,14 @@ type config struct {
 	ForwaderConfig harvester.ForwarderConfig `config:",inline"`
 	AccountName    string                    `config:"account_name"`
 	AccountKey     string                    `config:"account_key"`
+	Containers     []container               `config:"containers"`
+}
+
+type container struct {
+	Name            string `config:"name"`
+	BatchSize       int32  `config:"batch_size"`
+	BatchIntervalMs int32  `config:"batch_interval_ms"`
+	Poll            bool   `config:"poll"`
 }
 
 func defaultConfig() config {
@@ -22,5 +30,6 @@ func defaultConfig() config {
 		},
 		AccountName: "beatsblobstorage",
 		AccountKey:  "61A0frq/mFUSw6BGivRB8jhOiElUwGcMlI5lCbXruJokvYIWUcwvpp9ln6v7MPBzwsfvprCEt2qA+AStH+iVXw==",
+		Containers:  []container{{Name: "beatscontainer", BatchSize: 10, BatchIntervalMs: 100}, {Name: "blobcontainer", BatchSize: 10, BatchIntervalMs: 100}},
 	}
 }

@@ -38,3 +38,14 @@ func fetchBlobClients(url string, credential *azblob.SharedKeyCredential, log *l
 
 	return blobClient, nil
 }
+
+func fetchContainerClient(serviceClient *azblob.ServiceClient, containerName string, log *logp.Logger) (*azblob.ContainerClient, error) {
+
+	containerClient, err := serviceClient.NewContainerClient(containerName)
+	if err != nil {
+		log.Errorf("Error fetching container client for container : %s, error : %v", containerName, err)
+		return nil, err
+	}
+
+	return containerClient, nil
+}

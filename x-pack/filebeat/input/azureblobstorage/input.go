@@ -12,30 +12,30 @@ import (
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
+	"github.com/pkg/errors"
 )
 
 const (
 	inputName = "azureblobstorage"
 )
 
-type azurebsInputManager struct {
-	store beater.StateStore
-	log   *logp.Logger
+type source struct {
+	containerName string
+	accountName   string
+	batchSize     int32
+	batchIntrval  int32
+	poll          bool
 }
 
 type azurebsInput struct {
 	config     config
-	store      beater.StateStore
 	client     *azblob.ServiceClient
 	credential *azblob.SharedKeyCredential
-	log        *logp.Logger
 	serviceURL string
 }
 
@@ -44,76 +44,82 @@ type blobClientObj struct {
 	blob   *azblob.BlobItemInternal
 }
 
-func Plugin(log *logp.Logger, store beater.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Experimental,
 		Deprecated: false,
-		Info:       "Collect logs from Azure Blob Storage",
+		Info:       "Azure Blob Storage logs",
 		Doc:        "Collect logs from Azure Blob Storage Service",
-		Manager:    &azurebsInputManager{store: store, log: log},
+		Manager: &cursor.InputManager{
+			Logger:     log,
+			StateStore: store,
+			Type:       inputName,
+			Configure:  configure,
+		},
 	}
 }
 
-func (im *azurebsInputManager) Init(grp unison.Group, mode v2.Mode) error {
-	im.log.Infof("azureblobstorage input mode %s", mode.String())
-	return nil
-}
-
-func (im *azurebsInputManager) Create(cfg *conf.C) (v2.Input, error) {
+func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+		return nil, nil, errors.Wrap(err, "reading config")
 	}
 
-	return newInput(config, im.log, im.store)
+	var sources []cursor.Source
+	for _, c := range config.Containers {
+		sources = append(sources, &source{
+			accountName:   config.AccountName,
+			containerName: c.Name,
+			batchSize:     c.BatchSize,
+			batchIntrval:  c.BatchIntervalMs,
+		})
+	}
+
+	url := fmt.Sprintf("https://%s.blob.core.windows.net/", config.AccountName)
+	return sources, &azurebsInput{config: config, serviceURL: url}, nil
 }
 
-func newInput(config config, log *logp.Logger, store beater.StateStore) (*azurebsInput, error) {
-	url := fmt.Sprintf("https://%s.blob.core.windows.net/", config.AccountName)
-
-	serviceClient, credential, err := fetchServiceClientAndCreds(config, url, log)
-	if err != nil {
-		return nil, err
-	}
-
-	return &azurebsInput{
-		config:     config,
-		store:      store,
-		client:     serviceClient,
-		serviceURL: url,
-		log:        log,
-		credential: credential,
-	}, nil
+func (s *source) Name() string {
+	return s.accountName + "::" + s.containerName
 }
 
 func (input *azurebsInput) Name() string {
 	return inputName
 }
 
-func (input *azurebsInput) Test(ctx v2.TestContext) error {
+func (input *azurebsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 	return nil
 }
 
-func (input *azurebsInput) Run(inputCtx v2.Context, pipeline beat.Pipeline) error {
+func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
 	var err error
+	var st *state
+
+	currentSource := src.(*source)
 	ctx := context.Background()
-	log := inputCtx.Logger.With("name", inputName).With("account_name", input.config.AccountName)
-	input.log = log
+	log := inputCtx.Logger.With("account_name", currentSource.accountName).With("container", currentSource.containerName)
+	log.Info("Running azure blob storage for account %s", input.config.AccountName)
 
-	persistentStore, err := input.store.Access()
-	if err != nil {
-		return fmt.Errorf("cannot connect to persistent storage %v", err)
-	}
-
-	defer persistentStore.Close()
-
-	input.log.Info("Running azure blob storage for account %s", input.config.AccountName)
-
-	err = input.collect(ctx, persistentStore)
+	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
 		return err
 	}
+	containerClient, err := fetchContainerClient(serviceClient, currentSource.containerName, log)
+	if err != nil {
+		return err
+	}
+	input.client = serviceClient
+	input.credential = credential
+
+	if cursor.IsNew() {
+		st = newState()
+	} else {
+		cursor.Unpack(&st)
+	}
+
+	scheduler := newAzureInputScheduler(&publisher, containerClient, input.credential, currentSource, &input.config, st, input.serviceURL, log)
+	scheduler.schedule()
 
 	ctx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
