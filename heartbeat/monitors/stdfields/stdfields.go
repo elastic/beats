@@ -23,7 +23,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/elastic-agent-libs/config"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type ServiceFields struct {
@@ -52,10 +51,10 @@ type StdMonitorFields struct {
 	} `config:"source"`
 }
 
-func ConfigToStdMonitorFields(config *conf.C) (StdMonitorFields, error) {
+func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	sFields := StdMonitorFields{Enabled: true}
 
-	if err := config.Unpack(&sFields); err != nil {
+	if err := conf.Unpack(&sFields); err != nil {
 		return sFields, fmt.Errorf("error unpacking monitor plugin config: %w", err)
 	}
 
