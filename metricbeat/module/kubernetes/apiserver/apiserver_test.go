@@ -34,7 +34,7 @@ func TestEventMappingV2_0(t *testing.T) {
 		ptest.TestCases{
 			{
 				MetricsFile:  "./_meta/test/metrics.2.0",
-				ExpectedFile: "./_metatestFile/test/metrics.2.0.expected",
+				ExpectedFile: "./_meta/test/metrics.2.0.expected",
 			},
 		},
 	)
