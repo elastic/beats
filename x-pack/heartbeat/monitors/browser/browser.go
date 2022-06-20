@@ -44,6 +44,7 @@ func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
+	s.plugin()
 
 	return s.plugin(), nil
 }

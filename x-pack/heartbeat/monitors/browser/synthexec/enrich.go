@@ -54,7 +54,6 @@ type journeyEnricher struct {
 }
 
 func newJourneyEnricher(senr *streamEnricher) *journeyEnricher {
-	logp.Warn("NEW JE!!!!!")
 	return &journeyEnricher{
 		checkGroup:     makeUuid(),
 		streamEnricher: senr,

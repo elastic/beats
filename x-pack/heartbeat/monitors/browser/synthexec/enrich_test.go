@@ -170,9 +170,6 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(mapstr.M{
-					"monitor": mapstr.M{
-						"check_group": isdef.IsString,
-					},
 					"synthetics": mapstr.M{
 						"payload": mapstr.M{
 							"message": "Error from synthetics",
@@ -197,9 +194,6 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(mapstr.M{
-					"monitor": mapstr.M{
-						"check_group": isdef.IsString,
-					},
 					"synthetics": mapstr.M{
 						"payload": mapstr.M{
 							"message": "debug output",

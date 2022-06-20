@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -63,7 +62,8 @@ func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
 	return p.projectCfg.FilterJourneys
 }
 
-func (p *Project) Fields() stdfields.StdMonitorFields {
+/*
+func (p *Project) StdFields() stdfields.StdMonitorFields {
 	sFields := stdfields.StdMonitorFields{
 		Name: p.projectCfg.Name,
 		ID:   p.projectCfg.Id,
@@ -73,9 +73,11 @@ func (p *Project) Fields() stdfields.StdMonitorFields {
 	if p.projectCfg.Source.Local != nil || p.projectCfg.Source.ZipUrl != nil {
 		sFields.IsLegacyBrowserSource = true
 	}
+	logp.L().Warnf("LEGSUPP %v %v", sFields, sFields.IsLegacyBrowserSource)
 
 	return sFields
 }
+*/
 
 func (p *Project) Close() error {
 	if p.projectCfg.Source.ActiveMemo != nil {
@@ -131,14 +133,14 @@ func (p *Project) jobs() []jobs.Job {
 	isScript := p.projectCfg.Source.Inline != nil
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.Fields(), p.extraArgs()...)
+		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.StdFields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.Fields(), p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}

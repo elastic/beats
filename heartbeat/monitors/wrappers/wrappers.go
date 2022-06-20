@@ -98,6 +98,7 @@ func addMonitorMeta(sFields stdfields.StdMonitorFields, hashURLIntoID bool) jobs
 				"type": sFields.Type,
 			}
 
+			logp.L().Warnf("LBP %s %v", id, sFields.IsLegacyBrowserSource)
 			if !sFields.IsLegacyBrowserSource {
 				fields["id"] = id
 				fields["name"] = name
