@@ -364,7 +364,10 @@ func hashStrings(typ string, data []string) []byte {
 }
 
 func hexDecode(enc string) string {
-	decodedString, _ := hex.DecodeString(enc)
+	decodedString, err := hex.DecodeString(enc)
+	if err != nil {
+		return ""
+	}
 	return string(decodedString)
 }
 

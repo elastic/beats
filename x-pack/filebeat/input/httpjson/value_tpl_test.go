@@ -353,6 +353,14 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errEmptyTemplateResult.Error(),
 		},
 		{
+			name:          "func invalid hexDecode string",
+			value:         `[[hexDecode "abcdefghijklmnopqrstuvwxyz"]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
 			name: "func join",
 			value: `[[join .last_response.body.strarr ","]] [[join .last_response.body.iarr ","]] ` +
 				`[[join .last_response.body.narr ","]] [[join .last_response.body.singlevalstr ","]] ` +
