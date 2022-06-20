@@ -88,7 +88,7 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	if config.AddMetadata {
 		ms.enricher = util.NewResourceMetadataEnricher(
-			base, &kubernetes.CronJob{}, false)
+			base, &kubernetes.CronJob{}, mod.GetPerfMetricsCache(), false)
 	}
 	return &ms, nil
 }
@@ -129,8 +129,6 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-
-	return
 }
 
 // Close stops this metricset

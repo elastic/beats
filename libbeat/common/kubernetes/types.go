@@ -70,6 +70,9 @@ type ReplicaSet = appsv1.ReplicaSet
 // StatefulSet data
 type StatefulSet = appsv1.StatefulSet
 
+// DaemonSet data
+type DaemonSet = appsv1.DaemonSet
+
 // Service data
 type Service = v1.Service
 
