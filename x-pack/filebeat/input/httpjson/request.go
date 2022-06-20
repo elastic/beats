@@ -288,7 +288,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 				resps = intermediateResps
 			}
-			n = r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories), i)
+			n += r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories), i)
 		}
 	}
 
