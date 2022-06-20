@@ -54,6 +54,7 @@ type journeyEnricher struct {
 }
 
 func newJourneyEnricher(senr *streamEnricher) *journeyEnricher {
+	logp.Warn("NEW JE!!!!!")
 	return &journeyEnricher{
 		checkGroup:     makeUuid(),
 		streamEnricher: senr,
@@ -137,11 +138,17 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())
-	eventext.MergeEventFields(event, mapstr.M{
-		"monitor": mapstr.M{
-			"check_group": je.checkGroup,
-		},
-	})
+
+	logp.L().Warnf("J=%v", je.journey)
+	if je.journey != nil {
+		eventext.MergeEventFields(event, mapstr.M{
+			"monitor": mapstr.M{
+				"check_group": je.checkGroup,
+				"id":          je.journey.ID,
+				"name":        je.journey.Name,
+			},
+		})
+	}
 
 	if je.urlFields == nil {
 		if urlFields, err := event.GetValue("url"); err == nil {
@@ -168,10 +175,11 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	// to inform the journey never ran
 	if !je.start.IsZero() {
 		duration := je.end.Sub(je.start)
-		logp.L().Warnf("SET CG %s", je.checkGroup)
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
 				"check_group": je.checkGroup,
+				"id":          je.journey.ID,
+				"name":        je.journey.Name,
 				"duration": mapstr.M{
 					"us": duration.Microseconds(),
 				},
