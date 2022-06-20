@@ -147,7 +147,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
-			cID := (containerID).(string)
+			cID, ok := (containerID).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerID: %s", ok)
+			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
 				util.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
@@ -155,7 +158,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
-			cImage := (containerImage).(string)
+			cImage, ok := (containerImage).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+			}
+
 			util.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
 			util.ShouldDelete(event, "image", m.Logger())

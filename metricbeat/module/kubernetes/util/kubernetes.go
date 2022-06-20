@@ -203,7 +203,10 @@ func NewContainerMetadataEnricher(
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			meta := metaGen.Generate(pod)
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
@@ -245,7 +248,10 @@ func NewContainerMetadataEnricher(
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
