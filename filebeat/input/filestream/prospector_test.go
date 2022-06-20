@@ -290,9 +290,8 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
-
 		p.Run(ctx, testStore, hg)
 
 		wg.Done()
