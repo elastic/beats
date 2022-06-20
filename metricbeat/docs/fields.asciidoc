@@ -42645,16 +42645,6 @@ Kubernetes API server metrics
 
 
 
-*`kubernetes.apiserver.request.client`*::
-+
---
-Client executing requests
-
-
-type: keyword
-
---
-
 *`kubernetes.apiserver.request.resource`*::
 +
 --
