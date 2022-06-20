@@ -117,6 +117,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
 	watcher, err := GetWatcher(base, res, nodeScope)
@@ -156,12 +157,12 @@ func NewResourceMetadataEnricher(
 				name := r.GetObjectMeta().GetName()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
 					}
 				}
 
@@ -207,6 +208,7 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
 	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
@@ -241,12 +243,12 @@ func NewContainerMetadataEnricher(
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
 					}
 				}
 
