@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -105,6 +106,7 @@ func TestJourneyEnricher(t *testing.T) {
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
+				"monitor.check_group": isdef.IsString,
 			}))
 		}
 		return lookslike.Compose(v...)
@@ -168,6 +170,9 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(mapstr.M{
+					"monitor": mapstr.M{
+						"check_group": isdef.IsString,
+					},
 					"synthetics": mapstr.M{
 						"payload": mapstr.M{
 							"message": "Error from synthetics",
@@ -192,6 +197,9 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(mapstr.M{
+					"monitor": mapstr.M{
+						"check_group": isdef.IsString,
+					},
 					"synthetics": mapstr.M{
 						"payload": mapstr.M{
 							"message": "debug output",
