@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -257,6 +258,9 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}
 }
 
+// TestProspectorNewAndUpdatedFiles checks if the prospector can
+// save the size of an ignored file to the registry. If the ignored
+// file is updated, and has to be collected, a new harvester is started.
 func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	minuteAgo := time.Now().Add(-1 * time.Minute)
 
@@ -275,7 +279,8 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 		harvesterGroupStop{},
 	}
 
-	filewatcher := &mockFileWatcher{events: []loginp.FSEvent{eventCreate}}
+	watcherCtx, cancelWatcher := context.WithCancel(context.Background())
+	filewatcher := &mockFileWatcher{events: []loginp.FSEvent{eventCreate}, ctx: watcherCtx}
 	p := fileProspector{
 		filewatcher: filewatcher,
 		identifier:  mustPathIdentifier(false),
@@ -284,12 +289,39 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
-	p.Run(ctx, testStore, hg)
+	var wg sync.WaitGroup
+	go func() {
+		wg.Add(1)
 
-	assert.True(t, testStore.has("path::/path/to/file"), "file state has to be persisted")
+		p.Run(ctx, testStore, hg)
+
+		wg.Done()
+	}()
+
+	// The prospector must persist the size of the to the state
+	// as the offset, so when the file is updated only the new
+	// lines are sent to the output.
+	assert.Eventually(
+		t,
+		func() bool { return testStore.checkOffset("path::/path/to/file", 5) },
+		1*time.Second,
+		10*time.Millisecond,
+		"file state has to be persisted",
+	)
+
+	// The ignored file is updated, so the prospector must start a new harvester
+	// to read the new lines.
 	filewatcher.events = append(filewatcher.events, eventUpdated)
+	cancelWatcher()
+	wg.Wait()
 
-	assert.ElementsMatch(t, expectedEvents, hg.events, "expected different harvester events")
+	assert.Eventually(
+		t,
+		func() bool { return assert.ElementsMatch(t, expectedEvents, hg.events) },
+		1*time.Second,
+		10*time.Millisecond,
+		"expected different harvester events",
+	)
 }
 
 func TestProspectorDeletedFile(t *testing.T) {
@@ -473,13 +505,19 @@ func (t *testHarvesterGroup) StopGroup() error {
 }
 
 type mockFileWatcher struct {
+	ctx         context.Context
 	nextIdx     int
 	events      []loginp.FSEvent
 	filesOnDisk map[string]os.FileInfo
 }
 
 func (m *mockFileWatcher) Event() loginp.FSEvent {
+AGAIN:
 	if len(m.events) == m.nextIdx {
+		if m.ctx != nil && m.ctx.Err() == nil {
+			goto AGAIN
+		}
+		fmt.Println("nincs")
 		return loginp.FSEvent{}
 	}
 	evt := m.events[m.nextIdx]
@@ -505,7 +543,20 @@ func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
 
 func (mu *mockMetadataUpdater) has(id string) bool {
 	_, ok := mu.table[id]
+	fmt.Println("has", id, ok)
 	return ok
+}
+
+func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
+	c, ok := mu.table[id]
+	if !ok {
+		return false
+	}
+	cursor, ok := c.(state)
+	if !ok {
+		return false
+	}
+	return cursor.Offset == offset
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
@@ -517,12 +568,13 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
+	fmt.Println(s, cur)
 	mu.table[s.Name()] = cur
 	return nil
 }
 
 func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
-	mu.table[s.Name()] = v
+	mu.set(s.Name())
 	return nil
 }
 
