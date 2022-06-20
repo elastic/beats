@@ -104,7 +104,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 	}
 	dir, err := os.MkdirTemp("", t.Name())
 	assert.Nil(t, err)
-	//	defer os.RemoveAll(dir)
+	defer os.RemoveAll(dir)
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
@@ -163,7 +163,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 	}
 	dir, err := os.MkdirTemp("", t.Name())
 	assert.Nil(t, err)
-	//	defer os.RemoveAll(dir)
+	defer os.RemoveAll(dir)
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
