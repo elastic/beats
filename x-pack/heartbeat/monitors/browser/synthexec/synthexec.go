@@ -82,7 +82,6 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		logp.Warn("NEW EXEC SEEE!!!!!")
 		senr := streamEnricher{sFields: sFields}
 		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
 	}

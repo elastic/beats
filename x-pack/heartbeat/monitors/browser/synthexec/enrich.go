@@ -10,7 +10,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/gofrs/uuid"
@@ -138,7 +137,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	eventext.MergeEventFields(event, se.ToMap())
 
-	logp.L().Warnf("J=%v", je.journey)
 	if je.journey != nil {
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{

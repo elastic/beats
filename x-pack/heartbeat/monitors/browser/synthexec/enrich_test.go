@@ -470,6 +470,11 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 func TestCreateSummaryEvent(t *testing.T) {
 	baseTime := time.Now()
 
+	testJourney := Journey{
+		ID:   "my-monitor",
+		Name: "My Monitor",
+	}
+
 	defaultLogValidator := func(stepCount int) func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
 		return func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
 			require.Len(t, observed, 1)
@@ -494,7 +499,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 	}{{
 		name: "completed without errors",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
@@ -512,7 +517,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 	}, {
 		name: "completed with error",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
@@ -531,7 +536,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 	}, {
 		name: "started, but exited without running steps",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			stepCount:       0,
@@ -549,7 +554,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 	}, {
 		name: "syntax error - exited without starting",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
 			errorCount:      1,
@@ -593,7 +598,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"url":                mapstr.M{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
-				"synthetics.journey": Journey{},
+				"synthetics.journey": testJourney,
 			}, true)
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
 

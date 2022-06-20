@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -62,22 +63,15 @@ func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
 	return p.projectCfg.FilterJourneys
 }
 
-/*
 func (p *Project) StdFields() stdfields.StdMonitorFields {
-	sFields := stdfields.StdMonitorFields{
-		Name: p.projectCfg.Name,
-		ID:   p.projectCfg.Id,
-		Type: "browser",
+	sFields, err := stdfields.ConfigToStdMonitorFields(p.rawCfg)
+	// Should be impossible since outer monitor.go should run this same code elsewhere
+	// TODO: Just pass stdfields in to remove second deserialize
+	if err != nil {
+		logp.L().Warnf("Could not deserialize monitor fields for browser, this should never happen: %s", err)
 	}
-
-	if p.projectCfg.Source.Local != nil || p.projectCfg.Source.ZipUrl != nil {
-		sFields.IsLegacyBrowserSource = true
-	}
-	logp.L().Warnf("LEGSUPP %v %v", sFields, sFields.IsLegacyBrowserSource)
-
 	return sFields
 }
-*/
 
 func (p *Project) Close() error {
 	if p.projectCfg.Source.ActiveMemo != nil {
