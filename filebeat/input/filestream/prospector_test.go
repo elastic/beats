@@ -571,7 +571,7 @@ func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) err
 }
 
 func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
-	mu.set(s.Name())
+	mu.table[s.Name()] = v
 	return nil
 }
 
