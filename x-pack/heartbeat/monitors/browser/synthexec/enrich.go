@@ -164,6 +164,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		duration := je.end.Sub(je.start)
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
+				"check_group": je.checkGroup,
 				"duration": mapstr.M{
 					"us": duration.Microseconds(),
 				},
