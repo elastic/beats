@@ -34,10 +34,16 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProducerClient interface {
-	// Publishes an event via the Elastic agent shipper.
+	// Publishes a list of events via the Elastic agent shipper.
+	// Blocks until all processing steps complete and data is written to the queue.
+	// The order of `PublishRequest.events` always matches `PublishReply.results`.
 	//
-	// Blocks until all processing steps complete and data is written to the queue. Returns a
-	// RESOURCE_EXHAUSTED gRPC status code if the queue is full.
+	// Returns the `codes.ResourceExhausted` gRPC status code if the queue is full and none of the events
+	// can be accepted at the moment.
+	//
+	// If the queue could accept some events from the request, this returns a successful response
+	// containing results for the first K events that were accepted by the queue.
+	// The client is expected to retry sending the rest of the events in a separate request later.
 	//
 	// Inputs may execute multiple concurrent Produce requests for independent data streams.
 	// The order in which concurrent requests complete is not guaranteed. Use sequential requests to
@@ -100,10 +106,16 @@ func (x *producerStreamAcknowledgementsClient) Recv() (*StreamAcksReply, error) 
 // All implementations must embed UnimplementedProducerServer
 // for forward compatibility
 type ProducerServer interface {
-	// Publishes an event via the Elastic agent shipper.
+	// Publishes a list of events via the Elastic agent shipper.
+	// Blocks until all processing steps complete and data is written to the queue.
+	// The order of `PublishRequest.events` always matches `PublishReply.results`.
 	//
-	// Blocks until all processing steps complete and data is written to the queue. Returns a
-	// RESOURCE_EXHAUSTED gRPC status code if the queue is full.
+	// Returns the `codes.ResourceExhausted` gRPC status code if the queue is full and none of the events
+	// can be accepted at the moment.
+	//
+	// If the queue could accept some events from the request, this returns a successful response
+	// containing results for the first K events that were accepted by the queue.
+	// The client is expected to retry sending the rest of the events in a separate request later.
 	//
 	// Inputs may execute multiple concurrent Produce requests for independent data streams.
 	// The order in which concurrent requests complete is not guaranteed. Use sequential requests to

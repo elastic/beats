@@ -131,10 +131,10 @@ type Producer interface {
 	Cancel() int
 }
 
-// Batch of events to be returned to Consumers. The `ACK` method will send the
-// ACK signal to the queue.
+// Batch of events to be returned to Consumers. The `Done` method will tell the
+// queue that the batch has been consumed and its events can be discarded.
 type Batch interface {
 	Count() int
 	Event(i int) interface{}
-	ACK()
+	Done()
 }

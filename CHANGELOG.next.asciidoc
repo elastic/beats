@@ -80,7 +80,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
-
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
 
 *Auditbeat*
 
@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
 - Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
 - Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
 - Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
 
 *Auditbeat*
@@ -129,6 +130,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 - Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
+- Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 
 *Packetbeat*
 
