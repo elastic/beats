@@ -180,6 +180,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("namespace", r)
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate("replicaset", r)
+			case *kubernetes.DaemonSet:
+				m[id] = metaGen.Generate("daemonset", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
