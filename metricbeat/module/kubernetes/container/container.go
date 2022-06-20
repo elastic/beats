@@ -93,11 +93,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, util.PerfMetrics)
-=======
-	events, err := eventMapping(body, m.mod.GetPerfMetricsCache(), m.Logger())
->>>>>>> 4b625fc411 (Feature/cache expiration (#31785))
+	events, err := eventMapping(body, m.mod.GetPerfMetricsCache())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
