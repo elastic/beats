@@ -45,6 +45,7 @@ type Config struct {
 	RulesBlob    string   `config:"audit_rules"`         // Audit rules. One rule per line.
 	RuleFiles    []string `config:"audit_rule_files"`    // List of rule files.
 	SocketType   string   `config:"socket_type"`         // Socket type to use with the kernel (unicast or multicast).
+	Immutable    bool     `config:"immutable"`           // Sets kernel audit config immutable.
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
@@ -78,6 +79,7 @@ var defaultConfig = Config{
 	BacklogLimit:           8192,
 	RateLimit:              0,
 	RawMessage:             false,
+	Immutable:              false,
 	Warnings:               false,
 	ReassemblerMaxInFlight: 50,
 	ReassemblerTimeout:     2 * time.Second,

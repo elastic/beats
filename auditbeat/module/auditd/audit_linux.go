@@ -179,6 +179,14 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
+	if ms.config.Immutable {
+		if err := ms.client.SetImmutable(libaudit.WaitForReply); err != nil {
+			reporter.Error(err)
+			ms.log.Errorw("Failure setting audit config as immutable", "error", err)
+			return
+		}
+	}
+
 	if ms.kernelLost.enabled {
 		client, err := libaudit.NewAuditClient(nil)
 		if err != nil {
