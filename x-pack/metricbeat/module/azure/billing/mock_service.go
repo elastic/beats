@@ -30,9 +30,9 @@ func NewMockClient() *Client {
 }
 
 // GetForcast is a mock function for the billing service
-func (service *MockService) GetForecast(filter string) (consumption.ForecastsListResult, error) {
+func (service *MockService) GetForecast(filter string) ([]consumption.Forecast, error) {
 	args := service.Called(filter)
-	return args.Get(0).(consumption.ForecastsListResult), args.Error(1)
+	return args.Get(0).([]consumption.Forecast), args.Error(1)
 }
 
 // GetUsageDetails is a mock function for the billing service

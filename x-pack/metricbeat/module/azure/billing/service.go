@@ -19,7 +19,7 @@ import (
 
 // Service interface for the azure monitor service and mock for testing
 type Service interface {
-	GetForecast(filter string) (consumption.ForecastsListResult, error)
+	GetForecast(filter string) ([]consumption.Forecast, error)
 	GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, metrictype consumption.Metrictype, startDate string, endDate string) (consumption.UsageDetailsListResultPage, error)
 }
 
@@ -54,9 +54,24 @@ func NewService(config azure.Config) (*UsageService, error) {
 	return &service, nil
 }
 
-// GetForcast
-func (service *UsageService) GetForecast(filter string) (consumption.ForecastsListResult, error) {
-	return service.forecastsClient.List(service.context, filter)
+// GetForecast fetches the forecast for the given filter.
+func (service *UsageService) GetForecast(filter string) ([]consumption.Forecast, error) {
+	response, err := service.forecastsClient.List(service.context, filter)
+	if err != nil {
+		switch response.StatusCode {
+		case 404:
+			service.log.Warnf(
+				"no forecasts found for filter: \"%s\"; root cause: %v",
+				filter,
+				err,
+			)
+			return []consumption.Forecast{}, nil
+		default:
+			return nil, err
+		}
+	}
+
+	return *response.Value, nil
 }
 
 // GetUsageDetails

@@ -43,7 +43,6 @@ func NewClient(config azure.Config) (*Client, error) {
 
 // GetMetrics returns the usage detail and forecast values.
 func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage, error) {
-
 	var usage Usage
 	scope := fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId)
 	if client.Config.BillingScopeDepartment != "" {
@@ -51,10 +50,6 @@ func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage,
 	} else if client.Config.BillingScopeAccountId != "" {
 		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
 	}
-
-	//startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
-	//endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
-
 	client.Log.Infof("Getting usage details for scope: %s, startDate: %s, endDate: %s", scope, startTime, endTime)
 
 	usageDetails, err := client.BillingService.GetUsageDetails(
@@ -84,15 +79,15 @@ func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage,
 
 	actualCosts, err := client.BillingService.GetForecast(fmt.Sprintf("properties/chargeType eq '%s'", "Actual"))
 	if err != nil {
-		return usage, fmt.Errorf("Retrieving forecast - actual costs failed in client: %w", err)
+		return usage, fmt.Errorf("retrieving forecast - actual costs failed in client: %v", err)
 	}
-	usage.ActualCosts = *actualCosts.Value
+	usage.ActualCosts = actualCosts
 
 	forecastCosts, err := client.BillingService.GetForecast(fmt.Sprintf("properties/chargeType eq '%s'", "Forecast"))
 	if err != nil {
-		return usage, fmt.Errorf("Retrieving forecast - forecast costs failed in client: %w", err)
+		return usage, fmt.Errorf("retrieving forecast - forecast costs failed in client: %v", err)
 	}
-	usage.ForecastCosts = *forecastCosts.Value
+	usage.ForecastCosts = forecastCosts
 
 	return usage, nil
 }
