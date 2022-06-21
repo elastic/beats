@@ -19,11 +19,10 @@ package actions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -83,7 +82,7 @@ func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	err := c.Unpack(&config)
 	if err != nil {
 		logger.Warn("Error unpacking config for decode_json_fields")
-		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %w", err)
 	}
 
 	f := &decodeJSONFields{
@@ -141,13 +140,25 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 				if tmp, err := common.MapStr(dict).GetValue(key); err == nil {
 					if v, ok := tmp.(string); ok {
 						id = v
+<<<<<<< HEAD
 						common.MapStr(dict).Delete(key)
+=======
+						_ = mapstr.M(dict).Delete(key)
+>>>>>>> 7b99a8ec45 (Expand fields in `decode_json_fields` if target is set (#32010))
 					}
 				}
 			}
 		}
 
 		if target != "" {
+			if f.expandKeys {
+				switch t := output.(type) {
+				case map[string]interface{}:
+					jsontransform.ExpandFields(f.logger, event, t, f.addErrorKey)
+				default:
+					errs = append(errs, "failed to expand keys")
+				}
+			}
 			_, err = event.PutValue(target, output)
 		} else {
 			switch t := output.(type) {
@@ -199,14 +210,14 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		var tmp interface{}
 		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
-			return v, err == errProcessingSkipped
+			return v, errors.Is(err, errProcessingSkipped)
 		}
 
 		return tmp, true
 	}
 
 	// try to deep unmarshal fields
-	switch O := interface{}(*fields).(type) {
+	switch O := (*fields).(type) {
 	case map[string]interface{}:
 		for k, v := range O {
 			if decoded, ok := tryUnmarshal(v); ok {
@@ -241,11 +252,11 @@ func decodeJSON(text string, to *interface{}) error {
 		return errors.New("multiple json elements found")
 	}
 
-	if _, err := dec.Token(); err != nil && err != io.EOF {
+	if _, err := dec.Token(); err != nil && !errors.Is(err, io.EOF) {
 		return err
 	}
 
-	switch O := interface{}(*to).(type) {
+	switch O := (*to).(type) {
 	case map[string]interface{}:
 		jsontransform.TransformNumbers(O)
 	}

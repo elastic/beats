@@ -444,6 +444,7 @@ func TestExpandKeys(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+<<<<<<< HEAD
 func TestExpandKeysError(t *testing.T) {
 	testConfig := common.MustNewConfigFrom(map[string]interface{}{
 		"fields":        fields,
@@ -457,10 +458,28 @@ func TestExpandKeysError(t *testing.T) {
 		"error": common.MapStr{
 			"message": "cannot expand ...",
 			"type":    "json",
+=======
+func TestExpandKeysWithTarget(t *testing.T) {
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+		"fields":      fields,
+		"expand_keys": true,
+		"target":      "my_target",
+	})
+	input := mapstr.M{"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`}
+	expected := mapstr.M{
+		"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`,
+		"my_target": map[string]interface{}{
+			"a": mapstr.M{
+				"b": map[string]interface{}{
+					"c": "c",
+					"d": "d",
+				},
+			},
+>>>>>>> 7b99a8ec45 (Expand fields in `decode_json_fields` if target is set (#32010))
 		},
 	}
-
 	actual := getActualValue(t, testConfig, input)
+<<<<<<< HEAD
 	assert.Contains(t, actual, "error")
 	errorField := actual["error"].(common.MapStr)
 	assert.Contains(t, errorField, "message")
@@ -469,7 +488,41 @@ func TestExpandKeysError(t *testing.T) {
 	// message is not defined. Apart from that, the outcome is the same.
 	assert.Regexp(t, `cannot expand ".*": .*`, errorField["message"])
 	errorField["message"] = "cannot expand ..."
+=======
+>>>>>>> 7b99a8ec45 (Expand fields in `decode_json_fields` if target is set (#32010))
 	assert.Equal(t, expected, actual)
+}
+
+func TestExpandKeysError(t *testing.T) {
+	for _, target := range []string{"", "my_target"} {
+		t.Run(fmt.Sprintf("target set to '%s'", target), func(t *testing.T) {
+			testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+				"fields":        fields,
+				"expand_keys":   true,
+				"add_error_key": true,
+				"target":        "",
+			})
+			input := mapstr.M{"msg": `{"a.b": "c", "a.b.c": "d"}`}
+			expected := mapstr.M{
+				"msg": `{"a.b": "c", "a.b.c": "d"}`,
+				"error": mapstr.M{
+					"message": "cannot expand ...",
+					"type":    "json",
+				},
+			}
+
+			actual := getActualValue(t, testConfig, input)
+			assert.Contains(t, actual, "error")
+			errorField := actual["error"].(mapstr.M)
+			assert.Contains(t, errorField, "message")
+
+			// The order in which keys are processed is not defined, so the error
+			// message is not defined. Apart from that, the outcome is the same.
+			assert.Regexp(t, `cannot expand ".*": .*`, errorField["message"])
+			errorField["message"] = "cannot expand ..."
+			assert.Equal(t, expected, actual)
+		})
+	}
 }
 
 func TestOverwriteMetadata(t *testing.T) {
