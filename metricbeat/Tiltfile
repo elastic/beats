@@ -1,34 +1,81 @@
-# docker_build('metricbeat-debugger-image', '.',
-#     dockerfile='metricbeat/dev-tools/Dockerfile.debug')
-# k8s_yaml('metricbeat/dev-tools/k8s-debug.yaml')
-
-local_resource(
-  'metricbeat-compile',
-  'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/metricbeat .',
-  deps=['./main.go'])
 
 load('ext://restart_process', 'docker_build_with_restart')
 
-docker_build_with_restart(
-    'metricbeat-image',
-    '.',
-    entrypoint=[
-        '/usr/share/metricbeat/metricbeat',
-        "-c", "/etc/metricbeat.yml",
-        "-e",
-        "-system.hostfs=/hostfs",
-    ],
-    dockerfile='k8s-dev-tools/Dockerfile.run',
-    only=["build"],
-    live_update=[
-        sync('./build', '/usr/share/metricbeat'),
-    ],
+def metricbeat(
+        mode="run",  # or debug
+        **kwargs):
+
+    if mode not in ["run", "debug"]:
+        exit(-1)
+
+    ## Compile
+    flags = ""
+    if mode == "debug":
+        flags = '-gcflags "-N -l"'
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build {} -o build/metricbeat .".format(flags)
+    print("Build cmd: {}".format(build_cmd))
+
+    local_resource(
+        'metricbeat-compile',
+        build_cmd,
+        deps=['./main.go'])
+
+
+    ## Docker Build
+    docker_image = 'metricbeat-{}-image'.format(mode)
+    print("Docker image: {}".format(docker_image))
+
+    docker_file = 'k8s-dev-tools/Dockerfile.{}'.format(mode)
+    print("Docker file: {}".format(docker_file))
+
+    k8s_manifest = 'k8s-dev-tools/manifest.{}.yaml'.format(mode)
+    print("K8s manifest: {}".format(k8s_manifest))
+
+    if mode == "run":
+        docker_entrypoint = [
+                '/usr/share/metricbeat/metricbeat',
+                "-c", "/etc/metricbeat.yml",
+                "-e",
+                "-system.hostfs=/hostfs",
+            ]
+    else:
+        docker_entrypoint = [
+            "dlv",
+            "--headless=true",
+            "--listen=:56268",
+            "--api-version=2",
+            "--log",
+            "exec",
+            "/usr/share/metricbeat/metricbeat",
+            "--",
+            "-c", "/etc/metricbeat.yml",
+            "-e",
+            "-system.hostfs=/hostfs",
+        ]
+    print("Docker entrypoint: {}".format(docker_entrypoint))
+
+    docker_build_with_restart(
+        docker_image,
+        '.',
+        entrypoint=docker_entrypoint,
+        dockerfile=docker_file,
+        only=["build"],
+        live_update=[
+            sync('./build', '/usr/share/metricbeat'),
+        ],
     )
-# docker_build(
-#     'metricbeat-image',
-#     '.',
-#     dockerfile='k8s-dev-tools/Dockerfile.run',
-#     only=["build"]
-#     )
-k8s_yaml('k8s-dev-tools/k8s-run.yaml')
-k8s_resource('metricbeat')
+
+    k8s_yaml(k8s_manifest)
+
+    if mode == "run":
+        k8s_resource('metricbeat')
+    else:
+        k8s_resource('metricbeat', port_forwards=56268)
+
+
+metricbeat(mode="run")
+# metricbeat(mode="debug")
+
+
+
+
