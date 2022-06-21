@@ -21,6 +21,7 @@ Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-305011: Built dynamic UDP t
 Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-302015: Built outbound UDP connection 11758 for outside:100.66.80.32/53 (100.66.80.32/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)
 Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-302016: Teardown UDP connection 11758 for outside:100.66.80.32/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 148
 Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-302015: Built outbound UDP connection 11759 for outside:100.66.252.6/53 (100.66.252.6/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)
+Jun 21 2022 14:08:00 localhost CiscoASA[999]: %ASA-6-302015: Built inbound UDP connection 13292 for outside:10.10.10.2/1773 (10.10.10.2/1773)(LOCAL\username, 321) to inside:10.10.10.3/53 (10.10.10.3/53) (username)
 Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-302016: Teardown UDP connection 11759 for outside:100.66.252.6/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 164
 Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1773 to outside:100.66.98.44/8257
 Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-6-302013: Built outbound TCP connection 11760 for outside:100.66.252.226/80 (100.66.252.226/80) to inside:172.31.98.44/1773 (172.31.98.44/1773)
