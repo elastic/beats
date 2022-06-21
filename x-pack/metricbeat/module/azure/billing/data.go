@@ -5,6 +5,7 @@
 package billing
 
 import (
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
@@ -30,28 +31,36 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 			//
 			if legacy, isLegacy := ud.AsLegacyUsageDetail(); isLegacy {
 				event.ModuleFields = mapstr.M{
+					"subscription_id": legacy.SubscriptionID,
 					"resource": mapstr.M{
+						"name":  legacy.ResourceName,
 						"type":  legacy.ConsumedService,
 						"group": legacy.ResourceGroup,
-						"name":  legacy.ResourceName,
 					},
-					"subscription_id": legacy.SubscriptionID,
 				}
 				event.MetricSetFields = mapstr.M{
-					"pretax_cost":          legacy.Cost,
-					"department_name":      legacy.InvoiceSection,
-					"product":              legacy.Product,
-					"usage_start":          startTime,
-					"usage_end":            endTime,
+					// original fields
+					"product":         legacy.Product,
+					"pretax_cost":     legacy.Cost,
+					"currency":        legacy.BillingCurrency,
+					"department_name": legacy.InvoiceSection,
+					"account_name":    legacy.BillingAccountName,
+					"usage_start":     startTime, // not sure the value is correct
+					"usage_end":       endTime,   // not sure the value is correct
+					// "billing_period_id":   "?", // missing
+
 					"billing_period_start": legacy.BillingPeriodStartDate.ToTime(),
 					"billing_period_end":   legacy.BillingPeriodEndDate.ToTime(),
-					"currency":             legacy.BillingCurrency,
-					"effective_price":      legacy.EffectivePrice,
-					"account_name":         legacy.BillingAccountName,
-					"account_id":           legacy.BillingAccountID,
-					"subscription_name":    legacy.SubscriptionName,
-					"unit_price":           legacy.UnitPrice,
-					"quantity":             legacy.Quantity,
+
+					// additional fields
+					"usage_date":        legacy.Date, // Date for the usage record.
+					"account_id":        legacy.BillingAccountID,
+					"subscription_name": legacy.SubscriptionName,
+					"unit_price":        legacy.UnitPrice,
+					"quantity":          legacy.Quantity,
+
+					// legacy-only fields
+					"effective_price": legacy.EffectivePrice,
 				}
 				_, _ = event.RootFields.Put("cloud.region", legacy.ResourceLocation)
 				_, _ = event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
@@ -63,25 +72,33 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 			//
 			if modern, isModern := ud.AsModernUsageDetail(); isModern {
 				event.ModuleFields = mapstr.M{
+					"subscription_id": modern.SubscriptionGUID,
 					"resource": mapstr.M{
+						"name":  getResourceNameFromPath(*modern.InstanceName),
 						"type":  modern.ConsumedService,
 						"group": modern.ResourceGroup,
-						"name":  modern.InstanceName,
 					},
-					"subscription_id": modern.SubscriptionGUID,
 				}
 				event.MetricSetFields = mapstr.M{
-					"department_name":      modern.InvoiceSectionName,
-					"product":              modern.Product,
-					"usage_start":          startTime,
-					"usage_end":            endTime,
+					// original fields
+					"product":         modern.Product,
+					"pretax_cost":     modern.CostInBillingCurrency,
+					"currency":        modern.BillingCurrencyCode,
+					"department_name": modern.InvoiceSectionName,
+					"account_name":    modern.BillingAccountName,
+					"usage_start":     startTime, // not sure the value is correct
+					"usage_end":       endTime,   // not sure the value is correct
+					// "billing_period_id":   "?", // missing
+
+					// additional fields
+					"usage_date":        modern.Date, // Date for the usage record.
+					"account_id":        modern.BillingAccountID,
+					"subscription_name": modern.SubscriptionName,
+					"unit_price":        modern.UnitPrice,
+					"quantity":          modern.Quantity,
+
 					"billing_period_start": modern.BillingPeriodStartDate.ToTime(),
 					"billing_period_end":   modern.BillingPeriodEndDate.ToTime(),
-					"currency":             modern.BillingCurrencyCode,
-					"account_id":           modern.BillingAccountID,
-					"billing_account_name": modern.BillingAccountName,
-					"subscription_name":    modern.SubscriptionName,
-					"unit_price":           modern.UnitPrice,
 				}
 				_, _ = event.RootFields.Put("cloud.region", modern.ResourceLocation)
 			}
@@ -140,4 +157,17 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 	}
 
 	return events
+}
+
+// getResourceNameFromPath returns the resource name by picking the last part from a `/` separated resource path.
+//
+// For example, given a path like the following:
+// `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}`
+//
+// It would return the value `{vmName}`.
+func getResourceNameFromPath(path string) string {
+	parts := strings.Split(path, "/")
+	// According to the documentation, `string.Split()` always returns a non-empty slice when the separator is not empty,
+	// so it should be safe to use `len(parts) - 1` to get the last element.
+	return parts[len(parts)-1]
 }
