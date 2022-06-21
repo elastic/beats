@@ -20,10 +20,8 @@ output.shipper:
   max_retries: 3
   bulk_max_size: 50
   backoff:
-    base_delay: 1
-    multiplier: 1.6
-    jitter: 0.2
-    max_delay: 120
+    init: 1
+    max: 60
 ```
 
 ## Configuration options
@@ -62,3 +60,16 @@ Specifying a larger batch size may add some latency and buffering during publish
 Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
+
+### `backoff.init`
+
+The number of seconds to wait before trying to republish to Kafka
+after a network error. After waiting `backoff.init` seconds, {beatname_uc}
+tries to republish. If the attempt fails, the backoff timer is increased
+exponentially up to `backoff.max`. After a successful publish, the backoff
+timer is reset. The default is 1s.
+
+### `backoff.max`
+
+The maximum number of seconds to wait before attempting to republish to
+Kafka after a network error. The default is 60s.

@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -48,6 +47,7 @@ type shipper struct {
 	conn     *grpc.ClientConn
 	client   sc.ProducerClient
 	timeout  time.Duration
+	config   Config
 }
 
 func init() {
@@ -67,13 +67,25 @@ func makeShipper(
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	s := outputs.WithBackoff(&shipper{
+		log:      logp.NewLogger("shipper"),
+		observer: observer,
+		config:   config,
+		timeout:  config.Timeout,
+	}, config.Backoff.Init, config.Backoff.Max)
+
+	return outputs.Success(config.BulkMaxSize, config.MaxRetries, s)
+}
+
+// Connect establishes connection to the shipper server and implements `outputs.Connectable`.
+func (c *shipper) Connect() error {
+	tls, err := tlscommon.LoadTLSConfig(c.config.TLS)
 	if err != nil {
-		return outputs.Fail(fmt.Errorf("invalid shipper TLS configuration: %w", err))
+		return fmt.Errorf("invalid shipper TLS configuration: %w", err)
 	}
 
 	var creds credentials.TransportCredentials
-	if config.TLS != nil && config.TLS.Enabled != nil && *config.TLS.Enabled {
+	if c.config.TLS != nil && c.config.TLS.Enabled != nil && *c.config.TLS.Enabled {
 		creds = credentials.NewTLS(tls.ToConfig())
 	} else {
 		creds = insecure.NewCredentials()
@@ -81,36 +93,36 @@ func makeShipper(
 
 	opts := []grpc.DialOption{
 		grpc.WithConnectParams(grpc.ConnectParams{
-			Backoff:           backoff.DefaultConfig,
-			MinConnectTimeout: config.Timeout,
+			MinConnectTimeout: c.config.Timeout,
 		}),
+		grpc.WithBlock(),
 		grpc.WithTransportCredentials(creds),
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
+
+	ctx, cancel := context.WithTimeout(context.Background(), c.config.Timeout)
 	defer cancel()
 
-	log := logp.NewLogger("shipper")
-	log.Debugf("trying to connect to %s...", config.Server)
+	c.log.Debugf("trying to connect to %s...", c.config.Server)
 
-	conn, err := grpc.DialContext(ctx, config.Server, opts...)
+	conn, err := grpc.DialContext(ctx, c.config.Server, opts...)
 	if err != nil {
-		return outputs.Fail(fmt.Errorf("shipper connection failed with: %w", err))
+		return fmt.Errorf("shipper connection failed with: %w", err)
 	}
-	log.Debugf("connect to %s established.", config.Server)
+	c.log.Debugf("connect to %s established.", c.config.Server)
 
-	s := &shipper{
-		log:      log,
-		observer: observer,
-		conn:     conn,
-		client:   sc.NewProducerClient(conn),
-		timeout:  config.Timeout,
-	}
+	c.conn = conn
+	c.client = sc.NewProducerClient(conn)
 
-	return outputs.Success(config.BulkMaxSize, config.MaxRetries, s)
+	return nil
 }
 
-//nolint: godox // this implementation is not finished
+// Publish sends converts and sends a batch of events to the shipper server.
+// Also, implements `outputs.Client`
 func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
+	if c.client == nil {
+		return fmt.Errorf("connection is not established")
+	}
+
 	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))
@@ -147,8 +159,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	if status.Code(err) != codes.OK || resp == nil {
 		batch.Cancelled()         // does not decrease the TTL
 		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
-		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %s", len(convertedEvents), err)
-		return nil
+		return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
 	}
 
 	// with a correct server implementation should never happen, this error is not recoverable
@@ -177,10 +188,23 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	return nil
 }
 
+// Close closes the connection to the shipper server.
+// Also, implements `outputs.Client`
 func (c *shipper) Close() error {
-	return c.conn.Close()
+	if c.client == nil {
+		return fmt.Errorf("connection is not established")
+	}
+	err := c.conn.Close()
+	if err != nil {
+		return err
+	}
+	c.conn = nil
+	c.client = nil
+
+	return nil
 }
 
+// String implements `outputs.Client`
 func (c *shipper) String() string {
 	return "shipper"
 }
