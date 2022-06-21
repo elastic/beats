@@ -11,19 +11,15 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -105,6 +101,7 @@ func TestJourneyEnricher(t *testing.T) {
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
+				"monitor.check_group": isdef.IsString,
 			}))
 		}
 		return lookslike.Compose(v...)
@@ -468,31 +465,20 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 func TestCreateSummaryEvent(t *testing.T) {
 	baseTime := time.Now()
 
-	defaultLogValidator := func(stepCount int) func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
-		return func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
-			require.Len(t, observed, 1)
-			require.Equal(t, "Monitor finished", observed[0].Message)
-
-			durationMs := baseTime.Add(10 * time.Microsecond).Sub(baseTime).Milliseconds()
-			expectedMonitor := logger.NewMonitorRunInfo("my-monitor", "browser", durationMs)
-			expectedMonitor.Steps = &stepCount
-			require.ElementsMatch(t, []zap.Field{
-				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
-				logp.Any("monitor", &expectedMonitor),
-			}, observed[0].Context)
-		}
+	testJourney := Journey{
+		ID:   "my-monitor",
+		Name: "My Monitor",
 	}
 
 	tests := []struct {
-		name         string
-		je           *journeyEnricher
-		expected     mapstr.M
-		wantErr      bool
-		logValidator func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry)
+		name     string
+		je       *journeyEnricher
+		expected mapstr.M
+		wantErr  bool
 	}{{
 		name: "completed without errors",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
@@ -505,12 +491,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   1,
 			},
 		},
-		wantErr:      false,
-		logValidator: defaultLogValidator(3),
+		wantErr: false,
 	}, {
 		name: "completed with error",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
@@ -524,12 +509,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   0,
 			},
 		},
-		wantErr:      true,
-		logValidator: defaultLogValidator(0),
+		wantErr: true,
 	}, {
 		name: "started, but exited without running steps",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			stepCount:       0,
@@ -542,12 +526,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   1,
 			},
 		},
-		wantErr:      true,
-		logValidator: defaultLogValidator(0),
+		wantErr: true,
 	}, {
 		name: "syntax error - exited without starting",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
 			errorCount:      1,
@@ -558,21 +541,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   0,
 			},
 		},
-		logValidator: func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
-			// We don't log run data without duration
-			require.Len(t, observed, 1)
-			require.Equal(t, "Error gathering information to log event", observed[0].Message)
-		},
 		wantErr: true,
 	}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			core, observed := observer.New(zapcore.InfoLevel)
-			logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-				return zapcore.NewTee(in, core)
-			})))
-
 			monitorField := mapstr.M{"id": "my-monitor", "type": "browser"}
 
 			e := &beat.Event{
@@ -591,13 +564,9 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"url":                mapstr.M{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
-				"synthetics.journey": Journey{},
+				"synthetics.journey": testJourney,
 			}, true)
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
-
-			if tt.logValidator != nil {
-				tt.logValidator(t, tt.expected, observed.All())
-			}
 		})
 	}
 }
