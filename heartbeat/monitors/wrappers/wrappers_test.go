@@ -466,7 +466,7 @@ type BrowserMonitor struct {
 	id         string
 	name       string
 	checkGroup string
-	duration   int64
+	durationMs int64
 	// Used for testing legacy zip_url and local monitors
 	// where the top-level id/name are used to populate monitor.project
 	legacyProjectId   string
@@ -529,7 +529,7 @@ var projectMonitorValues = BrowserMonitor{
 	id:         "project-journey_1",
 	name:       "project-Journey 1",
 	checkGroup: "journey-1-check-group",
-	duration:   100,
+	durationMs: time.Second.Microseconds(),
 }
 
 // Used for testing legacy zip_url / local monitorss
@@ -545,6 +545,7 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.SetMeta(event, META_STEP_COUNT, 2)
 		eventext.MergeEventFields(event, mapstr.M{
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
@@ -552,7 +553,7 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 				"id":          bm.id,
 				"name":        bm.name,
 				"check_group": bm.checkGroup,
-				"duration":    mapstr.M{"us": bm.duration},
+				"duration":    mapstr.M{"us": bm.durationMs},
 			},
 		})
 		if summary {
@@ -598,7 +599,7 @@ func TestProjectBrowserJob(t *testing.T) {
 			"type":        "browser",
 			"id":          projectMonitorValues.id,
 			"name":        projectMonitorValues.name,
-			"duration":    mapstr.M{"us": int64(100)},
+			"duration":    mapstr.M{"us": int64(time.Second.Microseconds())},
 			"origin":      "my-origin",
 			"check_group": projectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
@@ -637,7 +638,7 @@ func TestProjectBrowserJob(t *testing.T) {
 					}),
 				))},
 		nil,
-		browserLogValidator(projectMonitorValues.id, 0, 0),
+		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2),
 	})
 	testCommonWrap(t, testDef{
 		"with down summary",
@@ -658,7 +659,7 @@ func TestProjectBrowserJob(t *testing.T) {
 					}),
 				))},
 		nil,
-		nil,
+		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2),
 	})
 
 	legacySFields := testBrowserMonFields
