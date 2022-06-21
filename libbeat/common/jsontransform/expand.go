@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -52,7 +50,7 @@ func expandFields(m mapstr.M) error {
 		newMap, newIsMap := getMap(v)
 		if newIsMap {
 			if err := expandFields(newMap); err != nil {
-				return errors.Wrapf(err, "error expanding %q", k)
+				return fmt.Errorf("error expanding %q: %w", k, err)
 			}
 		}
 		if dot := strings.IndexRune(k, '.'); dot < 0 {
@@ -79,10 +77,10 @@ func expandFields(m mapstr.M) error {
 		} else {
 			oldMap, oldIsMap := getMap(old)
 			if !oldIsMap {
-				return fmt.Errorf("cannot expand %q: found conflicting key", k)
+				return fmt.Errorf("cannot expand %q: found conflicting key: %w", k, err)
 			}
 			if err := mergeObjects(newMap, oldMap); err != nil {
-				return errors.Wrapf(err, "cannot expand %q", k)
+				return fmt.Errorf("cannot expand %q: %w", k, err)
 			}
 		}
 	}
@@ -111,7 +109,7 @@ func mergeObjects(lhs, rhs mapstr.M) error {
 			return fmt.Errorf("cannot merge %q: found (%T) value", k, rhsValue)
 		}
 		if err := mergeObjects(lhsMap, rhsMap); err != nil {
-			return errors.Wrapf(err, "cannot merge %q", k)
+			return fmt.Errorf("cannot merge %q: %w", k, err)
 		}
 	}
 	return nil
