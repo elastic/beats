@@ -20,7 +20,11 @@ def metricbeat(
     local_resource(
         'metricbeat-compile',
         build_cmd,
-        deps=['./main.go'])
+        deps=['.'],
+        ignore=[
+            "build",
+            "Tiltfile"
+        ])
 
 
     ## Docker Build
@@ -29,9 +33,6 @@ def metricbeat(
 
     docker_file = 'k8s-dev-tools/Dockerfile.{}'.format(mode)
     print("Docker file: {}".format(docker_file))
-
-    k8s_manifest = 'k8s-dev-tools/manifest.{}.yaml'.format(mode)
-    print("K8s manifest: {}".format(k8s_manifest))
 
     if mode == "run":
         docker_entrypoint = [
@@ -67,16 +68,21 @@ def metricbeat(
         ],
     )
 
+    ## Deploy to k8s
+    k8s_manifest = 'k8s-dev-tools/manifest.{}.yaml'.format(mode)
+    print("K8s manifest: {}".format(k8s_manifest))
+
     k8s_yaml(k8s_manifest)
 
+    ## Expose resource
     if mode == "run":
         k8s_resource('metricbeat')
     else:
         k8s_resource('metricbeat', port_forwards=56268)
 
 
-# metricbeat(mode="run")
-metricbeat(mode="debug")
+metricbeat(mode="run")
+# metricbeat(mode="debug")
 
 
 
