@@ -8,6 +8,8 @@ def metricbeat(
     if mode not in ["run", "debug"]:
         exit(-1)
 
+    print("Mode: {}".format(mode))
+
     ## Compile
     flags = ""
     if mode == "debug":
@@ -73,8 +75,8 @@ def metricbeat(
         k8s_resource('metricbeat', port_forwards=56268)
 
 
-metricbeat(mode="run")
-# metricbeat(mode="debug")
+# metricbeat(mode="run")
+metricbeat(mode="debug")
 
 
 
