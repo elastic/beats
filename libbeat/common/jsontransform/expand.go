@@ -67,7 +67,7 @@ func expandFields(m mapstr.M) error {
 		old, err := m.Put(k, v)
 		if err != nil {
 			// Put will return an error if we attempt to insert into a non-object value.
-			return fmt.Errorf("cannot expand %q: found conflicting key", k)
+			return fmt.Errorf("cannot expand %q: found conflicting key: %w", k, err)
 		}
 		if old == nil {
 			continue
@@ -77,7 +77,7 @@ func expandFields(m mapstr.M) error {
 		} else {
 			oldMap, oldIsMap := getMap(old)
 			if !oldIsMap {
-				return fmt.Errorf("cannot expand %q: found conflicting key: %w", k, err)
+				return fmt.Errorf("cannot expand %q: found conflicting key", k)
 			}
 			if err := mergeObjects(newMap, oldMap); err != nil {
 				return fmt.Errorf("cannot expand %q: %w", k, err)
