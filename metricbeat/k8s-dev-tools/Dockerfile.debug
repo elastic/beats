@@ -7,7 +7,7 @@ ENV CGO_ENABLED=0
 # RUN apk add --no-cache git
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.3
 
-COPY metricbeat /usr/share/metricbeat/metricbeat
+COPY build/metricbeat /usr/share/metricbeat/metricbeat
 
 FROM alpine:3.15
 
