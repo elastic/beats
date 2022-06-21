@@ -63,17 +63,13 @@ func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
 	return p.projectCfg.FilterJourneys
 }
 
-func (p *Project) Fields() stdfields.StdMonitorFields {
-	sFields := stdfields.StdMonitorFields{
-		Name: p.projectCfg.Name,
-		ID:   p.projectCfg.Id,
-		Type: "browser",
+func (p *Project) StdFields() stdfields.StdMonitorFields {
+	sFields, err := stdfields.ConfigToStdMonitorFields(p.rawCfg)
+	// Should be impossible since outer monitor.go should run this same code elsewhere
+	// TODO: Just pass stdfields in to remove second deserialize
+	if err != nil {
+		logp.L().Warnf("Could not deserialize monitor fields for browser, this should never happen: %s", err)
 	}
-
-	if p.projectCfg.Source.Local != nil || p.projectCfg.Source.ZipUrl != nil {
-		sFields.IsLegacyBrowserSource = true
-	}
-
 	return sFields
 }
 
@@ -131,14 +127,14 @@ func (p *Project) jobs() []jobs.Job {
 	isScript := p.projectCfg.Source.Inline != nil
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.Fields(), p.extraArgs()...)
+		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.StdFields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.Fields(), p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
