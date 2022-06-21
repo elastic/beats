@@ -15,8 +15,8 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -105,6 +105,8 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		}
 	}
 
+	// Needed for the edge case where a console log is emitted after one journey ends
+	// but before another begins.
 	if je.journey != nil {
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
@@ -142,7 +144,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		event.SetID(se.Id)
 		// This is only relevant for screenshots, which have a specific ID
 		// In that case we always want to issue an update op
-		_, _ = event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+		eventext.SetMeta(event, events.FieldMetaOpType, events.OpTypeCreate)
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())
@@ -195,10 +197,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		},
 	})
 
-	_, err := event.GetValue("monitor.id")
-	if err == nil {
-		logger.LogRun(event, &je.stepCount)
-	}
+	eventext.SetMeta(event, wrappers.META_STEP_COUNT, je.stepCount)
 
 	if je.journeyComplete {
 		return je.firstError

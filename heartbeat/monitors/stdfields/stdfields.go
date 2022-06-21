@@ -67,7 +67,7 @@ func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	}
 
 	// TODO: Delete this once browser / local monitors are removed
-	if sFields.Source.Local == nil || sFields.Source.ZipUrl == nil {
+	if sFields.Source.Local != nil || sFields.Source.ZipUrl != nil {
 		sFields.IsLegacyBrowserSource = true
 	}
 

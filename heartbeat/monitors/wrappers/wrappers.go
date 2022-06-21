@@ -71,6 +71,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(true),
+		logJourneySummaries,
 	)
 }
 
@@ -226,6 +227,27 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 		}
 
 		return cont, err
+	}
+}
+
+const META_STEP_COUNT = "__HEARTBEAT_STEP_COUNT__"
+
+// logJourneySummaries emits a metric for the service when summary events are complete.
+// Only applies to browser journeys.
+func logJourneySummaries(job jobs.Job) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		conts, err := job(event)
+
+		summary, _ := event.GetValue("summary")
+		if summary != nil {
+			sc, _ := event.Meta.GetValue(META_STEP_COUNT)
+			var scInt int
+			// If we don't have it we have zero steps
+			scInt, _ = sc.(int)
+			logger.LogRun(event, &scInt)
+		}
+
+		return conts, err
 	}
 }
 
