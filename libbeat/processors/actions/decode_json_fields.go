@@ -214,7 +214,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	}
 
 	// try to deep unmarshal fields
-	switch O := fields.(type) {
+	switch O := (*fields).(type) {
 	case map[string]interface{}:
 		for k, v := range O {
 			if decoded, ok := tryUnmarshal(v); ok {
@@ -253,7 +253,7 @@ func decodeJSON(text string, to *interface{}) error {
 		return err
 	}
 
-	switch O := to.(type) {
+	switch O := (*to).(type) {
 	case map[string]interface{}:
 		jsontransform.TransformNumbers(O)
 	}
