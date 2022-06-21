@@ -85,7 +85,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 			p := fileProspector{
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
-				filewatcher:  &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
+				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
 			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
 
@@ -151,7 +151,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			testStore := newMockProspectorCleaner(testCase.entries)
 			p := fileProspector{
 				identifier:  mustPathIdentifier(false),
-				filewatcher: &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
+				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
 			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
 
@@ -244,7 +244,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				filewatcher: &mockFileWatcher{events: test.events},
+				filewatcher: newMockFileWatcher(test.events, len(test.events)),
 				identifier:  mustPathIdentifier(false),
 				ignoreOlder: test.ignoreOlder,
 			}
@@ -279,8 +279,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 		harvesterGroupStop{},
 	}
 
-	watcherCtx, cancelWatcher := context.WithCancel(context.Background())
-	filewatcher := &mockFileWatcher{events: []loginp.FSEvent{eventCreate}, ctx: watcherCtx}
+	filewatcher := newMockFileWatcher([]loginp.FSEvent{eventCreate}, 2)
 	p := fileProspector{
 		filewatcher: filewatcher,
 		identifier:  mustPathIdentifier(false),
@@ -310,8 +309,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 
 	// The ignored file is updated, so the prospector must start a new harvester
 	// to read the new lines.
-	filewatcher.events = append(filewatcher.events, eventUpdated)
-	cancelWatcher()
+	filewatcher.out <- eventUpdated
 	wg.Wait()
 
 	assert.Eventually(
@@ -347,7 +345,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				filewatcher:  &mockFileWatcher{events: test.events},
+				filewatcher:  newMockFileWatcher(test.events, len(test.events)),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: test.cleanRemoved,
 			}
@@ -428,7 +426,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				filewatcher:       &mockFileWatcher{events: test.events},
+				filewatcher:       newMockFileWatcher(test.events, len(test.events)),
 				identifier:        mustPathIdentifier(test.trackRename),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: test.closeRenamed},
 			}
@@ -504,22 +502,41 @@ func (t *testHarvesterGroup) StopGroup() error {
 }
 
 type mockFileWatcher struct {
-	ctx         context.Context
-	nextIdx     int
 	events      []loginp.FSEvent
 	filesOnDisk map[string]os.FileInfo
+
+	outputCount, eventCount int
+
+	out chan loginp.FSEvent
+}
+
+// newMockFileWatcher creates an FSWatch mock, so you can read
+// the required FSEvents from it using the Event function.
+func newMockFileWatcher(events []loginp.FSEvent, eventCount int) *mockFileWatcher {
+	w := &mockFileWatcher{events: events, eventCount: eventCount, out: make(chan loginp.FSEvent, eventCount)}
+	for _, evt := range events {
+		w.out <- evt
+	}
+	return w
+}
+
+// newMockFileWatcherWithFiles creates an FSWatch mock to
+// get the required file information from the file system using
+// the GetFiles function.
+func newMockFileWatcherWithFiles(filesOnDisk map[string]os.FileInfo) *mockFileWatcher {
+	return &mockFileWatcher{
+		filesOnDisk: filesOnDisk,
+		out:         make(chan loginp.FSEvent),
+	}
 }
 
 func (m *mockFileWatcher) Event() loginp.FSEvent {
-AGAIN:
-	if len(m.events) == m.nextIdx {
-		if m.ctx != nil && m.ctx.Err() == nil {
-			goto AGAIN
-		}
+	if m.outputCount == m.eventCount {
+		close(m.out)
 		return loginp.FSEvent{}
 	}
-	evt := m.events[m.nextIdx]
-	m.nextIdx++
+	evt := <-m.out
+	m.outputCount = m.outputCount + 1
 	return evt
 }
 
