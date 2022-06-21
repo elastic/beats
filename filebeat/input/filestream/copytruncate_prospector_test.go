@@ -19,7 +19,6 @@ package filestream
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"testing"
 
@@ -145,14 +144,12 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			for originalFile, rotatedFiles := range test.expectedRotatedFiles {
 				rFile, ok := p.rotatedFiles.table[originalFile]
 				if !ok {
-					fmt.Printf("cannot find %s in original files\n", originalFile)
-					t.FailNow()
+					t.Fatalf("cannot find %s in original files\n", originalFile)
 				}
 				require.Equal(t, len(rotatedFiles), len(rFile.rotated))
 				for i, rotatedFile := range rotatedFiles {
 					if rFile.rotated[i].path != rotatedFile {
-						fmt.Printf("%s is not a rotated file, instead %s is\n", rFile.rotated[i].path, rotatedFile)
-						t.FailNow()
+						t.Fatalf("%s is not a rotated file, instead %s is\n", rFile.rotated[i].path, rotatedFile)
 					}
 				}
 			}
