@@ -63,7 +63,7 @@ number of events to be contained in a batch.
 
 ### `backoff.init`
 
-The number of seconds to wait before trying to republish to Kafka
+The number of seconds to wait before trying to republish to the shipper
 after a network error. After waiting `backoff.init` seconds, {beatname_uc}
 tries to republish. If the attempt fails, the backoff timer is increased
 exponentially up to `backoff.max`. After a successful publish, the backoff
@@ -72,4 +72,4 @@ timer is reset. The default is 1s.
 ### `backoff.max`
 
 The maximum number of seconds to wait before attempting to republish to
-Kafka after a network error. The default is 60s.
+the shipper after a network error. The default is 60s.
