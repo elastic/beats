@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -54,13 +55,6 @@ func (p *Project) Workdir() string {
 	return p.projectCfg.Source.Active().Workdir()
 }
 
-func (p *Project) InlineSource() (string, bool) {
-	if p.projectCfg.Source.Inline != nil {
-		return p.projectCfg.Source.Inline.Script, true
-	}
-	return "", false
-}
-
 func (p *Project) Params() map[string]interface{} {
 	return p.projectCfg.Params
 }
@@ -69,14 +63,14 @@ func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
 	return p.projectCfg.FilterJourneys
 }
 
-func (p *Project) Fields() synthexec.StdProjectFields {
-	_, isInline := p.InlineSource()
-	return synthexec.StdProjectFields{
-		Name:     p.projectCfg.Name,
-		Id:       p.projectCfg.Id,
-		IsInline: isInline,
-		Type:     "browser",
+func (p *Project) StdFields() stdfields.StdMonitorFields {
+	sFields, err := stdfields.ConfigToStdMonitorFields(p.rawCfg)
+	// Should be impossible since outer monitor.go should run this same code elsewhere
+	// TODO: Just pass stdfields in to remove second deserialize
+	if err != nil {
+		logp.L().Warnf("Could not deserialize monitor fields for browser, this should never happen: %s", err)
 	}
+	return sFields
 }
 
 func (p *Project) Close() error {
@@ -130,15 +124,17 @@ func (p *Project) extraArgs() []string {
 
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
-	if src, ok := p.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.Fields(), p.extraArgs()...)
+	isScript := p.projectCfg.Source.Inline != nil
+	if isScript {
+		src := p.projectCfg.Source.Inline.Script
+		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.StdFields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.Fields(), p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
