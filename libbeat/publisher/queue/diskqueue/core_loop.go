@@ -277,7 +277,7 @@ func (dq *diskQueue) handleShutdown() {
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
 	// We won't be updating the position anymore, so we can close the file.
-	dq.acks.positionFile.Sync()
+	_ = dq.acks.positionFile.Sync()
 	dq.acks.positionFile.Close()
 	dq.acks.lock.Unlock()
 
