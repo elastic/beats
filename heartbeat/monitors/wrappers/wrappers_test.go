@@ -599,7 +599,7 @@ func TestProjectBrowserJob(t *testing.T) {
 			"type":        "browser",
 			"id":          projectMonitorValues.id,
 			"name":        projectMonitorValues.name,
-			"duration":    mapstr.M{"us": int64(time.Second.Microseconds())},
+			"duration":    mapstr.M{"us": time.Second.Microseconds()},
 			"origin":      "my-origin",
 			"check_group": projectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
