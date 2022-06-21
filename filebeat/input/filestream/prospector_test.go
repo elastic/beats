@@ -297,7 +297,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 		wg.Done()
 	}()
 
-	// The prospector must persist the size of the to the state
+	// The prospector must persist the size of the file to the state
 	// as the offset, so when the file is updated only the new
 	// lines are sent to the output.
 	assert.Eventually(
