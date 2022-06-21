@@ -79,13 +79,13 @@ func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage,
 
 	actualCosts, err := client.BillingService.GetForecast(fmt.Sprintf("properties/chargeType eq '%s'", "Actual"))
 	if err != nil {
-		return usage, fmt.Errorf("retrieving forecast - actual costs failed in client: %v", err)
+		return usage, fmt.Errorf("retrieving forecast - actual costs failed in client: %w", err)
 	}
 	usage.ActualCosts = actualCosts
 
 	forecastCosts, err := client.BillingService.GetForecast(fmt.Sprintf("properties/chargeType eq '%s'", "Forecast"))
 	if err != nil {
-		return usage, fmt.Errorf("retrieving forecast - forecast costs failed in client: %v", err)
+		return usage, fmt.Errorf("retrieving forecast - forecast costs failed in client: %w", err)
 	}
 	usage.ForecastCosts = forecastCosts
 

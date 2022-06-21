@@ -16,6 +16,8 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
+	ID := "ID"
+	kind := "legacy"
 	usageDate := "2020-08-08"
 	name := "test"
 	billingAccountId := "123"
@@ -48,6 +50,8 @@ func TestEventMapping(t *testing.T) {
 		Product:                &name,
 	}
 	var legacy = consumption.LegacyUsageDetail{
+		ID:                          &ID,
+		Kind:                        consumption.Kind(kind),
 		LegacyUsageDetailProperties: &pros,
 	}
 	var usage = Usage{UsageDetails: []consumption.BasicUsageDetail{legacy},

@@ -31,7 +31,7 @@ func TestClient(t *testing.T) {
 		client := NewMockClient()
 		client.Config = config
 		m := &MockService{}
-		m.On("GetForecast", mock.Anything).Return(consumption.ForecastsListResult{}, errors.New("invalid query"))
+		m.On("GetForecast", mock.Anything).Return([]consumption.Forecast{}, errors.New("invalid query"))
 		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
 		client.BillingService = m
 		results, err := client.GetMetrics(startTime, endTime)
@@ -44,7 +44,7 @@ func TestClient(t *testing.T) {
 		client.Config = config
 		m := &MockService{}
 		forecasts := []consumption.Forecast{{}, {}}
-		m.On("GetForecast", mock.Anything).Return(consumption.ForecastsListResult{Value: &forecasts}, nil)
+		m.On("GetForecast", mock.Anything).Return(forecasts, nil)
 		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
 		client.BillingService = m
 		results, err := client.GetMetrics(startTime, endTime)
