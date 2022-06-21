@@ -33,11 +33,11 @@ import (
 //
 // Note that expandFields is destructive, and in the case of an error the
 // map may be left in a semi-expanded state.
-func expandFields(m mapstr.M) error {
+func ExpandFields(m mapstr.M) error {
 	for k, v := range m {
 		newMap, newIsMap := getMap(v)
 		if newIsMap {
-			if err := expandFields(newMap); err != nil {
+			if err := ExpandFields(newMap); err != nil {
 				return errors.Wrapf(err, "error expanding %q", k)
 			}
 		}
