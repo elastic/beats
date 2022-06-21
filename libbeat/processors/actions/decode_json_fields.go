@@ -152,12 +152,9 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			if f.expandKeys {
 				switch t := output.(type) {
 				case map[string]interface{}:
-					if err := jsontransform.ExpandFields(t); err != nil {
-						f.logger.Errorf("JSON: failed to expand fields: %s", err)
-						event.SetErrorWithOption(mapstr.M{"json": mapstr.M{"error": err.Error()}}, f.addErrorKey)
-					}
+					jsontransform.ExpandFields(f.logger, event, t, f.addErrorKey)
 				default:
-					errs = append(errs, "failed to add target to root")
+					errs = append(errs, "failed to expand keys")
 				}
 			}
 			_, err = event.PutValue(target, output)

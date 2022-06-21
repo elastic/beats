@@ -23,8 +23,22 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// ExpandFields de-dots the keys in m by expanding them in-place into a
+// nested object structure, merging objects as necessary. If there are any
+// conflicts (i.e. a common prefix where one field is an object and another
+// is a non-object), an error key is added to the event if add_error_key
+// is enabled.
+func ExpandFields(logger *logp.Logger, event *beat.Event, m mapstr.M, addErrorKey bool) {
+	if err := expandFields(m); err != nil {
+		logger.Errorf("JSON: failed to expand fields: %s", err)
+		event.SetErrorWithOption(createJSONError(err.Error()), addErrorKey)
+	}
+}
 
 // expandFields de-dots the keys in m by expanding them in-place into a
 // nested object structure, merging objects as necessary. If there are any
@@ -33,11 +47,11 @@ import (
 //
 // Note that expandFields is destructive, and in the case of an error the
 // map may be left in a semi-expanded state.
-func ExpandFields(m mapstr.M) error {
+func expandFields(m mapstr.M) error {
 	for k, v := range m {
 		newMap, newIsMap := getMap(v)
 		if newIsMap {
-			if err := ExpandFields(newMap); err != nil {
+			if err := expandFields(newMap); err != nil {
 				return errors.Wrapf(err, "error expanding %q", k)
 			}
 		}
