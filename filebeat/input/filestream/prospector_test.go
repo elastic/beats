@@ -258,7 +258,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}
 }
 
-// TestProspectorNewAndUpdatedFiles checks if the prospector can
+// TestProspectorHarvesterUpdateIgnoredFiles checks if the prospector can
 // save the size of an ignored file to the registry. If the ignored
 // file is updated, and has to be collected, a new harvester is started.
 func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
