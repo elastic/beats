@@ -4,10 +4,14 @@
     Controller manager metrics
   release: ga
   fields:
-    - name: handler
+    - name: url
       type: keyword
       description: >
-        Request handler
+        Request url
+    - name: verb
+      type: keyword
+      description: >
+        Request verb
     - name: code
       type: keyword
       description: >
@@ -45,51 +49,29 @@
         - name: fds.open.count
           type: long
           description: Number of open file descriptors
+        - name: fds.max.count
+          type: long
+          description: Maximum number of open file descriptors
         - name: started.sec
           type: double
           description: Seconds since the process started
-    - name: http
+    - name: client.request
       type: group
       fields:
-        - name: request.duration.us.percentile.*
-          type: object
-          object_type: double
-          description: Request duration microseconds percentiles
-        - name: request.duration.us.sum
-          type: double
-          description: Request duration microseconds cumulative sum
-        - name: request.duration.us.count
+        - name: count
           type: long
-          description: Request count for duration
-        - name: request.size.bytes.percentile.*
-          type: object
-          object_type: long
-          description: Request size percentiles
-        - name: request.size.bytes.sum
+          description: >
+            Number of requests as client
+        - name: duration.sec.sum
           type: long
-          format: bytes
-          description: Request size cumulative sum
-        - name: request.size.bytes.count
+          description: Request duration, sum in seconds
+        - name: duration.sec.count
           type: long
-          description: Request count for size
-        - name: response.size.bytes.percentile.*
+          description: Request duration, number of operations
+        - name: duration.sec.bucket.*
           type: object
           object_type: long
-          description: Response size percentiles
-        - name: response.size.bytes.sum
-          type: long
-          format: bytes
-          description: Response size cumulative sum
-        - name: response.size.bytes.count
-          type: long
-          description: Response count
-        - name: request.count
-          type: long
-          description: Request count for response
-    - name: client.request.count
-      type: long
-      description: >
-        Number of requests as client
+          description: Response latency distribution, histogram buckets
     - name: workqueue
       type: group
       fields:
@@ -108,6 +90,16 @@
         - name: retries.count
           type: long
           description: Workqueue number of retries
+        - name: work.duration.sec.sum
+          type: long
+          description: Processing time of workqueue item, sum in seconds
+        - name: work.duration.sec.count
+          type: long
+          description: Processing time of workqueue item, number of operations
+        - name: work.duration.sec.bucket.*
+          type: object
+          object_type: long
+          description: Processing time of workqueue item, histogram buckets
     - name: node.collector
       type: group
       fields:
