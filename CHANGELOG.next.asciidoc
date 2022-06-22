@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Add new Kubernetes module dashboards {pull}31341[31341]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
+- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
 *Packetbeat*
 
