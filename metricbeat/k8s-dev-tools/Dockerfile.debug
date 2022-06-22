@@ -4,7 +4,6 @@ ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 
 ENV CGO_ENABLED=0
 
-# RUN apk add --no-cache git
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.3
 
 COPY build/metricbeat /usr/share/metricbeat/metricbeat
@@ -14,10 +13,6 @@ FROM alpine:3.15
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin
 
 WORKDIR /usr/share/metricbeat
-
-ENV ELASTICSEARCH_PASSWORD=changeme
-ENV ELASTICSEARCH_USERNAME=elastic
-ENV ELASTICSEARCH_HOST=elasticsearch
 
 COPY --from=builder /go/bin/dlv /go/bin/dlv
 COPY --from=builder /usr/share/metricbeat/metricbeat /usr/share/metricbeat/metricbeat
