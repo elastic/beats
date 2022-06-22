@@ -6029,16 +6029,6 @@ type: date
 
 --
 
-*`azure.billing.usage_date`*::
-+
---
-Date for the usage record.
-
-
-type: date
-
---
-
 *`azure.billing.billing_period_id`*::
 +
 --
