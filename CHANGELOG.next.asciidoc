@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
 - If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+- Fix Cisco AMP rate limit and pagination. {pull}[]
 
 *Heartbeat*
 
