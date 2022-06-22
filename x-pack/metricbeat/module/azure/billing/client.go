@@ -27,7 +27,7 @@ type Usage struct {
 	ForecastCosts []consumption.Forecast
 }
 
-// NewClient instantiates the an Azure monitoring client
+// NewClient builds a new client for the azure billing service
 func NewClient(config azure.Config) (*Client, error) {
 	usageService, err := NewService(config)
 	if err != nil {
@@ -62,7 +62,6 @@ func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage,
 		),
 		"", // skipToken
 		nil,
-		// "properties/instanceLocation",
 		consumption.MetrictypeActualCostMetricType,
 		startTime.Format("2006-01-02"), // startDate
 		endTime.Format("2006-01-02"),   // endDate

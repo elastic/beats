@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// EventsMapping maps the usage details to a slice of metricbeat events.
 func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) []mb.Event {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {

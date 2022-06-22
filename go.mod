@@ -307,7 +307,7 @@ require (
 )
 
 replace (
-	github.com/Azure/azure-sdk-for-go => github.com/elastic/azure-sdk-for-go v0.0.0-20220617145915-7563115fcc40
+	github.com/Azure/azure-sdk-for-go => github.com/elastic/azure-sdk-for-go v0.0.0-20220617145915-7563115fcc40 // see https://github.com/elastic/azure-sdk-for-go/releases/tag/v59.0.0-elastic-1 for details.
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
