@@ -36,10 +36,6 @@
       type: date
       description: >
         The usage end date
-    - name: usage_date
-      type: date
-      description: >
-        Date for the usage record.
     - name: billing_period_id
       type: keyword
       description: >
