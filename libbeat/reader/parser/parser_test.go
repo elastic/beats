@@ -337,7 +337,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		config          map[string]interface{}
 		expectedMessage reader.Message
 	}{
-		"no postprocesser, no processing": {
+		"no postprocessor, no processing": {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
@@ -346,7 +346,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("line 1"),
 			},
 		},
-		"JSON post processer with keys_under_root": {
+		"JSON post processor with keys_under_root": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\"}"),
 				Fields:  mapstr.M{},
@@ -367,7 +367,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer with document ID": {
+		"JSON post processor with document ID": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
 				Fields:  mapstr.M{},
@@ -392,7 +392,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer with overwrite keys and under root": {
+		"JSON post processor with overwrite keys and under root": {
 			message: reader.Message{
 				Content: []byte("{\"key\": \"value\"}"),
 				Fields: mapstr.M{
@@ -418,7 +418,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer with type in message": {
+		"JSON post processor with type in message": {
 			message: reader.Message{
 				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": "test"}`),
 				Fields:  mapstr.M{},
@@ -459,7 +459,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer on invalid type in message": {
+		"JSON post processor on invalid type in message": {
 			message: reader.Message{
 				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": 5}`),
 				Fields:  mapstr.M{},
@@ -503,7 +503,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer on invalid struct under type in message": {
+		"JSON post processor on invalid struct under type in message": {
 			message: reader.Message{
 				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": {"hello": "shouldn't work"}}`),
 				Fields:  mapstr.M{},
