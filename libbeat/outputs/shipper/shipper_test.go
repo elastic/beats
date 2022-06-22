@@ -406,10 +406,10 @@ func TestPublish(t *testing.T) {
 }
 
 // runServer mocks the shipper mock server for testing
-// `qSize` is a sice of the event buffer in the mock
+// `qSize` is a slice of the event buffer in the mock
 // `err` is a preset error that the server will serve to the client
 // `listenAddr` is the address for the server to listen
-// returns `actualAddr` where the listener actuall is and the `stop` function to stop the server
+// returns `actualAddr` where the listener actually is and the `stop` function to stop the server
 func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, stop func()) {
 	producer := sc.NewProducerMock(qSize)
 	producer.Error = err

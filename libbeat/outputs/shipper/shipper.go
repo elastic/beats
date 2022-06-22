@@ -116,7 +116,7 @@ func (c *shipper) Connect() error {
 	return nil
 }
 
-// Publish sends converts and sends a batch of events to the shipper server.
+// Publish converts and sends a batch of events to the shipper server.
 // Also, implements `outputs.Client`
 func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	if c.client == nil {
