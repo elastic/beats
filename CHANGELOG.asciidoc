@@ -63,7 +63,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...v8.2.1[View commits]
 - Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
 - Add metadata for missing k8s resources/metricsets {pull}31590[31590]
 - Fix `include_top_n` fields in system/process {pull}31595[31595]
-- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
 [[release-notes-8.2.0]]
 === Beats version 8.2.0
