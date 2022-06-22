@@ -89,16 +89,15 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 		return errors.Wrap(err, "failure parsing Logstash Node API response")
 	}
 
-	fields, err := schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure applying node schema")
-	}
-
 	pipelines = getUserDefinedPipelines(pipelines)
 	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, overrideClusterUUID)
 
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
 		for _, pipeline := range pipelines {
+			fields, err := schema.Apply(data)
+			if err != nil {
+				return errors.Wrap(err, "failure applying node schema")
+			}
 			removeClusterUUIDsFromPipeline(pipeline)
 
 			// Rename key: graph -> representation
@@ -115,6 +114,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 				},
 				ModuleFields: mapstr.M{},
 			}
+
 			event.MetricSetFields.Update(fields)
 
 			if err = commonFieldsMapping(&event, fields); err != nil {
