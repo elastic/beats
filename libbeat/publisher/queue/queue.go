@@ -109,6 +109,8 @@ type ProducerConfig struct {
 	DropOnCancel bool
 }
 
+type EntryId uint64
+
 // Producer is an interface to be used by the pipelines client to forward
 // events to a queue.
 type Producer interface {
@@ -135,6 +137,7 @@ type Producer interface {
 // queue that the batch has been consumed and its events can be discarded.
 type Batch interface {
 	Count() int
-	Event(i int) interface{}
+	Entry(i int) interface{}
+	Id(i int) EntryId
 	Done()
 }

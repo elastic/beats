@@ -17,11 +17,6 @@
 
 package memqueue
 
-type queueEntry struct {
-	event  interface{}
-	client clientState
-}
-
 type batchBuffer struct {
 	next    *batchBuffer
 	flushed bool

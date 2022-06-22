@@ -95,6 +95,11 @@ type Settings struct {
 	InputQueueSize int
 }
 
+type queueEntry struct {
+	event  interface{}
+	client clientState
+}
+
 type batch struct {
 	queue    *broker
 	entries  []queueEntry
@@ -380,8 +385,12 @@ func (b *batch) Count() int {
 	return len(b.entries)
 }
 
-func (b *batch) Event(i int) interface{} {
+func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
+}
+
+func (b *batch) Id(i int) queue.EntryId {
+	return queue.EntryId(b.entries[i].client.seq)
 }
 
 func (b *batch) Done() {

@@ -21,7 +21,7 @@ package memqueue
 
 type pushRequest struct {
 	event interface{}
-	seq   uint32
+	seq   uint64
 	state *produceState
 }
 

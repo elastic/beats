@@ -86,8 +86,12 @@ func (batch *diskQueueBatch) Count() int {
 	return len(batch.frames)
 }
 
-func (batch *diskQueueBatch) Event(i int) interface{} {
+func (batch *diskQueueBatch) Entry(i int) interface{} {
 	return batch.frames[i].event
+}
+
+func (batch *diskQueueBatch) Id(i int) queue.EntryId {
+	return 0
 }
 
 func (batch *diskQueueBatch) Done() {

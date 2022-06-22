@@ -31,7 +31,7 @@ type forgetfulProducer struct {
 type ackProducer struct {
 	broker       *broker
 	dropOnCancel bool
-	seq          uint32
+	seq          uint64
 	state        produceState
 	openState    openState
 }
@@ -46,7 +46,7 @@ type produceState struct {
 	cb        ackHandler
 	dropCB    func(beat.Event)
 	cancelled bool
-	lastACK   uint32
+	lastACK   uint64
 }
 
 type ackHandler func(count int)
