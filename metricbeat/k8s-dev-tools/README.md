@@ -14,7 +14,7 @@ You can install Tilt by using the script
 
 
 ## How to run
-The Tiltfile that orchestrates everything is located at `./metricbeat/Tiltfile` under the metricbeat folder of thisrepo. All the following commands need to be run from `./metricbeat`, in the same folder where the Tiltfile is located.
+The Tiltfile that orchestrates everything is located at `./metricbeat/Tiltfile` under the metricbeat folder of this repo. All the following commands need to be run from `./metricbeat`, in the same folder where the Tiltfile is located.
 
 How to run Tilt
 
