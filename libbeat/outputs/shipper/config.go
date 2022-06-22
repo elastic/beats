@@ -24,8 +24,8 @@ import (
 )
 
 type backoffConfig struct {
-	Init time.Duration `config:"init"`
-	Max  time.Duration `config:"max"`
+	Init time.Duration `config:"init" validate:"nonzero"`
+	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
 type Config struct {
