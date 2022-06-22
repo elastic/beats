@@ -944,3 +944,41 @@ func TestGlobalIDCannotBeUsed(t *testing.T) {
 		t.Fatal("expecting an error because '.global' cannot be used as input ID")
 	}
 }
+
+// test_rotating_close_inactive_low_write_rate from test_input.py
+func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id": "my-id",
+		"paths": []string{
+			env.abspath("*"),
+		},
+		"prospector.scanner.check_interval":    "1ms",
+		"close.on_state_change.check_interval": "1ms",
+		"close.on_state_change.inactive":       "1s",
+		"ignore_older":                         "10s",
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	time.Sleep(1 * time.Second)
+
+	env.mustWriteLinesToFile(testlogName, []byte("Line 1\n"))
+	env.waitUntilEventCount(1)
+
+	env.mustRenameFile(testlogName, testlogName+".1")
+
+	env.waitUntilHarvesterIsDone()
+	time.Sleep(2 * time.Second)
+
+	env.mustWriteLinesToFile(testlogName, []byte("Line 2\n"))
+
+	// allow for events to be send multiple times due to log rotation
+	env.waitUntilAtLeastEventCount(2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
