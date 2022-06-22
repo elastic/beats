@@ -42645,16 +42645,6 @@ Kubernetes API server metrics
 
 
 
-*`kubernetes.apiserver.request.client`*::
-+
---
-Client executing requests
-
-
-type: keyword
-
---
-
 *`kubernetes.apiserver.request.resource`*::
 +
 --
@@ -42846,46 +42836,19 @@ type: double
 --
 
 
-*`kubernetes.apiserver.http.request.duration.us.percentile.*`*::
+*`kubernetes.apiserver.watch.events.size.bytes.bucket.*`*::
 +
 --
-Request duration microseconds percentiles
+Watch event size distribution in bytes
 
 type: object
 
 --
 
-*`kubernetes.apiserver.http.request.duration.us.sum`*::
+*`kubernetes.apiserver.watch.events.size.bytes.sum`*::
 +
 --
-Request duration microseconds cumulative sum
-
-type: double
-
---
-
-*`kubernetes.apiserver.http.request.duration.us.count`*::
-+
---
-Request count for duration
-
-type: long
-
---
-
-*`kubernetes.apiserver.http.request.size.bytes.percentile.*`*::
-+
---
-Request size percentiles
-
-type: object
-
---
-
-*`kubernetes.apiserver.http.request.size.bytes.sum`*::
-+
---
-Request size cumulative sum
+Sum of watch events sizes in bytes
 
 type: long
 
@@ -42893,28 +42856,40 @@ format: bytes
 
 --
 
-*`kubernetes.apiserver.http.request.size.bytes.count`*::
+*`kubernetes.apiserver.watch.events.size.bytes.count`*::
 +
 --
-Request count for size
+Number of watch events
 
 type: long
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.percentile.*`*::
+*`kubernetes.apiserver.watch.events.kind`*::
 +
 --
-Response size percentiles
+Resource kind of the watch event
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.apiserver.response.size.bytes.bucket.*`*::
++
+--
+Response size distribution in bytes for each group, version, verb, resource, subresource, scope and component.
+
 
 type: object
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.sum`*::
+*`kubernetes.apiserver.response.size.bytes.sum`*::
 +
 --
-Response size cumulative sum
+Sum of responses sizes in bytes
 
 type: long
 
@@ -42922,19 +42897,10 @@ format: bytes
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.count`*::
+*`kubernetes.apiserver.response.size.bytes.count`*::
 +
 --
-Response count
-
-type: long
-
---
-
-*`kubernetes.apiserver.http.request.count`*::
-+
---
-Request count for response
+Number of responses to requests
 
 type: long
 
@@ -42959,33 +42925,6 @@ type: long
 
 --
 
-*`kubernetes.apiserver.request.latency.sum`*::
-+
---
-Requests latency, sum of latencies in microseconds
-
-type: long
-
---
-
-*`kubernetes.apiserver.request.latency.count`*::
-+
---
-Request latency, number of requests
-
-type: long
-
---
-
-*`kubernetes.apiserver.request.latency.bucket.*`*::
-+
---
-Request latency histogram buckets
-
-type: object
-
---
-
 *`kubernetes.apiserver.request.duration.us.sum`*::
 +
 --
@@ -43007,7 +42946,7 @@ type: long
 *`kubernetes.apiserver.request.duration.us.bucket.*`*::
 +
 --
-Request duration, histogram buckets
+Response latency distribution, histogram buckets
 
 type: object
 
@@ -54549,6 +54488,163 @@ type: long
 +
 --
 Ratio of session cursor cache hits from total number of cursors
+
+type: double
+
+--
+
+[float]
+=== sysmetric
+
+Sysmetric related metrics.
+
+
+
+*`oracle.sysmetric.session_count`*::
++
+--
+Session Count.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.average_active_sessions`*::
++
+--
+Average Active Sessions.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.current_os_load`*::
++
+--
+Current OS Load.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_reads_per_sec`*::
++
+--
+Physical Reads Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_transaction_per_sec`*::
++
+--
+User Transaction Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_table_scans_per_txn`*::
++
+--
+Total Table Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_writes_per_sec`*::
++
+--
+Physical Writes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_index_scans_per_txn`*::
++
+--
+Total Index Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.host_cpu_utilization_pct`*::
++
+--
+Host CPU Utilization (%).
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.network_traffic_volume_per_sec`*::
++
+--
+Network Traffic Volume Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_rollbacks_per_sec`*::
++
+--
+User Rollbacks Per Second.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.cpu_usage_per_sec`*::
++
+--
+CPU Usage Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.db_block_changes_per_sec`*::
++
+--
+DB Block Changes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_read_total_bytes_per_sec`*::
++
+--
+Physical Read Total Bytes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.response_time_per_txn`*::
++
+--
+Response Time Per Transaction.
+
 
 type: double
 
