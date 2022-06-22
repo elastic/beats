@@ -7,35 +7,7 @@
 === Beats version 7.17.5
 https://github.com/elastic/beats/compare/v7.17.4\...v7.17.5[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -52,78 +24,15 @@ https://github.com/elastic/beats/compare/v7.17.4\...v7.17.5[View commits]
 - Add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 - Fix issue with certain V1 cgroup events not reporting root IDs {pull}https://github.com/elastic/beats/pull/31959{pull}
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
 *Affecting all Beats*
 
 - Update to Go 1.17.10 {issue}31636[31636]
-
-*Auditbeat*
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
 
 [[release-notes-7.17.4]]
 === Beats version 7.17.4
