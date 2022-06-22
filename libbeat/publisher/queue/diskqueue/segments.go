@@ -227,8 +227,13 @@ func (segment *queueSegment) shouldUseJSON() bool {
 	return segment.schemaVersion != nil && *segment.schemaVersion == 0
 }
 
-// Should only be called from the reader loop. If successful, returns an open
-// file handle positioned at the beginning of the segment's data region.
+// getReader sets up the segmentReader.  The order of encryption and
+// compression is important.  If both options are enabled we want
+// encrypted compressed data not compressed encrypted data.  This is
+// because encryption will mask the repetions in the data making
+// compression much less effective.  getReader should only be called
+// from the reader loop. If successful, returns an open segmentReader
+// positioned at the beginning of the segment's data region.
 func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
@@ -263,7 +268,12 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 	return sr, nil
 }
 
-// Should only be called from the writer loop.
+// getWriter sets up the segmentWriter.  The order of encryption and
+// compression is important.  If both options are enabled we want
+// encrypted compressed data not compressed encrypted data.  This is
+// because encryption will mask the repetions in the data making
+// compression much less effective.  getWriter should only be called
+// from the writer loop.
 func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
 	var options uint32
 	path := queueSettings.segmentPath(segment.id)
@@ -449,6 +459,14 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	return total
 }
 
+// segmentReader handles reading of segments.  getReader sets up the
+// reader and handles setting up the Reader to deal with the different
+// schema version.  With Schema version 2 there is the option for
+// plain data, encrypted data, compressed data and encrypted
+// compressed data.  If compression is enabled operations go through
+// the CompressionReader because compressing encrypted data defeats
+// the purpose of compression since encryption will make the data
+// less compressable.
 type segmentReader struct {
 	src io.ReadSeekCloser
 	er  *EncryptionReader
@@ -512,6 +530,13 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 	return r.src.Seek(offset, whence)
 }
 
+//segmentWriter handles writing of segments.  With Schema version 2
+// there is the option for plain data, encrypted data, compressed data
+// and encrypted compressed data.  getWriter sets up the segmentWriter
+// to handle these options.  If compression is enabled operations go
+// through the CompressionWriter because compressing encrypted data
+// defeats the purpose of compression since encryption will make the
+// data less compressable.
 type segmentWriter struct {
 	dst *os.File
 	ew  *EncryptionWriter
@@ -536,16 +561,6 @@ func (w *segmentWriter) Close() error {
 		return w.ew.Close()
 	}
 	return w.dst.Close()
-}
-
-func (w *segmentWriter) Seek(offset int64, whence int) (int64, error) {
-	if w.cw != nil {
-		return 0, fmt.Errorf("seek not supported with compression")
-	}
-	if w.ew != nil {
-		return 0, fmt.Errorf("seek not supported with encryption")
-	}
-	return w.dst.Seek(offset, whence)
 }
 
 func (w *segmentWriter) Sync() error {
