@@ -54,7 +54,7 @@ type eventDecoder struct {
 
 type entry struct {
 	Timestamp int64
-	Flags     uint8
+	Flags     uint32
 	Meta      mapstr.M
 	Fields    mapstr.M
 }
@@ -98,7 +98,7 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 
 	err := e.folder.Fold(entry{
 		Timestamp: event.Content.Timestamp.UTC().UnixNano(),
-		Flags:     uint8(event.Flags),
+		Flags:     uint32(event.Flags),
 		Meta:      event.Content.Meta,
 		Fields:    event.Content.Fields,
 	})

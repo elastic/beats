@@ -68,6 +68,9 @@ type Settings struct {
 	// use exponential backoff up to the specified limit.
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
+
+	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
+	EncryptionKey []byte
 }
 
 // userConfig holds the parameters for a disk queue that are configurable

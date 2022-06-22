@@ -37,11 +37,15 @@ const EventCancelledMetaKey = "__hb_evt_cancel__"
 // CancelEvent marks the event as cancelled. Downstream consumers of it should not emit nor output this event.
 func CancelEvent(event *beat.Event) {
 	if event != nil {
-		if event.Meta == nil {
-			event.Meta = mapstr.M{}
-		}
-		_, _ = event.Meta.Put(EventCancelledMetaKey, true)
+		SetMeta(event, EventCancelledMetaKey, true)
 	}
+}
+
+func SetMeta(event *beat.Event, k string, v interface{}) {
+	if event.Meta == nil {
+		event.Meta = mapstr.M{}
+	}
+	_, _ = event.Meta.Put(k, v)
 }
 
 // IsEventCancelled checks for the marker left by CancelEvent.

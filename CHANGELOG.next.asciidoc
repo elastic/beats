@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Allow loading secrets that contain commas from the keystore {pull}31694{pull}.
 - Fix Windows service timeouts when the "TCP/IP NetBIOS Helper" service is disabled. {issue}31810[31810] {pull}31835[31835]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 
 *Auditbeat*
 
@@ -51,6 +52,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
+- If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
 
 *Heartbeat*
 
@@ -59,7 +61,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
+- Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
 - add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
+- update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
 
 *Packetbeat*
 
@@ -80,7 +84,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
-
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
 
 *Auditbeat*
 
@@ -105,6 +109,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
 - Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
 - Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
+- Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
 
 *Auditbeat*
 
@@ -128,6 +134,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 - Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
+- Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 
 *Packetbeat*
