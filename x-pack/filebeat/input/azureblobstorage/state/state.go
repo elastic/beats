@@ -5,7 +5,7 @@
 //go:build !aix
 // +build !aix
 
-package azureblobstorage
+package state
 
 import (
 	"sync"
@@ -13,26 +13,40 @@ import (
 )
 
 // State contains the the current state of the operation
-type state struct {
+type State struct {
 	// Mutex lock to help in concurrent R/W
 	mu sync.Mutex
-	// marker contains the last known position in the blob pager which was fetched
-	marker *string
-	// name of the blob
-	name string
-	// timestamp to denote when the blob was last modified
-	lastModifiedOn *time.Time
+	cp *Checkpoint
 }
 
-func newState() *state {
-	return &state{}
+type Checkpoint struct {
+	// marker contains the last known position in the blob pager which was fetched
+	Marker *string
+	// name of the blob
+	Name string
+	// timestamp to denote when the blob was last modified
+	LastModifiedOn *time.Time
+}
+
+func NewState() *State {
+	return &State{
+		cp: &Checkpoint{},
+	}
 }
 
 // save functions , saves/updates the current state
-func (s *state) save(name string, marker *string, lastModifiedOn *time.Time) {
+func (s *State) Save(name string, marker *string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
-	s.name = name
-	s.marker = marker
-	s.lastModifiedOn = lastModifiedOn
+	s.cp.Name = name
+	s.cp.Marker = marker
+	s.cp.LastModifiedOn = lastModifiedOn
 	s.mu.Unlock()
+}
+
+func (s *State) SetCheckpoint(chkpt *Checkpoint) {
+	s.cp = chkpt
+}
+
+func (s *State) Checkpoint() *Checkpoint {
+	return s.cp
 }
