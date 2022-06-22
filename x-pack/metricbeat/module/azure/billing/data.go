@@ -31,7 +31,8 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 			//
 			if legacy, isLegacy := ud.AsLegacyUsageDetail(); isLegacy {
 				event.ModuleFields = mapstr.M{
-					"subscription_id": legacy.SubscriptionID,
+					"subscription_id":   legacy.SubscriptionID,
+					"subscription_name": legacy.SubscriptionName,
 					"resource": mapstr.M{
 						"name":  legacy.ResourceName,
 						"type":  legacy.ConsumedService,
@@ -40,27 +41,20 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				}
 				event.MetricSetFields = mapstr.M{
 					// original fields
-					"product":         legacy.Product,
-					"pretax_cost":     legacy.Cost,
-					"currency":        legacy.BillingCurrency,
-					"department_name": legacy.InvoiceSection,
-					"account_name":    legacy.BillingAccountName,
-					"usage_start":     startTime, // not sure the value is correct
-					"usage_end":       endTime,   // not sure the value is correct
-					// "billing_period_id":   "?", // missing
-
-					"billing_period_start": legacy.BillingPeriodStartDate.ToTime(),
-					"billing_period_end":   legacy.BillingPeriodEndDate.ToTime(),
+					"billing_period_id": legacy.ID,
+					"product":           legacy.Product,
+					"pretax_cost":       legacy.Cost,
+					"currency":          legacy.BillingCurrency,
+					"department_name":   legacy.InvoiceSection,
+					"account_name":      legacy.BillingAccountName,
+					"usage_start":       startTime,
+					"usage_end":         endTime,
 
 					// additional fields
-					"usage_date":        legacy.Date, // Date for the usage record.
-					"account_id":        legacy.BillingAccountID,
-					"subscription_name": legacy.SubscriptionName,
-					"unit_price":        legacy.UnitPrice,
-					"quantity":          legacy.Quantity,
-
-					// legacy-only fields
-					"effective_price": legacy.EffectivePrice,
+					"usage_date": legacy.Date, // Date for the usage record.
+					"account_id": legacy.BillingAccountID,
+					"unit_price": legacy.UnitPrice,
+					"quantity":   legacy.Quantity,
 				}
 				_, _ = event.RootFields.Put("cloud.region", legacy.ResourceLocation)
 				_, _ = event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
@@ -72,7 +66,8 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 			//
 			if modern, isModern := ud.AsModernUsageDetail(); isModern {
 				event.ModuleFields = mapstr.M{
-					"subscription_id": modern.SubscriptionGUID,
+					"subscription_id":   modern.SubscriptionGUID,
+					"subscription_name": modern.SubscriptionName,
 					"resource": mapstr.M{
 						"name":  getResourceNameFromPath(*modern.InstanceName),
 						"type":  modern.ConsumedService,
@@ -81,24 +76,20 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				}
 				event.MetricSetFields = mapstr.M{
 					// original fields
-					"product":         modern.Product,
-					"pretax_cost":     modern.CostInBillingCurrency,
-					"currency":        modern.BillingCurrencyCode,
-					"department_name": modern.InvoiceSectionName,
-					"account_name":    modern.BillingAccountName,
-					"usage_start":     startTime, // not sure the value is correct
-					"usage_end":       endTime,   // not sure the value is correct
-					// "billing_period_id":   "?", // missing
+					"billing_period_id": modern.ID,
+					"product":           modern.Product,
+					"pretax_cost":       modern.CostInBillingCurrency,
+					"currency":          modern.BillingCurrencyCode,
+					"department_name":   modern.InvoiceSectionName,
+					"account_name":      modern.BillingAccountName,
+					"usage_start":       startTime,
+					"usage_end":         endTime,
 
 					// additional fields
-					"usage_date":        modern.Date, // Date for the usage record.
-					"account_id":        modern.BillingAccountID,
-					"subscription_name": modern.SubscriptionName,
-					"unit_price":        modern.UnitPrice,
-					"quantity":          modern.Quantity,
-
-					"billing_period_start": modern.BillingPeriodStartDate.ToTime(),
-					"billing_period_end":   modern.BillingPeriodEndDate.ToTime(),
+					"usage_date": modern.Date, // Date for the usage record.
+					"account_id": modern.BillingAccountID,
+					"unit_price": modern.UnitPrice,
+					"quantity":   modern.Quantity,
 				}
 				_, _ = event.RootFields.Put("cloud.region", modern.ResourceLocation)
 			}
@@ -152,7 +143,6 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 			Timestamp: time.Now().UTC(),
 		}
 
-		//event.ID = generateEventID(parsedDate)
 		events = append(events, event)
 	}
 
