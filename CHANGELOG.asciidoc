@@ -76,7 +76,6 @@ https://github.com/elastic/beats/compare/v7.17.4\...v7.17.5[View commits]
 
 *Filebeat*
 
-- Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
 
 *Heartbeat*
 
