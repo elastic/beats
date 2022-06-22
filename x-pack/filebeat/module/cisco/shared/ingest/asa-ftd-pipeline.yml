@@ -15,7 +15,7 @@ processors:
         - "(?:%{SYSLOG_HEADER})?\\s*%{GREEDYDATA:log.original}"
       pattern_definitions:
         SYSLOG_HEADER: "(?:%{SYSLOGFACILITY}\\s*)?(?:%{FTD_DATE:_temp_.raw_date}:?\\s+)?(?:%{PROCESS_HOST}|%{HOST_PROCESS})(?:{DATA})?%{SYSLOG_END}?"
-        SYSLOGFACILITY: "<%{NONNEGINT:log.syslog.priority:int}>"
+        SYSLOGFACILITY: "<%{NONNEGINT:log.syslog.priority:int}(?:\\.%{NONNEGINT:_temp_.mystery_number:int})?>"
         # Beginning with version 6.3, Firepower Threat Defense provides the option to enable timestamp as per RFC 5424.
         FTD_DATE: "(?:%{TIMESTAMP_ISO8601}|%{ASA_DATE})"
         ASA_DATE: "(?:%{DAY} )?%{MONTH}  *%{MONTHDAY}(?: %{YEAR})? %{TIME}(?: %{TZ})?"
