@@ -24,6 +24,7 @@ import (
 type Job interface {
 	Do(ctx context.Context, jobID string, marker *string, wg *sync.WaitGroup, errChan chan<- error)
 	Name() string
+	Timestamp() *time.Time
 }
 
 type azureInputJob struct {
@@ -76,6 +77,10 @@ func (aij *azureInputJob) Do(ctx context.Context, jobID string, marker *string, 
 
 func (aij *azureInputJob) Name() string {
 	return *aij.blob.Name
+}
+
+func (aij *azureInputJob) Timestamp() *time.Time {
+	return aij.blob.Properties.LastModified
 }
 
 func (aij *azureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {

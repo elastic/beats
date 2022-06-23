@@ -8,6 +8,7 @@
 package state
 
 import (
+	"strings"
 	"sync"
 	"time"
 )
@@ -19,13 +20,16 @@ type State struct {
 	cp *Checkpoint
 }
 
+// Azure sdks do not return results based on timestamps , but only based on alphabetical order
+// This forces us to maintain 2 different vars in addition to the page marker to calculate the
+// exact checkpoint based on various senarios
 type Checkpoint struct {
 	// marker contains the last known position in the blob pager which was fetched
 	Marker *string
-	// name of the blob
-	Name string
+	// name of the latest blob in alphabetical order
+	BlobName string
 	// timestamp to denote when the blob was last modified
-	LastModifiedOn *time.Time
+	LatestEntryTime *time.Time
 }
 
 func NewState() *State {
@@ -37,9 +41,17 @@ func NewState() *State {
 // save functions , saves/updates the current state
 func (s *State) Save(name string, marker *string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
-	s.cp.Name = name
+	if len(s.cp.BlobName) == 0 {
+		s.cp.BlobName = name
+	} else if strings.ToLower(name) > strings.ToLower(s.cp.BlobName) {
+		s.cp.BlobName = name
+	}
 	s.cp.Marker = marker
-	s.cp.LastModifiedOn = lastModifiedOn
+	if s.cp.LatestEntryTime == nil {
+		s.cp.LatestEntryTime = lastModifiedOn
+	} else if lastModifiedOn.After(*s.cp.LatestEntryTime) {
+		s.cp.LatestEntryTime = lastModifiedOn
+	}
 	s.mu.Unlock()
 }
 

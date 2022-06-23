@@ -72,7 +72,7 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 		}
 
 		// If previous checkpoint was saved then look up starting point for new jobs
-		if ais.state.Checkpoint().LastModifiedOn != nil {
+		if ais.state.Checkpoint().LatestEntryTime != nil {
 			jobs = ais.moveToLastSeenJob(jobs)
 		}
 
@@ -81,7 +81,7 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 			wg.Add(1)
 			jobID := fetchJobID(jobCounter, ais.src.containerName, job.Name())
 			go job.Do(ctx, jobID, pageMarker, &wg, errs)
-			ais.log.Info("JOB WITH ID %v EXECUTED\n", jobID)
+			fmt.Printf("JOB WITH ID %v and timeStamp %v EXECUTED\n", jobID, job.Timestamp().String())
 			jobCounter++
 		}
 		wg.Wait()
@@ -129,8 +129,12 @@ func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
 	// Jobs are stored in alphabedical order always , hence the latest position can be found on the basis of job name
 	counter := 0
 	flag := false
+	var latestJobs []Job
+	var jobsToReturn []Job
 	for _, job := range jobs {
-		if job.Name() == ais.state.Checkpoint().Name {
+		if job.Timestamp().After(*ais.state.Checkpoint().LatestEntryTime) {
+			latestJobs = append(latestJobs, job)
+		} else if job.Name() == ais.state.Checkpoint().BlobName {
 			flag = true
 			break
 		}
@@ -139,13 +143,16 @@ func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
 
 	if flag {
 		if counter < len(jobs)-1 {
-			return jobs[counter+1:]
+			jobsToReturn = jobs[counter+1:]
+		} else {
+			emptyJobList := make([]Job, 0)
+			jobsToReturn = emptyJobList
 		}
-
-		emptyJobList := make([]Job, 0)
-		return emptyJobList
+	} else {
+		jobsToReturn = jobs
 	}
 
-	return jobs
+	latestJobs = append(latestJobs, jobsToReturn...)
+	return latestJobs
 
 }

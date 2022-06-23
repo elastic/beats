@@ -7,28 +7,26 @@
 
 package azureblobstorage
 
-import "github.com/elastic/beats/v7/filebeat/harvester"
-
 type config struct {
-	ForwaderConfig harvester.ForwarderConfig `config:",inline"`
-	AccountName    string                    `config:"account_name"`
-	AccountKey     string                    `config:"account_key"`
-	Containers     []container               `config:"containers"`
+	AccountName string      `config:"account_name"`
+	AccountKey  string      `config:"account_key"`
+	Containers  []container `config:"containers"`
 }
 
 type container struct {
-	Name      string `config:"name"`
-	BatchSize int32  `config:"batch_size"`
-	Poll      bool   `config:"poll"`
+	Name           string `config:"name"`
+	BatchSize      int32  `config:"batch_size"`
+	Poll           bool   `config:"poll"`
+	PollIntervalMs int32  `config:"poll_interval_ms"`
 }
 
 func defaultConfig() config {
 	return config{
-		ForwaderConfig: harvester.ForwarderConfig{
-			Type: "azureblobstorage",
-		},
 		AccountName: "beatsblobstorage",
 		AccountKey:  "61A0frq/mFUSw6BGivRB8jhOiElUwGcMlI5lCbXruJokvYIWUcwvpp9ln6v7MPBzwsfvprCEt2qA+AStH+iVXw==",
-		Containers:  []container{{Name: "beatscontainer", BatchSize: 10}, {Name: "blobcontainer", BatchSize: 10}},
+		Containers: []container{
+			{Name: "beatscontainer", BatchSize: 10, Poll: true, PollIntervalMs: 5000},
+			{Name: "blobcontainer", BatchSize: 10, Poll: true, PollIntervalMs: 5000},
+		},
 	}
 }
