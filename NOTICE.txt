@@ -863,11 +863,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/azure-sdk-for-go
-Version: v0.0.0-20220617145915-7563115fcc40
+Version: v59.0.0-elastic-1+incompatible
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/azure-sdk-for-go@v0.0.0-20220617145915-7563115fcc40/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/azure-sdk-for-go@v59.0.0-elastic-1+incompatible/LICENSE.txt:
 
 The MIT License (MIT)
 
