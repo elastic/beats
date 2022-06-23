@@ -195,13 +195,10 @@ func (c *shipper) Close() error {
 		return fmt.Errorf("connection is not established")
 	}
 	err := c.conn.Close()
-	if err != nil {
-		return err
-	}
 	c.conn = nil
 	c.client = nil
 
-	return nil
+	return err
 }
 
 // String implements `outputs.Client`
