@@ -4756,6 +4756,9 @@
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 13909,
+        "log.syslog.facility.code": 1,
+        "log.syslog.priority": 13,
+        "log.syslog.severity.code": 5,
         "network.protocol": "tcp",
         "observer.egress.interface.name": "Inside",
         "observer.ingress.interface.name": "outside",
@@ -4770,7 +4773,6 @@
         "source.address": "54.239.28.85",
         "source.ip": "54.239.28.85",
         "source.port": 443,
-        "syslog.facility": 13,
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -4797,6 +4799,9 @@
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 14071,
+        "log.syslog.facility.code": 1,
+        "log.syslog.priority": 13,
+        "log.syslog.severity.code": 5,
         "network.protocol": "tcp",
         "observer.egress.interface.name": "Inside",
         "observer.ingress.interface.name": "outside",
@@ -4811,7 +4816,6 @@
         "source.address": "54.239.28.85",
         "source.ip": "54.239.28.85",
         "source.port": 443,
-        "syslog.facility": 13,
         "tags": [
             "cisco-asa",
             "forwarded"
