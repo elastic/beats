@@ -80,7 +80,7 @@
         "google_workspace.saml.orgunit_path": "ounit",
         "google_workspace.saml.status_code": "SUCCESS_URI",
         "input.type": "log",
-        "log.offset": 621,
+        "log.offset": 641,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

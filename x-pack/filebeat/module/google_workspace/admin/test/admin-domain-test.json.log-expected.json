@@ -71,7 +71,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 436,
+        "log.offset": 456,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -120,7 +120,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 898,
+        "log.offset": 938,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -170,7 +170,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1320,
+        "log.offset": 1381,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -218,7 +218,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1778,
+        "log.offset": 1860,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -266,7 +266,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2149,
+        "log.offset": 2252,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -314,7 +314,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2529,
+        "log.offset": 2652,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -364,7 +364,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2900,
+        "log.offset": 3043,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -413,7 +413,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3352,
+        "log.offset": 3515,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -463,7 +463,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3750,
+        "log.offset": 3934,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -512,7 +512,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4199,
+        "log.offset": 4403,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -561,7 +561,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4616,
+        "log.offset": 4840,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -610,7 +610,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5036,
+        "log.offset": 5281,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -659,7 +659,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5457,
+        "log.offset": 5722,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -709,7 +709,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5880,
+        "log.offset": 6165,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -759,7 +759,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6358,
+        "log.offset": 6663,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -809,7 +809,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6787,
+        "log.offset": 7112,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -860,7 +860,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 7218,
+        "log.offset": 7563,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -913,7 +913,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 7669,
+        "log.offset": 8034,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -962,7 +962,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 8150,
+        "log.offset": 8536,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1012,7 +1012,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 8583,
+        "log.offset": 8989,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1061,7 +1061,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9079,
+        "log.offset": 9505,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1110,7 +1110,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9504,
+        "log.offset": 9950,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1161,7 +1161,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9923,
+        "log.offset": 10389,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1213,7 +1213,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 10377,
+        "log.offset": 10863,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1263,7 +1263,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 10892,
+        "log.offset": 11398,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1314,7 +1314,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 11355,
+        "log.offset": 11881,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1364,7 +1364,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 11816,
+        "log.offset": 12362,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1412,7 +1412,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12236,
+        "log.offset": 12802,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1462,7 +1462,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12628,
+        "log.offset": 13215,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1510,7 +1510,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13048,
+        "log.offset": 13655,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1560,7 +1560,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13427,
+        "log.offset": 14054,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1611,7 +1611,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13887,
+        "log.offset": 14534,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1661,7 +1661,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 14344,
+        "log.offset": 15011,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1709,7 +1709,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 14812,
+        "log.offset": 15499,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1757,7 +1757,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 15204,
+        "log.offset": 15911,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1807,7 +1807,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 15587,
+        "log.offset": 16314,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1857,7 +1857,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 16046,
+        "log.offset": 16793,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1906,7 +1906,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 16507,
+        "log.offset": 17275,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1955,7 +1955,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 16921,
+        "log.offset": 17709,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2005,7 +2005,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 17351,
+        "log.offset": 18160,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2053,7 +2053,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 17811,
+        "log.offset": 18640,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2101,7 +2101,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 18191,
+        "log.offset": 19041,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2151,7 +2151,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 18574,
+        "log.offset": 19445,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2201,7 +2201,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 19020,
+        "log.offset": 19911,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2251,7 +2251,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 19448,
+        "log.offset": 20360,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2301,7 +2301,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 19862,
+        "log.offset": 20794,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2351,7 +2351,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 20268,
+        "log.offset": 21221,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2398,7 +2398,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 20730,
+        "log.offset": 21704,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2448,7 +2448,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 21054,
+        "log.offset": 22049,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2498,7 +2498,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 21514,
+        "log.offset": 22530,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2548,7 +2548,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 21970,
+        "log.offset": 23006,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2597,7 +2597,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 22428,
+        "log.offset": 23484,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2645,7 +2645,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 22872,
+        "log.offset": 23948,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2694,7 +2694,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 23268,
+        "log.offset": 24364,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2748,7 +2748,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 23706,
+        "log.offset": 24822,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2798,7 +2798,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 24125,
+        "log.offset": 25261,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2846,7 +2846,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 24554,
+        "log.offset": 25710,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2894,7 +2894,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 24939,
+        "log.offset": 26115,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2944,7 +2944,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 25332,
+        "log.offset": 26529,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2994,7 +2994,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 25750,
+        "log.offset": 26968,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3046,7 +3046,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 26205,
+        "log.offset": 27443,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3096,7 +3096,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 26696,
+        "log.offset": 27954,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3146,7 +3146,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 27153,
+        "log.offset": 28431,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3196,7 +3196,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 27610,
+        "log.offset": 28908,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3247,7 +3247,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 28074,
+        "log.offset": 29392,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3296,7 +3296,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 28544,
+        "log.offset": 29882,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3345,7 +3345,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 28959,
+        "log.offset": 30317,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3395,7 +3395,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 29389,
+        "log.offset": 30767,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3444,7 +3444,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 29852,
+        "log.offset": 31251,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3492,7 +3492,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 30260,
+        "log.offset": 31679,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3540,7 +3540,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 30632,
+        "log.offset": 32071,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3588,7 +3588,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 30995,
+        "log.offset": 32454,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3636,7 +3636,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 31367,
+        "log.offset": 32846,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3685,7 +3685,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 31730,
+        "log.offset": 33229,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3735,7 +3735,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 32127,
+        "log.offset": 33646,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3784,7 +3784,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 32568,
+        "log.offset": 34107,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3833,7 +3833,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 33005,
+        "log.offset": 34564,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3882,7 +3882,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 33445,
+        "log.offset": 35024,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3931,7 +3931,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 33886,
+        "log.offset": 35486,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3980,7 +3980,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 34329,
+        "log.offset": 35949,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -4030,7 +4030,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 34769,
+        "log.offset": 36410,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -4079,7 +4079,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 35229,
+        "log.offset": 36891,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -4126,7 +4126,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 35609,
+        "log.offset": 37291,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -4174,7 +4174,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 35922,
+        "log.offset": 37625,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

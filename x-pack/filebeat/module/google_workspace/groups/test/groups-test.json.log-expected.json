@@ -83,7 +83,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 558,
+        "log.offset": 578,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -136,7 +136,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 944,
+        "log.offset": 984,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -194,7 +194,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 1382,
+        "log.offset": 1443,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -246,7 +246,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 1755,
+        "log.offset": 1836,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -301,7 +301,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 2139,
+        "log.offset": 2241,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -352,7 +352,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 2659,
+        "log.offset": 2782,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -403,7 +403,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 3040,
+        "log.offset": 3184,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -458,7 +458,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 3421,
+        "log.offset": 3585,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -512,7 +512,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 3989,
+        "log.offset": 4173,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -567,7 +567,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 4456,
+        "log.offset": 4660,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -621,7 +621,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 4972,
+        "log.offset": 5197,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -676,7 +676,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 5442,
+        "log.offset": 5687,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -731,7 +731,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 6014,
+        "log.offset": 6280,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -786,7 +786,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 6588,
+        "log.offset": 6874,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -841,7 +841,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 7203,
+        "log.offset": 7510,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -896,7 +896,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 7743,
+        "log.offset": 8070,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -950,7 +950,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 8265,
+        "log.offset": 8612,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1010,7 +1010,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 8742,
+        "log.offset": 9109,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1070,7 +1070,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 9209,
+        "log.offset": 9596,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1129,7 +1129,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 9692,
+        "log.offset": 10099,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1188,7 +1188,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 10127,
+        "log.offset": 10554,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1247,7 +1247,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 10556,
+        "log.offset": 11003,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1306,7 +1306,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 10993,
+        "log.offset": 11460,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1365,7 +1365,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 11424,
+        "log.offset": 11911,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

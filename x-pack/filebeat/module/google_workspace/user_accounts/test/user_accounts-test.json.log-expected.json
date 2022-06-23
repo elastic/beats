@@ -68,7 +68,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 315,
+        "log.offset": 335,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -116,7 +116,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 629,
+        "log.offset": 669,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -164,7 +164,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 951,
+        "log.offset": 1012,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -212,7 +212,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1284,
+        "log.offset": 1365,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -260,7 +260,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1617,
+        "log.offset": 1719,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -308,7 +308,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1954,
+        "log.offset": 2076,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -356,7 +356,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2278,
+        "log.offset": 2420,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

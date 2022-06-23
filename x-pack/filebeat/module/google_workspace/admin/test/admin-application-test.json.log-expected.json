@@ -85,7 +85,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 640,
+        "log.offset": 660,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -141,7 +141,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 1245,
+        "log.offset": 1285,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -195,7 +195,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1850,
+        "log.offset": 1911,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -245,7 +245,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2342,
+        "log.offset": 2423,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -294,7 +294,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2765,
+        "log.offset": 2866,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -343,7 +343,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3212,
+        "log.offset": 3334,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -393,7 +393,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3659,
+        "log.offset": 3801,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -442,7 +442,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4106,
+        "log.offset": 4268,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

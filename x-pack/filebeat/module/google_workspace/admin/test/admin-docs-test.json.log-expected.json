@@ -77,7 +77,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 470,
+        "log.offset": 491,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -137,7 +137,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 965,
+        "log.offset": 1006,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
