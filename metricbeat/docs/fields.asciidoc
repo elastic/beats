@@ -5982,7 +5982,7 @@ type: float
 *`azure.billing.quantity`*::
 +
 --
-Measure the quantity purchased or consumed.The amount of the meter used during the billing period.
+Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
 
 
 type: float
@@ -6002,7 +6002,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-TProduct name for the consumed service or purchase. Not available for Marketplace.
+Product name for the consumed service or purchase. Not available for Marketplace.
 
 
 type: keyword

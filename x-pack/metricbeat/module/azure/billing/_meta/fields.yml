@@ -19,7 +19,7 @@
     - name: quantity
       type: float
       description: >
-        Measure the quantity purchased or consumed.The amount of the meter used during the billing period.
+        Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
     - name: department_name
       type: keyword
       description: >
@@ -27,7 +27,7 @@
     - name: product
       type: keyword
       description: >
-        TProduct name for the consumed service or purchase. Not available for Marketplace.
+        Product name for the consumed service or purchase. Not available for Marketplace.
     - name: usage_start
       type: date
       description: >
