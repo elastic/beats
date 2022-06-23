@@ -63,7 +63,7 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 			ais.log.Errorf("Scheduler error : %v ", e)
 		}
 	}()
-	page := 0
+
 	for pager.NextPage(ctx) {
 		jobs, err := ais.createJobs(pager)
 		if err != nil {
@@ -71,16 +71,20 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 			return err
 		}
 
+		// If previous checkpoint was saved then look up starting point for new jobs
+		if ais.state.Checkpoint().LastModifiedOn != nil {
+			jobs = ais.moveToLastSeenJob(jobs)
+		}
+
 		pageMarker := pager.PageResponse().Marker
 		for _, job := range jobs {
 			wg.Add(1)
 			jobID := fetchJobID(jobCounter, ais.src.containerName, job.Name())
 			go job.Do(ctx, jobID, pageMarker, &wg, errs)
-			fmt.Printf("PAGE : %d --- JOB WITH ID %v EXECUTED\n", page, jobID)
+			ais.log.Info("JOB WITH ID %v EXECUTED\n", jobID)
 			jobCounter++
 		}
 		wg.Wait()
-		page++
 	}
 	close(errs)
 
@@ -109,11 +113,6 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 }
 
 func (ais *azureInputScheduler) fetchBlobPager() *azblob.ContainerListBlobFlatPager {
-	if ais.state.Checkpoint().Marker != nil {
-		fmt.Printf("\nPAGER MARKER : %v\n", *ais.state.Checkpoint().Marker)
-	} else {
-		fmt.Printf("\nPAGER MARKER : %v\n", ais.state.Checkpoint().Marker)
-	}
 	pager := ais.client.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
 		Include: []azblob.ListBlobsIncludeItem{
 			azblob.ListBlobsIncludeItemMetadata,
@@ -124,4 +123,29 @@ func (ais *azureInputScheduler) fetchBlobPager() *azblob.ContainerListBlobFlatPa
 	})
 
 	return pager
+}
+
+func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
+	// Jobs are stored in alphabedical order always , hence the latest position can be found on the basis of job name
+	counter := 0
+	flag := false
+	for _, job := range jobs {
+		if job.Name() == ais.state.Checkpoint().Name {
+			flag = true
+			break
+		}
+		counter++
+	}
+
+	if flag {
+		if counter < len(jobs)-1 {
+			return jobs[counter+1:]
+		}
+
+		emptyJobList := make([]Job, 0)
+		return emptyJobList
+	}
+
+	return jobs
+
 }

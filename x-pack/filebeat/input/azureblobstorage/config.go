@@ -29,6 +29,6 @@ func defaultConfig() config {
 		},
 		AccountName: "beatsblobstorage",
 		AccountKey:  "61A0frq/mFUSw6BGivRB8jhOiElUwGcMlI5lCbXruJokvYIWUcwvpp9ln6v7MPBzwsfvprCEt2qA+AStH+iVXw==",
-		Containers:  []container{{Name: "beatscontainer", BatchSize: 1}, {Name: "blobcontainer", BatchSize: 1}},
+		Containers:  []container{{Name: "beatscontainer", BatchSize: 10}, {Name: "blobcontainer", BatchSize: 10}},
 	}
 }

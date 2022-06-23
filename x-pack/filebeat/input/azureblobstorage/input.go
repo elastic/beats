@@ -105,7 +105,6 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 	if !cursor.IsNew() {
 		cursor.Unpack(&cp)
 		st.SetCheckpoint(cp)
-		fmt.Printf("OLD STATE %v", st.Checkpoint())
 	}
 
 	scheduler := newAzureInputScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
