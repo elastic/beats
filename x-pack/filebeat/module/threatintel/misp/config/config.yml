@@ -51,7 +51,7 @@ response.request_body_on_pagination: true
 response.pagination:
 - set:
     target: body.page
-    value: '[[add .last_response.page 1]]'
+    value: '[[if (ne (len .last_response.body.response) 0)]][[add .last_response.page 1]][[end]]'
     fail_on_template_error: true
 cursor:
   timestamp:

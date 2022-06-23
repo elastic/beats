@@ -50,9 +50,11 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
+- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
 - If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 - Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
 
 *Heartbeat*
@@ -72,6 +74,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
+- Powershell: Fix processing of parameter details. {pull}31833[31833]
+- Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
 
 *Functionbeat*
 
@@ -137,6 +141,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
+- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
 *Packetbeat*
 
