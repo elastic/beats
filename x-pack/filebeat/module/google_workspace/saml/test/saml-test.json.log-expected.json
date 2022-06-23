@@ -7,9 +7,9 @@
             "session"
         ],
         "event.dataset": "google_workspace.saml",
-        "event.id": "1",
+        "event.id": "8076841295866241644",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"saml\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"login\",\"name\":\"login_failure\",\"parameters\":[{\"name\":\"application_name\",\"value\":\"app\"},{\"name\":\"failure_type\",\"value\":\"failure_app_not_configured_for_user\"},{\"name\":\"initiated_by\",\"value\":\"idp\"},{\"name\":\"orgunit_path\",\"value\":\"ounit\"},{\"name\":\"saml_second_level_status_code\",\"value\":\"SUCCESS_URI\"},{\"name\":\"saml_status_code\",\"value\":\"SUCCESS_URI\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8076841295866241644\",\"applicationName\":\"saml\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"login\",\"name\":\"login_failure\",\"parameters\":[{\"name\":\"application_name\",\"value\":\"app\"},{\"name\":\"failure_type\",\"value\":\"failure_app_not_configured_for_user\"},{\"name\":\"initiated_by\",\"value\":\"idp\"},{\"name\":\"orgunit_path\",\"value\":\"ounit\"},{\"name\":\"saml_second_level_status_code\",\"value\":\"SUCCESS_URI\"},{\"name\":\"saml_status_code\",\"value\":\"SUCCESS_URI\"}]}}",
         "event.outcome": "failure",
         "event.provider": "saml",
         "event.type": [
@@ -62,9 +62,9 @@
             "session"
         ],
         "event.dataset": "google_workspace.saml",
-        "event.id": "1",
+        "event.id": "2788332015748535186",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:01Z\",\"uniqueQualifier\":1,\"applicationName\":\"saml\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"login\",\"name\":\"login_success\",\"parameters\":[{\"name\":\"application_name\",\"value\":\"app\"},{\"name\":\"initiated_by\",\"value\":\"idp\"},{\"name\":\"orgunit_path\",\"value\":\"ounit\"},{\"name\":\"saml_status_code\",\"value\":\"SUCCESS_URI\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:01Z\",\"uniqueQualifier\":\"2788332015748535186\",\"applicationName\":\"saml\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"login\",\"name\":\"login_success\",\"parameters\":[{\"name\":\"application_name\",\"value\":\"app\"},{\"name\":\"initiated_by\",\"value\":\"idp\"},{\"name\":\"orgunit_path\",\"value\":\"ounit\"},{\"name\":\"saml_status_code\",\"value\":\"SUCCESS_URI\"}]}}",
         "event.outcome": "success",
         "event.provider": "saml",
         "event.type": [
