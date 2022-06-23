@@ -63,6 +63,11 @@ func Update() { mg.Deps(winlogbeat.Update.All) }
 func GoUnitTest(ctx context.Context) error {
 	mg.SerialCtxDeps(ctx, goTestDeps...)
 	args := devtools.DefaultGoTestUnitArgs()
+	// The module unit tests depend on a running docker container to provide
+	// the ES instance to run the processor pipeline. In the absence of a
+	// test supervisor or a single test executable to ensure that only a
+	// single container is running, or additional logic to ensure no network
+	// collisions, we ensure that only one test package is running at a time.
 	args.ExtraFlags = append(args.ExtraFlags, "-p", "1")
 	return devtools.GoTest(ctx, args)
 }
