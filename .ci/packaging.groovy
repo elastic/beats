@@ -433,25 +433,23 @@ def runE2ETests(){
 
   def suites = '' // empty value represents all suites in the E2E tests
 
-  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    def suitesSet = e2eTestSuites.toSet()
+  def suitesSet = e2eTestSuites.toSet()
 
-    if (!suitesSet.contains('ALL')) {
-      suitesSet.each { suite ->
-        suites += "${suite},"
-      };
-    }
-    echo 'runE2E will run now in a sync mode to validate packages can be published.'
-    runE2E(runTestsSuites: suites,
-          testMatrixFile: '.ci/.e2e-tests-beats.yaml',
-          beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-          gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
-          gitHubCheckRepo: env.REPO,
-          gitHubCheckSha1: env.GIT_BASE_COMMIT,
-          propagate: true,
-          wait: true)
+  if (!suitesSet.contains('ALL')) {
+    suitesSet.each { suite ->
+      suites += "${suite},"
+    };
   }
-}
+  echo 'runE2E has asynchronously triggered the end to end test job.'
+  runE2E(runTestsSuites: suites,
+        testMatrixFile: '.ci/.e2e-tests-beats.yaml',
+        beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+        gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+        gitHubCheckRepo: env.REPO,
+        gitHubCheckSha1: env.GIT_BASE_COMMIT,
+        propagate: false, // Ignore the result of the downstream E2E job.
+        wait: false) // Do not synchronously wait for the downstream E2E job to complete.
+  }
 
 /**
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
