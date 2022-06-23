@@ -45,6 +45,24 @@
             The name of the computer that generated the record. When using Windows
             event forwarding, this name can differ from `agent.hostname`.
 
+        - name: computerObject.domain
+          required: false
+          type: keyword
+          description: >
+            The domain of the account that was added, modified or deleted in the event.
+
+        - name: computerObject.id
+          required: false
+          type: keyword
+          description: >
+            A globally unique identifier that identifies the target device.
+
+        - name: computerObject.name
+          required: false
+          type: keyword
+          description: >
+            The account name that was added, modified or deleted in the event.
+
         - name: event_data
           type: object
           object_type: keyword
@@ -365,6 +383,30 @@
           required: false
           description: >
             The event creation time.
+
+        - name: trustAttribute
+          required: false
+          type: keyword
+          description: >
+            The decimal value of attributes for new trust created to a domain.
+
+        - name: trustDirection
+          required: false
+          type: keyword
+          description: >
+            The direction of new trust created to a domain.
+
+            Possible values are `TRUST_DIRECTION_DISABLED`, `TRUST_DIRECTION_INBOUND`,
+            `TRUST_DIRECTION_OUTBOUND` and `TRUST_DIRECTION_BIDIRECTIONAL`
+
+        - name: trustType
+          required: false
+          type: keyword
+          description: >
+            The account name that was added, modified or deleted in the event.
+
+            Possible values are `TRUST_TYPE_DOWNLEVEL`, `TRUST_TYPE_UPLEVEL`,
+            `TRUST_TYPE_MIT` and `TRUST_TYPE_DCE`
 
         - name: process.thread.id
           type: long
