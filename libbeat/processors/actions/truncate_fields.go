@@ -105,7 +105,7 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 func (f *truncateFields) truncateSingleField(field string, event *beat.Event) (*beat.Event, error) {
 	v, err := event.GetValue(field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == mapstr.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "could not fetch value for key: %s", field)

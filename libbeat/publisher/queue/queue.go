@@ -22,9 +22,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // Factory for creating a queue used by a pipeline instance.
@@ -45,6 +45,9 @@ type Metrics struct {
 	ByteLimit opt.Uint
 	//EventLimit is the user-configured event limit of the queue
 	EventLimit opt.Uint
+
+	//UnackedConsumedEvents is the count of events that an output consumer has read, but not yet ack'ed
+	UnackedConsumedEvents opt.Uint
 
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time
@@ -128,10 +131,10 @@ type Producer interface {
 	Cancel() int
 }
 
-// Batch of events to be returned to Consumers. The `ACK` method will send the
-// ACK signal to the queue.
+// Batch of events to be returned to Consumers. The `Done` method will tell the
+// queue that the batch has been consumed and its events can be discarded.
 type Batch interface {
 	Count() int
 	Event(i int) interface{}
-	ACK()
+	Done()
 }
