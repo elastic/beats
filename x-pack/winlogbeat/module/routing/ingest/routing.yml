@@ -1,6 +1,9 @@
 ---
 description: Winlogbeat Routing Pipeline
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - pipeline:
       name: '{< IngestPipeline "security" >}'
       if: ctx?.winlog?.channel == 'Security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx?.winlog?.provider_name)
