@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || dragonfly || freebsd || linux || netbsd || openbsd || windows
+// +build darwin dragonfly freebsd linux netbsd openbsd windows
+
 //nolint:errorlint // Bad linter!
 package route
 
