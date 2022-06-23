@@ -38,25 +38,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
-- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
 - Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 
 *Heartbeat*
 
-- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 *Metricbeat*
 
-- Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
-- add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 
 *Packetbeat*
 
 
 *Winlogbeat*
 
-- Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
 
 
 *Functionbeat*
@@ -70,14 +64,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Update to Go 1.17.10 {issue}31636[31636]
-- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
 
 *Auditbeat*
 
 *Filebeat*
 
-- Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
 
 *Heartbeat*
 
@@ -118,6 +109,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
