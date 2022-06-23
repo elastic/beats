@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
 - If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 
 *Heartbeat*
 - Fix unintentional use of no-op logger. {pull}31543[31543]
@@ -131,6 +132,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
 - Add new Kubernetes module dashboards {pull}31341[31341]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
+- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
 *Packetbeat*
 
