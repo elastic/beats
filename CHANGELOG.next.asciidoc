@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 - Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
+- If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 
 *Heartbeat*
 
