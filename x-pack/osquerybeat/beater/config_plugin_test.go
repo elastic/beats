@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -161,7 +160,7 @@ func TestFlattenECSMappingEdges(t *testing.T) {
 	// max + 1 depth key map should return error
 	m = generateTestMapping(maxECSMappingDepth+1, "value", 2)
 	_, err = flattenECSMapping(m)
-	if err != ErrECSMappingIsTooDeep {
+	if !errors.Is(err, ErrECSMappingIsTooDeep) {
 		t.Fatalf("expected error: %v", ErrECSMappingIsTooDeep)
 	}
 }
@@ -369,7 +368,6 @@ func TestSet(t *testing.T) {
 
 			diff = cmp.Diff(tc.scfg, scfg)
 			if diff != "" {
-				fmt.Println(scfg)
 				t.Error(diff)
 			}
 

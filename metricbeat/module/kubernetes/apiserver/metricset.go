@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 // Metricset for apiserver is a prometheus based metricset
@@ -56,34 +55,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error getting metrics: %w", err)
 	}
 
-	rcPost14 := false
 	for _, event := range events {
-		if ok, _ := event.HasKey("request.count"); ok {
-			rcPost14 = true
-			break
-		}
-	}
-
-	for _, event := range events {
-		// Hack: super ugly trick. An improvement would be to add pipeline/lifecycle
-		// to metrics retrieval in general, so mappings, retrieved metrics, ... can be
-		// modified on events. Current design is limiting.
-		if ok, _ := event.HasKey("request.beforev14.count"); ok {
-			if rcPost14 {
-				if bothInformed, _ := event.HasKey("request.count"); !bothInformed {
-					continue
-				}
-				util.ShouldDelete(event, "request.beforev14", m.Logger())
-			} else {
-				v, err := event.GetValue("request.beforev14.count")
-				if err != nil {
-					reporter.Error(err)
-					continue
-				}
-				util.ShouldPut(event, "request.count", v, m.Logger())
-				util.ShouldDelete(event, "request.beforev14", m.Logger())
-			}
-		}
 
 		reporter.Event(mb.Event{
 			MetricSetFields: event,

@@ -211,7 +211,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	transform, err := newAppendResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend := transform.(*appendt) //nolint:errcheck // Bad linter! Panic is a check.
+	testAppend := transform.(*appendt)
 
 	trCtx := emptyTransformContext()
 	tr := transformable{}
@@ -241,7 +241,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend = transform.(*appendt) //nolint:errcheck // Bad linter! Panic is a check.
+	testAppend = transform.(*appendt)
 
 	tr = transformable{}
 
@@ -262,7 +262,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend = transform.(*appendt) //nolint:errcheck // Bad linter! Panic is a check.
+	testAppend = transform.(*appendt)
 
 	tr = transformable{}
 

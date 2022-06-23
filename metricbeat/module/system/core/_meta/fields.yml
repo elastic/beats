@@ -107,3 +107,29 @@
         The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
+
+    - name: model_number
+      type: keyword
+      description: >
+        CPU model number. Only availabe on Linux
+
+    - name: model_name
+      type: keyword
+      description: >
+        CPU model name. Only availabe on Linux
+
+    - name: mhz
+      type: float
+      description: >
+        CPU core current clock. Only availabe on Linux
+
+    - name: core_id
+      type: keyword
+      description: >
+        CPU physical core ID. One core might might execute multiple threads, hence more than
+        one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
+
+    - name: physical_id
+      type: keyword
+      description: >
+        CPU core physical ID. Only availabe on Linux

@@ -889,7 +889,7 @@ metricbeat.modules:
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
-  metricsets: ["node", "queue", "connection"]
+  metricsets: ["node", "queue", "connection", "exchange", "shovel"]
   enabled: true
   period: 10s
   hosts: ["localhost:15672"]
@@ -1013,6 +1013,10 @@ metricbeat.modules:
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. Default is false.
 #fields_under_root: false
+
+# Configure the precision of all timestamps in Metricbeat.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
 #queue:

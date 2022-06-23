@@ -3,6 +3,81 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.2.2]]
+=== Beats version 8.2.2
+https://github.com/elastic/beats/compare/v8.2.1\...v8.2.2[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+
+*Filebeat*
+
+- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+
+[[release-notes-8.2.1]]
+=== Beats version 8.2.1
+https://github.com/elastic/beats/compare/v8.2.0\...v8.2.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
+- Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
+
+*Filebeat*
+
+- Netflow: replace invalid field value. {pull}31295[31295]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+- Duplicate awscloudwatch.* fields to aws.cloudwatch.* in aws-cloudwatch input. {pull}31488[31488]
+- aws-s3 input: Stop SQS keep-alive routine on InvalidParameterValue error. {issue}30675[30675] {pull}31499[31499]
+- Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
+- Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
+- Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
+
+*Heartbeat*
+
+- Restrict setuid to containerized environments. {pull}30869[30869]
+
+*Metricbeat*
+
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
+
+*Packetbeat*
+
+- Use /proc/<pid>/comm for linux process names where possible. {pull}31527[31527]
+- Move "protocol" term from event.category to event.type in SIP events. {pull}31599[31599]
+
+*Winlogbeat*
+
+- Fix resource handle leak during event log enrichment. {pull}31504[31504]
+- Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.17.10 {issue}31636[31636]
+- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
+
+*Filebeat*
+
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
+- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
+- Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
+
+*Metricbeat*
+
+- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
+- Add metadata for missing k8s resources/metricsets {pull}31590[31590]
+- Fix `include_top_n` fields in system/process {pull}31595[31595]
+
 [[release-notes-8.2.0]]
 === Beats version 8.2.0
 https://github.com/elastic/beats/compare/v8.1.3\...v8.2.0[View commits]
@@ -63,6 +138,7 @@ https://github.com/elastic/beats/compare/v8.1.3\...v8.2.0[View commits]
 - Populate new container ECS fields in Docker module. {pull}30399[30399]
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 - Populate ecs container fields in Containerd module. {pull}31025[31025]
+- Add new metricset shovel to RabbitMQ module {pull}31534[31534]
 
 *Winlogbeat*
 

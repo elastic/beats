@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -197,7 +198,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 
 // turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
 // set.
-func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion common.Version) (map[string]interface{}, error) {
+func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion version.V) (map[string]interface{}, error) {
 	retVars := map[string]interface{}{}
 	for key, val := range vars {
 		retVars[key] = val
@@ -216,7 +217,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 
 		minESVersion, ok := vals["min_elasticsearch_version"].(map[string]interface{})
 		if ok {
-			minVersion, err := common.NewVersion(minESVersion["version"].(string))
+			minVersion, err := version.New(minESVersion["version"].(string))
 			if err != nil {
 				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
 			}
@@ -422,7 +423,7 @@ func (fs *Fileset) getPipelineIDs(info beat.Info) ([]string, error) {
 }
 
 // GetPipelines returns the JSON content of the Ingest Node pipeline that parses the logs.
-func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline, err error) {
+func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err error) {
 	vars, err := fs.turnOffElasticsearchVars(fs.vars, esVersion)
 	if err != nil {
 		return nil, err

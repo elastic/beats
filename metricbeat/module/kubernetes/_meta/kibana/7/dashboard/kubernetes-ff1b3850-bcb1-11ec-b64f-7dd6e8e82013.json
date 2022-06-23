@@ -1,0 +1,78 @@
+{
+    "attributes": {
+        "description": "Metrics about Services",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "0bbd68c5-b790-4c31-b4d4-55880249845c",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "0bbd68c5-b790-4c31-b4d4-55880249845c",
+                "panelRefName": "panel_0bbd68c5-b790-4c31-b4d4-55880249845c",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "71ee95da-9df9-4572-a3c3-40ad1fc67cf4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "71ee95da-9df9-4572-a3c3-40ad1fc67cf4",
+                "panelRefName": "panel_71ee95da-9df9-4572-a3c3-40ad1fc67cf4",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Services",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-ff1b3850-bcb1-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "kubernetes-2f0553e0-bcba-11ec-b64f-7dd6e8e82013",
+            "name": "0bbd68c5-b790-4c31-b4d4-55880249845c:panel_0bbd68c5-b790-4c31-b4d4-55880249845c",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-32e1cac0-bcba-11ec-b64f-7dd6e8e82013",
+            "name": "71ee95da-9df9-4572-a3c3-40ad1fc67cf4:panel_71ee95da-9df9-4572-a3c3-40ad1fc67cf4",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-05-23T08:46:52.825Z",
+    "version": "Wzc1MiwxXQ=="
+}

@@ -18,8 +18,8 @@
 package iostat
 
 import (
-	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
 )
 
 // AddLinuxIOStat adds the linux iostat data to the provided map

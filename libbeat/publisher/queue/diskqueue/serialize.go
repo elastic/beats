@@ -22,6 +22,7 @@ package diskqueue
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -53,7 +54,7 @@ type eventDecoder struct {
 
 type entry struct {
 	Timestamp int64
-	Flags     uint8
+	Flags     uint32
 	Meta      mapstr.M
 	Fields    mapstr.M
 }
@@ -82,12 +83,22 @@ func (e *eventEncoder) reset() {
 	e.folder = folder
 }
 
-func (e *eventEncoder) encode(event *publisher.Event) ([]byte, error) {
+func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
+	event, ok := evt.(publisher.Event)
+	if !ok {
+		// In order to support events of varying type, the disk queue needs
+		// to know how to encode them. When we decide to do this, we'll need
+		// to add an encoder to the settings passed in when creating a disk
+		// queue. See https://github.com/elastic/elastic-agent-shipper/issues/41.
+		// For now, just return an error.
+		return nil, fmt.Errorf("disk queue only supports publisher.Event")
+	}
+
 	e.buf.Reset()
 
 	err := e.folder.Fold(entry{
 		Timestamp: event.Content.Timestamp.UTC().UnixNano(),
-		Flags:     uint8(event.Flags),
+		Flags:     uint32(event.Flags),
 		Meta:      event.Content.Meta,
 		Fields:    event.Content.Fields,
 	})
@@ -131,12 +142,12 @@ func (d *eventDecoder) Buffer(n int) []byte {
 }
 
 func (d *eventDecoder) Decode() (publisher.Event, error) {
-	var (
-		to  entry
-		err error
-	)
+	var to entry
 
-	d.unfolder.SetTarget(&to)
+	err := d.unfolder.SetTarget(&to)
+	if err != nil {
+		return publisher.Event{}, err
+	}
 	defer d.unfolder.Reset()
 
 	if d.useJSON {

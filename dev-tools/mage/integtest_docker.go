@@ -194,6 +194,11 @@ func WithGoIntegTestHostEnv(env map[string]string) map[string]string {
 	env["REDIS_HOST"] = dockerServiceHostname
 	env["SREDIS_HOST"] = dockerServiceHostname
 	env["LS_HOST"] = dockerServiceHostname
+
+	// Allow connecting to older versions in tests. There can be a delay producing the snapshot
+	// images for the next release after a feature freeze, which causes temporary test failures.
+	env["TESTING_FILEBEAT_ALLOW_OLDER"] = "1"
+
 	return env
 }
 
@@ -472,7 +477,7 @@ func WriteDockerComposeEnvFile() (string, error) {
 	}
 
 	envFile := filepath.Join(esBeatsDir, "docker.env")
-	err = os.WriteFile( //nolint:gosec // File permissions are not a security risk.
+	err = os.WriteFile(
 		envFile,
 		[]byte(strings.Join(envFileContent, "\n")),
 		0644,

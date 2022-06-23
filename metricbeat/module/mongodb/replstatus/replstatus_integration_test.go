@@ -40,6 +40,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/31768")
+
 	service := compose.EnsureUp(t, "mongodb")
 
 	err := initiateReplicaSet(t, service.Host())

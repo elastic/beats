@@ -2827,6 +2827,24 @@ type: double
 
 --
 
+*`aws.applicationelb.metrics.HealthyHostCount.max`*::
++
+--
+The number of targets that are considered healthy.
+
+type: long
+
+--
+
+*`aws.applicationelb.metrics.UnHealthyHostCount.max`*::
++
+--
+The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
 [float]
 === networkelb
 
@@ -31763,6 +31781,36 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+--
+
+
+
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
 +
@@ -32446,6 +32494,134 @@ type: long
 +
 --
 type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.limit_in_bytes`*::
++
+--
+type: long
+
+format: bytes
 
 --
 
@@ -41648,6 +41824,154 @@ type: keyword
 --
 
 [float]
+=== cluster_actions
+
+Kibana cluster actions metrics.
+
+
+
+
+*`kibana.cluster_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_actions.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_actions.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_actions.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== cluster_rules
+
+Kibana cluster rule metrics.
+
+
+
+
+*`kibana.cluster_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_rules.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_rules.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_rules.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== node_actions
+
+Kibana node actions metrics.
+
+
+
+
+*`kibana.node_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_actions.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
+=== node_rules
+
+Kibana node rule metrics.
+
+
+
+
+*`kibana.node_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_rules.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
 === settings
 
 Kibana stats and run-time metrics.
@@ -42321,16 +42645,6 @@ Kubernetes API server metrics
 
 
 
-*`kubernetes.apiserver.request.client`*::
-+
---
-Client executing requests
-
-
-type: keyword
-
---
-
 *`kubernetes.apiserver.request.resource`*::
 +
 --
@@ -42522,46 +42836,19 @@ type: double
 --
 
 
-*`kubernetes.apiserver.http.request.duration.us.percentile.*`*::
+*`kubernetes.apiserver.watch.events.size.bytes.bucket.*`*::
 +
 --
-Request duration microseconds percentiles
+Watch event size distribution in bytes
 
 type: object
 
 --
 
-*`kubernetes.apiserver.http.request.duration.us.sum`*::
+*`kubernetes.apiserver.watch.events.size.bytes.sum`*::
 +
 --
-Request duration microseconds cumulative sum
-
-type: double
-
---
-
-*`kubernetes.apiserver.http.request.duration.us.count`*::
-+
---
-Request count for duration
-
-type: long
-
---
-
-*`kubernetes.apiserver.http.request.size.bytes.percentile.*`*::
-+
---
-Request size percentiles
-
-type: object
-
---
-
-*`kubernetes.apiserver.http.request.size.bytes.sum`*::
-+
---
-Request size cumulative sum
+Sum of watch events sizes in bytes
 
 type: long
 
@@ -42569,28 +42856,40 @@ format: bytes
 
 --
 
-*`kubernetes.apiserver.http.request.size.bytes.count`*::
+*`kubernetes.apiserver.watch.events.size.bytes.count`*::
 +
 --
-Request count for size
+Number of watch events
 
 type: long
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.percentile.*`*::
+*`kubernetes.apiserver.watch.events.kind`*::
 +
 --
-Response size percentiles
+Resource kind of the watch event
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.apiserver.response.size.bytes.bucket.*`*::
++
+--
+Response size distribution in bytes for each group, version, verb, resource, subresource, scope and component.
+
 
 type: object
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.sum`*::
+*`kubernetes.apiserver.response.size.bytes.sum`*::
 +
 --
-Response size cumulative sum
+Sum of responses sizes in bytes
 
 type: long
 
@@ -42598,19 +42897,10 @@ format: bytes
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.count`*::
+*`kubernetes.apiserver.response.size.bytes.count`*::
 +
 --
-Response count
-
-type: long
-
---
-
-*`kubernetes.apiserver.http.request.count`*::
-+
---
-Request count for response
+Number of responses to requests
 
 type: long
 
@@ -42635,33 +42925,6 @@ type: long
 
 --
 
-*`kubernetes.apiserver.request.latency.sum`*::
-+
---
-Requests latency, sum of latencies in microseconds
-
-type: long
-
---
-
-*`kubernetes.apiserver.request.latency.count`*::
-+
---
-Request latency, number of requests
-
-type: long
-
---
-
-*`kubernetes.apiserver.request.latency.bucket.*`*::
-+
---
-Request latency histogram buckets
-
-type: object
-
---
-
 *`kubernetes.apiserver.request.duration.us.sum`*::
 +
 --
@@ -42683,7 +42946,7 @@ type: long
 *`kubernetes.apiserver.request.duration.us.bucket.*`*::
 +
 --
-Request duration, histogram buckets
+Response latency distribution, histogram buckets
 
 type: object
 
@@ -54231,6 +54494,163 @@ type: double
 --
 
 [float]
+=== sysmetric
+
+Sysmetric related metrics.
+
+
+
+*`oracle.sysmetric.session_count`*::
++
+--
+Session Count.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.average_active_sessions`*::
++
+--
+Average Active Sessions.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.current_os_load`*::
++
+--
+Current OS Load.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_reads_per_sec`*::
++
+--
+Physical Reads Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_transaction_per_sec`*::
++
+--
+User Transaction Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_table_scans_per_txn`*::
++
+--
+Total Table Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_writes_per_sec`*::
++
+--
+Physical Writes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_index_scans_per_txn`*::
++
+--
+Total Index Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.host_cpu_utilization_pct`*::
++
+--
+Host CPU Utilization (%).
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.network_traffic_volume_per_sec`*::
++
+--
+Network Traffic Volume Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_rollbacks_per_sec`*::
++
+--
+User Rollbacks Per Second.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.cpu_usage_per_sec`*::
++
+--
+CPU Usage Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.db_block_changes_per_sec`*::
++
+--
+DB Block Changes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_read_total_bytes_per_sec`*::
++
+--
+Physical Read Total Bytes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.response_time_per_txn`*::
++
+--
+Response Time Per Transaction.
+
+
+type: double
+
+--
+
+[float]
 === tablespace
 
 tablespace
@@ -56514,6 +56934,67 @@ Total number of times messages have been written to disk by this queue since it 
 
 
 type: long
+
+--
+
+[float]
+=== shovel
+
+shovel
+
+
+
+*`rabbitmq.shovel.name`*::
++
+--
+The name of the shovel with non-ASCII characters escaped as in C.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.vhost`*::
++
+--
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+type: alias
+
+alias to: rabbitmq.vhost
+
+--
+
+*`rabbitmq.shovel.node`*::
++
+--
+Node name.
+
+
+type: alias
+
+alias to: rabbitmq.node.name
+
+--
+
+*`rabbitmq.shovel.state`*::
++
+--
+The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.type`*::
++
+--
+The type of the shovel. Either 'static' or 'dynamic'.
+
+
+type: keyword
 
 --
 
@@ -59695,6 +60176,56 @@ type: long
 
 --
 
+*`system.core.model_number`*::
++
+--
+CPU model number. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.model_name`*::
++
+--
+CPU model name. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.mhz`*::
++
+--
+CPU core current clock. Only availabe on Linux
+
+
+type: float
+
+--
+
+*`system.core.core_id`*::
++
+--
+CPU physical core ID. One core might might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.physical_id`*::
++
+--
+CPU core physical ID. Only availabe on Linux
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
@@ -60206,6 +60737,16 @@ Total number of inodes on the system, which will be a combination of files, fold
 
 
 type: long
+
+--
+
+*`system.filesystem.options`*::
++
+--
+The options present on the filesystem mount.
+
+
+type: keyword
 
 --
 

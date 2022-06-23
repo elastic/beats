@@ -14,6 +14,6 @@ import (
 //go:embed */ingest/*.yml
 var pipelinesFS embed.FS
 
-func Init() {
+func init() {
 	module.PipelinesFS = &pipelinesFS
 }

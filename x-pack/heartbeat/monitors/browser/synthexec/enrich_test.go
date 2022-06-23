@@ -11,18 +11,15 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -40,15 +37,14 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 }
 
 func TestJourneyEnricher(t *testing.T) {
-	var stdFields = StdSuiteFields{
-		Id:       "mysuite",
-		Name:     "mysuite",
-		Type:     "browser",
-		IsInline: false,
+	var sFields = stdfields.StdMonitorFields{
+		ID:   "myproject",
+		Name: "myproject",
+		Type: "browser",
 	}
 	journey := &Journey{
 		Name: "A Journey Name",
-		Id:   "my-journey-id",
+		ID:   "my-journey-id",
 	}
 	syntherr := &SynthError{
 		Message: "my-errmsg",
@@ -89,23 +85,7 @@ func TestJourneyEnricher(t *testing.T) {
 		journeyEnd,
 	}
 
-	suiteValidator := func() validator.Validator {
-		return lookslike.MustCompile(mapstr.M{
-			"suite.id":     stdFields.Id,
-			"suite.name":   stdFields.Name,
-			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
-			"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-			"monitor.type": stdFields.Type,
-		})
-	}
-	inlineValidator := func() validator.Validator {
-		return lookslike.MustCompile(mapstr.M{
-			"monitor.id":   stdFields.Id,
-			"monitor.name": stdFields.Name,
-			"monitor.type": stdFields.Type,
-		})
-	}
-	commonValidator := func(se *SynthEvent) validator.Validator {
+	valid := func(se *SynthEvent) validator.Validator {
 		var v []validator.Validator
 
 		// We need an expectation for each input plus a final
@@ -121,51 +101,46 @@ func TestJourneyEnricher(t *testing.T) {
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
+				"monitor.check_group": isdef.IsString,
 			}))
 		}
 		return lookslike.Compose(v...)
 	}
 
-	je := &journeyEnricher{}
-	check := func(t *testing.T, se *SynthEvent, ssf StdSuiteFields) {
+	check := func(t *testing.T, se *SynthEvent, je *journeyEnricher) {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, ssf)
+			enrichErr := je.enrich(e, se)
 			if se.Error != nil {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
-			if ssf.IsInline {
-				sv, _ := e.Fields.GetValue("suite")
-				require.Nil(t, sv)
-				testslike.Test(t, inlineValidator(), e.Fields)
-			} else {
-				testslike.Test(t, suiteValidator(), e.Fields)
-			}
-			testslike.Test(t, commonValidator(se), e.Fields)
+
+			testslike.Test(t, valid(se), e.Fields)
 
 			require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
 		})
 	}
 
 	tests := []struct {
-		name     string
-		isInline bool
+		name                  string
+		IsLegacyBrowserSource bool
 	}{
 		{
-			name:     "suite monitor",
-			isInline: false,
+			name:                  "legacy project monitor",
+			IsLegacyBrowserSource: true,
 		},
 		{
-			name:     "inline monitor",
-			isInline: true,
+			name:                  "modern monitor",
+			IsLegacyBrowserSource: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stdFields.IsInline = tt.isInline
+			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
+			je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: sFields}}
 			for _, se := range synthEvents {
-				check(t, se, stdFields)
+				check(t, se, je)
 			}
 		})
 	}
@@ -362,7 +337,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 func TestNoSummaryOnAfterHook(t *testing.T) {
 	journey := &Journey{
 		Name: "A journey that fails after completing",
-		Id:   "my-bad-after-all-hook",
+		ID:   "my-bad-after-all-hook",
 	}
 	journeyStart := &SynthEvent{
 		Type:                 JourneyStart,
@@ -398,13 +373,13 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 		cmdStatus,
 	}
 
-	je := &journeyEnricher{}
-
+	stdFields := stdfields.StdMonitorFields{}
+	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StdSuiteFields{IsInline: false}
+
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields)
+			enrichErr := je.enrich(e, se)
 
 			if se != nil && se.Type == CmdStatus {
 				t.Run("no summary in cmd/status", func(t *testing.T) {
@@ -435,7 +410,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	journey := &Journey{
 		Name: "A journey that never emits journey/end but exits successfully",
-		Id:   "no-journey-end-but-success",
+		ID:   "no-journey-end-but-success",
 	}
 	journeyStart := &SynthEvent{
 		Type:                 "journey/start",
@@ -458,15 +433,14 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		cmdStatus,
 	}
 
-	je := &journeyEnricher{}
-
 	hasCmdStatus := false
 
+	stdFields := stdfields.StdMonitorFields{}
+	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StdSuiteFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields)
+			enrichErr := je.enrich(e, se)
 
 			if se != nil && se.Type == CmdStatus {
 				hasCmdStatus = true
@@ -491,31 +465,20 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 func TestCreateSummaryEvent(t *testing.T) {
 	baseTime := time.Now()
 
-	defaultLogValidator := func(stepCount int) func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
-		return func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
-			require.Len(t, observed, 1)
-			require.Equal(t, "Monitor finished", observed[0].Message)
-
-			durationMs := baseTime.Add(10 * time.Microsecond).Sub(baseTime).Milliseconds()
-			expectedMonitor := logger.NewMonitorRunInfo("my-monitor", "browser", durationMs)
-			expectedMonitor.Steps = &stepCount
-			require.ElementsMatch(t, []zap.Field{
-				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
-				logp.Any("monitor", &expectedMonitor),
-			}, observed[0].Context)
-		}
+	testJourney := Journey{
+		ID:   "my-monitor",
+		Name: "My Monitor",
 	}
 
 	tests := []struct {
-		name         string
-		je           *journeyEnricher
-		expected     mapstr.M
-		wantErr      bool
-		logValidator func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry)
+		name     string
+		je       *journeyEnricher
+		expected mapstr.M
+		wantErr  bool
 	}{{
 		name: "completed without errors",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
@@ -528,12 +491,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   1,
 			},
 		},
-		wantErr:      false,
-		logValidator: defaultLogValidator(3),
+		wantErr: false,
 	}, {
 		name: "completed with error",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
@@ -547,12 +509,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   0,
 			},
 		},
-		wantErr:      true,
-		logValidator: defaultLogValidator(0),
+		wantErr: true,
 	}, {
 		name: "started, but exited without running steps",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			start:           baseTime,
 			end:             baseTime.Add(10 * time.Microsecond),
 			stepCount:       0,
@@ -565,12 +526,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   1,
 			},
 		},
-		wantErr:      true,
-		logValidator: defaultLogValidator(0),
+		wantErr: true,
 	}, {
 		name: "syntax error - exited without starting",
 		je: &journeyEnricher{
-			journey:         &Journey{},
+			journey:         &testJourney,
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
 			errorCount:      1,
@@ -581,21 +541,11 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"up":   0,
 			},
 		},
-		logValidator: func(t *testing.T, summary mapstr.M, observed []observer.LoggedEntry) {
-			// We don't log run data without duration
-			require.Len(t, observed, 1)
-			require.Equal(t, "Error gathering information to log event", observed[0].Message)
-		},
 		wantErr: true,
 	}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			core, observed := observer.New(zapcore.InfoLevel)
-			logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-				return zapcore.NewTee(in, core)
-			})))
-
 			monitorField := mapstr.M{"id": "my-monitor", "type": "browser"}
 
 			e := &beat.Event{
@@ -614,13 +564,9 @@ func TestCreateSummaryEvent(t *testing.T) {
 				"url":                mapstr.M{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
-				"synthetics.journey": Journey{},
+				"synthetics.journey": testJourney,
 			}, true)
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
-
-			if tt.logValidator != nil {
-				tt.logValidator(t, tt.expected, observed.All())
-			}
 		})
 	}
 }

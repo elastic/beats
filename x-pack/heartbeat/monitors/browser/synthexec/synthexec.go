@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -26,23 +27,16 @@ import (
 
 const debugSelector = "synthexec"
 
-type StdSuiteFields struct {
-	Name     string
-	Id       string
-	Type     string
-	IsInline bool
-}
-
 type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
 }
 
-// SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields StdSuiteFields, extraArgs ...string) (jobs.Job, error) {
-	// Run the command in the given suitePath, use '.' as the first arg since the command runs
+// ProjectJob will run a single journey by name from the given project.
+func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
+	// Run the command in the given projectPath, use '.' as the first arg since the command runs
 	// in the correct dir
-	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
+	cmdFactory, err := projectCommandFactory(projectPath, extraArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,19 +44,19 @@ func SuiteJob(ctx context.Context, suitePath string, params mapstr.M, filterJour
 	return startCmdJob(ctx, cmdFactory, nil, params, filterJourneys, fields), nil
 }
 
-func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, error) {
-	npmRoot, err := getNpmRoot(suitePath)
+func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd, error) {
+	npmRoot, err := getNpmRoot(projectPath)
 	if err != nil {
 		return nil, err
 	}
 
 	newCmd := func() *exec.Cmd {
 		bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
-		// Always put the suite path first to prevent conflation with variadic args!
+		// Always put the project path first to prevent conflation with variadic args!
 		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
 		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
 		// to the end.
-		cmd := exec.Command(bin, append([]string{suitePath}, args...)...)
+		cmd := exec.Command(bin, append([]string{projectPath}, args...)...)
 		cmd.Dir = npmRoot
 		return cmd
 	}
@@ -71,7 +65,7 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields StdSuiteFields, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
 		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...) //nolint:gosec // we are safely building a command here, users can add args at their own risk
 	}
@@ -82,25 +76,25 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, fields StdSuiteFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
 			return nil, err
 		}
-		senr := streamEnricher{}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich, fields)}, nil
+		senr := streamEnricher{sFields: sFields}
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
 	}
 }
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher, fields StdSuiteFields) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		se := <-synthEvents
-		err = enrich(event, se, fields)
+		err = enrich(event, se)
 		if se != nil {
-			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich, fields)}, err
+			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
 		} else {
 			return nil, err
 		}
