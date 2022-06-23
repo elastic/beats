@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add a new `salesforce` module to collect data from salesforce. {pull}31486[31486]
 
 *Heartbeat*
+- Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
+- Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
 
 
 *Metricbeat*

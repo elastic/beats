@@ -227,6 +227,7 @@ func preProcessors(info beat.Info, settings publishSettings, monitorType string)
 	}
 
 	if !settings.Index.IsEmpty() {
+		logp.L().Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
 		proc, err := indexProcessor(&settings.Index, info)
 		if err != nil {
 			return nil, err
