@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"reflect"
 	"testing"
 	"time"
 
@@ -248,6 +247,7 @@ func TestPublish(t *testing.T) {
 		events      []beat.Event
 		expSignals  []outest.BatchSignal
 		serverError error
+		expError    string
 		qSize       int
 	}{
 		{
@@ -281,6 +281,7 @@ func TestPublish(t *testing.T) {
 			},
 			qSize:       3,
 			serverError: errors.New("some error"),
+			expError:    "failed to publish the batch to the shipper, none of the 2 events were accepted",
 		},
 	}
 
@@ -291,21 +292,12 @@ func TestPublish(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
-			producer := sc.NewProducerMock(tc.qSize)
-			producer.Error = tc.serverError
-			grpcServer := grpc.NewServer()
-			sc.RegisterProducerServer(grpcServer, producer)
 
-			listener, err := net.Listen("tcp", "localhost:0") // random available port
-			require.NoError(t, err)
-
-			defer grpcServer.Stop()
-			go func() {
-				_ = grpcServer.Serve(listener)
-			}()
+			addr, stop := runServer(t, tc.qSize, tc.serverError, "localhost:0")
+			defer stop()
 
 			cfg, err := config.NewConfigFrom(map[string]interface{}{
-				"server": listener.Addr().String(),
+				"server": addr,
 			})
 			require.NoError(t, err)
 
@@ -319,8 +311,17 @@ func TestPublish(t *testing.T) {
 			require.Len(t, group.Clients, 1)
 
 			batch := outest.NewBatch(tc.events...)
-			err = group.Clients[0].Publish(ctx, batch)
+
+			err = group.Clients[0].(outputs.Connectable).Connect()
 			require.NoError(t, err)
+
+			err = group.Clients[0].Publish(ctx, batch)
+			if tc.expError != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expError)
+			} else {
+				require.NoError(t, err)
+			}
 
 			require.Equal(t, tc.expSignals, batch.Signals)
 		})
@@ -330,17 +331,16 @@ func TestPublish(t *testing.T) {
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
-		producer := sc.NewProducerMock(5)
-		grpcServer := grpc.NewServer()
-		sc.RegisterProducerServer(grpcServer, producer)
-
-		listener, err := net.Listen("tcp", "localhost:0") // random available port
-		require.NoError(t, err)
-		defer grpcServer.Stop()
+		addr, stop := runServer(t, 5, nil, "localhost:0")
+		defer stop()
 
 		cfg, err := config.NewConfigFrom(map[string]interface{}{
-			"server":  listener.Addr().String(),
-			"timeout": 1, // 1 sec
+			"server":  addr,
+			"timeout": 5, // 5 sec
+			"backoff": map[string]interface{}{
+				"init": "10ms",
+				"max":  "5s",
+			},
 		})
 		require.NoError(t, err)
 
@@ -353,46 +353,82 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, group.Clients, 1)
 
-		batch := outest.NewBatch(events...)
+		client := group.Clients[0].(outputs.NetworkClient)
 
-		// try to publish without the server running
-		err = group.Clients[0].Publish(ctx, batch)
+		err = client.Connect()
 		require.NoError(t, err)
 
+		// Should successfully publish with the server running
+		batch := outest.NewBatch(events...)
+		err = client.Publish(ctx, batch)
+		require.NoError(t, err)
 		expSignals := []outest.BatchSignal{
+			{
+				Tag: outest.BatchACK,
+			},
+		}
+		require.Equal(t, expSignals, batch.Signals)
+
+		stop() // now stop the server and try sending again
+
+		batch = outest.NewBatch(events...) // resetting the batch signals
+		err = client.Publish(ctx, batch)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "failed to publish the batch to the shipper, none of the 2 events were accepted")
+		expSignals = []outest.BatchSignal{
 			{
 				Tag: outest.BatchCancelled, // "cancelled" means there will be a retry without decreasing the TTL
 			},
 		}
 		require.Equal(t, expSignals, batch.Signals)
+		client.Close()
 
-		// Start the server
-		go func() {
-			_ = grpcServer.Serve(listener)
-		}()
+		// Start the server again
+		_, stop = runServer(t, 5, nil, addr)
+		defer stop()
 
-		var actSignals []outest.BatchSignal
+		batch = outest.NewBatch(events...) // resetting the signals
 		expSignals = []outest.BatchSignal{
 			{
 				Tag: outest.BatchACK,
 			},
 		}
 
-		// Poll for the batch to be acknowledged. The gRPC server takes a variable amount
-		// of time to start, so some retries are necessary.
-		require.Eventually(t, func() bool {
-			batch = outest.NewBatch(events...)
-			err = group.Clients[0].Publish(ctx, batch)
-			require.NoError(t, err)
+		// The backoff wrapper should take care of the errors and
+		// retries while the server is still starting
+		err = client.Connect()
+		require.NoError(t, err)
 
-			actSignals = batch.Signals
-			return reflect.DeepEqual(expSignals, batch.Signals)
-		}, 5*time.Second, 500*time.Millisecond)
-
-		// Use require.Equal() on the final signal set. If the Eventually() loop above
-		// failed this will print the difference between the signal sets.
-		require.Equal(t, expSignals, actSignals)
+		err = client.Publish(ctx, batch)
+		require.NoError(t, err)
+		require.Equal(t, expSignals, batch.Signals)
 	})
+}
+
+// runServer mocks the shipper mock server for testing
+// `qSize` is a slice of the event buffer in the mock
+// `err` is a preset error that the server will serve to the client
+// `listenAddr` is the address for the server to listen
+// returns `actualAddr` where the listener actually is and the `stop` function to stop the server
+func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, stop func()) {
+	producer := sc.NewProducerMock(qSize)
+	producer.Error = err
+	grpcServer := grpc.NewServer()
+	sc.RegisterProducerServer(grpcServer, producer)
+
+	listener, err := net.Listen("tcp", listenAddr)
+	require.NoError(t, err)
+	go func() {
+		_ = grpcServer.Serve(listener)
+	}()
+
+	actualAddr = listener.Addr().String()
+	stop = func() {
+		grpcServer.Stop()
+		listener.Close()
+	}
+
+	return actualAddr, stop
 }
 
 func protoStruct(t *testing.T, values map[string]interface{}) *structpb.Struct {
