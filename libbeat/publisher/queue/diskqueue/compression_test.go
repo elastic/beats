@@ -39,7 +39,7 @@ func TestCompressionReader(t *testing.T) {
 		plaintext  []byte
 		compressed []byte
 	}{
-		"abc 1.9.3 lz4": {
+		"abc compressed with https://github.com/lz4/lz4 v1.9.3": {
 			plaintext: []byte("abc"),
 			compressed: []byte{
 				0x04, 0x22, 0x4d, 0x18,
@@ -49,7 +49,7 @@ func TestCompressionReader(t *testing.T) {
 				0x00, 0x00, 0x00, 0x6c,
 				0x3e, 0x7b, 0x08, 0x00},
 		},
-		"abc pierrec lz4": {
+		"abc compressed with pierrec lz4": {
 			plaintext: []byte("abc"),
 			compressed: []byte{
 				0x04, 0x22, 0x4d, 0x18,
@@ -141,6 +141,9 @@ func TestCompressionSync(t *testing.T) {
 			src1 := bytes.NewReader(tc.plaintext)
 			_, err := io.Copy(cw, src1)
 			assert.Nil(t, err, name)
+			//prior to v4.1.15 of pierrec/lz4 there was a
+			// bug that prevented writing after a Flush.
+			// The call to Sync here exercises Flush.
 			err = cw.Sync()
 			assert.Nil(t, err, name)
 			src2 := bytes.NewReader(tc.plaintext)
