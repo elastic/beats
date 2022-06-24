@@ -34,7 +34,7 @@ func TestParser(t *testing.T) {
 	}{
 		"keep all messages": {
 			config: map[string]interface{}{
-				"pattern": "this matches*",
+				"patterns": []string{"this matches*"},
 			},
 			input: []reader.Message{
 				{
@@ -49,6 +49,22 @@ func TestParser(t *testing.T) {
 				[]byte("this matches again"),
 			},
 		},
+		"keep one message": {
+			config: map[string]interface{}{
+				"patterns": []string{"this matches*"},
+			},
+			input: []reader.Message{
+				{
+					Content: []byte("this matches"),
+				},
+				{
+					Content: []byte("this does not match"),
+				},
+			},
+			expectedMessageContent: [][]byte{
+				[]byte("this matches"),
+			},
+		},
 	}
 
 	for name, test := range tests {
@@ -56,6 +72,7 @@ func TestParser(t *testing.T) {
 			var c Config
 			cfg := config.MustNewConfigFrom(test.config)
 			err := cfg.Unpack(&c)
+			require.NoError(t, err)
 			r := NewFilterParser(newTestReader(test.input), &c)
 
 			contents := make([][]byte, 0)
