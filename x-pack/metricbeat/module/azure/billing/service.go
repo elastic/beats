@@ -76,11 +76,12 @@ func (service *UsageService) GetForecast(filter string) ([]consumption.Forecast,
 			// Subscriptions." [1]
 			//
 			// [1]: https://docs.microsoft.com/en-us/rest/api/consumption/
-			service.log.Warnf(
-				"no forecasts found for filter: \"%s\"; possible cause: Forecast data is not supported for subscription '%s'",
-				filter,
-				service.forecastsClient.SubscriptionID,
-			)
+			service.log.
+				With("billing.filter", filter).
+				With("billing.subscription_id", service.forecastsClient.SubscriptionID).
+				Warnf(
+					"no forecasts available for subscription; possibly because the subscription is not an enterprise subscription. For details, see: https://docs.microsoft.com/en-us/rest/api/consumption/",
+				)
 			return []consumption.Forecast{}, nil
 		default:
 			return nil, err

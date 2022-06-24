@@ -36,7 +36,7 @@ func NewClient(config azure.Config) (*Client, error) {
 	client := &Client{
 		BillingService: usageService,
 		Config:         config,
-		Log:            logp.NewLogger("azure monitor client"),
+		Log:            logp.NewLogger("azure billing client"),
 	}
 	return client, nil
 }
@@ -50,7 +50,11 @@ func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage,
 	} else if client.Config.BillingScopeAccountId != "" {
 		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
 	}
-	client.Log.Infof("Getting usage details for scope: %s, startDate: %s, endDate: %s", scope, startTime, endTime)
+	client.Log.
+		With("billing.scope", scope).
+		With("billing.start_time", startTime).
+		With("billing.end_time", endTime).
+		Infow("Getting usage details for scope")
 
 	usageDetails, err := client.BillingService.GetUsageDetails(
 		scope,
@@ -67,7 +71,7 @@ func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage,
 		endTime.Format("2006-01-02"),   // endDate
 	)
 	if err != nil {
-		return usage, fmt.Errorf("Retrieving usage details failed in client: %w", err)
+		return usage, fmt.Errorf("retrieving usage details failed in client: %w", err)
 	}
 
 	usage.UsageDetails = usageDetails.Values()

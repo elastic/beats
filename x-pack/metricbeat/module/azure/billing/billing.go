@@ -59,11 +59,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	// The time interval for the Usage Details data is yesterday (00:00:00->23:59:59) in UTC.
+	// The time interval is yesterday (00:00:00->23:59:59) in UTC.
 	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
 
-	m.log.Infof("Fetching billing data for period: %s to %s", startTime, endTime)
+	m.log.
+		With("billing.start_time", startTime).
+		With("billing.end_time", endTime).
+		Infow("Fetching billing data")
 
 	results, err := m.client.GetMetrics(startTime, endTime)
 	if err != nil {
