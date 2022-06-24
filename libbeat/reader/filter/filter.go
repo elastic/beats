@@ -31,6 +31,10 @@ type Config struct {
 	Filters []match.Matcher `config:"patterns" validate:"required"`
 }
 
+// FilterParser accepts a list of matchers to determine if a line
+// should be kept or not. If one of the patterns matches the
+// contents of the message, it is returned to the next reader.
+// If not, the message is dropped.
 type FilterParser struct {
 	ctx      ctxtool.CancelContext
 	logger   *logp.Logger
@@ -47,7 +51,6 @@ func NewFilterParser(r reader.Reader, c *Config) *FilterParser {
 	}
 }
 
-// Next decodes JSON and returns the filled Line object.
 func (p *FilterParser) Next() (reader.Message, error) {
 	for p.ctx.Err() == nil {
 		message, err := p.r.Next()
