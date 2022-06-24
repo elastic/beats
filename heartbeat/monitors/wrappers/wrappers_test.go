@@ -30,6 +30,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -699,4 +700,20 @@ func TestProjectBrowserJob(t *testing.T) {
 		nil,
 		nil,
 	})
+}
+
+func TestECSErrors(t *testing.T) {
+	ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
+	wrappedEcsErr := fmt.Errorf("wrapped: %w", ecse)
+	expectedEcsErr := ecserr.NewECSErr(
+		ecse.Type,
+		ecse.Code,
+		wrappedEcsErr.Error(),
+	)
+
+	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields)
+	event := &beat.Event{}
+	_, err := j[0](event)
+	require.NoError(t, err)
+	require.Equal(t, event.Fields["error"], expectedEcsErr)
 }

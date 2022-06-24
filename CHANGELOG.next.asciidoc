@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix unintentional use of no-op logger. {pull}31543[31543]
+- Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
 
 *Metricbeat*
 
