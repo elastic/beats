@@ -76,7 +76,8 @@ func TestEventMapping(t *testing.T) {
 	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
 
-	events := EventsMapping("sub", usage, startTime, endTime)
+	events, err := EventsMapping("sub", usage, startTime, endTime)
+	assert.NoError(t, err)
 	assert.Equal(t, len(events), 2)
 
 	for _, event := range events {

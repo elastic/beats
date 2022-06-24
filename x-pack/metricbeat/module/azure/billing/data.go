@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"errors"
+
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/shopspring/decimal"
 
@@ -16,7 +18,7 @@ import (
 )
 
 // EventsMapping maps the usage details to a slice of metricbeat events.
-func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) []mb.Event {
+func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) ([]mb.Event, error) {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
 		for _, ud := range results.UsageDetails {
@@ -27,10 +29,12 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				"cloud.provider": "azure",
 			}
 
-			//
-			// legacy data format
-			//
 			if legacy, isLegacy := ud.AsLegacyUsageDetail(); isLegacy {
+
+				//
+				// legacy data format
+				//
+
 				event.ModuleFields = mapstr.M{
 					"subscription_id":   legacy.SubscriptionID,
 					"subscription_name": legacy.SubscriptionName,
@@ -60,12 +64,13 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				_, _ = event.RootFields.Put("cloud.region", legacy.ResourceLocation)
 				_, _ = event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
 				_, _ = event.RootFields.Put("cloud.instance.id", legacy.ResourceID)
-			}
 
-			//
-			// modern data format
-			//
-			if modern, isModern := ud.AsModernUsageDetail(); isModern {
+			} else if modern, isModern := ud.AsModernUsageDetail(); isModern {
+
+				//
+				// modern data format
+				//
+
 				event.ModuleFields = mapstr.M{
 					"subscription_id":   modern.SubscriptionGUID,
 					"subscription_name": modern.SubscriptionName,
@@ -93,6 +98,13 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 					"quantity":   modern.Quantity,
 				}
 				_, _ = event.RootFields.Put("cloud.region", modern.ResourceLocation)
+
+			} else {
+
+				//
+				// Unsupported data format
+				//
+				return events, errors.New("unsupported usage details format: not legacy nor modern")
 			}
 
 			events = append(events, event)
@@ -147,7 +159,7 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 		events = append(events, event)
 	}
 
-	return events
+	return events, nil
 }
 
 // getResourceNameFromPath returns the resource name by picking the last part from a `/` separated resource path.
