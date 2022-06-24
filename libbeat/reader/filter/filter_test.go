@@ -49,6 +49,23 @@ func TestParser(t *testing.T) {
 				[]byte("this matches again"),
 			},
 		},
+		"keep all messages with multiple patterns": {
+			config: map[string]interface{}{
+				"patterns": []string{"this matches*", "should match as well*"},
+			},
+			input: []reader.Message{
+				{
+					Content: []byte("this matches"),
+				},
+				{
+					Content: []byte("should match as well"),
+				},
+			},
+			expectedMessageContent: [][]byte{
+				[]byte("this matches"),
+				[]byte("should match as well"),
+			},
+		},
 		"keep one message": {
 			config: map[string]interface{}{
 				"patterns": []string{"this matches*"},
