@@ -18,6 +18,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -82,7 +83,7 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		senr := streamEnricher{sFields: sFields}
+		senr := newStreamEnricher(sFields)
 		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
 	}
 }
@@ -213,13 +214,12 @@ func runCmd(
 
 		var cmdError *SynthError = nil
 		if err != nil {
-			errMessage := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
-			cmdError = &SynthError{Name: "cmdexit", Message: errMessage}
+			cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 		}
 
 		mpx.writeSynthEvent(&SynthEvent{
-			Type:                 "cmd/status",
+			Type:                 CmdStatus,
 			Error:                cmdError,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 		})
@@ -257,8 +257,8 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	return nil
 }
 
-var stdoutToSynthEvent = lineToSynthEventFactory("stdout")
-var stderrToSynthEvent = lineToSynthEventFactory("stderr")
+var stdoutToSynthEvent = lineToSynthEventFactory(Stdout)
+var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 
 // lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
