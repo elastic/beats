@@ -25,10 +25,11 @@ const (
 )
 
 type source struct {
-	containerName string
-	accountName   string
-	batchSize     int32
-	poll          bool
+	containerName  string
+	accountName    string
+	batchSize      int32
+	poll           bool
+	pollIntervalMs int32
 }
 
 type azurebsInput struct {
@@ -61,10 +62,11 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	var sources []cursor.Source
 	for _, c := range config.Containers {
 		sources = append(sources, &source{
-			accountName:   config.AccountName,
-			containerName: c.Name,
-			batchSize:     c.BatchSize,
-			poll:          c.Poll,
+			accountName:    config.AccountName,
+			containerName:  c.Name,
+			batchSize:      c.BatchSize,
+			poll:           c.Poll,
+			pollIntervalMs: c.PollIntervalMs,
 		})
 	}
 

@@ -11,17 +11,18 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/state"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-concert/timed"
 )
 
 type scheduler interface {
 	createJobs(pager *azblob.ContainerListBlobFlatPager) ([]Job, error)
 	schedule(ctx context.Context) error
-	scheduleWithPoll() error
 }
 
 type azureInputScheduler struct {
@@ -52,10 +53,33 @@ func newAzureInputScheduler(publisher cursor.Publisher, client *azblob.Container
 }
 
 func (ais *azureInputScheduler) schedule(ctx context.Context) error {
+	var pager *azblob.ContainerListBlobFlatPager
+	if !ais.src.poll {
+		pager = ais.fetchBlobPager()
+		return ais.scheduleOnce(ctx, pager)
+	}
+
+	for {
+
+		pager = ais.fetchBlobPager()
+		err := ais.scheduleOnce(ctx, pager)
+		if err != nil {
+			return err
+		}
+
+		err = timed.Wait(ctx, time.Millisecond*time.Duration(ais.src.pollIntervalMs))
+		if err != nil {
+			return err
+		}
+
+	}
+
+}
+
+func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager) error {
 	var wg sync.WaitGroup
 	errs := make(chan error)
 	jobCounter := 0
-	pager := ais.fetchBlobPager()
 
 	// Iterate over the error channel in a go routine and print errors as and when they come
 	go func() {
@@ -87,11 +111,6 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 		wg.Wait()
 	}
 	close(errs)
-
-	return nil
-}
-
-func (ais *azureInputScheduler) scheduleWithPoll() error {
 	return nil
 }
 
@@ -127,10 +146,11 @@ func (ais *azureInputScheduler) fetchBlobPager() *azblob.ContainerListBlobFlatPa
 
 func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
 	// Jobs are stored in alphabedical order always , hence the latest position can be found on the basis of job name
-	counter := 0
-	flag := false
 	var latestJobs []Job
 	var jobsToReturn []Job
+	counter := 0
+	flag := false
+
 	for _, job := range jobs {
 		if job.Timestamp().After(*ais.state.Checkpoint().LatestEntryTime) {
 			latestJobs = append(latestJobs, job)
@@ -145,14 +165,13 @@ func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
 		if counter < len(jobs)-1 {
 			jobsToReturn = jobs[counter+1:]
 		} else {
-			emptyJobList := make([]Job, 0)
-			jobsToReturn = emptyJobList
+			jobsToReturn = make([]Job, 0)
 		}
 	} else {
 		jobsToReturn = jobs
 	}
 
 	latestJobs = append(latestJobs, jobsToReturn...)
-	return latestJobs
 
+	return latestJobs
 }
