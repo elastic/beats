@@ -93,7 +93,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	}
 
 	eventext.MergeEventFields(event, mapstr.M{
-		"event.type": se.Type,
+		"event": mapstr.M{"type": se.Type},
 	})
 
 	return je.enrichSynthEvent(event, se)

@@ -97,7 +97,8 @@ func TestJourneyEnricher(t *testing.T) {
 		} else {
 			u, _ := url.Parse(url1)
 			// journey end gets a summary
-			v = append(v, lookslike.MustCompile(mapstr.M{
+			v = append(v, lookslike.MustCompile(map[string]interface{}{
+				"event.type":          "heartbeat/summary",
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
