@@ -27,7 +27,7 @@
     - name: product
       type: keyword
       description: >
-        Product name for the consumed service or purchase. Not available for Marketplace.
+        Product name for the consumed service or purchase.
     - name: usage_start
       type: date
       description: >

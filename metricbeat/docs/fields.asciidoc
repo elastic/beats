@@ -6002,7 +6002,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-Product name for the consumed service or purchase. Not available for Marketplace.
+Product name for the consumed service or purchase.
 
 
 type: keyword
