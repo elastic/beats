@@ -10,8 +10,11 @@ where:
     -h  show this help text
 
 Examples using reference log files:
-  $(basename "$0") ./testdata/log_with_metrics.log
   $(basename "$0") ./testdata/log_with_metrics.json
+
+  # Extract all metrics, using jq to show changes in the active event count over time.
+  # The active event count is the number events in the pipeline, including the the queue.
+  $(basename "$0") ./testdata/log_with_metrics.log | jq \"{timestamp: .timestamp, active: .monitoring.metrics.libbeat.pipeline.events.active}\"
 "
 
 while getopts ':h' option; do
