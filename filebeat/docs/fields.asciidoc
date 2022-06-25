@@ -56,6 +56,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-lumberjack>>
 * <<exported-fields-microsoft>>
 * <<exported-fields-misp>>
 * <<exported-fields-mongodb>>
@@ -87532,6 +87533,23 @@ alias to: log.level
 type: alias
 
 alias to: event.duration
+
+--
+
+[[exported-fields-lumberjack]]
+== Lumberjack fields
+
+Fields from Lumberjack input.
+
+
+
+*`lumberjack`*::
++
+--
+Structured data received in an event sent over the Lumberjack protocol.
+
+
+type: flattened
 
 --
 
