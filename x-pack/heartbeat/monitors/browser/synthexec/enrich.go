@@ -15,8 +15,8 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -25,6 +25,10 @@ type enricher func(event *beat.Event, se *SynthEvent) error
 type streamEnricher struct {
 	je      *journeyEnricher
 	sFields stdfields.StdMonitorFields
+}
+
+func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
+	return &streamEnricher{sFields: sFields}
 }
 
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
@@ -42,7 +46,7 @@ type journeyEnricher struct {
 	journey         *Journey
 	checkGroup      string
 	errorCount      int
-	firstError      error
+	error           error
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
@@ -77,7 +81,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
-			je.firstError = nil
+			je.error = nil
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
@@ -89,7 +93,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	}
 
 	eventext.MergeEventFields(event, mapstr.M{
-		"event.type": se.Type,
+		"event": mapstr.M{"type": se.Type},
 	})
 
 	return je.enrichSynthEvent(event, se)
@@ -100,9 +104,21 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
 		je.errorCount++
-		if je.firstError == nil {
-			je.firstError = jobErr
+		if je.error == nil {
+			je.error = jobErr
 		}
+	}
+
+	// Needed for the edge case where a console log is emitted after one journey ends
+	// but before another begins.
+	if je.journey != nil {
+		eventext.MergeEventFields(event, mapstr.M{
+			"monitor": mapstr.M{
+				"check_group": je.checkGroup,
+				"id":          je.journey.ID,
+				"name":        je.journey.Name,
+			},
+		})
 	}
 
 	switch se.Type {
@@ -111,20 +127,19 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
+			if se.Error != nil {
+				je.error = se.Error.toECSErr()
+			}
 			return je.createSummary(event)
 		}
 	case JourneyEnd:
 		je.journeyComplete = true
 		return je.createSummary(event)
-	case "step/end":
+	case StepEnd:
 		je.stepCount++
-	case "step/screenshot":
-		fallthrough
-	case "step/screenshot_ref":
-		fallthrough
-	case "screenshot/block":
+	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
 		add_data_stream.SetEventDataset(event, "browser.screenshot")
-	case "journey/network_info":
+	case JourneyNetworkInfo:
 		add_data_stream.SetEventDataset(event, "browser.network")
 	}
 
@@ -132,7 +147,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		event.SetID(se.Id)
 		// This is only relevant for screenshots, which have a specific ID
 		// In that case we always want to issue an update op
-		_, _ = event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+		eventext.SetMeta(event, events.FieldMetaOpType, events.OpTypeCreate)
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())
@@ -185,18 +200,15 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		},
 	})
 
-	_, err := event.GetValue("monitor.id")
-	if err == nil {
-		logger.LogRun(event, &je.stepCount)
-	}
+	eventext.SetMeta(event, wrappers.META_STEP_COUNT, je.stepCount)
 
 	if je.journeyComplete {
-		return je.firstError
+		return je.error
 	}
 
-	return fmt.Errorf("journey did not finish executing, %d steps ran", je.stepCount)
+	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
 
 func stepError(e *SynthError) error {
-	return fmt.Errorf("error executing step: %s", e.String())
+	return fmt.Errorf("error executing step: %w", e.toECSErr())
 }
