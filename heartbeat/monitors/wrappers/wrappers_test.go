@@ -30,6 +30,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -466,6 +467,7 @@ type BrowserMonitor struct {
 	id         string
 	name       string
 	checkGroup string
+	durationMs int64
 	// Used for testing legacy zip_url and local monitors
 	// where the top-level id/name are used to populate monitor.project
 	legacyProjectId   string
@@ -528,6 +530,7 @@ var projectMonitorValues = BrowserMonitor{
 	id:         "project-journey_1",
 	name:       "project-Journey 1",
 	checkGroup: "journey-1-check-group",
+	durationMs: time.Second.Microseconds(),
 }
 
 // Used for testing legacy zip_url / local monitorss
@@ -543,6 +546,7 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.SetMeta(event, META_STEP_COUNT, 2)
 		eventext.MergeEventFields(event, mapstr.M{
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
@@ -550,6 +554,7 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 				"id":          bm.id,
 				"name":        bm.name,
 				"check_group": bm.checkGroup,
+				"duration":    mapstr.M{"us": bm.durationMs},
 			},
 		})
 		if summary {
@@ -567,6 +572,21 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 	}
 }
 
+var browserLogValidator = func(monId string, expectedDurationUs int64, stepCount int) func(t *testing.T, events []*beat.Event, observed []observer.LoggedEntry) {
+	return func(t *testing.T, events []*beat.Event, observed []observer.LoggedEntry) {
+		require.Len(t, observed, 1)
+		require.Equal(t, "Monitor finished", observed[0].Message)
+
+		durationMs := expectedDurationUs / 1000
+		expectedMonitor := logger.NewMonitorRunInfo(monId, "browser", durationMs)
+		expectedMonitor.Steps = &stepCount
+		require.ElementsMatch(t, []zap.Field{
+			logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
+			logp.Any("monitor", &expectedMonitor),
+		}, observed[0].Context)
+	}
+}
+
 func TestProjectBrowserJob(t *testing.T) {
 	sFields := testBrowserMonFields
 	sFields.ID = projectMonitorValues.id
@@ -580,6 +600,7 @@ func TestProjectBrowserJob(t *testing.T) {
 			"type":        "browser",
 			"id":          projectMonitorValues.id,
 			"name":        projectMonitorValues.name,
+			"duration":    mapstr.M{"us": time.Second.Microseconds()},
 			"origin":      "my-origin",
 			"check_group": projectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
@@ -618,7 +639,7 @@ func TestProjectBrowserJob(t *testing.T) {
 					}),
 				))},
 		nil,
-		nil,
+		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2),
 	})
 	testCommonWrap(t, testDef{
 		"with down summary",
@@ -639,7 +660,7 @@ func TestProjectBrowserJob(t *testing.T) {
 					}),
 				))},
 		nil,
-		nil,
+		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2),
 	})
 
 	legacySFields := testBrowserMonFields
@@ -649,9 +670,10 @@ func TestProjectBrowserJob(t *testing.T) {
 
 	expectedLegacyMonFields := lookslike.MustCompile(map[string]interface{}{
 		"monitor": map[string]interface{}{
-			"type": "browser",
-			"id":   fmt.Sprintf("%s-%s", legacyProjectMonitorValues.legacyProjectId, legacyProjectMonitorValues.id),
-			"name": fmt.Sprintf("%s - %s", legacyProjectMonitorValues.legacyProjectName, legacyProjectMonitorValues.name),
+			"type":     "browser",
+			"id":       fmt.Sprintf("%s-%s", legacyProjectMonitorValues.legacyProjectId, legacyProjectMonitorValues.id),
+			"name":     fmt.Sprintf("%s - %s", legacyProjectMonitorValues.legacyProjectName, legacyProjectMonitorValues.name),
+			"duration": mapstr.M{"us": int64(0)},
 			"project": mapstr.M{
 				"id":   legacyProjectMonitorValues.legacyProjectId,
 				"name": legacyProjectMonitorValues.legacyProjectName,
@@ -678,4 +700,20 @@ func TestProjectBrowserJob(t *testing.T) {
 		nil,
 		nil,
 	})
+}
+
+func TestECSErrors(t *testing.T) {
+	ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
+	wrappedEcsErr := fmt.Errorf("wrapped: %w", ecse)
+	expectedEcsErr := ecserr.NewECSErr(
+		ecse.Type,
+		ecse.Code,
+		wrappedEcsErr.Error(),
+	)
+
+	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields)
+	event := &beat.Event{}
+	_, err := j[0](event)
+	require.NoError(t, err)
+	require.Equal(t, event.Fields["error"], expectedEcsErr)
 }

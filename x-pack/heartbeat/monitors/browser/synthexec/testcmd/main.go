@@ -15,6 +15,11 @@ func main() {
 	// For sending JSON results
 	pipe := os.NewFile(3, "pipe")
 
+	// Exit immediately to test this error condition
+	if len(os.Args) > 1 && os.Args[1] == "exit" {
+		os.Exit(123)
+	}
+
 	file, err := os.Open("sample.ndjson")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open samplerun.ndjson: %s\n", err)

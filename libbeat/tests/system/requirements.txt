@@ -48,3 +48,4 @@ urllib3==1.26.5
 wcwidth==0.2.5
 websocket-client==0.47.0
 zipp>=1.2.0,<=3.1.0
+protobuf==3.19.4 #Temporary change because of protobuf new version bug: https://github.com/protocolbuffers/protobuf/issues/10051
