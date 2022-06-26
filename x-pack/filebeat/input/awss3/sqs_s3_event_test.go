@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -176,7 +175,7 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 	}{
 		{
 			Name: "keepalive stop after ReceiptHandleIsInvalid",
-			Err:  awserr.New(sqs.ErrCodeReceiptHandleIsInvalid, "fake receipt handle is invalid.", nil),
+			Err:  awserr.New(sqsReceiptHandleIsInvalidErrCode, "fake receipt handle is invalid.", nil),
 		},
 		{
 			Name: "keepalive stop after InvalidParameterValue",

@@ -22,7 +22,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	s3Types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
@@ -40,33 +41,33 @@ const (
 )
 
 type constantSQS struct {
-	msgs []sqs.Message
+	msgs []sqsTypes.Message
 }
 
 var _ sqsAPI = (*constantSQS)(nil)
 
 func newConstantSQS() *constantSQS {
 	return &constantSQS{
-		msgs: []sqs.Message{
+		msgs: []sqsTypes.Message{
 			newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile))),
 		},
 	}
 }
 
-func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqsTypes.Message, error) {
 	return c.msgs, nil
 }
 
-func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqsTypes.Message) error {
 	return nil
 }
 
-func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqsTypes.Message, timeout time.Duration) error {
 	return nil
 }
 
 type s3PagerConstant struct {
-	objects      []s3.Object
+	objects      []s3Types.Object
 	currentIndex int
 }
 
@@ -76,8 +77,8 @@ func (c *s3PagerConstant) Next(ctx context.Context) bool {
 	return c.currentIndex < len(c.objects)
 }
 
-func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
-	ret := &s3.ListObjectsOutput{}
+func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsV2Output {
+	ret := &s3.ListObjectsV2Output{}
 	pageSize := 1000
 	if len(c.objects) < c.currentIndex+pageSize {
 		pageSize = len(c.objects) - c.currentIndex
@@ -103,7 +104,7 @@ func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	}
 
 	for i := 0; i < totalListingObjectsForInputS3; i++ {
-		ret.objects = append(ret.objects, s3.Object{
+		ret.objects = append(ret.objects, s3Types.Object{
 			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
 			LastModified: aws.Time(lastModified),
@@ -135,7 +136,7 @@ func newConstantS3(t testing.TB) *constantS3 {
 	}
 }
 
-func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 

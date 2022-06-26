@@ -13,8 +13,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
-	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	gomock "github.com/golang/mock/gomock"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -45,7 +45,7 @@ func (m *MockSQSAPI) EXPECT() *MockSQSAPIMockRecorder {
 }
 
 // ChangeMessageVisibility mocks base method.
-func (m *MockSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (m *MockSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeMessageVisibility", ctx, msg, timeout)
 	ret0, _ := ret[0].(error)
@@ -59,7 +59,7 @@ func (mr *MockSQSAPIMockRecorder) ChangeMessageVisibility(ctx, msg, timeout inte
 }
 
 // DeleteMessage mocks base method.
-func (m *MockSQSAPI) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (m *MockSQSAPI) DeleteMessage(ctx context.Context, msg *types.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMessage", ctx, msg)
 	ret0, _ := ret[0].(error)
@@ -73,10 +73,10 @@ func (mr *MockSQSAPIMockRecorder) DeleteMessage(ctx, msg interface{}) *gomock.Ca
 }
 
 // ReceiveMessage mocks base method.
-func (m *MockSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (m *MockSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReceiveMessage", ctx, maxMessages)
-	ret0, _ := ret[0].([]sqs.Message)
+	ret0, _ := ret[0].([]types.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -111,10 +111,10 @@ func (m *MocksqsReceiver) EXPECT() *MocksqsReceiverMockRecorder {
 }
 
 // ReceiveMessage mocks base method.
-func (m *MocksqsReceiver) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (m *MocksqsReceiver) ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReceiveMessage", ctx, maxMessages)
-	ret0, _ := ret[0].([]sqs.Message)
+	ret0, _ := ret[0].([]types.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -149,7 +149,7 @@ func (m *MocksqsDeleter) EXPECT() *MocksqsDeleterMockRecorder {
 }
 
 // DeleteMessage mocks base method.
-func (m *MocksqsDeleter) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (m *MocksqsDeleter) DeleteMessage(ctx context.Context, msg *types.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMessage", ctx, msg)
 	ret0, _ := ret[0].(error)
@@ -186,7 +186,7 @@ func (m *MocksqsVisibilityChanger) EXPECT() *MocksqsVisibilityChangerMockRecorde
 }
 
 // ChangeMessageVisibility mocks base method.
-func (m *MocksqsVisibilityChanger) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (m *MocksqsVisibilityChanger) ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeMessageVisibility", ctx, msg, timeout)
 	ret0, _ := ret[0].(error)
@@ -223,7 +223,7 @@ func (m *MockSQSProcessor) EXPECT() *MockSQSProcessorMockRecorder {
 }
 
 // ProcessSQS mocks base method.
-func (m *MockSQSProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
+func (m *MockSQSProcessor) ProcessSQS(ctx context.Context, msg *types.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessSQS", ctx, msg)
 	ret0, _ := ret[0].(error)
@@ -260,10 +260,10 @@ func (m *MockS3API) EXPECT() *MockS3APIMockRecorder {
 }
 
 // GetObject mocks base method.
-func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
-	ret0, _ := ret[0].(*s3.GetObjectResponse)
+	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -275,10 +275,10 @@ func (mr *MockS3APIMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock
 }
 
 // ListObjectsPaginator mocks base method.
-func (m *MockS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
+func (m *MockS3API) ListObjectsPaginator(bucket, prefix string) s3.ListObjectsV2Paginator {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket, prefix)
-	ret0, _ := ret[0].(s3Pager)
+	ret0, _ := ret[0].(s3.ListObjectsV2Paginator)
 	return ret0
 }
 
@@ -312,10 +312,10 @@ func (m *Mocks3Getter) EXPECT() *Mocks3GetterMockRecorder {
 }
 
 // GetObject mocks base method.
-func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
-	ret0, _ := ret[0].(*s3.GetObjectResponse)
+	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -387,10 +387,10 @@ func (m *MockS3Pager) EXPECT() *MockS3PagerMockRecorder {
 }
 
 // CurrentPage mocks base method.
-func (m *MockS3Pager) CurrentPage() *s3.ListObjectsOutput {
+func (m *MockS3Pager) CurrentPage() *s3.ListObjectsV2Output {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CurrentPage")
-	ret0, _ := ret[0].(*s3.ListObjectsOutput)
+	ret0, _ := ret[0].(*s3.ListObjectsV2Output)
 	return ret0
 }
 

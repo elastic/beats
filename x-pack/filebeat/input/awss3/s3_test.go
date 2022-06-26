@@ -11,6 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -63,9 +64,9 @@ func TestS3Poller(t *testing.T) {
 		mockPager.EXPECT().
 			CurrentPage().
 			Times(1).
-			DoAndReturn(func() *s3.ListObjectsOutput {
-				return &s3.ListObjectsOutput{
-					Contents: []s3.Object{
+			DoAndReturn(func() *s3.ListObjectsV2Output {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
 						{
 							ETag:         aws.String("etag1"),
 							Key:          aws.String("key1"),
@@ -193,9 +194,9 @@ func TestS3Poller(t *testing.T) {
 		mockPagerSecond.EXPECT().
 			CurrentPage().
 			Times(1).
-			DoAndReturn(func() *s3.ListObjectsOutput {
-				return &s3.ListObjectsOutput{
-					Contents: []s3.Object{
+			DoAndReturn(func() *s3.ListObjectsV2Output {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
 						{
 							ETag:         aws.String("etag1"),
 							Key:          aws.String("key1"),

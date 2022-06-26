@@ -170,21 +170,22 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 // Content-Type and reader to get the object's contents. The caller must
 // close the returned reader.
 func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
-	resp, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	getObjectOutput, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
 	if err != nil {
 		return "", nil, nil, err
 	}
 
-	if resp == nil {
+	if getObjectOutput == nil {
 		return "", nil, nil, errors.New("empty response from s3 get object")
 	}
-	p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
+	// TODO: change this to use new sdk version
+	// p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
 
-	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
-	if resp.ContentType == nil {
-		return "", meta, resp.Body, nil
+	meta := s3Metadata(getObjectOutput, p.readerConfig.IncludeS3Metadata...)
+	if getObjectOutput.ContentType == nil {
+		return "", meta, getObjectOutput.Body, nil
 	}
-	return *resp.ContentType, meta, resp.Body, nil
+	return *getObjectOutput.ContentType, meta, getObjectOutput.Body, nil
 }
 
 func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
@@ -386,7 +387,7 @@ func isStreamGzipped(r *bufio.Reader) (bool, error) {
 }
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.
-func s3Metadata(resp *s3.GetObjectResponse, keys ...string) mapstr.M {
+func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 	if len(keys) == 0 {
 		return nil
 	}
@@ -399,8 +400,8 @@ func s3Metadata(resp *s3.GetObjectResponse, keys ...string) mapstr.M {
 	allMeta := map[string]interface{}{}
 
 	// Get headers using AWS SDK struct tags.
-	fields := reflect.TypeOf(resp.GetObjectOutput).Elem()
-	values := reflect.ValueOf(resp.GetObjectOutput).Elem()
+	fields := reflect.TypeOf(resp).Elem()
+	values := reflect.ValueOf(resp).Elem()
 	for i := 0; i < fields.NumField(); i++ {
 		f := fields.Field(i)
 

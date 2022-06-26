@@ -152,7 +152,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	bucketName := getBucketNameFromARN(p.bucket)
 
 	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
-	for paginator.Next(ctx) {
+	for paginator.HasMorePages() {
 		listingID, err := uuid.NewV4()
 		if err != nil {
 			p.log.Warnw("Error generating UUID for listing page.", "error", err)
@@ -165,7 +165,10 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 		lock.Lock()
 		p.workersListingMap.Store(listingID.String(), lock)
 
-		page := paginator.CurrentPage()
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			p.log.Warnw("Error when paginating listing.", "error", err)
+		}
 
 		totProcessableObjects := 0
 		totListedObjects := len(page.Contents)
@@ -236,10 +239,6 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 		for s3ObjectPayload := range s3ObjectPayloadChanByPage {
 			s3ObjectPayloadChan <- s3ObjectPayload
 		}
-	}
-
-	if err := paginator.Err(); err != nil {
-		p.log.Warnw("Error when paginating listing.", "error", err)
 	}
 }
 
