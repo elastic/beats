@@ -55,7 +55,9 @@ Stopped  winlogbeat         winlogbeat
 
 NOTE: If script execution is disabled on your system, you need to set the
 execution policy for the current session to allow the script to run. For example:
-`PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
+PowerShell.exe -ExecutionPolicy UnRestricted -File "C:\Program Files\winlogbeat\install-service-winlogbeat.ps1"
+Than you would require to press "R".
+and than you have to manually start the service from services.msc.
 
 [float]
 [[set-connection]]
