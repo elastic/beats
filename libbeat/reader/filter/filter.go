@@ -31,7 +31,7 @@ type Config struct {
 	Filters []match.Matcher `config:"patterns" validate:"required"`
 }
 
-func DefaultConfig() *Config {
+func DefaultConfig() Config {
 	return &Config{}
 }
 

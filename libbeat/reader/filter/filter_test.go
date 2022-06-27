@@ -91,7 +91,7 @@ func TestParser(t *testing.T) {
 			cfg := config.MustNewConfigFrom(test.config)
 			err := cfg.Unpack(&c)
 			require.NoError(t, err)
-			r := NewFilterParser(newTestReader(test.input), &c)
+			r := NewParser(newTestReader(test.input), &c)
 
 			contents := make([][]byte, 0)
 			msg, err := r.Next()
