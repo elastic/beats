@@ -92,21 +92,21 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing multiline parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing multiline parser config: %w", err)
 			}
 		case "ndjson":
 			var config readjson.ParserConfig
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing ndjson parser config: %w", err)
 			}
 		case "container":
 			config := readjson.DefaultContainerConfig()
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing container parser config: %w", err)
 			}
 			if config.Stream != readjson.All {
 				if suffix != "" {
