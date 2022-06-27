@@ -174,7 +174,7 @@
                             "filters": [],
                             "query": {
                                 "language": "kuery",
-                                "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
+                                "query": ""
                             },
                             "visualization": {
                                 "layers": [
@@ -1147,7 +1147,7 @@
                             "filters": [],
                             "query": {
                                 "language": "kuery",
-                                "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
+                                "query": ""
                             },
                             "visualization": {
                                 "axisTitlesVisibilitySettings": {
