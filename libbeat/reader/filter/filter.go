@@ -32,7 +32,7 @@ type Config struct {
 }
 
 func DefaultConfig() Config {
-	return &Config{}
+	return Config{}
 }
 
 // FilterParser accepts a list of matchers to determine if a line
