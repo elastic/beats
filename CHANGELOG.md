@@ -16,6 +16,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.2.5]
+
+### Fixed
+
+- Remove VerificationMode option to empty string. Default will be `full` #49
+
 ## [0.2.4]
 
 ### Fixed

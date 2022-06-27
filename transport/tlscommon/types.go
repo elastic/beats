@@ -133,7 +133,6 @@ const (
 )
 
 var tlsVerificationModes = map[string]TLSVerificationMode{
-	"":            VerifyFull,
 	"full":        VerifyFull,
 	"strict":      VerifyStrict,
 	"none":        VerifyNone,
@@ -165,6 +164,10 @@ func (m *TLSVerificationMode) Unpack(in interface{}) error {
 	s, ok := in.(string)
 	if !ok {
 		return fmt.Errorf("verification mode must be an identifier")
+	}
+	if s == "" {
+		*m = VerifyFull
+		return nil
 	}
 
 	mode, found := tlsVerificationModes[s]
