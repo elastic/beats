@@ -122,7 +122,7 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 				return nil, fmt.Errorf("error while parsing syslog parser config: %w", err)
 			}
 		default:
-			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
+			return nil, fmt.Errorf("%s: %w", name, ErrNoSuchParser)
 		}
 	}
 
