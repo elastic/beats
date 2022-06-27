@@ -221,7 +221,17 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	})
 
 	// Wait for clean exit
-	return g.Wait()
+	err = g.Wait()
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			bt.log.Debugf("osquerybeat Run exited, context cancelled")
+		} else {
+			bt.log.Errorf("osquerybeat Run exited with error: %v", err)
+		}
+	} else {
+		bt.log.Debugf("osquerybeat Run exited")
+	}
+	return err
 }
 
 func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
@@ -304,7 +314,19 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 			}
 		}
 	})
-	return g.Wait()
+
+	err = g.Wait()
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			bt.log.Debugf("runOsquery exited, context cancelled")
+		} else {
+			bt.log.Errorf("runOsquery exited with error: %v", err)
+		}
+		bt.log.Errorf("runOsquery exited with error: %v", err)
+	} else {
+		bt.log.Debugf("runOsquery exited")
+	}
+	return err
 }
 
 func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration) (err error) {
