@@ -54,23 +54,33 @@ func (aij *azureInputJob) Do(ctx context.Context, jobID string, marker *string, 
 		errChan <- ctx.Err()
 		return
 	default:
-		data, err := aij.extractData(ctx)
-		if err != nil {
-			errChan <- fmt.Errorf("Job with jobID %s encountered an error : %v", jobID, err)
-			return
-		}
+		var event beat.Event
 		msg := mapstr.M{}
-		msg.Put("container.name", aij.src.containerName)
-		msg.Put("container.blob.name", aij.blob.Name)
-		msg.Put("container.blob.content_type", aij.blob.Properties.ContentType)
-		msg.Put("container.blob.data", data.String())
-		msg.Put("event.kind", "publish_data")
-		event := beat.Event{
+		if allowedContentTypes[*aij.blob.Properties.ContentType] {
+			data, err := aij.extractData(ctx)
+			if err != nil {
+				errChan <- fmt.Errorf("Job with jobID %s encountered an error : %v", jobID, err)
+				return
+			}
+			msg.Put("message.containerName", aij.src.containerName)
+			msg.Put("message.blobName", aij.blob.Name)
+			msg.Put("message.content_type", aij.blob.Properties.ContentType)
+			msg.Put("message.data", data.String())
+			msg.Put("event.kind", "publish_data")
+
+		} else {
+			err := fmt.Errorf("Job with jobID %s encountered an error : content-type %s not supported", jobID, *aij.blob.Properties.ContentType)
+			msg.Put("message.error", err)
+			msg.Put("event.kind", "publish_error")
+		}
+
+		event = beat.Event{
 			Timestamp: time.Now(),
 			Fields:    msg,
 		}
 		aij.state.Save(*aij.blob.Name, marker, aij.blob.Properties.LastModified)
 		aij.publisher.Publish(event, aij.state.Checkpoint())
+
 	}
 
 }

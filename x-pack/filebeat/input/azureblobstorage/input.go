@@ -20,10 +20,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	inputName = "azureblobstorage"
-)
-
 type source struct {
 	containerName  string
 	accountName    string
