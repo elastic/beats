@@ -173,6 +173,14 @@ func (c *Config) Create(in reader.Reader) Parser {
 				return p
 			}
 			p = syslog.NewParser(p, &config)
+		case "include_message":
+			config := filter.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return p
+			}
+			p = filter.NewParser(p, &config)
 		default:
 			return p
 		}

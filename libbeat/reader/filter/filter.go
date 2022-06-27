@@ -31,6 +31,10 @@ type Config struct {
 	Filters []match.Matcher `config:"patterns" validate:"required"`
 }
 
+func DefaultConfig() *Config {
+	return &Config{}
+}
+
 // FilterParser accepts a list of matchers to determine if a line
 // should be kept or not. If one of the patterns matches the
 // contents of the message, it is returned to the next reader.
@@ -42,7 +46,7 @@ type FilterParser struct {
 	matchers []match.Matcher
 }
 
-func NewFilterParser(r reader.Reader, c *Config) *FilterParser {
+func NewParser(r reader.Reader, c *Config) *FilterParser {
 	return &FilterParser{
 		ctx:      ctxtool.WithCancelContext(context.Background()),
 		logger:   logp.NewLogger("filter_parser"),
