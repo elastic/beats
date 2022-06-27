@@ -118,6 +118,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
 - Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
 - Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
+- Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
 
 *Auditbeat*
 
