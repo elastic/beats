@@ -42,7 +42,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
 - Fix audit status collection on kernels prior to version 5.9. {issue}31616[31616] {pull}31710[31710]
 
 *Filebeat*
@@ -50,7 +49,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
 - sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
-- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
 - Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
@@ -60,8 +58,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 
 *Heartbeat*
-- Fix unintentional use of no-op logger. {pull}31543[31543]
 
+- Fix unintentional use of no-op logger. {pull}31543[31543]
 
 *Metricbeat*
 
@@ -130,10 +128,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
 - Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
-- Add new Kubernetes module dashboards {pull}31341[31341]
+- Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 
