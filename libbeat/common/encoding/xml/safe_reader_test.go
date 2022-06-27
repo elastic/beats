@@ -21,27 +21,106 @@
 package xml
 
 import (
+	"encoding/xml"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestInvalidXMLIsSanitized(t *testing.T) {
-	// add a byte bigger than 127 to create an invalid xml
-	xml := append(append([]byte(`<person><Name ID="123">John`), 128), []byte(`</Name></person>`)...)
-
-	expected := map[string]interface{}{
-		"person": map[string]interface{}{
-			"Name": map[string]interface{}{
-				"#text": "John\\ufffd",
-				"ID":    "123",
+	tests := []struct {
+		name  string
+		input []byte
+		want  map[string]interface{}
+		err   error
+	}{
+		{
+			name: "control space",
+			input: []byte(`<person><Name ID="123">John` + "\t" + `
+</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "John",
+						"ID":    "123",
+					},
+				},
+			},
+		},
+		{
+			name:  "crlf",
+			input: []byte(`<person><Name ID="123">John` + "\r\n" + `</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "John",
+						"ID":    "123",
+					},
+				},
+			},
+		},
+		{
+			name:  "single invalid",
+			input: []byte(`<person><Name ID="123">John` + "\x80" + `</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "John\\ufffd",
+						"ID":    "123",
+					},
+				},
+			},
+		},
+		{
+			name:  "double invalid",
+			input: []byte(`<person><Name ID="123">` + "\x80" + `John` + "\x80" + `</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "\\ufffdJohn\\ufffd",
+						"ID":    "123",
+					},
+				},
+			},
+		},
+		{
+			name:  "happy single invalid",
+			input: []byte(`<person><Name ID="123">😊John` + "\x80" + `</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "😊John\\ufffd",
+						"ID":    "123",
+					},
+				},
+			},
+		},
+		{
+			name:  "invalid tag",
+			input: []byte(`<person><Name ID` + "\x80" + `="123">John</Name></person>`),
+			want:  nil,
+			err:   &xml.SyntaxError{Msg: "attribute name without = in element", Line: 1},
+		},
+		{
+			name:  "invalid tag value",
+			input: []byte(`<person><Name ID="` + "\x80" + `123">John</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "John",
+						"ID":    "\\ufffd123",
+					},
+				},
 			},
 		},
 	}
 
-	d := NewDecoder(NewSafeReader(xml))
-	out, err := d.Decode()
-	require.Nil(t, err)
-	assert.Equal(t, expected, out)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			d := NewDecoder(NewSafeReader(test.input))
+			out, err := d.Decode()
+			assert.Equal(t, test.err, err)
+			assert.Equal(t, test.want, out)
+		})
+	}
 }
