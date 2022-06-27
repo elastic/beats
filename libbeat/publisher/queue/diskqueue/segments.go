@@ -154,7 +154,10 @@ const currentSegmentVersion = 2
 // version of the target segment.
 const segmentHeaderSize = 12
 
-const ENABLE_ENCRYPTION uint32 = 0x1
+const (
+	ENABLE_ENCRYPTION  uint32 = 0x1
+	ENABLE_COMPRESSION uint32 = 0x2
+)
 
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
@@ -224,8 +227,13 @@ func (segment *queueSegment) shouldUseJSON() bool {
 	return segment.schemaVersion != nil && *segment.schemaVersion == 0
 }
 
-// Should only be called from the reader loop. If successful, returns an open
-// file handle positioned at the beginning of the segment's data region.
+// getReader sets up the segmentReader.  The order of encryption and
+// compression is important.  If both options are enabled we want
+// encrypted compressed data not compressed encrypted data.  This is
+// because encryption will mask the repetions in the data making
+// compression much less effective.  getReader should only be called
+// from the reader loop. If successful, returns an open segmentReader
+// positioned at the beginning of the segment's data region.
 func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
@@ -250,11 +258,22 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 			return nil, fmt.Errorf("couldn't create encryption reader: %w", err)
 		}
 	}
-
+	if (header.options & ENABLE_COMPRESSION) == ENABLE_COMPRESSION {
+		if sr.er != nil {
+			sr.cr = NewCompressionReader(sr.er)
+		} else {
+			sr.cr = NewCompressionReader(sr.src)
+		}
+	}
 	return sr, nil
 }
 
-// Should only be called from the writer loop.
+// getWriter sets up the segmentWriter.  The order of encryption and
+// compression is important.  If both options are enabled we want
+// encrypted compressed data not compressed encrypted data.  This is
+// because encryption will mask the repetions in the data making
+// compression much less effective.  getWriter should only be called
+// from the writer loop.
 func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
 	var options uint32
 	path := queueSettings.segmentPath(segment.id)
@@ -266,6 +285,11 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 	if len(queueSettings.EncryptionKey) > 0 {
 		options = options | ENABLE_ENCRYPTION
 	}
+
+	if queueSettings.UseCompression {
+		options = options | ENABLE_COMPRESSION
+	}
+
 	sw := &segmentWriter{}
 	sw.dst = file
 
@@ -278,6 +302,14 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 		if err != nil {
 			sw.dst.Close()
 			return nil, fmt.Errorf("couldn't create encryption writer: %w", err)
+		}
+	}
+
+	if (options & ENABLE_COMPRESSION) == ENABLE_COMPRESSION {
+		if sw.ew != nil {
+			sw.cw = NewCompressionWriter(sw.ew)
+		} else {
+			sw.cw = NewCompressionWriter(sw.dst)
 		}
 	}
 
@@ -385,7 +417,7 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	header := &segmentHeader{}
 	err := binary.Read(in, binary.LittleEndian, &header.version)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not read segment version: %w", err)
 	}
 
 	if header.version > currentSegmentVersion {
@@ -395,13 +427,13 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	if header.version >= 1 {
 		err = binary.Read(in, binary.LittleEndian, &header.frameCount)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not read segment count: %w", err)
 		}
 	}
 	if header.version >= 2 {
 		err = binary.Read(in, binary.LittleEndian, &header.options)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not read segment options: %w", err)
 		}
 	}
 
@@ -427,12 +459,24 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	return total
 }
 
+// segmentReader handles reading of segments.  getReader sets up the
+// reader and handles setting up the Reader to deal with the different
+// schema version.  With Schema version 2 there is the option for
+// plain data, encrypted data, compressed data and encrypted
+// compressed data.  If compression is enabled operations go through
+// the CompressionReader because compressing encrypted data defeats
+// the purpose of compression since encryption will make the data
+// less compressable.
 type segmentReader struct {
 	src io.ReadSeekCloser
 	er  *EncryptionReader
+	cr  *CompressionReader
 }
 
 func (r *segmentReader) Read(p []byte) (int, error) {
+	if r.cr != nil {
+		return r.cr.Read(p)
+	}
 	if r.er != nil {
 		return r.er.Read(p)
 	}
@@ -440,6 +484,9 @@ func (r *segmentReader) Read(p []byte) (int, error) {
 }
 
 func (r *segmentReader) Close() error {
+	if r.cr != nil {
+		return r.cr.Close()
+	}
 	if r.er != nil {
 		return r.er.Close()
 	}
@@ -447,16 +494,35 @@ func (r *segmentReader) Close() error {
 }
 
 func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
+	if r.cr != nil {
+		//can't seek before segment header
+		if (offset + int64(whence)) < segmentHeaderSize {
+			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
+		}
+		if _, err := r.src.Seek(segmentHeaderSize, io.SeekStart); err != nil {
+			return 0, fmt.Errorf("could not seek past segment header: %w", err)
+		}
+		if r.er != nil {
+			if err := r.er.Reset(); err != nil {
+				return 0, fmt.Errorf("could not reset encryption: %w", err)
+			}
+		}
+		if err := r.cr.Reset(); err != nil {
+			return 0, fmt.Errorf("could not reset compression: %w", err)
+		}
+		written, err := io.CopyN(io.Discard, r.cr, (offset+int64(whence))-segmentHeaderSize)
+		return written + segmentHeaderSize, err
+	}
 	if r.er != nil {
 		//can't seek before segment header
 		if (offset + int64(whence)) < segmentHeaderSize {
 			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
 		}
 		if _, err := r.src.Seek(segmentHeaderSize, io.SeekStart); err != nil {
-			return 0, err
+			return 0, fmt.Errorf("could not seek past segment header: %w", err)
 		}
 		if err := r.er.Reset(); err != nil {
-			return 0, err
+			return 0, fmt.Errorf("could not reset encryption: %w", err)
 		}
 		written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSize)
 		return written + segmentHeaderSize, err
@@ -464,12 +530,23 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 	return r.src.Seek(offset, whence)
 }
 
+//segmentWriter handles writing of segments.  With Schema version 2
+// there is the option for plain data, encrypted data, compressed data
+// and encrypted compressed data.  getWriter sets up the segmentWriter
+// to handle these options.  If compression is enabled operations go
+// through the CompressionWriter because compressing encrypted data
+// defeats the purpose of compression since encryption will make the
+// data less compressable.
 type segmentWriter struct {
 	dst *os.File
 	ew  *EncryptionWriter
+	cw  *CompressionWriter
 }
 
 func (w *segmentWriter) Write(p []byte) (int, error) {
+	if w.cw != nil {
+		return w.cw.Write(p)
+	}
 	if w.ew != nil {
 		return w.ew.Write(p)
 	}
@@ -477,20 +554,19 @@ func (w *segmentWriter) Write(p []byte) (int, error) {
 }
 
 func (w *segmentWriter) Close() error {
+	if w.cw != nil {
+		return w.cw.Close()
+	}
 	if w.ew != nil {
 		return w.ew.Close()
 	}
 	return w.dst.Close()
 }
 
-func (w *segmentWriter) Seek(offset int64, whence int) (int64, error) {
-	if w.ew != nil {
-		return 0, fmt.Errorf("seek not supported with encryption")
-	}
-	return w.dst.Seek(offset, whence)
-}
-
 func (w *segmentWriter) Sync() error {
+	if w.cw != nil {
+		return w.cw.Sync()
+	}
 	if w.ew != nil {
 		return w.ew.Sync()
 	}
@@ -498,32 +574,52 @@ func (w *segmentWriter) Sync() error {
 }
 
 func (w *segmentWriter) WriteHeader(options uint32) error {
-	if _, err := w.dst.Seek(0, io.SeekStart); err != nil {
-		return err
+	_, err := w.dst.Seek(0, io.SeekStart)
+	if err != nil {
+		return fmt.Errorf("could not seek to beginning of segment: %w", err)
 	}
 
 	//write version
-	if err := binary.Write(w.dst, binary.LittleEndian, uint32(2)); err != nil {
-		return err
+	err = binary.Write(w.dst, binary.LittleEndian, uint32(2))
+	if err != nil {
+		return fmt.Errorf("could not write version to segment: %w", err)
 	}
 
 	//write count
-	if err := binary.Write(w.dst, binary.LittleEndian, uint32(0)); err != nil {
-		return err
+	err = binary.Write(w.dst, binary.LittleEndian, uint32(0))
+	if err != nil {
+		return fmt.Errorf("could not write count to segment: %w", err)
 	}
 
 	//write options
-	if err := binary.Write(w.dst, binary.LittleEndian, options); err != nil {
-		return err
+	err = binary.Write(w.dst, binary.LittleEndian, options)
+	if err != nil {
+		return fmt.Errorf("could not write options to segment: %w", err)
 	}
 
 	return nil
 }
 
 func (w *segmentWriter) UpdateCount(count uint32) error {
-	// Seek to count on disk
-	if _, err := w.dst.Seek(4, io.SeekStart); err != nil {
-		return err
+	//get current offset
+	offset, err := w.dst.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return fmt.Errorf("could not get current position: %w", err)
 	}
-	return binary.Write(w.dst, binary.LittleEndian, count)
+	// Seek to count on disk
+	_, err = w.dst.Seek(4, io.SeekStart)
+	if err != nil {
+		return fmt.Errorf("cound not seek to count position: %w", err)
+	}
+	// Write the count
+	err = binary.Write(w.dst, binary.LittleEndian, count)
+	if err != nil {
+		return fmt.Errorf("cound not write count: %w", err)
+	}
+	// Return to previous location
+	_, err = w.dst.Seek(offset, io.SeekStart)
+	if err != nil {
+		return fmt.Errorf("cound not seek back to count position: %w", err)
+	}
+	return nil
 }
