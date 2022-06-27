@@ -21,9 +21,10 @@ import (
 	"io"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/stretchr/testify/require"
 )
 
 func TestParser(t *testing.T) {
