@@ -59,30 +59,30 @@ func (t *testReader) Next() (reader.Message, error) {
 
 func TestNewParser(t *testing.T) {
 	type testResult struct {
-		Timestamp time.Time
-		Content   []byte
-		Fields    common.MapStr
-		WantErr   bool
+		timestamp time.Time
+		content   []byte
+		fields    common.MapStr
+		wantErr   bool
 	}
 
 	referenceTime := time.Now()
 	tests := map[string]struct {
-		Config Config
-		In     [][]byte
-		Want   []testResult
+		config Config
+		in     [][]byte
+		want   []testResult
 	}{
 		"format-auto": {
-			Config: DefaultConfig(),
-			In: [][]byte{
+			config: DefaultConfig(),
+			in: [][]byte{
 				[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`),
 				[]byte(`<13>Oct 11 22:14:15 test-host su[1024]: this is the message`),
 				[]byte(`Not a valid message.`),
 			},
-			Want: []testResult{
+			want: []testResult{
 				{
-					Timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
-					Content:   []byte("this is the message"),
-					Fields: common.MapStr{
+					timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
+					content:   []byte("this is the message"),
+					fields: common.MapStr{
 						"log": common.MapStr{
 							"syslog": common.MapStr{
 								"priority": 165,
@@ -99,11 +99,11 @@ func TestNewParser(t *testing.T) {
 								"procid":   "1024",
 								"msgid":    "ID47",
 								"version":  "1",
-								"structured_data": map[string]map[string]string{
-									"examplePriority@32473": {
+								"structured_data": map[string]interface{}{
+									"examplePriority@32473": map[string]interface{}{
 										"class": "high",
 									},
-									"exampleSDID@32473": {
+									"exampleSDID@32473": map[string]interface{}{
 										"eventID":     "1011",
 										"eventSource": "Application",
 										"iut":         "3",
@@ -115,9 +115,9 @@ func TestNewParser(t *testing.T) {
 					},
 				},
 				{
-					Timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
-					Content:   []byte("this is the message"),
-					Fields: common.MapStr{
+					timestamp: mustParseTime(time.Stamp, "Oct 11 22:14:15", time.Local),
+					content:   []byte("this is the message"),
+					fields: common.MapStr{
 						"log": common.MapStr{
 							"syslog": common.MapStr{
 								"priority": 13,
@@ -138,8 +138,8 @@ func TestNewParser(t *testing.T) {
 					},
 				},
 				{
-					Timestamp: referenceTime,
-					WantErr:   true,
+					timestamp: referenceTime,
+					wantErr:   true,
 				},
 			},
 		},
@@ -153,10 +153,10 @@ func TestNewParser(t *testing.T) {
 			var got []reader.Message
 
 			r := &testReader{
-				messages:      tc.In,
+				messages:      tc.in,
 				referenceTime: referenceTime,
 			}
-			parser := NewParser(r, &tc.Config)
+			parser := NewParser(r, &tc.config)
 
 			var err error
 			var msg reader.Message
@@ -169,22 +169,22 @@ func TestNewParser(t *testing.T) {
 				got = append(got, msg)
 			}
 
-			assert.Len(t, got, len(tc.Want))
-			for i, want := range tc.Want {
-				if want.WantErr {
-					assert.Equal(t, tc.In[i], got[i].Content)
-					assert.Equal(t, len(tc.In[i]), got[i].Bytes)
+			assert.Len(t, got, len(tc.want))
+			for i, want := range tc.want {
+				if want.wantErr {
+					assert.Equal(t, tc.in[i], got[i].Content)
+					assert.Equal(t, len(tc.in[i]), got[i].Bytes)
 					assert.Equal(t, referenceTime, got[i].Ts)
 
-					if tc.Config.AddErrorKey {
+					if tc.config.AddErrorKey {
 						_, errMsgErr := got[i].Fields.GetValue("error.message")
 						assert.NoError(t, errMsgErr, "Expected error.message when Config.AddErrorKey true")
 					}
 				} else {
-					assert.Equal(t, want.Timestamp, got[i].Ts)
-					assert.Equal(t, want.Content, got[i].Content)
-					assert.Equal(t, len(want.Content), got[i].Bytes)
-					assert.Equal(t, want.Fields, got[i].Fields)
+					assert.Equal(t, want.timestamp, got[i].Ts)
+					assert.Equal(t, want.content, got[i].Content)
+					assert.Equal(t, len(want.content), got[i].Bytes)
+					assert.Equal(t, want.fields, got[i].Fields)
 				}
 			}
 		})

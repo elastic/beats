@@ -27,32 +27,32 @@ import (
 
 func TestStringToInt(t *testing.T) {
 	cases := map[string]struct {
-		In   string
-		Want int
+		in   string
+		want int
 	}{
 		"valid_1024": {
-			In:   "1024",
-			Want: 1024,
+			in:   "1024",
+			want: 1024,
 		},
 		"valid_-1024": {
-			In:   "-1024",
-			Want: -1024,
+			in:   "-1024",
+			want: -1024,
 		},
 		"valid_0": {
-			In:   "0",
-			Want: 0,
+			in:   "0",
+			want: 0,
 		},
 		"invalid_-": {
-			In:   "-",
-			Want: 0,
+			in:   "-",
+			want: 0,
 		},
 		"invalid_+": {
-			In:   "+",
-			Want: 0,
+			in:   "+",
+			want: 0,
 		},
 		"invalid_empty": {
-			In:   "",
-			Want: 0,
+			in:   "",
+			want: 0,
 		},
 	}
 
@@ -60,72 +60,72 @@ func TestStringToInt(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			got := stringToInt(tc.In)
+			got := stringToInt(tc.in)
 
-			assert.Equal(t, tc.Want, got)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
 var removeBytesCases = map[string]struct {
-	In        string
-	Positions []int
-	Offset    int
-	Want      string
+	in        string
+	positions []int
+	offset    int
+	want      string
 }{
 	"basic-1": {
-		In:        "abcdefghijklmno",
-		Positions: []int{3, 5, 6, 10, 12},
-		Want:      "abcehijlno",
+		in:        "abcdefghijklmno",
+		positions: []int{3, 5, 6, 10, 12},
+		want:      "abcehijlno",
 	},
 	"basic-2": {
-		In:        "abcdefghijklmno",
-		Positions: []int{0, 5, 6, 10, 12},
-		Want:      "bcdehijlno",
+		in:        "abcdefghijklmno",
+		positions: []int{0, 5, 6, 10, 12},
+		want:      "bcdehijlno",
 	},
 	"basic-3": {
-		In:        "abcdefghijklmno",
-		Positions: []int{0, 1, 2, 3, 4},
-		Want:      "fghijklmno",
+		in:        "abcdefghijklmno",
+		positions: []int{0, 1, 2, 3, 4},
+		want:      "fghijklmno",
 	},
 	"basic-4": {
-		In:        "\\ab\\cd\\ef\\ghijklmno",
-		Positions: []int{0, 1, 2, 9},
-		Want:      "\\cd\\efghijklmno",
+		in:        "\\ab\\cd\\ef\\ghijklmno",
+		positions: []int{0, 1, 2, 9},
+		want:      "\\cd\\efghijklmno",
 	},
 	"offset-1": {
-		In:        "abcdefghijklmno",
-		Positions: []int{5, 8, 9, 12},
-		Offset:    5,
-		Want:      "bcfgijklmno",
+		in:        "abcdefghijklmno",
+		positions: []int{5, 8, 9, 12},
+		offset:    5,
+		want:      "bcfgijklmno",
 	},
 	"no-positions": {
-		In:        "abcdefghijklmno",
-		Positions: nil,
-		Want:      "abcdefghijklmno",
+		in:        "abcdefghijklmno",
+		positions: nil,
+		want:      "abcdefghijklmno",
 	},
 	"negative-offset": {
-		In:        "abcdefghijklmno",
-		Positions: []int{5, 8, 9, 12},
-		Offset:    -1,
-		Want:      "abcdefghijklmno",
+		in:        "abcdefghijklmno",
+		positions: []int{5, 8, 9, 12},
+		offset:    -1,
+		want:      "abcdefghijklmno",
 	},
 	"too-many-positions": {
-		In:        "abc",
-		Positions: []int{5, 8, 9, 12},
-		Want:      "abc",
+		in:        "abc",
+		positions: []int{5, 8, 9, 12},
+		want:      "abc",
 	},
 	"offset-position-negative": {
-		In:        "abc",
-		Positions: []int{3},
-		Offset:    5,
-		Want:      "abc",
+		in:        "abc",
+		positions: []int{3},
+		offset:    5,
+		want:      "abc",
 	},
 	"offset-position-out-of-bounds": {
-		In:        "abc",
-		Positions: []int{8},
-		Offset:    5,
-		Want:      "abc",
+		in:        "abc",
+		positions: []int{8},
+		offset:    5,
+		want:      "abc",
 	},
 }
 
@@ -135,9 +135,9 @@ func TestRemoveBytes(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got := removeBytes(tc.In, tc.Positions, tc.Offset)
+			got := removeBytes(tc.in, tc.positions, tc.offset)
 
-			assert.Equal(t, tc.Want, got)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -148,7 +148,7 @@ func BenchmarkRemoveBytes(b *testing.B) {
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				_ = removeBytes(bc.In, bc.Positions, bc.Offset)
+				_ = removeBytes(bc.in, bc.positions, bc.offset)
 			}
 		})
 	}
@@ -161,27 +161,27 @@ func TestMapIndexToString(t *testing.T) {
 		"C",
 	}
 	tests := map[string]struct {
-		In     int
-		Want   string
-		WantOK bool
+		in     int
+		want   string
+		wantOK bool
 	}{
 		"valid-index-bottom": {
-			In:     0,
-			Want:   items[0],
-			WantOK: true,
+			in:     0,
+			want:   items[0],
+			wantOK: true,
 		},
 		"valid-index-top": {
-			In:     len(items) - 1,
-			Want:   items[len(items)-1],
-			WantOK: true,
+			in:     len(items) - 1,
+			want:   items[len(items)-1],
+			wantOK: true,
 		},
 		"invalid-index-high": {
-			In:     len(items),
-			WantOK: false,
+			in:     len(items),
+			wantOK: false,
 		},
 		"invalid-index-low": {
-			In:     -1,
-			WantOK: false,
+			in:     -1,
+			wantOK: false,
 		},
 	}
 
@@ -190,56 +190,56 @@ func TestMapIndexToString(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got, ok := mapIndexToString(tc.In, items)
+			got, ok := mapIndexToString(tc.in, items)
 
-			assert.Equal(t, tc.Want, got)
-			assert.Equal(t, tc.WantOK, ok)
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tc.wantOK, ok)
 		})
 	}
 }
 
 func TestAppendStringField(t *testing.T) {
 	tests := map[string]struct {
-		InMap   common.MapStr
-		InField string
-		InValue string
-		Want    common.MapStr
+		inMap   common.MapStr
+		inField string
+		inValue string
+		want    common.MapStr
 	}{
 		"nil": {
-			InMap:   common.MapStr{},
-			InField: "error",
-			InValue: "foo",
-			Want: common.MapStr{
+			inMap:   common.MapStr{},
+			inField: "error",
+			inValue: "foo",
+			want: common.MapStr{
 				"error": "foo",
 			},
 		},
 		"string": {
-			InMap: common.MapStr{
+			inMap: common.MapStr{
 				"error": "foo",
 			},
-			InField: "error",
-			InValue: "bar",
-			Want: common.MapStr{
+			inField: "error",
+			inValue: "bar",
+			want: common.MapStr{
 				"error": []string{"foo", "bar"},
 			},
 		},
 		"string-slice": {
-			InMap: common.MapStr{
+			inMap: common.MapStr{
 				"error": []string{"foo", "bar"},
 			},
-			InField: "error",
-			InValue: "some value",
-			Want: common.MapStr{
+			inField: "error",
+			inValue: "some value",
+			want: common.MapStr{
 				"error": []string{"foo", "bar", "some value"},
 			},
 		},
 		"interface-slice": {
-			InMap: common.MapStr{
+			inMap: common.MapStr{
 				"error": []interface{}{"foo", "bar"},
 			},
-			InField: "error",
-			InValue: "some value",
-			Want: common.MapStr{
+			inField: "error",
+			inValue: "some value",
+			want: common.MapStr{
 				"error": []interface{}{"foo", "bar", "some value"},
 			},
 		},
@@ -249,9 +249,54 @@ func TestAppendStringField(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			appendStringField(tc.InMap, tc.InField, tc.InValue)
+			appendStringField(tc.inMap, tc.inField, tc.inValue)
 
-			assert.Equal(t, tc.Want, tc.InMap)
+			assert.Equal(t, tc.want, tc.inMap)
+		})
+	}
+}
+
+func TestJoinStr(t *testing.T) {
+	tests := map[string]struct {
+		inA   string
+		inB   string
+		inSep string
+		want  string
+	}{
+		"both-empty": {
+			inA:   "",
+			inB:   "",
+			inSep: " ",
+			want:  "",
+		},
+		"only-a": {
+			inA:   "alpha",
+			inB:   "",
+			inSep: " ",
+			want:  "alpha",
+		},
+		"only-b": {
+			inA:   "",
+			inB:   "beta",
+			inSep: " ",
+			want:  "beta",
+		},
+		"both": {
+			inA:   "alpha",
+			inB:   "beta",
+			inSep: " ",
+			want:  "alpha beta",
+		},
+	}
+
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			got := joinStr(tc.inA, tc.inB, tc.inSep)
+
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
