@@ -28,7 +28,7 @@ import (
 )
 
 type Config struct {
-	Filters []match.Matcher `config:"patterns" validate:"required"`
+	Patterns []match.Matcher `config:"patterns" validate:"required"`
 }
 
 func DefaultConfig() Config {
@@ -51,7 +51,7 @@ func NewParser(r reader.Reader, c *Config) *FilterParser {
 		ctx:      ctxtool.WithCancelContext(context.Background()),
 		logger:   logp.NewLogger("filter_parser"),
 		r:        r,
-		matchers: c.Filters,
+		matchers: c.Patterns,
 	}
 }
 
