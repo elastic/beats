@@ -163,6 +163,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.1.1
 	github.com/elastic/elastic-agent-libs v0.2.5
 	github.com/elastic/elastic-agent-system-metrics v0.4.1
+	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
@@ -208,6 +209,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.1.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect

@@ -335,6 +335,17 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}
 }
 
+// waitUntilAtLeastEventCount waits until at least count events arrive to the client.
+func (e *inputTestingEnvironment) waitUntilAtLeastEventCount(count int) {
+	for {
+		sum := len(e.pipeline.GetAllEvents())
+		if count <= sum {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
 // waitUntilHarvesterIsDone detects Harvester stop by checking if the last client has been closed
 // as when a Harvester stops the client is closed.
 func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
