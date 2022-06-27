@@ -22,8 +22,7 @@ var (
 )
 
 func TestClient(t *testing.T) {
-	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
-	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+	startTime, endTime := previousDayFrom(time.Now())
 
 	t.Run("return error not valid query", func(t *testing.T) {
 		client := NewMockClient()

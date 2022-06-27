@@ -24,7 +24,7 @@ func init() {
 
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
-// mb.BaseMetricSet because it implements all of the required mb.MetricSet
+// mb.BaseMetricSet because it implements all the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
@@ -60,8 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// The time interval is yesterday (00:00:00->23:59:59) in UTC.
-	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
-	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+	startTime, endTime := previousDayFrom(time.Now())
 
 	m.log.
 		With("billing.start_time", startTime).
@@ -86,4 +85,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+// previousDayFrom returns the start/end times (00:00:00->23:59:59 UTC) of the day before, given the `reference` time.
+func previousDayFrom(reference time.Time) (time.Time, time.Time) {
+	startTime := reference.UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
+	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+	return startTime, endTime
 }
