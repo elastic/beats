@@ -29,17 +29,32 @@ func TestSegmentsRoundTrip(t *testing.T) {
 	tests := map[string]struct {
 		id        segmentID
 		encrypt   bool
+		compress  bool
 		plaintext []byte
 	}{
-		"No Encryption": {
+		"No Encryption or Compression": {
 			id:        0,
 			encrypt:   false,
-			plaintext: []byte("abc"),
+			compress:  false,
+			plaintext: []byte("no encryption or compression"),
 		},
-		"Encryption": {
+		"Encryption Only": {
 			id:        1,
 			encrypt:   true,
-			plaintext: []byte("abc"),
+			compress:  false,
+			plaintext: []byte("encryption only"),
+		},
+		"Compression Only": {
+			id:        2,
+			encrypt:   false,
+			compress:  true,
+			plaintext: []byte("compression only"),
+		},
+		"Encryption and Compression": {
+			id:        3,
+			encrypt:   true,
+			compress:  true,
+			plaintext: []byte("encryption and compression"),
 		},
 	}
 	dir, err := os.MkdirTemp("", t.Name())
@@ -52,6 +67,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		if tc.encrypt {
 			settings.EncryptionKey = []byte("keykeykeykeykeyk")
 		}
+		settings.UseCompression = tc.compress
 		qs := &queueSegment{
 			id: tc.id,
 		}
@@ -89,16 +105,31 @@ func TestSegmentReaderSeek(t *testing.T) {
 	tests := map[string]struct {
 		id         segmentID
 		encrypt    bool
+		compress   bool
 		plaintexts [][]byte
 	}{
-		"No Encryption": {
+		"No Encryption or compression": {
 			id:         0,
 			encrypt:    false,
+			compress:   false,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
-		"Encryption": {
+		"Encryption Only": {
 			id:         1,
 			encrypt:    true,
+			compress:   false,
+			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
+		},
+		"Compression Only": {
+			id:         2,
+			encrypt:    false,
+			compress:   true,
+			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
+		},
+		"Encryption and Compression": {
+			id:         3,
+			encrypt:    true,
+			compress:   true,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
 	}
@@ -111,6 +142,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 		if tc.encrypt {
 			settings.EncryptionKey = []byte("keykeykeykeykeyk")
 		}
+		settings.UseCompression = tc.compress
 
 		qs := &queueSegment{
 			id: tc.id,
@@ -145,18 +177,35 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 	tests := map[string]struct {
 		id         segmentID
 		encrypt    bool
+		compress   bool
 		plaintexts [][]byte
 		location   int64
 	}{
-		"No Encryption": {
+		"No Encryption or Compression": {
 			id:         0,
 			encrypt:    false,
+			compress:   false,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 			location:   -1,
 		},
 		"Encryption": {
 			id:         1,
 			encrypt:    true,
+			compress:   false,
+			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
+			location:   2,
+		},
+		"Compression": {
+			id:         1,
+			encrypt:    false,
+			compress:   true,
+			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
+			location:   2,
+		},
+		"Encryption and Compression": {
+			id:         1,
+			encrypt:    true,
+			compress:   true,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 			location:   2,
 		},
@@ -170,6 +219,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 		if tc.encrypt {
 			settings.EncryptionKey = []byte("keykeykeykeykeyk")
 		}
+		settings.UseCompression = tc.compress
 		qs := &queueSegment{
 			id: tc.id,
 		}
