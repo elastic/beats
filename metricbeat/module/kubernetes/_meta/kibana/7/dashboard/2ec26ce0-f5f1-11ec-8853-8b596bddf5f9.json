@@ -1361,6 +1361,7 @@
                                     "series_drop_last_bucket": 0,
                                     "split_mode": "everything",
                                     "stacked": "none",
+                                    "time_range_mode": "entire_time_range",
                                     "var_name": "fds_max"
                                 }
                             ],
@@ -1373,6 +1374,7 @@
                             "type": "markdown",
                             "use_kibana_indexes": false
                         },
+                        "title": "",
                         "type": "metrics",
                         "uiState": {}
                     }
@@ -1578,7 +1580,7 @@
         "version": 1
     },
     "coreMigrationVersion": "8.4.0",
-    "id": "97312060-9c1b-11e9-9dc8-fd27291d427f",
+    "id": "2ec26ce0-f5f1-11ec-8853-8b596bddf5f9",
     "migrationVersion": {
         "dashboard": "8.3.0"
     },
@@ -1635,6 +1637,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-06-23T14:43:27.315Z",
-    "version": "WzE5MjMsMV0="
+    "updated_at": "2022-06-27T08:15:29.690Z",
+    "version": "WzUzMDMsM10="
 }
