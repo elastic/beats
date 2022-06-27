@@ -62,16 +62,16 @@
           type: long
           description: >
             Number of requests as client
+        - name: request.duration.sec.bucket.*
+          type: object
+          object_type: long
+          description: Response latency distribution, histogram buckets
         - name: request.duration.sec.sum
           type: long
           description: Request duration, sum in seconds
         - name: request.duration.sec.count
           type: long
           description: Request duration, number of operations
-        - name: request.duration.sec.bucket.*
-          type: object
-          object_type: long
-          description: Response latency distribution, histogram buckets
     - name: workqueue
       type: group
       fields:
