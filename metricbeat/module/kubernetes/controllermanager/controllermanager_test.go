@@ -23,6 +23,8 @@ package controllermanager
 import (
 	"testing"
 
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )
 
@@ -35,4 +37,8 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 	)
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "controllermanager")
 }

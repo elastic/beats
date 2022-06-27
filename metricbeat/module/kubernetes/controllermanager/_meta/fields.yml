@@ -55,20 +55,20 @@
         - name: started.sec
           type: double
           description: Seconds since the process started
-    - name: client.request
+    - name: client
       type: group
       fields:
-        - name: count
+        - name: request.count
           type: long
           description: >
             Number of requests as client
-        - name: duration.sec.sum
+        - name: request.duration.sec.sum
           type: long
           description: Request duration, sum in seconds
-        - name: duration.sec.count
+        - name: request.duration.sec.count
           type: long
           description: Request duration, number of operations
-        - name: duration.sec.bucket.*
+        - name: request.duration.sec.bucket.*
           type: object
           object_type: long
           description: Response latency distribution, histogram buckets
