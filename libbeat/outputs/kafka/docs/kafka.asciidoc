@@ -194,10 +194,6 @@ NOTE: Publishing to a subset of available partitions potentially increases resou
 
 The configurable ClientID used for logging, debugging, and auditing purposes. The default is "beats".
 
-===== `worker`
-
-The number of concurrent load-balanced Kafka output workers.
-
 ===== `codec`
 
 Output codec configuration. If the `codec` section is missing, events will be json encoded.

@@ -92,6 +92,7 @@
 - Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
 - Increase the download artifact timeout to 10mins and add log download statistics. {pull}31461[31461]
+- Add filemod times to files in diagnostics collect bundle. {pull}31986[31986]
 
 ==== New features
 

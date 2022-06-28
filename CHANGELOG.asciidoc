@@ -3,6 +3,37 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.5]]
+=== Beats version 7.17.5
+https://github.com/elastic/beats/compare/v7.17.4\...v7.17.5[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
+- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
+
+*Heartbeat*
+
+- Fix unintentional use of no-op logger. {pull}31543[31543]
+
+*Metricbeat*
+
+- Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
+- Add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
+- Fix issue with certain V1 cgroup events not reporting root IDs {pull}https://github.com/elastic/beats/pull/31959{pull}
+
+*Winlogbeat*
+
+- Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.17.10 {issue}31636[31636]
+
 [[release-notes-7.17.4]]
 === Beats version 7.17.4
 https://github.com/elastic/beats/compare/v7.17.3\...v7.17.4[View commits]
