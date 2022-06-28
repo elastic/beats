@@ -23,23 +23,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// PerfMetrics stores known metrics from Kubernetes nodes and containers
-var PerfMetrics = NewPerfMetricsCache()
-
-func init() {
-	PerfMetrics.Start()
-}
-
-const defaultTimeout = 120 * time.Second
-
 // NewPerfMetricsCache initializes and returns a new PerfMetricsCache
-func NewPerfMetricsCache() *PerfMetricsCache {
+func NewPerfMetricsCache(timeout time.Duration) *PerfMetricsCache {
 	return &PerfMetricsCache{
-		NodeMemAllocatable:   newValueMap(defaultTimeout),
-		NodeCoresAllocatable: newValueMap(defaultTimeout),
+		NodeMemAllocatable:   newValueMap(timeout),
+		NodeCoresAllocatable: newValueMap(timeout),
 
-		ContainerMemLimit:   newValueMap(defaultTimeout),
-		ContainerCoresLimit: newValueMap(defaultTimeout),
+		ContainerMemLimit:   newValueMap(timeout),
+		ContainerCoresLimit: newValueMap(timeout),
 	}
 }
 
@@ -66,6 +57,43 @@ func (c *PerfMetricsCache) Stop() {
 	c.NodeCoresAllocatable.Stop()
 	c.ContainerMemLimit.Stop()
 	c.ContainerCoresLimit.Stop()
+}
+
+// Returns the maximum timeout of all the caches under PerfMetricsCache
+func (c *PerfMetricsCache) GetTimeout() time.Duration {
+	var ans time.Duration = 0
+
+	nmATimeout := c.NodeMemAllocatable.GetTimeout()
+	if nmATimeout > ans {
+		ans = nmATimeout
+	}
+
+	ncATimeout := c.NodeCoresAllocatable.GetTimeout()
+	if ncATimeout > ans {
+		ans = ncATimeout
+	}
+
+	cmLTimeout := c.ContainerMemLimit.GetTimeout()
+	if cmLTimeout > ans {
+		ans = cmLTimeout
+	}
+
+	ccLTimeout := c.ContainerCoresLimit.GetTimeout()
+	if ccLTimeout > ans {
+		ans = ccLTimeout
+	}
+	return ans
+}
+
+// Set the timeout of all the caches under PerfMetricsCache, then Stop and Start all the cache janitors
+func (c *PerfMetricsCache) SetOrUpdateTimeout(timeout time.Duration) {
+	c.NodeMemAllocatable.SetTimeout(timeout)
+	c.NodeCoresAllocatable.SetTimeout(timeout)
+	c.ContainerMemLimit.SetTimeout(timeout)
+	c.ContainerCoresLimit.SetTimeout(timeout)
+
+	c.Stop()
+	c.Start()
 }
 
 type valueMap struct {
@@ -107,6 +135,14 @@ func (m *valueMap) Start() {
 // Stop cache workers
 func (m *valueMap) Stop() {
 	m.cache.StopJanitor()
+}
+
+func (m *valueMap) GetTimeout() time.Duration {
+	return m.timeout
+}
+
+func (m *valueMap) SetTimeout(timeout time.Duration) {
+	m.timeout = timeout
 }
 
 // ContainerUID creates an unique ID for from namespace, pod name and container name
