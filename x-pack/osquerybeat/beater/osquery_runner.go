@@ -7,10 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
-	"net"
-	"strings"
 	"sync"
-	"syscall"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -116,9 +113,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				r.log.Info("Osquery exited: ", err)
 			} else {
 				r.log.Error("Failed to run osquery:", err)
-				var netErr *net.OpError
-				if (errors.As(err, &netErr) && (errors.Is(netErr.Err, syscall.EPIPE) || errors.Is(netErr.Err, syscall.ECONNRESET))) ||
-					strings.HasSuffix(err.Error(), " broken pipe") {
+				if isBrokenPipeOrEOFError(err) {
 					r.log.Infof("Recover osquery after broken pipe error")
 					if lastKnownInputs != nil {
 						select {
