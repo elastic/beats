@@ -356,6 +356,37 @@ func TestClone(t *testing.T) {
 	assert.Equal(M{"c31": 1, "c32": 2}, c["c3"])
 }
 
+func BenchmarkClone(b *testing.B) {
+	assert := assert.New(b)
+
+	m := M{
+		"c1": 1,
+		"c2": 2,
+		"c3": M{
+			"c31": 1,
+			"c32": 2,
+			"c33": 3,
+			"c34": 4,
+			"c35": 5,
+			"c36": 6,
+			"c37": 7,
+			"c38": 8,
+			"c39": 9,
+		},
+		"c4": 4,
+		"c5": 5,
+		"c6": 6,
+		"c7": 7,
+		"c8": 8,
+		"c9": 9,
+	}
+
+	for i := 0; i < b.N; i++ {
+		c := m.Clone()
+		assert.Equal(m, c)
+	}
+}
+
 func TestString(t *testing.T) {
 	type io struct {
 		Input  M

@@ -152,13 +152,13 @@ func (m M) CopyFieldsTo(to M, key string) error {
 // Clone returns a copy of the M. It recursively makes copies of inner
 // maps.
 func (m M) Clone() M {
-	result := M{}
+	result := make(M, len(m))
 
-	for k, v := range m {
-		if innerMap, ok := tryToMapStr(v); ok {
-			v = innerMap.Clone()
+	for k := range m {
+		if innerMap, ok := (m[k]).(M); ok {
+			result[k] = innerMap.Clone()
 		}
-		result[k] = v
+		result[k] = m[k]
 	}
 
 	return result
