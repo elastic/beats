@@ -155,7 +155,7 @@
         "title": "Status per Pod [Metricbeat Kubernetes]",
         "visualizationType": "lnsDatatable"
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "95f0b070-db48-11ec-a23d-5dd6249f86b6",
     "migrationVersion": {
         "lens": "8.3.0"
@@ -173,6 +173,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-24T10:02:14.139Z",
-    "version": "WzExNDAzLDFd"
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MzAsM10="
 }

@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
 - add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 - update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
+- update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 
 *Packetbeat*
 
