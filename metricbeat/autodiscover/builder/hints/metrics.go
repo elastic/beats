@@ -22,6 +22,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/go-ucfg"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
@@ -29,9 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
