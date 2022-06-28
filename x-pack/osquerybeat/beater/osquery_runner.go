@@ -56,7 +56,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 
 	errCh := make(chan error, 1)
 
-	// lastKnowsInput is used for recovery after "broken pipe" error
+	// lastKnownInputs is used for recovery after "broken pipe" error
 	var lastKnownInputs []config.InputConfig
 
 	process := func(inputs []config.InputConfig) {
