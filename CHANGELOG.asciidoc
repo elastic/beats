@@ -9,31 +9,6 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-- Add a new `salesforce` module to collect data from salesforce. {pull}31486[31486]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -98,6 +73,7 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 - Change threatintel module from beta to GA. {pull}31693[31693]
 - Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
 - Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
+- Add a new `salesforce` module to collect data from salesforce. {pull}31486[31486]
 
 *Auditbeat*
 
