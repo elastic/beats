@@ -18,12 +18,8 @@
 package queuetest
 
 import (
-	"errors"
-	"io"
 	"sync"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -213,26 +209,10 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 
 			go test.producers(&wg, nil, log, queue)()
 			go test.consumers(&wg, nil, log, queue)()
-			go testFetchMetrics(t, queue)
+
 			wg.Wait()
 		}))
 	}
-}
-
-func testFetchMetrics(t *testing.T, mon queue.Queue) {
-	_, err := mon.Metrics()
-	if errors.Is(err, queue.ErrMetricsNotImplemented) {
-		return
-	}
-
-	metrics, err := mon.Metrics()
-	// EOF is returned if the queue is closing, so the only "good" error is that
-	if err != nil {
-		assert.ErrorIs(t, err, io.EOF)
-	}
-
-	assert.True(t, metrics.EventCount.Exists() || metrics.ByteCount.Exists())
-
 }
 
 func multiple(
