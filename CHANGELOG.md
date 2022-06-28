@@ -8,7 +8,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Modify npipe package to directly get the user SID.
+### Deprecated
+
+### Removed
+
+### Fixed
+
+## [0.2.6]
+
+### Added
+
+### Changed
+
+- Modify npipe package to directly get the user SID. #62
 
 ### Deprecated
 
@@ -16,11 +28,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Remove VerificationMode option to empty string. Default will be `full` #59
+
 ## [0.2.5]
 
-### Fixed
+### Changed
 
-- Remove VerificationMode option to empty string. Default will be `full` #49
+- Upgrade the YAML package dependency: #56
 
 ## [0.2.4]
 
