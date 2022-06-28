@@ -2,7 +2,13 @@
     "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-            "searchSourceJSON": {}
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
         },
         "title": "Controller Process [Metricbeat Kubernetes]",
         "uiStateJSON": {},
@@ -18,9 +24,10 @@
                 "id": "61ca57f0-469d-11e7-af02-69e470af7417",
                 "index_pattern": "metricbeat-*",
                 "interval": "30s",
-                "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_controllermanager_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ average_of_kubernetes_controllermanager_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_controllermanager_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
-                "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
-                "markdown_less": "\ntable, tr, td, th {\n    border: none;\n}\n\n",
+                "isModelInvalid": false,
+                "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_controllermanager_process_fds_open_count.fds.last.formatted }}|\n|**Maximun File descriptors**|{{ max_of_kubernetes_controllermanager_process_fds_max_count.fds_max.last.formatted }}|\n|**Resident Memory**|{{ average_of_kubernetes_controllermanager_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_controllermanager_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
+                "markdown_css": "table, tr, td, th{border:none}",
+                "max_lines_legend": 1,
                 "series": [
                     {
                         "axis_position": "right",
@@ -54,6 +61,7 @@
                         "split_color_mode": "gradient",
                         "split_mode": "everything",
                         "stacked": "none",
+                        "time_range_mode": "entire_time_range",
                         "var_name": "started"
                     },
                     {
@@ -77,6 +85,7 @@
                         "split_color_mode": "gradient",
                         "split_mode": "everything",
                         "stacked": "none",
+                        "time_range_mode": "entire_time_range",
                         "var_name": "fds"
                     },
                     {
@@ -100,6 +109,7 @@
                         "split_color_mode": "gradient",
                         "split_mode": "everything",
                         "stacked": "none",
+                        "time_range_mode": "entire_time_range",
                         "var_name": "resident_memory"
                     },
                     {
@@ -122,12 +132,45 @@
                         "split_color_mode": "gradient",
                         "split_mode": "everything",
                         "stacked": "none",
+                        "time_range_mode": "entire_time_range",
                         "var_name": "virtual_memory"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "6faac700-f2dd-11ec-ab74-4342b85d7779",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.controllermanager.process.fds.max.count",
+                                "id": "6faaee10-f2dd-11ec-ab74-4342b85d7779",
+                                "type": "max"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "time_range_mode": "entire_time_range",
+                        "var_name": "fds_max"
                     }
                 ],
                 "show_grid": 1,
                 "show_legend": 1,
                 "time_field": "@timestamp",
+                "time_range_mode": "last_value",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
                 "type": "markdown",
                 "use_kibana_indexes": false
             },
@@ -135,13 +178,13 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.0.0",
-    "id": "3dbf6230-9c20-11e9-9dc8-fd27291d427f",
+    "coreMigrationVersion": "8.4.0",
+    "id": "e6f265b0-f5f9-11ec-8853-8b596bddf5f9",
     "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "8.3.0"
     },
     "references": [],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:31:36.329Z",
-    "version": "WzQwMDQsMV0="
+    "updated_at": "2022-06-27T09:17:01.203Z",
+    "version": "WzU0OTQsM10="
 }

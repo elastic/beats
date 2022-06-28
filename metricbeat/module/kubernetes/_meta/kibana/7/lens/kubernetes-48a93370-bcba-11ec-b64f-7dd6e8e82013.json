@@ -140,7 +140,7 @@
         "title": "Filesystem Inodes Informations [Metricbeat Kubernetes]",
         "visualizationType": "lnsDatatable"
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-48a93370-bcba-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "lens": "8.3.0"
@@ -163,6 +163,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-23T08:46:44.843Z",
-    "version": "WzY3OCwxXQ=="
+    "updated_at": "2022-06-28T06:47:01.240Z",
+    "version": "WzU3MTksM10="
 }
