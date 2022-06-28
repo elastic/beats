@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"runtime"
 	"strconv"
 	"sync"
 	"testing"
@@ -27,6 +28,10 @@ import (
 func TestDownloadBodyError(t *testing.T) {
 	// This tests the scenario where the download encounters a network error
 	// part way through the download, while copying the response body.
+	// Skipped on Windows where it frequently but not always fails.
+	if runtime.GOOS == "windows" {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/31996")
+	}
 
 	type connKey struct{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
