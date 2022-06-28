@@ -22,17 +22,16 @@ import (
 	"regexp"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-ucfg"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -80,8 +79,8 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 	}
 
 	// Hint must be explicitly enabled when default_config sets enabled=false.
-	if !l.config.DefaultConfig.Enabled() && !builder.IsEnabled(hints, l.config.Key) ||
-		builder.IsDisabled(hints, l.config.Key) {
+	if !l.config.DefaultConfig.Enabled() && !utils.IsEnabled(hints, l.config.Key) ||
+		utils.IsDisabled(hints, l.config.Key) {
 		l.log.Debugw("Hints config is not enabled.", "autodiscover.event", event)
 		return nil
 	}
@@ -168,37 +167,37 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, l.config.Key, multiline)
+	return utils.GetHintMapStr(hints, l.config.Key, multiline)
 }
 
 func (l *logHints) getIncludeLines(hints mapstr.M) []string {
-	return builder.GetHintAsList(hints, l.config.Key, includeLines)
+	return utils.GetHintAsList(hints, l.config.Key, includeLines)
 }
 
 func (l *logHints) getExcludeLines(hints mapstr.M) []string {
-	return builder.GetHintAsList(hints, l.config.Key, excludeLines)
+	return utils.GetHintAsList(hints, l.config.Key, excludeLines)
 }
 
 func (l *logHints) getModule(hints mapstr.M) string {
-	module := builder.GetHintString(hints, l.config.Key, "module")
+	module := utils.GetHintString(hints, l.config.Key, "module")
 	// for security, strip module name
 	return validModuleNames.ReplaceAllString(module, "")
 }
 
 func (l *logHints) getInputsConfigs(hints mapstr.M) []mapstr.M {
-	return builder.GetHintAsConfigs(hints, l.config.Key)
+	return utils.GetHintAsConfigs(hints, l.config.Key)
 }
 
 func (l *logHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return builder.GetProcessors(hints, l.config.Key)
+	return utils.GetProcessors(hints, l.config.Key)
 }
 
 func (l *logHints) getPipeline(hints mapstr.M) string {
-	return builder.GetHintString(hints, l.config.Key, "pipeline")
+	return utils.GetHintString(hints, l.config.Key, "pipeline")
 }
 
 func (l *logHints) getJSONOptions(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, l.config.Key, json)
+	return utils.GetHintMapStr(hints, l.config.Key, json)
 }
 
 type filesetConfig struct {
@@ -222,7 +221,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 	}
 
 	// If a single fileset is given, pass all streams to it
-	fileset := builder.GetHintString(hints, l.config.Key, "fileset")
+	fileset := utils.GetHintString(hints, l.config.Key, "fileset")
 	if fileset != "" {
 		if conf, ok := filesets[fileset]; ok {
 			conf.Enabled = true
@@ -232,7 +231,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 
 	// If fileset is defined per stream, return all of them
 	for _, stream := range []string{"all", "stdout", "stderr"} {
-		fileset := builder.GetHintString(hints, l.config.Key, "fileset."+stream)
+		fileset := utils.GetHintString(hints, l.config.Key, "fileset."+stream)
 		if fileset != "" {
 			if conf, ok := filesets[fileset]; ok {
 				conf.Enabled = true
@@ -253,7 +252,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 }
 
 func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
-	modules := builder.GetHintsAsList(hints, l.config.Key)
+	modules := utils.GetHintsAsList(hints, l.config.Key)
 	var output []mapstr.M
 
 	for _, mod := range modules {

@@ -24,15 +24,17 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/gofrs/uuid"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -153,7 +155,7 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := builder.GenerateHints(annotations, "", n.config.Prefix)
+	hints := utils.GenerateHints(annotations, "", n.config.Prefix)
 	n.logger.Debugf("Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints

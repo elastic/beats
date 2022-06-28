@@ -28,10 +28,11 @@ import (
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -215,10 +216,10 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["container"] = container
 	}
 
-	cname := builder.GetContainerName(container)
+	cname := utils.GetContainerName(container)
 
 	// Generate hints based on the cumulative of both namespace and pod annotations.
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	hints := utils.GenerateHints(annotations, cname, p.config.Prefix)
 	p.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {

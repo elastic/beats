@@ -11,8 +11,9 @@ import (
 
 	"github.com/gofrs/uuid"
 
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
@@ -272,8 +273,8 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		}
 	}
 
-	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
+	cname := utils.GetContainerName(container)
+	hints := utils.GenerateHints(tasks, cname, p.config.Prefix)
 	if len(hints) > 0 {
 		e["hints"] = hints
 	}

@@ -23,16 +23,15 @@ import (
 	"strings"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-ucfg"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -202,13 +201,13 @@ func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
 }
 
 func (m *metricHints) getModule(hints mapstr.M) string {
-	return builder.GetHintString(hints, m.Key, module)
+	return utils.GetHintString(hints, m.Key, module)
 }
 
 func (m *metricHints) getMetricSets(hints mapstr.M, module string) []string {
 	var msets []string
 	var err error
-	msets = builder.GetHintAsList(hints, m.Key, metricsets)
+	msets = utils.GetHintAsList(hints, m.Key, metricsets)
 
 	if len(msets) == 0 {
 		// If no metricset list is given, take module defaults
@@ -224,7 +223,7 @@ func (m *metricHints) getMetricSets(hints mapstr.M, module string) []string {
 
 func (m *metricHints) getHostsWithPort(hints mapstr.M, port int, noPort bool) ([]string, bool) {
 	var result []string
-	thosts := builder.GetHintAsList(hints, m.Key, hosts)
+	thosts := utils.GetHintAsList(hints, m.Key, hosts)
 
 	// Only pick hosts that:
 	// 1. have noPort (pod level event) and data.ports.<port_name> defined
@@ -273,23 +272,23 @@ func (m *metricHints) checkHostPort(h string, p int) bool {
 }
 
 func (m *metricHints) getNamespace(hints mapstr.M) string {
-	return builder.GetHintString(hints, m.Key, namespace)
+	return utils.GetHintString(hints, m.Key, namespace)
 }
 
 func (m *metricHints) getMetricPath(hints mapstr.M) string {
-	return builder.GetHintString(hints, m.Key, metricspath)
+	return utils.GetHintString(hints, m.Key, metricspath)
 }
 
 func (m *metricHints) getUsername(hints mapstr.M) string {
-	return builder.GetHintString(hints, m.Key, username)
+	return utils.GetHintString(hints, m.Key, username)
 }
 
 func (m *metricHints) getPassword(hints mapstr.M) string {
-	return builder.GetHintString(hints, m.Key, password)
+	return utils.GetHintString(hints, m.Key, password)
 }
 
 func (m *metricHints) getPeriod(hints mapstr.M) string {
-	if ival := builder.GetHintString(hints, m.Key, period); ival != "" {
+	if ival := utils.GetHintString(hints, m.Key, period); ival != "" {
 		return ival
 	}
 
@@ -297,35 +296,35 @@ func (m *metricHints) getPeriod(hints mapstr.M) string {
 }
 
 func (m *metricHints) getTimeout(hints mapstr.M) string {
-	if tout := builder.GetHintString(hints, m.Key, timeout); tout != "" {
+	if tout := utils.GetHintString(hints, m.Key, timeout); tout != "" {
 		return tout
 	}
 	return defaultTimeout
 }
 
 func (m *metricHints) getSSLConfig(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, m.Key, ssl)
+	return utils.GetHintMapStr(hints, m.Key, ssl)
 }
 
 func (m *metricHints) getMetricsFilters(hints mapstr.M) mapstr.M {
 	mf := mapstr.M{}
-	for k := range builder.GetHintMapStr(hints, m.Key, metricsfilters) {
-		mf[k] = builder.GetHintAsList(hints, m.Key, metricsfilters+"."+k)
+	for k := range utils.GetHintMapStr(hints, m.Key, metricsfilters) {
+		mf[k] = utils.GetHintAsList(hints, m.Key, metricsfilters+"."+k)
 	}
 	return mf
 }
 
 func (m *metricHints) getModuleConfigs(hints mapstr.M) []mapstr.M {
-	return builder.GetHintAsConfigs(hints, m.Key)
+	return utils.GetHintAsConfigs(hints, m.Key)
 }
 
 func (m *metricHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return builder.GetProcessors(hints, m.Key)
+	return utils.GetProcessors(hints, m.Key)
 
 }
 
 func (m *metricHints) getModules(hints mapstr.M) []mapstr.M {
-	modules := builder.GetHintsAsList(hints, m.Key)
+	modules := utils.GetHintsAsList(hints, m.Key)
 	var output []mapstr.M
 
 	for _, mod := range modules {
