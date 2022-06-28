@@ -32,6 +32,10 @@ The default value is `false`.
 The {es} instances that you want to ship your {beatname_uc} metrics to. This
 configuration option contains the following fields:
 
+==== `monitoring.cluster_uuid`
+
+The `monitoring.cluster_uuid` config identifies the {es} cluster under which the monitoring data will appear in the Stack Monitoring UI. 
+
 ===== `api_key`
 
 The detail of the API key to be used to send monitoring information to {es}.
