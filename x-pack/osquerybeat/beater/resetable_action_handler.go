@@ -41,11 +41,6 @@ type resetableActionHandler struct {
 	timeout   time.Duration
 }
 
-type resetableActionHandlerResponse struct {
-	res map[string]interface{}
-	err error
-}
-
 func newResetableActionHandler(log *logp.Logger) *resetableActionHandler {
 	a := &resetableActionHandler{
 		log:     log,
