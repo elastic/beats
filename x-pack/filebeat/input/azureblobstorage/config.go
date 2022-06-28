@@ -7,6 +7,8 @@
 
 package azureblobstorage
 
+import "fmt"
+
 type config struct {
 	AccountName string      `config:"account_name"`
 	AccountKey  string      `config:"account_key"`
@@ -14,10 +16,19 @@ type config struct {
 }
 
 type container struct {
-	Name           string `config:"name"`
+	Name           string `config:"name" validate:"required"`
 	BatchSize      int32  `config:"batch_size"`
 	Poll           bool   `config:"poll"`
 	PollIntervalMs int32  `config:"poll_interval_ms"`
+}
+
+func (c config) Validate() error {
+	for _, v := range c.Containers {
+		if v.BatchSize > 10000 {
+			return fmt.Errorf("batch size should be less than 10000")
+		}
+	}
+	return nil
 }
 
 func defaultConfig() config {
