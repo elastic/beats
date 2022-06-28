@@ -214,7 +214,10 @@ func TestGenerateHints(t *testing.T) {
 	for _, test := range tests {
 		annMap := mapstr.M{}
 		for k, v := range test.annotations {
-			annMap.Put(k, v)
+			_, err := annMap.Put(k, v)
+			if err != nil {
+				continue
+			}
 		}
 		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic"))
 	}
