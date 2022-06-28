@@ -7,8 +7,6 @@
 === Beats version 8.3.0
 https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 
-==== Breaking changes
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -37,26 +35,15 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 - Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
 - add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
 *Affecting all Beats*
 
 - Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
-
 
 *Auditbeat*
 
@@ -89,53 +76,20 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 - Add ARM64 seccomp profile. {issue}31285[31285] {pull}31422[31422]
 - Add new `playwright_options` config for browser monitors. {issue}28197[28196] {pull}31737[31737]
 
-
 *Metricbeat*
 
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
 
 *Winlogbeat*
 
 - Add parent process ID to new process creation events. {issue}29237[29237] {pull}31102[31102]
 - Sysmon: Support for Sysmon Registry non-QWORD/DWORD events. {pull}31556[31556]
 
-*Elastic Log Driver*
-
-
 ==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
 
 *Heartbeat*
 - Bump node.js version for synthetics to 16.15.0. {pull}31675[31675]
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
 
 [[release-notes-8.2.3]]
 === Beats version 8.2.3
