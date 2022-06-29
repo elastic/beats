@@ -19,7 +19,6 @@ package hints
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"regexp"
 
 	"github.com/elastic/go-ucfg"
@@ -30,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"

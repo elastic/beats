@@ -100,7 +100,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
-		return fmt.Errorf("error setting up kubernetes autodiscover provider: %+v", err)
+		return fmt.Errorf("error setting up kubernetes autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()

@@ -28,7 +28,10 @@ import (
 const NomadEventKey = "nomad"
 
 func init() {
-	autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
+	err := autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -67,7 +70,7 @@ func AutodiscoverBuilder(
 	}
 	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to intialize nomad API client: %w", err)
+		return nil, fmt.Errorf("failed to initialize nomad API client: %w", err)
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
@@ -280,7 +283,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	prefix := strings.Split(p.config.Prefix, ".")[0]
-	tasks.Delete(prefix)
+	_ = tasks.Delete(prefix)
 
 	return e
 }

@@ -74,7 +74,7 @@ func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
 	err := cfg.Unpack(&config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
 	return &metricHints{config.Key, config.Registry, logp.NewLogger("hints.builder")}, nil
