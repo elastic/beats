@@ -36,18 +36,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
-- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
-- Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
-- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
-- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 
 *Heartbeat*
 
@@ -132,6 +126,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
