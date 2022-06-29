@@ -74,7 +74,7 @@ func makeEvent() publisher.Event {
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup(encrypt bool) (*diskQueue, queue.Producer) {
+func setup(encrypt bool, compress bool) (*diskQueue, queue.Producer) {
 	dir, err := os.MkdirTemp("", "benchmark")
 	if err != nil {
 		panic(err)
@@ -84,7 +84,8 @@ func setup(encrypt bool) (*diskQueue, queue.Producer) {
 	if encrypt {
 		s.EncryptionKey = []byte("testtesttesttest")
 	}
-	q, err := NewQueue(logp.NewLogger("benchmark"), s)
+	s.UseCompression = compress
+	q, err := NewQueue(logp.L(), s)
 	if err != nil {
 		os.RemoveAll(dir)
 		panic(err)
@@ -144,14 +145,14 @@ func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_si
 
 //benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
-func benchmarkQueue(num_events int, batch_size int, encrypt bool, async bool, b *testing.B) {
+func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool, async bool, b *testing.B) {
 	b.ResetTimer()
 	var err error
 
 	for n := 0; n < b.N; n++ {
 		b.StopTimer()
 		rand.Seed(1)
-		q, p := setup(encrypt)
+		q, p := setup(encrypt, compress)
 		b.StartTimer()
 		if async {
 			if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
@@ -172,11 +173,24 @@ func benchmarkQueue(num_events int, batch_size int, encrypt bool, async bool, b 
 }
 
 // Actual benchmark calls follow
-func BenchmarkAsync1k(b *testing.B)        { benchmarkQueue(1000, 10, false, true, b) }
-func BenchmarkAsync1M(b *testing.B)        { benchmarkQueue(1000000, 1000, false, true, b) }
-func BenchmarkEncryptAsync1k(b *testing.B) { benchmarkQueue(1000, 10, true, true, b) }
-func BenchmarkEncryptAsync1M(b *testing.B) { benchmarkQueue(1000000, 1000, true, true, b) }
-func BenchmarkSync1k(b *testing.B)         { benchmarkQueue(1000, 10, false, false, b) }
-func BenchmarkSync1M(b *testing.B)         { benchmarkQueue(1000000, 1000, false, false, b) }
-func BenchmarkEncryptSync1k(b *testing.B)  { benchmarkQueue(1000, 10, true, false, b) }
-func BenchmarkEncryptSync1M(b *testing.B)  { benchmarkQueue(1000000, 1000, true, false, b) }
+func BenchmarkAsync1k(b *testing.B)                { benchmarkQueue(1000, 10, false, false, true, b) }
+func BenchmarkAsync1M(b *testing.B)                { benchmarkQueue(1000000, 1000, false, false, true, b) }
+func BenchmarkEncryptAsync1k(b *testing.B)         { benchmarkQueue(1000, 10, true, false, true, b) }
+func BenchmarkEncryptAsync1M(b *testing.B)         { benchmarkQueue(1000000, 1000, true, false, true, b) }
+func BenchmarkCompressAsync1k(b *testing.B)        { benchmarkQueue(1000, 10, false, true, true, b) }
+func BenchmarkCompressAsync1M(b *testing.B)        { benchmarkQueue(1000000, 1000, false, true, true, b) }
+func BenchmarkEncryptCompressAsync1k(b *testing.B) { benchmarkQueue(1000, 10, true, true, true, b) }
+func BenchmarkEncryptCompressAsync1M(b *testing.B) {
+	benchmarkQueue(1000000, 1000, true, true, true, b)
+}
+
+func BenchmarkSync1k(b *testing.B)                { benchmarkQueue(1000, 10, false, false, false, b) }
+func BenchmarkSync1M(b *testing.B)                { benchmarkQueue(1000000, 1000, false, false, false, b) }
+func BenchmarkEncryptSync1k(b *testing.B)         { benchmarkQueue(1000, 10, true, false, false, b) }
+func BenchmarkEncryptSync1M(b *testing.B)         { benchmarkQueue(1000000, 1000, true, false, false, b) }
+func BenchmarkCompressSync1k(b *testing.B)        { benchmarkQueue(1000, 10, false, true, false, b) }
+func BenchmarkCompressSync1M(b *testing.B)        { benchmarkQueue(1000000, 1000, false, true, false, b) }
+func BenchmarkEncryptCompressSync1k(b *testing.B) { benchmarkQueue(1000, 10, true, true, false, b) }
+func BenchmarkEncryptCompressSync1M(b *testing.B) {
+	benchmarkQueue(1000000, 1000, true, true, false, b)
+}

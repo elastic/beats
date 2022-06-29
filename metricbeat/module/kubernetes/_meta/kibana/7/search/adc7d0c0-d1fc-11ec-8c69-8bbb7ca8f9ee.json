@@ -45,7 +45,7 @@
         ],
         "title": "Kubernetes Events [Metricbeat Kubernetes]"
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "adc7d0c0-d1fc-11ec-8c69-8bbb7ca8f9ee",
     "migrationVersion": {
         "search": "8.0.0"
@@ -58,6 +58,6 @@
         }
     ],
     "type": "search",
-    "updated_at": "2022-05-23T08:46:51.937Z",
-    "version": "Wzc0OSwxXQ=="
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODEsM10="
 }
