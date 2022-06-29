@@ -124,7 +124,7 @@ Specifying the index is especially useful on Windows where device names can be l
 
 Alternatively the `default_route` device may be specified. This will set the capture
 device to be the device that is associated with the first default IPv4 route identified
-on Packetbeat start-up.
+on Packetbeat start-up. The selected interface is not altered after it is chosen.
 
 [float]
 ==== `snaplen`
