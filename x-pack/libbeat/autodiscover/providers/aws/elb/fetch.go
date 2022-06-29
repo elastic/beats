@@ -167,8 +167,6 @@ func (p *fetchRequest) fetchNextPage() {
 	for _, lb := range page.LoadBalancers {
 		p.dispatch(func() { p.fetchListeners(lb) })
 	}
-
-	return
 }
 
 // dispatch runs the given func in a new goroutine, properly throttling requests
@@ -203,8 +201,8 @@ func (p *fetchRequest) fetchListeners(lb types.LoadBalancer) {
 			if err != nil {
 				p.recordErrResult(err)
 			}
-			for _, listener := range page.Listeners {
-				p.recordGoodResult(&lb, &listener)
+			for i := range page.Listeners {
+				p.recordGoodResult(&lb, &page.Listeners[i])
 			}
 		}
 

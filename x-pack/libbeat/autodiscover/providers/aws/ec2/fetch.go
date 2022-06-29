@@ -166,8 +166,6 @@ func (p *fetchRequest) fetchNextPage() {
 			p.dispatch(func() { p.fetchInstances(instance) })
 		}
 	}
-
-	return
 }
 
 // dispatch runs the given func in a new goroutine, properly throttling requests

@@ -22,18 +22,16 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("aws_ec2", AutodiscoverBuilder)
+	_ = autodiscover.Registry.AddProvider("aws_ec2", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for aws EC2s.
 type Provider struct {
-	config        *awsauto.Config
-	bus           bus.Bus
-	templates     *template.Mapper
-	startListener bus.Listener
-	stopListener  bus.Listener
-	watcher       *watcher
-	uuid          uuid.UUID
+	config    *awsauto.Config
+	bus       bus.Bus
+	templates *template.Mapper
+	watcher   *watcher
+	uuid      uuid.UUID
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
