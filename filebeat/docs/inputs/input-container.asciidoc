@@ -26,6 +26,18 @@ Example configuration:
 
 <1> `paths` is required. All other settings are optional.
 
+
+When using CRI-O runtime the following path should be used:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: container
+  paths: <1>
+    - '/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log'
+----
+
+
 ==== Configuration options
 
 The `container` input supports the following configuration options plus the
