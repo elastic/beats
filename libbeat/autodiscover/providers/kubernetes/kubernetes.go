@@ -349,7 +349,7 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("error while creating Leader Elector: %v", err)
+		p.logger.Errorf("error while creating Leader Elector: %w", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 	go le.Run(ctx)
