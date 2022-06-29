@@ -19,9 +19,9 @@ package state_container
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
