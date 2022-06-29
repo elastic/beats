@@ -309,6 +309,7 @@ func (k *kubernetesAnnotator) Close() error {
 	}
 	if k.cache != nil {
 		k.cache.stop()
+		k.cache = nil
 	}
 	return nil
 }

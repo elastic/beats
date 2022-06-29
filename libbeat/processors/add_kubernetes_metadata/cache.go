@@ -94,18 +94,5 @@ func (c *cache) cleanup() {
 }
 
 func (c *cache) stop() {
-	if !isClosed(c.done) {
-		close(c.done)
-	}
-}
-
-// isClosed checks if a given chan is already closed
-func isClosed(ch <-chan struct{}) bool {
-	select {
-	case <-ch:
-		return true
-	default:
-	}
-
-	return false
+	close(c.done)
 }
