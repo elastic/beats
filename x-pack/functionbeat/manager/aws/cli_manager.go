@@ -74,7 +74,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
 	}
 
-	svcCF := cf.New(c.awsCfg)
+	svcCF := cf.NewFromConfig(c.awsCfg)
 
 	executer := executor.NewExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
@@ -108,7 +108,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		))
 	}
 
-	executer.Add(newOpWaitCloudFormation(c.log, cf.New(c.awsCfg)))
+	executer.Add(newOpWaitCloudFormation(c.log, cf.NewFromConfig(c.awsCfg)))
 	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), templateData.codeKey))
 
 	ctx := newStackContext()
@@ -156,7 +156,7 @@ func (c *CLIManager) Remove(name string) error {
 		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
 	}
 
-	svc := cf.New(c.awsCfg)
+	svc := cf.NewFromConfig(c.awsCfg)
 	executer := executor.NewExecutor(c.log)
 	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
 	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
