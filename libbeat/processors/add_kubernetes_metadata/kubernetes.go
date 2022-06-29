@@ -100,7 +100,7 @@ func kubernetesMetadataExist(event *beat.Event) bool {
 
 // New constructs a new add_kubernetes_metadata processor.
 func New(cfg *config.C) (processors.Processor, error) {
-	config, err := newProcessorConfig(cfg, Indexing)
+	conf, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err
 	}
@@ -108,36 +108,36 @@ func New(cfg *config.C) (processors.Processor, error) {
 	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
-		cache:               newCache(config.CleanupTimeout),
+		cache:               newCache(conf.CleanupTimeout),
 		kubernetesAvailable: false,
 	}
 
 	// complete processor's initialisation asynchronously so as to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
-	go processor.init(config, cfg)
+	go processor.init(conf, cfg)
 
 	return processor, nil
 }
 
 func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig, error) {
-	config := defaultKubernetesAnnotatorConfig()
+	conf := defaultKubernetesAnnotatorConfig()
 
-	err := cfg.Unpack(&config)
+	err := cfg.Unpack(&conf)
 	if err != nil {
-		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+		return conf, fmt.Errorf("fail to unpack the kubernetes configuration: %w", err)
 	}
 
 	// Load and append default indexer configs
-	if config.DefaultIndexers.Enabled {
-		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
+	if conf.DefaultIndexers.Enabled {
+		conf.Indexers = append(conf.Indexers, register.GetDefaultIndexerConfigs()...)
 	}
 
 	// Load and append default matcher configs
-	if config.DefaultMatchers.Enabled {
-		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
+	if conf.DefaultMatchers.Enabled {
+		conf.Matchers = append(conf.Matchers, register.GetDefaultMatcherConfigs()...)
 	}
 
-	return config, nil
+	return conf, nil
 }
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
@@ -273,18 +273,18 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	k.log.Debugf("Using the following index key %s", index)
-	metadata := k.cache.get(index)
-	if metadata == nil {
+	meta := k.cache.get(index)
+	if meta == nil {
 		k.log.Debugf("Index key %s did not match any of the cached resources", index)
 		return event, nil
 	}
 
-	metaClone := metadata.Clone()
-	metaClone.Delete("kubernetes.container.name")
-	containerImage, err := metadata.GetValue("kubernetes.container.image")
+	metaClone := meta.Clone()
+	_ = metaClone.Delete("kubernetes.container.name")
+	containerImage, err := meta.GetValue("kubernetes.container.image")
 	if err == nil {
-		metaClone.Delete("kubernetes.container.image")
-		metaClone.Put("kubernetes.container.image.name", containerImage)
+		_ = metaClone.Delete("kubernetes.container.image")
+		_, _ = metaClone.Put("kubernetes.container.image.name", containerImage)
 	}
 	cmeta, err := metaClone.Clone().GetValue("kubernetes.container")
 	if err == nil {
@@ -293,11 +293,11 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		})
 	}
 
-	kubeMeta := metadata.Clone()
+	kubeMeta := meta.Clone()
 	// remove container meta from kubernetes.container.*
-	kubeMeta.Delete("kubernetes.container.id")
-	kubeMeta.Delete("kubernetes.container.runtime")
-	kubeMeta.Delete("kubernetes.container.image")
+	_ = kubeMeta.Delete("kubernetes.container.id")
+	_ = kubeMeta.Delete("kubernetes.container.runtime")
+	_ = kubeMeta.Delete("kubernetes.container.image")
 	event.Fields.DeepUpdate(kubeMeta)
 
 	return event, nil
@@ -315,8 +315,8 @@ func (k *kubernetesAnnotator) Close() error {
 }
 
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
-	metadata := k.indexers.GetMetadata(pod)
-	for _, m := range metadata {
+	meta := k.indexers.GetMetadata(pod)
+	for _, m := range meta {
 		k.log.Debugf("Created index %s for pod %s/%s", m.Index, pod.GetNamespace(), pod.GetName())
 		k.cache.set(m.Index, m.Data)
 	}
