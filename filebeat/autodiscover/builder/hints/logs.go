@@ -19,6 +19,7 @@ package hints
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"regexp"
 
 	"github.com/elastic/go-ucfg"
@@ -37,7 +38,10 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	if err != nil {
+		fmt.Println(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 const (
@@ -50,7 +54,7 @@ const (
 )
 
 // validModuleNames to sanitize user input
-var validModuleNames = regexp.MustCompile("[^a-zA-Z0-9\\_\\-]+")
+var validModuleNames = regexp.MustCompile(`[^a-zA-Z0-9\\_\\-]+`)
 
 type logHints struct {
 	config   *config
@@ -106,30 +110,33 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 	for _, h := range inputs {
 		// Clone original config, enable it if disabled
 		config, _ := conf.NewConfigFrom(l.config.DefaultConfig)
-		config.Remove("enabled", -1)
+		_, err := config.Remove("enabled", -1)
+		if err != nil {
+			continue
+		}
 
 		tempCfg := mapstr.M{}
 		mline := l.getMultiline(h)
 		if len(mline) != 0 {
-			tempCfg.Put(multiline, mline)
+			util.ShouldPut(tempCfg, multiline, mline, l.log)
 		}
 		if ilines := l.getIncludeLines(h); len(ilines) != 0 {
-			tempCfg.Put(includeLines, ilines)
+			util.ShouldPut(tempCfg, includeLines, ilines, l.log)
 		}
 		if elines := l.getExcludeLines(h); len(elines) != 0 {
-			tempCfg.Put(excludeLines, elines)
+			util.ShouldPut(tempCfg, excludeLines, elines, l.log)
 		}
 
 		if procs := l.getProcessors(h); len(procs) != 0 {
-			tempCfg.Put(processors, procs)
+			util.ShouldPut(tempCfg, processors, procs, l.log)
 		}
 
 		if pip := l.getPipeline(h); len(pip) != 0 {
-			tempCfg.Put(pipeline, pip)
+			util.ShouldPut(tempCfg, pipeline, pip, l.log)
 		}
 
 		if jsonOpts := l.getJSONOptions(h); len(jsonOpts) != 0 {
-			tempCfg.Put(json, jsonOpts)
+			util.ShouldPut(tempCfg, json, jsonOpts, l.log)
 		}
 		// Merge config template with the configs from the annotations
 		if err := config.Merge(tempCfg); err != nil {
@@ -148,9 +155,9 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				filesetConf, _ := conf.NewConfigFrom(config)
 
 				if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
-					filesetConf.SetString("stream", -1, cfg.Stream)
+					_ = filesetConf.SetString("stream", -1, cfg.Stream)
 				} else {
-					filesetConf.SetString("containers.stream", -1, cfg.Stream)
+					_ = filesetConf.SetString("containers.stream", -1, cfg.Stream)
 				}
 
 				moduleConf[fileset+".enabled"] = cfg.Enabled

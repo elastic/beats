@@ -66,7 +66,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	}, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %w due to error %+w", &kubernetes.Service{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %w due to error %w", &kubernetes.Service{}, err)
 	}
 
 	var namespaceMeta metadata.MetaGen
@@ -78,7 +78,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		Namespace:   config.Namespace,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %w due to error %w", &kubernetes.Namespace{}, err)
 	}
 
 	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)

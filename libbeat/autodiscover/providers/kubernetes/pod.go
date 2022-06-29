@@ -91,7 +91,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %w due to error %+w", &kubernetes.Pod{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %w due to error %w", &kubernetes.Pod{}, err)
 	}
 
 	options := kubernetes.WatchOptions{

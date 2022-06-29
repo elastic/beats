@@ -87,7 +87,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish
 	}, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %w due to error %+w", &kubernetes.Node{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %w due to error %w", &kubernetes.Node{}, err)
 	}
 
 	p := &node{
