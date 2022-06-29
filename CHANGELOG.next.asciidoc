@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+- Gracefully close `add_kubernetes_metadata` processor cache. {pull}32010[32010]
 
 *Auditbeat*
 
