@@ -97,8 +97,6 @@ func GetAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
 // getConfigForKeys creates a default AWS config and adds a CredentialsProvider using the provided Beats config.
 // Provided config must contain an accessKeyID, secretAccessKey and sessionToken to generate a valid CredentialsProfile
 func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
-	logger := logp.NewLogger("getConfigForKeys")
-
 	config := awssdk.NewConfig()
 	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     beatsConfig.AccessKeyID,
@@ -112,18 +110,10 @@ func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
 	config.Credentials = credentials.StaticCredentialsProvider{
 		Value: awsCredentials,
 	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if beatsConfig.RoleArn != "" {
-		logger.Debug("Using role arn and access keys for AWS credential")
-		addStaticCredentialsProviderToAwsConfig(beatsConfig, config)
-		return *config
-	}
-
 	return *config
 }
 
-// getConfigSharedCredentialProfile If accessKeyID, secretAccessKey or sessionToken is not given, iam_role is not given,
+// getConfigSharedCredentialProfile If accessKeyID, secretAccessKey or sessionToken is not given,
 // then load from default config // Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 //	with more details. If credential_profile_name is empty, then default profile is used.
 func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, error) {
@@ -145,13 +135,6 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, err
 	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), options...)
 	if err != nil {
 		return cfg, fmt.Errorf("awsConfig.LoadDefaultConfig failed with shared credential profile given: [%w]", err)
-	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if beatsConfig.RoleArn != "" {
-		logger.Debug("Using role arn and shared credential profile for AWS credential")
-		addStaticCredentialsProviderToAwsConfig(beatsConfig, &cfg)
-		return cfg, nil
 	}
 
 	logger.Debug("Using shared credential profile for AWS credential")
