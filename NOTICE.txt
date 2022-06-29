@@ -6914,11 +6914,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-concert@v0.2
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-libaudit/v2
-Version: v2.3.1-0.20220523121157-87f0a814a1c0
+Version: v2.3.1-0.20220629014624-b10731ae427c
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.1-0.20220523121157-87f0a814a1c0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.1-0.20220629014624-b10731ae427c/LICENSE.txt:
 
 
                                  Apache License
@@ -7125,21 +7125,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@
 
 
 --------------------------------------------------------------------------------
-<<<<<<< HEAD
 Dependency : github.com/elastic/go-licenser
 Version: v0.4.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.4.0/LICENSE:
-=======
-Dependency : github.com/elastic/go-libaudit/v2
-Version: v2.3.1-0.20220629014624-b10731ae427c
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.1-0.20220629014624-b10731ae427c/LICENSE.txt:
->>>>>>> b35363196d (auditbeat: update version of go-libaudit (#32141))
 
 
                                  Apache License
