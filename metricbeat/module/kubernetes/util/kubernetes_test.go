@@ -19,7 +19,6 @@ package util
 
 import (
 	"fmt"
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"testing"
 
 	k8s "k8s.io/client-go/kubernetes"
@@ -34,6 +33,8 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 )
 
 var (
