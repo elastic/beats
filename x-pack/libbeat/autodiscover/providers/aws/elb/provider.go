@@ -58,6 +58,10 @@ func AutodiscoverBuilder(
 		ProfileName:     config.AWSConfig.ProfileName,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
 		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsCfg.Region)

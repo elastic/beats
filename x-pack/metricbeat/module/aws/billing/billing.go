@@ -117,7 +117,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	var config aws.Config
 	err := m.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil
+		return err
 	}
 	monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 	// Get startDate and endDate
@@ -170,7 +170,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		return nil
 	}
 
-	if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
+	if len(listMetricsOutput) == 0 {
 		return events
 	}
 

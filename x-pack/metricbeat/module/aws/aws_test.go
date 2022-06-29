@@ -8,6 +8,8 @@
 package aws
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -23,35 +25,26 @@ type MockEC2Client struct {
 	*ec2.Client
 }
 
-var regionName = "us-west-1"
+func (m *MockEC2Client) DescribeRegions(ctx context.Context, params *ec2.DescribeRegionsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRegionsOutput, error) {
+	return &ec2.DescribeRegionsOutput{
+		Regions: []ec2types.Region{
+			{
+				RegionName: awssdk.String("us-west-1"),
+			},
+		},
+	}, nil
+}
 
-//func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
-//	httpReq, _ := http.NewRequest("", "", nil)
-//	return ec2.DescribeRegionsRequest{
-//		Request: &awssdk.Request{
-//			Data: &ec2.DescribeRegionsOutput{
-//				Regions: []ec2.Region{
-//					{
-//						RegionName: &regionName,
-//					},
-//				},
-//			},
-//			HTTPRequest: httpReq,
-//			Retryer:     awssdk.NoOpRetryer{},
-//		},
-//	}
-//}
-
-//func TestGetRegions(t *testing.T) {
-//	mockSvc := &MockEC2Client{}
-//	regionsList, err := getRegions(mockSvc)
-//	if err != nil {
-//		fmt.Println("failed getRegions: ", err)
-//		t.FailNow()
-//	}
-//	assert.Equal(t, 1, len(regionsList))
-//	assert.Equal(t, regionName, regionsList[0])
-//}
+func TestGetRegions(t *testing.T) {
+	mockSvc := &MockEC2Client{}
+	regionsList, err := getRegions(mockSvc)
+	if err != nil {
+		fmt.Println("failed getRegions: ", err)
+		t.FailNow()
+	}
+	assert.Equal(t, 1, len(regionsList))
+	assert.Equal(t, "us-west-1", regionsList[0])
+}
 
 func TestStringInSlice(t *testing.T) {
 	cases := []struct {

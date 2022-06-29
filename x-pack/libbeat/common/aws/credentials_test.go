@@ -105,10 +105,7 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			enrichedAWSConfig, err := EnrichAWSConfigWithEndpoint(c.endpoint, c.serviceName, c.region, c.awsConfig)
-			if err != nil {
-				t.Fatal(err)
-			}
+			enrichedAWSConfig := EnrichAWSConfigWithEndpoint(c.endpoint, c.serviceName, c.region, c.awsConfig)
 			assert.Equal(t, c.expectedAWSConfig, enrichedAWSConfig)
 		})
 	}

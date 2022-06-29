@@ -24,6 +24,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+type describeRegionsClient interface {
+	DescribeRegions(ctx context.Context, params *ec2.DescribeRegionsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRegionsOutput, error)
+}
+
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
 	Period     time.Duration       `config:"period" validate:"nonzero,required"`
@@ -149,7 +153,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &metricSet, nil
 }
 
-func getRegions(svc *ec2.Client) (completeRegionsList []string, err error) {
+func getRegions(svc describeRegionsClient) (completeRegionsList []string, err error) {
 	input := &ec2.DescribeRegionsInput{}
 	output, err := svc.DescribeRegions(context.TODO(), input)
 	if err != nil {
@@ -224,22 +228,19 @@ func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 	var tagKeys []string
 	var tagValues []string
 
-	switch tags.(type) {
+	switch tags := tags.(type) {
 	case []resourcegroupstaggingapitypes.Tag:
-		tagsResource := tags.([]resourcegroupstaggingapitypes.Tag)
-		for _, tag := range tagsResource {
+		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
 	case []ec2types.Tag:
-		tagsEC2 := tags.([]ec2types.Tag)
-		for _, tag := range tagsEC2 {
+		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
 	case []rdstypes.Tag:
-		tagsRDS := tags.([]rdstypes.Tag)
-		for _, tag := range tagsRDS {
+		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
