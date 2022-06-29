@@ -11,6 +11,8 @@ This repo contains packages required by autodiscover.
 
 ## Releasing updates
 
+Note: For every user-facing change remember to update the [changelog](https://github.com/elastic/elastic-agent-autodiscover/blob/main/CHANGELOG.md) properly
+
 Every time a new PR is merged and we want to make it available to external repos using this library we need to create a new tag.
 Anybody with push privileges to this repository can create a new tag locally and push it to the upstream like the following:
 
