@@ -135,7 +135,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get s3 object (elasped_time_ns=%d)",
+		return errors.Wrapf(err, "failed to get s3 object (elapsed_time_ns=%d)",
 			time.Since(start).Nanoseconds())
 	}
 	defer body.Close()
@@ -159,7 +159,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
+		return errors.Wrapf(err, "failed reading s3 object (elapsed_time_ns=%d)",
 			time.Since(start).Nanoseconds())
 	}
 
@@ -298,7 +298,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			// No more lines
 			break
 		}
@@ -353,7 +353,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	event.SetID(objectID(p.s3ObjHash, offset))
 
 	if len(p.s3Metadata) > 0 {
-		event.Fields.Put("aws.s3.metadata", p.s3Metadata)
+		_, _ = event.Fields.Put("aws.s3.metadata", p.s3Metadata)
 	}
 
 	return event

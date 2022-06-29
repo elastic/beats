@@ -66,7 +66,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 
 				// Throttle retries.
-				timed.Wait(ctx, sqsRetryDelay)
+				_ = timed.Wait(ctx, sqsRetryDelay)
 			}
 			continue
 		}

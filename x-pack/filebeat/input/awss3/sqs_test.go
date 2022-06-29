@@ -26,7 +26,9 @@ const testTimeout = 10 * time.Second
 var errFakeConnectivityFailure = errors.New("fake connectivity failure")
 
 func TestSQSReceiver(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
+
 	const maxMessages = 5
 
 	t.Run("ReceiveMessage success", func(t *testing.T) {

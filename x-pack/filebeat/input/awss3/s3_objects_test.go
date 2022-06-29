@@ -53,7 +53,8 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	t.Run("download text/plain file", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
