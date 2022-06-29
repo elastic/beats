@@ -121,5 +121,5 @@ func setupPlatformSpecificMetrics(logger *logp.Logger, processStats *process.Sta
 		monitoring.NewFunc(systemMetrics, "load", ReportSystemLoadAverage, monitoring.Report)
 	}
 
-	SetupLinuxBSDFDMetrics(logger, systemMetrics, processStats)
+	SetupLinuxBSDFDMetrics(logger, processMetrics, processStats)
 }
