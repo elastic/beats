@@ -20,6 +20,7 @@ package pod
 import (
 	"encoding/json"
 	"fmt"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -104,7 +105,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 		}
 
 		if pod.StartTime != "" {
-			util.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
+			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
 		if coresLimit > nodeCores {
@@ -116,31 +117,31 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 		}
 
 		if nodeCores > 0 {
-			util.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
+			kubernetes2.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
 		}
 
 		if coresLimit > 0 {
-			util.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit, logger)
+			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit, logger)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
-				util.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
 			}
 			if memLimit > 0 {
-				util.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/memLimit, logger)
-				util.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/memLimit, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
 			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
 			if nodeMem > 0 {
-				util.ShouldPut(podEvent, "memory.usage.node.pct", float64(workingSet)/nodeMem, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(workingSet)/nodeMem, logger)
 			}
 			if memLimit > 0 {
-				util.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/memLimit, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/memLimit, logger)
 
-				util.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
 			}
 		}
 
@@ -155,12 +156,12 @@ func ecsfields(podEvent mapstr.M, logger *logp.Logger) mapstr.M {
 
 	egressBytes, err := podEvent.GetValue("network.tx.bytes")
 	if err == nil {
-		util.ShouldPut(ecsfields, "network.egress.bytes", egressBytes, logger)
+		kubernetes2.ShouldPut(ecsfields, "network.egress.bytes", egressBytes, logger)
 	}
 
 	ingressBytes, err := podEvent.GetValue("network.rx.bytes")
 	if err == nil {
-		util.ShouldPut(ecsfields, "network.ingress.bytes", ingressBytes, logger)
+		kubernetes2.ShouldPut(ecsfields, "network.ingress.bytes", ingressBytes, logger)
 	}
 
 	return ecsfields

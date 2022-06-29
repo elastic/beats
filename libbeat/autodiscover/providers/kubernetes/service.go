@@ -22,7 +22,6 @@ package kubernetes
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"time"
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
@@ -78,7 +77,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		Namespace:   config.Namespace,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %w due to error %w", &kubernetes.Namespace{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
 	}
 
 	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
@@ -205,7 +204,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
-		util.ShouldPut(annotations, k, v, s.logger)
+		ShouldPut(annotations, k, v, s.logger)
 	}
 	kubemeta["annotations"] = annotations
 
@@ -215,7 +214,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				nsAnns := mapstr.M{}
 
 				for k, v := range namespace.GetAnnotations() {
-					util.ShouldPut(nsAnns, k, v, s.logger)
+					ShouldPut(nsAnns, k, v, s.logger)
 				}
 				kubemeta["namespace_annotations"] = nsAnns
 			}

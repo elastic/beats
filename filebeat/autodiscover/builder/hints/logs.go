@@ -19,7 +19,7 @@ package hints
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"regexp"
 
 	"github.com/elastic/go-ucfg"
@@ -40,7 +40,7 @@ import (
 func init() {
 	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
 	if err != nil {
-		fmt.Println(fmt.Errorf("could not add `hints` builder"))
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
 	}
 }
 
@@ -118,25 +118,25 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		tempCfg := mapstr.M{}
 		mline := l.getMultiline(h)
 		if len(mline) != 0 {
-			util.ShouldPut(tempCfg, multiline, mline, l.log)
+			kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
 		}
 		if ilines := l.getIncludeLines(h); len(ilines) != 0 {
-			util.ShouldPut(tempCfg, includeLines, ilines, l.log)
+			kubernetes.ShouldPut(tempCfg, includeLines, ilines, l.log)
 		}
 		if elines := l.getExcludeLines(h); len(elines) != 0 {
-			util.ShouldPut(tempCfg, excludeLines, elines, l.log)
+			kubernetes.ShouldPut(tempCfg, excludeLines, elines, l.log)
 		}
 
 		if procs := l.getProcessors(h); len(procs) != 0 {
-			util.ShouldPut(tempCfg, processors, procs, l.log)
+			kubernetes.ShouldPut(tempCfg, processors, procs, l.log)
 		}
 
 		if pip := l.getPipeline(h); len(pip) != 0 {
-			util.ShouldPut(tempCfg, pipeline, pip, l.log)
+			kubernetes.ShouldPut(tempCfg, pipeline, pip, l.log)
 		}
 
 		if jsonOpts := l.getJSONOptions(h); len(jsonOpts) != 0 {
-			util.ShouldPut(tempCfg, json, jsonOpts, l.log)
+			kubernetes.ShouldPut(tempCfg, json, jsonOpts, l.log)
 		}
 		// Merge config template with the configs from the annotations
 		if err := config.Merge(tempCfg); err != nil {

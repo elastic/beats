@@ -22,7 +22,6 @@ package kubernetes
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"time"
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
@@ -87,7 +86,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish
 	}, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %w due to error %w", &kubernetes.Node{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Node{}, err)
 	}
 
 	p := &node{
@@ -198,7 +197,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
-		util.ShouldPut(annotations, k, v, n.logger)
+		ShouldPut(annotations, k, v, n.logger)
 	}
 	kubemeta["annotations"] = annotations
 	event := bus.Event{

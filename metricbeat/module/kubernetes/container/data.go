@@ -20,6 +20,7 @@ package container
 import (
 	"encoding/json"
 	"fmt"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -115,15 +116,15 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 			}
 
 			if container.StartTime != "" {
-				util.ShouldPut(containerEvent, "start_time", container.StartTime, logger)
+				kubernetes2.ShouldPut(containerEvent, "start_time", container.StartTime, logger)
 			}
 
 			if nodeCores > 0 {
-				util.ShouldPut(containerEvent, "cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores, logger)
+				kubernetes2.ShouldPut(containerEvent, "cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores, logger)
 			}
 
 			if nodeMem > 0 {
-				util.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
+				kubernetes2.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
@@ -131,12 +132,12 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 
 			if coresLimit > 0 {
-				util.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit, logger)
+				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit, logger)
 			}
 
 			if memLimit > 0 {
-				util.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit, logger)
-				util.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit, logger)
+				kubernetes2.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit, logger)
+				kubernetes2.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit, logger)
 			}
 
 			events = append(events, containerEvent)
@@ -153,17 +154,17 @@ func ecsfields(containerEvent mapstr.M, logger *logp.Logger) mapstr.M {
 
 	name, err := containerEvent.GetValue("name")
 	if err == nil {
-		util.ShouldPut(ecsfields, "name", name, logger)
+		kubernetes2.ShouldPut(ecsfields, "name", name, logger)
 	}
 
 	cpuUsage, err := containerEvent.GetValue("cpu.usage.node.pct")
 	if err == nil {
-		util.ShouldPut(ecsfields, "cpu.usage", cpuUsage, logger)
+		kubernetes2.ShouldPut(ecsfields, "cpu.usage", cpuUsage, logger)
 	}
 
 	memUsage, err := containerEvent.GetValue("memory.usage.node.pct")
 	if err == nil {
-		util.ShouldPut(ecsfields, "memory.usage", memUsage, logger)
+		kubernetes2.ShouldPut(ecsfields, "memory.usage", memUsage, logger)
 	}
 
 	return ecsfields

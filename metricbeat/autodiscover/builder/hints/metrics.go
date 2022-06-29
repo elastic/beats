@@ -40,7 +40,7 @@ import (
 func init() {
 	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
 	if err != nil {
-		fmt.Println(fmt.Errorf("could not add `hints` builder"))
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
 	}
 }
 
