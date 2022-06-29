@@ -88,11 +88,33 @@ func resolveDeviceName(name string) (string, error) {
 		}
 		name = "default_route"
 	}
-	if name == "default_route" {
-		iface, _, err := route.Default(syscall.AF_INET)
+	if strings.HasPrefix(name, "default_route") {
+		var (
+			iface string
+			err   error
+		)
+		switch name {
+		case "default_route":
+			for _, inet := range []int{syscall.AF_INET, syscall.AF_INET6} {
+				iface, _, err = route.Default(inet)
+				if err == nil {
+					break
+				}
+				if err != route.ErrNotFound { //nolint:errorlint // route.ErrNotFound is never wrapped.
+					return "", err
+				}
+			}
+		case "default_route_ipv4":
+			iface, _, err = route.Default(syscall.AF_INET)
+		case "default_route_ipv6":
+			iface, _, err = route.Default(syscall.AF_INET6)
+		default:
+			return "", fmt.Errorf("invalid default route: %v", name)
+		}
 		if err != nil {
 			return "", fmt.Errorf("failed to get default route device: %w", err)
 		}
+
 		devices, err := ListDeviceNames(false, false)
 		if err != nil {
 			return "", fmt.Errorf("failed to get device list: %w", err)

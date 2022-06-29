@@ -122,9 +122,12 @@ packetbeat.interfaces.device: 0
 
 Specifying the index is especially useful on Windows where device names can be long.
 
-Alternatively the `default_route` device may be specified. This will set the capture
-device to be the device that is associated with the first default IPv4 route identified
-on Packetbeat start-up. The selected interface is not altered after it is chosen.
+Alternatively the `default_route`, `default_route_ipv4` or `default_route_ipv6` device
+may be specified. This will set the capture device to be the device that is associated
+with the first default route identified on Packetbeat start-up. `default_route` will
+select the first default route from either IPv4 or IPv6 with a preference for the IPv4
+route, while `default_route_ipv4` and `default_route_ipv6` will only select from the
+specified stack. The selected interface is not altered after it is chosen.
 
 [float]
 ==== `snaplen`
