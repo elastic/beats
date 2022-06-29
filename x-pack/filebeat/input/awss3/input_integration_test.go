@@ -425,14 +425,13 @@ func TestPaginatorListPrefix(t *testing.T) {
 
 	var objects []string
 	paginator := s3API.ListObjectsPaginator(tfConfig.BucketName, "log")
-	for paginator.Next(context.Background()) {
-		page := paginator.CurrentPage()
+	for paginator.HasMorePage() {
+		page, err := paginator.NextPage(context.Background())
+		assert.NoError(t, err)
 		for _, object := range page.Contents {
 			objects = append(objects, *object.Key)
 		}
 	}
-
-	assert.NoError(t, paginator.Err())
 
 	expected := []string{
 		"log.json",

@@ -73,11 +73,15 @@ type s3PagerConstant struct {
 
 var _ s3Pager = (*s3PagerConstant)(nil)
 
-func (c *s3PagerConstant) Next(ctx context.Context) bool {
+func (c *s3PagerConstant) HasMorePages() bool {
 	return c.currentIndex < len(c.objects)
 }
 
-func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsV2Output {
+func (c *s3PagerConstant) NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+	if !c.HasMorePages() {
+		return nil, errors.New("no more pages")
+	}
+
 	ret := &s3.ListObjectsV2Output{}
 	pageSize := 1000
 	if len(c.objects) < c.currentIndex+pageSize {
@@ -87,14 +91,7 @@ func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsV2Output {
 	ret.Contents = c.objects[c.currentIndex : c.currentIndex+pageSize]
 	c.currentIndex = c.currentIndex + pageSize
 
-	return ret
-}
-
-func (c *s3PagerConstant) Err() error {
-	if c.currentIndex >= len(c.objects) {
-		c.currentIndex = 0
-	}
-	return nil
+	return ret, nil
 }
 
 func newS3PagerConstant(listPrefix string) *s3PagerConstant {
@@ -268,13 +265,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		})
 
 		defer close(client.Channel)
-		conf := makeBenchmarkConfig(t)
-
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		store, err := storeReg.Get("test")
-		if err != nil {
-			t.Fatalf("Failed to access store: %v", err)
-		}
+		config := makeBenchmarkConfig(t)
 
 		b.ResetTimer()
 		start := time.Now()
@@ -297,13 +288,20 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				listPrefix := fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
 				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				store, err := storeReg.Get("test")
+				if err != nil {
+					errChan <- fmt.Errorf("failed to access store: %w", err)
+					return
+				}
+
 				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
 				if err != nil {
 					errChan <- err
 					return
 				}
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, config.FileSelectors)
 				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {

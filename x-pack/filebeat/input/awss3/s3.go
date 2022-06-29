@@ -22,6 +22,8 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
+const maxCircuitBreaker = 5
+
 type commitWriteState struct {
 	time.Time
 }
@@ -151,8 +153,24 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 
 	bucketName := getBucketNameFromARN(p.bucket)
 
+	circuitBreaker := 0
 	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
 	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			if !paginator.HasMorePages() {
+				break
+			}
+
+			p.log.Warnw("Error when paginating listing.", "error", err)
+			circuitBreaker++
+			if circuitBreaker >= maxCircuitBreaker {
+				p.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
+				break
+			}
+			continue
+		}
+
 		listingID, err := uuid.NewV4()
 		if err != nil {
 			p.log.Warnw("Error generating UUID for listing page.", "error", err)
@@ -164,11 +182,6 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 		lock := new(sync.Mutex)
 		lock.Lock()
 		p.workersListingMap.Store(listingID.String(), lock)
-
-		page, err := paginator.NextPage(ctx)
-		if err != nil {
-			p.log.Warnw("Error when paginating listing.", "error", err)
-		}
 
 		totProcessableObjects := 0
 		totListedObjects := len(page.Contents)

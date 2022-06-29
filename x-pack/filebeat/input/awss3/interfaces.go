@@ -69,13 +69,12 @@ type s3Getter interface {
 }
 
 type s3Lister interface {
-	ListObjectsPaginator(bucket, prefix string) s3.ListObjectsV2Paginator
+	ListObjectsPaginator(bucket, prefix string) s3Pager
 }
 
 type s3Pager interface {
-	Next(ctx context.Context) bool
-	CurrentPage() *s3.ListObjectsV2Output
-	Err() error
+	HasMorePages() bool // NextPage retrieves the next ListObjectsV2 page.
+	NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error)
 }
 
 type s3ObjectHandlerFactory interface {
@@ -202,11 +201,10 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 }
 
 func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
-	req := a.client.ListObjectsRequest(&s3.ListObjectsInput{
+	pager := s3.NewListObjectsV2Paginator(a.client, &s3.ListObjectsV2Input{
 		Bucket: awssdk.String(bucket),
 		Prefix: awssdk.String(prefix),
 	})
 
-	pager := s3.NewListObjectsPaginator(req)
-	return &pager
+	return pager
 }

@@ -291,12 +291,12 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Obj
 		numPages++
 	}
 
-	mockS3Pager.EXPECT().Next(gomock.Any()).Times(numPages + 1).DoAndReturn(func(_ context.Context) interface{} {
+	mockS3Pager.EXPECT().HasMorePages().Times(numPages + 1).DoAndReturn(func() bool {
 		currentPage++
 		next := currentPage*pageSize < len(s3Objects)
 		return next
 	})
-	mockS3Pager.EXPECT().CurrentPage().AnyTimes().DoAndReturn(func() *s3.ListObjectsV2Output {
+	mockS3Pager.EXPECT().NextPage(gomock.Any()).AnyTimes().DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
 		startIdx := currentPage * pageSize
 		endIdx := currentPage + 1*pageSize
 		if endIdx > len(s3Objects) {
@@ -304,9 +304,8 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Obj
 		}
 		return &s3.ListObjectsV2Output{
 			Contents: s3Objects[startIdx:endIdx],
-		}
+		}, nil
 	})
-	mockS3Pager.EXPECT().Err().Return(nil)
 
 	return mockS3Pager
 }
