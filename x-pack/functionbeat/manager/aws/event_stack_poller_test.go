@@ -22,7 +22,6 @@ import (
 type mockEventHandler struct {
 	skipEvents int32
 	skipCount  atomic.Int32
-	count      atomic.Int32
 	events     chan types.StackEvent
 }
 

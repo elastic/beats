@@ -71,21 +71,21 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	_, err = c.awsCfg.Credentials.Retrieve(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
 
 	svcCF := cf.NewFromConfig(c.awsCfg)
 
 	executer := executor.NewExecutor(c.log)
-	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
-	executer.Add(newOpUploadToBucket(
+	_ = executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
+	_ = executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
 		c.bucket(),
 		templateData.codeKey,
 		templateData.zip.content,
 	))
-	executer.Add(newOpUploadToBucket(
+	_ = executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
 		c.bucket(),
@@ -93,14 +93,14 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		templateData.json,
 	))
 	if update {
-		executer.Add(newOpUpdateCloudFormation(
+		_ = executer.Add(newOpUpdateCloudFormation(
 			c.log,
 			svcCF,
 			templateData.url,
 			c.stackName(name),
 		))
 	} else {
-		executer.Add(newOpCreateCloudFormation(
+		_ = executer.Add(newOpCreateCloudFormation(
 			c.log,
 			svcCF,
 			templateData.url,
@@ -108,8 +108,8 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		))
 	}
 
-	executer.Add(newOpWaitCloudFormation(c.log, cf.NewFromConfig(c.awsCfg)))
-	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), templateData.codeKey))
+	_ = executer.Add(newOpWaitCloudFormation(c.log, cf.NewFromConfig(c.awsCfg)))
+	_ = executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), templateData.codeKey))
 
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
@@ -153,13 +153,13 @@ func (c *CLIManager) Remove(name string) error {
 
 	_, err := c.awsCfg.Credentials.Retrieve(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
 
 	svc := cf.NewFromConfig(c.awsCfg)
 	executer := executor.NewExecutor(c.log)
-	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
-	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
+	_ = executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
+	_ = executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
 
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
@@ -197,7 +197,7 @@ func (c *CLIManager) Package(outputPattern string) error {
 		return err
 	}
 
-	fmt.Fprintf(os.Stderr, "Generated package for provider aws at: %s\n", output)
+	_, _ = fmt.Fprintf(os.Stderr, "Generated package for provider aws at: %s\n", output)
 	return nil
 }
 
@@ -217,7 +217,7 @@ func NewCLI(
 	}
 	awsCfg, err := awscommon.InitializeAWSConfig(config.Credentials)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
+		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}
 	if config.Region != "" {
 		awsCfg.Region = config.Region

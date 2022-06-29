@@ -25,8 +25,8 @@ type eventStackHandler interface {
 }
 
 // eventStackPoller takes a stack id and will report any events coming from it.
-// The event stream for a stack will return all the events for a specific existance of a stack,
-// its important to be able to skip some events and only report the meaningful events.
+// The event stream for a stack will return all the events for a specific existence of a stack,
+// it's important to be able to skip some events and only report the meaningful events.
 type eventStackPoller struct {
 	log           *logp.Logger
 	svc           cloudformation.DescribeStackEventsAPIClient

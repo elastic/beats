@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -40,7 +42,8 @@ func (o *opEnsureBucket) Execute(_ executor.Context) error {
 		return nil
 	}
 
-	if aerr, ok := err.(awserr.Error); ok {
+	var aerr awserr.Error
+	if errors.As(err, &aerr) {
 		if aerr.Code() == notFound {
 			// bucket do not exist let's create it.
 			input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName)}

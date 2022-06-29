@@ -34,7 +34,7 @@ func (i *ec2Instance) toMap() mapstr.M {
 	}
 
 	for _, tag := range i.ec2Instance.Tags {
-		m.Put("tags."+awsauto.SafeString(tag.Key), awsauto.SafeString(tag.Value))
+		_, _ = m.Put("tags."+awsauto.SafeString(tag.Key), awsauto.SafeString(tag.Value))
 	}
 	return m
 }
