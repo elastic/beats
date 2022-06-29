@@ -43,6 +43,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Fix handling of audit status messages for modern kernels with reduced audit message feature support. {issue}31616[31616] {pull}32141[32141]
+
 *Filebeat*
 
 - Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]xs
