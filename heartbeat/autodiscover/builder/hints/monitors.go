@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 

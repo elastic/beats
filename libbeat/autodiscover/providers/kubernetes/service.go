@@ -22,6 +22,7 @@ package kubernetes
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"time"
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
@@ -36,7 +37,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 type service struct {
@@ -66,7 +66,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	}, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Service{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %w due to error %+w", &kubernetes.Service{}, err)
 	}
 
 	var namespaceMeta metadata.MetaGen
@@ -205,7 +205,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		util.ShouldPut(annotations, k, v, s.logger)
 	}
 	kubemeta["annotations"] = annotations
 
@@ -215,7 +215,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				nsAnns := mapstr.M{}
 
 				for k, v := range namespace.GetAnnotations() {
-					safemapstr.Put(nsAnns, k, v)
+					util.ShouldPut(nsAnns, k, v, s.logger)
 				}
 				kubemeta["namespace_annotations"] = nsAnns
 			}

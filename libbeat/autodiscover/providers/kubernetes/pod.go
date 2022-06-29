@@ -22,6 +22,7 @@ package kubernetes
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"sync"
 	"time"
 
@@ -90,7 +91,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %w due to error %+w", &kubernetes.Pod{}, err)
 	}
 
 	options := kubernetes.WatchOptions{
@@ -359,7 +360,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 	var events []bus.Event
 	portsMap := mapstr.M{}
 
-	meta.Put("container", cmeta)
+	util.ShouldPut(meta, "container", cmeta, p.logger)
 
 	for _, port := range ports {
 		event := bus.Event{
