@@ -154,7 +154,7 @@ func (s *states) Update(newState state, listingID string) {
 	s.Lock()
 	defer s.Unlock()
 
-	id := newState.Bucket + newState.Key
+	id := newState.ID
 	index := s.findPrevious(id)
 
 	if index >= 0 {
