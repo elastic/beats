@@ -375,11 +375,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			dimensions:         cloudwatchDimensions,
 		}
 
-		if _, ok := namespaceDetailTotal[config.Namespace]; ok {
-			namespaceDetailTotal[config.Namespace] = append(namespaceDetailTotal[config.Namespace], configPerNamespace)
-		} else {
-			namespaceDetailTotal[config.Namespace] = []namespaceDetail{configPerNamespace}
-		}
+		namespaceDetailTotal[config.Namespace] = append(namespaceDetailTotal[config.Namespace], configPerNamespace)
 	}
 
 	listMetricDetailTotal.resourceTypeFilters = resourceTypesWithTags

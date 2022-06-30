@@ -310,7 +310,7 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 	event := aws.InitEvent("", m.AccountName, m.AccountID, time.Now())
 
 	// add group definition
-	event.MetricSetFields.Put("group_definition", mapstr.M{
+	_, _ = event.MetricSetFields.Put("group_definition", mapstr.M{
 		"key":  *groupDefinition.Key,
 		"type": groupDefinition.Type,
 	})
@@ -329,9 +329,9 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 			"unit":   &cost.Unit,
 		}
 
-		event.MetricSetFields.Put(metricName, value)
-		event.MetricSetFields.Put("start_date", startDate)
-		event.MetricSetFields.Put("end_date", endDate)
+		_, _ = event.MetricSetFields.Put(metricName, value)
+		_, _ = event.MetricSetFields.Put("start_date", startDate)
+		_, _ = event.MetricSetFields.Put("end_date", endDate)
 	}
 	return event
 }
@@ -349,7 +349,7 @@ func constructMetricQueries(listMetricsOutput []types.Metric, period time.Durati
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric types.Metric, index int, period time.Duration) (metricDataQuery types.MetricDataQuery) {
+func createMetricDataQuery(metric types.Metric, index int, period time.Duration) types.MetricDataQuery {
 	statistic := "Maximum"
 	periodInSeconds := int32(period.Seconds())
 	id := metricsetName + strconv.Itoa(index)
@@ -361,7 +361,7 @@ func createMetricDataQuery(metric types.Metric, index int, period time.Duration)
 		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
 	}
 
-	metricDataQuery = types.MetricDataQuery{
+	return types.MetricDataQuery{
 		Id: &id,
 		MetricStat: &types.MetricStat{
 			Period: &periodInSeconds,
@@ -370,18 +370,18 @@ func createMetricDataQuery(metric types.Metric, index int, period time.Duration)
 		},
 		Label: &label,
 	}
-	return
 }
 
-func getStartDateEndDate(period time.Duration) (startDate string, endDate string) {
+func getStartDateEndDate(period time.Duration) (string, string) {
 	currentTime := time.Now()
 	startTime := currentTime.Add(period * -1)
-	startDate = startTime.Format(dateLayout)
-	endDate = currentTime.Format(dateLayout)
-	return
+	startDate := startTime.Format(dateLayout)
+	endDate := currentTime.Format(dateLayout)
+	return startDate, endDate
 }
 
-func parseGroupKey(groupKey string) (tagKey string, tagValue string) {
+func parseGroupKey(groupKey string) (string, string) {
+	tagKey, tagValue := "", ""
 	keys := strings.Split(groupKey, "$")
 	if len(keys) == 2 {
 		tagKey = keys[0]
@@ -396,7 +396,8 @@ func parseGroupKey(groupKey string) (tagKey string, tagValue string) {
 		tagKey = keys[0]
 		tagValue = ""
 	}
-	return
+
+	return tagKey, tagValue
 }
 
 type groupBy struct {

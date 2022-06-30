@@ -153,17 +153,18 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &metricSet, nil
 }
 
-func getRegions(svc describeRegionsClient) (completeRegionsList []string, err error) {
+func getRegions(svc describeRegionsClient) ([]string, error) {
+	completeRegionsList := make([]string, 0)
 	input := &ec2.DescribeRegionsInput{}
 	output, err := svc.DescribeRegions(context.TODO(), input)
 	if err != nil {
 		err = fmt.Errorf("failed DescribeRegions: %w", err)
-		return
+		return completeRegionsList, err
 	}
 	for _, region := range output.Regions {
 		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
-	return
+	return completeRegionsList, err
 }
 
 func getAccountName(svc *iam.Client, base mb.BaseMetricSet, metricSet MetricSet) string {

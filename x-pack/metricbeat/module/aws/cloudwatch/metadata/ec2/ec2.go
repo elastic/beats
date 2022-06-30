@@ -12,7 +12,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -41,57 +40,57 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fi
 
 		for _, tag := range output.Tags {
 			if *tag.Key == "Name" {
-				events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
-				events[instanceID].RootFields.Put("host.name", *tag.Value)
+				_, _ = events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
+				_, _ = events[instanceID].RootFields.Put("host.name", *tag.Value)
 			}
 		}
 
-		events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
+		_, _ = events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 
 		if output.InstanceType != "" {
-			events[instanceID].RootFields.Put("cloud.machine.type", output.InstanceType)
+			_, _ = events[instanceID].RootFields.Put("cloud.machine.type", output.InstanceType)
 		} else {
 			logp.Error(fmt.Errorf("InstanceType is empty"))
 		}
 
 		placement := output.Placement
 		if placement != nil {
-			events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
+			_, _ = events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
 		}
 
 		if output.State.Name != "" {
-			events[instanceID].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
+			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
 		} else {
 			logp.Error(fmt.Errorf("instance.State.Name is empty"))
 		}
 
 		if output.Monitoring.State != "" {
 			monitoringStates[instanceID] = string(output.Monitoring.State)
-			events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
+			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
 		} else {
 			logp.Error(fmt.Errorf("Monitoring.State is empty"))
 		}
 
 		cpuOptions := output.CpuOptions
 		if cpuOptions != nil {
-			events[instanceID].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
-			events[instanceID].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
+			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
+			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
 		}
 
 		publicIP := output.PublicIpAddress
 		if publicIP != nil {
-			events[instanceID].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
+			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
 		}
 
 		privateIP := output.PrivateIpAddress
 		if privateIP != nil {
-			events[instanceID].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
+			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
 		}
 
-		events[instanceID].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
-		events[instanceID].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
-		events[instanceID].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
-		events[instanceID].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
+		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
+		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
+		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
+		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
 
 		// add host cpu/network/disk fields and host.id
 		addHostFields(events[instanceID], instanceID)
@@ -111,12 +110,13 @@ func getInstancesPerRegion(svc *ec2.Client) (map[string]*ec2types.Instance, erro
 		describeInstanceInput := &ec2.DescribeInstancesInput{}
 		output, err := svc.DescribeInstances(context.Background(), describeInstanceInput)
 		if err != nil {
-			err = errors.Wrap(err, "Error DescribeInstances")
+			err = fmt.Errorf("error DescribeInstances: %w", err)
 			return nil, err
 		}
 
 		for _, reservation := range output.Reservations {
-			for _, instance := range reservation.Instances {
+			for i, _ := range reservation.Instances {
+				instance := reservation.Instances[i]
 				instancesOutputs[*instance.InstanceId] = &instance
 			}
 		}
@@ -125,14 +125,14 @@ func getInstancesPerRegion(svc *ec2.Client) (map[string]*ec2types.Instance, erro
 }
 
 func addHostFields(event mb.Event, instanceID string) {
-	event.RootFields.Put("host.id", instanceID)
+	_, _ = event.RootFields.Put("host.id", instanceID)
 
 	// If there is no instance name, use instance ID as the host.name
 	hostName, err := event.RootFields.GetValue("host.name")
 	if err == nil && hostName != nil {
-		event.RootFields.Put("host.name", hostName)
+		_, _ = event.RootFields.Put("host.name", hostName)
 	} else {
-		event.RootFields.Put("host.name", instanceID)
+		_, _ = event.RootFields.Put("host.name", instanceID)
 	}
 
 	hostFieldTable := map[string]string{
@@ -155,7 +155,7 @@ func addHostFields(event mb.Event, instanceID string) {
 			if ec2MetricName == "cpu.total.pct" {
 				value = value / 100
 			}
-			event.RootFields.Put(hostMetricName, value)
+			_, _ = event.RootFields.Put(hostMetricName, value)
 		}
 	}
 }
@@ -180,7 +180,7 @@ func calculateRate(event mb.Event, monitoringState string) {
 		metricValue, err := event.RootFields.GetValue(metricName)
 		if err == nil && metricValue != nil {
 			rateValue := metricValue.(float64) / period
-			event.RootFields.Put(strings.Replace(metricName, ".sum", ".rate", -1), rateValue)
+			_, _ = event.RootFields.Put(strings.Replace(metricName, ".sum", ".rate", -1), rateValue)
 		}
 	}
 }
