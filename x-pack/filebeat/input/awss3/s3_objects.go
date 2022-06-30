@@ -178,8 +178,10 @@ func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]
 	if getObjectOutput == nil {
 		return "", nil, nil, fmt.Errorf("empty response from s3 get object: %w", err)
 	}
-	// TODO: change this to use new sdk version
-	// p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
+	s3RequestURL := getObjectOutput.ResultMetadata.Get(s3RequestURLMetadataKey)
+	if s3RequestURLAsString, ok := s3RequestURL.(string); ok {
+		p.s3RequestURL = s3RequestURLAsString
+	}
 
 	meta := s3Metadata(getObjectOutput, p.readerConfig.IncludeS3Metadata...)
 	if getObjectOutput.ContentType == nil {

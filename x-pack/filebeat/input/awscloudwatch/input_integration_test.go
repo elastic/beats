@@ -174,7 +174,7 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 	// Terraform is used to set up S3 and SQS and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}

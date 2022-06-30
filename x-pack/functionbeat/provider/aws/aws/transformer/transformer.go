@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-sdk-go/service/kinesis"
-	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
+	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
+	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -88,14 +88,14 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 	var events []beat.Event
 	for _, record := range request.Records {
-		kr := &kinesis.Record{
+		kr := types.Record{
 			ApproximateArrivalTimestamp: &record.Kinesis.ApproximateArrivalTimestamp.Time,
 			Data:                        record.Kinesis.Data,
-			EncryptionType:              &record.Kinesis.EncryptionType,
+			EncryptionType:              types.EncryptionType(record.Kinesis.EncryptionType),
 			PartitionKey:                &record.Kinesis.PartitionKey,
 			SequenceNumber:              &record.Kinesis.SequenceNumber,
 		}
-		deaggRecords, err := deaggregator.DeaggregateRecords([]*kinesis.Record{kr})
+		deaggRecords, err := deaggregator.DeaggregateRecords([]types.Record{kr})
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 					"kinesis_partition_key":   *deaggRecord.PartitionKey,
 					"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
 					"kinesis_sequence_number": *deaggRecord.SequenceNumber,
-					"kinesis_encryption_type": *deaggRecord.EncryptionType,
+					"kinesis_encryption_type": deaggRecord.EncryptionType,
 				},
 			})
 		}

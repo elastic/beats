@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/smithy-go"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -41,9 +41,9 @@ func (o *opEnsureBucket) Execute(_ executor.Context) error {
 		return nil
 	}
 
-	var aerr awserr.Error
-	if errors.As(err, &aerr) {
-		if aerr.Code() == notFound {
+	var apiError smithy.APIError
+	if errors.As(err, &apiError) {
+		if apiError.ErrorCode() == notFound {
 			// bucket do not exist let's create it.
 			input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName)}
 			resp, err := o.svc.CreateBucket(context.TODO(), input)

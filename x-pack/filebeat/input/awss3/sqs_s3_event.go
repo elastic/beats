@@ -15,10 +15,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/smithy-go"
+
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -187,9 +188,9 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
-				var awsErr awserr.Error
-				if errors.As(err, &awsErr) {
-					switch awsErr.Code() {
+				var apiError smithy.APIError
+				if errors.As(err, &apiError) {
+					switch apiError.ErrorCode() {
 					case sqsReceiptHandleIsInvalidErrCode, sqsInvalidParameterValueErrorCode:
 						log.Warnw("Failed to extend message visibility timeout "+
 							"because SQS receipt handle is no longer valid. "+
@@ -197,8 +198,6 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 						return
 					}
 				}
-
-				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
 	}

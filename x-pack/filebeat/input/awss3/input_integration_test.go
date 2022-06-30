@@ -21,9 +21,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	s3manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -309,13 +309,13 @@ func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{
 func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string) {
 	t.Helper()
 
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 	cfg.Region = region
-
-	uploader := s3manager.NewUploader(cfg)
+	s3Client := s3.NewFromConfig(cfg)
+	uploader := s3manager.NewUploader(s3Client)
 
 	for _, filename := range filenames {
 		data, err := ioutil.ReadFile(filename)
@@ -324,7 +324,7 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 		}
 
 		// Upload the file to S3.
-		result, err := uploader.Upload(&s3manager.UploadInput{
+		result, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 			Bucket: aws.String(bucket),
 			Key:    aws.String(filepath.Base(filename)),
 			Body:   bytes.NewReader(data),
@@ -337,14 +337,14 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 }
 
 func drainSQS(t *testing.T, region string, queueURL string) {
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 	cfg.Region = region
 
 	sqs := &awsSQSAPI{
-		client:            sqs.New(cfg),
+		client:            sqs.NewFromConfig(cfg),
 		queueURL:          queueURL,
 		apiTimeout:        1 * time.Minute,
 		visibilityTimeout: 30 * time.Second,
@@ -383,12 +383,12 @@ func TestGetRegionForBucketARN(t *testing.T) {
 	// Terraform is used to set up S3 and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
+	s3Client := s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
 
 	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
@@ -411,13 +411,13 @@ func TestPaginatorListPrefix(t *testing.T) {
 		"testdata/log.txt", // Skipped (no match).
 	)
 
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(), nil)
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	cfg.Region = tfConfig.AWSRegion
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
+	s3Client := s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
 
 	s3API := &awsS3API{
 		client: s3Client,
@@ -425,7 +425,7 @@ func TestPaginatorListPrefix(t *testing.T) {
 
 	var objects []string
 	paginator := s3API.ListObjectsPaginator(tfConfig.BucketName, "log")
-	for paginator.HasMorePage() {
+	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.Background())
 		assert.NoError(t, err)
 		for _, object := range page.Contents {

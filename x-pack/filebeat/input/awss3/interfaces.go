@@ -8,7 +8,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
+
+	smithyhttp "github.com/aws/smithy-go/transport/http"
+
+	"github.com/aws/smithy-go/middleware"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
@@ -28,6 +33,8 @@ import (
 // ------
 // SQS interfaces
 // ------
+
+const s3RequestURLMetadataKey = `x-beat-s3-request-url`
 
 type sqsAPI interface {
 	sqsReceiver
@@ -191,7 +198,27 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 	getObjectOutput, err := a.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: awssdk.String(bucket),
 		Key:    awssdk.String(key),
-	})
+	}, s3.WithAPIOptions(
+		func(stack *middleware.Stack) error {
+			// adds AFTER operation finalize middleware
+			return stack.Finalize.Add(middleware.FinalizeMiddlewareFunc("add s3 request url to metadata",
+				func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (
+					out middleware.FinalizeOutput, metadata middleware.Metadata, err error,
+				) {
+					out, metadata, err = next.HandleFinalize(ctx, in)
+					requestURL, err := url.Parse(in.Request.(*smithyhttp.Request).URL.String())
+					if err != nil {
+						return out, metadata, err
+					}
+
+					requestURL.RawQuery = ""
+
+					metadata.Set(s3RequestURLMetadataKey, requestURL.String())
+
+					return out, metadata, err
+				},
+			), middleware.After)
+		}))
 
 	if err != nil {
 		return nil, fmt.Errorf("s3 GetObject failed: %w", err)
