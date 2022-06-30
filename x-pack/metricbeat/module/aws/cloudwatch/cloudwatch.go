@@ -462,8 +462,8 @@ func stripNamespace(namespace string) string {
 
 func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.Event {
 	namespace := labels[namespaceIdx]
-	event.RootFields.Put(generateFieldName(namespace, labels), metricValue)
-	event.RootFields.Put("aws.cloudwatch.namespace", namespace)
+	_, _ = event.RootFields.Put(generateFieldName(namespace, labels), metricValue)
+	_, _ = event.RootFields.Put("aws.cloudwatch.namespace", namespace)
 	if len(labels) == 3 {
 		return event
 	}
@@ -471,7 +471,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	dimNames := strings.Split(labels[identifierNameIdx], ",")
 	dimValues := strings.Split(labels[identifierValueIdx], ",")
 	for i := 0; i < len(dimNames); i++ {
-		event.RootFields.Put("aws.dimensions."+dimNames[i], dimValues[i])
+		_, _ = event.RootFields.Put("aws.dimensions."+dimNames[i], dimValues[i])
 	}
 	return event
 }
@@ -649,7 +649,7 @@ func insertTags(events map[string]mb.Event, identifier string, resourceTagMap ma
 			// By default, replace dot "." using underscore "_" for tag keys.
 			// Note: tag values are not dedotted.
 			for _, tag := range tags {
-				events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
+				_, _ = events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
 			}
 			continue
 		}

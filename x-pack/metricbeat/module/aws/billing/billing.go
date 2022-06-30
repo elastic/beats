@@ -381,7 +381,7 @@ func getStartDateEndDate(period time.Duration) (string, string) {
 }
 
 func parseGroupKey(groupKey string) (string, string) {
-	tagKey, tagValue := "", ""
+	var tagKey, tagValue string
 	keys := strings.Split(groupKey, "$")
 	if len(keys) == 2 {
 		tagKey = keys[0]
