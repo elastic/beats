@@ -65,7 +65,8 @@ import (
 // Following contains basic call structure for each call after normal httpjson
 // call.
 type chainConfig struct {
-	Step stepConfig `config:"step" validate:"required"`
+	Step  *stepConfig  `config:"step,omitempty"`
+	While *whileConfig `config:"while,omitempty"`
 }
 
 // stepConfig will contain basic properties like, request.url,
@@ -77,7 +78,12 @@ type stepConfig struct {
 	Response responseChainConfig `config:"response,omitempty"`
 	Replace  string              `config:"replace,omitempty"`
 }
-
+type whileConfig struct {
+	Request  requestChainConfig  `config:"request"`
+	Response responseChainConfig `config:"response,omitempty"`
+	Replace  string              `config:"replace,omitempty"`
+	Till     *valueTpl           `config:"till" validate:"required"`
+}
 type requestChainConfig struct {
 	URL        *urlConfig       `config:"url" validate:"required"`
 	Method     string           `config:"method" validate:"required"`

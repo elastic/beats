@@ -101,6 +101,7 @@ type requestFactory struct {
 	log        *logp.Logger
 	encoder    encoderFunc
 	replace    string
+	till       *valueTpl
 }
 
 func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
@@ -122,16 +123,31 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	}
 	rfs = append(rfs, rf)
 	for _, ch := range config.Chain {
+		var rf *requestFactory
 		// chain calls requestFactory object
-		ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
-		rf := &requestFactory{
-			url:        *ch.Step.Request.URL.URL,
-			method:     ch.Step.Request.Method,
-			body:       ch.Step.Request.Body,
-			transforms: ts,
-			log:        log,
-			encoder:    registeredEncoders[config.Request.EncodeAs],
-			replace:    ch.Step.Replace,
+		if ch.Step != nil {
+			ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
+			rf = &requestFactory{
+				url:        *ch.Step.Request.URL.URL,
+				method:     ch.Step.Request.Method,
+				body:       ch.Step.Request.Body,
+				transforms: ts,
+				log:        log,
+				encoder:    registeredEncoders[config.Request.EncodeAs],
+				replace:    ch.Step.Replace,
+			}
+		} else if ch.While != nil {
+			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
+			rf = &requestFactory{
+				url:        *ch.While.Request.URL.URL,
+				method:     ch.While.Request.Method,
+				body:       ch.While.Request.Body,
+				transforms: ts,
+				log:        log,
+				encoder:    registeredEncoders[config.Request.EncodeAs],
+				replace:    ch.While.Replace,
+				till:       ch.While.Till,
+			}
 		}
 		rfs = append(rfs, rf)
 	}
@@ -252,6 +268,25 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				n = 0
 				continue
 			}
+			// Debug block
+			if rf.till != nil {
+				tr := transformable{}
+				paramCtx := &transformContext{
+					firstEvent: &mapstr.M{},
+					lastEvent:  &mapstr.M{},
+					lastResponse: &response{body: mapstr.M{"status": mapstr.M{
+						"one": "completed",
+					}}},
+				}
+
+				val, err := rf.till.Execute(paramCtx, tr, nil, r.log)
+				if err != nil {
+					fmt.Printf("\nERROR = %v\n", err)
+				} else {
+					fmt.Println("VALUE = ", val)
+				}
+			}
+			// debug block
 			urlCopy = rf.url
 			urlString = rf.url.String()
 			// perform request over collected ids
