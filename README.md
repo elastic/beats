@@ -33,3 +33,6 @@ To https://github.com/elastic/elastic-agent-autodiscover.git
 ```
 
 Then the tag should be available at https://github.com/elastic/elastic-agent-autodiscover/tags and anyone can use the the new version of the library in other projects. For example in order to use `v0.2.1` in Beats projects one would need a `go get github.com/elastic/elastic-agent-autodiscover@v0.2.1`.
+
+
+After the tag is available a Release can be created using this tag and the proper content from the changelog.
