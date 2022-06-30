@@ -131,21 +131,21 @@ ENV PATH="$NODE_PATH/node/bin:$PATH"
 # playwright install-deps is kept up to date with additional packages chromium needs
 # beyond the base packages listed above
 RUN cd /usr/share/heartbeat/.node \
-&& NODE_DOWNLOAD_URL="" \
-&& case "$(arch)" in \
-    x86_64) \
-        NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
-        ;; \
-    aarch64) \
-        NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
-        ;; \
-    *) \
-        echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
-        ;; \
-    esac \
-&& mkdir -p node \
-&& curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
-&& chmod ug+rwX -R $NODE_PATH
+    && NODE_DOWNLOAD_URL="" \
+    && case "$(arch)" in \
+        x86_64) \
+            NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
+            ;; \
+        aarch64) \
+            NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
+            ;; \
+        *) \
+            echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+            ;; \
+        esac \
+    && mkdir -p node \
+    && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
+    && chmod ug+rwX -R $NODE_PATH
 
 # Install synthetics as a regular user, installing npm deps as root odesn't work
 RUN chown -R {{ .user }} $NODE_PATH
@@ -155,7 +155,6 @@ RUN npm i -g --loglevel verbose -f @elastic/synthetics || sh -c 'tail -n +1 /roo
 RUN chmod ug+rwX -R $NODE_PATH 
 USER root
 
-RUN  
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
 # We don't use npx playwright install-deps because that could pull a newer version
 # Install additional fonts as well
