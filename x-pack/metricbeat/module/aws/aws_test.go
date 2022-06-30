@@ -9,7 +9,6 @@ package aws
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -39,8 +38,7 @@ func TestGetRegions(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	regionsList, err := getRegions(mockSvc)
 	if err != nil {
-		fmt.Println("failed getRegions: ", err)
-		t.FailNow()
+		t.Fatalf("failed getRegions: %s", err)
 	}
 	assert.Equal(t, 1, len(regionsList))
 	assert.Equal(t, "us-west-1", regionsList[0])

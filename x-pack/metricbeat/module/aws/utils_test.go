@@ -6,7 +6,6 @@ package aws
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -175,8 +174,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 
 	getMetricDataOutput, err := mockSvc.GetMetricData(context.TODO(), getMetricDataInput)
 	if err != nil {
-		fmt.Println("failed getMetricDataPerRegion: ", err)
-		t.FailNow()
+		t.Fatalf("failed getMetricDataPerRegion: %s", err)
 	}
 
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
@@ -215,8 +213,7 @@ func TestGetMetricDataResults(t *testing.T) {
 	}
 	getMetricDataResults, err := GetMetricDataResults(metricDataQueries, mockSvc, startTime, endTime)
 	if err != nil {
-		fmt.Println("failed getMetricDataPerRegion: ", err)
-		t.FailNow()
+		t.Fatalf("failed getMetricDataPerRegion: %s", err)
 	}
 
 	assert.Equal(t, 4, len(getMetricDataResults))
