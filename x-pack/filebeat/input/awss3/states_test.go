@@ -123,7 +123,7 @@ func TestStatesDelete(t *testing.T) {
 				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
-			deleteID: "bucketkey",
+			deleteID: "bucketkeyetag" + lastModified.String(),
 			expected: []state{},
 		},
 		"delete first": {
@@ -134,7 +134,7 @@ func TestStatesDelete(t *testing.T) {
 				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
 				return states
 			},
-			deleteID: "bucketkey1",
+			deleteID: "bucketkey1etag1" + lastModified.String(),
 			expected: []state{
 				{
 					ID:           "bucketkey3etag3" + lastModified.String(),
@@ -162,7 +162,7 @@ func TestStatesDelete(t *testing.T) {
 				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
 				return states
 			},
-			deleteID: "bucketkey3",
+			deleteID: "bucketkey3etag3" + lastModified.String(),
 			expected: []state{
 				{
 					ID:           "bucketkey1etag1" + lastModified.String(),
@@ -190,7 +190,7 @@ func TestStatesDelete(t *testing.T) {
 				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
 				return states
 			},
-			deleteID: "bucketkey2",
+			deleteID: "bucketkey2etag2" + lastModified.String(),
 			expected: []state{
 				{
 					ID:           "bucketkey1etag1" + lastModified.String(),
