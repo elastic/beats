@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
 - Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
+- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 
 *Heartbeat*
 
