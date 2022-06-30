@@ -14,11 +14,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-## [0.2.7]
+## [0.2.8]
 
 ### Changed
 
 - Fix bug introduced by mapstr optimization: #65
+
+## [0.2.7]
+
+### Changed
+
+- mapstr: optimyze Clone #64
 
 ## [0.2.6]
 
