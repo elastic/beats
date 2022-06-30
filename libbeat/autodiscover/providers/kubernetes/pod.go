@@ -28,10 +28,11 @@ import (
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -89,7 +90,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
 	options := kubernetes.WatchOptions{
@@ -215,10 +216,10 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["container"] = container
 	}
 
-	cname := builder.GetContainerName(container)
+	cname := utils.GetContainerName(container)
 
 	// Generate hints based on the cumulative of both namespace and pod annotations.
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	hints := utils.GenerateHints(annotations, cname, p.config.Prefix)
 	p.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {
@@ -358,7 +359,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 	var events []bus.Event
 	portsMap := mapstr.M{}
 
-	meta.Put("container", cmeta)
+	ShouldPut(meta, "container", cmeta, p.logger)
 
 	for _, port := range ports {
 		event := bus.Event{
