@@ -16,9 +16,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -267,13 +268,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		})
 
 		defer close(client.Channel)
-		conf := makeBenchmarkConfig(t)
-
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		store, err := storeReg.Get("test")
-		if err != nil {
-			t.Fatalf("Failed to access store: %v", err)
-		}
+		config := makeBenchmarkConfig(t)
 
 		b.ResetTimer()
 		start := time.Now()
@@ -296,13 +291,21 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				listPrefix := fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
 				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+
+				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				store, err := storeReg.Get("test")
+				if err != nil {
+					errChan <- fmt.Errorf("Failed to access store: %w", err)
+					return
+				}
+
 				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
 				if err != nil {
 					errChan <- err
 					return
 				}
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, config.FileSelectors)
 				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {
