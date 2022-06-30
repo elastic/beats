@@ -206,8 +206,8 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 					out middleware.FinalizeOutput, metadata middleware.Metadata, err error,
 				) {
 					out, metadata, err = next.HandleFinalize(ctx, in)
-					requestURL, err := url.Parse(in.Request.(*smithyhttp.Request).URL.String())
-					if err != nil {
+					requestURL, parseErr := url.Parse(in.Request.(*smithyhttp.Request).URL.String())
+					if parseErr != nil {
 						return out, metadata, err
 					}
 

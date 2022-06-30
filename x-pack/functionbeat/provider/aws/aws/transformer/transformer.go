@@ -12,6 +12,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
@@ -27,10 +29,10 @@ import (
 
 // CloudwatchLogs takes an CloudwatchLogsData and transform it into a beat event.
 func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
-	events := make([]beat.Event, len(request.LogEvents))
+	beatEvents := make([]beat.Event, len(request.LogEvents))
 
 	for idx, logEvent := range request.LogEvents {
-		events[idx] = beat.Event{
+		beatEvents[idx] = beat.Event{
 			Timestamp: time.Unix(0, logEvent.Timestamp*1000000),
 			Fields: mapstr.M{
 				"event": mapstr.M{
@@ -50,7 +52,7 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 		}
 	}
 
-	return events
+	return beatEvents
 }
 
 // APIGatewayProxyRequest takes a web request on the api gateway proxy and transform it into a beat event.
@@ -86,7 +88,7 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 // KinesisEvent takes a kinesis event and create multiples beat events.
 // DOCS: https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html
 func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
-	var events []beat.Event
+	var beatEvents []beat.Event
 	for _, record := range request.Records {
 		kr := types.Record{
 			ApproximateArrivalTimestamp: &record.Kinesis.ApproximateArrivalTimestamp.Time,
@@ -101,7 +103,7 @@ func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 		}
 
 		for _, deaggRecord := range deaggRecords {
-			events = append(events, beat.Event{
+			beatEvents = append(beatEvents, beat.Event{
 				Timestamp: time.Now(),
 				Fields: mapstr.M{
 					"event": mapstr.M{
@@ -126,7 +128,7 @@ func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 			})
 		}
 	}
-	return events, nil
+	return beatEvents, nil
 }
 
 // CloudwatchKinesisEvent takes a Kinesis event containing Cloudwatch logs and creates events for all
@@ -171,10 +173,15 @@ func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compress
 			}
 
 			var outBuf bytes.Buffer
-			_, err = io.Copy(&outBuf, r)
-			if err != nil {
-				r.Close()
-				return nil, err
+			for {
+				_, err := io.CopyN(&outBuf, r, 1024)
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					_ = r.Close()
+					return nil, err
+				}
 			}
 
 			err = r.Close()
@@ -201,9 +208,9 @@ func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compress
 
 // SQS takes a SQS event and create multiples beat events.
 func SQS(request events.SQSEvent) []beat.Event {
-	events := make([]beat.Event, len(request.Records))
+	beatEvents := make([]beat.Event, len(request.Records))
 	for idx, record := range request.Records {
-		events[idx] = beat.Event{
+		beatEvents[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
 				"event": mapstr.M{
@@ -224,5 +231,5 @@ func SQS(request events.SQSEvent) []beat.Event {
 			// TODO: SQS message attributes missing, need to check doc
 		}
 	}
-	return events
+	return beatEvents
 }

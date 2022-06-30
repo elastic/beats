@@ -18,7 +18,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
 	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint:SA1019 // dependency uses deprecated package
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
