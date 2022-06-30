@@ -41,12 +41,23 @@ type resetableActionHandler struct {
 	timeout   time.Duration
 }
 
-func newResetableActionHandler(log *logp.Logger) *resetableActionHandler {
+type optionFunc func(a *resetableActionHandler)
+
+func newResetableActionHandler(log *logp.Logger, opts ...optionFunc) *resetableActionHandler {
 	a := &resetableActionHandler{
 		log:     log,
 		timeout: defaultTimeout,
 	}
+	for _, opt := range opts {
+		opt(a)
+	}
 	return a
+}
+
+func resetableActionHandlerWithTimeout(timeout time.Duration) optionFunc {
+	return func(a *resetableActionHandler) {
+		a.timeout = timeout
+	}
 }
 
 func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]interface{}) (res map[string]interface{}, err error) {
@@ -149,7 +160,7 @@ func (a *resetableActionHandler) Name() string {
 	return a.ah.Name()
 }
 
-func (a *resetableActionHandler) Attach(ah *actionHandler) {
+func (a *resetableActionHandler) Attach(ah client.Action) {
 	a.mx.Lock()
 	a.ah = ah
 	chSignals := a.chSignals
