@@ -16,7 +16,7 @@ import (
 	sqstypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
 
-func getQueueUrls(svc *sqs.Client) ([]string, error) {
+func getQueueUrls(svc *sqs.Client) ([]string, error) { //nolint:unused // standalone tool
 	// ListQueues
 	listQueuesInput := &sqs.ListQueuesInput{}
 	output, err := svc.ListQueues(context.TODO(), listQueuesInput)
@@ -26,7 +26,7 @@ func getQueueUrls(svc *sqs.Client) ([]string, error) {
 	return output.QueueUrls, nil
 }
 
-func sendMessages(qURL string, svc *sqs.Client, idx int) error {
+func sendMessages(qURL string, svc *sqs.Client, idx int) error { //nolint:unused // standalone tool
 	sendMessageInput := &sqs.SendMessageInput{
 		DelaySeconds: 10,
 		MessageAttributes: map[string]sqstypes.MessageAttributeValue{
@@ -52,11 +52,11 @@ func sendMessages(qURL string, svc *sqs.Client, idx int) error {
 		return err
 	}
 
-	fmt.Println("Succeed writing message ", *output.MessageId)
+	fmt.Println("Succeed writing message ", *output.MessageId) //nolint:forbidigo // standalone tool
 	return nil
 }
 
-func receiveMessages(qURL string, svc *sqs.Client) ([]sqstypes.Message, error) {
+func receiveMessages(qURL string, svc *sqs.Client) ([]sqstypes.Message, error) { //nolint:unused // standalone tool
 	receiveMessageInput := &sqs.ReceiveMessageInput{
 		QueueUrl:            &qURL,
 		MaxNumberOfMessages: 10,
@@ -68,11 +68,11 @@ func receiveMessages(qURL string, svc *sqs.Client) ([]sqstypes.Message, error) {
 		return nil, err
 	}
 
-	fmt.Println("Received # messages: " + strconv.Itoa(len(output.Messages)))
+	fmt.Println("Received # messages: " + strconv.Itoa(len(output.Messages))) //nolint:forbidigo // standalone tool
 	return output.Messages, nil
 }
 
-func deleteMessage(qURL string, svc *sqs.Client, message sqstypes.Message) error {
+func deleteMessage(qURL string, svc *sqs.Client, message sqstypes.Message) error { //nolint:unused // standalone tool
 	deleteMessageInput := &sqs.DeleteMessageInput{
 		QueueUrl:      &qURL,
 		ReceiptHandle: message.ReceiptHandle,
@@ -82,7 +82,7 @@ func deleteMessage(qURL string, svc *sqs.Client, message sqstypes.Message) error
 		return err
 	}
 
-	fmt.Println("DeleteMessage: ", output.ResultMetadata)
+	fmt.Println("DeleteMessage: ", output.ResultMetadata) //nolint:forbidigo // standalone tool
 	return nil
 }
 

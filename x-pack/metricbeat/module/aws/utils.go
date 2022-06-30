@@ -6,17 +6,16 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
-	"github.com/pkg/errors"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -58,7 +57,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.TODO())
 		if err != nil {
-			return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+			return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
 
 		metricsTotal = append(metricsTotal, page.Metrics...)
@@ -92,7 +91,7 @@ func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwa
 		var page *cloudwatch.GetMetricDataOutput
 		for paginator.HasMorePages() {
 			if page, err = paginator.NextPage(context.TODO()); err != nil {
-				return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
+				return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
 			}
 			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
 		}
@@ -171,7 +170,7 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 	var page *resourcegroupstaggingapi.GetResourcesOutput
 	for paginator.HasMorePages() {
 		if page, err = paginator.NextPage(context.TODO()); err != nil {
-			err = errors.Wrap(err, "error GetResources with Paginator")
+			err = fmt.Errorf("error GetResources with Paginator: %w", err)
 			return nil, err
 		}
 
@@ -180,7 +179,7 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 			if err == nil {
 				resourceTagMap[shortIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing shortIdentifier")
+				err = fmt.Errorf("error occurs when processing shortIdentifier: %w", err)
 				return nil, err
 			}
 
@@ -188,7 +187,7 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 			if err == nil {
 				resourceTagMap[wholeIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing longIdentifier")
+				err = fmt.Errorf("error occurs when processing longIdentifier: %w", err)
 				return nil, err
 			}
 		}
@@ -201,7 +200,7 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 
@@ -218,11 +217,11 @@ func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	return strings.Join(resourceARNSplit[1:], "/"), nil
 }
 
-// FindWholeIdentifierFromARN funtion extracts whole resource filed of ARN
+// FindWholeIdentifierFromARN function extracts whole resource filed of ARN
 func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 	return arnParsed.Resource, nil
