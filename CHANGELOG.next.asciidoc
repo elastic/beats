@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
+- Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 
 *Packetbeat*
 
