@@ -47,6 +47,7 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+    booleanParam(name: 'macosM1Test', defaultValue: false, description: 'Allow macOS M1 stages.')
     string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
   stages {
