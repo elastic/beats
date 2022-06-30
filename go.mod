@@ -160,7 +160,7 @@ require (
 
 require (
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/elastic-agent-autodiscover v0.1.1
+	github.com/elastic/elastic-agent-autodiscover v0.2.1
 	github.com/elastic/elastic-agent-libs v0.2.5
 	github.com/elastic/elastic-agent-system-metrics v0.4.1
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
@@ -197,7 +197,7 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
-	github.com/containerd/containerd v1.5.11 // indirect
+	github.com/containerd/containerd v1.5.13 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
