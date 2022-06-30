@@ -177,7 +177,7 @@ func (c *CLIManager) Export(name string) error {
 		return err
 	}
 
-	fmt.Println(tmpl)
+	fmt.Println(tmpl) //nolint:forbidigo // standalone tool
 
 	return nil
 }
