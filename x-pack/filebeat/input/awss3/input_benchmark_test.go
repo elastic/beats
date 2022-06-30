@@ -67,6 +67,7 @@ func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Messag
 }
 
 type s3PagerConstant struct {
+	mutex        *sync.Mutex
 	objects      []s3.Object
 	currentIndex int
 }
@@ -74,10 +75,14 @@ type s3PagerConstant struct {
 var _ s3Pager = (*s3PagerConstant)(nil)
 
 func (c *s3PagerConstant) Next(ctx context.Context) bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.currentIndex < len(c.objects)
 }
 
 func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	ret := &s3.ListObjectsOutput{}
 	pageSize := 1000
 	if len(c.objects) < c.currentIndex+pageSize {
@@ -91,6 +96,8 @@ func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
 }
 
 func (c *s3PagerConstant) Err() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	if c.currentIndex >= len(c.objects) {
 		c.currentIndex = 0
 	}
@@ -100,6 +107,7 @@ func (c *s3PagerConstant) Err() error {
 func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	lastModified := time.Now()
 	ret := &s3PagerConstant{
+		mutex:        new(sync.Mutex),
 		currentIndex: 0,
 	}
 
@@ -260,6 +268,8 @@ func TestBenchmarkInputSQS(t *testing.T) {
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
+		log.Infof("benchmark with %d number of workers", numberOfWorkers
+		)
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics(metricRegistry, "test_id")
 
@@ -267,7 +277,10 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
-		defer close(client.Channel)
+		defer func() {
+			_ = client.Close()
+		}()
+
 		config := makeBenchmarkConfig(t)
 
 		b.ResetTimer()
