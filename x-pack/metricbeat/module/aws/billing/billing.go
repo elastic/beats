@@ -394,7 +394,6 @@ func parseGroupKey(groupKey string) (string, string) {
 		}
 	} else {
 		tagKey = keys[0]
-		tagValue = ""
 	}
 
 	return tagKey, tagValue

@@ -11,7 +11,6 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -40,7 +39,7 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fi
 		if _, ok := events[queueName]; !ok {
 			continue
 		}
-		events[queueName].RootFields.Put(metadataPrefix+".name", queueName)
+		_, _ = events[queueName].RootFields.Put(metadataPrefix+".name", queueName)
 	}
 	return events, nil
 }
@@ -50,7 +49,7 @@ func getQueueUrls(svc *sqs.Client) ([]string, error) {
 	listQueuesInput := &sqs.ListQueuesInput{}
 	output, err := svc.ListQueues(context.TODO(), listQueuesInput)
 	if err != nil {
-		err = errors.Wrap(err, "Error ListQueues")
+		err = fmt.Errorf("error ListQueues: %w", err)
 		return nil, err
 	}
 	return output.QueueUrls, nil

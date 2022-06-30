@@ -115,7 +115,7 @@ func getInstancesPerRegion(svc *ec2.Client) (map[string]*ec2types.Instance, erro
 		}
 
 		for _, reservation := range output.Reservations {
-			for i, _ := range reservation.Instances {
+			for i := range reservation.Instances {
 				instance := reservation.Instances[i]
 				instancesOutputs[*instance.InstanceId] = &instance
 			}

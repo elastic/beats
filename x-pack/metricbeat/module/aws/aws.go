@@ -210,15 +210,15 @@ func InitEvent(regionName string, accountName string, accountID string, timestam
 		RootFields:      mapstr.M{},
 	}
 
-	event.RootFields.Put("cloud.provider", "aws")
+	_, _ = event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {
-		event.RootFields.Put("cloud.region", regionName)
+		_, _ = event.RootFields.Put("cloud.region", regionName)
 	}
 	if accountName != "" {
-		event.RootFields.Put("cloud.account.name", accountName)
+		_, _ = event.RootFields.Put("cloud.account.name", accountName)
 	}
 	if accountID != "" {
-		event.RootFields.Put("cloud.account.id", accountID)
+		_, _ = event.RootFields.Put("cloud.account.id", accountID)
 	}
 	return event
 }
