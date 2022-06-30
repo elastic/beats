@@ -6914,11 +6914,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-concert@v0.2
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-libaudit/v2
-Version: v2.3.1-0.20220523121157-87f0a814a1c0
+Version: v2.3.1-0.20220629014624-b10731ae427c
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.1-0.20220523121157-87f0a814a1c0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.1-0.20220629014624-b10731ae427c/LICENSE.txt:
 
 
                                  Apache License
