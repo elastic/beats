@@ -197,11 +197,11 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 			labels := strings.Split(*output.Label, labelSeparator)
 
 			event := aws.InitEvent("", m.AccountName, m.AccountID, timestamp)
-			event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+			_, _ = event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
 
 			i := 1
 			for i < len(labels)-1 {
-				event.MetricSetFields.Put(labels[i], labels[i+1])
+				_, _ = event.MetricSetFields.Put(labels[i], labels[i+1])
 				i += 2
 			}
 			event.Timestamp = endTime
@@ -276,11 +276,11 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					eventID += key
 					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
 					if !strings.Contains(key, "$") {
-						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
+						_, _ = event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
 						if groupBy.dimension == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
-								event.RootFields.Put("aws.linked_account.id", key)
-								event.RootFields.Put("aws.linked_account.name", name)
+								_, _ = event.RootFields.Put("aws.linked_account.id", key)
+								_, _ = event.RootFields.Put("aws.linked_account.name", name)
 							}
 						}
 						continue
@@ -289,7 +289,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					// tag key value is separated by $
 					tagKey, tagValue := parseGroupKey(key)
 					if tagValue != "" {
-						event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+						_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
 					}
 				}
 

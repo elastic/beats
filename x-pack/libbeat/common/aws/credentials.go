@@ -12,6 +12,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -55,7 +59,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 
 	// Assume IAM role if iam_role config parameter is given
 	if beatsConfig.RoleArn != "" {
-		addStaticCredentialsProviderToAwsConfig(beatsConfig, &awsConfig)
+		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig)
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)
@@ -107,9 +111,8 @@ func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
 		awsCredentials.SessionToken = beatsConfig.SessionToken
 	}
 
-	config.Credentials = credentials.StaticCredentialsProvider{
-		Value: awsCredentials,
-	}
+	addStaticCredentialsProviderToAwsConfig(beatsConfig, config)
+
 	return *config
 }
 
@@ -141,14 +144,13 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, err
 	return cfg, nil
 }
 
-// switchToAssumeRoleProvider TODO (this function seems deprecated and replaced by addStaticCredentialsProviderToAwsConfig) switches the credentials provider in the awsConfig to the `AssumeRoleProvider`.
-func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
-	//	logger := logp.NewLogger("switchToAssumeRoleProvider")
-	//	logger.Debug("Switching credentials provider to AssumeRoleProvider")
-	//	stsSvc := sts.New(awsConfig)
-	//	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-	//	awsConfig.Credentials = stsCredProvider
-	return awsConfig
+// addAssumeRoleProviderToAwsConfig adds the credentials provider to the current AWS config by using the role ARN stored in Beats config
+func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config) {
+	logger := logp.NewLogger("addAssumeRoleProviderToAwsConfig")
+	logger.Debug("Switching credentials provider to AssumeRoleProvider")
+	stsSvc := sts.NewFromConfig(*awsConfig)
+	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+	awsConfig.Credentials = stsCredProvider
 }
 
 // addStaticCredentialsProviderToAwsConfig adds a static credentials provider to the current AWS config by using the keys stored in Beats config
@@ -161,8 +163,6 @@ func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *a
 		beatsConfig.SessionToken)
 
 	awsConfig.Credentials = staticCredentialsProvider
-
-	return
 }
 
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS service clients when endpoint is given in config.

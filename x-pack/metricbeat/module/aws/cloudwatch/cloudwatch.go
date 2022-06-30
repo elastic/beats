@@ -191,7 +191,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
+			if len(listMetricsOutput) == 0 {
 				continue
 			}
 
