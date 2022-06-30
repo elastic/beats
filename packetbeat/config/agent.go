@@ -41,16 +41,11 @@ type agentInput struct {
 	Streams    []map[string]interface{} `config:"streams"`
 }
 
-var osDefaultDevices = map[string]string{
-	"darwin": "en0",
-	"linux":  "any",
-}
-
 func defaultDevice() string {
-	if device, found := osDefaultDevices[runtime.GOOS]; found {
-		return device
+	if runtime.GOOS == "linux" {
+		return "any"
 	}
-	return "0"
+	return "default_route"
 }
 
 func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
