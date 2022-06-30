@@ -22,9 +22,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,7 +63,7 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool, logger *lo
 	labels := docker.DeDotLabels(cont.Labels, dedot)
 
 	if len(labels) > 0 {
-		util.ShouldPut(event, "docker.container.labels", labels, logger)
+		kubernetes.ShouldPut(event, "docker.container.labels", labels, logger)
 	}
 
 	r.Event(mb.Event{
