@@ -6,9 +6,8 @@ package aws
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 

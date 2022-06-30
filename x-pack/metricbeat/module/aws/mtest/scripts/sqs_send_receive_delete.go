@@ -86,11 +86,11 @@ func deleteMessage(qURL string, svc *sqs.Client, message sqstypes.Message) error
 	return nil
 }
 
-func sqsSendReceiveDelete() { //nolint:unused
-	fmt.Println("Please setup AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and SESSION_TOKEN first. If a temp credentials are needed, please run getTempCreds.go first.") //nolint:forbidigo
+func sqsSendReceiveDelete() { //nolint:unused // standalone tool
+	fmt.Println("Please setup AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and SESSION_TOKEN first. If a temp credentials are needed, please run getTempCreds.go first.") //nolint:forbidigo // standalone tool
 	regionsList := []string{"us-west-1", "us-east-1"}
 	accessKeyID := "FAKE-ACCESS-KEY-ID"
-	secretAccessKey := "FAKE-SECRET-ACCESS-KEY" //nolint:gosec
+	secretAccessKey := "FAKE-SECRET-ACCESS-KEY" //nolint:gosec // standalone tool
 	sessionToken := "FAKE-SESSION-TOKEN"
 
 	awsConfig := awssdk.NewConfig()
@@ -109,27 +109,27 @@ func sqsSendReceiveDelete() { //nolint:unused
 		svc := sqs.NewFromConfig(*awsConfig)
 		queueURLs, err := getQueueUrls(svc)
 		if err != nil {
-			fmt.Println("Failed getQueueUrls: ", err)
+			fmt.Println("Failed getQueueUrls: ", err) //nolint:forbidigo // standalone tool
 		}
 
 		for i, qURL := range queueURLs {
 			//SEND
 			errS := sendMessages(qURL, svc, i)
 			if errS != nil {
-				fmt.Println("Error sendMessageSQS", errS)
+				fmt.Println("Error sendMessageSQS", errS) //nolint:forbidigo // standalone tool
 			}
 
 			// RECEIVE
 			messages, errR := receiveMessages(qURL, svc)
 			if errR != nil {
-				fmt.Println("Error receiveMessages", errR)
+				fmt.Println("Error receiveMessages", errR) //nolint:forbidigo // standalone tool
 			}
 
 			// DELETE
 			if len(messages) > 0 {
 				errD := deleteMessage(qURL, svc, messages[0])
 				if errD != nil {
-					fmt.Println("Error deleteMessage", errD)
+					fmt.Println("Error deleteMessage", errD) //nolint:forbidigo // standalone tool
 				}
 			}
 		}
