@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.2.7]
+
+### Changed
+
+- Fix bug introduced by mapstr optimization: #65
+
 ## [0.2.6]
 
 ### Added

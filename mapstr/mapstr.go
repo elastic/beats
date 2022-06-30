@@ -157,8 +157,9 @@ func (m M) Clone() M {
 	for k := range m {
 		if innerMap, ok := (m[k]).(M); ok {
 			result[k] = innerMap.Clone()
+		} else {
+			result[k] = m[k]
 		}
-		result[k] = m[k]
 	}
 
 	return result

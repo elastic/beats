@@ -343,7 +343,7 @@ func TestMapStrGetValue(t *testing.T) {
 func TestClone(t *testing.T) {
 	assert := assert.New(t)
 
-	m := M{
+	original := M{
 		"c1": 1,
 		"c2": 2,
 		"c3": M{
@@ -352,8 +352,36 @@ func TestClone(t *testing.T) {
 		},
 	}
 
-	c := m.Clone()
-	assert.Equal(M{"c31": 1, "c32": 2}, c["c3"])
+	// Clone the original mapstr and then increment every value in it. Ensures the test will fail if
+	// the cloned mapstr kept a reference to any part of the original.
+	cloned := original.Clone()
+	incrementMapstrValues(original)
+
+	// Ensure that the cloned copy is as expected and no longer matches the original mapstr.
+	assert.Equal(
+		M{
+			"c1": 1,
+			"c2": 2,
+			"c3": M{
+				"c31": 1,
+				"c32": 2,
+			},
+		},
+		cloned,
+	)
+	assert.NotEqual(cloned, original)
+}
+
+func incrementMapstrValues(m M) {
+	for k := range m {
+		switch v := m[k].(type) {
+		case int:
+			m[k] = v + 1
+		case M:
+			incrementMapstrValues(m[k].(M))
+		}
+
+	}
 }
 
 func BenchmarkClone(b *testing.B) {
