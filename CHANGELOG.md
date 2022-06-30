@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.2]
+
+## Fixed
+
+- Fix reporting "handles" metrics as part of the "system" metrics group instead of the "beat" process metrics group. #37
+
 ## [0.4.1]
 
 ### Added
