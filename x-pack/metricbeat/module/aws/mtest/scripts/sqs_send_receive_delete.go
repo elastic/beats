@@ -86,11 +86,11 @@ func deleteMessage(qURL string, svc *sqs.Client, message sqstypes.Message) error
 	return nil
 }
 
-func sqsSendReceiveDelete() {
-	fmt.Println("Please setup AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and SESSION_TOKEN first. If a temp credentials are needed, please run getTempCreds.go first.")
+func sqsSendReceiveDelete() { //nolint:unused
+	fmt.Println("Please setup AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and SESSION_TOKEN first. If a temp credentials are needed, please run getTempCreds.go first.") //nolint:forbidigo
 	regionsList := []string{"us-west-1", "us-east-1"}
 	accessKeyID := "FAKE-ACCESS-KEY-ID"
-	secretAccessKey := "FAKE-SECRET-ACCESS-KEY"
+	secretAccessKey := "FAKE-SECRET-ACCESS-KEY" //nolint:gosec
 	sessionToken := "FAKE-SESSION-TOKEN"
 
 	awsConfig := awssdk.NewConfig()

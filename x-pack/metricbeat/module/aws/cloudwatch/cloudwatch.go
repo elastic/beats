@@ -5,6 +5,7 @@
 package cloudwatch
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -98,7 +98,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logger := logp.NewLogger(metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating aws metricset")
+		return nil, fmt.Errorf("error creating aws metricset: %w", err)
 	}
 
 	config := struct {
@@ -107,12 +107,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	err = base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 
 	logger.Debugf("cloudwatch config = %s", config)
 	if len(config.CloudwatchMetrics) == 0 {
-		return nil, errors.New("metrics in config is missing")
+		return nil, fmt.Errorf("metrics in config is missing: %w", err)
 	}
 
 	return &MetricSet{
@@ -133,7 +133,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Check statistic method in config
 	err := m.checkStatistics()
 	if err != nil {
-		return errors.Wrap(err, "checkStatistics failed")
+		return fmt.Errorf("checkStatistics failed: %w", err)
 	}
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
@@ -161,7 +161,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
 			if err != nil {
-				return errors.Wrap(err, "createEvents failed for region "+regionName)
+				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
 
 			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
@@ -202,7 +202,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 			if err != nil {
-				return errors.Wrap(err, "createEvents failed for region "+regionName)
+				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
@@ -312,7 +312,7 @@ func (m *MetricSet) checkStatistics() error {
 	for _, config := range m.CloudwatchConfigs {
 		for _, stat := range config.Statistic {
 			if _, ok := statisticLookup(stat); !ok {
-				return errors.New("statistic method specified is not valid: " + stat)
+				return fmt.Errorf("statistic method specified is not valid: %s", stat)
 			}
 		}
 	}
@@ -491,7 +491,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 	metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 	m.logger.Debugf("Number of metricDataResults = %d", len(metricDataResults))
 	if err != nil {
-		return events, errors.Wrap(err, "GetMetricDataResults failed")
+		return events, fmt.Errorf("getMetricDataResults failed: %w", err)
 	}
 
 	// Find a timestamp for all metrics in output
@@ -537,7 +537,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
 		if err != nil {
 			// If GetResourcesTags failed, continue report event just without tags.
-			m.logger.Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
+			m.logger.Info(fmt.Errorf("getResourcesTags failed, skipping region %s: %w", regionName, err))
 		}
 
 		if len(tagsFilter) != 0 && len(resourceTagMap) == 0 {

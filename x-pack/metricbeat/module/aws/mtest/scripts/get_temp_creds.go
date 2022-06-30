@@ -14,17 +14,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
-// lint:ignore unused
-func getCredentialsUsingMFA() {
-	// lint:ignore forbidigo
-	fmt.Println("Please setup MFA_TOKEN, SERIAL_NUMBER, AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY first.")
+func getCredentialsUsingMFA() { //nolint:unused
+	fmt.Println("Please setup MFA_TOKEN, SERIAL_NUMBER, AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY first.") //nolint:forbidigo
 	mfaToken := "123456"
 	serialNumber := "arn:aws:iam::654321:mfa/test@test.com"
 
 	// access key id and secret access key of your IAM user.
 	accessKeyID := "FAKE-ACCESS-KEY-ID"
-	// lint:ignore gosec
-	secretAccessKey := "FAKE-SECRET-ACCESS-KEY"
+	secretAccessKey := "FAKE-SECRET-ACCESS-KEY" //nolint:gosec
 
 	os.Setenv("AWS_ACCESS_KEY_ID", accessKeyID)
 	os.Setenv("AWS_SECRET_ACCESS_KEY", secretAccessKey)
