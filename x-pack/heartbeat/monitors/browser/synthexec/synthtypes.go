@@ -10,14 +10,26 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const JourneyStart = "journey/start"
-const JourneyEnd = "journey/end"
-const CmdStatus = "cmd/status"
+// These constants define all known synthetics event types
+const (
+	JourneyStart       = "journey/start"
+	JourneyEnd         = "journey/end"
+	JourneyNetworkInfo = "journey/network_info"
+	StepStart          = "step/start"
+	StepEnd            = "step/end"
+	CmdStatus          = "cmd/status"
+	StepScreenshot     = "step/screenshot"
+	StepScreenshotRef  = "step/screenshot_ref"
+	ScreenshotBlock    = "screenshot/block"
+	Stdout             = "stdout" // special type for non-JSON content read off stdout
+	Stderr             = "stderr" // special type for content read off stderr
+)
 
 type SynthEvent struct {
 	Id                   string      `json:"_id"`
@@ -98,9 +110,14 @@ func (se SynthEvent) Timestamp() time.Time {
 	return time.Unix(int64(wholeSeconds), int64(nanos))
 }
 
+// SynthError describes an error coming out of the synthetics agent
+// At some point we should deprecate this in favor of ECSErr and unify the behavior
+// to just follow ECS schema everywhere.
 type SynthError struct {
+	Type    string `json:"type"`
 	Name    string `json:"name"`
 	Message string `json:"message"`
+	Code    string `json:"code"`
 	Stack   string `json:"stack"`
 }
 
@@ -114,6 +131,46 @@ func (se *SynthError) toMap() mapstr.M {
 		"message": se.Message,
 		"stack":   se.Stack,
 	}
+}
+
+func (se *SynthError) toECSErr() *ecserr.ECSErr {
+	// Type is more ECS friendly, so we prefer it
+	t := se.Type
+	if t == "" {
+		// Legacy support for the 'name' field
+		t = se.Name
+
+	}
+
+	var stack *string
+	if se.Stack != "" {
+		stack = &se.Stack
+	}
+	return ecserr.NewECSErrWithStack(
+		t,
+		se.Code,
+		se.Message,
+		stack,
+	)
+}
+
+// ECSErrToSynthError does a simple type conversion. Hopefully at
+// some point we can move away from SynthError.
+func ECSErrToSynthError(ee *ecserr.ECSErr) *SynthError {
+	var stack string
+	if ee.StackTrace != nil {
+		stack = *ee.StackTrace
+	}
+	return &SynthError{
+		Type:    ee.Type,
+		Code:    ee.Code,
+		Message: ee.Message,
+		Stack:   stack,
+	}
+}
+
+func (se *SynthError) Error() string {
+	return se.toECSErr().Error()
 }
 
 type DurationUs struct {
@@ -151,7 +208,7 @@ func (s *Step) ToMap() mapstr.M {
 
 type Journey struct {
 	Name string   `json:"name"`
-	Id   string   `json:"id"`
+	ID   string   `json:"id"`
 	Tags []string `json:"tags"`
 }
 
@@ -159,12 +216,12 @@ func (j Journey) ToMap() mapstr.M {
 	if len(j.Tags) > 0 {
 		return mapstr.M{
 			"name": j.Name,
-			"id":   j.Id,
+			"id":   j.ID,
 			"tags": j.Tags,
 		}
 	}
 	return mapstr.M{
 		"name": j.Name,
-		"id":   j.Id,
+		"id":   j.ID,
 	}
 }

@@ -109,7 +109,7 @@ func (l *ackLoop) collectAcked() chanList {
 	for !l.ackChans.empty() && !done {
 		acks := l.ackChans.front()
 		select {
-		case <-acks.ackChan:
+		case <-acks.doneChan:
 			lst.append(l.ackChans.pop())
 
 		default:

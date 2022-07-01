@@ -72,7 +72,7 @@
         "title": "[Metricbeat Kubernetes] Volumes",
         "version": 1
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-3912d9a0-bcb2-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "dashboard": "8.3.0"
@@ -95,6 +95,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-23T08:46:44.843Z",
-    "version": "WzY3OSwxXQ=="
+    "updated_at": "2022-06-28T06:47:01.240Z",
+    "version": "WzU3MjAsM10="
 }

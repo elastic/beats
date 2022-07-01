@@ -63,6 +63,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"div":                 div,
 			"hmac":                hmacStringHex,
 			"hash":                hashStringHex,
+			"hexDecode":           hexDecode,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
 			"base64Decode":        base64Decode,
@@ -360,6 +361,14 @@ func hashStrings(typ string, data []string) []byte {
 		h.Write([]byte(d))
 	}
 	return h.Sum(nil)
+}
+
+func hexDecode(enc string) string {
+	decodedString, err := hex.DecodeString(enc)
+	if err != nil {
+		return ""
+	}
+	return string(decodedString)
 }
 
 func uuidString() string {

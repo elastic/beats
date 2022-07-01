@@ -44,8 +44,6 @@ func TestValidLocal(t *testing.T) {
 	s, e := NewProject(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	_, ok := s.InlineSource()
-	require.False(t, ok)
 
 	source.GoOffline()
 	defer source.GoOnline()
@@ -77,9 +75,7 @@ func TestValidInline(t *testing.T) {
 	s, e := NewProject(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	sSrc, ok := s.InlineSource()
-	require.True(t, ok)
-	require.Equal(t, script, sSrc)
+	require.Equal(t, script, s.projectCfg.Source.Inline.Script)
 	require.Equal(t, "", s.Workdir())
 	require.Equal(t, testParams, s.Params())
 

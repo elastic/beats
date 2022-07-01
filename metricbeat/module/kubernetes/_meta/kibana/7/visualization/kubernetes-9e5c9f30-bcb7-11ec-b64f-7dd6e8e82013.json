@@ -79,7 +79,7 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-9e5c9f30-bcb7-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "visualization": "8.3.0"
@@ -92,6 +92,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-23T08:46:45.812Z",
-    "version": "WzY4MywxXQ=="
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MjQsM10="
 }
