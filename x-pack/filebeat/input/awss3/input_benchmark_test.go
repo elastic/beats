@@ -268,8 +268,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
-		log.Infof("benchmark with %d number of workers", numberOfWorkers
-		)
+		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics(metricRegistry, "test_id")
 
