@@ -31,8 +31,9 @@ import (
 )
 
 const (
-	// how often to collect and report expired and terminated flows.
-	reapInterval = time.Second
+	// how often to check for expired flows.
+	expireInterval = time.Second
+
 	// how often the state log generated (only in debug mode).
 	logInterval = time.Second * 30
 )
@@ -375,9 +376,6 @@ type state struct {
 	// lru used for socket expiration.
 	socketLRU linkedList
 
-	// holds closed and expired flows.
-	done linkedList
-
 	// holds sockets in closing state. This is to keep them around until their
 	// close timeout expires.
 	closing linkedList
@@ -386,6 +384,8 @@ type state struct {
 
 	// Decouple time.Now()
 	clock func() time.Time
+
+	currentPID int
 }
 
 func (s *state) getSocket(sock uintptr) *socket {
@@ -410,7 +410,7 @@ var kernelProcess = process{
 
 func NewState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *state {
 	s := makeState(r, log, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift)
-	go s.reapLoop()
+	go s.expireLoop()
 	go s.logStateLoop()
 	return s
 }
@@ -428,15 +428,8 @@ func makeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTi
 		clockMaxDrift:   clockMaxDrift,
 		dns:             newDNSTracker(inactiveTimeout * 2),
 		clock:           time.Now,
+		currentPID:      os.Getpid(),
 	}
-}
-
-func (s *state) DoneFlows() linkedList {
-	s.Lock()
-	defer s.Unlock()
-	r := s.done
-	s.done = linkedList{}
-	return r
 }
 
 var (
@@ -451,7 +444,6 @@ func (s *state) logState() {
 	numProcs := len(s.processes)
 	numThreads := len(s.threads)
 	flowLRUSize := s.flowLRU.size
-	doneSize := s.done.size
 	closingSize := s.closing.size
 	events := atomic.LoadUint64(&eventCount)
 	s.Unlock()
@@ -465,8 +457,8 @@ func (s *state) logState() {
 	if uint64(flowLRUSize) != numFlows {
 		errs = append(errs, "flow count mismatch")
 	}
-	msg := fmt.Sprintf("state flows=%d sockets=%d procs=%d threads=%d lru=%d done=%d closing=%d events=%d eps=%.1f",
-		numFlows, numSocks, numProcs, numThreads, flowLRUSize, doneSize, closingSize, events,
+	msg := fmt.Sprintf("state flows=%d sockets=%d procs=%d threads=%d lru=%d closing=%d events=%d eps=%.1f",
+		numFlows, numSocks, numProcs, numThreads, flowLRUSize, closingSize, events,
 		float64(newEvs)*float64(time.Second)/float64(took))
 	if errs == nil {
 		s.log.Debugf("%s", msg)
@@ -475,8 +467,8 @@ func (s *state) logState() {
 	}
 }
 
-func (s *state) reapLoop() {
-	reportTicker := time.NewTicker(reapInterval)
+func (s *state) expireLoop() {
+	reportTicker := time.NewTicker(expireInterval)
 	defer reportTicker.Stop()
 	for {
 		select {
@@ -484,26 +476,6 @@ func (s *state) reapLoop() {
 			return
 		case <-reportTicker.C:
 			s.ExpireOlder()
-			flows := s.DoneFlows()
-			for elem := flows.get(); elem != nil; elem = flows.get() {
-				flow, ok := elem.(*flow)
-				if !ok || !flow.isValid() {
-					continue
-				}
-				if int(flow.pid) == os.Getpid() {
-					// Do not report flows for which we are the source
-					// to prevent a feedback loop.
-					continue
-				}
-				ev, err := flow.toEvent(true)
-				if err != nil {
-					s.log.Errorf("Failed to convert flow=%v err=%v", flow, err)
-					continue
-				}
-				if !s.reporter.Event(ev) {
-					return
-				}
-			}
 		}
 	}
 }
@@ -522,12 +494,21 @@ func (s *state) logStateLoop() {
 }
 
 func (s *state) ExpireOlder() {
+	start := s.clock()
+	var toReport linkedList
+	// Send flows to the output as a deferred function to avoid
+	// holding on s mutex when there's backpressure from the output.
+	defer func() {
+		if sent := s.reportFlows(&toReport); sent > 0 {
+			s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
+		}
+	}()
 	s.Lock()
 	defer s.Unlock()
 	deadline := s.clock().Add(-s.inactiveTimeout)
 	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if flow, ok := item.(*flow); ok {
-			s.onFlowTerminated(flow)
+			toReport.append(s.onFlowTerminated(flow))
 		} else {
 			s.flowLRU.get()
 		}
@@ -545,7 +526,7 @@ func (s *state) ExpireOlder() {
 	deadline = s.clock().Add(-s.closeTimeout)
 	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
-			s.onSockTerminated(sock)
+			toReport.append(s.onSockTerminated(sock))
 		} else {
 			s.closing.get()
 		}
@@ -650,20 +631,27 @@ func (s *state) ThreadLeave(tid uint32) (ev event, found bool) {
 	return
 }
 
-func (s *state) onSockTerminated(sock *socket) {
-	for _, flow := range sock.flows {
-		s.onFlowTerminated(flow)
+func (s *state) onSockTerminated(sock *socket) (expired linkedList) {
+	for _, f := range sock.flows {
+		expired.append(s.onFlowTerminated(f))
 	}
+	sock.flows = nil
 	delete(s.socks, sock.sock)
 	if sock.closing {
 		s.closing.remove(sock)
 	} else {
 		s.moveToClosing(sock)
 	}
+	return
 }
 
 // CreateSocket allocates a new sock in the system
 func (s *state) CreateSocket(ref flow) error {
+	var toReport linkedList
+	// Send flows to the output as a deferred function to avoid
+	// holding on s mutex when there's backpressure from the output.
+	defer s.reportFlows(&toReport)
+
 	s.Lock()
 	defer s.Unlock()
 	ref.createdTime = s.kernTimestampToTime(ref.created)
@@ -678,7 +666,7 @@ func (s *state) CreateSocket(ref flow) error {
 			delete(prev.flows, ref.remote.String())
 		}
 		// terminate existing if sock ptr is reused
-		s.onSockTerminated(prev)
+		toReport = s.onSockTerminated(prev)
 	}
 	return s.createFlow(ref)
 }
@@ -869,9 +857,32 @@ func (f *flow) updateWith(ref flow, s *state) {
 	f.remote.updateWith(ref.remote)
 }
 
-func (s *state) onFlowTerminated(f *flow) {
+func (s *state) reportFlow(f *flow) {
+	if f != nil && f.isValid() && int(f.pid) != s.currentPID {
+		ev, err := f.toEvent(true)
+		if err != nil {
+			s.log.Errorf("Failed to convert flow=%v err=%v", f, err)
+			return
+		}
+		if !s.reporter.Event(ev) {
+			return
+		}
+	}
+}
+
+func (s *state) reportFlows(l *linkedList) (count int) {
+	for head := l.head; head != nil; head = head.Next() {
+		if f, ok := head.(*flow); ok {
+			s.reportFlow(f)
+			count++
+		}
+	}
+	return count
+}
+
+func (s *state) onFlowTerminated(f *flow) (toReport linkedList) {
 	if f.done {
-		return
+		return toReport
 	}
 	s.flowLRU.remove(f)
 	f.done = true
@@ -879,10 +890,23 @@ func (s *state) onFlowTerminated(f *flow) {
 	if parent, found := s.socks[f.sock]; found {
 		delete(parent.flows, f.remote.addr.String())
 	}
-	if f.isValid() {
-		s.done.add(f)
-	}
 	s.numFlows--
+	toReport.add(f)
+	return toReport
+}
+
+func (a *linkedList) append(b linkedList) {
+	if b.size == 0 {
+		return
+	}
+	if a.size == 0 {
+		*a = b
+		return
+	}
+	a.tail.SetNext(b.head)
+	b.head.SetPrev(a.tail)
+	a.tail = b.tail
+	a.size += b.size
 }
 
 func (l *linkedList) add(f linkedElement) {
