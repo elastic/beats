@@ -93,7 +93,7 @@ func newS3Poller(log *logp.Logger,
 }
 
 func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
-	id := info.name + info.key + info.etag + info.lastModified.String()
+	id := stateID(info.name, info.key, info.etag, info.lastModified)
 	previousState := p.states.FindPreviousByID(id)
 	if !previousState.IsEmpty() {
 		if isStored {

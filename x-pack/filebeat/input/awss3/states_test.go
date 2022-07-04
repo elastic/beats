@@ -108,7 +108,7 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "an id",
 			expected: []state{
 				{
-					ID:           "bucketkeyetag" + lastModified.String(),
+					ID:           stateID("bucket", "key", "etag", lastModified),
 					Bucket:       "bucket",
 					Key:          "key",
 					Etag:         "etag",
@@ -123,7 +123,7 @@ func TestStatesDelete(t *testing.T) {
 				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
-			deleteID: "bucketkeyetag" + lastModified.String(),
+			deleteID: stateID("bucket", "key", "etag", lastModified),
 			expected: []state{},
 		},
 		"delete first": {
@@ -137,7 +137,7 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "bucketkey1etag1" + lastModified.String(),
 			expected: []state{
 				{
-					ID:           "bucketkey3etag3" + lastModified.String(),
+					ID:           stateID("bucket", "key3", "etag3", lastModified),
 					Bucket:       "bucket",
 					Key:          "key3",
 					Etag:         "etag3",
@@ -145,7 +145,7 @@ func TestStatesDelete(t *testing.T) {
 					LastModified: lastModified,
 				},
 				{
-					ID:           "bucketkey2etag2" + lastModified.String(),
+					ID:           stateID("bucket", "key2", "etag2", lastModified),
 					Bucket:       "bucket",
 					Key:          "key2",
 					Etag:         "etag2",
@@ -165,7 +165,7 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "bucketkey3etag3" + lastModified.String(),
 			expected: []state{
 				{
-					ID:           "bucketkey1etag1" + lastModified.String(),
+					ID:           stateID("bucket", "key1", "etag1", lastModified),
 					Bucket:       "bucket",
 					Key:          "key1",
 					Etag:         "etag1",
@@ -173,7 +173,7 @@ func TestStatesDelete(t *testing.T) {
 					LastModified: lastModified,
 				},
 				{
-					ID:           "bucketkey2etag2" + lastModified.String(),
+					ID:           stateID("bucket", "key2", "etag2", lastModified),
 					Bucket:       "bucket",
 					Key:          "key2",
 					Etag:         "etag2",
@@ -193,7 +193,7 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "bucketkey2etag2" + lastModified.String(),
 			expected: []state{
 				{
-					ID:           "bucketkey1etag1" + lastModified.String(),
+					ID:           stateID("bucket", "key1", "etag1", lastModified),
 					Bucket:       "bucket",
 					Key:          "key1",
 					Etag:         "etag1",
@@ -201,7 +201,7 @@ func TestStatesDelete(t *testing.T) {
 					LastModified: lastModified,
 				},
 				{
-					ID:           "bucketkey3etag3" + lastModified.String(),
+					ID:           stateID("bucket", "key3", "etag3", lastModified),
 					Bucket:       "bucket",
 					Key:          "key3",
 					Etag:         "etag3",
