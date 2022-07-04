@@ -475,7 +475,11 @@ func (s *state) expireLoop() {
 		case <-s.reporter.Done():
 			return
 		case <-reportTicker.C:
-			s.ExpireOlder()
+			start := s.clock()
+			toReport := s.ExpireOlder()
+			if sent := s.reportFlows(&toReport); sent > 0 {
+				s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
+			}
 		}
 	}
 }
@@ -493,16 +497,7 @@ func (s *state) logStateLoop() {
 	}
 }
 
-func (s *state) ExpireOlder() {
-	start := s.clock()
-	var toReport linkedList
-	// Send flows to the output as a deferred function to avoid
-	// holding on s mutex when there's backpressure from the output.
-	defer func() {
-		if sent := s.reportFlows(&toReport); sent > 0 {
-			s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
-		}
-	}()
+func (s *state) ExpireOlder() (toReport linkedList) {
 	s.Lock()
 	defer s.Unlock()
 	deadline := s.clock().Add(-s.inactiveTimeout)
@@ -534,6 +529,7 @@ func (s *state) ExpireOlder() {
 	}
 	// Expire cached DNS
 	s.dns.CleanUp()
+	return toReport
 }
 
 func (s *state) CreateProcess(p *process) error {

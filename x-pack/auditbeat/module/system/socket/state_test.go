@@ -96,8 +96,8 @@ func TestTCPConnWithProcess(t *testing.T) {
 	if err := feedEvents(evs, st, t); err != nil {
 		t.Fatal(err)
 	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
+
+	flows, err := getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,9 +183,9 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	if err := feedEvents(evs, st, t); err != nil {
 		t.Fatal(err)
 	}
-	st.ExpireOlder()
+
 	// Nothing expired just yet.
-	flows, err := getFlows(st.DoneFlows(), all)
+	flows, err := getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,8 +225,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	}
 	// Expire the first socket
 	now = now.Add(closeTimeout + 1)
-	st.ExpireOlder()
-	flows, err = getFlows(st.DoneFlows(), all)
+	flows, err = getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -262,8 +261,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	// Wait until sock+1 expires due to inactivity. It won't be available
 	// just yet.
 	now = now.Add(socketTimeout + 1)
-	st.ExpireOlder()
-	flows, err = getFlows(st.DoneFlows(), all)
+	flows, err = getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,8 +269,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 
 	// Wait until the sock is closed completely.
 	now = now.Add(closeTimeout + 1)
-	st.ExpireOlder()
-	flows, err = getFlows(st.DoneFlows(), all)
+	flows, err = getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -361,8 +358,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 	if err := feedEvents(evs, st, t); err != nil {
 		t.Fatal(err)
 	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
+	flows, err := getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -433,8 +429,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 	if err := feedEvents(evs, st, t); err != nil {
 		t.Fatal(err)
 	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
+	flows, err := getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -830,8 +825,7 @@ func TestSocketReuse(t *testing.T) {
 	if err := feedEvents(evs, st, t); err != nil {
 		t.Fatal(err)
 	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
+	flows, err := getFlows(st.ExpireOlder(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
