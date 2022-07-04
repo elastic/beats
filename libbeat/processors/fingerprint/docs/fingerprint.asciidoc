@@ -11,6 +11,8 @@ specified subset of its fields.
 The value that is hashed is constructed as a concatenation of the field name and
 field value separated by `|`. For example `|field1|value1|field2|value2|`.
 
+Nested fields are supported in the following format: `"field1.field2"` e.g: `["log.path.file", "foo"]`
+
 [source,yaml]
 -----------------------------------------------------
 processors:

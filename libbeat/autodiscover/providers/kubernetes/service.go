@@ -24,17 +24,18 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 type service struct {
@@ -64,7 +65,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	}, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Service{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Service{}, err)
 	}
 
 	var namespaceMeta metadata.MetaGen
@@ -76,7 +77,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		Namespace:   config.Namespace,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
 	}
 
 	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
@@ -155,7 +156,7 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := builder.GenerateHints(annotations, "", s.config.Prefix)
+	hints := utils.GenerateHints(annotations, "", s.config.Prefix)
 	s.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {
@@ -203,7 +204,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		ShouldPut(annotations, k, v, s.logger)
 	}
 	kubemeta["annotations"] = annotations
 
@@ -213,7 +214,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				nsAnns := mapstr.M{}
 
 				for k, v := range namespace.GetAnnotations() {
-					safemapstr.Put(nsAnns, k, v)
+					ShouldPut(nsAnns, k, v, s.logger)
 				}
 				kubemeta["namespace_annotations"] = nsAnns
 			}

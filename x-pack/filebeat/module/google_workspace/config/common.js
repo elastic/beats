@@ -25,7 +25,7 @@ var googleWorkspace = (function () {
             "json.id.applicationName",
             "json.id.customerId",
         ],
-        target_field: "@metadata.id",
+        target_field: "@metadata._id",
         ignore_missing: true,
         fail_on_error: false,
     });

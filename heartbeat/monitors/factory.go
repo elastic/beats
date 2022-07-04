@@ -205,6 +205,15 @@ func preProcessors(info beat.Info, settings publishSettings, monitorType string)
 	// Always set event.dataset
 	procs.AddProcessor(actions.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
 
+	// always use synthetics data streams for browser monitors, there is no good reason not to
+	// the default `heartbeat` data stream won't split out network and screenshot data.
+	// at some point we should make all monitors use the `synthetics` datastreams and retire
+	// the heartbeat one, but browser is the only beta one, and it would be a breaking change
+	// to do so otherwise.
+	if monitorType == "browser" && settings.DataStream == nil {
+		settings.DataStream = &add_data_stream.DataStream{}
+	}
+
 	if settings.DataStream != nil {
 		ds := *settings.DataStream
 		if ds.Type == "" {
@@ -218,6 +227,7 @@ func preProcessors(info beat.Info, settings publishSettings, monitorType string)
 	}
 
 	if !settings.Index.IsEmpty() {
+		logp.L().Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
 		proc, err := indexProcessor(&settings.Index, info)
 		if err != nil {
 			return nil, err
