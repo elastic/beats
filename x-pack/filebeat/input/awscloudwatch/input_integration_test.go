@@ -49,13 +49,6 @@ const (
 	logGroupNamePrefix = "filebeat-log-group-integtest-"
 )
 
-var cloudwatchConfig = mapstr.M{
-	"start_position":    "beginning",
-	"scan_frequency":    10 * time.Second,
-	"api_timeout":       120 * time.Second,
-	"number_of_workers": 1,
-}
-
 type terraformOutputData struct {
 	AWSRegion  string `yaml:"aws_region"`
 	LogGroup1  string `yaml:"log_group_name_1"`
@@ -110,7 +103,7 @@ func openTestStatestore() beater.StateStore {
 }
 
 func (s *testInputStore) Close() {
-	s.registry.Close()
+	_ = s.registry.Close()
 }
 
 func (s *testInputStore) Access() (*statestore.Store, error) {
@@ -152,13 +145,13 @@ func uploadLogMessage(t *testing.T, svc *cloudwatchlogs.Client, message string, 
 		t.Fatalf("Describe log stream %q in log group %q should return 1 and only 1 value", logStreamName, logGroupName)
 	}
 
-	inputLogEvent := &cloudwatchlogstypes.InputLogEvent{
+	inputLogEvent := cloudwatchlogstypes.InputLogEvent{
 		Message:   awssdk.String(message),
 		Timestamp: awssdk.Int64(timestamp),
 	}
 
 	_, err = svc.PutLogEvents(context.TODO(), &cloudwatchlogs.PutLogEventsInput{
-		LogEvents:     []*cloudwatchlogstypes.InputLogEvent{inputLogEvent},
+		LogEvents:     []cloudwatchlogstypes.InputLogEvent{inputLogEvent},
 		LogGroupName:  awssdk.String(logGroupName),
 		LogStreamName: awssdk.String(logStreamName),
 		SequenceToken: resp.LogStreams[0].UploadSequenceToken,
@@ -169,7 +162,8 @@ func uploadLogMessage(t *testing.T, svc *cloudwatchlogs.Client, message string, 
 }
 
 func TestInputWithLogGroupNamePrefix(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	// Terraform is used to set up S3 and SQS and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
