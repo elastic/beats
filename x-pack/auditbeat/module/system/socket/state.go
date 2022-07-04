@@ -18,6 +18,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/joeshaw/multierror"
+
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -253,7 +255,7 @@ func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
 	p.RLock()
 	defer p.RUnlock()
 	domain, found = p.resolvedDomains[ip.String()]
-	return
+	return domain, found
 }
 
 type socket struct {
@@ -624,12 +626,12 @@ func (s *state) ThreadLeave(tid uint32) (ev event, found bool) {
 	if ev, found = s.threads[tid]; found {
 		delete(s.threads, tid)
 	}
-	return
+	return ev, found
 }
 
-func (s *state) onSockTerminated(sock *socket) (expired linkedList) {
+func (s *state) onSockTerminated(sock *socket) (toReport linkedList) {
 	for _, f := range sock.flows {
-		expired.append(s.onFlowTerminated(f))
+		toReport.append(s.onFlowTerminated(f))
 	}
 	sock.flows = nil
 	delete(s.socks, sock.sock)
@@ -638,7 +640,7 @@ func (s *state) onSockTerminated(sock *socket) (expired linkedList) {
 	} else {
 		s.moveToClosing(sock)
 	}
-	return
+	return toReport
 }
 
 // CreateSocket allocates a new sock in the system
@@ -740,15 +742,15 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 	s.Lock()
 	defer s.Unlock()
 
-	return s.onSockDestroyed(ptr, nil, pid)
+	s.onSockDestroyed(ptr, nil, pid)
+	return nil
 }
 
-func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
+func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) {
 	var found bool
 	if sock == nil {
-		sock, found = s.socks[ptr]
-		if !found {
-			return nil
+		if sock, found = s.socks[ptr]; !found {
+			return
 		}
 	}
 	// Enrich with pid
@@ -763,7 +765,6 @@ func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
 	if !sock.closing {
 		s.moveToClosing(sock)
 	}
-	return nil
 }
 
 func (s *state) moveToClosing(sock *socket) {
@@ -891,18 +892,18 @@ func (s *state) onFlowTerminated(f *flow) (toReport linkedList) {
 	return toReport
 }
 
-func (a *linkedList) append(b linkedList) {
+func (l *linkedList) append(b linkedList) {
 	if b.size == 0 {
 		return
 	}
-	if a.size == 0 {
-		*a = b
+	if l.size == 0 {
+		*l = b
 		return
 	}
-	a.tail.SetNext(b.head)
-	b.head.SetPrev(a.tail)
-	a.tail = b.tail
-	a.size += b.size
+	l.tail.SetNext(b.head)
+	b.head.SetPrev(l.tail)
+	l.tail = b.tail
+	l.size += b.size
 }
 
 func (l *linkedList) add(f linkedElement) {
@@ -1030,6 +1031,12 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"complete": f.complete,
 		},
 	}
+	var errs multierror.Errors
+	rootPut := func(key string, value interface{}) {
+		if _, err := root.Put(key, value); err != nil {
+			errs = append(errs, err)
+		}
+	}
 
 	relatedIPs := []string{}
 	if len(localAddr.IP) != 0 {
@@ -1039,7 +1046,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		relatedIPs = append(relatedIPs, remoteAddr.IP.String())
 	}
 	if len(relatedIPs) > 0 {
-		root.Put("related.ip", relatedIPs)
+		rootPut("related.ip", relatedIPs)
 	}
 
 	metricset := mapstr.M{
@@ -1064,14 +1071,14 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			if f.process.hasCreds {
 				uid := strconv.Itoa(int(f.process.uid))
 				gid := strconv.Itoa(int(f.process.gid))
-				root.Put("user.id", uid)
-				root.Put("group.id", gid)
+				rootPut("user.id", uid)
+				rootPut("group.id", gid)
 				if name := userCache.LookupID(uid); name != "" {
-					root.Put("user.name", name)
-					root.Put("related.user", []string{name})
+					rootPut("user.name", name)
+					rootPut("related.user", []string{name})
 				}
 				if name := groupCache.LookupID(gid); name != "" {
-					root.Put("group.name", name)
+					rootPut("group.name", name)
 				}
 				metricset["uid"] = f.process.uid
 				metricset["gid"] = f.process.gid
@@ -1092,7 +1099,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	return mb.Event{
 		RootFields:      root,
 		MetricSetFields: metricset,
-	}, nil
+	}, errs.Err()
 }
 
 func (s *state) SyncClocks(kernelNanos, userNanos uint64) error {

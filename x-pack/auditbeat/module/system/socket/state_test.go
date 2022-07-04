@@ -473,18 +473,6 @@ func be16(val uint16) uint16 {
 	return tracing.MachineEndian.Uint16(buf[:])
 }
 
-func be32(val uint32) uint32 {
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], val)
-	return tracing.MachineEndian.Uint32(buf[:])
-}
-
-func be64(val uint64) uint64 {
-	var buf [8]byte
-	binary.BigEndian.PutUint64(buf[:], val)
-	return tracing.MachineEndian.Uint64(buf[:])
-}
-
 func ipv4(ip string) uint32 {
 	netIP := net.ParseIP(ip).To4()
 	if netIP == nil {
@@ -514,12 +502,6 @@ func feedEvents(evs []event, st *state, t *testing.T) error {
 
 func all(*flow) bool {
 	return true
-}
-
-type noDNSResolution struct{}
-
-func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bool) {
-	return "", false
 }
 
 func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err error) {
@@ -809,7 +791,7 @@ func TestSocketReuse(t *testing.T) {
 			LPort:    lPort,
 			AltRPort: rPort,
 		},
-		// Asume inetRelease lost.
+		// Assume inetRelease lost.
 		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
 		&udpSendMsgCall{
