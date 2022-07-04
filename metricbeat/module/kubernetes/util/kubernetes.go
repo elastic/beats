@@ -18,6 +18,7 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -78,10 +79,11 @@ const selector = "kubernetes"
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-	config := validatedConfig(base)
-	if config == nil {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
@@ -120,12 +122,12 @@ func NewResourceMetadataEnricher(
 				name := r.GetObjectMeta().GetName()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
 					}
 				}
 
@@ -145,6 +147,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("namespace", r)
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate("replicaset", r)
+			case *kubernetes.DaemonSet:
+				m[id] = metaGen.Generate("daemonset", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
@@ -173,10 +177,11 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-	config := validatedConfig(base)
-	if config == nil {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
@@ -198,7 +203,10 @@ func NewContainerMetadataEnricher(
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			meta := metaGen.Generate(pod)
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
@@ -215,12 +223,12 @@ func NewContainerMetadataEnricher(
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
 					}
 				}
 
@@ -229,8 +237,9 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						meta.Put("container.id", s.ContainerID[split+3:])
-						meta.Put("container.runtime", s.ContainerID[:split])
+						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+
+						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
@@ -239,7 +248,10 @@ func NewContainerMetadataEnricher(
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
@@ -314,21 +326,39 @@ func GetDefaultDisabledMetaConfig() *kubernetesConfig {
 	}
 }
 
-func validatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
-	config := kubernetesConfig{
+func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
+	config, err := GetConfig(base)
+	if err != nil {
+		logp.Err("Error while getting config: %v", err)
+		return nil, err
+	}
+
+	config, err = validateConfig(config)
+	if err != nil {
+		logp.Err("Error while validating config: %v", err)
+		return nil, err
+	}
+	return config, nil
+}
+
+func validateConfig(config *kubernetesConfig) (*kubernetesConfig, error) {
+	if !config.AddMetadata {
+		return nil, errors.New("metadata enriching is disabled")
+	}
+	return config, nil
+}
+
+func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
+	config := &kubernetesConfig{
 		AddMetadata:         true,
 		SyncPeriod:          time.Minute * 10,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil
+		return nil, errors.New("error unpacking configs")
 	}
 
-	// Return nil if metadata enriching is disabled:
-	if !config.AddMetadata {
-		return nil
-	}
-	return &config
+	return config, nil
 }
 
 func getString(m common.MapStr, key string) string {
@@ -449,7 +479,10 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			ecsMeta.Delete("kubernetes")
+			err = ecsMeta.Delete("kubernetes")
+			if err != nil {
+				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+			}
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
@@ -496,4 +529,18 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 		}
 	}
 	return e, err
+}
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }
