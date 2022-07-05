@@ -31,7 +31,7 @@ func setupFiles(testdataBaseDir string, files []string) (string, error) {
 			return "", err
 		}
 
-		err = ioutil.WriteFile(fp, nil, 0750)
+		err = ioutil.WriteFile(fp, nil, 0600)
 		if err != nil {
 			return "", err
 		}

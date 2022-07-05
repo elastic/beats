@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -82,37 +83,55 @@ type message struct {
 	pid       string
 
 	// RFC-5424 fields.
-	msgID          string
-	version        int
-	structuredData map[string]map[string]string
+	msgID      string
+	version    int
+	rawSDValue string
 }
 
 // setTimestampRFC3339 sets the timestamp for this message using an RFC3339 timestamp (time.RFC3339Nano).
-func (m *message) setTimestampRFC3339(v string) {
-	if t, err := time.Parse(time.RFC3339Nano, v); err == nil {
+func (m *message) setTimestampRFC3339(v string) error {
+	t, err := time.Parse(time.RFC3339Nano, v)
+	if err == nil {
 		m.timestamp = t
 	}
+
+	return err
 }
 
 // setTimestampBSD sets the timestamp for this message using a BSD-style timestamp (time.Stamp). Since these
 // timestamps lack year and timezone information, the year will be derived from the current time (adjusted for
 // loc) and the timezone will be provided by loc.
-func (m *message) setTimestampBSD(v string, loc *time.Location) {
+func (m *message) setTimestampBSD(v string, loc *time.Location) error {
 	if loc == nil {
 		loc = time.Local
 	}
-	if t, err := time.ParseInLocation(time.Stamp, v, loc); err == nil {
+	t, err := time.ParseInLocation(time.Stamp, v, loc)
+	if err == nil {
 		t = t.AddDate(time.Now().In(loc).Year(), 0, 0)
 		m.timestamp = t
 	}
+
+	return err
 }
 
 // setPriority sets the priority for this message. The facility and severity are
 // derived from the priority and associated values are set.
-func (m *message) setPriority(v string) {
+func (m *message) setPriority(v string) error {
+	priority, err := strconv.Atoi(v)
+	if err != nil {
+		return fmt.Errorf("invalid priority: %w", err)
+	}
+
+	// Range defined by RFC.
+	if priority < 0 || 191 < priority {
+		return ErrPriority
+	}
+
 	m.priority = stringToInt(v)
 	m.facility = m.priority >> facilityShift
 	m.severity = m.priority & severityMask
+
+	return nil
 }
 
 // setHostname sets the hostname for this message. If the value is the "nil value" (-), the hostname will NOT be set.
@@ -160,32 +179,39 @@ func (m *message) setMsgID(v string) {
 }
 
 // setVersion sets the version for this message.
-func (m *message) setVersion(v string) {
-	n := stringToInt(v)
-	m.version = n
+func (m *message) setVersion(v string) error {
+	version, err := strconv.Atoi(v)
+	if err != nil {
+		return fmt.Errorf("invalid version, expected an integer: %w", err)
+	}
+
+	m.version = version
+
+	return nil
 }
 
-// setDataValue sets a structured data value. 'id' must already exist in the
-// structured data map, otherwise the value will not be set.
-func (m *message) setDataValue(id, key, value string) {
-	if _, okID := m.structuredData[id]; okID {
-		m.structuredData[id][key] = value
+func (m *message) setRawSDValue(v string) {
+	if v != "-" {
+		m.rawSDValue = v
 	}
 }
 
 // fields produces fields from the message.
 func (m message) fields() mapstr.M {
 	f := mapstr.M{}
+	msg := m.msg
 
 	// Syslog fields.
-	_, _ = f.Put("log.syslog.priority", m.priority)
-	_, _ = f.Put("log.syslog.facility.code", m.facility)
-	_, _ = f.Put("log.syslog.severity.code", m.severity)
-	if v, ok := mapIndexToString(m.severity, severityLabels); ok {
-		_, _ = f.Put("log.syslog.severity.name", v)
-	}
-	if v, ok := mapIndexToString(m.facility, facilityLabels); ok {
-		_, _ = f.Put("log.syslog.facility.name", v)
+	if m.priority >= 0 {
+		_, _ = f.Put("log.syslog.priority", m.priority)
+		_, _ = f.Put("log.syslog.facility.code", m.facility)
+		_, _ = f.Put("log.syslog.severity.code", m.severity)
+		if v, ok := mapIndexToString(m.severity, severityLabels); ok {
+			_, _ = f.Put("log.syslog.severity.name", v)
+		}
+		if v, ok := mapIndexToString(m.facility, facilityLabels); ok {
+			_, _ = f.Put("log.syslog.facility.name", v)
+		}
 	}
 	if m.process != "" {
 		_, _ = f.Put("log.syslog.appname", m.process)
@@ -202,13 +228,19 @@ func (m message) fields() mapstr.M {
 	if m.version != 0 {
 		_, _ = f.Put("log.syslog.version", strconv.Itoa(m.version))
 	}
-	if len(m.structuredData) > 0 {
-		_, _ = f.Put("log.syslog.structured_data", m.structuredData)
+	if data := parseStructuredData(m.rawSDValue); data != nil {
+		_, _ = f.Put("log.syslog.structured_data", data)
+	} else {
+		// Raw structured data value is prepended to the message field
+		// if it could not be parsed properly. The message is not altered
+		// if no structured data was extracted from the message (nil value was
+		// used or message format is not RFC 5424).
+		msg = joinStr(m.rawSDValue, m.msg, " ")
 	}
 
 	// Message field.
-	if m.msg != "" {
-		_, _ = f.Put("message", m.msg)
+	if msg != "" {
+		_, _ = f.Put("message", msg)
 	}
 
 	return f

@@ -13,9 +13,9 @@
     }
 
     timestamp = (timestamp_rfc3339 | timestamp_bsd);
-    hostname  = hostname_range >tok %set_hostname $err(err_hostname);
+    hostname  = graph+ >tok %set_hostname;
 
-    tag           = (print -- [ :\[]){1,32} >tok %set_tag;
+    tag           = (print -- [ :\[])+ >tok %set_tag;
     content_value = print+ >tok %set_content;
     content       = '[' content_value ']';
     msg           = (tag content? ':' sp)? any+ >tok %set_msg;
