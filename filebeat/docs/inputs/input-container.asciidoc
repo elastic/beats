@@ -38,7 +38,8 @@ When using CRI-O runtime the following path should be used:
 ----
 
 > ----
-'var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log', so above path can be edited accordingly
+'var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log', 
+so above path can be edited accordingly
 
 
 ==== Configuration options
