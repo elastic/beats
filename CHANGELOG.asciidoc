@@ -3,6 +3,24 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.3.1]]
+=== Beats version 8.3.1
+https://github.com/elastic/beats/compare/v8.3.0\...v8.3.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
+
+*Filebeat*
+
+- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
+- Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
+- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
+- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
+- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
+
 [[release-notes-8.3.0]]
 === Beats version 8.3.0
 https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
@@ -11,7 +29,7 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 
 *Affecting all Beats*
 
-- Allow loading secrets that contain commas from the keystore {pull}31694{pull}.
+- Allow loading secrets that contain commas from the keystore {pull}31694[31694].
 
 *Auditbeat*
 
@@ -24,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
 
 *Heartbeat*
 
@@ -38,6 +57,7 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 *Winlogbeat*
 
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
+- Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
 
 ==== Added
 
