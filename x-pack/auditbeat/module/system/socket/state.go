@@ -477,11 +477,7 @@ func (s *state) expireLoop() {
 		case <-s.reporter.Done():
 			return
 		case <-reportTicker.C:
-			start := s.clock()
-			toReport := s.ExpireOlder()
-			if sent := s.reportFlows(&toReport); sent > 0 {
-				s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
-			}
+			s.ExpireFlows()
 		}
 	}
 }
@@ -499,7 +495,15 @@ func (s *state) logStateLoop() {
 	}
 }
 
-func (s *state) ExpireOlder() (toReport linkedList) {
+func (s *state) ExpireFlows() {
+	start := s.clock()
+	toReport := s.expireFlows()
+	if sent := s.reportFlows(&toReport); sent > 0 {
+		s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
+	}
+}
+
+func (s *state) expireFlows() (toReport linkedList) {
 	s.Lock()
 	defer s.Unlock()
 	deadline := s.clock().Add(-s.inactiveTimeout)
