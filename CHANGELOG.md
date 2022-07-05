@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.2.9]
+
+### Changed
+
+- Fix breaking change to mapstr type conversions during Clone(). #66
+
 ## [0.2.8]
 
 ### Changed

@@ -155,7 +155,7 @@ func (m M) Clone() M {
 	result := make(M, len(m))
 
 	for k := range m {
-		if innerMap, ok := (m[k]).(M); ok {
+		if innerMap, ok := tryToMapStr(m[k]); ok {
 			result[k] = innerMap.Clone()
 		} else {
 			result[k] = m[k]
