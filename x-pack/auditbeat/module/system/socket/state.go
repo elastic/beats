@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
