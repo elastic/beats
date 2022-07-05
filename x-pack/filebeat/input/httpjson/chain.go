@@ -56,11 +56,6 @@
 
 package httpjson
 
-import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-)
-
 // chainConfig for chain request.
 // Following contains basic call structure for each call after normal httpjson
 // call.
@@ -74,23 +69,18 @@ type chainConfig struct {
 // will contain replace string with original URL to make a skeleton for the
 // call request.
 type stepConfig struct {
-	Request  requestChainConfig  `config:"request"`
+	Auth     *authConfig         `config:"auth"`
+	Request  requestConfig       `config:"request" validate:"required"`
 	Response responseChainConfig `config:"response,omitempty"`
 	Replace  string              `config:"replace,omitempty"`
 }
-type whileConfig struct {
-	Request  requestChainConfig  `config:"request"`
-	Response responseChainConfig `config:"response,omitempty"`
-	Replace  string              `config:"replace,omitempty"`
-	Till     *valueTpl           `config:"till" validate:"required"`
-}
-type requestChainConfig struct {
-	URL        *urlConfig       `config:"url" validate:"required"`
-	Method     string           `config:"method" validate:"required"`
-	Body       *mapstr.M        `config:"body"`
-	Transforms transformsConfig `config:"transforms"`
 
-	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+type whileConfig struct {
+	Auth     *authConfig         `config:"auth"`
+	Request  requestConfig       `config:"request" validate:"required"`
+	Response responseChainConfig `config:"response,omitempty"`
+	Replace  string              `config:"replace,omitempty"`
+	Till     *valueTpl           `config:"till"`
 }
 
 type responseChainConfig struct {

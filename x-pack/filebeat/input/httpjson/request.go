@@ -92,19 +92,21 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 }
 
 type requestFactory struct {
-	url        url.URL
-	method     string
-	body       *mapstr.M
-	transforms []basicTransform
-	user       string
-	password   string
-	log        *logp.Logger
-	encoder    encoderFunc
-	replace    string
-	till       *valueTpl
+	url             url.URL
+	method          string
+	body            *mapstr.M
+	transforms      []basicTransform
+	user            string
+	password        string
+	log             *logp.Logger
+	encoder         encoderFunc
+	replace         string
+	isChain         bool
+	till            *valueTpl
+	chainHTTPClient *httpClient
 }
 
-func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
+func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
@@ -127,31 +129,52 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 		// chain calls requestFactory object
 		if ch.Step != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
+			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, &ch.Step.Request, log)
+			if err != nil {
+				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
+			}
+			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
+				rf.user = ch.Step.Auth.Basic.User
+				rf.password = ch.Step.Auth.Basic.Password
+			}
 			rf = &requestFactory{
-				url:        *ch.Step.Request.URL.URL,
-				method:     ch.Step.Request.Method,
-				body:       ch.Step.Request.Body,
-				transforms: ts,
-				log:        log,
-				encoder:    registeredEncoders[config.Request.EncodeAs],
-				replace:    ch.Step.Replace,
+				url:             *ch.Step.Request.URL.URL,
+				method:          ch.Step.Request.Method,
+				body:            ch.Step.Request.Body,
+				transforms:      ts,
+				log:             log,
+				encoder:         registeredEncoders[config.Request.EncodeAs],
+				replace:         ch.Step.Replace,
+				isChain:         true,
+				chainHTTPClient: httpClient,
 			}
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
+			policy := newHTTPPolicy(evaluateResponse, ch.While.Till, log)
+			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, &ch.While.Request, log, policy)
+			if err != nil {
+				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
+			}
+			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
+				rf.user = ch.While.Auth.Basic.User
+				rf.password = ch.While.Auth.Basic.Password
+			}
 			rf = &requestFactory{
-				url:        *ch.While.Request.URL.URL,
-				method:     ch.While.Request.Method,
-				body:       ch.While.Request.Body,
-				transforms: ts,
-				log:        log,
-				encoder:    registeredEncoders[config.Request.EncodeAs],
-				replace:    ch.While.Replace,
-				till:       ch.While.Till,
+				url:             *ch.While.Request.URL.URL,
+				method:          ch.While.Request.Method,
+				body:            ch.While.Request.Body,
+				transforms:      ts,
+				log:             log,
+				encoder:         registeredEncoders[config.Request.EncodeAs],
+				replace:         ch.While.Replace,
+				till:            ch.While.Till,
+				isChain:         true,
+				chainHTTPClient: httpClient,
 			}
 		}
 		rfs = append(rfs, rf)
 	}
-	return rfs
+	return rfs, nil
 }
 
 func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transformContext) (*http.Request, error) {
@@ -211,14 +234,26 @@ func newRequester(
 
 // collectResponse returns response from provided request
 func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transformContext, r *requester) (*http.Response, error) {
+	var err error
+	var httpResp *http.Response
+
 	req, err := rf.newHTTPRequest(stdCtx, trCtx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create http request: %w", err)
 	}
-	httpResp, err := r.client.do(stdCtx, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
+
+	if rf.isChain && rf.chainHTTPClient != nil {
+		httpResp, err = rf.chainHTTPClient.do(stdCtx, req)
+		if err != nil {
+			return nil, fmt.Errorf("failed to execute chain http client.Do: %w", err)
+		}
+	} else {
+		httpResp, err = r.client.do(stdCtx, req)
+		if err != nil {
+			return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
+		}
 	}
+
 	return httpResp, nil
 }
 
@@ -268,25 +303,6 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				n = 0
 				continue
 			}
-			// Debug block
-			if rf.till != nil {
-				tr := transformable{}
-				paramCtx := &transformContext{
-					firstEvent: &mapstr.M{},
-					lastEvent:  &mapstr.M{},
-					lastResponse: &response{body: mapstr.M{"status": mapstr.M{
-						"one": "completed",
-					}}},
-				}
-
-				val, err := rf.till.Execute(paramCtx, tr, nil, r.log)
-				if err != nil {
-					fmt.Printf("\nERROR = %v\n", err)
-				} else {
-					fmt.Println("VALUE = ", val)
-				}
-			}
-			// debug block
 			urlCopy = rf.url
 			urlString = rf.url.String()
 			// perform request over collected ids

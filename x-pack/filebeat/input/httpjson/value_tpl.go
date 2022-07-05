@@ -61,7 +61,6 @@ func (t *valueTpl) Unpack(in string) error {
 			"add":                 add,
 			"mul":                 mul,
 			"div":                 div,
-			"equals":              equals,
 			"hmac":                hmacStringHex,
 			"hash":                hashStringHex,
 			"hexDecode":           hexDecode,
@@ -260,10 +259,6 @@ func add(vs ...int64) int64 {
 
 func mul(a, b int64) int64 {
 	return a * b
-}
-
-func equals(a, b interface{}) bool {
-	return a == b
 }
 
 func div(a, b int64) int64 {
