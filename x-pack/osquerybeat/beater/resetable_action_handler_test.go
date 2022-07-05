@@ -103,7 +103,10 @@ func TestResetableActionHandler(t *testing.T) {
 
 			var resErr string
 			if v, ok := res["error"]; ok {
-				resErr = v.(string)
+				resErr, ok = v.(string)
+				if !ok {
+					t.Error("unable to convert error property to string")
+				}
 			}
 			if tc.err != nil {
 				diff := cmp.Diff(resErr, tc.err.Error())
