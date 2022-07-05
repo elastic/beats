@@ -137,6 +137,8 @@ filebeat.autodiscover:
           - /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
 ----
 
+>`var/log/containers/*.log` is normally a symlink to `/var/log/pods/*/*/.log`, so above paths can be edited accordingly
+
 [float]
 ==== Load {kib} dashboards
 
