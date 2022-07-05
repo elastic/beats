@@ -153,37 +153,6 @@ func (c *Client) close() {
 	}
 }
 
-<<<<<<< HEAD
-func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
-	err := fn()
-	if err == nil {
-		return nil
-	}
-
-	var netErr *net.OpError
-
-	// The current osquery go library github.com/osquery/osquery-go uses the older version of thrift library that
-	// doesn't not wrap the original error, so we have to use this ugly check for the error message suffix here.
-	// The latest version of thrift library is wrapping the error, so adding this check first here.
-	if (errors.As(err, &netErr) && (netErr.Err == syscall.EPIPE || netErr.Err ==
-		syscall.ECONNRESET)) ||
-		strings.HasSuffix(err.Error(), " broken pipe") {
-
-		c.log.Debugf("osquery error: %v, reconnect", err)
-
-		// reconnect && retry
-		err = c.reconnect(ctx)
-		if err != nil {
-			c.log.Errorf("failed to reconnect: %v", err)
-			return err
-		}
-		return fn()
-	}
-	return nil
-}
-
-=======
->>>>>>> 9886c34b58 (Osquerybeat: Handle broken pipe (linux) error gracefully (#32134))
 // Query executes a given query, resolves the types
 func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
 	c.mx.Lock()
