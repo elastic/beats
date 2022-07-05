@@ -96,7 +96,7 @@ http.host: xxx.xxx.xxx.xxx
 // end::set-http-host[]
 --
 
-. Configure cluster uuid (optional). +
+. Configure cluster UUID. +
 +
 --
 // tag::set-cluster-uuid[]
