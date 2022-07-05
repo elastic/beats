@@ -129,9 +129,10 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 		// chain calls requestFactory object
 		if ch.Step != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
+			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
 			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, &ch.Step.Request, log)
 			if err != nil {
-				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
+				return nil, fmt.Errorf("failed in creating chain http client with error : %v", err)
 			}
 			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
 				rf.user = ch.Step.Auth.Basic.User
@@ -151,9 +152,10 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Till, log)
+			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
 			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, &ch.While.Request, log, policy)
 			if err != nil {
-				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
+				return nil, fmt.Errorf("failed in creating chain http client with error : %v", err)
 			}
 			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
 				rf.user = ch.While.Auth.Basic.User

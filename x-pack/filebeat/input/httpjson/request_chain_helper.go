@@ -83,3 +83,10 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 
 	return result, nil
 }
+
+func tryAssignAuth(parentConfig *authConfig, childConfig *authConfig) *authConfig {
+	if parentConfig != nil && childConfig == nil {
+		return parentConfig
+	}
+	return childConfig
+}
