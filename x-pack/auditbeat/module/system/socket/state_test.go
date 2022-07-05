@@ -504,10 +504,6 @@ func ipv6(ip string) (hi uint64, lo uint64) {
 	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
 }
 
-func all(*flow) bool {
-	return true
-}
-
 func callExecve(meta tracing.Metadata, args []string) *execveCall {
 	ptr := &execveCall{
 		Meta: meta,
