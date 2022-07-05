@@ -537,12 +537,21 @@ github.com/elastic/elastic-agent-autodiscover v0.2.1/go.mod h1:gPnzzfdYNdgznAb+i
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6 h1:nFvXHBjYK3e9+xF0WKDeAKK4aOO51uC28s+L9rBmilo=
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6/go.mod h1:uh/Gj9a0XEbYoM4NYz4LvaBVARz3QXLmlNjsrKY9fTc=
 github.com/elastic/elastic-agent-libs v0.2.2/go.mod h1:1xDLBhIqBIjhJ7lr2s+xRFFkQHpitSp8q2zzv1Dqg+s=
+<<<<<<< HEAD
 github.com/elastic/elastic-agent-libs v0.2.5 h1:8+sYCW/kkWQe5KegGLMYYT3ELXUwibMcjMh+IMr2LRE=
 github.com/elastic/elastic-agent-libs v0.2.5/go.mod h1:chO3rtcLyGlKi9S0iGVZhYCzDfdDsAQYBc+ui588AFE=
 github.com/elastic/elastic-agent-system-metrics v0.4.1 h1:1bKgU0Y2F4PBLSCX2LmJbRd4wWoq5DOvXc9ysuXBVpI=
 github.com/elastic/elastic-agent-system-metrics v0.4.1/go.mod h1:tF/f9Off38nfzTZHIVQ++FkXrDm9keFhFpJ+3pQ00iI=
 github.com/elastic/elastic-transport-go/v8 v8.1.0 h1:NeqEz1ty4RQz+TVbUrpSU7pZ48XkzGWQj02k5koahIE=
 github.com/elastic/elastic-transport-go/v8 v8.1.0/go.mod h1:87Tcz8IVNe6rVSLdBux1o/PEItLtyabHU3naC7IoqKI=
+=======
+github.com/elastic/elastic-agent-libs v0.2.4 h1:TOy+vild5MSkn/eTOwrnffAeAntq4GiLpkvWe+uNVms=
+github.com/elastic/elastic-agent-libs v0.2.4 h1:TOy+vild5MSkn/eTOwrnffAeAntq4GiLpkvWe+uNVms=
+github.com/elastic/elastic-agent-libs v0.2.4/go.mod h1:eUiaofWIVdxVOAR4ICGxn2wbFByhrnmR6/kppwYq3qI=
+github.com/elastic/elastic-agent-libs v0.2.4/go.mod h1:eUiaofWIVdxVOAR4ICGxn2wbFByhrnmR6/kppwYq3qI=
+github.com/elastic/elastic-agent-system-metrics v0.4.2 h1:tM24imnCLNrgrO74myzSF6RhJ3ikeF8VIxKdXB5RHzk=
+github.com/elastic/elastic-agent-system-metrics v0.4.2/go.mod h1:tF/f9Off38nfzTZHIVQ++FkXrDm9keFhFpJ+3pQ00iI=
+>>>>>>> cec2491ba5 (Update system metrics (#32203))
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
 github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4/go.mod h1:EWib/APOK0SL3dFbYqvxE3UYd8E6s1ouQ7iEp/0LWV4=
