@@ -117,3 +117,19 @@ func appendStringField(m common.MapStr, field, value string) {
 		_, _ = m.Put(field, append(t, value))
 	}
 }
+
+// joinStr joins strings a and b using separator sep. If a and b are empty, the
+// result is an empty string. If a or b are empty, the other is returned.
+func joinStr(a, b, sep string) string {
+	if a == "" && b == "" {
+		return ""
+	}
+	if a == "" {
+		return b
+	}
+	if b == "" {
+		return a
+	}
+
+	return a + sep + b
+}
