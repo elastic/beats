@@ -74,15 +74,12 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 
 	val, err := expression.Execute(paramCtx, tr, nil, log)
 	if err != nil {
-		fmt.Printf("\nERROR = %v\n", err)
 		return false, fmt.Errorf("error while evaluating expression %w", err)
 	}
 	result, err := strconv.ParseBool(val)
 	if err != nil {
 		return false, fmt.Errorf("error while parsing boolean value of string %w", err)
 	}
-
-	fmt.Println("VALUE = ", val)
 
 	return result, nil
 }

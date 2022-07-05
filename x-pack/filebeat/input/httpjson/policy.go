@@ -89,23 +89,20 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 	// Evaluate custom
 	if p.fn != nil && p.expression != nil {
 		var retry bool
+
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return false, fmt.Errorf("failed to read http response body : %w", err)
+			return retry, fmt.Errorf("failed to read http response body : %w", err)
 		}
 
 		result, err := p.fn(p.expression, body, p.log)
 		if err != nil {
-			return false, err
+			return retry, err
 		}
 
-		if result {
-			fmt.Println("RESPONSE MATCHED EXPRESSION")
-			retry = false
-		} else {
+		if !result {
 			retry = true
 		}
-
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
 		return retry, nil
