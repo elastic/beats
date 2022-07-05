@@ -8,11 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"strconv"
-	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"golang.org/x/sync/semaphore"
@@ -156,6 +153,7 @@ func (c *Client) close() {
 	}
 }
 
+<<<<<<< HEAD
 func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
 	err := fn()
 	if err == nil {
@@ -184,6 +182,8 @@ func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
 	return nil
 }
 
+=======
+>>>>>>> 9886c34b58 (Osquerybeat: Handle broken pipe (linux) error gracefully (#32134))
 // Query executes a given query, resolves the types
 func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
 	c.mx.Lock()
@@ -199,10 +199,7 @@ func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{
 	defer c.cliLimiter.Release(limit)
 
 	var res *genosquery.ExtensionResponse
-	err = c.withReconnect(ctx, func() error {
-		res, err = c.cli.Client.Query(ctx, sql)
-		return err
-	})
+	res, err = c.cli.Client.Query(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
@@ -261,10 +258,7 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
-		err = c.withReconnect(ctx, func() error {
-			exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
-			return err
-		})
+		exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
 
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)
