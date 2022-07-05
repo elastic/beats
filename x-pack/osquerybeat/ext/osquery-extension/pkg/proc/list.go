@@ -16,6 +16,7 @@ func List(root string) ([]string, error) {
 }
 
 func ListFS(sysfs fs.FS) ([]string, error) {
+	//nolint:prealloc // saving on alloc and not breaking the existing expected behavior
 	var pids []string
 
 	dirs, err := fs.ReadDir(sysfs, "proc")
@@ -31,9 +32,8 @@ func ListFS(sysfs fs.FS) ([]string, error) {
 
 		name := dir.Name()
 		// Check if directory is number
-		_, err := strconv.Atoi(name)
+		_, err = strconv.Atoi(name)
 		if err != nil {
-			err = nil
 			continue
 		}
 		pids = append(pids, name)
