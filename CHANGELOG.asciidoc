@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
 
 *Heartbeat*
 
@@ -56,6 +57,7 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 *Winlogbeat*
 
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
+- Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
 
 ==== Added
 
