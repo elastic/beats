@@ -24,6 +24,7 @@ import (
 // IsRecoverable returns a boolean indicating whether the error represents
 // a condition where the Windows Event Log session can be recovered through a
 // reopening of the handle (Close, Open).
+//nolint:errorlint // These are never wrapped.
 func IsRecoverable(err error) bool {
-	return err == win.ERROR_INVALID_HANDLE || err == win.RPC_S_SERVER_UNAVAILABLE || err == win.RPC_S_CALL_CANCELLED
+	return err == win.ERROR_INVALID_HANDLE || err == win.RPC_S_SERVER_UNAVAILABLE || err == win.RPC_S_CALL_CANCELLED || err == win.ERROR_EVT_QUERY_RESULT_STALE
 }

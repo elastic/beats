@@ -38,19 +38,13 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 
 *Auditbeat*
 
-- Fix handling of audit status messages for modern kernels with reduced audit message feature support. {issue}31616[31616] {pull}32141[32141]
 
 *Filebeat*
 
-- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]xs
-- Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
-- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
-- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 
 *Heartbeat*
 
@@ -118,6 +112,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 - Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
+* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 
 *Packetbeat*
 
@@ -154,6 +149,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
 
 
 
