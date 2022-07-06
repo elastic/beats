@@ -7,42 +7,7 @@
 === Beats version 8.3.2
 https://github.com/elastic/beats/compare/v8.3.1\...v8.3.2[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
 
 *Heartbeat*
 
@@ -50,90 +15,13 @@ https://github.com/elastic/beats/compare/v8.3.1\...v8.3.2[View commits]
 
 *Metricbeat*
 
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
+- Fix for unintentionally reporting the libbeat "handles" metrics under "system" instead of "beat" as they were in previous releases. https://github.com/elastic/elastic-agent-system-metrics/pull/37[system-metrics#37]
 
 ==== Added
 
-*Affecting all Beats*
-
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
 *Metricbeat*
 
-* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
+- Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 
 [[release-notes-8.3.1]]
 === Beats version 8.3.1
