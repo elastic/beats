@@ -55,7 +55,7 @@ func (ts *testingState) Event(event mb.Event) bool {
 	return true
 }
 
-func (ts *testingState) Error(_ error) bool {
+func (ts *testingState) Error(error) bool {
 	return true
 }
 
@@ -64,6 +64,7 @@ func (ts *testingState) Done() <-chan struct{} {
 }
 
 func (ts *testingState) feedEvents(evs []event) {
+	ts.t.Helper()
 	for idx, ev := range evs {
 		ts.t.Logf("Delivering event %d: %s", idx, ev.String())
 		if err := ev.Update(&ts.state); err != nil {
