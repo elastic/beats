@@ -498,7 +498,7 @@ func (s *state) logStateLoop() {
 func (s *state) ExpireFlows() {
 	start := s.clock()
 	toReport := s.expireFlows()
-	if sent := s.reportFlows(&toReport); sent > 0 {
+	if sent := s.reportFlows(&toReport); sent != 0 {
 		s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
 	}
 }
