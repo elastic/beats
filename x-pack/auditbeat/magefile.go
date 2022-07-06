@@ -88,17 +88,6 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
-// Ironbank packages the Beat for the IronBank distribution.
-// Use SNAPSHOT=true to build snapshots.
-// Use PLATFORMS to control the target platforms.
-// Use VERSION_QUALIFIER to control the version qualifier.
-func Ironbank() {
-	start := time.Now()
-	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
-
-	devtools.PackageIronbankFromBuildDir()
-}
-
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
