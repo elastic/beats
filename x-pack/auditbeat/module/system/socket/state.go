@@ -387,6 +387,7 @@ type state struct {
 	// Decouple time.Now()
 	clock func() time.Time
 
+	// currentPID is the PID of the beat.
 	currentPID int
 }
 
