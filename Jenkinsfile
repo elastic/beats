@@ -577,7 +577,7 @@ def targetWithoutNode(Map args = [:]) {
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+    withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id, label: args.get('label', '')) {
       dumpVariables()
       withTools(k8s: installK8s, gcp: withGCP) {
         // make commands use -C <folder> while mage commands require the dir(folder)
@@ -614,6 +614,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
+  def label = args.get('label', '')
 
   def path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
@@ -681,8 +682,23 @@ def withBeatsEnv(Map args = [:], Closure body) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
           withOtelEnv() {
-            withTerraformEnv(version: env.TERRAFORM_VERSION) {
-              body()
+            // for windows-2008-r2 there is a requirement to install terraform without the certificate validation
+            // see https://github.com/elastic/beats/pull/32219
+            if (label?.contains('windows-2008')) {
+              def location = pwd(tmp: true)
+              withEnv(["PATH+TERRAFORM=${location}"]) {
+                def url = "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_windows_amd64.zip"
+                def zipfile = 'terraform.zip'
+                dir(location) {
+                  downloadWithWget(url: url, output: zipfile, flags: '--no-check-certificate')
+                  unzip(quiet: true, zipFile: zipfile)
+                }
+                body()
+              }
+            } else {
+              withTerraformEnv(version: env.TERRAFORM_VERSION) {
+                body()
+              }
             }
           }
         } catch(err) {
