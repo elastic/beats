@@ -509,7 +509,8 @@ func (s *state) expireFlows() (toReport linkedList) {
 	deadline := s.clock().Add(-s.inactiveTimeout)
 	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if flow, ok := item.(*flow); ok {
-			toReport.append(s.onFlowTerminated(flow))
+			flows := s.onFlowTerminated(flow)
+			toReport.append(&flows)
 		} else {
 			s.flowLRU.get()
 		}
@@ -527,7 +528,8 @@ func (s *state) expireFlows() (toReport linkedList) {
 	deadline = s.clock().Add(-s.closeTimeout)
 	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
-			toReport.append(s.onSockTerminated(sock))
+			flows := s.onSockTerminated(sock)
+			toReport.append(&flows)
 		} else {
 			s.closing.get()
 		}
@@ -635,7 +637,8 @@ func (s *state) ThreadLeave(tid uint32) (ev event, found bool) {
 
 func (s *state) onSockTerminated(sock *socket) (toReport linkedList) {
 	for _, f := range sock.flows {
-		toReport.append(s.onFlowTerminated(f))
+		flows := s.onFlowTerminated(f)
+		toReport.append(&flows)
 	}
 	sock.flows = nil
 	delete(s.socks, sock.sock)
@@ -894,18 +897,20 @@ func (s *state) onFlowTerminated(f *flow) (toReport linkedList) {
 	return toReport
 }
 
-func (l *linkedList) append(b linkedList) {
+func (l *linkedList) append(b *linkedList) {
 	if b.size == 0 {
 		return
 	}
 	if l.size == 0 {
-		*l = b
+		*l = *b
+		*b = linkedList{}
 		return
 	}
 	l.tail.SetNext(b.head)
 	b.head.SetPrev(l.tail)
 	l.tail = b.tail
 	l.size += b.size
+	*b = linkedList{}
 }
 
 func (l *linkedList) add(f linkedElement) {
