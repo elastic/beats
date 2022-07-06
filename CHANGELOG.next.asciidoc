@@ -39,8 +39,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- Fix handling of audit status messages for modern kernels with reduced audit message feature support. {issue}31616[31616] {pull}32141[32141]
-
 *Filebeat*
 
 
