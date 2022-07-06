@@ -866,9 +866,7 @@ func (s *state) reportFlow(f *flow) {
 			s.log.Errorf("Failed to convert flow=%v err=%v", f, err)
 			return
 		}
-		if !s.reporter.Event(ev) {
-			return
-		}
+		s.reporter.Event(ev)
 	}
 }
 
