@@ -28,25 +28,28 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
+	"github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
+	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 func TestToShipperEvent(t *testing.T) {
+	wrong := struct{}{}
 	ts := time.Now().Truncate(time.Second)
 
 	cases := []struct {
 		name   string
 		value  publisher.Event
-		exp    *sc.Event
+		exp    *messages.Event
 		expErr string
 	}{
 		{
@@ -62,10 +65,10 @@ func TestToShipperEvent(t *testing.T) {
 					},
 				},
 			},
-			exp: &sc.Event{
+			exp: &messages.Event{
 				Timestamp:  timestamppb.New(ts),
-				Source:     &sc.Source{},
-				DataStream: &sc.DataStream{},
+				Source:     &messages.Source{},
+				DataStream: &messages.DataStream{},
 				Metadata: protoStruct(t, map[string]interface{}{
 					"metafield": 42,
 				}),
@@ -94,13 +97,13 @@ func TestToShipperEvent(t *testing.T) {
 					},
 				},
 			},
-			exp: &sc.Event{
+			exp: &messages.Event{
 				Timestamp: timestamppb.New(ts),
-				Source: &sc.Source{
+				Source: &messages.Source{
 					InputId:  "input",
 					StreamId: "stream",
 				},
-				DataStream: &sc.DataStream{
+				DataStream: &messages.DataStream{
 					Type:      "ds-type",
 					Namespace: "ds-namespace",
 					Dataset:   "ds-dataset",
@@ -126,7 +129,7 @@ func TestToShipperEvent(t *testing.T) {
 				Content: beat.Event{
 					Timestamp: ts,
 					Meta: mapstr.M{
-						"metafield": ts, // timestamp is a wrong type
+						"metafield": wrong,
 					},
 				},
 			},
@@ -138,7 +141,7 @@ func TestToShipperEvent(t *testing.T) {
 				Content: beat.Event{
 					Timestamp: ts,
 					Fields: mapstr.M{
-						"field": ts, // timestamp is a wrong type
+						"field": wrong,
 					},
 				},
 			},
@@ -163,12 +166,12 @@ func TestConvertMapStr(t *testing.T) {
 	cases := []struct {
 		name   string
 		value  mapstr.M
-		exp    *structpb.Value
+		exp    *messages.Value
 		expErr string
 	}{
 		{
 			name: "nil returns nil",
-			exp:  structpb.NewNullValue(),
+			exp:  helpers.NewNullValue(),
 		},
 		{
 			name:  "empty map returns empty struct",
@@ -178,9 +181,9 @@ func TestConvertMapStr(t *testing.T) {
 		{
 			name: "returns error when type is not supported",
 			value: mapstr.M{
-				"key": time.Now(),
+				"key": struct{}{},
 			},
-			expErr: "invalid type: time.Time",
+			expErr: "invalid type: struct {}",
 		},
 		{
 			name: "values are preserved",
@@ -411,10 +414,10 @@ func TestPublish(t *testing.T) {
 // `listenAddr` is the address for the server to listen
 // returns `actualAddr` where the listener actually is and the `stop` function to stop the server
 func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, stop func()) {
-	producer := sc.NewProducerMock(qSize)
+	producer := api.NewProducerMock(qSize)
 	producer.Error = err
 	grpcServer := grpc.NewServer()
-	sc.RegisterProducerServer(grpcServer, producer)
+	pb.RegisterProducerServer(grpcServer, producer)
 
 	listener, err := net.Listen("tcp", listenAddr)
 	require.NoError(t, err)
@@ -431,14 +434,14 @@ func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAdd
 	return actualAddr, stop
 }
 
-func protoStruct(t *testing.T, values map[string]interface{}) *structpb.Struct {
-	s, err := structpb.NewStruct(values)
+func protoStruct(t *testing.T, values map[string]interface{}) *messages.Struct {
+	s, err := helpers.NewStruct(values)
 	require.NoError(t, err)
 	return s
 }
-func protoStructValue(t *testing.T, values map[string]interface{}) *structpb.Value {
+func protoStructValue(t *testing.T, values map[string]interface{}) *messages.Value {
 	s := protoStruct(t, values)
-	return structpb.NewStructValue(s)
+	return helpers.NewStructValue(s)
 }
 
 func requireEqualProto(t *testing.T, expected, actual proto.Message) {

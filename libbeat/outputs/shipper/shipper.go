@@ -24,8 +24,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
+	sc "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -37,7 +39,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -128,7 +129,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	st.NewBatch(len(events))
 
 	nonDroppedEvents := make([]publisher.Event, 0, len(events))
-	convertedEvents := make([]*sc.Event, 0, len(events))
+	convertedEvents := make([]*messages.Event, 0, len(events))
 
 	c.log.Debugf("converting %d events to protobuf...", len(events))
 
@@ -152,7 +153,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
-	resp, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
+	resp, err := c.client.PublishEvents(ctx, &messages.PublishRequest{
 		Events: convertedEvents,
 	})
 
@@ -163,26 +164,26 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	}
 
 	// with a correct server implementation should never happen, this error is not recoverable
-	if len(resp.Results) > len(nonDroppedEvents) {
+	if int(resp.AcceptedCount) > len(nonDroppedEvents) {
 		return fmt.Errorf(
-			"server returned unexpected results, expected maximum %d items, got %d",
+			"server returned unexpected results, expected maximum accepted items %d, got %d",
 			len(nonDroppedEvents),
-			len(resp.Results),
+			resp.AcceptedCount,
 		)
 	}
 
 	// the server is supposed to retain the order of the initial events in the response
 	// judging by the size of the result list we can determine what part of the initial
 	// list was accepted and we can send the rest of the list for a retry
-	retries := nonDroppedEvents[len(resp.Results):]
+	retries := nonDroppedEvents[resp.AcceptedCount:]
 	if len(retries) == 0 {
 		batch.ACK()
 		st.Acked(len(nonDroppedEvents))
-		c.log.Debugf("%d events have been acknowledged, %d dropped", len(nonDroppedEvents), droppedCount)
+		c.log.Debugf("%d events have been accepted, %d dropped", len(nonDroppedEvents), droppedCount)
 	} else {
 		batch.RetryEvents(retries) // decreases TTL unless guaranteed delivery
 		st.Failed(len(retries))
-		c.log.Debugf("%d events have been acknowledged, %d sent for retry, %d dropped", len(resp.Results), len(retries), droppedCount)
+		c.log.Debugf("%d events have been accepted, %d sent for retry, %d dropped", resp.AcceptedCount, len(retries), droppedCount)
 	}
 
 	return nil
@@ -206,23 +207,23 @@ func (c *shipper) String() string {
 	return "shipper"
 }
 
-func convertMapStr(m mapstr.M) (*structpb.Value, error) {
+func convertMapStr(m mapstr.M) (*messages.Value, error) {
 	if m == nil {
-		return structpb.NewNullValue(), nil
+		return helpers.NewNullValue(), nil
 	}
 
-	fields := make(map[string]*structpb.Value, len(m))
+	fields := make(map[string]*messages.Value, len(m))
 
 	for key, value := range m {
 		var (
-			protoValue *structpb.Value
+			protoValue *messages.Value
 			err        error
 		)
 		switch v := value.(type) {
 		case mapstr.M:
 			protoValue, err = convertMapStr(v)
 		default:
-			protoValue, err = structpb.NewValue(v)
+			protoValue, err = helpers.NewValue(v)
 		}
 		if err != nil {
 			return nil, err
@@ -230,14 +231,14 @@ func convertMapStr(m mapstr.M) (*structpb.Value, error) {
 		fields[key] = protoValue
 	}
 
-	s := &structpb.Struct{
-		Fields: fields,
+	s := &messages.Struct{
+		Data: fields,
 	}
 
-	return structpb.NewStructValue(s), nil
+	return helpers.NewStructValue(s), nil
 }
 
-func toShipperEvent(e publisher.Event) (*sc.Event, error) {
+func toShipperEvent(e publisher.Event) (*messages.Event, error) {
 	meta, err := convertMapStr(e.Content.Meta)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert event metadata to protobuf: %w", err)
@@ -248,8 +249,8 @@ func toShipperEvent(e publisher.Event) (*sc.Event, error) {
 		return nil, fmt.Errorf("failed to convert event fields to protobuf: %w", err)
 	}
 
-	source := &sc.Source{}
-	ds := &sc.DataStream{}
+	source := &messages.Source{}
+	ds := &messages.DataStream{}
 
 	inputIDVal, err := e.Content.Meta.GetValue("input_id")
 	if err == nil {
@@ -274,7 +275,7 @@ func toShipperEvent(e publisher.Event) (*sc.Event, error) {
 		ds.Dataset, _ = dsDataset.(string)
 	}
 
-	return &sc.Event{
+	return &messages.Event{
 		Timestamp:  timestamppb.New(e.Content.Timestamp),
 		Metadata:   meta.GetStructValue(),
 		Fields:     fields.GetStructValue(),
