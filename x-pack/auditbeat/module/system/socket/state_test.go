@@ -813,3 +813,24 @@ func TestProcessDNSRace(t *testing.T) {
 	}()
 	wg.Wait()
 }
+
+func benchmarkLinkedListAllocs(b *testing.B) {
+	var input, output linkedList
+	for i := 0; i < b.N; i++ {
+		input.add(&flow{})
+	}
+	// Enable allocations reporting
+	b.ReportAllocs()
+	// Reset timer and allocation counters
+	b.ResetTimer()
+	// Consuming a linked list and constructing a new linked list from the
+	// original elements must result in zero allocations.
+	for elem := input.get(); elem != nil; elem = input.get() {
+		output.add(elem)
+	}
+}
+
+func TestLinkedListNoAllocs(t *testing.T) {
+	result := testing.Benchmark(benchmarkLinkedListAllocs)
+	assert.Zero(t, result.AllocsPerOp())
+}
