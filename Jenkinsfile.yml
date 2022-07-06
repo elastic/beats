@@ -9,7 +9,6 @@ projects:
     - "winlogbeat"
     - "x-pack/auditbeat"
     - "x-pack/dockerlogbeat"
-    - "x-pack/elastic-agent"
     - "x-pack/filebeat"
     - "x-pack/functionbeat"
     - "x-pack/heartbeat"

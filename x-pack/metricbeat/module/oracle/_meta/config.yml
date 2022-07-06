@@ -1,9 +1,24 @@
+# Module: oracle
+
 - module: oracle
-  metricsets: ["tablespace", "performance"]
+  period: 10m
+  metricsets:
+    - tablespace
   enabled: true
+  hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']
+- module: oracle
   period: 10s
-  hosts: ["user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
+  metricsets:
+    - performance
+  enabled: true
+  hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']
+- module: oracle
+  period: 60s
+  metricsets:
+    - sysmetric
+  enabled: true
+  hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']
+  # patterns: ["foo%","%bar","%foobar%"]
 
   # username: ""
   # password: ""
-

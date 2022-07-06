@@ -21,8 +21,8 @@ package memcache
 // binary/text protocol based commands with setters and serializers.
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type commandType struct {
@@ -32,7 +32,7 @@ type commandType struct {
 	event eventFn
 }
 
-type eventFn func(msg *message, event common.MapStr) error
+type eventFn func(msg *message, event mapstr.M) error
 
 type argDef struct {
 	parse     argParser
@@ -82,11 +82,11 @@ func setByteCount(msg *message, count uint32) {
 	msg.bytes = uint(count)
 }
 
-func serializeNop(msg *message, event common.MapStr) error {
+func serializeNop(msg *message, event mapstr.M) error {
 	return nil
 }
 
-func serializeArgs(msg *message, event common.MapStr, args []argDef) error {
+func serializeArgs(msg *message, event mapstr.M, args []argDef) error {
 	for _, arg := range args {
 		if err := arg.serialize(msg, event); err != nil {
 			return err
@@ -96,45 +96,45 @@ func serializeArgs(msg *message, event common.MapStr, args []argDef) error {
 }
 
 func serializeValue(name string) eventFn {
-	return func(msg *message, event common.MapStr) error {
+	return func(msg *message, event mapstr.M) error {
 		event[name] = msg.value
 		return nil
 	}
 }
 
 func serializeValue2(name string) eventFn {
-	return func(msg *message, event common.MapStr) error {
+	return func(msg *message, event mapstr.M) error {
 		event[name] = msg.value2
 		return nil
 	}
 }
 
-func serializeFlags(msg *message, event common.MapStr) error {
+func serializeFlags(msg *message, event mapstr.M) error {
 	event["flags"] = msg.flags
 	return nil
 }
 
-func serializeKeys(msg *message, event common.MapStr) error {
+func serializeKeys(msg *message, event mapstr.M) error {
 	event["keys"] = msg.keys
 	return nil
 }
 
-func serializeExpTime(msg *message, event common.MapStr) error {
+func serializeExpTime(msg *message, event mapstr.M) error {
 	event["exptime"] = msg.exptime
 	return nil
 }
 
-func serializeByteCount(msg *message, event common.MapStr) error {
+func serializeByteCount(msg *message, event mapstr.M) error {
 	event["bytes"] = msg.bytes
 	return nil
 }
 
-func serializeStats(msg *message, event common.MapStr) error {
+func serializeStats(msg *message, event mapstr.M) error {
 	event["stats"] = msg.stats
 	return nil
 }
 
-func serializeCas(msg *message, event common.MapStr) error {
+func serializeCas(msg *message, event mapstr.M) error {
 	event["cas_unique"] = msg.casUnique
 	return nil
 }

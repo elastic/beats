@@ -14,9 +14,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func waitGroupWithTimeout(ctx context.Context, g *errgroup.Group, to time.Duration) error {
@@ -59,7 +59,8 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 
 	runCh := make(chan struct{}, 1)
 
-	runfn := func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
+	//nolint:unparam // false positive on returning nil error, need this signature
+	runfn := func(ctx context.Context, _ osqd.Flags, _ <-chan []config.InputConfig) error {
 		runCh <- struct{}{}
 		<-ctx.Done()
 		return nil
@@ -77,10 +78,13 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 	})
 
 	// Sent input that will start the runner function
-	runner.Update(ctx, nil)
+	err := runner.Update(ctx, nil)
+	if err != nil {
+		t.Fatal("failed runner update:", err)
+	}
 
 	// Wait for runner start
-	err := waitForStart(ctx, runCh, to)
+	err = waitForStart(ctx, runCh, to)
 	if err != nil {
 		t.Fatal("failed starting:", err)
 	}
@@ -105,7 +109,8 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 
 	var runs int
 
-	runfn := func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
+	//nolint:unparam // false positive on returning nil error, need this signature
+	runfn := func(ctx context.Context, _ osqd.Flags, _ <-chan []config.InputConfig) error {
 		runs++
 		runCh <- struct{}{}
 		<-ctx.Done()
@@ -124,10 +129,13 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	})
 
 	// Sent input that will start the runner function
-	runner.Update(ctx, nil)
+	err := runner.Update(ctx, nil)
+	if err != nil {
+		t.Fatal("failed runner update:", err)
+	}
 
 	// Wait for runner start
-	err := waitForStart(ctx, runCh, to)
+	err = waitForStart(ctx, runCh, to)
 	if err != nil {
 		t.Fatal("failed starting:", err)
 	}
@@ -143,7 +151,10 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	}
 
 	// Update flags, this should restart the run function
-	runner.Update(ctx, inputConfigs)
+	err = runner.Update(ctx, inputConfigs)
+	if err != nil {
+		t.Fatal("failed runner update:", err)
+	}
 
 	// Should get another run
 	err = waitForStart(ctx, runCh, to)
@@ -152,11 +163,14 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	}
 
 	// Update with the same flags, should not restart the runner function
-	runner.Update(ctx, inputConfigs)
+	err = runner.Update(ctx, inputConfigs)
+	if err != nil {
+		t.Fatal("failed runner update:", err)
+	}
 
 	// Should timeout on waiting for another run
 	err = waitForStart(ctx, runCh, 300*time.Millisecond)
-	if err != context.DeadlineExceeded {
+	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatal("unexpected error type after update with the same flags:", err)
 	}
 

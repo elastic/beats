@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: consul
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/consul/_meta/docs.asciidoc
+
 
 [[metricbeat-module-consul]]
 == Consul module
@@ -23,6 +25,8 @@ The Consul module comes with a predefined dashboard:
 
 image::./images/metricbeat-consul.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -54,3 +58,4 @@ The following metricsets are available:
 
 include::consul/agent.asciidoc[]
 
+:edit_url!:

@@ -1,0 +1,51 @@
+[
+  {
+    "@timestamp": "2019-10-22T11:35:09.0701919Z",
+    "event": {
+      "action": "Security Group Management",
+      "code": "4757",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A member was removed from a security-enabled universal group.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nMember:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tCN=Administrator,CN=Users,DC=wlbeat,DC=local\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1113\n\tGroup Name:\t\tTest_group3v2\n\tGroup Domain:\t\tWLBEAT\n\nAdditional Information:\n\tPrivileges:\t\t-",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_data": {
+        "MemberName": "CN=Administrator,CN=Users,DC=wlbeat,DC=local",
+        "MemberSid": "S-1-5-21-101361758-2486510592-3018839910-500",
+        "PrivilegeList": "-",
+        "SubjectDomainName": "WLBEAT",
+        "SubjectLogonId": "0x4a727",
+        "SubjectUserName": "Administrator",
+        "SubjectUserSid": "S-1-5-21-101361758-2486510592-3018839910-500",
+        "TargetDomainName": "WLBEAT",
+        "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1113",
+        "TargetUserName": "Test_group3v2"
+      },
+      "event_id": "4757",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 772,
+        "thread": {
+          "id": 1664
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 4686,
+      "task": "Security Group Management"
+    }
+  }
+]

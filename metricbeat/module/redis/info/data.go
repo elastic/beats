@@ -18,10 +18,12 @@
 package info
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"strings"
+
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -234,16 +236,36 @@ var (
 	}
 )
 
+func buildCommandstatsSchema(key string, schema s.Schema) {
+	// Build schema for each command
+	command := strings.Split(key, "_")[1]
+	schema[command] = s.Object{
+		"calls":          c.Int("cmdstat_" + command + "_calls"),
+		"usec":           c.Int("cmdstat_" + command + "_usec"),
+		"usec_per_call":  c.Float("cmdstat_" + command + "_usec_per_call"),
+		"rejected_calls": c.Int("cmdstat_" + command + "_rejected_calls"),
+		"failed_calls":   c.Int("cmdstat_" + command + "_failed_calls"),
+	}
+}
+
 // Map data to MapStr
 func eventMapping(r mb.ReporterV2, info map[string]string) {
 	// Full mapping from info
 	source := map[string]interface{}{}
+	commandstatsSchema := s.Schema{}
 	for key, val := range info {
 		source[key] = val
+		if strings.HasPrefix(key, "cmdstat_") {
+			buildCommandstatsSchema(key, commandstatsSchema)
+		}
 	}
 	data, _ := schema.Apply(source)
 
-	rootFields := common.MapStr{}
+	// Add commandstats info
+	commandstatsData, _ := commandstatsSchema.Apply(source)
+	data["commandstats"] = commandstatsData
+
+	rootFields := mapstr.M{}
 	if v, err := data.GetValue("server.version"); err == nil {
 		rootFields.Put("service.version", v)
 		data.Delete("server.version")

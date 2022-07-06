@@ -76,3 +76,44 @@
           format: bytes
           description: >
             Default size for huge pages.
+    - name: swap
+      type: group
+      prefix: "[float]"
+      description: This group contains statistics related to the swap memory usage on the system.
+      fields:
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total swap memory.
+        - name: used.bytes
+          type: long
+          format: bytes
+          description: >
+            Used swap memory.
+        - name: free
+          type: long
+          format: bytes
+          description: >
+            Available swap memory.
+        - name: used.pct
+          type: scaled_float
+          format: percent
+          description: >
+            The percentage of used swap memory.
+        - name: in.pages
+          type: long
+          description: >
+            Pages swapped in.
+        - name: out.pages
+          type: long
+          description: >
+            Pages swapped out.
+        - name: readahead.cached
+          type: long
+          description: >
+            Swap readahead pages hit from swap_ra_hit.
+        - name: readahead.pages
+          type: long
+          description: >
+            Pages swapped based on readahead predictions.

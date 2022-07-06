@@ -1,0 +1,56 @@
+[
+  {
+    "@timestamp": "2020-10-28T02:39:26.3883252Z",
+    "event": {
+      "code": "7",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Company": "Microsoft Corporation",
+        "Description": "Identity Store",
+        "FileVersion": "10.0.17763.1 (WinBuild.160101.0800)",
+        "Hashes": "SHA1=9955A1C071C44A7CEECC0D928A9CFB7F64CC3F93,MD5=C7C45610F644906E6F7D664EF2E45B08,SHA256=4808F1101F4E42387D8DDB7A355668BAE3BF6F781C42D3BCD82E23446B1DEB3E,IMPHASH=194F3797B52231028C718B6D776C6853",
+        "Image": "C:\\Windows\\System32\\dllhost.exe",
+        "ImageLoaded": "C:\\Windows\\System32\\IDStore.dll",
+        "OriginalFileName": "IdStore.dll",
+        "ProcessGuid": "{9f32b55f-d9de-5f98-f006-000000000600}",
+        "ProcessId": "5184",
+        "Product": "Microsoft® Windows® Operating System",
+        "RuleName": "-",
+        "Signature": "Microsoft Windows",
+        "SignatureStatus": "Valid",
+        "Signed": "true",
+        "UtcTime": "2020-10-28 02:39:26.374"
+      },
+      "event_id": "7",
+      "opcode": "Info",
+      "process": {
+        "pid": 1676,
+        "thread": {
+          "id": 4796
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 10685,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  }
+]

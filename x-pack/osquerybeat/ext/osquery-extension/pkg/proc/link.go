@@ -6,10 +6,11 @@ package proc
 
 import (
 	"os"
+	"path/filepath"
 )
 
 func ReadLink(root string, pid string, attr string) (string, error) {
-	fn := getProcAttr(root, pid, attr)
+	fn := filepath.Join(root, pid, attr)
 
 	s, err := os.Readlink(fn)
 	if err != nil {

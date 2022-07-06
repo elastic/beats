@@ -1,0 +1,52 @@
+[
+  {
+    "@timestamp": "2020-08-19T07:56:17.1121901Z",
+    "event": {
+      "action": "Audit Policy Change",
+      "code": "4907",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-BVM4LI1L1Q6.TEST.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Auditing settings on object were changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nObject:\n\tObject Server:\tSecurity\n\tObject Type:\tFile\n\tObject Name:\tC:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\Modules\\RemoteAccess\\RemoteAccess.psd1\n\tHandle ID:\t0x93c\n\nProcess Information:\n\tProcess ID:\t0x10cc\n\tProcess Name:\tC:\\Windows\\WinSxS\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.14393.1883_none_7ed84bd822106081\\TiWorker.exe\n\nAuditing Settings:\n\tOriginal Security Descriptor:\t\n\tNew Security Descriptor:\t\tS:ARAI(AU;SAFA;DCLCRPCRSDWDWO;;;WD)",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
+      "event_data": {
+        "HandleId": "0x93c",
+        "NewSd": "S:ARAI(AU;SAFA;DCLCRPCRSDWDWO;;;WD)",
+        "ObjectName": "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\Modules\\RemoteAccess\\RemoteAccess.psd1",
+        "ObjectServer": "Security",
+        "ObjectType": "File",
+        "ProcessId": "0x10cc",
+        "ProcessName": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.14393.1883_none_7ed84bd822106081\\TiWorker.exe",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-BVM4LI1L1Q6$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "4907",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 4,
+        "thread": {
+          "id": 408
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 146933,
+      "task": "Audit Policy Change"
+    }
+  }
+]

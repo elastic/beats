@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/pkg/errors"
+	"github.com/pkg/errors" //nolint:gomodguard // go-cfclient uses pkg/errors internally, must be upgraded to at least https://github.com/cloudfoundry-community/go-cfclient/commit/0ada4e9452
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/persistentcache"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // cfClient interface is provided so unit tests can mock the actual client.
@@ -63,7 +63,17 @@ type appResponse struct {
 
 func (r *appResponse) fromStructs(app cfclient.App, err error) {
 	if err != nil {
+		// Check if the error was wrapped with the "github.com/pkg/errors" Cause() method.
 		cause := errors.Cause(err)
+
+		// Check if the error was wrapped with the "errors" Unwrap() method.
+		var cferr *cfclient.CloudFoundryError
+		if errors.As(cause, &cferr) {
+			cause = *cferr
+		}
+
+		// Explicitly check if the error is a CloudFoundryError. Needed when the error implemented Cause() instead of Unwrap().
+		//nolint:errorlint // go-cfclient uses pkg/errors internally, must be upgraded to at least https://github.com/cloudfoundry-community/go-cfclient/commit/0ada4e9452
 		if cferr, ok := cause.(cfclient.CloudFoundryError); ok {
 			r.Error = cferr
 		}

@@ -19,7 +19,7 @@ package dialchain
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 // DialerChain composes builders for multiple network layers, used to build
@@ -64,7 +64,7 @@ func (c *DialerChain) Build(event *beat.Event) (d transport.Dialer, err error) {
 			return nil, err
 		}
 	}
-	return
+	return d, nil
 }
 
 // AddLayer adds another layer to the dialer chain.

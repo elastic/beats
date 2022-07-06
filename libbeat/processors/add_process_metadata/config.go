@@ -19,11 +19,12 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type config struct {
@@ -60,31 +61,31 @@ type config struct {
 }
 
 // available fields by default
-var defaultFields = common.MapStr{
-	"process": common.MapStr{
+var defaultFields = mapstr.M{
+	"process": mapstr.M{
 		"name":       nil,
 		"title":      nil,
 		"executable": nil,
 		"args":       nil,
 		"pid":        nil,
-		"parent": common.MapStr{
+		"parent": mapstr.M{
 			"pid": nil,
 		},
 		"start_time": nil,
-		"owner": common.MapStr{
+		"owner": mapstr.M{
 			"name": nil,
 			"id":   nil,
 		},
 	},
-	"container": common.MapStr{
+	"container": mapstr.M{
 		"id": nil,
 	},
 }
 
 // fields declared in here will only appear when requested explicitly
 // with `restricted_fields: true`.
-var restrictedFields = common.MapStr{
-	"process": common.MapStr{
+var restrictedFields = mapstr.M{
+	"process": mapstr.M{
 		"env": nil,
 	},
 }
@@ -105,8 +106,8 @@ func defaultConfig() config {
 	}
 }
 
-func (pf *config) getMappings() (mappings common.MapStr, err error) {
-	mappings = common.MapStr{}
+func (pf *config) getMappings() (mappings mapstr.M, err error) {
+	mappings = mapstr.M{}
 	validFields := defaultFields
 	if pf.RestrictedFields {
 		validFields = restrictedFields
@@ -120,13 +121,13 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 		wantedFields = []string{"process", "container"}
 	}
 	for _, docSrc := range wantedFields {
-		dstField := fieldPrefix + docSrc
+		dstField := constructPath(fieldPrefix, docSrc)
 		reqField, err := validFields.GetValue(docSrc)
 		if err != nil {
 			return nil, fmt.Errorf("field '%v' not found", docSrc)
 		}
 		if reqField != nil {
-			for subField := range reqField.(common.MapStr) {
+			for subField := range reqField.(mapstr.M) {
 				key := dstField + "." + subField
 				val := docSrc + "." + subField
 				if _, err = mappings.Put(key, val); err != nil {
@@ -144,4 +145,14 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 		}
 	}
 	return mappings.Flatten(), nil
+}
+
+// constructPath returns a full JSON path given the prefix and target taking
+// care to ensure that parent process attributes are placed directly within the
+// parent object.
+func constructPath(prefix, target string) string {
+	if prefix == "parent." || strings.HasSuffix(prefix, ".parent.") {
+		return prefix + strings.TrimPrefix(target, "process.")
+	}
+	return prefix + target
 }

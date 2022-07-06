@@ -1,5 +1,5 @@
 # Module: kubernetes
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kubernetes.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-kubernetes.html
 
 # Node metrics, from kubelet:
 - module: kubernetes
@@ -38,6 +38,7 @@
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5

@@ -33,35 +33,6 @@ const packageSpecFile = "dev-tools/packaging/packages.yml"
 // executed.
 var Packages []OSPackageArgs
 
-// UseCommunityBeatPackaging configures the package target to build packages for
-// a community Beat.
-func UseCommunityBeatPackaging() {
-	MustUsePackaging("community_beat", packageSpecFile)
-}
-
-// UseElasticAgentPackaging configures the package target to build packages for
-// an Elastic Agent.
-func UseElasticAgentPackaging() {
-	// Prepare binaries so they can be packed into agent
-	MustUsePackaging("elastic_beat_agent_binaries", packageSpecFile)
-}
-
-// UseElasticAgentDemoPackaging configures the package target to build packages for
-// an Elastic Agent demo purposes.
-func UseElasticAgentDemoPackaging() {
-	// Prepare binaries so they can be packed into agent
-	MustUsePackaging("elastic_beat_agent_demo_binaries", packageSpecFile)
-}
-
-// UseElasticBeatPackaging configures the package target to build packages for
-// an Elastic Beat. This means it will generate two sets of packages -- one
-// that is purely OSS under Apache 2.0 and one that is licensed under the
-// Elastic License and may contain additional X-Pack features.
-func UseElasticBeatPackaging() {
-	UseElasticBeatOSSPackaging()
-	MustUsePackaging("elastic_beat_xpack_separate_binaries", packageSpecFile)
-}
-
 // UseElasticBeatOSSPackaging configures the package target to build OSS
 // packages.
 func UseElasticBeatOSSPackaging() {
@@ -80,19 +51,6 @@ func UseElasticBeatXPackReducedPackaging() {
 	MustUsePackaging("elastic_beat_xpack_reduced", packageSpecFile)
 }
 
-// UseElasticBeatWithoutXPackPackaging configures the package target to build
-// packages for an Elastic Beat. This means it will generate two sets of
-// packages -- one that is purely OSS under Apache 2.0 and one that is licensed
-// under the Elastic License and may contain additional X-Pack features.
-//
-// NOTE: This method doesn't use binaries produced in the x-pack folder, this is
-// a temporary packaging target for projects that depends on beat but do have
-// concrete x-pack binaries.
-func UseElasticBeatWithoutXPackPackaging() {
-	UseElasticBeatOSSPackaging()
-	UseElasticBeatXPackPackaging()
-}
-
 // MustUsePackaging will load a named spec from a named file, if any errors
 // occurs when loading the specs it will panic.
 //
@@ -104,20 +62,6 @@ func MustUsePackaging(specName, specFile string) {
 	}
 
 	err = LoadNamedSpec(specName, filepath.Join(beatsDir, specFile))
-	if err != nil {
-		panic(err)
-	}
-}
-
-// LoadLocalNamedSpec loads the named package spec from the packages.yml in the
-// current directory.
-func LoadLocalNamedSpec(name string) {
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		panic(err)
-	}
-
-	err = LoadNamedSpec(name, filepath.Join(beatsDir, packageSpecFile), "packages.yml")
 	if err != nil {
 		panic(err)
 	}

@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type registrarLogger struct {
@@ -43,7 +43,7 @@ type eventCounter struct {
 	wg    sync.WaitGroup
 }
 
-// countingClient adds and substracts from a counter when events have been
+// countingClient adds and subtracts from a counter when events have been
 // published, dropped or ACKed. The countingClient can be used to keep track of
 // inflight events for a beat.Client instance. The counter is updated after the
 // client has been disconnected from the publisher pipeline via 'Closed'.

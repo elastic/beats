@@ -22,7 +22,6 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"syscall"
 	"time"
 
 	"github.com/google/gopacket"
@@ -31,7 +30,7 @@ import (
 	"github.com/google/gopacket/pcapgo"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 )
@@ -179,8 +178,8 @@ func (s *Sniffer) Run() error {
 		}
 
 		data, ci, err := handle.ReadPacketData()
-		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
-			logp.Debug("sniffer", "Interrupted")
+		if err == pcap.NextErrorTimeoutExpired || isAfpacketErrTimeout(err) {
+			logp.Debug("sniffer", "timedout")
 			continue
 		}
 

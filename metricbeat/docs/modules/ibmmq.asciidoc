@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: ibmmq
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/ibmmq/_meta/docs.asciidoc
+
 
 [[metricbeat-module-ibmmq]]
 [role="xpack"]
@@ -40,6 +42,8 @@ image::./images/metricbeat-ibmmq-messages.png[]
 image::./images/metricbeat-ibmmq-subscriptions.png[]
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -71,3 +75,4 @@ The following metricsets are available:
 
 include::ibmmq/qmgr.asciidoc[]
 
+:edit_url!:

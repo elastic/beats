@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: php_fpm
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/php_fpm/_meta/docs.asciidoc
+
 
 [[metricbeat-module-php_fpm]]
 == PHP_FPM module
@@ -40,6 +42,8 @@ The PHP_FPM metricsets were tested with PHP 7.1.1 and are expected to
 work with all versions >= 5.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -75,3 +79,4 @@ include::php_fpm/pool.asciidoc[]
 
 include::php_fpm/process.asciidoc[]
 
+:edit_url!:

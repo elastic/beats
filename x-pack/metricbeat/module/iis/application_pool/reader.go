@@ -10,14 +10,14 @@ package application_pool
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const ecsProcessId = "process.pid"
@@ -145,7 +145,7 @@ func (r *Reader) read() ([]mb.Event, error) {
 	// Get the values.
 	values, err := r.query.GetFormattedCounterValues()
 	if err != nil {
-		r.query.Close()
+		r.close()
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 	var events []mb.Event
@@ -163,10 +163,10 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 	events := make(map[string]mb.Event)
 	for _, appPool := range r.applicationPools {
 		events[appPool.name] = mb.Event{
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"name": appPool.name,
 			},
-			RootFields: common.MapStr{},
+			RootFields: mapstr.M{},
 		}
 		for counterPath, value := range values {
 			for _, val := range value {

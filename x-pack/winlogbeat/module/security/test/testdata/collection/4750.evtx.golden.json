@@ -1,0 +1,51 @@
+[
+  {
+    "@timestamp": "2019-12-19T08:10:57.4737631Z",
+    "event": {
+      "action": "Distribution Group Management",
+      "code": "4750",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A security-disabled global group was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2904\n\tGroup Name:\t\ttestglobal1\n\tGroup Domain:\t\tTEST\n\nChanged Attributes:\n\tSAM Account Name:\ttestglobal1\n\tSID History:\t\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "PrivilegeList": "-",
+        "SamAccountName": "testglobal1",
+        "SidHistory": "-",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x2e67800",
+        "SubjectUserName": "at_adm",
+        "SubjectUserSid": "S-1-5-21-1717121054-434620538-60925301-2794",
+        "TargetDomainName": "TEST",
+        "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2904",
+        "TargetUserName": "testglobal1"
+      },
+      "event_id": "4750",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 664
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 3707550,
+      "task": "Distribution Group Management"
+    }
+  }
+]

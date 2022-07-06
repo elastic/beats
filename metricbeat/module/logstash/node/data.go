@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -42,8 +43,8 @@ var (
 	}
 )
 
-func commonFieldsMapping(event *mb.Event, fields common.MapStr) error {
-	event.RootFields = common.MapStr{}
+func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
+	event.RootFields = mapstr.M{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
 
 	// Set service ID
@@ -88,16 +89,15 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 		return errors.Wrap(err, "failure parsing Logstash Node API response")
 	}
 
-	fields, err := schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure applying node schema")
-	}
-
 	pipelines = getUserDefinedPipelines(pipelines)
 	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, overrideClusterUUID)
 
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
 		for _, pipeline := range pipelines {
+			fields, err := schema.Apply(data)
+			if err != nil {
+				return errors.Wrap(err, "failure applying node schema")
+			}
 			removeClusterUUIDsFromPipeline(pipeline)
 
 			// Rename key: graph -> representation
@@ -109,11 +109,12 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 			}
 
 			event := mb.Event{
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"state": logstashState,
 				},
-				ModuleFields: common.MapStr{},
+				ModuleFields: mapstr.M{},
 			}
+
 			event.MetricSetFields.Update(fields)
 
 			if err = commonFieldsMapping(&event, fields); err != nil {

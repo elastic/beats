@@ -1,0 +1,47 @@
+[
+  {
+    "@timestamp": "2018-05-18T23:09:03.2086661Z",
+    "event": {
+      "action": "Special Logon",
+      "code": "4672",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "vagrant-2016"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Special privileges assigned to new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1766348727-1038078804-3833492317-1000\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2016\n\tLogon ID:\t\t0x76A087\n\nPrivileges:\t\tSeSecurityPrivilege\n\t\t\tSeTakeOwnershipPrivilege\n\t\t\tSeLoadDriverPrivilege\n\t\t\tSeBackupPrivilege\n\t\t\tSeRestorePrivilege\n\t\t\tSeDebugPrivilege\n\t\t\tSeSystemEnvironmentPrivilege\n\t\t\tSeImpersonatePrivilege\n\t\t\tSeDelegateSessionUserImpersonatePrivilege",
+    "winlog": {
+      "activity_id": "{3be96152-eefc-0002-c061-e93bfceed301}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2016",
+      "event_data": {
+        "PrivilegeList": "SeSecurityPrivilege\n\t\t\tSeTakeOwnershipPrivilege\n\t\t\tSeLoadDriverPrivilege\n\t\t\tSeBackupPrivilege\n\t\t\tSeRestorePrivilege\n\t\t\tSeDebugPrivilege\n\t\t\tSeSystemEnvironmentPrivilege\n\t\t\tSeImpersonatePrivilege\n\t\t\tSeDelegateSessionUserImpersonatePrivilege",
+        "SubjectDomainName": "VAGRANT-2016",
+        "SubjectLogonId": "0x76a087",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-1766348727-1038078804-3833492317-1000"
+      },
+      "event_id": "4672",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 596,
+        "thread": {
+          "id": 636
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 143340,
+      "task": "Special Logon"
+    }
+  }
+]

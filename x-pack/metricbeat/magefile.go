@@ -20,16 +20,17 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
+	//mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 )
 
 func init() {
@@ -132,6 +133,13 @@ func BuildSystemTestBinary() error {
 		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
 	}()
 	return sh.RunV("go", args...)
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.

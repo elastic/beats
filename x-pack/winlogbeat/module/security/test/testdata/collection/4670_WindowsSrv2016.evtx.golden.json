@@ -1,0 +1,53 @@
+[
+  {
+    "@timestamp": "2020-07-28T13:22:18.7993488Z",
+    "event": {
+      "action": "Authorization Policy Change",
+      "code": "4670",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-BVM4LI1L1Q6.TEST.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Permissions on an object were changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nObject:\n\tObject Server:\tSecurity\n\tObject Type:\tToken\n\tObject Name:\t-\n\tHandle ID:\t0x56c\n\nProcess:\n\tProcess ID:\t0x2fc\n\tProcess Name:\tC:\\Windows\\System32\\services.exe\n\nPermissions Change:\n\tOriginal Security Descriptor:\tD:(A;;GA;;;SY)(A;;GA;;;NS)\n\tNew Security Descriptor:\tD:(A;;GA;;;SY)(A;;RC;;;OW)(A;;GA;;;S-1-5-80-123231216-2592883651-3715271367-3753151631-4175906628)",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
+      "event_data": {
+        "HandleId": "0x56c",
+        "NewSd": "D:(A;;GA;;;SY)(A;;RC;;;OW)(A;;GA;;;S-1-5-80-123231216-2592883651-3715271367-3753151631-4175906628)",
+        "ObjectName": "-",
+        "ObjectServer": "Security",
+        "ObjectType": "Token",
+        "OldSd": "D:(A;;GA;;;SY)(A;;GA;;;NS)",
+        "ProcessId": "0x2fc",
+        "ProcessName": "C:\\Windows\\System32\\services.exe",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-BVM4LI1L1Q6$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "4670",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 4,
+        "thread": {
+          "id": 4604
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 31932,
+      "task": "Authorization Policy Change"
+    }
+  }
+]

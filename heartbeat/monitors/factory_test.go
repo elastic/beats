@@ -27,10 +27,10 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var binfo = beat.Info{
@@ -48,19 +48,31 @@ func TestPreProcessors(t *testing.T) {
 		wantProc           bool
 		wantErr            bool
 	}{
-		"no settings should yield no processor": {
+		"no settings should yield no processor for lightweight monitor": {
 			publishSettings{},
 			"",
 			nil,
-			"browser",
+			"http",
 			false,
+			false,
+		},
+		"no settings should yield a data stream processor for browsers": {
+			publishSettings{},
+			"synthetics-browser-default",
+			&add_data_stream.DataStream{
+				Namespace: "default",
+				Dataset:   "browser",
+				Type:      "synthetics",
+			},
+			"browser",
+			true,
 			false,
 		},
 		"exact index should be used exactly": {
 			publishSettings{Index: *fmtstr.MustCompileEvent("test")},
 			"test",
 			nil,
-			"browser",
+			"http",
 			true,
 			false,
 		},
@@ -100,7 +112,7 @@ func TestPreProcessors(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			e := beat.Event{Meta: common.MapStr{}, Fields: common.MapStr{}}
+			e := beat.Event{Meta: mapstr.M{}, Fields: mapstr.M{}}
 			procs, err := preProcessors(binfo, tt.settings, tt.monitorType)
 			if tt.wantErr == true {
 				require.Error(t, err)
@@ -138,7 +150,7 @@ func TestPreProcessors(t *testing.T) {
 			t.Run("event.data_stream", func(t *testing.T) {
 				dataStreamRaw, _ := e.GetValue("data_stream")
 				if tt.expectedDatastream != nil {
-					dataStream := dataStreamRaw.(add_data_stream.DataStream)
+					dataStream, _ := dataStreamRaw.(add_data_stream.DataStream)
 					require.Equal(t, eventDs, dataStream.Dataset, "event.dataset be identical to data_stream.dataset")
 
 					require.Equal(t, *tt.expectedDatastream, dataStream)
@@ -150,7 +162,7 @@ func TestPreProcessors(t *testing.T) {
 
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
-	badConf := mockBadPluginConf(t, "custom", "@every 1ms")
+	badConf := mockBadPluginConf(t, "custom")
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 

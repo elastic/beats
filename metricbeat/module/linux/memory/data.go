@@ -25,19 +25,22 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	util "github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/memory"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
-func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
+func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 	vmstat, err := GetVMStat(hostfs)
 	if err != nil {
 		return errors.Wrap(err, "error fetching VMStats")
 	}
 
-	pageStats := common.MapStr{}
+	pageStats := mapstr.M{}
 
 	insertPagesChild("pgscan_kswapd", vmstat, pageStats)
 	insertPagesChild("pgscan_direct", vmstat, pageStats)
@@ -56,6 +59,7 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 	}
 	baseMap["hugepages"] = thp
 
+	// huge pages swap out
 	if thbswpout, ok := vmstat["thp_swpout"]; ok {
 		baseMap.Put("hugepages.swap.out.pages", thbswpout)
 	}
@@ -63,38 +67,64 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 		baseMap.Put("hugepages.swap.out.fallback", thbswpfall)
 	}
 
+	// This is largely for convenience, and allows the swap.* metrics to more closely emulate how they're reported on system/memory
+	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
+	eventRaw, err := metrics.Get(hostfs)
+	if err != nil {
+		return errors.Wrap(err, "error fetching memory metrics")
+	}
+	swap := mapstr.M{}
+	err = typeconv.Convert(&swap, &eventRaw.Swap)
+	if err != nil {
+		return errors.Wrap(err, "error converting raw event")
+	}
+
+	baseMap["swap"] = swap
+
+	// linux-exclusive swap data
+	map2evt("pswpin", "swap.in.pages", vmstat, baseMap)
+	map2evt("pswpout", "swap.out.pages", vmstat, baseMap)
+	map2evt("swap_ra", "swap.readahead.pages", vmstat, baseMap)
+	map2evt("swap_ra_hit", "swap.readahead.cached", vmstat, baseMap)
+
 	baseMap["vmstat"] = vmstat
 
 	return nil
 }
 
-func computeEfficiency(scanName string, stealName string, fieldName string, raw map[string]uint64, inMap common.MapStr) {
-	scanVal, _ := raw[scanName]
-	stealVal, stealOk := raw[stealName]
-	if scanVal != 0 && stealOk {
-		inMap[fieldName] = common.MapStr{
-			"pct": common.Round(float64(stealVal)/float64(scanVal), common.DefaultDecimalPlacesCount),
-		}
+func map2evt(inName string, outName string, rawEvt map[string]uint64, outEvt mapstr.M) {
+	if selected, ok := rawEvt[inName]; ok {
+		outEvt.Put(outName, selected)
 	}
-
 }
 
 // insertPagesChild inserts a "child" MapStr into given events. This is mostly so we don't break mapping for fields that have been around.
 // most of the fields in vmstat are fairly esoteric and (somewhat) self-documenting, so use of this shouldn't expand beyond what's needed for backwards compat.
-func insertPagesChild(field string, raw map[string]uint64, evt common.MapStr) {
+func insertPagesChild(field string, raw map[string]uint64, evt mapstr.M) {
 	stat, ok := raw[field]
 	if ok {
 		evt.Put(fmt.Sprintf("%s.pages", field), stat)
 	}
 }
 
-func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
+func computeEfficiency(scanName string, stealName string, fieldName string, raw map[string]uint64, inMap mapstr.M) {
+	scanVal, _ := raw[scanName]
+	stealVal, stealOk := raw[stealName]
+	if scanVal != 0 && stealOk {
+		inMap[fieldName] = mapstr.M{
+			"pct": util.Round(float64(stealVal) / float64(scanVal)),
+		}
+	}
+
+}
+
+func getHugePages(hostfs resolve.Resolver) (mapstr.M, error) {
 	// see https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
 	table, err := memory.ParseMeminfo(hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "error parsing meminfo")
 	}
-	thp := common.MapStr{}
+	thp := mapstr.M{}
 
 	total, okTotal := table["HugePages_Total"]
 	free, okFree := table["HugePages_Free"]
@@ -114,7 +144,7 @@ func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
 		if total > 0 {
 			perc = float64(total-free+reserved) / float64(total)
 		}
-		thp.Put("used.pct", common.Round(perc, common.DefaultDecimalPlacesCount))
+		thp.Put("used.pct", util.Round(perc))
 
 		if !okTotalSize && okDefaultSize {
 			thp.Put("used.bytes", (total-free+reserved)*defaultSize)

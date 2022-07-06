@@ -18,7 +18,7 @@
 package apiserver
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -52,37 +52,10 @@ func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.Metri
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
 	if err != nil {
-		return errors.Wrap(err, "error getting metrics")
-	}
-
-	rcPost14 := false
-	for _, event := range events {
-		if ok, _ := event.HasKey("request.count"); ok {
-			rcPost14 = true
-			break
-		}
+		return fmt.Errorf("error getting metrics: %w", err)
 	}
 
 	for _, event := range events {
-		// Hack: super ugly trick. An improvement would be to add pipeline/lifecycle
-		// to metrics retrieval in general, so mappings, retrieved metrics, ... can be
-		// modified on events. Current design is limiting.
-		if ok, _ := event.HasKey("request.beforev14.count"); ok {
-			if rcPost14 {
-				if bothInformed, _ := event.HasKey("request.count"); !bothInformed {
-					continue
-				}
-				event.Delete("request.beforev14")
-			} else {
-				v, err := event.GetValue("request.beforev14.count")
-				if err != nil {
-					reporter.Error(err)
-					continue
-				}
-				event.Put("request.count", v)
-				event.Delete("request.beforev14")
-			}
-		}
 
 		reporter.Event(mb.Event{
 			MetricSetFields: event,

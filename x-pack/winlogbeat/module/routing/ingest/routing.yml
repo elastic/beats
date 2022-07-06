@@ -1,6 +1,9 @@
 ---
 description: Winlogbeat Routing Pipeline
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - pipeline:
       name: '{< IngestPipeline "security" >}'
       if: ctx?.winlog?.channel == 'Security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx?.winlog?.provider_name)
@@ -9,7 +12,7 @@ processors:
       if: ctx?.winlog?.channel == 'Microsoft-Windows-Sysmon/Operational'
   - pipeline:
       name: '{< IngestPipeline "powershell" >}'
-      if: ctx?.winlog?.channel == 'Windows Powershell'
+      if: ctx?.winlog?.channel == 'Windows PowerShell'
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
       if: ctx?.winlog?.channel == 'Microsoft-Windows-PowerShell/Operational'

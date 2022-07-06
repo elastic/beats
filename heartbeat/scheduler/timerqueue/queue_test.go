@@ -50,7 +50,7 @@ func TestStress(t *testing.T) {
 
 		select {
 		case <-failed:
-			pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+			_ = pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
 			require.FailNow(t, "Scheduler test iteration timed out, deadlock issue?")
 		case <-succeeded:
 			watchdog.Stop()
@@ -98,14 +98,11 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 
 	var taskResults []int
 Reader:
-	for {
-		select {
-		case res := <-taskResCh:
-			if res == 0 { // chan closed
-				break Reader
-			}
-			taskResults = append(taskResults, res)
+	for res := range taskResCh {
+		if res == 0 { // chan closed
+			break Reader
 		}
+		taskResults = append(taskResults, res)
 	}
 
 	require.Len(t, taskResults, numItems)
@@ -124,8 +121,6 @@ func TestQueueRunsTasksAddedAfterStart(t *testing.T) {
 		resCh <- 1
 	})
 
-	select {
-	case r := <-resCh:
-		require.Equal(t, 1, r)
-	}
+	r := <-resCh
+	require.Equal(t, 1, r)
 }

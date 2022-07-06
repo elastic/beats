@@ -31,6 +31,18 @@
         "microsoft.m365_defender.alerts.detectionSource": "WindowsDefenderAv",
         "microsoft.m365_defender.alerts.devices": [
             {
+                "deviceDnsName": "TestServer5",
+                "firstSeen": "2020-06-30T08:55:08.8320449Z",
+                "healthStatus": "Inactive",
+                "mdatpDeviceId": "75a63a39f9bc5a964f417c11f6277d5bf9489f0d",
+                "osBuild": 17763,
+                "osPlatform": "Other",
+                "osProcessor": "x64",
+                "rbacGroupId": 0,
+                "riskScore": "High",
+                "version": "Other"
+            },
+            {
                 "deviceDnsName": "TestServer4",
                 "firstSeen": "2020-06-30T08:55:08.8320449Z",
                 "healthStatus": "Inactive",
@@ -64,6 +76,10 @@
         "related.hash": [
             "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
             "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281"
+        ],
+        "related.hosts": [
+            "TestServer4",
+            "TestServer5"
         ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",
@@ -99,7 +115,7 @@
         "file.name": "amsistream-B103C1A335BDB049E617D1AC4A41FCDC",
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 2071,
+        "log.offset": 2381,
         "message": "'Mountsi' malware was detected",
         "microsoft.m365_defender.alerts.assignedTo": "Automation",
         "microsoft.m365_defender.alerts.creationTime": "2020-06-30T09:32:31.4579225Z",
@@ -140,6 +156,9 @@
             "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
             "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281"
         ],
+        "related.hosts": [
+            "TestServer4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -175,7 +194,7 @@
         "file.path": "C:\\Windows\\Temp\\sb-sim-temp-ikyxqi\\sb_10554_bs_h4qpk5",
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 4142,
+        "log.offset": 4452,
         "message": "'Exeselrun' malware was detected",
         "microsoft.m365_defender.alerts.assignedTo": "Automation",
         "microsoft.m365_defender.alerts.creationTime": "2020-06-30T10:08:58.9655663Z",
@@ -216,6 +235,9 @@
             "ce8d3a3811a3bf923902d6924532308506fe5d024435ddee0cabf90ad9b29f6a",
             "d1bb29ce3d01d01451e3623132545d5f577a1bd6"
         ],
+        "related.hosts": [
+            "testserver4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -249,7 +271,7 @@
         "file.path": "C:\\Windows\\Temp\\sb-sim-temp-ikyxqi\\sb_10554_bs_h4qpk5",
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 6249,
+        "log.offset": 6559,
         "message": "An active 'Exeselrun' malware was detected",
         "microsoft.m365_defender.alerts.assignedTo": "elastic@elasticuser.com",
         "microsoft.m365_defender.alerts.creationTime": "2020-06-30T10:09:01.1569718Z",
@@ -286,6 +308,9 @@
         "observer.name": "MicrosoftDefenderATP",
         "observer.product": "365 Defender",
         "observer.vendor": "Microsoft",
+        "related.hosts": [
+            "TestServer4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -317,7 +342,7 @@
         ],
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 8376,
+        "log.offset": 8686,
         "message": "Suspicious 'AccessibilityEscalation' behavior was detected",
         "microsoft.m365_defender.alerts.assignedTo": "elastic@elasticuser.com",
         "microsoft.m365_defender.alerts.classification": "FalsePositive",
@@ -356,6 +381,9 @@
         "observer.vendor": "Microsoft",
         "process.pid": 6720,
         "process.start": "2020-06-30T10:31:04.1092404Z",
+        "related.hosts": [
+            "testserver4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -387,7 +415,7 @@
         ],
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 10542,
+        "log.offset": 10852,
         "message": "Suspicious 'AccessibilityEscalation' behavior was detected",
         "microsoft.m365_defender.alerts.assignedTo": "elastic@elasticuser.com",
         "microsoft.m365_defender.alerts.classification": "FalsePositive",
@@ -424,6 +452,9 @@
         "observer.name": "MicrosoftDefenderATP",
         "observer.product": "365 Defender",
         "observer.vendor": "Microsoft",
+        "related.hosts": [
+            "testserver4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -455,7 +486,7 @@
         ],
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 12598,
+        "log.offset": 12908,
         "message": "Suspicious 'AccessibilityEscalation' behavior was detected",
         "microsoft.m365_defender.alerts.assignedTo": "elastic@elasticuser.com",
         "microsoft.m365_defender.alerts.classification": "FalsePositive",
@@ -494,6 +525,9 @@
         "observer.vendor": "Microsoft",
         "process.pid": 1324,
         "process.start": "2020-06-30T10:09:10.5747992Z",
+        "related.hosts": [
+            "testserver4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -522,7 +556,7 @@
         "event.timezone": "UTC",
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 14764,
+        "log.offset": 15074,
         "message": "Activity from infrequent country",
         "microsoft.m365_defender.alerts.assignedTo": "elastic@elasticuser.com",
         "microsoft.m365_defender.alerts.classification": "FalsePositive",
@@ -575,7 +609,7 @@
         "event.timezone": "UTC",
         "fileset.name": "m365_defender",
         "input.type": "log",
-        "log.offset": 15990,
+        "log.offset": 16300,
         "message": "Activity from infrequent country",
         "microsoft.m365_defender.alerts.assignedTo": "elastic@elasticuser.com",
         "microsoft.m365_defender.alerts.classification": "FalsePositive",
@@ -610,5 +644,87 @@
         "threat.technique.name": "SuspiciousActivity",
         "user.id": "8e24c50a-a77c-4782-813f-965009b5ddf3",
         "user.name": "brent@elasticbv.onmicrosoft.com"
+    },
+    {
+        "@timestamp": "2020-09-23T19:44:36.29Z",
+        "cloud.provider": "azure",
+        "event.action": "Malware",
+        "event.category": [
+            "host"
+        ],
+        "event.dataset": "microsoft.m365_defender",
+        "event.duration": 892514711800,
+        "event.end": "2020-06-30T09:46:15.0876676Z",
+        "event.id": "da637291063515066999_-2102938302",
+        "event.kind": "alert",
+        "event.module": "microsoft",
+        "event.provider": "MicrosoftDefenderATP",
+        "event.severity": 2,
+        "event.start": "2020-06-30T09:31:22.5729558Z",
+        "event.timezone": "UTC",
+        "event.type": [
+            "end"
+        ],
+        "fileset.name": "m365_defender",
+        "input.type": "log",
+        "log.offset": 17627,
+        "message": "'Mountsi' malware was detected",
+        "microsoft.m365_defender.alerts.assignedTo": "Automation",
+        "microsoft.m365_defender.alerts.creationTime": "2020-06-30T09:32:31.4579225Z",
+        "microsoft.m365_defender.alerts.detectionSource": "WindowsDefenderAv",
+        "microsoft.m365_defender.alerts.devices": [
+            {
+                "deviceDnsName": "TestServer4",
+                "firstSeen": "2020-06-30T08:55:08.8320449Z",
+                "healthStatus": "Inactive",
+                "mdatpDeviceId": "75a63a39f9bc5a964f417c11f6277d5bf9489f0d",
+                "osBuild": 17763,
+                "osPlatform": "Other",
+                "osProcessor": "x64",
+                "rbacGroupId": 0,
+                "riskScore": "High",
+                "version": "Other"
+            },
+            {
+                "deviceDnsName": "TestServer5",
+                "firstSeen": "2020-06-30T08:55:08.8320449Z",
+                "healthStatus": "Inactive",
+                "mdatpDeviceId": "75a63a39f9bc5a964f417c11f6277d5bf9489f0d",
+                "osBuild": 17763,
+                "osPlatform": "Other",
+                "osProcessor": "x64",
+                "rbacGroupId": 0,
+                "riskScore": "High",
+                "version": "Other"
+            }
+        ],
+        "microsoft.m365_defender.alerts.incidentId": "12",
+        "microsoft.m365_defender.alerts.investigationId": 9,
+        "microsoft.m365_defender.alerts.investigationState": "Benign",
+        "microsoft.m365_defender.alerts.lastUpdatedTime": "2020-08-26T09:41:27.7233333Z",
+        "microsoft.m365_defender.alerts.resolvedTime": "2020-06-30T11:13:12.2680434Z",
+        "microsoft.m365_defender.alerts.severity": "Informational",
+        "microsoft.m365_defender.alerts.status": "Resolved",
+        "microsoft.m365_defender.assignedTo": "elastic@elasticuser.com",
+        "microsoft.m365_defender.classification": "Unknown",
+        "microsoft.m365_defender.determination": "NotAvailable",
+        "microsoft.m365_defender.incidentId": "12",
+        "microsoft.m365_defender.incidentName": "12",
+        "microsoft.m365_defender.status": "Resolved",
+        "observer.name": "MicrosoftDefenderATP",
+        "observer.product": "365 Defender",
+        "observer.vendor": "Microsoft",
+        "related.hosts": [
+            "TestServer4",
+            "TestServer5"
+        ],
+        "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
+        "service.type": "microsoft",
+        "tags": [
+            "forwarded",
+            "m365-defender"
+        ],
+        "threat.framework": "MITRE ATT&CK",
+        "threat.technique.name": "Malware"
     }
 ]

@@ -19,15 +19,17 @@ package memqueue
 
 import (
 	"flag"
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/assert"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var seed int64
@@ -71,6 +73,69 @@ func TestProduceConsumer(t *testing.T) {
 	t.Run("flush", testWith(makeTestQueue(bufferSize, batchSize/2, 100*time.Millisecond)))
 }
 
+func TestQueueMetricsDirect(t *testing.T) {
+	eventsToTest := 5
+	maxEvents := 10
+
+	// Test the directEventLoop
+	directSettings := Settings{
+		Events:         maxEvents,
+		FlushMinEvents: 1,
+		FlushTimeout:   0,
+	}
+	t.Logf("Testing directEventLoop")
+	queueTestWithSettings(t, directSettings, eventsToTest, "directEventLoop")
+
+}
+
+func TestQueueMetricsBuffer(t *testing.T) {
+	eventsToTest := 5
+	maxEvents := 10
+	// Test Buffered Event Loop
+	bufferedSettings := Settings{
+		Events:         maxEvents,
+		FlushMinEvents: eventsToTest, // The buffered event loop can only return FlushMinEvents per Get()
+		FlushTimeout:   time.Millisecond,
+	}
+	t.Logf("Testing bufferedEventLoop")
+	queueTestWithSettings(t, bufferedSettings, eventsToTest, "bufferedEventLoop")
+}
+
+func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, testName string) {
+	testQueue := NewQueue(nil, settings)
+	defer testQueue.Close()
+
+	// Send events to queue
+	producer := testQueue.Producer(queue.ProducerConfig{})
+	for i := 0; i < eventsToTest; i++ {
+		producer.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
+	}
+	queueMetricsAreValid(t, testQueue, 5, settings.Events, 0, fmt.Sprintf("%s - First send of metrics to queue", testName))
+
+	// Read events, don't yet ack them
+	batch, err := testQueue.Get(eventsToTest)
+	assert.NilError(t, err, "error in Get")
+	t.Logf("Got batch of %d events", batch.Count())
+
+	queueMetricsAreValid(t, testQueue, 5, settings.Events, 5, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
+
+	// Test metrics after ack
+	batch.Done()
+
+	queueMetricsAreValid(t, testQueue, 0, settings.Events, 0, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
+
+}
+
+func queueMetricsAreValid(t *testing.T, q queue.Queue, evtCount, evtLimit, occupied int, test string) {
+	// wait briefly to avoid races across all the queue channels
+	time.Sleep(time.Millisecond * 100)
+	testMetrics, err := q.Metrics()
+	assert.NilError(t, err, "error calling metrics for test %s", test)
+	assert.Equal(t, testMetrics.EventCount.ValueOr(0), uint64(evtCount), "incorrect EventCount for %s", test)
+	assert.Equal(t, testMetrics.EventLimit.ValueOr(0), uint64(evtLimit), "incorrect EventLimit for %s", test)
+	assert.Equal(t, testMetrics.UnackedConsumedEvents.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
+}
+
 func TestProducerCancelRemovesEvents(t *testing.T) {
 	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024, 0, 0))
 }
@@ -81,7 +146,6 @@ func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.Queu
 			Events:         sz,
 			FlushMinEvents: minEvents,
 			FlushTimeout:   flushTimeout,
-			WaitOnClose:    true,
 		})
 	}
 }

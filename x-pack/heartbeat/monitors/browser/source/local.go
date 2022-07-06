@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/otiai10/copy"
 )
@@ -41,9 +41,9 @@ func (l *LocalSource) Validate() error {
 		return fmt.Errorf("%s: %w", base, err)
 	}
 	if !s.IsDir() {
-		return fmt.Errorf("%s: path points to a non-directory", base)
+		return fmt.Errorf("path points to a non-directory: %w", base)
 	}
-	// ensure the used synthetics version dep used in suite does not
+	// ensure the used synthetics version dep used in project does not
 	// exceed our supported range
 	err = validatePackageJSON(path.Join(l.OrigPath, "package.json"))
 	if err != nil {
@@ -71,10 +71,10 @@ func (l *LocalSource) Fetch() (err error) {
 
 	err = copy.Copy(l.OrigPath, l.workingPath)
 	if err != nil {
-		return fmt.Errorf("could not copy suite: %w", err)
+		return fmt.Errorf("could not copy project: %w", err)
 	}
 
-	dir, err := getAbsoluteSuiteDir(l.workingPath)
+	dir, err := getAbsoluteProjectDir(l.workingPath)
 	if err != nil {
 		return err
 	}
@@ -122,8 +122,8 @@ func (l *LocalSource) Close() error {
 	return nil
 }
 
-func getAbsoluteSuiteDir(suiteFile string) (string, error) {
-	absPath, err := filepath.Abs(suiteFile)
+func getAbsoluteProjectDir(projectFile string) (string, error) {
+	absPath, err := filepath.Abs(projectFile)
 	if err != nil {
 		return "", err
 	}
@@ -133,10 +133,10 @@ func getAbsoluteSuiteDir(suiteFile string) (string, error) {
 	}
 
 	if stat.IsDir() {
-		return suiteFile, nil
+		return projectFile, nil
 	}
 
-	return filepath.Dir(suiteFile), nil
+	return filepath.Dir(projectFile), nil
 }
 
 func runSimpleCommand(cmd *exec.Cmd, dir string) error {

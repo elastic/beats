@@ -137,8 +137,11 @@ class Proc():
         """
         kill_and_wait will kill the process and wait for it to return
         """
-        self.kill()
-        os.close(self.stdin_write)
+        # If the process is running, kill it and close self.stdin_write
+        # this is done so this method can safely be called multiple times
+        if self.proc.poll() is None:
+            self.kill()
+            os.close(self.stdin_write)
         return self.wait()
 
     def check_kill_and_wait(self, exit_code=0):
@@ -151,6 +154,8 @@ class Proc():
 
     def __del__(self):
         # Ensure the process is stopped.
+        # For some reason when some tests error/timeout this
+        # method is not called in a timely manner.
         try:
             self.proc.terminate()
             self.proc.kill()
@@ -413,7 +418,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # running tests in parallel
             pass
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
+    def wait_until(self, cond, max_timeout=20, poll_interval=0.1, name="cond", err_msg=""):
         """
         TODO: this can probably be a "wait_until_output_count", among other things, since that could actually use `self`, and this can become an internal function
         Waits until the cond function returns true,
@@ -427,7 +432,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
                 raise WaitTimeoutError(
-                    f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds.")
+                    f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)
 
     def wait_until_output_has_key(self, key: str, max_timeout=15):
@@ -861,7 +866,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         return "https://{host}:{port}".format(
             host=os.getenv("ES_HOST_SSL", "localhost"),
-            port=os.getenv("ES_PORT_SSL", "9205"),
+            port=os.getenv("ES_PORT_SSL", "9201"),
         )
 
     def get_kibana_url(self):

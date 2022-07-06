@@ -28,8 +28,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/plugin"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
@@ -40,7 +40,7 @@ type PluginFactory struct {
 	Stats   RegistryRecorder
 }
 
-type PluginMake func(string, *common.Config) (p Plugin, err error)
+type PluginMake func(string, *conf.C) (p Plugin, err error)
 
 // Plugin describes a configured instance of a plug-in with its jobs already instantiated.
 type Plugin struct {
@@ -49,7 +49,7 @@ type Plugin struct {
 	Endpoints int
 }
 
-// Close closes the plugin, invoking any DoClose hooks if avialable.
+// Close closes the plugin, invoking any DoClose hooks if available.
 func (p Plugin) Close() error {
 	if p.DoClose != nil {
 		return p.DoClose()
@@ -126,7 +126,7 @@ const (
 	PassiveMonitor
 )
 
-// globalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
+// GlobalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
 var GlobalPluginsReg = NewPluginsReg()
 
 type PluginsReg struct {
@@ -185,7 +185,8 @@ func (r *PluginsReg) Get(name string) (PluginFactory, bool) {
 }
 
 func (r *PluginsReg) String() string {
-	var monitors []string
+	monitors := make([]string, 0, len(r.monitors))
+	// note r.monitors is a map, we're iterating over the key names
 	for m := range r.monitors {
 		monitors = append(monitors, m)
 	}
@@ -202,6 +203,6 @@ func (r *PluginsReg) MonitorNames() []string {
 	return names
 }
 
-func (e *PluginFactory) Create(cfg *common.Config) (p Plugin, err error) {
+func (e *PluginFactory) Create(cfg *conf.C) (p Plugin, err error) {
 	return e.Make(e.Name, cfg)
 }

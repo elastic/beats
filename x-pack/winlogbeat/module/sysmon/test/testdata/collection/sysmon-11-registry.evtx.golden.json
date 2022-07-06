@@ -1,0 +1,237 @@
+[
+  {
+    "@timestamp": "2020-05-05T14:57:40.5995672Z",
+    "event": {
+      "code": "13",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Details": "DWORD (0x00000004)",
+        "EventType": "SetValue",
+        "Image": "C:\\Windows\\regedit.exe",
+        "ProcessGuid": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+        "ProcessId": "6072",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1",
+        "UtcTime": "2020-05-05 14:57:40.589"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2682,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.7232485Z",
+    "event": {
+      "code": "13",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Details": "Binary Data",
+        "EventType": "SetValue",
+        "Image": "C:\\Windows\\Explorer.EXE",
+        "ProcessGuid": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+        "ProcessId": "4320",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+        "UtcTime": "2020-05-05 14:57:44.714"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2686,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.7260099Z",
+    "event": {
+      "code": "13",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Details": "QWORD (0x00000000-0x00000005)",
+        "EventType": "SetValue",
+        "Image": "C:\\Windows\\regedit.exe",
+        "ProcessGuid": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+        "ProcessId": "6072",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2",
+        "UtcTime": "2020-05-05 14:57:44.714"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2687,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:46.8188214Z",
+    "event": {
+      "code": "13",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Details": "Binary Data",
+        "EventType": "SetValue",
+        "Image": "C:\\Windows\\Explorer.EXE",
+        "ProcessGuid": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+        "ProcessId": "4320",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr",
+        "UtcTime": "2020-05-05 14:57:46.808"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2690,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:46.8188691Z",
+    "event": {
+      "code": "13",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Details": "Binary Data",
+        "EventType": "SetValue",
+        "Image": "C:\\Windows\\Explorer.EXE",
+        "ProcessGuid": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+        "ProcessId": "4320",
+        "RuleName": "-",
+        "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+        "UtcTime": "2020-05-05 14:57:46.808"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2691,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  }
+]

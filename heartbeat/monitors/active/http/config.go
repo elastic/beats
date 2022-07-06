@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type Config struct {
@@ -63,10 +63,6 @@ type requestParameters struct {
 	SendHeaders map[string]string `config:"headers"`     // http request headers
 	SendBody    string            `config:"body"`        // send body payload
 	Compression compressionConfig `config:"compression"` // optionally compress payload
-
-	// TODO:
-	//  - add support for cookies
-	//  - select HTTP version. golang lib will either use 1.1 or 2.0 if HTTPS is used, otherwise HTTP 1.1 . => implement/use specific http.RoundTripper implementation to change wire protocol/version being used
 }
 
 type responseParameters struct {

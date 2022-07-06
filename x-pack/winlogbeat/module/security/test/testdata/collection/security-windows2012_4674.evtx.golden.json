@@ -1,0 +1,53 @@
+[
+  {
+    "@timestamp": "2020-04-06T06:38:31.1087891Z",
+    "event": {
+      "action": "Sensitive Privilege Use",
+      "code": "4674",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An operation was attempted on a privileged object.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x8AA365B\n\nObject:\n\tObject Server:\tSecurity\n\tObject Type:\tFile\n\tObject Name:\tC:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\PLA\\Server Manager Performance Monitor\n\tObject Handle:\t0x1ee0\n\nProcess Information:\n\tProcess ID:\t0x374\n\tProcess Name:\tC:\\Windows\\System32\\svchost.exe\n\nRequested Operation:\n\tDesired Access:\tREAD_CONTROL\n\t\t\t\tACCESS_SYS_SEC\n\t\t\t\t\n\tPrivileges:\t\tSeSecurityPrivilege",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "AccessMask": "%%1538\n\t\t\t\t%%1542\n\t\t\t\t",
+        "HandleId": "0x1ee0",
+        "ObjectName": "C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\PLA\\Server Manager Performance Monitor",
+        "ObjectServer": "Security",
+        "ObjectType": "File",
+        "PrivilegeList": "SeSecurityPrivilege",
+        "ProcessId": "0x374",
+        "ProcessName": "C:\\Windows\\System32\\svchost.exe",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x8aa365b",
+        "SubjectUserName": "at_adm",
+        "SubjectUserSid": "S-1-5-21-1717121054-434620538-60925301-2794"
+      },
+      "event_id": "4674",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 504
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5109140,
+      "task": "Sensitive Privilege Use"
+    }
+  }
+]

@@ -15,6 +15,11 @@ func main() {
 	// For sending JSON results
 	pipe := os.NewFile(3, "pipe")
 
+	// Exit immediately to test this error condition
+	if len(os.Args) > 1 && os.Args[1] == "exit" {
+		os.Exit(123)
+	}
+
 	file, err := os.Open("sample.ndjson")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open samplerun.ndjson: %s\n", err)
@@ -42,11 +47,12 @@ func main() {
 			os.Stderr.WriteString("Stderr 2\n")
 			time.Sleep(time.Millisecond * 100)
 		}
-		pipe.WriteString(scanner.Text())
-		pipe.WriteString("\n")
+		_, _ = pipe.WriteString(scanner.Text())
+		_, _ = pipe.WriteString("\n")
 		i++
 	}
 	if scanner.Err() != nil {
+		//nolint:forbidigo // we don't care about this test command
 		fmt.Printf("Scanner error %s", scanner.Err())
 		os.Exit(1)
 	}

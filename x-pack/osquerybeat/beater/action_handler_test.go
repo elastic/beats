@@ -6,15 +6,14 @@ package beater
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type mockExecutor struct {
@@ -156,8 +155,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-
-			fmt.Println(res)
 			_ = res
 		})
 	}

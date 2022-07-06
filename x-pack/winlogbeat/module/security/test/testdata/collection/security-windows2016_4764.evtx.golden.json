@@ -1,0 +1,50 @@
+[
+  {
+    "@timestamp": "2019-10-22T11:33:57.271141Z",
+    "event": {
+      "action": "Security Group Management",
+      "code": "4764",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A group’s type was changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4A727\n\nChange Type:\t\t\tSecurity Enabled Universal Group Changed to Security Enabled Global Group.\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1112\n\tGroup Name:\t\ttest_group2v2\n\tGroup Domain:\t\tWLBEAT\n\nAdditional Information:\n\tPrivileges:\t\t-",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_data": {
+        "GroupTypeChange": "Security Enabled Universal Group Changed to Security Enabled Global Group.",
+        "PrivilegeList": "-",
+        "SubjectDomainName": "WLBEAT",
+        "SubjectLogonId": "0x4a727",
+        "SubjectUserName": "Administrator",
+        "SubjectUserSid": "S-1-5-21-101361758-2486510592-3018839910-500",
+        "TargetDomainName": "WLBEAT",
+        "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1112",
+        "TargetUserName": "test_group2v2"
+      },
+      "event_id": "4764",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 772,
+        "thread": {
+          "id": 1664
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 4669,
+      "task": "Security Group Management"
+    }
+  }
+]

@@ -745,8 +745,7 @@
         "destination.port": 80,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,

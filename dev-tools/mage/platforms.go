@@ -35,7 +35,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"darwin/386", CGOSupported | CrossBuildSupported},
 	{"darwin/amd64", CGOSupported | CrossBuildSupported | Default},
 	{"darwin/arm", CGOSupported},
-	{"darwin/arm64", CGOSupported},
+	{"darwin/arm64", CGOSupported | CrossBuildSupported | Default},
 	{"dragonfly/amd64", CGOSupported},
 	{"freebsd/386", CGOSupported},
 	{"freebsd/amd64", CGOSupported},
@@ -326,13 +326,13 @@ func newPlatformExpression(expr string) (*platformExpression, error) {
 
 // NewPlatformList returns a new BuildPlatformList based on given expression.
 //
-// By default the initial set include only the platforms designated as defaults.
+// By default, the initial set include only the platforms designated as defaults.
 // To add additional platforms to list use an addition term that is designated
 // with a plug sign (e.g. "+netbsd" or "+linux/armv7"). Or you may use "+all"
 // to change the initial set to include all possible platforms then filter
 // from there (e.g. "+all linux windows").
 //
-// The expression can consists of selections (e.g. "linux") and/or
+// The expression can consist of selections (e.g. "linux") and/or
 // removals (e.g."!windows"). Each term can be valid GOOS or a valid GOOS/Arch
 // pair.
 //

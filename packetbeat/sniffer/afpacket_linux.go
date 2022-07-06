@@ -32,7 +32,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/net/bpf"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type afpacketHandle struct {
@@ -161,4 +161,9 @@ func setPromiscMode(device string, enabled bool) error {
 	// and avoid Cgo (pcap)
 	// TODO: replace with x/net/bpf or pcap
 	return syscall.SetLsfPromisc(device, enabled)
+}
+
+// isAfpacketErrTimeout returns whether err is afpacket.ErrTimeout.
+func isAfpacketErrTimeout(err error) bool {
+	return err == afpacket.ErrTimeout
 }

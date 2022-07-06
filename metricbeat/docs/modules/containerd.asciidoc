@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: containerd
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/containerd/_meta/docs.asciidoc
+
 
 [[metricbeat-module-containerd]]
 [role="xpack"]
@@ -50,6 +52,8 @@ Default value is true.
 
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -90,3 +94,4 @@ include::containerd/cpu.asciidoc[]
 
 include::containerd/memory.asciidoc[]
 
+:edit_url!:

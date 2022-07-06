@@ -1,5 +1,5 @@
 [![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/main/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/main/)
-[![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
+[![Go Report Card](https://goreportcard.com/badge/github.com/elastic/beats)](https://goreportcard.com/report/github.com/elastic/beats)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 # Beats - The Lightweight Shippers of the Elastic Stack

@@ -20,6 +20,7 @@ package icmp
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
@@ -31,6 +32,8 @@ import (
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type stdICMPLoop struct {
@@ -76,7 +79,6 @@ type requestContext struct {
 
 type requestResult struct {
 	packet packet
-	err    error
 }
 
 // stdLoop is a singleton for our main ICMP loop since it doesn't
@@ -116,8 +118,8 @@ func newICMPLoop() (*stdICMPLoop, error) {
 	// first (not yet configured).
 	// With multiple configurations using the icmp loop, we have to postpose
 	// IPv4/IPv6 checking
-	conn4 := createListener("IPv4", "ip4:icmp")
-	conn6 := createListener("IPv6", "ip6:ipv6-icmp")
+	conn4 := createListener("ip4:icmp")
+	conn6 := createListener("ip6:ipv6-icmp")
 	unprivilegedPossible := false
 	l := &stdICMPLoop{
 		conn4:    conn4,
@@ -131,8 +133,8 @@ func newICMPLoop() (*stdICMPLoop, error) {
 		case "linux", "darwin":
 			unprivilegedPossible = true
 			//This is non-privileged ICMP, not udp
-			l.conn4 = createListener("Unprivileged IPv4", "udp4")
-			l.conn6 = createListener("Unprivileged IPv6", "udp6")
+			l.conn4 = createListener("udp4")
+			l.conn6 = createListener("udp6")
 		}
 	}
 
@@ -161,13 +163,19 @@ func newICMPLoop() (*stdICMPLoop, error) {
 func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 	for {
 		bytes := make([]byte, 512)
-		conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+		err := conn.SetReadDeadline(time.Now().Add(time.Second))
+		if err != nil {
+			logp.L().Error("could not set read deadline for ICMP: %w", err)
+			return
+		}
 		_, addr, err := conn.ReadFrom(bytes)
 		if err != nil {
-			if neterr, ok := err.(*net.OpError); ok {
-				if neterr.Timeout() {
+			var netErr *net.OpError
+			if errors.As(err, &netErr) {
+				if netErr.Timeout() {
 					continue
 				} else {
+					//nolint:godox // old TODO
 					// TODO: report error and quit loop?
 					return
 				}
@@ -346,10 +354,13 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 	l.requests[id] = ctx
 	l.mutex.Unlock()
 
-	payloadBuf := make([]byte, 48, 48)
+	payloadBuf := make([]byte, 48)
 	payload := bytes.NewBuffer(payloadBuf)
 	ts := time.Now()
-	binary.Write(payload, binary.BigEndian, ts.UnixNano())
+	err := binary.Write(payload, binary.BigEndian, ts.UnixNano())
+	if err != nil {
+		return nil, fmt.Errorf("could not write binary payload: %w", err)
+	}
 
 	msg := &icmp.Message{
 		Type: typ,
@@ -361,7 +372,7 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 	}
 	encoded, _ := msg.Marshal(nil)
 
-	_, err := conn.WriteTo(encoded, addr)
+	_, err = conn.WriteTo(encoded, addr)
 	if err != nil {
 		return nil, fmt.Errorf("could not write to conn: %w", err)
 	}
@@ -370,7 +381,7 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 	return ctx, nil
 }
 
-func createListener(name, network string) *icmp.PacketConn {
+func createListener(network string) *icmp.PacketConn {
 	conn, err := icmp.ListenPacket(network, "")
 
 	// XXX: need to check for conn == nil, as 'err != nil' seems always to be

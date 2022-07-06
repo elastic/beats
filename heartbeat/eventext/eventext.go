@@ -19,11 +19,11 @@ package eventext
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// MergeEventFields merges the given common.MapStr into the given Event's Fields.
-func MergeEventFields(e *beat.Event, merge common.MapStr) {
+// MergeEventFields merges the given mapstr.M into the given Event's Fields.
+func MergeEventFields(e *beat.Event, merge mapstr.M) {
 	if e.Fields != nil {
 		e.Fields.DeepUpdate(merge.Clone())
 	} else {
@@ -37,11 +37,15 @@ const EventCancelledMetaKey = "__hb_evt_cancel__"
 // CancelEvent marks the event as cancelled. Downstream consumers of it should not emit nor output this event.
 func CancelEvent(event *beat.Event) {
 	if event != nil {
-		if event.Meta == nil {
-			event.Meta = common.MapStr{}
-		}
-		event.Meta.Put(EventCancelledMetaKey, true)
+		SetMeta(event, EventCancelledMetaKey, true)
 	}
+}
+
+func SetMeta(event *beat.Event, k string, v interface{}) {
+	if event.Meta == nil {
+		event.Meta = mapstr.M{}
+	}
+	_, _ = event.Meta.Put(k, v)
 }
 
 // IsEventCancelled checks for the marker left by CancelEvent.

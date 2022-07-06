@@ -1,0 +1,52 @@
+[
+  {
+    "@timestamp": "2020-04-01T08:45:44.1717416Z",
+    "event": {
+      "action": "Kerberos Service Ticket Operations",
+      "code": "4769",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A Kerberos service ticket was requested.\n\nAccount Information:\n\tAccount Name:\t\tat_adm@TEST.SAAS\n\tAccount Domain:\t\tTEST.SAAS\n\tLogon GUID:\t\t{46f85809-d26e-96f5-fbf2-73bd761a2d68}\n\nService Information:\n\tService Name:\t\tDC_TEST2K12$\n\tService ID:\t\tS-1-5-21-1717121054-434620538-60925301-1110\n\nNetwork Information:\n\tClient Address:\t\t::1\n\tClient Port:\t\t0\n\nAdditional Information:\n\tTicket Options:\t\t0x40810000\n\tTicket Encryption Type:\t0x12\n\tFailure Code:\t\t0x0\n\tTransited Services:\t-\n\nThis event is generated every time access is requested to a resource such as a computer or a Windows service.  The service name indicates the resource to which access was requested.\n\nThis event can be correlated with Windows logon events by comparing the Logon GUID fields in each event.  The logon event occurs on the machine that was accessed, which is often a different machine than the domain controller which issued the service ticket.\n\nTicket options, encryption types, and failure codes are defined in RFC 4120.",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "IpAddress": "::1",
+        "IpPort": "0",
+        "LogonGuid": "{46f85809-d26e-96f5-fbf2-73bd761a2d68}",
+        "ServiceName": "DC_TEST2K12$",
+        "ServiceSid": "S-1-5-21-1717121054-434620538-60925301-1110",
+        "Status": "0x0",
+        "TargetDomainName": "TEST.SAAS",
+        "TargetUserName": "at_adm@TEST.SAAS",
+        "TicketEncryptionType": "0x12",
+        "TicketOptions": "0x40810000",
+        "TransmittedServices": "-"
+      },
+      "event_id": "4769",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 2868
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5040236,
+      "task": "Kerberos Service Ticket Operations"
+    }
+  }
+]

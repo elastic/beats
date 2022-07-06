@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var inputCtx = v2.Context{
@@ -39,7 +39,7 @@ func TestStatesDelete(t *testing.T) {
 		"delete not existing state": {
 			states: func() *states {
 				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", lastModified), "")
+				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
 			deleteID: "an id",
@@ -49,6 +49,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key",
 					Etag:         "etag",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 			},
@@ -56,7 +57,7 @@ func TestStatesDelete(t *testing.T) {
 		"delete only one existing": {
 			states: func() *states {
 				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", lastModified), "")
+				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey",
@@ -65,9 +66,9 @@ func TestStatesDelete(t *testing.T) {
 		"delete first": {
 			states: func() *states {
 				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
+				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
+				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
+				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey1",
@@ -77,6 +78,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key3",
 					Etag:         "etag3",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 				{
@@ -84,6 +86,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key2",
 					Etag:         "etag2",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 			},
@@ -91,9 +94,9 @@ func TestStatesDelete(t *testing.T) {
 		"delete last": {
 			states: func() *states {
 				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
+				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
+				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
+				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey3",
@@ -103,6 +106,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key1",
 					Etag:         "etag1",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 				{
@@ -110,6 +114,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key2",
 					Etag:         "etag2",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 			},
@@ -117,9 +122,9 @@ func TestStatesDelete(t *testing.T) {
 		"delete any": {
 			states: func() *states {
 				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
+				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
+				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
+				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey2",
@@ -129,6 +134,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key1",
 					Etag:         "etag1",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 				{
@@ -136,6 +142,7 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key3",
 					Etag:         "etag3",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 			},

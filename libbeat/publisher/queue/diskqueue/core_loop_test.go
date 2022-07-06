@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestHandleProducerWriteRequest(t *testing.T) {
@@ -486,11 +486,9 @@ func TestMaybeReadPending(t *testing.T) {
 				nextReadFrameID: 5,
 			},
 			expectedRequest: &readerLoopRequest{
-				segment:      &queueSegment{id: 1},
-				startFrameID: 5,
-				// startPosition is 8, the end of the segment header in the
-				// current file schema.
-				startPosition: 8,
+				segment:       &queueSegment{id: 1},
+				startFrameID:  5,
+				startPosition: segmentHeaderSize,
 				endPosition:   1000,
 			},
 		},
@@ -533,7 +531,7 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest: &readerLoopRequest{
 				segment:       &queueSegment{id: 1},
-				startPosition: 8,
+				startPosition: segmentHeaderSize,
 				endPosition:   1000,
 			},
 		},
@@ -573,7 +571,7 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest: &readerLoopRequest{
 				segment:       &queueSegment{id: 2},
-				startPosition: 8,
+				startPosition: segmentHeaderSize,
 				endPosition:   500,
 			},
 			expectedACKingSegment: segmentIDRef(1),

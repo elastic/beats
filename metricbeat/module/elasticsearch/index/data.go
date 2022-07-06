@@ -24,11 +24,11 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Based on https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L127-L203
@@ -156,7 +156,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	var errs multierror.Errors
 	for name, idx := range indicesStats.Indices {
 		event := mb.Event{
-			ModuleFields: common.MapStr{},
+			ModuleFields: mapstr.M{},
 		}
 		idx.Index = name
 
@@ -181,7 +181,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 			errs = append(errs, errors.Wrap(err, "failure trying to convert metrics results to JSON"))
 			continue
 		}
-		var indexOutput common.MapStr
+		var indexOutput mapstr.M
 		if err = json.Unmarshal(indexBytes, &indexOutput); err != nil {
 			errs = append(errs, errors.Wrap(err, "failure trying to convert JSON metrics back to mapstr"))
 			continue
@@ -210,7 +210,7 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
-func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
+func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
 	if err != nil {
 		return errors.Wrap(err, "failed to get index routing table from cluster state")
@@ -238,7 +238,7 @@ func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
 	return nil
 }
 
-func getClusterStateMetricForIndex(clusterState common.MapStr, index, metricKey string) (common.MapStr, error) {
+func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey string) (mapstr.M, error) {
 	fieldKey := metricKey + ".indices." + index
 	value, err := clusterState.GetValue(fieldKey)
 	if err != nil {
@@ -249,7 +249,7 @@ func getClusterStateMetricForIndex(clusterState common.MapStr, index, metricKey 
 	if !ok {
 		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
 	}
-	return common.MapStr(metric), nil
+	return mapstr.M(metric), nil
 }
 
 func getIndexStatus(shards map[string]interface{}) (string, error) {
@@ -273,7 +273,7 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 				return "", fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
-			shard := common.MapStr(s)
+			shard := mapstr.M(s)
 
 			isPrimary := shard["primary"].(bool)
 			state := shard["state"].(string)
@@ -297,7 +297,7 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 	return "red", nil
 }
 
-func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
+func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 	primaries := 0
 	replicas := 0
 
@@ -322,7 +322,7 @@ func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
 				return nil, fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
-			shard := common.MapStr(s)
+			shard := mapstr.M(s)
 
 			isPrimary := shard["primary"].(bool)
 			state := shard["state"].(string)
@@ -369,7 +369,7 @@ func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
 	}, nil
 }
 
-func getShardsFromRoutingTable(indexRoutingTable common.MapStr) (map[string]interface{}, error) {
+func getShardsFromRoutingTable(indexRoutingTable mapstr.M) (map[string]interface{}, error) {
 	s, err := indexRoutingTable.GetValue("shards")
 	if err != nil {
 		return nil, err

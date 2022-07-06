@@ -26,29 +26,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var validQuery = `\Processor Information(_Total)\% Processor Time`
-
 // TestNewReaderWhenQueryPathNotProvided will check for invalid/no query.
 func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
-	counter := Counter{Format: "float", InstanceName: "TestInstanceName"}
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		Counters:          []Counter{counter},
+		Queries:           make([]Query, 1),
+	}
+	config.Queries[0].Name = "Invalid"
+	config.Queries[0].Instance = []string{"*"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
 	}
 	reader, err := NewReader(config)
 	assert.Error(t, err)
 	assert.Nil(t, reader)
-	assert.EqualValues(t, err.Error(), `failed to expand counter (query=""): no query path given`)
+	assert.EqualValues(t, err.Error(), `failed to expand counter (query="\Invalid(*)\% Processor Time"): The specified object was not found on the computer.`)
 }
 
 // TestNewReaderWithValidQueryPath should successfully instantiate the reader.
 func TestNewReaderWithValidQueryPath(t *testing.T) {
-	counter := Counter{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
+
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		Counters:          []Counter{counter},
+		Queries:           make([]Query, 1),
+	}
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
 	}
 	reader, err := NewReader(config)
 	defer reader.Close()
@@ -63,11 +74,17 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 
 // TestReadSuccessfully will test the func read when it first retrieves no events (and ignored) and then starts retrieving events.
 func TestReadSuccessfully(t *testing.T) {
-	counter := Counter{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		Counters:          []Counter{counter},
+		Queries:           make([]Query, 1),
+	}
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
 	}
 	reader, err := NewReader(config)
 	if err != nil {
@@ -76,10 +93,6 @@ func TestReadSuccessfully(t *testing.T) {
 	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we call reader.Read() twice.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	events, err := reader.Read()
-	assert.NoError(t, err)
-	assert.Nil(t, events)
-	assert.Zero(t, len(events))
-	events, err = reader.Read()
 	assert.NoError(t, err)
 	assert.NotNil(t, events)
 	assert.NotZero(t, len(events))

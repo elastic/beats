@@ -80,5 +80,47 @@
             "cyberarkpas.audit",
             "forwarded"
         ]
+    },
+    {
+        "@timestamp": "2022-03-30T05:51:59.000Z",
+        "cyberarkpas.audit.action": "Retrieve File",
+        "cyberarkpas.audit.ca_properties.other.configuration_schema_version": "12121",
+        "cyberarkpas.audit.desc": "Retrieve File",
+        "cyberarkpas.audit.file": "Root[\\ConfigurationSchemas\\AuditFilters.xsd](file:///ConfigurationSchemas////AuditFilters.xsd/)",
+        "cyberarkpas.audit.iso_timestamp": "2022-03-30T05:51:59Z",
+        "cyberarkpas.audit.issuer": "PSMApp_FOOBAR",
+        "cyberarkpas.audit.message": "Retrieve File",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "PVWAConfig",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.2.1.12",
+        "cyberarkpas.audit.timestamp": "Mar 30 16:51:59",
+        "event.action": "retrieve file",
+        "event.code": "51",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root[\\ConfigurationSchemas\\AuditFilters.xsd](file:///ConfigurationSchemas////AuditFilters.xsd/)",
+        "fileset.name": "audit",
+        "host.name": "HOSTNAME",
+        "input.type": "log",
+        "log.offset": 1243,
+        "log.syslog.priority": "5",
+        "observer.hostname": "HOSTNAME",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "12.1.0000",
+        "related.ip": [
+            "10.2.1.12"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.2.1.12",
+        "source.ip": "10.2.1.12",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
     }
 ]

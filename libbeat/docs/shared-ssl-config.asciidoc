@@ -131,8 +131,9 @@ The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
 
 The list of cipher suites to use. The first entry has the highest priority.
 If this option is omitted, the Go crypto library's https://golang.org/pkg/crypto/tls/[default suites]
-are used (recommended). Note that TLS 1.3 cipher suites are not
-individually configurable in Go, so they are not included in this list.
+are used (recommended).
+
+Note that if TLS 1.3 is enabled (which is true by default), then the default TLS 1.3 cipher suites are always included, because Go's standard library adds them to all connections. In order to exclude the default TLS 1.3 ciphers, TLS 1.3 must also be disabled, e.g. with the setting `ssl.supported_protocols = [TLSv1.2]`.
 
 // tag::cipher_suites[]
 The following cipher suites are available:

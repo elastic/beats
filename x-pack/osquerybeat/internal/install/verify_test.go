@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // setupFiles helper function that creates subdirectory with a given set of files
@@ -31,7 +31,7 @@ func setupFiles(testdataBaseDir string, files []string) (string, error) {
 			return "", err
 		}
 
-		err = ioutil.WriteFile(fp, nil, 0750)
+		err = ioutil.WriteFile(fp, nil, 0600)
 		if err != nil {
 			return "", err
 		}

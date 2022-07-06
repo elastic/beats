@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConversions(t *testing.T) {
@@ -92,7 +93,7 @@ func TestConversions(t *testing.T) {
 		"test_error_string": Str("testErrorString", s.Optional),
 	}
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"test_string":               "hello",
 		"test_int":                  int64(42),
 		"test_int_from_float":       int64(42),
@@ -106,10 +107,10 @@ func TestConversions(t *testing.T) {
 		"test_bool":                 true,
 		"test_time":                 common.Time(ts),
 		"common_time":               cTs,
-		"test_obj_1": common.MapStr{
+		"test_obj_1": mapstr.M{
 			"test": "hello from top level",
 		},
-		"test_obj_2": common.MapStr{
+		"test_obj_2": mapstr.M{
 			"test": "hello, object",
 		},
 		"test_nested": map[string]interface{}{
@@ -129,7 +130,7 @@ func TestOptionalField(t *testing.T) {
 		Description string
 		Input       map[string]interface{}
 		Schema      s.Schema
-		Expected    common.MapStr
+		Expected    mapstr.M
 		ExpectError bool
 	}{
 		{
@@ -143,7 +144,7 @@ func TestOptionalField(t *testing.T) {
 				"test_int":    Int("testInt"),
 				"test_opt":    Bool("testOptionalInt", s.Optional),
 			},
-			common.MapStr{
+			mapstr.M{
 				"test_string": "hello",
 				"test_int":    int64(42),
 			},
@@ -157,7 +158,7 @@ func TestOptionalField(t *testing.T) {
 			s.Schema{
 				"test_int": Int("testInt", s.Optional),
 			},
-			common.MapStr{},
+			mapstr.M{},
 			true,
 		},
 	}
@@ -242,7 +243,7 @@ func TestFullFieldPathInErrors(t *testing.T) {
 			assert.Contains(t, err.Error(), c.Expected, c.Description)
 		}
 
-		_, errs := c.Schema.ApplyTo(common.MapStr{}, c.Input)
+		_, errs := c.Schema.ApplyTo(mapstr.M{}, c.Input)
 		assert.Error(t, errs.Err(), c.Description)
 		if assert.Equal(t, 1, len(errs), c.Description) {
 			keyErr, ok := errs[0].(s.KeyError)
@@ -258,7 +259,7 @@ func TestNestedFieldPaths(t *testing.T) {
 		Description string
 		Input       map[string]interface{}
 		Schema      s.Schema
-		Expected    common.MapStr
+		Expected    mapstr.M
 		ExpectError bool
 	}{
 		{
@@ -277,7 +278,7 @@ func TestNestedFieldPaths(t *testing.T) {
 				"int":   Int("root.int"),
 				"bool":  Bool("root.bool"),
 			},
-			common.MapStr{
+			mapstr.M{
 				"foo":   "bar",
 				"float": float64(4.5),
 				"int":   int64(4),
@@ -293,7 +294,7 @@ func TestNestedFieldPaths(t *testing.T) {
 			s.Schema{
 				"foo": Str("root.foo"),
 			},
-			common.MapStr{
+			mapstr.M{
 				"foo": "bar",
 			},
 			false,
@@ -312,8 +313,8 @@ func TestNestedFieldPaths(t *testing.T) {
 					"foo": Str("foo"),
 				}),
 			},
-			common.MapStr{
-				"dict": common.MapStr{
+			mapstr.M{
+				"dict": mapstr.M{
 					"foo": "bar",
 				},
 			},

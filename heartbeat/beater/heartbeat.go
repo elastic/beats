@@ -31,10 +31,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 )
@@ -58,17 +58,10 @@ type CloudConfig struct {
 }
 
 // New creates a new heartbeat.
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
-	//es8, _ := elasticsearch8.NewDefaultClient()
-
-	//cloudConfig{}
-	//elasticsearch8.NewClient(elasticsearch8.Config{
-	//	CloudID: cfg.CloudID,
-	//})
-
+func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
@@ -127,6 +120,12 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 			return err
 		}
 	}
+	// Configure the beats Manager to start after all the reloadable hooks are initialized
+	// and shutdown when the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -148,7 +147,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
-	var runners []cfgfile.Runner
+	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
 		created, err := bt.dynamicFactory.Create(b.Publisher, cfg)
 		if err != nil {

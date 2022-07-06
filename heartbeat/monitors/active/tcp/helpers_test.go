@@ -18,12 +18,12 @@
 package tcp
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -31,11 +31,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port uint16) *beat.Event {
-	config, err := common.NewConfigFrom(configMap)
+func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {
+	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
 	p, err := create("tcp", config)
@@ -53,7 +54,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	return event
 }
 
-func setupServer(t *testing.T, serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
+func setupServer(_ *testing.T, serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
 	server, err := serverCreator(hbtest.HelloWorldHandler(200))
 	if err != nil {
 		return nil, 0, err
@@ -73,7 +74,7 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) (*httptest.Serve
 func newHostTestServer(handler http.Handler, host string) (*httptest.Server, error) {
 	listener, err := net.Listen("tcp", net.JoinHostPort(host, "0"))
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to listen on host '%s'", host)
+		return nil, fmt.Errorf("failed to listen on host '%s': %w", host, err)
 	}
 
 	server := &httptest.Server{

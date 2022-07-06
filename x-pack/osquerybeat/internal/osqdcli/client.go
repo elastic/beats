@@ -21,7 +21,7 @@ import (
 	"github.com/osquery/osquery-go"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -167,8 +167,7 @@ func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
 	// The current osquery go library github.com/osquery/osquery-go uses the older version of thrift library that
 	// doesn't not wrap the original error, so we have to use this ugly check for the error message suffix here.
 	// The latest version of thrift library is wrapping the error, so adding this check first here.
-	if (errors.As(err, &netErr) && (netErr.Err == syscall.EPIPE || netErr.Err ==
-		syscall.ECONNRESET)) ||
+	if (errors.As(err, &netErr) && (errors.Is(netErr.Err, syscall.EPIPE) || errors.Is(netErr.Err, syscall.ECONNRESET))) ||
 		strings.HasSuffix(err.Error(), " broken pipe") {
 
 		c.log.Debugf("osquery error: %v, reconnect", err)

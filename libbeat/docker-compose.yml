@@ -1,54 +1,11 @@
 version: '2.3'
 services:
-  beat:
-    build: ${PWD}/.
-    depends_on:
-      - proxy_dep
-    environment:
-      - BEAT_STRICT_PERMS=false
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - SREDIS_HOST=sredis
-      - SREDIS_PORT=6380
-      - LS_HOST=logstash
-      - LS_TCP_PORT=5044
-      - LS_TLS_PORT=5055
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9092
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
-      - KIBANA_USER=beats
-      - KIBANA_PASS=testing
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-      # ES_USER must be admin in order for the Go Integration tests to
-      # function because they require indices:data/read/search
-      - ES_USER=admin
-      - ES_PASS=testing
-      - ES_MONITORING_HOST=elasticsearch_monitoring
-      - ES_MONITORING_PORT=9200
-      - ES_HOST_SSL=elasticsearchssl
-      # See https://github.com/elastic/beats/issues/21838
-      # - ES_KERBEROS_HOST=elasticsearch_kerberos.elastic
-      - ES_PORT_SSL=9200
-      - ES_SUPERUSER_USER=admin
-      - ES_SUPERUSER_PASS=testing
-    volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
-      # Used for docker integration tests:
-      - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /go/src/github.com/elastic/beats/libbeat
-    command: make
-
-  # This is a proxy used to block beats until all services are healthy.
+  # This is a proxy used to block "docker-compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
     image: busybox
     depends_on:
       elasticsearch:                  { condition: service_healthy }
-      # See https://github.com/elastic/beats/issues/21838
-      # elasticsearch_kerberos.elastic: { condition: service_healthy }
-      elasticsearch_monitoring:       { condition: service_healthy }
       elasticsearchssl:               { condition: service_healthy }
       logstash:                       { condition: service_healthy }
       kafka:                          { condition: service_healthy }
@@ -67,13 +24,8 @@ services:
       test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
       interval: 1s
-
-  elasticsearch_monitoring:
-    extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
-      service: elasticsearch
-    healthcheck:
-      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+    ports:
+      - 9200:9200
 
   elasticsearchssl:
     extends:
@@ -86,7 +38,6 @@ services:
       start_period: 60s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=true"
@@ -104,8 +55,8 @@ services:
       - ${ES_BEATS}/testing/environments/docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml
       - ${ES_BEATS}/testing/environments/docker/elasticsearch/users:/usr/share/elasticsearch/config/users
       - ${ES_BEATS}/testing/environments/docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles
-    expose:
-      - 9200
+    ports:
+      - 9201:9200
 
   # This host name is static because of the certificate.
   logstash:
@@ -118,55 +69,30 @@ services:
 
   redis:
     build: ${ES_BEATS}/testing/environments/docker/redis
+    ports:
+      - 6379:6379
 
   # This host name is static because of the certificate.
   sredis: # stunnel proxy for redis
     build: ${ES_BEATS}/testing/environments/docker/sredis
-    expose:
-      - 6380
     depends_on:
       redis:
         condition: service_healthy
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    ports:
+      - 6380:6380
 
   kafka:
     build: ${ES_BEATS}/testing/environments/docker/kafka
-    expose:
-      - 9092
-      - 2181
+    ports:
+      - 9092:9092
+      - 9093:9093
+      - 9094:9094
+      - 2181:2181
     environment:
       - ADVERTISED_HOST=kafka
-
-  # elasticsearch_kerberos.elastic:
-  #   build: ${ES_BEATS}/testing/environments/docker/elasticsearch_kerberos
-  #   healthcheck:
-  #     test: bash -c "/healthcheck.sh"
-  #     retries: 1200
-  #     interval: 5s
-  #     start_period: 60s
-  #   environment:
-  #     - "TERM=linux"
-  #     - "ELASTIC_PASSWORD=changeme"
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.security.krb5.conf=/etc/krb5.conf"
-  #     - "network.host="
-  #     - "transport.host=127.0.0.1"
-  #     - "http.host=0.0.0.0"
-  #     - "xpack.security.enabled=true"
-  #     - "indices.id_field_data.enabled=true"
-  #     - "xpack.license.self_generated.type=trial"
-  #     - "xpack.security.authc.realms.kerberos.ELASTIC.order=1"
-  #     - "xpack.security.authc.realms.kerberos.ELASTIC.keytab.path=/usr/share/elasticsearch/config/HTTP_elasticsearch_kerberos.elastic.keytab"
-  #   hostname: elasticsearch_kerberos.elastic
-  #   volumes:
-  #     # This is needed otherwise there won't be enough entropy to generate a new kerberos realm
-  #     - /dev/urandom:/dev/random
-  #   ports:
-  #     - 1088
-  #     - 1749
-  #     - 9200
-  #   command: bash -c "/start.sh"
 
   kibana:
     extends:

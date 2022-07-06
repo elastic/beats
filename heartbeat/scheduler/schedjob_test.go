@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestSchedJobRun(t *testing.T) {
@@ -66,7 +66,8 @@ func TestSchedJobRun(t *testing.T) {
 			s := Create(limit, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 			if testCase.overLimit {
-				s.limitSem.Acquire(context.Background(), limit)
+				err := s.limitSem.Acquire(context.Background(), limit)
+				require.NoError(t, err)
 			}
 
 			wg := &sync.WaitGroup{}

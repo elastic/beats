@@ -1,0 +1,57 @@
+[
+  {
+    "@timestamp": "2019-11-14T17:10:15.1515514Z",
+    "event": {
+      "action": "Process Creation",
+      "code": "4688",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A new process has been created.\n\nCreator Subject:\n\tSecurity ID:\t\tS-1-5-21-1610636575-2290000098-1654242922-1000\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT\n\tLogon ID:\t\t0x274A2\n\nTarget Subject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nProcess Information:\n\tNew Process ID:\t\t0x11cc\n\tNew Process Name:\tC:\\Windows\\System32\\wevtutil.exe\n\tToken Elevation Type:\t%%1937\n\tMandatory Label:\t\tS-1-16-12288\n\tCreator Process ID:\t0x122c\n\tCreator Process Name:\tC:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n\tProcess Command Line:\t\"C:\\Windows\\system32\\wevtutil.exe\" cl Security\n\nToken Elevation Type indicates the type of token that was assigned to the new process in accordance with User Account Control policy.\n\nType 1 is a full token with no privileges removed or groups disabled.  A full token is only used if User Account Control is disabled or if the user is the built-in Administrator account or a service account.\n\nType 2 is an elevated token with no privileges removed or groups disabled.  An elevated token is used when User Account Control is enabled and the user chooses to start the program using Run as administrator.  An elevated token is also used when an application is configured to always require administrative privilege or to always require maximum privilege, and the user is a member of the Administrators group.\n\nType 3 is a limited token with administrative privileges removed and administrative groups disabled.  The limited token is used when User Account Control is enabled, the application does not require administrative privilege, and the user does not choose to start the program using Run as administrator.",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant",
+      "event_data": {
+        "CommandLine": "\"C:\\Windows\\system32\\wevtutil.exe\" cl Security",
+        "MandatoryLabel": "S-1-16-12288",
+        "NewProcessId": "0x11cc",
+        "NewProcessName": "C:\\Windows\\System32\\wevtutil.exe",
+        "ParentProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "ProcessId": "0x122c",
+        "SubjectDomainName": "VAGRANT",
+        "SubjectLogonId": "0x274a2",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000",
+        "TargetDomainName": "-",
+        "TargetLogonId": "0x0",
+        "TargetUserName": "-",
+        "TargetUserSid": "S-1-0-0",
+        "TokenElevationType": "%%1937"
+      },
+      "event_id": "4688",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 4,
+        "thread": {
+          "id": 5076
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5010,
+      "task": "Process Creation",
+      "version": 2
+    }
+  }
+]

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: istio
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/istio/_meta/docs.asciidoc
+
 
 [[metricbeat-module-istio]]
 [role="xpack"]
@@ -43,6 +45,8 @@ image::./images/metricbeat-istio-overview.png[]
 
 image::./images/metricbeat-istio-traffic.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -139,3 +143,4 @@ include::istio/pilot.asciidoc[]
 
 include::istio/proxy.asciidoc[]
 
+:edit_url!:

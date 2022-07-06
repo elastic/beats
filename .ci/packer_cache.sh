@@ -57,10 +57,11 @@ function dockerPullImages() {
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
   golang:${GO_VERSION}
+  docker.elastic.co/infra/release-manager:latest
   "
   for image in ${DOCKER_IMAGES}
   do
-    (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image. Continuing."
+    (retry 2 docker pull "${image}") || echo "Error pulling ${image} Docker image. Continuing."
   done
 }
 

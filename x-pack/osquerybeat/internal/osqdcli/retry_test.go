@@ -9,13 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestRetryRun(t *testing.T) {
-	logp.Configure(logp.Config{
+	_ = logp.Configure(logp.Config{
 		Level:     logp.DebugLevel,
 		ToStderr:  true,
 		Selectors: []string{"*"},

@@ -1,9 +1,0 @@
-version: '3'
-services:
-  testunit:
-    build:
-      context: .
-      dockerfile: Dockerfile.test
-      args:
-        GO_VERSION: ${GO_VERSION}
-    command: ["mage", "update", "check:all", "test:all"]
