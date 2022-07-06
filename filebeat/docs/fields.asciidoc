@@ -21639,6 +21639,16 @@ type: keyword
 
 --
 
+*`cisco.asa.source_user_security_group_tag`*::
++
+--
+The Security Group Tag for the source user. Security Group Tag are 16-bit identifiers used to represent logical group privilege.
+
+
+type: long
+
+--
+
 *`cisco.asa.destination_username`*::
 +
 --
@@ -21646,6 +21656,16 @@ Name of the user that is the destination for this event.
 
 
 type: keyword
+
+--
+
+*`cisco.asa.destination_user_security_group_tag`*::
++
+--
+The Security Group Tag for the destination user. Security Group Tag are 16-bit identifiers used to represent logical group privilege.
+
+
+type: long
 
 --
 

@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
+- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 
 *Heartbeat*
 
