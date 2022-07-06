@@ -133,6 +133,8 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	if err != nil {
 		return ProcState{}, fmt.Errorf("error fetching PID %d: %w", self, err)
 	}
+	// Copy Value over here, which would normally happen in system/process as part of percent calculation
+	pidStat.CPU.Total.Value = opt.FloatWith(float64(pidStat.CPU.Total.Ticks.ValueOr(0)))
 
 	return pidStat, nil
 }
