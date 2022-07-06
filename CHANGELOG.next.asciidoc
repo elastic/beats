@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
 - Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
+- Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 
 *Heartbeat*
 

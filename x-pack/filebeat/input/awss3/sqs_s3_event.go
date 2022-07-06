@@ -21,6 +21,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const (
@@ -274,7 +275,7 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	defer log.Debug("End processing SQS S3 event notifications.")
 
 	// Wait for all events to be ACKed before proceeding.
-	acker := newEventACKTracker(ctx)
+	acker := awscommon.NewEventACKTracker(ctx)
 	defer acker.Wait()
 
 	var errs []error

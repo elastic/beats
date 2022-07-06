@@ -30,6 +30,7 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const (
@@ -176,7 +177,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		go func() {
 			for event := range client.Channel {
 				// Fake the ACK handling that's not implemented in pubtest.
-				event.Private.(*eventACKTracker).ACK()
+				event.Private.(*awscommon.EventACKTracker).ACK()
 			}
 		}()
 
@@ -262,7 +263,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		metrics := newInputMetrics(metricRegistry, "test_id")
 
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
 		defer close(client.Channel)
