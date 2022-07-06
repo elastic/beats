@@ -683,22 +683,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
           }
           withOtelEnv() {
             // for windows-2008-r2 there is a requirement to install terraform without the certificate validation
-            // see https://github.com/elastic/beats/pull/32219
-            if (label?.contains('windows-2008')) {
-              def location = pwd(tmp: true)
-              withEnv(["PATH+TERRAFORM=${location}"]) {
-                def url = "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_windows_amd64.zip"
-                def zipfile = 'terraform.zip'
-                dir(location) {
-                  downloadWithWget(url: url, output: zipfile, flags: '--no-check-certificate')
-                  unzip(quiet: true, zipFile: zipfile)
-                }
-                body()
-              }
-            } else {
-              withTerraformEnv(version: env.TERRAFORM_VERSION) {
-                body()
-              }
+            withTerraformEnv(version: env.TERRAFORM_VERSION, noCheckCertificate: label?.contains('windows-2008')) {
+              body()
             }
           }
         } catch(err) {
