@@ -10,10 +10,11 @@ import (
 	"fmt"
 	"strconv"
 
+	retryablehttp "github.com/hashicorp/go-retryablehttp"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
 )
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -57,7 +58,8 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 	}
 
 	if err != nil {
-		if v, ok := err.(*url.Error); ok {
+		var v *url.Error
+		if errors.As(err, &v) {
 			// Don't retry if the error was due to too many redirects.
 			if redirectsErrorRe.MatchString(v.Error()) {
 				return false, nil
@@ -69,7 +71,8 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 			}
 
 			// Don't retry if the error was due to TLS cert verification failure.
-			if _, ok := v.Err.(x509.UnknownAuthorityError); ok {
+			var k x509.UnknownAuthorityError
+			if errors.As(v.Err, &k) {
 				return false, nil
 			}
 		}
