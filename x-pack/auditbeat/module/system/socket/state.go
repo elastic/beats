@@ -506,7 +506,8 @@ func (s *state) ExpireFlows() {
 func (s *state) expireFlows() (toReport linkedList) {
 	s.Lock()
 	defer s.Unlock()
-	deadline := s.clock().Add(-s.inactiveTimeout)
+	now := s.clock()
+	deadline := now.Add(-s.inactiveTimeout)
 	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if flow, ok := item.(*flow); ok {
 			flows := s.onFlowTerminated(flow)
@@ -516,7 +517,7 @@ func (s *state) expireFlows() (toReport linkedList) {
 		}
 		item = s.flowLRU.peek()
 	}
-	deadline = s.clock().Add(-s.socketTimeout)
+	deadline = now.Add(-s.socketTimeout)
 	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
 			s.onSockDestroyed(sock.sock, sock, 0)
@@ -525,7 +526,7 @@ func (s *state) expireFlows() (toReport linkedList) {
 		}
 		item = s.socketLRU.peek()
 	}
-	deadline = s.clock().Add(-s.closeTimeout)
+	deadline = now.Add(-s.closeTimeout)
 	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
 			flows := s.onSockTerminated(sock)
