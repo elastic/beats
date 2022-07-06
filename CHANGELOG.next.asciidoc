@@ -46,7 +46,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Heartbeat*
 
-- Fix regression where we write a dotted (non-nested) key `event.type`. {pull}32097[32097]
 
 *Metricbeat*
 
@@ -129,6 +128,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
