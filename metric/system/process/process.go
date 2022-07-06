@@ -134,7 +134,7 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	if err != nil {
 		return ProcState{}, fmt.Errorf("error fetching PID %d: %w", self, err)
 	}
-
+	procStats.ProcsMap[self] = pidStat
 	return pidStat, nil
 }
 
