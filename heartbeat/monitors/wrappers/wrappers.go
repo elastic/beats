@@ -97,15 +97,17 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 			}
 			status, err := event.GetValue("monitor.status")
 
+			fmt.Printf("COMPUTE START\n")
 			ms, newMs, oldMs := mst.Compute(trackerId, status == "up")
+			fmt.Printf("COMPUTE END\n")
 
-			stateFields := common.MapStr{
+			stateFields := mapstr.M{
 				"id":     ms.Id(),
 				"status": ms.Status(),
 			}
 
 			if newMs != nil {
-				stateFields["starting"] = common.MapStr{
+				stateFields["starting"] = mapstr.M{
 					"id":         newMs.Id(),
 					"started_at": newMs.StartedAt.UnixMilli(),
 					"status":     newMs.Status(),
@@ -116,7 +118,7 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 				logp.Warn("!!!ADD  END")
 				endedAt := newMs.StartedAt.Add(-time.Millisecond)
 
-				stateFields["ending"] = common.MapStr{
+				stateFields["ending"] = mapstr.M{
 					"id":         oldMs.Id(),
 					"started_at": oldMs.StartedAt.UnixMilli(),
 					// Set the end time to 1ms before the new state
@@ -130,7 +132,7 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 			}
 			logp.Warn("CHECKS: %s - u:%d d:%d", ms.Status(), ms.Up, ms.Down)
 
-			eventext.MergeEventFields(event, common.MapStr{"state": stateFields})
+			eventext.MergeEventFields(event, mapstr.M{"state": stateFields})
 
 			return cont, err
 		}

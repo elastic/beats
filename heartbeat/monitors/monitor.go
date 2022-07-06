@@ -227,7 +227,6 @@ func (m *Monitor) Start() {
 	defer m.internalsMtx.Unlock()
 
 	for _, t := range m.configuredJobs {
-		client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
 		if m.runOnce {
 			client, err := pipeline.NewSyncClient(logp.L(), t.monitor.pipelineConnector, beat.ClientConfig{})
 			if err != nil {
@@ -242,16 +241,15 @@ func (m *Monitor) Start() {
 				wait:  client.Wait,
 			})
 		} else {
+			client, err := m.pipelineConnector.Connect()
 			if err != nil {
 				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
-				Publish: func(event beat.Event) {
-					client.Publish(event)
-				},
-				Close: client.Close,
-				wait:  func() {},
+				Publish: client.Publish,
+				Close:   client.Close,
+				wait:    func() {},
 			})
 		}
 	}
