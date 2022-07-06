@@ -100,7 +100,7 @@ type monitorState struct {
 	flapHistory []historicalStatus
 }
 
-func (state monitorState) Id() int64 {
+func (state *monitorState) Id() int64 {
 	return state.StartedAt.UnixMilli()
 }
 

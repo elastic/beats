@@ -18,6 +18,7 @@
 package wrappers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
@@ -43,7 +44,7 @@ import (
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	mst := monitorstate.NewMonitorStateTracker()
 	if stdMonFields.Type == "browser" {
-		return WrapBrowser(js, stdMonFields)
+		return WrapBrowser(js, stdMonFields, mst)
 	} else {
 		return WrapLightweight(js, stdMonFields, mst)
 	}
@@ -69,37 +70,40 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.MonitorStateTracker) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(true),
+		addMonitorState(stdMonFields, mst),
 		logJourneySummaries,
 	)
 }
 
-// addMonitorMeta adds the id, name, and type fields to the monitor.
+// addMonitorState computes the various state fields
 func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorStateTracker) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := job(event)
 
-			// Only process terminal docs
-			if len(cont) > 0 {
+			hasSummary, _ := event.Fields.HasKey("summary.up")
+			if !hasSummary {
 				return cont, err
 			}
+			logp.Warn("TERMINAL DOC FOR %s", sf.ID)
 
 			trackerId := sf.ID
 			if ip, err := event.GetValue("monitor.ip"); err != nil {
 				trackerId = fmt.Sprintf("%s-%s", sf.ID, ip)
 			}
 			status, err := event.GetValue("monitor.status")
+			if err != nil {
+				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
+			}
 
-			fmt.Printf("COMPUTE START\n")
 			ms, newMs, oldMs := mst.Compute(trackerId, status == "up")
-			fmt.Printf("COMPUTE END\n")
 
 			stateFields := mapstr.M{
 				"id":     ms.Id(),
@@ -118,23 +122,28 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 				logp.Warn("!!!ADD  END")
 				endedAt := newMs.StartedAt.Add(-time.Millisecond)
 
+				durationMs := endedAt.Sub(oldMs.StartedAt).Milliseconds()
+				stateFields["duration_ms"] = durationMs
+
 				stateFields["ending"] = mapstr.M{
 					"id":         oldMs.Id(),
 					"started_at": oldMs.StartedAt.UnixMilli(),
 					// Set the end time to 1ms before the new state
 					"ended_at":    endedAt.UnixMilli(),
-					"duration_ms": endedAt.Sub(oldMs.StartedAt).Milliseconds(),
+					"duration_ms": durationMs,
 					"checks":      oldMs.Checks,
 					"up":          oldMs.Up,
 					"down":        oldMs.Down,
 					"status":      oldMs.Status(),
 				}
 			}
-			logp.Warn("CHECKS: %s - u:%d d:%d", ms.Status(), ms.Up, ms.Down)
+			logp.Warn("CHECKS: %s - s:%s u:%d d:%d", sf.ID, ms.Status(), ms.Up, ms.Down)
 
 			eventext.MergeEventFields(event, mapstr.M{"state": stateFields})
+			f, _ := json.Marshal(event.Fields)
+			logp.Info("SUMMARY %s", f)
 
-			return cont, err
+			return cont, nil
 		}
 	}
 }

@@ -18,7 +18,6 @@
 package monitors
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -93,7 +92,6 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 		} else {
 			// Let's yield this goroutine so we don't spin
 			// This could (possibly?) lock on a single core system otherwise
-			fmt.Println("WAITA")
 			time.Sleep(time.Microsecond)
 		}
 	}
