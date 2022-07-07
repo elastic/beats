@@ -1094,7 +1094,11 @@ Collect and make events from response in any format supported by httpjson for al
 [float]
 ==== `chain[].while`
 
-Contains basic request and response configuration for chained while calls. Chained while calls keep making the requests for a given number of times until a condition is met.
+Contains basic request and response configuration for chained while calls. Chained while calls will keep making the requests for a given number of times until a condition is met
+or the maximum number of attempts gets exhausted. While chain has an attribute `till` which holds the expression to be evaluated. Ideally the `till` field should always be used 
+together with the attributes `request.retry.max_attempts` and `request.retry.wait_min` which specifies the maximum number of attempts to evaluate `till` before giving up and the 
+maximum wait time in between such requests. If `request.retry.max_attempts` is not specified, it will only try to evaluate the expression once and give up if it fails. If 
+`request.retry.wait_min` is not specified the default wait time will always be `0` as in successive calls will be made immediately.
 
 [float]
 ==== `chain[].while.request`

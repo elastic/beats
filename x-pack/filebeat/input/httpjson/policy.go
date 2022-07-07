@@ -10,7 +10,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -31,6 +31,11 @@ var (
 	schemeErrorRe = regexp.MustCompile(`unsupported protocol scheme`)
 )
 
+// Evaluate is a template expression evaluation function which accepts a
+// valid go text/template expression and evaluates the expected field value to the
+// field value present in data using the defined operator/function in the given expression.
+// Example : [[ eq .last_response.body.status "completed" ]] -- which means here data is a http response
+// containing a field "status" under the field "body" , and value status should be equal to the string "completed"
 type Evaluate func(expression *valueTpl, data []byte, log *logp.Logger) (bool, error)
 
 // Responsible for maintaining different http client policies
@@ -89,11 +94,11 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 		return true, nil
 	}
 
-	// Evaluate custom
+	// Evaluate custom expression
 	if p.fn != nil && p.expression != nil {
 		var retry bool
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return retry, fmt.Errorf("failed to read http response body : %w", err)
 		}
@@ -106,7 +111,7 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 		if !result {
 			retry = true
 		}
-		resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		resp.Body = io.NopCloser(bytes.NewBuffer(body))
 
 		return retry, nil
 	}

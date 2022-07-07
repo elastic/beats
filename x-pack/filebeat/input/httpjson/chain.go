@@ -75,6 +75,12 @@ type stepConfig struct {
 	Replace  string              `config:"replace,omitempty"`
 }
 
+// whileConfig will contain basic properties like auth parameters, request parameters,
+// response parameters , a replace parameter and an expression parameter called till.
+// While is similar to stepConfig with the addition of till. Till holds an expression
+// and with the combination of "request.retry.max_attempts" retries a request till the
+// expression is evaluated to "true" or request.retry.max_attempts is exhausted. If
+// request.retry.max_attempts is not specified , the max_attempts is always 1.
 type whileConfig struct {
 	Auth     *authConfig         `config:"auth"`
 	Request  requestConfig       `config:"request" validate:"required"`
