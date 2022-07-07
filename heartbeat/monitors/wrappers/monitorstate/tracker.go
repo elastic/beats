@@ -72,7 +72,7 @@ func (mst *MonitorStateTracker) Compute(monitorId string, isUp bool) (curState *
 			// The state is stable, no changes needed
 			state.recordCheck(isUp)
 			return state
-		} else if state.StartedAtMs > time.Now().Add(-FlappingThreshold).UnixMilli() {
+		} else if state.StartedAtMs > float64(time.Now().Add(-FlappingThreshold).UnixMilli()) {
 			// The state changed too quickly, we're now flapping
 			// TODO: is the above conditional right?
 			state.flapCompute(currentStatus) // record the new state to the flap history

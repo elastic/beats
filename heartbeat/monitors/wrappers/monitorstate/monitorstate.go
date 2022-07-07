@@ -14,7 +14,7 @@ const (
 )
 
 func NewMonitorState(monitorId string, isUp bool) *MonitorState {
-	startedAtMs := time.Now().UnixMilli()
+	startedAtMs := float64(time.Now().UnixMilli())
 	ms := &MonitorState{
 		Id:          fmt.Sprintf("%s-%x", monitorId, startedAtMs),
 		MonitorId:   monitorId,
@@ -30,14 +30,14 @@ func NewMonitorState(monitorId string, isUp bool) *MonitorState {
 }
 
 type HistoricalStatus struct {
-	TsMs   int64  `json:"ts_ms"`
-	Status string `json:"status"`
+	TsMs   float64 `json:"ts_ms"`
+	Status string  `json:"status"`
 }
 
 type MonitorState struct {
 	MonitorId   string             `json:"monitorId"`
 	Id          string             `json:"id"`
-	StartedAtMs int64              `json:"started_at_ms"`
+	StartedAtMs float64            `json:"started_at_ms"`
 	Status      string             `json:"status"`
 	Checks      int                `json:"checks"`
 	Up          int                `json:"up"`
@@ -65,14 +65,14 @@ func (state *MonitorState) isStateStillStable(currentStatus string) bool {
 
 // flapCompute returns true if we are still flapping, false if we no longer are.
 func (state *MonitorState) flapCompute(currentStatus string) bool {
-	state.FlapHistory = append(state.FlapHistory, HistoricalStatus{time.Now().UnixMilli(), state.Status})
+	state.FlapHistory = append(state.FlapHistory, HistoricalStatus{float64(time.Now().UnixMilli()), state.Status})
 	state.Status = currentStatus
 
 	// Figure out which values are old enough that we can discard them for our calculation
 	cutOff := time.Now().Add(-FlappingThreshold).UnixMilli()
 	discardIndex := -1
 	for idx, hs := range state.FlapHistory {
-		if hs.TsMs < cutOff {
+		if int64(hs.TsMs) < cutOff {
 			discardIndex = idx
 		} else {
 			break
