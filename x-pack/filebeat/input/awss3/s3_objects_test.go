@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectResponse) {
@@ -147,7 +148,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
-		ack := newEventACKTracker(ctx)
+		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 		assert.True(t, errors.Is(err, errFakeConnectivityFailure), "expected errFakeConnectivityFailure error")
@@ -169,7 +170,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, nil)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
-		ack := newEventACKTracker(ctx)
+		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 	})
@@ -196,7 +197,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
-		ack := newEventACKTracker(ctx)
+		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
 	})
@@ -234,13 +235,13 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 	)
 
 	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, selectors)
-	ack := newEventACKTracker(ctx)
+	ack := awscommon.NewEventACKTracker(ctx)
 	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 
 	if !expectErr {
 		require.NoError(t, err)
 		assert.Equal(t, numEvents, len(events))
-		assert.EqualValues(t, numEvents, ack.pendingACKs)
+		assert.EqualValues(t, numEvents, ack.PendingACKs)
 	} else {
 		require.Error(t, err)
 	}

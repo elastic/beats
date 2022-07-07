@@ -59,7 +59,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		return nil, err
 	}
 	if tlsConfigBuilder != nil {
-		tlsConfig = tlsConfigBuilder.BuildModuleClientConfig(addr)
+		tlsConfig = tlsConfigBuilder.BuildServerConfig(addr)
 	}
 
 	return &httpEndpoint{

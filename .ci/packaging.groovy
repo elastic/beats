@@ -40,6 +40,9 @@ pipeline {
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
+  parameters {
+    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets. This workaround will generate broken/buggy binaries.')
+  }
   stages {
     stage('Filter build') {
       options { skipDefaultCheckout() }
@@ -102,6 +105,9 @@ pipeline {
         }
         stage('Run E2E Tests for Packages'){
           options { skipDefaultCheckout() }
+          when {
+            expression { return params.run_e2e }
+          }
           steps {
             runE2ETests()
           }
@@ -368,23 +374,22 @@ def runE2ETests(){
 
   def suites = '' // empty value represents all suites in the E2E tests
 
-  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    def suitesSet = e2eTestSuites.toSet()
+  def suitesSet = e2eTestSuites.toSet()
 
-    if (!suitesSet.contains('ALL')) {
-      suitesSet.each { suite ->
-        suites += "${suite},"
-      };
-    }
-    echo 'runE2E will run now in a sync mode to validate packages can be published.'
-    runE2E(runTestsSuites: suites,
-           beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-           gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
-           gitHubCheckRepo: env.REPO,
-           gitHubCheckSha1: env.GIT_BASE_COMMIT,
-           propagate: true,
-           wait: true)
+  if (!suitesSet.contains('ALL')) {
+    suitesSet.each { suite ->
+      suites += "${suite},"
+    };
   }
+  echo 'runE2E will run now in a sync mode to validate packages can be published.'
+  runE2E(runTestsSuites: suites,
+         testMatrixFile: '.ci/.e2e-tests-beats.yaml',
+         beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+         gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+         gitHubCheckRepo: env.REPO,
+         gitHubCheckSha1: env.GIT_BASE_COMMIT,
+         propagate: true,
+         wait: true)
 }
 
 /**

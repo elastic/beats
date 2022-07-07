@@ -28,6 +28,47 @@ func TestStatesDelete(t *testing.T) {
 	}
 
 	lastModified := time.Date(2021, time.July, 22, 18, 38, 00, 0, time.UTC)
+	statesFuncSingle := func() *states {
+		states := newStates(inputCtx)
+		states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
+		return states
+	}
+
+	statesFuncMultiple := func() *states {
+		states := newStates(inputCtx)
+		states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
+		states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
+		states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
+		return states
+	}
+
+	stateFirst := state{
+		ID:           "bucketkey1etag1" + lastModified.String(),
+		Bucket:       "bucket",
+		Key:          "key1",
+		Etag:         "etag1",
+		ListPrefix:   "listPrefix",
+		LastModified: lastModified,
+	}
+
+	stateSecond := state{
+		ID:           "bucketkey2etag2" + lastModified.String(),
+		Bucket:       "bucket",
+		Key:          "key2",
+		Etag:         "etag2",
+		ListPrefix:   "listPrefix",
+		LastModified: lastModified,
+	}
+
+	stateThird := state{
+		ID:           "bucketkey3etag3" + lastModified.String(),
+		Bucket:       "bucket",
+		Key:          "key3",
+		Etag:         "etag3",
+		ListPrefix:   "listPrefix",
+		LastModified: lastModified,
+	}
+
 	tests := map[string]stateTestCase{
 		"delete empty states": {
 			states: func() *states {
@@ -37,11 +78,7 @@ func TestStatesDelete(t *testing.T) {
 			expected: []state{},
 		},
 		"delete not existing state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", lastModified), "")
-				return states
-			},
+			states:   statesFuncSingle,
 			deleteID: "an id",
 			expected: []state{
 				{
@@ -49,96 +86,30 @@ func TestStatesDelete(t *testing.T) {
 					Bucket:       "bucket",
 					Key:          "key",
 					Etag:         "etag",
+					ListPrefix:   "listPrefix",
 					LastModified: lastModified,
 				},
 			},
 		},
 		"delete only one existing": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", lastModified), "")
-				return states
-			},
+			states:   statesFuncSingle,
 			deleteID: "bucketkey",
 			expected: []state{},
 		},
 		"delete first": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
-				return states
-			},
+			states:   statesFuncMultiple,
 			deleteID: "bucketkey1",
-			expected: []state{
-				{
-					ID:           "bucketkey3etag3" + lastModified.String(),
-					Bucket:       "bucket",
-					Key:          "key3",
-					Etag:         "etag3",
-					LastModified: lastModified,
-				},
-				{
-					ID:           "bucketkey2etag2" + lastModified.String(),
-					Bucket:       "bucket",
-					Key:          "key2",
-					Etag:         "etag2",
-					LastModified: lastModified,
-				},
-			},
+			expected: []state{stateThird, stateSecond},
 		},
 		"delete last": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
-				return states
-			},
+			states:   statesFuncMultiple,
 			deleteID: "bucketkey3",
-			expected: []state{
-				{
-					ID:           "bucketkey1etag1" + lastModified.String(),
-					Bucket:       "bucket",
-					Key:          "key1",
-					Etag:         "etag1",
-					LastModified: lastModified,
-				},
-				{
-					ID:           "bucketkey2etag2" + lastModified.String(),
-					Bucket:       "bucket",
-					Key:          "key2",
-					Etag:         "etag2",
-					LastModified: lastModified,
-				},
-			},
+			expected: []state{stateFirst, stateSecond},
 		},
 		"delete any": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
-				return states
-			},
+			states:   statesFuncMultiple,
 			deleteID: "bucketkey2",
-			expected: []state{
-				{
-					ID:           "bucketkey1etag1" + lastModified.String(),
-					Bucket:       "bucket",
-					Key:          "key1",
-					Etag:         "etag1",
-					LastModified: lastModified,
-				},
-				{
-					ID:           "bucketkey3etag3" + lastModified.String(),
-					Bucket:       "bucket",
-					Key:          "key3",
-					Etag:         "etag3",
-					LastModified: lastModified,
-				},
-			},
+			expected: []state{stateFirst, stateThird},
 		},
 	}
 
