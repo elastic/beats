@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -113,6 +114,102 @@ func Package() error {
 
 	Parallel(tasks...)
 	return nil
+}
+
+// Package packages the Beat for IronBank distribution, relying on the
+// binaries having already been built.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	if runtime.GOARCH != "amd64" {
+		fmt.Printf(">> IronBank images are only supported for amd64 arch (%s is not supported)\n", runtime.GOARCH)
+		return nil
+	}
+	if err := prepareIronbankBuild(); err != nil {
+		return errors.Wrap(err, "failed to prepare the IronBank context")
+	}
+	if err := saveIronbank(); err != nil {
+		return errors.Wrap(err, "failed to save artifacts for IronBank")
+	}
+	return nil
+}
+
+func getIronbankContextName() string {
+	version, _ := BeatQualifiedVersion()
+	ironbankBinaryName := "{{.Name}}-ironbank-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}-docker-build-context"
+	// TODO: get the name of the project
+	outputDir, _ := Expand(ironbankBinaryName, map[string]interface{}{
+		"Name":    "auditbeat",
+		"Version": version,
+	})
+	return outputDir
+}
+
+func prepareIronbankBuild() error {
+	fmt.Println(">> prepareIronbankBuild: prepare the IronBank container context.")
+	ironbank := getIronbankContextName()
+	// TODO: get the name of the project
+	templatesDir := filepath.Join("dev-tools", "packaging", "templates", "ironbank", "auditbeat")
+
+	data := map[string]interface{}{
+		"MajorMinor": BeatMajorMinorVersion(),
+	}
+
+	fmt.Printf(">> prepareIronbankBuild %s \n", ironbank)
+
+	err := filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
+		if !info.IsDir() {
+			target := strings.TrimSuffix(
+				filepath.Join(ironbank, filepath.Base(path)),
+				".tmpl",
+			)
+
+			err := ExpandFile(path, target, data)
+			if err != nil {
+				return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("cannot create templates for the IronBank: %+v", err)
+	}
+
+	// copy files
+	fmt.Printf(">> prepareIronbankBuild 3 \n")
+	sourcePath := filepath.Join("dev-tools", "packaging", "files", "ironbank")
+	if err := Copy(sourcePath, ironbank); err != nil {
+		return fmt.Errorf("cannot create files for the IronBank: %+v", err)
+	}
+	return nil
+}
+
+func saveIronbank() error {
+	fmt.Println(">> saveIronbank: save the IronBank container context.")
+
+	ironbank := getIronbankContextName()
+	buildDir := filepath.Join(ironbank)
+	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
+		return fmt.Errorf("cannot find the folder with the ironbank context")
+	}
+
+	distributionsDir := "build/distributions"
+	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
+		err := os.MkdirAll(distributionsDir, 0750)
+		if err != nil {
+			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+		}
+	}
+	tarGzFile := filepath.Join(distributionsDir, ironbank+".tar.gz")
+
+	// Save the build context as tar.gz artifact
+	err := Tar(buildDir, tarGzFile)
+	if err != nil {
+		return fmt.Errorf("cannot compress the tar.gz file")
+	}
+
+	return errors.Wrap(CreateSHA512File(tarGzFile), "failed to create .sha512 file")
 }
 
 // updateWithDarwinUniversal checks if darwin/amd64 and darwin/arm64, are listed
