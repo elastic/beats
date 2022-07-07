@@ -94,52 +94,16 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 			}
 			logp.Warn("TERMINAL DOC FOR %s", sf.ID)
 
-			trackerId := sf.ID
-			if ip, err := event.GetValue("monitor.ip"); err != nil {
-				trackerId = fmt.Sprintf("%s-%s", sf.ID, ip)
-			}
 			status, err := event.GetValue("monitor.status")
 			if err != nil {
 				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
 			}
 
-			ms, newMs, oldMs := mst.Compute(trackerId, status == "up")
+			ms := mst.Compute(sf.ID, status == "up")
 
-			stateFields := mapstr.M{
-				"id":     ms.Id(),
-				"status": ms.Status(),
-			}
+			logp.Warn("CHECKS: %s - s:%s u:%d d:%d", sf.ID, ms.Status, ms.Up, ms.Down)
 
-			if newMs != nil {
-				stateFields["starting"] = mapstr.M{
-					"id":         newMs.Id(),
-					"started_at": newMs.StartedAt.UnixMilli(),
-					"status":     newMs.Status(),
-				}
-			}
-
-			if oldMs != nil {
-				logp.Warn("!!!ADD  END")
-				endedAt := newMs.StartedAt.Add(-time.Millisecond)
-
-				durationMs := endedAt.Sub(oldMs.StartedAt).Milliseconds()
-				stateFields["duration_ms"] = durationMs
-
-				stateFields["ending"] = mapstr.M{
-					"id":         oldMs.Id(),
-					"started_at": oldMs.StartedAt.UnixMilli(),
-					// Set the end time to 1ms before the new state
-					"ended_at":    endedAt.UnixMilli(),
-					"duration_ms": durationMs,
-					"checks":      oldMs.Checks,
-					"up":          oldMs.Up,
-					"down":        oldMs.Down,
-					"status":      oldMs.Status(),
-				}
-			}
-			logp.Warn("CHECKS: %s - s:%s u:%d d:%d", sf.ID, ms.Status(), ms.Up, ms.Down)
-
-			eventext.MergeEventFields(event, mapstr.M{"state": stateFields})
+			eventext.MergeEventFields(event, mapstr.M{"state": ms})
 			f, _ := json.Marshal(event.Fields)
 			logp.Info("SUMMARY %s", f)
 

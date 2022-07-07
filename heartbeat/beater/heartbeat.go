@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -35,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-elasticsearch/v8"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 )
@@ -50,15 +52,33 @@ type Heartbeat struct {
 	autodiscover    *autodiscover.Autodiscover
 }
 
-type CloudConfig struct {
-	Cloud struct {
-		ID   string `config:"id"`
-		Auth string `config:"auth"`
-	} `config:"cloud"`
+type EsConfig struct {
+	Hosts    []string `config:"hosts"`
+	Username string   `config:"username"`
+	Password string   `config:"password"`
 }
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+
+	esConfig := EsConfig{}
+	err := b.Config.Output.Config().Unpack(&esConfig)
+
+	if err != nil {
+		logp.L().Info("could not unpack cloud config for heartbeat: %w", err)
+	} else {
+		esc, err := elasticsearch.NewClient(elasticsearch.Config{
+			Addresses: esConfig.Hosts,
+			Username:  esConfig.Username,
+			Password:  esConfig.Password,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("could not initialize elasticsearch client: %w", err)
+		}
+		monitorstate.SetEsClient(esc)
+		logp.Info("successfully connected to ES for state tracking: %v", esConfig.Hosts)
+	}
+
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
