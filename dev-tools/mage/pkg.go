@@ -148,16 +148,20 @@ func getIronbankContextName() string {
 func prepareIronbankBuild() error {
 	fmt.Println(">> prepareIronbankBuild: prepare the IronBank container context.")
 	ironbank := getIronbankContextName()
+
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return fmt.Errorf("could not get the base dir: %+v", err)
+	}
+
 	// TODO: get the name of the project
-	templatesDir := filepath.Join("dev-tools", "packaging", "templates", "ironbank", "auditbeat")
+	templatesDir := filepath.Join(beatsDir, "dev-tools", "packaging", "templates", "ironbank", "auditbeat")
 
 	data := map[string]interface{}{
 		"MajorMinor": BeatMajorMinorVersion(),
 	}
 
-	fmt.Printf(">> prepareIronbankBuild %s \n", ironbank)
-
-	err := filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
+	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
 		if !info.IsDir() {
 			target := strings.TrimSuffix(
 				filepath.Join(ironbank, filepath.Base(path)),
@@ -177,8 +181,7 @@ func prepareIronbankBuild() error {
 	}
 
 	// copy files
-	fmt.Printf(">> prepareIronbankBuild 3 \n")
-	sourcePath := filepath.Join("dev-tools", "packaging", "files", "ironbank")
+	sourcePath := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank")
 	if err := Copy(sourcePath, ironbank); err != nil {
 		return fmt.Errorf("cannot create files for the IronBank: %+v", err)
 	}
