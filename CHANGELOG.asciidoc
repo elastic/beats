@@ -3,6 +3,33 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.3.2]]
+=== Beats version 8.3.2
+https://github.com/elastic/beats/compare/v8.3.1\...v8.3.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
+
+*Heartbeat*
+
+- Fix regression where we write a dotted (non-nested) key `event.type`. {pull}32097[32097]
+
+*Metricbeat*
+
+- Fix for unintentionally reporting the libbeat "handles" metrics under "system" instead of "beat" as they were in previous releases. https://github.com/elastic/elastic-agent-system-metrics/pull/37[system-metrics#37]
+
+*Winlogbeat*
+
+- Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
+
+==== Added
+
+*Metricbeat*
+
+- Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
+
 [[release-notes-8.3.1]]
 === Beats version 8.3.1
 https://github.com/elastic/beats/compare/v8.3.0\...v8.3.1[View commits]
@@ -12,6 +39,10 @@ https://github.com/elastic/beats/compare/v8.3.0\...v8.3.1[View commits]
 *Affecting all Beats*
 
 - Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
+
+*Auditbeat*
+
+- Fix handling of audit status messages for modern kernels with reduced audit message feature support. {issue}31616[31616] {pull}32141[32141]
 
 *Filebeat*
 
@@ -42,7 +73,6 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Fix type mapping of client.as.number in okta module. {pull}31676[31676]
 - If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
-- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
 
 *Heartbeat*
 
@@ -57,7 +87,6 @@ https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
 *Winlogbeat*
 
 - Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
-- Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
 
 ==== Added
 
