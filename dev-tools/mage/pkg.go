@@ -125,10 +125,10 @@ func Ironbank() error {
 		return nil
 	}
 	if err := prepareIronbankBuild(); err != nil {
-		return errors.Wrap(err, "failed to prepare the IronBank context")
+		return fmt.Errorf("failed to prepare the IronBank context: %w", err)
 	}
 	if err := saveIronbank(); err != nil {
-		return errors.Wrap(err, "failed to save artifacts for IronBank")
+		return fmt.Errorf("failed to save the IronBank context: %w", err)
 	}
 	return nil
 }
@@ -150,7 +150,7 @@ func prepareIronbankBuild() error {
 
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
-		return fmt.Errorf("could not get the base dir: %+v", err)
+		return fmt.Errorf("could not get the base dir: %w", err)
 	}
 
 	// TODO: get the name of the project
@@ -169,28 +169,28 @@ func prepareIronbankBuild() error {
 
 			err := ExpandFile(path, target, data)
 			if err != nil {
-				return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
+				return fmt.Errorf("expanding template '%s' to '%s': %w", path, target, err)
 			}
 		}
 		return nil
 	})
 
 	if err != nil {
-		return fmt.Errorf("cannot create templates for the IronBank: %+v", err)
+		return fmt.Errorf("cannot create templates for the IronBank: %w", err)
 	}
 
 	// copy license
 	sourceLicense := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank", "LICENSE")
 	targetLicense := filepath.Join(ironbank, "LICENSE")
 	if err := CopyFile(sourceLicense, targetLicense); err != nil {
-		return fmt.Errorf("cannot copy LICENSE file for the IronBank: %+v", err)
+		return fmt.Errorf("cannot copy LICENSE file for the IronBank: %w", err)
 	}
 
 	// copy specific files for the given beat
 	sourceBeatPath := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank", BeatName)
 	if _, err := os.Stat(sourceBeatPath); !os.IsNotExist(err) {
 		if err := Copy(sourceBeatPath, ironbank); err != nil {
-			return fmt.Errorf("cannot create files for the IronBank: %+v", err)
+			return fmt.Errorf("cannot create files for the IronBank: %w", err)
 		}
 	}
 
