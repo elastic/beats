@@ -139,7 +139,7 @@ func getIronbankContextName() string {
 	ironbankBinaryName := "{{.Name}}-ironbank-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}-docker-build-context"
 	// TODO: get the name of the project
 	outputDir, _ := Expand(ironbankBinaryName, map[string]interface{}{
-		"Name":    "auditbeat",
+		"Name":    BeatName,
 		"Version": version,
 	})
 	return outputDir
@@ -155,7 +155,7 @@ func prepareIronbankBuild() error {
 	}
 
 	// TODO: get the name of the project
-	templatesDir := filepath.Join(beatsDir, "dev-tools", "packaging", "templates", "ironbank", "auditbeat")
+	templatesDir := filepath.Join(beatsDir, "dev-tools", "packaging", "templates", "ironbank", BeatName)
 
 	data := map[string]interface{}{
 		"MajorMinor": BeatMajorMinorVersion(),
@@ -180,11 +180,21 @@ func prepareIronbankBuild() error {
 		return fmt.Errorf("cannot create templates for the IronBank: %+v", err)
 	}
 
-	// copy files
-	sourcePath := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank")
-	if err := Copy(sourcePath, ironbank); err != nil {
-		return fmt.Errorf("cannot create files for the IronBank: %+v", err)
+	// copy license
+	sourceLicense := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank", "LICENSE")
+	targetLicense := filepath.Join(ironbank, "LICENSE")
+	if err := CopyFile(sourceLicense, targetLicense); err != nil {
+		return fmt.Errorf("cannot copy LICENSE file for the IronBank: %+v", err)
 	}
+
+	// copy specific files for the given beat
+	sourceBeatPath := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank", BeatName)
+	if _, err := os.Stat(sourceBeatPath); !os.IsNotExist(err) {
+		if err := Copy(sourceBeatPath, ironbank); err != nil {
+			return fmt.Errorf("cannot create files for the IronBank: %+v", err)
+		}
+	}
+
 	return nil
 }
 
