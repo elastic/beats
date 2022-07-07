@@ -36,18 +36,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
 
 *Auditbeat*
 
-
 *Filebeat*
 
-- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
-- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
-- Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
-- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
-- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
+- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 
 *Heartbeat*
 
@@ -79,13 +73,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 
 *Auditbeat*
 
@@ -94,7 +81,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
-
 
 
 *Metricbeat*
@@ -132,6 +118,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
 
 
 

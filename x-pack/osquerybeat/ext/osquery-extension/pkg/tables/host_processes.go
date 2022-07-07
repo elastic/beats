@@ -18,8 +18,6 @@ import (
 )
 
 const (
-	procDir = "/proc"
-
 	// https://groups.google.com/g/fa.linux.kernel/c/JndVy0RgHHI/m/Nu7nkRfZ-c0J
 	// CLK_TCK is 100 on x86. As it has always been. User land should never
 	// care about whatever random value the kernel happens to use for the
@@ -109,12 +107,13 @@ func genProcesses(root string, queryContext table.QueryContext) ([]map[string]st
 }
 
 func dirExists(dirp string) (ok bool, err error) {
-	if stat, err := os.Stat(dirp); err == nil && stat.IsDir() {
+	var stat os.FileInfo
+	if stat, err = os.Stat(dirp); err == nil && stat.IsDir() {
 		ok = true
 	} else if os.IsNotExist(err) {
 		err = nil
 	}
-	return
+	return ok, err
 }
 
 func getProcList(root string, queryContext table.QueryContext) ([]string, error) {
@@ -135,7 +134,7 @@ func getProcList(root string, queryContext table.QueryContext) ([]string, error)
 	}
 
 	pids := make([]string, 0, len(pidset))
-	for pid, _ := range pidset {
+	for pid := range pidset {
 		pids = append(pids, pid)
 	}
 	return pids, nil
