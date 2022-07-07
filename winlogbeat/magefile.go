@@ -21,6 +21,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
