@@ -311,13 +311,19 @@ func (b GolangCrossBuilder) Build() error {
 		args = append(args, "-v", hostDir+":/go/pkg/mod:ro")
 	}
 
+	if b.Platform == "darwin/amd64" {
+		fmt.Printf(">> %v: Forcing DEV=0 for %s: https://github.com/elastic/golang-crossbuild/issues/217\n", b.Target, b.Platform)
+		args = append(args, "--env", "DEV=0")
+	} else {
+		args = append(args, "--env", fmt.Sprintf("DEV=%v", DevBuild))
+	}
+
 	args = append(args,
 		"--rm",
 		"--env", "GOFLAGS=-mod=readonly",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
-		"--env", fmt.Sprintf("DEV=%v", DevBuild),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
