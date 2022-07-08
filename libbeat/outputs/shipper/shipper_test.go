@@ -414,7 +414,7 @@ func BenchmarkToShipperEvent(b *testing.B) {
 	ts := time.Date(2022, time.July, 8, 16, 00, 00, 00, time.UTC)
 	str := strings.Repeat("somelongstring", 100)
 
-	// This event causes to go through every code path during the event convertion
+	// This event causes to go through every code path during the event conversion
 	e := publisher.Event{Content: beat.Event{
 		Timestamp: ts,
 		Meta: mapstr.M{
