@@ -30,6 +30,14 @@ import (
 )
 
 func TestUnnestStream(t *testing.T) {
+	testRootId := "rootId"
+	testStreamId := "streamId"
+	testType := "montype"
+	testOrigin := "testOrigin"
+	testSched := "@every 10s"
+	testNs := "mynamespace"
+	testDs := "mydataset"
+
 	type testCase struct {
 		name string
 		cfg  mapstr.M
@@ -37,65 +45,115 @@ func TestUnnestStream(t *testing.T) {
 	}
 	tests := []testCase{
 		{
-			name: "simple",
+			name: "no datastream",
 			cfg: mapstr.M{
-				"id": "myuuid",
+				"id":       testRootId,
+				"type":     testType,
+				"schedule": testSched,
+			},
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testRootId,
+				"type":     testType,
+				"schedule": testSched,
+			}),
+		},
+		{
+			name: "simple datastream, with origin uses streamId",
+			cfg: mapstr.M{
+				"id": testRootId,
 				"streams": []mapstr.M{
 					{
-						"type":     "montype",
-						"streamid": "mystreamid",
+						"id":       testStreamId,
+						"type":     testType,
+						"schedule": testSched,
+						"origin":   testOrigin,
 						"data_stream": mapstr.M{
-							"namespace": "mynamespace",
-							"dataset":   "mydataset",
-							"type":      "mytype",
+							"namespace": testNs,
+							"dataset":   testDs,
+							"type":      testType,
 						},
 					},
 				},
 			},
 			v: lookslike.MustCompile(mapstr.M{
-				"id":   "myuuid",
-				"type": "montype",
+				"id":       testStreamId,
+				"type":     testType,
+				"schedule": testSched,
+				"origin":   testOrigin,
 				"data_stream": mapstr.M{
-					"namespace": "mynamespace",
-					"dataset":   "mydataset",
-					"type":      "mytype",
+					"namespace": testNs,
+					"dataset":   testDs,
+					"type":      testType,
+				},
+			}),
+		},
+		{
+			name: "simple datastream, no origin, uses rootId",
+			cfg: mapstr.M{
+				"id": testRootId,
+				"streams": []mapstr.M{
+					{
+						"id":       testStreamId,
+						"type":     testType,
+						"schedule": testSched,
+						"data_stream": mapstr.M{
+							"namespace": testNs,
+							"dataset":   testDs,
+							"type":      testType,
+						},
+					},
+				},
+			},
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testRootId,
+				"type":     testType,
+				"schedule": testSched,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
+					"dataset":   testDs,
+					"type":      testType,
 				},
 			}),
 		},
 		{
 			name: "split data stream",
 			cfg: mapstr.M{
-				"id":   "myuuid",
-				"type": "montype",
+				"id":   testRootId,
+				"type": testType,
 				"data_stream": mapstr.M{
-					"namespace": "mynamespace",
+					"namespace": testNs,
 				},
 				"streams": []mapstr.M{
 					{
-						"type": "montype",
+						"id":       testStreamId,
+						"origin":   testOrigin,
+						"type":     testType,
+						"schedule": testSched,
 						"data_stream": mapstr.M{
-							"type":    "mytype",
-							"dataset": "mydataset",
+							"type":    testType,
+							"dataset": testDs,
 						},
 					},
 				},
 			},
 			v: lookslike.MustCompile(mapstr.M{
-				"id":   "myuuid",
-				"type": "montype",
+				"id":       testStreamId,
+				"type":     testType,
+				"schedule": testSched,
+				"origin":   testOrigin,
 				"data_stream": mapstr.M{
-					"namespace": "mynamespace",
-					"dataset":   "mydataset",
-					"type":      "mytype",
+					"namespace": testNs,
+					"dataset":   testDs,
+					"type":      testType,
 				},
 			}),
 		},
 		{
 			name: "base is last, not first stream",
 			cfg: mapstr.M{
-				"id": "myuuid",
+				"id": testRootId,
 				"data_stream": mapstr.M{
-					"namespace": "parentnamespace",
+					"namespace": testNs,
 				},
 				"streams": []mapstr.M{
 					{
@@ -107,21 +165,25 @@ func TestUnnestStream(t *testing.T) {
 						},
 					},
 					{
-						"type": "montype",
+						"id":       testStreamId,
+						"type":     testType,
+						"schedule": testSched,
+						"origin":   testOrigin,
 						"data_stream": mapstr.M{
-							"type":    "basetype",
-							"dataset": "basedataset",
+							"type":    testType,
+							"dataset": testDs,
 						},
 					},
 				},
 			},
 			v: lookslike.MustCompile(mapstr.M{
-				"id":   "myuuid",
-				"type": "montype",
+				"id":       testStreamId,
+				"type":     testType,
+				"schedule": testSched,
 				"data_stream": mapstr.M{
-					"namespace": "parentnamespace",
-					"type":      "basetype",
-					"dataset":   "basedataset",
+					"namespace": testNs,
+					"type":      testType,
+					"dataset":   testDs,
 				},
 			}),
 		},
