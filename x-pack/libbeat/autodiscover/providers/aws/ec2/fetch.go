@@ -154,7 +154,6 @@ func (p *fetchRequest) fetchAllPages() {
 	}
 }
 
-// TODO This is copy-pasted from elb/fetch.go
 func (p *fetchRequest) fetchNextPage() {
 	page, err := p.paginator.NextPage(p.context)
 	if err != nil {

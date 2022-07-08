@@ -30,7 +30,7 @@ func GetRegions(svc *ec2.Client) ([]string, error) {
 		return nil, fmt.Errorf("Failed DescribeRegions: %w", err)
 	}
 
-	completeRegionsList := make([]string, 0)
+	completeRegionsList := make([]string, 0, len(output.Regions))
 	for _, region := range output.Regions {
 		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
