@@ -1,4 +1,4 @@
-name: x-pack-metricbeat
+name: x-pack-packetbeat
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
       - 8.*
 
 env:
-  BEAT_MODULE: 'x-pack/metricbeat'
+  BEAT_MODULE: 'x-pack/packetbeat'
 
 jobs:
   macos:
