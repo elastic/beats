@@ -35,6 +35,6 @@ jobs:
       with:
         jobName: "macos"
         stepName: "Run test"
-        path: "test_output/*.junit.xml"
+        path: "${{ env.BEAT_MODULE }}/build/TEST*.xml"
         type: "junit"
         githubToken: ${{ secrets.GITHUB_TOKEN }}
