@@ -23,17 +23,21 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je      *journeyEnricher
-	sFields stdfields.StdMonitorFields
+	je         *journeyEnricher
+	sFields    stdfields.StdMonitorFields
+	checkGroup string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
-	return &streamEnricher{sFields: sFields}
+	return &streamEnricher{sFields: sFields, checkGroup: makeUuid()}
 }
 
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	if senr.je == nil || (se != nil && se.Type == JourneyStart) {
 		senr.je = newJourneyEnricher(senr)
+		if senr.je != nil {
+			senr.checkGroup = makeUuid()
+		}
 	}
 
 	return senr.je.enrich(event, se)
@@ -44,7 +48,6 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 type journeyEnricher struct {
 	journeyComplete bool
 	journey         *Journey
-	checkGroup      string
 	errorCount      int
 	error           error
 	stepCount       int
@@ -58,7 +61,6 @@ type journeyEnricher struct {
 
 func newJourneyEnricher(senr *streamEnricher) *journeyEnricher {
 	return &journeyEnricher{
-		checkGroup:     makeUuid(),
 		streamEnricher: senr,
 	}
 }
@@ -82,7 +84,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		switch se.Type {
 		case JourneyStart:
 			je.error = nil
-			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
 		case JourneyEnd, CmdStatus:
@@ -114,7 +115,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	if je.journey != nil {
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
-				"check_group": je.checkGroup,
+				"check_group": je.streamEnricher.checkGroup,
 				"id":          je.journey.ID,
 				"name":        je.journey.Name,
 			},
