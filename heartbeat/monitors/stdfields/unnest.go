@@ -75,7 +75,10 @@ func UnnestStream(config *conf.C) (res *conf.C, err error) {
 		return nil, fmt.Errorf("could not determine base stream for config: %s", id)
 	}
 
-	res.Merge(mapstr.M{"data_stream": optS.DataStream})
+	err = res.Merge(mapstr.M{"data_stream": optS.DataStream})
+	if err != nil {
+		return nil, err
+	}
 
 	// We only override the ID for the original fleet integration, not monitors configured
 	// through monitor mgmt. See https://github.com/elastic/beats/issues/32224
