@@ -247,7 +247,7 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 
 func assertFieldNotContains(field, s string) func(t *testing.T, event beat.Event) {
 	return func(t *testing.T, event beat.Event) {
-		value, err := event.GetValue("service.address")
+		value, err := event.GetValue(field)
 		assert.NoError(t, err)
 		require.NotEmpty(t, value.(string))
 		require.NotContains(t, value.(string), s)
