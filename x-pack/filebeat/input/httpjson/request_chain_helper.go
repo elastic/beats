@@ -64,7 +64,7 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 
 	err := json.Unmarshal(data, &dataMap)
 	if err != nil {
-		return false, fmt.Errorf("error while unmarshalling data %w", err)
+		return false, fmt.Errorf("error while unmarshalling data : %w", err)
 	}
 	tr := transformable{}
 	paramCtx := &transformContext{
@@ -75,11 +75,11 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 
 	val, err := expression.Execute(paramCtx, tr, nil, log)
 	if err != nil {
-		return false, fmt.Errorf("error while evaluating expression %w", err)
+		return false, fmt.Errorf("error while evaluating expression : %w", err)
 	}
 	result, err := strconv.ParseBool(val)
 	if err != nil {
-		return false, fmt.Errorf("error while parsing boolean value of string %w", err)
+		return false, fmt.Errorf("error while parsing boolean value of string : %w", err)
 	}
 
 	return result, nil
