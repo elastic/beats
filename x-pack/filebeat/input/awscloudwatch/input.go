@@ -248,21 +248,23 @@ func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, log
 	}
 
 	// construct DescribeLogGroupsInput
-	filterLogEventsInput := &cloudwatchlogs.DescribeLogGroupsInput{
+	describeLogGroupsInput := &cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix: awssdk.String(logGroupNamePrefix),
 	}
 
 	// make API request
-	logsGroups, err := svc.DescribeLogGroups(context.TODO(), filterLogEventsInput)
-	if err != nil {
-		return nil, fmt.Errorf("aws describe log groups request returned an error: %w", err)
-	}
-
 	var logGroupNames []string
-	for _, logGroup := range logsGroups.LogGroups {
-		logGroupNames = append(logGroupNames, *logGroup.LogGroupName)
-	}
+	paginator := cloudwatchlogs.NewDescribeLogGroupsPaginator(svc, describeLogGroupsInput)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return nil, fmt.Errorf("error DescribeLogGroups with Paginator: %w", err)
+		}
 
+		for _, lg := range page.LogGroups {
+			logGroupNames = append(logGroupNames, *lg.LogGroupName)
+		}
+	}
 	return logGroupNames, nil
 }
 

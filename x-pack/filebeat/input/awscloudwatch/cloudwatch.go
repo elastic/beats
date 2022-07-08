@@ -76,23 +76,25 @@ func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, star
 func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroup string, startTime int64, endTime int64, logProcessor *logProcessor) error {
 	// construct FilterLogEventsInput
 	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroup)
+	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(svc, filterLogEventsInput)
+	for paginator.HasMorePages() {
+		filterLogEventsOutput, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return fmt.Errorf("error FilterLogEvents with Paginator: %w", err)
+		}
 
-	// make API request
-	logEventsFiltered, err := svc.FilterLogEvents(context.TODO(), filterLogEventsInput)
-	if err != nil {
-		return fmt.Errorf("aws describe log groups request returned an error: [%w]", err)
+		p.metrics.apiCallsTotal.Inc()
+		logEvents := filterLogEventsOutput.Events
+		p.metrics.logEventsReceivedTotal.Add(uint64(len(logEvents)))
+
+		// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
+		p.log.Debugf("sleeping for %v before making FilterLogEvents API call again", p.apiSleep)
+		time.Sleep(p.apiSleep)
+		p.log.Debug("done sleeping")
+
+		p.log.Debugf("Processing #%v events", len(logEvents))
+		logProcessor.processLogEvents(logEvents, logGroup, p.region)
 	}
-
-	logEvents := logEventsFiltered.Events
-	p.metrics.logEventsReceivedTotal.Add(uint64(len(logEvents)))
-
-	// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
-	p.log.Debugf("sleeping for %v before making FilterLogEvents API call again", p.apiSleep)
-	time.Sleep(p.apiSleep)
-	p.log.Debug("done sleeping")
-
-	p.log.Debugf("Processing #%v events", len(logEvents))
-	logProcessor.processLogEvents(logEvents, logGroup, p.region)
 	return nil
 }
 
