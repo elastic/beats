@@ -13,13 +13,14 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestPolicy_CustomRetryPolicy(t *testing.T) {
 	statusCompleted := `{"status":"completed"}`
-	statusInitiated := `{"status":"cmnsmc"}`
+	statusInitiated := `{"status":"initiated"}`
 
 	exp := &valueTpl{}
 	err := exp.Unpack(`[[ eq .last_response.body.status "completed" ]]`)
@@ -28,6 +29,14 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 	expErr := &valueTpl{}
 	err = exp.Unpack("")
 	assert.NoError(t, err)
+
+	statusCompletedResponse := getTestResponse(statusCompleted, 200)
+	defer statusCompletedResponse.Body.Close()
+	statusInitiatedResponse := getTestResponse(statusInitiated, 200)
+	defer statusInitiatedResponse.Body.Close()
+	internalServerErrorResponse := getTestResponse(statusCompleted, 200)
+	defer internalServerErrorResponse.Body.Close()
+
 	type fields struct {
 		fn         Evaluate
 		expression *valueTpl
@@ -54,7 +63,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:  context.Background(),
-				resp: getTestResponse(statusCompleted, 200),
+				resp: statusCompletedResponse,
 				err:  nil,
 			},
 			want:          false,
@@ -69,7 +78,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:  context.Background(),
-				resp: getTestResponse(statusInitiated, 200),
+				resp: statusInitiatedResponse,
 				err:  nil,
 			},
 			want:          true,
@@ -84,7 +93,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:  context.Background(),
-				resp: getTestResponse(statusCompleted, 200),
+				resp: statusCompletedResponse,
 				err:  nil,
 			},
 			want:          false,
@@ -99,7 +108,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:  context.Background(),
-				resp: getTestResponse(statusCompleted, 500),
+				resp: internalServerErrorResponse,
 				err:  nil,
 			},
 			want:          true,
@@ -114,7 +123,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:  context.Background(),
-				resp: getTestResponse(statusCompleted, 200),
+				resp: statusCompletedResponse,
 				err:  &url.Error{Err: x509.UnknownAuthorityError{}},
 			},
 			want:          false,
@@ -140,14 +149,15 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 }
 
 func getTestResponse(exprStr string, statusCode int) *http.Response {
-	return &http.Response{
+	resp := &http.Response{
 		StatusCode:    statusCode,
 		Proto:         "HTTP/1.1",
 		ProtoMajor:    1,
 		ProtoMinor:    1,
 		Body:          io.NopCloser(bytes.NewBufferString(exprStr)),
-		ContentLength: int64(len(string(exprStr))),
+		ContentLength: int64(len(exprStr)),
 		Request:       nil,
 		Header:        make(http.Header, 0),
 	}
+	return resp
 }

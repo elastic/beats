@@ -5,12 +5,13 @@
 package httpjson
 
 import (
+	"bytes"
 	"context"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
-	"k8s.io/apimachinery/pkg/util/json"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func Test_newChainHTTPClient(t *testing.T) {
@@ -51,14 +52,8 @@ func Test_newChainHTTPClient(t *testing.T) {
 
 func Test_evaluateResponse(t *testing.T) {
 	log := logp.NewLogger("newEvaluateResponseTestLogger")
-	responseTrue, err := json.Marshal(map[string]interface{}{
-		"status": "completed",
-	})
-	assert.NoError(t, err)
-	responseFalse, err := json.Marshal(map[string]interface{}{
-		"status": "initiated",
-	})
-	assert.NoError(t, err)
+	responseTrue := bytes.NewBufferString(`{"status": "completed"}`).Bytes()
+	responseFalse := bytes.NewBufferString(`{"status": "initiated"}`).Bytes()
 
 	type args struct {
 		expression string
