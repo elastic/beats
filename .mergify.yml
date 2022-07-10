@@ -4,6 +4,8 @@ queue_rules:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
   - name: ask jd to review changes on python files
+    conditions:
+      - label=comment
     actions:
       request_reviews:
         users:
