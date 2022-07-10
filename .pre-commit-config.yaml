@@ -1,10 +1,10 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
     -   id: check-merge-conflict
 
--   repo: https://github.com/elastic/apm-pipeline-library.git
+ repo: https://github.com/elastic/apm-pipeline-library.git
     rev: current
     hooks:
     -   id: check-jenkins-pipelines
