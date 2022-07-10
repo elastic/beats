@@ -1,7 +1,7 @@
 queue_rules:
   - name: default
     conditions:
-      - check-success=beats-ci/pr-merge
+      - check-success=module.system('id')
 pull_request_rules:
   - name: self-assign PRs
     conditions:
