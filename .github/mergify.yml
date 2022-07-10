@@ -1,3 +1,7 @@
+queue_rules:
+  - name: default
+    conditions:
+      - check-success=beats-ci/pr-merge
 pull_request_rules:
   - name: ask jd to review changes on python files
     conditions:
