@@ -14,7 +14,6 @@ pull_request_rules:
           - "{{ author }}"
   - name: forward-port patches to main branch
     conditions:
-      - merged
       - label=forwardport-main
     actions:
       backport:
