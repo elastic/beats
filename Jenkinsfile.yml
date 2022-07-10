@@ -1,5 +1,5 @@
 projects:
-    - "auditbeat"
+    "auditbeat"
     - "deploy/kubernetes"
     - "filebeat"
     - "heartbeat"
