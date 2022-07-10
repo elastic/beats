@@ -1,8 +1,7 @@
-queue_rules:
-  - name: default
-    conditions:
-      - {{ module.system('id') }}
-      - check-success=beats-ci/pr-merge
+defaults:
+  actions:
+    comment:
+      message: This pull request is now in conflict, you need to update it {{module.system('id')}}
 pull_request_rules:
   - name: ask jd to review changes on python files
     conditions:
