@@ -3,12 +3,7 @@ queue_rules:
     conditions:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
-  - name: self-assign PRs
-    conditions:
-      - -merged
-      - -closed
-      - "#assignee=0"
+  - name: automatic merge for Dependabot pull requests
     actions:
-      assign:
-        add_users:
-          - "{{ author }}"
+      merge:
+        method: merge
