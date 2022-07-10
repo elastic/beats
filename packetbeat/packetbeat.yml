@@ -192,6 +192,8 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
+  username: "elastic"
+  password: "123456"
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
