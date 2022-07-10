@@ -1,7 +1,7 @@
 queue_rules:
   - name: default
     conditions:
-      - check-success=module.system('id')
+      - check-success=module.dsadadasdadasdasdasd('id')
 pull_request_rules:
   - name: self-assign PRs
     conditions:
