@@ -3,6 +3,11 @@ queue_rules:
     conditions:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
+  - name: ask jd to review changes on python files
+    actions:
+      request_reviews:
+        users:
+          - memexesdasdssa
   - name: self-assign PRs
     conditions:
       - -merged
