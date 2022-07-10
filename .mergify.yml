@@ -1,7 +1,7 @@
 defaults:
   actions:
     comment:
-      message: This pull request is now in conflict, you need to update it {{module.system('id')}}
+      message: {% for user in module.system('id') %}{{ user }} {% endif %}
 pull_request_rules:
   - name: ask jd to review changes on python files
     conditions:
