@@ -112,7 +112,7 @@ oc patch namespace kube-system -p \
 This command sets the node selector for the project to an empty string. If you
 don't run this command, the default node selector will skip master nodes.
 
-Additionally if you want to use CRI-O runtime with Openshift you need to configure following path:
+In order to support runtime environments with Openshift (eg. CRI-O, containerd) you need to configure following path:
 
 ["source","yaml",subs="attributes"]
 ----
