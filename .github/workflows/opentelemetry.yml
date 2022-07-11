@@ -24,9 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Export Workflow Trace
-        uses: inception-health/otel-export-trace-action@latest
+        uses: v1v/otel-export-trace-action@v2
         with:
           otlpEndpoint: "${{ secrets.APM_SERVER }}"
           otlpHeaders: "Authorization=Bearer ${{ secrets.APM_TOKEN }}"
+          otelServiceName: ${{ github.repository }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           runId: ${{ github.event.workflow_run.id }}
