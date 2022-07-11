@@ -45,12 +45,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 
 *Heartbeat*
 
 - Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
-- Fix regression where we write a dotted (non-nested) key `event.type`. {pull}32097[32097]
 
 *Metricbeat*
 
@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
 - Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
 - Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
+- Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
 
 *Auditbeat*
 
@@ -112,7 +113,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
-* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 
 *Packetbeat*
 
@@ -149,6 +149,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
