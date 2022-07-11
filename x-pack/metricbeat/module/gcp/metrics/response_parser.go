@@ -259,7 +259,11 @@ func getValueFromPoint(p *monitoring.Point) (out interface{}) {
 		out = v.StringValue
 	case *monitoring.TypedValue_DistributionValue:
 		// Distribution values aren't simple values. Take a look at this
-		out = v.DistributionValue
+		histogram := gcp.DistributionHistogramToES(v.DistributionValue)
+
+		out = mapstr.M{
+			"histogram": histogram,
+		}
 	}
 
 	return out
