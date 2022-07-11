@@ -13,6 +13,4 @@
 #          config:
 #            - type: container
 #              paths:
-#                #Uncomment below line if you want to enable CRI-O based logs autodiscover
-#                #- /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
-#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+#                - /var/log/containers/*.log

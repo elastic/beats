@@ -119,7 +119,7 @@ Additionally if you want to use CRI-O runtime with Openshift you need to configu
 {beatname_lc}.inputs:
 - type: container
   paths: <1>
-    - '/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log'
+    - '/var/log/containers/*.log'
 ----
 
 Same path needs to be configured in case autodiscovery needs to be enabled:
@@ -134,7 +134,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: container
         paths:
-          - /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
+          - /var/log/containers/*.log
 ----
 
 > ----
