@@ -16,6 +16,14 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+
+>>>>>>> 7e7755ce5f (fix bug related to wrong state.ID in awss3 direct s3 input (#32164))
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -66,6 +74,7 @@ func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Messag
 }
 
 type s3PagerConstant struct {
+	mutex        *sync.Mutex
 	objects      []s3.Object
 	currentIndex int
 }
@@ -73,10 +82,14 @@ type s3PagerConstant struct {
 var _ s3Pager = (*s3PagerConstant)(nil)
 
 func (c *s3PagerConstant) Next(ctx context.Context) bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.currentIndex < len(c.objects)
 }
 
 func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	ret := &s3.ListObjectsOutput{}
 	pageSize := 1000
 	if len(c.objects) < c.currentIndex+pageSize {
@@ -90,6 +103,8 @@ func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
 }
 
 func (c *s3PagerConstant) Err() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	if c.currentIndex >= len(c.objects) {
 		c.currentIndex = 0
 	}
@@ -99,6 +114,7 @@ func (c *s3PagerConstant) Err() error {
 func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	lastModified := time.Now()
 	ret := &s3PagerConstant{
+		mutex:        new(sync.Mutex),
 		currentIndex: 0,
 	}
 
@@ -259,6 +275,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
+		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics(metricRegistry, "test_id")
 
@@ -266,14 +283,11 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
-		defer close(client.Channel)
-		conf := makeBenchmarkConfig(t)
+		defer func() {
+			_ = client.Close()
+		}()
 
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		store, err := storeReg.Get("test")
-		if err != nil {
-			t.Fatalf("Failed to access store: %v", err)
-		}
+		config := makeBenchmarkConfig(t)
 
 		b.ResetTimer()
 		start := time.Now()
@@ -296,14 +310,27 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				listPrefix := fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
 				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+
+				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				store, err := storeReg.Get("test")
+				if err != nil {
+					errChan <- fmt.Errorf("Failed to access store: %w", err)
+					return
+				}
+
 				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
 				if err != nil {
 					errChan <- err
 					return
 				}
 
+<<<<<<< HEAD
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
 				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", numberOfWorkers, time.Second)
+=======
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, config.FileSelectors)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
+>>>>>>> 7e7755ce5f (fix bug related to wrong state.ID in awss3 direct s3 input (#32164))
 
 				if err := s3Poller.Poll(ctx); err != nil {
 					if !errors.Is(err, context.DeadlineExceeded) {
