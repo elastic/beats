@@ -24,12 +24,12 @@ class Test(XPackTest):
   sql_query: 'SELECT name, physical_reads, db_block_gets, consistent_gets, 1 - (physical_reads / (db_block_gets + consistent_gets)) FROM V$BUFFER_POOL_STATISTICS'
   sql_response_format: table"""
         }])
-        proc = self.start_beat(home=self.beat_path)        
+        proc = self.start_beat(home=self.beat_path)
         self.wait_until(lambda: self.output_lines() > 0)
         self.wait_until(lambda: self.check_for_events(), max_timeout=300)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
-        
+
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
@@ -38,13 +38,12 @@ class Test(XPackTest):
             if evt.get("sql") and evt["sql"].get("query"):
                 event_valid_counter = True
 
-
     def check_for_events(self):
         output = self.read_output_json()
         for evt in output:
             if evt.get("sql") and evt["sql"].get("query"):
                 return True
-        
+
         return False
 
     def get_hosts(self):
