@@ -25,6 +25,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
@@ -135,36 +136,21 @@ func (re *Reader) Read() ([]mb.Event, error) {
 
 func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	var val map[string][]pdh.CounterValue
-	var sec uint32 = 1
-	err := re.query.CollectDataEx(sec, re.event)
+	// Sleep for one second before collecting the second raw value-
+	time.Sleep(time.Second)
+
+	// Collect the second raw value.
+	err := re.query.CollectData()
 	if err != nil {
 		return nil, err
 	}
-	waitFor, err := windows.WaitForSingleObject(re.event, windows.INFINITE)
+	
+	// Collect the displayable value.
+	val, err = re.query.GetFormattedCounterValues()
 	if err != nil {
 		return nil, err
-	}
-	switch waitFor {
-	case windows.WAIT_OBJECT_0:
-		val, err = re.query.GetFormattedCounterValues()
-		if err != nil {
-			return nil, err
-		}
-	case windows.WAIT_FAILED:
-		return nil, errors.New("WaitForSingleObject has failed")
-	default:
-		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
 	}
 	return val, err
-}
-
-func randSeq(n int) string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }
 
 // Close will close the PDH query for now.
