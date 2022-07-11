@@ -52,11 +52,12 @@ type pipeline struct {
 
 // UploadPipelines reads all pipelines embedded in the Winlogbeat executable
 // and adapts the pipeline for a given ES version, converts to JSON if
-// necessary and creates or updates ingest pipeline in ES.
-func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwritePipelines bool) error {
+// necessary and creates or updates ingest pipeline in ES. The IDs of pipelines
+// uploaded to ES are returned in loaded.
+func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwritePipelines bool) (loaded []string, err error) {
 	pipelines, err := readAll(info)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	return load(esClient, pipelines, overwritePipelines)
 }
@@ -94,7 +95,7 @@ func ExportPipelines(info beat.Info, version version.V, directory string) error 
 // with load.
 func readAll(info beat.Info) (pipelines []pipeline, err error) {
 	p, err := readDir(".", info)
-	if err == errNoFS {
+	if err == errNoFS { //nolint:errorlint // Bad linter! This is never wrapped.
 		return nil, nil
 	}
 	return p, err
@@ -118,7 +119,7 @@ func readDir(dir string, info beat.Info) (pipelines []pipeline, err error) {
 			continue
 		}
 		p, err := readFile(path.Join(dir, de.Name()), info)
-		if err == errNoFS {
+		if err == errNoFS { //nolint:errorlint // Bad linter! This is never wrapped.
 			continue
 		}
 		if err != nil {
@@ -149,11 +150,11 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 }
 
 // load uses esClient to load pipelines to Elasticsearch cluster.
-// Will only overwrite existing pipelines if overwritePipelines is
-// true.  An error in loading one of the pipelines will cause the
+// The IDs of loaded pipelines will be returned in loaded.
+// load will only overwrite existing pipelines if overwritePipelines is
+// true. An error in loading one of the pipelines will cause the
 // successfully loaded ones to be deleted.
-func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool) (err error) {
-	var pipelineIDsLoaded []string
+func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool) (loaded []string, err error) {
 	log := logp.NewLogger(logName)
 
 	for _, pipeline := range pipelines {
@@ -162,20 +163,20 @@ func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipel
 			err = fmt.Errorf("error loading pipeline %s: %w", pipeline.id, err)
 			break
 		}
-		pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
+		loaded = append(loaded, pipeline.id)
 	}
 
 	if err != nil {
 		errs := multierror.Errors{err}
-		for _, pipelineID := range pipelineIDsLoaded {
-			err = fileset.DeletePipeline(esClient, pipelineID)
+		for _, id := range loaded {
+			err = fileset.DeletePipeline(esClient, id)
 			if err != nil {
 				errs = append(errs, err)
 			}
 		}
-		return errs.Err()
+		return nil, errs.Err()
 	}
-	return nil
+	return loaded, nil
 }
 
 func applyTemplates(prefix string, version string, filename string, original []byte) (converted map[string]interface{}, err error) {

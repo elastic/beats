@@ -168,8 +168,8 @@ The files affected by this setting fall into two categories:
 * Files that were harvested but weren't updated for longer than `ignore_older`
 
 For files which were never seen before, the offset state is set to the end of
-the file. If a state already exists, the offset is not changed. If a file is
-updated again later, reading continues at the set offset position.
+the file. If a state already exists, the offset is reset to the size of the file.
+If a file is updated again later, reading continues at the set offset position.
 
 The `ignore_older` setting relies on the modification time of the file to
 determine if a file is ignored. If the modification time of the file is not

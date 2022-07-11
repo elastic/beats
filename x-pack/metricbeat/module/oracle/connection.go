@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/godror/godror"
+	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -16,14 +17,15 @@ import (
 // ConnectionDetails contains all possible data that can be used to create a connection with
 // an Oracle db
 type ConnectionDetails struct {
-	Username string `config:"username"`
-	Password string `config:"password"`
+	Username string        `config:"username"`
+	Password string        `config:"password"`
+	Patterns []interface{} `config:"patterns"`
 }
 
 // HostParser parses host and extracts connection information and returns it to HostData
 // HostData can then be used to make connection to SQL
 func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
-	params, err := godror.ParseConnString(rawURL)
+	params, err := godror.ParseDSN(rawURL)
 	if err != nil {
 		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}
@@ -37,16 +39,17 @@ func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
 		params.Username = config.Username
 	}
 
-	if params.Password == "" {
-		params.Password = config.Password
+	if params.Password.Secret() == "" {
+		params.StandaloneConnection = true
+		params.Password = dsn.NewPassword(config.Password)
 	}
 
 	return mb.HostData{
 		URI:          params.StringWithPassword(),
-		SanitizedURI: params.SID,
-		Host:         params.SID,
+		SanitizedURI: params.ConnectString,
+		Host:         params.String(),
 		User:         params.Username,
-		Password:     params.Password,
+		Password:     params.Password.Secret(),
 	}, nil
 }
 

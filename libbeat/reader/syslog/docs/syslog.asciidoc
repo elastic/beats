@@ -69,3 +69,10 @@ The RFC 5424 format accepts the following forms of timestamps:
   ** `2003-10-11T22:14:15.123456-06:00`
 
 Formats with an asterisk (*) are a non-standard allowance.
+
+[float]
+==== Structured Data
+
+For RFC 5424-formatted logs, if the structured data cannot be parsed according
+to RFC standards, the original structured data text will be prepended to the message
+field, separated by a space.

@@ -221,6 +221,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `hashBase64`: calculates the hash of a list of strings concatenated together. Returns a base64 encoded hash. Supports sha1 or sha256. Example `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `hexDecode`: Decodes the hexadecimal string. Any hexadecimal string will be converted to its bytes representation. Example `[[hexDecode "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96"]]`; Expected Output: `"\xb0\xa9*\b\xa9\xb4\x88:\xa3\xaa-\tW\xbe\x12\xa6x\xcb۳-\xc5\xdb\t\xfeh#\x9a\t\x87/\x96"`
 - `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
 - `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
 - `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
@@ -374,9 +375,19 @@ default credentials from the environment will be attempted via ADC. For more inf
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [float]
+==== `auth.oauth2.google.jwt_json`
+
+The JWT Account Key file as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
 ==== `auth.oauth2.google.delegated_account`
 
-Email of the delegated account used to create the credentials (usually an admin).
+Email of the delegated account used to create the credentials (usually an admin). Used in combination
+with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
 
 [[request-parameters]]
 [float]

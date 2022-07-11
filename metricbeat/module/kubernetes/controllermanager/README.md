@@ -2,7 +2,7 @@
 
 ## Version history
 
-- June 2019, `v1.14.3`
+- June 2022, `v21.1.x`
 
 ## Resources
 
@@ -10,33 +10,36 @@ Each controller emits a set of metrics, there is no source file to reference but
 
 ## Metrics insight
 
-http_request_duration_microseconds The HTTP request latencies in microseconds. Summary
-    - handler
-
-http_requests_total Total number of HTTP requests made. Counter
-    - code
-    - handler
-    - method
-
-http_request_size_bytes The HTTP request sizes in bytes. Summary
-    - handler
-
-http_response_size_bytes The HTTP response sizes in bytes. Summary
-    - handler
+rest_client_request_duration_seconds Request latency in seconds. Broken down by verb and URL. Histogram
+    - verb
+    - url
 
 rest_client_requests_total Number of HTTP requests, partitioned by status code, method, and host. Counter
     - code
     - host
     - method
 
-workqueue_longest_running_processor_seconds. Gauge
-    - name: 
+workqueue_longest_running_processor_seconds How many seconds has the longest running processor for workqueue been running. Gauge
+    - name
 
-workqueue_unfinished_work_seconds: How many seconds of work has done that is in progress and hasn't been observed by work_duration. Large values indicate stuck threads. One can deduce the number of stuck threads by observing the rate at which this increases. Gauge
-    - name: 
+workqueue_unfinished_work_seconds How many seconds of work has done that is in progress and hasn't been observed by work_duration. Large values indicate stuck threads. One can deduce the number of stuck threads by observing the rate at which this increases. Gauge
+    - name
 
-process_cpu_seconds_total: Total user and system CPU time spent in seconds.
+workqueue_work_duration_seconds How long in seconds processing an item from workqueue takes. Histogram
+    - name
+
+workqueue_adds_total Total number of adds handled by workqueue. Counter
+    - name
+
+workqueue_depth Current depth of workqueue. Counter
+    - name
+
+workqueue_retries_total Total number of retries handled by workqueue. Counter
+    - name
+
+process_cpu_seconds_total Total user and system CPU time spent in seconds.
 process_open_fds Number of open file descriptors.
+process_max_fds Maximum number of open file descriptors.
 process_resident_memory_bytes Resident memory size in bytes.
 process_start_time_seconds Start time of the process since unix epoch in seconds.
 process_virtual_memory_bytes Virtual memory size in bytes
@@ -50,7 +53,7 @@ node_collector_unhealthy_nodes_in_zone Gauge measuring number of not Ready Nodes
 node_collector_zone_health measuring percentage of healthy nodes per zone.
     - zone
 
-node_collector_zone_size: measuring number of registered Nodes per zones.
+node_collector_zone_size measuring number of registered Nodes per zones.
     - zone
 
 leader_election_master_status
