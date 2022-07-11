@@ -1201,7 +1201,7 @@ filebeat.inputs:
 #          config:
 #            - type: container
 #              paths:
-#                - /var/log/containers/*.log
+#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
 
 # ========================== Filebeat global options ===========================
 
