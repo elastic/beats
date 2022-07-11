@@ -86,7 +86,7 @@ type whileConfig struct {
 	Request  requestConfig       `config:"request" validate:"required"`
 	Response responseChainConfig `config:"response,omitempty"`
 	Replace  string              `config:"replace,omitempty"`
-	Till     *valueTpl           `config:"till"`
+	Till     *valueTpl           `config:"till" validate:"required"`
 }
 
 type responseChainConfig struct {
