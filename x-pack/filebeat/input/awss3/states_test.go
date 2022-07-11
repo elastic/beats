@@ -91,7 +91,6 @@ func TestStatesDelete(t *testing.T) {
 	}
 
 	lastModified := time.Date(2021, time.July, 22, 18, 38, 00, 0, time.UTC)
-<<<<<<< HEAD
 	statesFuncSingle := func() *states {
 		states := newStates(inputCtx)
 		states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
@@ -107,7 +106,7 @@ func TestStatesDelete(t *testing.T) {
 	}
 
 	stateFirst := state{
-		ID:           "bucketkey1etag1" + lastModified.String(),
+		ID:           stateID("bucket", "key1", "etag1", lastModified),
 		Bucket:       "bucket",
 		Key:          "key1",
 		Etag:         "etag1",
@@ -116,7 +115,7 @@ func TestStatesDelete(t *testing.T) {
 	}
 
 	stateSecond := state{
-		ID:           "bucketkey2etag2" + lastModified.String(),
+		ID:           stateID("bucket", "key2", "etag2", lastModified),
 		Bucket:       "bucket",
 		Key:          "key2",
 		Etag:         "etag2",
@@ -125,7 +124,7 @@ func TestStatesDelete(t *testing.T) {
 	}
 
 	stateThird := state{
-		ID:           "bucketkey3etag3" + lastModified.String(),
+		ID:           stateID("bucket", "key3", "etag3", lastModified),
 		Bucket:       "bucket",
 		Key:          "key3",
 		Etag:         "etag3",
@@ -133,8 +132,6 @@ func TestStatesDelete(t *testing.T) {
 		LastModified: lastModified,
 	}
 
-=======
->>>>>>> 7e7755ce5f (fix bug related to wrong state.ID in awss3 direct s3 input (#32164))
 	tests := map[string]stateTestCase{
 		"delete empty states": {
 			states: func() *states {
@@ -158,118 +155,24 @@ func TestStatesDelete(t *testing.T) {
 			},
 		},
 		"delete only one existing": {
-<<<<<<< HEAD
 			states:   statesFuncSingle,
-			deleteID: "bucketkey",
-			expected: []state{},
-		},
-		"delete first": {
-			states:   statesFuncMultiple,
-			deleteID: "bucketkey1",
-			expected: []state{stateThird, stateSecond},
-		},
-		"delete last": {
-			states:   statesFuncMultiple,
-			deleteID: "bucketkey3",
-			expected: []state{stateFirst, stateSecond},
-		},
-		"delete any": {
-			states:   statesFuncMultiple,
-			deleteID: "bucketkey2",
-			expected: []state{stateFirst, stateThird},
-=======
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
-			},
 			deleteID: stateID("bucket", "key", "etag", lastModified),
 			expected: []state{},
 		},
 		"delete first": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "bucketkey1etag1" + lastModified.String(),
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key3", "etag3", lastModified),
-					Bucket:       "bucket",
-					Key:          "key3",
-					Etag:         "etag3",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-				{
-					ID:           stateID("bucket", "key2", "etag2", lastModified),
-					Bucket:       "bucket",
-					Key:          "key2",
-					Etag:         "etag2",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
+			states:   statesFuncMultiple,
+			deleteID: stateID("bucket", "key1", "etag1", lastModified),
+			expected: []state{stateThird, stateSecond},
 		},
 		"delete last": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "bucketkey3etag3" + lastModified.String(),
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key1", "etag1", lastModified),
-					Bucket:       "bucket",
-					Key:          "key1",
-					Etag:         "etag1",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-				{
-					ID:           stateID("bucket", "key2", "etag2", lastModified),
-					Bucket:       "bucket",
-					Key:          "key2",
-					Etag:         "etag2",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
+			states:   statesFuncMultiple,
+			deleteID: stateID("bucket", "key3", "etag3", lastModified),
+			expected: []state{stateFirst, stateSecond},
 		},
 		"delete any": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "bucketkey2etag2" + lastModified.String(),
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key1", "etag1", lastModified),
-					Bucket:       "bucket",
-					Key:          "key1",
-					Etag:         "etag1",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-				{
-					ID:           stateID("bucket", "key3", "etag3", lastModified),
-					Bucket:       "bucket",
-					Key:          "key3",
-					Etag:         "etag3",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
->>>>>>> 7e7755ce5f (fix bug related to wrong state.ID in awss3 direct s3 input (#32164))
+			states:   statesFuncMultiple,
+			deleteID: stateID("bucket", "key2", "etag2", lastModified),
+			expected: []state{stateFirst, stateThird},
 		},
 	}
 

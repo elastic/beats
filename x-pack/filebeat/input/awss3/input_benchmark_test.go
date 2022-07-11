@@ -16,14 +16,6 @@ import (
 	"testing"
 	"time"
 
-<<<<<<< HEAD
-=======
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-
->>>>>>> 7e7755ce5f (fix bug related to wrong state.ID in awss3 direct s3 input (#32164))
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -324,13 +316,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					return
 				}
 
-<<<<<<< HEAD
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", numberOfWorkers, time.Second)
-=======
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, config.FileSelectors)
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
->>>>>>> 7e7755ce5f (fix bug related to wrong state.ID in awss3 direct s3 input (#32164))
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {
 					if !errors.Is(err, context.DeadlineExceeded) {
