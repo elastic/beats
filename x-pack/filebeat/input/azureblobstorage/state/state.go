@@ -28,7 +28,7 @@ type Checkpoint struct {
 	Marker *string
 	// name of the latest blob in alphabetical order
 	BlobName string
-	// timestamp to denote when the blob was last modified
+	// timestamp to denote which is the latest blob
 	LatestEntryTime *time.Time
 }
 

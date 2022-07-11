@@ -9,6 +9,7 @@ package azureblobstorage
 
 import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
