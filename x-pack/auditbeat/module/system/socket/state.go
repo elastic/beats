@@ -157,21 +157,8 @@ func newEndpointIPv6(beIPa uint64, beIPb uint64, bePort uint16, pkts uint64, byt
 	return e
 }
 
-type linkedElement interface {
-	Prev() linkedElement
-	Next() linkedElement
-	SetPrev(linkedElement)
-	SetNext(linkedElement)
-	Timestamp() time.Time
-}
-
-type linkedList struct {
-	head, tail linkedElement
-	size       uint
-}
-
 type flow struct {
-	prev, next linkedElement
+	prev, next helper.LinkedElement
 
 	sock              uintptr
 	inetType          inetType
@@ -193,22 +180,22 @@ func (f *flow) isValid() bool {
 }
 
 // Prev returns the previous flow in a linked list of flows.
-func (f *flow) Prev() linkedElement {
+func (f *flow) Prev() helper.LinkedElement {
 	return f.prev
 }
 
 // Next returns the next flow in a linked list of flows.
-func (f *flow) Next() linkedElement {
+func (f *flow) Next() helper.LinkedElement {
 	return f.next
 }
 
 // SetPrev sets previous flow in a linked list of flows.
-func (f *flow) SetPrev(e linkedElement) {
+func (f *flow) SetPrev(e helper.LinkedElement) {
 	f.prev = e
 }
 
 // SetNext sets the next flow in a linked list of flows.
-func (f *flow) SetNext(e linkedElement) {
+func (f *flow) SetNext(e helper.LinkedElement) {
 	f.next = e
 }
 
@@ -267,28 +254,28 @@ type socket struct {
 	process *process
 	// This signals that the socket is in the closeTimeout list.
 	closing    bool
-	prev, next linkedElement
+	prev, next helper.LinkedElement
 
 	createdTime, lastSeenTime time.Time
 }
 
 // Prev returns the previous socket in the linked list.
-func (s *socket) Prev() linkedElement {
+func (s *socket) Prev() helper.LinkedElement {
 	return s.prev
 }
 
 // Next returns the next socket in the linked list.
-func (s *socket) Next() linkedElement {
+func (s *socket) Next() helper.LinkedElement {
 	return s.next
 }
 
 // SetPrev sets the previous socket in the linked list.
-func (s *socket) SetPrev(e linkedElement) {
+func (s *socket) SetPrev(e helper.LinkedElement) {
 	s.prev = e
 }
 
 // SetNext sets the next socket in the linked list.
-func (s *socket) SetNext(e linkedElement) {
+func (s *socket) SetNext(e helper.LinkedElement) {
 	s.next = e
 }
 
@@ -372,14 +359,14 @@ type state struct {
 	clockMaxDrift                                time.Duration
 
 	// lru used for flow expiration.
-	flowLRU linkedList
+	flowLRU helper.LinkedList
 
 	// lru used for socket expiration.
-	socketLRU linkedList
+	socketLRU helper.LinkedList
 
 	// holds sockets in closing state. This is to keep them around until their
 	// close timeout expires.
-	closing linkedList
+	closing helper.LinkedList
 
 	dns dnsTracker
 
@@ -401,7 +388,7 @@ func (s *state) getSocket(sock uintptr) *socket {
 		lastSeenTime: now,
 	}
 	s.socks[sock] = socket
-	s.socketLRU.add(socket)
+	s.socketLRU.Add(socket)
 	return socket
 }
 
@@ -445,8 +432,8 @@ func (s *state) logState() {
 	numSocks := len(s.socks)
 	numProcs := len(s.processes)
 	numThreads := len(s.threads)
-	flowLRUSize := s.flowLRU.size
-	closingSize := s.closing.size
+	flowLRUSize := s.flowLRU.Size()
+	closingSize := s.closing.Size()
 	events := atomic.LoadUint64(&eventCount)
 	s.Unlock()
 
@@ -503,39 +490,34 @@ func (s *state) ExpireFlows() {
 	}
 }
 
-func (s *state) expireFlows() (toReport linkedList) {
+func (s *state) expireFlows() (toReport helper.LinkedList) {
 	s.Lock()
 	defer s.Unlock()
 	now := s.clock()
-	deadline := now.Add(-s.inactiveTimeout)
-	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
-		if flow, ok := item.(*flow); ok {
+	s.flowLRU.RemoveOlder(now.Add(-s.inactiveTimeout), func(e helper.LinkedElement) bool {
+		flow, ok := e.(*flow)
+		if ok {
 			flows := s.onFlowTerminated(flow)
-			toReport.append(&flows)
-		} else {
-			s.flowLRU.get()
+			toReport.Append(&flows)
 		}
-		item = s.flowLRU.peek()
-	}
-	deadline = now.Add(-s.socketTimeout)
-	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
-		if sock, ok := item.(*socket); ok {
+		return ok
+	})
+	s.socketLRU.RemoveOlder(now.Add(-s.socketTimeout), func(e helper.LinkedElement) bool {
+		sock, ok := e.(*socket)
+		if ok {
 			s.onSockDestroyed(sock.sock, sock, 0)
-		} else {
-			s.socketLRU.get()
 		}
-		item = s.socketLRU.peek()
-	}
-	deadline = now.Add(-s.closeTimeout)
-	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
-		if sock, ok := item.(*socket); ok {
+		return ok
+	})
+	s.closing.RemoveOlder(now.Add(-s.closeTimeout), func(e helper.LinkedElement) bool {
+		sock, ok := e.(*socket)
+		if ok {
 			flows := s.onSockTerminated(sock)
-			toReport.append(&flows)
-		} else {
-			s.closing.get()
+			toReport.Append(&flows)
 		}
-		item = s.closing.peek()
-	}
+		return ok
+	})
+
 	// Expire cached DNS
 	s.dns.CleanUp()
 	return toReport
@@ -636,15 +618,15 @@ func (s *state) ThreadLeave(tid uint32) (ev event, found bool) {
 	return ev, found
 }
 
-func (s *state) onSockTerminated(sock *socket) (toReport linkedList) {
+func (s *state) onSockTerminated(sock *socket) (toReport helper.LinkedList) {
 	for _, f := range sock.flows {
 		flows := s.onFlowTerminated(f)
-		toReport.append(&flows)
+		toReport.Append(&flows)
 	}
 	sock.flows = nil
 	delete(s.socks, sock.sock)
 	if sock.closing {
-		s.closing.remove(sock)
+		s.closing.Remove(sock)
 	} else {
 		s.moveToClosing(sock)
 	}
@@ -653,7 +635,7 @@ func (s *state) onSockTerminated(sock *socket) (toReport linkedList) {
 
 // CreateSocket allocates a new sock in the system
 func (s *state) CreateSocket(ref flow) error {
-	var toReport linkedList
+	var toReport helper.LinkedList
 	// Send flows to the output as a deferred function to avoid
 	// holding on s mutex when there's backpressure from the output.
 	defer s.reportFlows(&toReport)
@@ -719,8 +701,8 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 	}
 	if !sock.closing {
 		sock.lastSeenTime = s.clock()
-		s.socketLRU.remove(sock)
-		s.socketLRU.add(sock)
+		s.socketLRU.Remove(sock)
+		s.socketLRU.Add(sock)
 	}
 }
 
@@ -740,7 +722,7 @@ func (s *state) createFlow(ref flow) error {
 		sock.flows = make(map[string]*flow, 1)
 	}
 	sock.flows[ref.remote.addr.String()] = ptr
-	s.flowLRU.add(ptr)
+	s.flowLRU.Add(ptr)
 	s.numFlows++
 	return nil
 }
@@ -778,8 +760,8 @@ func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) {
 func (s *state) moveToClosing(sock *socket) {
 	sock.lastSeenTime = s.clock()
 	sock.closing = true
-	s.socketLRU.remove(sock)
-	s.closing.add(sock)
+	s.socketLRU.Remove(sock)
+	s.closing.Add(sock)
 }
 
 // UpdateFlow receives a partial flow and creates or updates an existing flow.
@@ -814,8 +796,8 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	s.mutualEnrich(sock, &ref)
 	prev.updateWith(ref, s)
 	s.enrichDNS(prev)
-	s.flowLRU.remove(prev)
-	s.flowLRU.add(prev)
+	s.flowLRU.Remove(prev)
+	s.flowLRU.Add(prev)
 	return nil
 }
 
@@ -873,9 +855,9 @@ func (s *state) reportFlow(f *flow) {
 	}
 }
 
-func (s *state) reportFlows(l *linkedList) (count int) {
-	for head := l.head; head != nil; head = head.Next() {
-		if f, ok := head.(*flow); ok {
+func (s *state) reportFlows(l *helper.LinkedList) (count int) {
+	for item := l.Get(); item != nil; item = l.Get() {
+		if f, ok := item.(*flow); ok {
 			s.reportFlow(f)
 			count++
 		}
@@ -883,81 +865,19 @@ func (s *state) reportFlows(l *linkedList) (count int) {
 	return count
 }
 
-func (s *state) onFlowTerminated(f *flow) (toReport linkedList) {
+func (s *state) onFlowTerminated(f *flow) (toReport helper.LinkedList) {
 	if f.done {
 		return toReport
 	}
-	s.flowLRU.remove(f)
+	s.flowLRU.Remove(f)
 	f.done = true
 	// Unbind this flow from its parent
 	if parent, found := s.socks[f.sock]; found {
 		delete(parent.flows, f.remote.addr.String())
 	}
 	s.numFlows--
-	toReport.add(f)
+	toReport.Add(f)
 	return toReport
-}
-
-func (l *linkedList) append(b *linkedList) {
-	if b.size == 0 {
-		return
-	}
-	if l.size == 0 {
-		*l = *b
-		*b = linkedList{}
-		return
-	}
-	l.tail.SetNext(b.head)
-	b.head.SetPrev(l.tail)
-	l.tail = b.tail
-	l.size += b.size
-	*b = linkedList{}
-}
-
-func (l *linkedList) add(f linkedElement) {
-	if f == nil || f.Next() != nil || f.Prev() != nil {
-		panic("bad flow in linked list")
-	}
-	l.size++
-	if l.tail == nil {
-		l.head = f
-		l.tail = f
-		f.SetNext(nil)
-		f.SetPrev(nil)
-		return
-	}
-	l.tail.SetNext(f)
-	f.SetPrev(l.tail)
-	l.tail = f
-	f.SetNext(nil)
-}
-
-func (l *linkedList) peek() linkedElement {
-	return l.head
-}
-
-func (l *linkedList) get() linkedElement {
-	f := l.head
-	if f != nil {
-		l.remove(f)
-	}
-	return f
-}
-
-func (l *linkedList) remove(e linkedElement) {
-	l.size--
-	if e.Prev() != nil {
-		e.Prev().SetNext(e.Next())
-	} else {
-		l.head = e.Next()
-	}
-	if e.Next() != nil {
-		e.Next().SetPrev(e.Prev())
-	} else {
-		l.tail = e.Prev()
-	}
-	e.SetPrev(nil)
-	e.SetNext(nil)
 }
 
 func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
