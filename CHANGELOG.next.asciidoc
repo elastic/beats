@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
 - Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
 - Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
+- Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
 
 *Auditbeat*
 
