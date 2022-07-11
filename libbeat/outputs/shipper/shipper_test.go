@@ -409,7 +409,7 @@ func TestPublish(t *testing.T) {
 	})
 }
 
-// BenchmarkToShipperEvent is used to detech performance regression when the conversion function is changed.
+// BenchmarkToShipperEvent is used to detect performance regression when the conversion function is changed.
 func BenchmarkToShipperEvent(b *testing.B) {
 	ts := time.Date(2022, time.July, 8, 16, 00, 00, 00, time.UTC)
 	str := strings.Repeat("somelongstring", 100)
