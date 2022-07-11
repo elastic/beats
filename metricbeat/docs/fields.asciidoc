@@ -32397,18 +32397,14 @@ type: keyword
 *`elasticsearch.node.stats.os.cgroup.memory.limit.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
 *`elasticsearch.node.stats.os.cgroup.memory.usage.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
