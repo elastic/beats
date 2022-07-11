@@ -91,6 +91,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
+- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
+- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
+- Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
+- Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
+- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
+- Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
+* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 
 *Packetbeat*
 
