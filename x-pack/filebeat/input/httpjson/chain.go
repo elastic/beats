@@ -102,14 +102,11 @@ func defaultChainConfig() config {
 				Auth:     chaincfg.Auth,
 				Request:  *chaincfg.Request,
 				Response: responseChainConfig{},
-				Replace:  "",
-				Till:     nil,
 			},
 			Step: &stepConfig{
 				Auth:     chaincfg.Auth,
 				Request:  *chaincfg.Request,
 				Response: responseChainConfig{},
-				Replace:  "",
 			},
 		},
 	}
