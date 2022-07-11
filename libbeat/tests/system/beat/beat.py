@@ -30,11 +30,13 @@ REGEXP_TYPE = type(re.compile("t"))
 class TimeoutError(Exception):
     pass
 
+
 class WaitTimeoutError(Exception):
     """
     WaitTimeoutError is raised by the wait_until function if the `until` logic passes its timeout.
     """
     pass
+
 
 class Proc(object):
     """
