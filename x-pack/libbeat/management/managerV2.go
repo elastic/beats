@@ -5,15 +5,59 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/helpers/transpiler"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	ucfg "github.com/elastic/go-ucfg"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 )
+
+// BeatInput represents the "root" of a single input config
+type BeatInput struct {
+	Enabled   bool
+	Id        ComponentID
+	Name      string
+	UseOutput string
+	Streams   []MetricbeatStream
+	Meta      InputMetadata
+}
+
+type InputMetadata struct {
+	Package PackageData
+}
+
+type PackageData struct {
+	Name    string
+	Version string
+}
+
+// ComponentID covers the `id` field found in streams and inputs,
+// which currently requires regex and string format statements to manipulate
+type ComponentID struct {
+	Type      string
+	Namespace string
+	Dataset   string
+}
+
+// MetricbeatStream covers the config for an indvidual stream found in an input config,
+// which maps to a metricbeat module/metricset within metricbeat.
+// Normally metricbeat has a one-to-many relationship between modules and metricsets,
+// But fleet will give us one stream per metricset, translating to one module per metricset.
+type MetricbeatStream struct {
+	Hosts   []string
+	Period  time.Duration
+	Module  string
+	Dataset string
+	Enabled bool
+	// The one remaining "quarantined" string blob.
+	DatasetConfig string
+}
 
 type BeatV2Manager struct {
 	config   *Config
@@ -162,14 +206,16 @@ func (cm *BeatV2Manager) unitListen() {
 func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 	cm.addUnit(unit)
 	unitType := unit.Type()
+	reloadConfig, err := createConfigForReloader(unit)
+	if err != nil {
+		errString := fmt.Errorf("Failed to generate config for output: %w", err)
+		unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
+	}
+
 	if unitType == client.UnitTypeOutput { // unit for the beat's configured output
 		// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 		output := cm.registry.GetReloadable("output")
-		reloadConfig, err := createConfigForReloader(unit)
-		if err != nil {
-			errString := fmt.Errorf("Failed to generate config for output: %w", err)
-			unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
-		}
+
 		unit.UpdateState(client.UnitStateConfiguring, "reloading component", nil)
 		err = output.Reload(reloadConfig)
 		if err != nil {
@@ -177,6 +223,28 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 			unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
 		}
 		unit.UpdateState(client.UnitStateHealthy, "reloaded component", nil)
+	} else if unitType == client.UnitTypeOutput {
+
+		// Find the V2 inputs we need to reload
+		// I'm not 100% sure that we'll "get" a unit that is specific to the beat we're currently running,
+		// and we may need some kind of filter here to make sure we route unit configs to the correct reloader
+
+		// The reloader provides list and non-list types, but all the beats register as lists,
+		// so just go with that for V2
+		obj := cm.registry.GetReloadableList("input")
+		if obj == nil {
+			unit.UpdateState(client.UnitStateFailed, "failed to find beat reloadable type 'input'", nil)
+			return
+		}
+		conv := ucfg.Config(*reloadConfig.Config)
+		_, err := transpiler.NewASTFromConfig(&conv)
+		if err != nil {
+			errString := fmt.Errorf("Failed to create AST from config: %w", err)
+			unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
+		}
+
+		// Here: take the incoming config, use the same AST logic the agent was using to transform it
+
 	}
 }
 
@@ -189,7 +257,7 @@ func (cm *BeatV2Manager) handleUnitUpdated(unit *client.Unit) {
 // createConfigForReloader is a little helper that takes the raw config from the unit
 // and converts it to the weird config type used by the reloaders
 func createConfigForReloader(unit *client.Unit) (*reload.ConfigWithMeta, error) {
-	unitRaw, _ := unit.Expected()
+	_, unitRaw := unit.Expected()
 	uconfig, err := conf.NewConfigFrom(unitRaw)
 	if err != nil {
 		return nil, err

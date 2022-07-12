@@ -29,6 +29,9 @@ import (
 // Register holds a registry of reloadable objects
 var Register = NewRegistry()
 
+// RegisterV2 is the special registry used for the V2 controller
+var RegisterV2 = NewRegistry()
+
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
 	// Config to store
