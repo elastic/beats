@@ -31,8 +31,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"math/rand"
-
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
