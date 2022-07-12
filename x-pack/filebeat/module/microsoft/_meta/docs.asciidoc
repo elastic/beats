@@ -5,7 +5,13 @@
 
 == Microsoft module
 
+//temporarily override modulename to create working link
+:modulename: m365_defender
+
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: microsoft
 
 This is a module for ingesting data from the different Microsoft Products. Currently supports these filesets:
 

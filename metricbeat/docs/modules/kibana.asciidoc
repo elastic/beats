@@ -9,6 +9,10 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-kibana]]
 == Kibana module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 The `kibana` module collects metrics about {kib}.
 
 [float]
