@@ -57,20 +57,20 @@ func mustParseTime(layout, value string, loc *time.Location) time.Time {
 }
 
 var syslogCases = map[string]struct {
-	Cfg      *conf.C
-	In       mapstr.M
-	Want     mapstr.M
-	WantTime time.Time
-	WantErr  bool
+	cfg      *conf.C
+	in       mapstr.M
+	want     mapstr.M
+	wantTime time.Time
+	wantErr  bool
 }{
 	"rfc-3164": {
-		Cfg: conf.MustNewConfigFrom(mapstr.M{
+		cfg: conf.MustNewConfigFrom(mapstr.M{
 			"timezone": "America/Chicago",
 		}),
-		In: mapstr.M{
+		in: mapstr.M{
 			"message": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
 		},
-		Want: mapstr.M{
+		want: mapstr.M{
 			"log": mapstr.M{
 				"syslog": mapstr.M{
 					"priority": 13,
@@ -89,14 +89,14 @@ var syslogCases = map[string]struct {
 			},
 			"message": "this is the message",
 		},
-		WantTime: mustParseTime(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
+		wantTime: mustParseTime(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
 	},
 	"rfc-5424": {
-		Cfg: conf.MustNewConfigFrom(mapstr.M{}),
-		In: mapstr.M{
+		cfg: conf.MustNewConfigFrom(mapstr.M{}),
+		in: mapstr.M{
 			"message": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
 		},
-		Want: mapstr.M{
+		want: mapstr.M{
 			"log": mapstr.M{
 				"syslog": mapstr.M{
 					"priority": 165,
@@ -113,11 +113,11 @@ var syslogCases = map[string]struct {
 					"procid":   "1024",
 					"msgid":    "ID47",
 					"version":  "1",
-					"structured_data": map[string]map[string]string{
-						"examplePriority@32473": {
+					"structured_data": map[string]interface{}{
+						"examplePriority@32473": map[string]interface{}{
 							"class": "high",
 						},
-						"exampleSDID@32473": {
+						"exampleSDID@32473": map[string]interface{}{
 							"eventID":     "1011",
 							"eventSource": "Application",
 							"iut":         "3",
@@ -127,7 +127,7 @@ var syslogCases = map[string]struct {
 			},
 			"message": "this is the message",
 		},
-		WantTime: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
+		wantTime: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
 	},
 }
 
@@ -137,22 +137,22 @@ func TestSyslog(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			p, err := New(tc.Cfg)
+			p, err := New(tc.cfg)
 			if err != nil {
 				panic(err)
 			}
 			event := &beat.Event{
-				Fields: tc.In,
+				Fields: tc.in,
 			}
 
 			got, gotErr := p.Run(event)
-			if tc.WantErr {
+			if tc.wantErr {
 				assert.Error(t, gotErr)
 			} else {
 				assert.NoError(t, gotErr)
 			}
 
-			assert.Equal(t, tc.Want, got.Fields)
+			assert.Equal(t, tc.want, got.Fields)
 		})
 	}
 }
@@ -164,9 +164,9 @@ func BenchmarkSyslog(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 
-				p, _ := New(bc.Cfg)
+				p, _ := New(bc.cfg)
 				event := &beat.Event{
-					Fields: bc.In,
+					Fields: bc.in,
 				}
 
 				_, _ = p.Run(event)
@@ -177,46 +177,46 @@ func BenchmarkSyslog(b *testing.B) {
 
 func TestAppendStringField(t *testing.T) {
 	tests := map[string]struct {
-		InMap   mapstr.M
-		InField string
-		InValue string
-		Want    mapstr.M
+		inMap   mapstr.M
+		inField string
+		inValue string
+		want    mapstr.M
 	}{
 		"nil": {
-			InMap:   mapstr.M{},
-			InField: "error",
-			InValue: "foo",
-			Want: mapstr.M{
+			inMap:   mapstr.M{},
+			inField: "error",
+			inValue: "foo",
+			want: mapstr.M{
 				"error": "foo",
 			},
 		},
 		"string": {
-			InMap: mapstr.M{
+			inMap: mapstr.M{
 				"error": "foo",
 			},
-			InField: "error",
-			InValue: "bar",
-			Want: mapstr.M{
+			inField: "error",
+			inValue: "bar",
+			want: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
 		},
 		"string-slice": {
-			InMap: mapstr.M{
+			inMap: mapstr.M{
 				"error": []string{"foo", "bar"},
 			},
-			InField: "error",
-			InValue: "some value",
-			Want: mapstr.M{
+			inField: "error",
+			inValue: "some value",
+			want: mapstr.M{
 				"error": []string{"foo", "bar", "some value"},
 			},
 		},
 		"interface-slice": {
-			InMap: mapstr.M{
+			inMap: mapstr.M{
 				"error": []interface{}{"foo", "bar"},
 			},
-			InField: "error",
-			InValue: "some value",
-			Want: mapstr.M{
+			inField: "error",
+			inValue: "some value",
+			want: mapstr.M{
 				"error": []interface{}{"foo", "bar", "some value"},
 			},
 		},
@@ -226,9 +226,9 @@ func TestAppendStringField(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			appendStringField(tc.InMap, tc.InField, tc.InValue)
+			appendStringField(tc.inMap, tc.inField, tc.inValue)
 
-			assert.Equal(t, tc.Want, tc.InMap)
+			assert.Equal(t, tc.want, tc.inMap)
 		})
 	}
 }

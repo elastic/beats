@@ -674,11 +674,15 @@ filebeat.inputs:
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list. The include_lines is called before
   # exclude_lines. By default, no lines are dropped.
+  # Line filtering happens after the parsers pipeline. If you would like to filter lines
+  # before parsers, use include_message parser.
   #exclude_lines: ['^DBG']
 
   # Include lines. A list of regular expressions to match. It exports the lines that are
   # matching any regular expression from the list. The include_lines is called before
   # exclude_lines. By default, all the lines are exported.
+  # Line filtering happens after the parsers pipeline. If you would like to filter lines
+  # before parsers, use include_message parser.
   #include_lines: ['^ERR', '^WARN']
 
   ### Prospector options
@@ -733,6 +737,16 @@ filebeat.inputs:
       # unmarshaling errors or when a text key is defined in the configuration but cannot
       # be used.
       #add_error_key: false
+
+  #### Filtering messages
+
+  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # include or exclude lines before they are aggregated into multiline or the JSON contents
+  # are parsed.
+
+  #parsers:
+    #- include_message.patterns:
+      - ["WARN", "ERR"]
 
   #### Multiline options
 
@@ -1187,7 +1201,7 @@ filebeat.inputs:
 #          config:
 #            - type: container
 #              paths:
-#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+#                - /var/log/containers/*.log
 
 # ========================== Filebeat global options ===========================
 

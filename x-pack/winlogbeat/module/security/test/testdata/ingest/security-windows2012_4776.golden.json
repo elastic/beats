@@ -1,0 +1,69 @@
+[
+  {
+    "@timestamp": "2020-04-01T08:45:42.1873153Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "credential-validated",
+      "category": [
+        "authentication"
+      ],
+      "code": "4776",
+      "ingested": "2022-06-08T06:21:08.213859200Z",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "start"
+      ]
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "The computer attempted to validate the credentials for an account.\n\nAuthentication Package:\tMICROSOFT_AUTHENTICATION_PACKAGE_V1_0\nLogon Account:\tat_adm\nSource Workstation:\tEQP01777\nError Code:\t0x0",
+    "related": {
+      "user": [
+        "at_adm"
+      ]
+    },
+    "user": {
+      "name": "at_adm"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "PackageName": "MICROSOFT_AUTHENTICATION_PACKAGE_V1_0",
+        "Status": "0x0",
+        "TargetUserName": "at_adm",
+        "Workstation": "EQP01777"
+      },
+      "event_id": "4776",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "failure": {
+          "status": "Status OK."
+        }
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 1864
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "5040222",
+      "task": "Credential Validation"
+    }
+  }
+]

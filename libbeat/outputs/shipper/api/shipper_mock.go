@@ -19,28 +19,29 @@ package api
 
 import (
 	context "context"
+
+	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 func NewProducerMock(cap int) *ProducerMock {
 	return &ProducerMock{
-		Q: make([]*Event, 0, cap),
+		Q: make([]*messages.Event, 0, cap),
 	}
 }
 
 type ProducerMock struct {
-	UnimplementedProducerServer
-	Q     []*Event
+	pb.UnimplementedProducerServer
+	Q     []*messages.Event
 	Error error
 }
 
-func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*PublishReply, error) {
+func (p *ProducerMock) PublishEvents(ctx context.Context, r *messages.PublishRequest) (*messages.PublishReply, error) {
 	if p.Error != nil {
 		return nil, p.Error
 	}
 
-	resp := &PublishReply{
-		Results: make([]*EventResult, 0, len(r.Events)),
-	}
+	resp := &messages.PublishReply{}
 
 	for _, e := range r.Events {
 		if len(p.Q) == cap(p.Q) {
@@ -48,12 +49,7 @@ func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*P
 		}
 
 		p.Q = append(p.Q, e)
-
-		resp.Results = append(resp.Results, &EventResult{
-			Timestamp: e.GetTimestamp(),
-			QueueId:   "queue",
-			EventId:   e.GetEventId(),
-		})
+		resp.AcceptedCount++
 	}
 
 	return resp, nil

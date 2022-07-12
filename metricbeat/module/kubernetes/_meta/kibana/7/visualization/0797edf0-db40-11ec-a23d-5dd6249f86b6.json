@@ -23,7 +23,7 @@
                 "id": "39383e82-d6d8-4850-81b3-696b74b2f8fd",
                 "index_pattern_ref_name": "metrics_0_index_pattern",
                 "interval": "",
-                "markdown": "[Kubernetes Overview](/app/dashboards#/view/kubernetes-e0195ce0-bcaf-11ec-b64f-7dd6e8e82013),\n[Kubernetes Nodes](/app/dashboards#/view/kubernetes-b945b7b0-bcb1-11ec-b64f-7dd6e8e82013), \n[Kubernetes Pods](/app/dashboards#/view/kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013),  [Kubernetes Deployments](/app/dashboards#/view/kubernetes-5be46210-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes StatefulSets](/app/dashboards#/view/kubernetes-21694370-bcb2-11ec-b64f-7dd6e8e82013),  [Kubernetes DaemonSets](/app/dashboards#/view/kubernetes-85879010-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes CronJobs](/app/dashboards#/view/kubernetes-0a672d50-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Jobs](/app/dashboards#/view/kubernetes-9bf990a0-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Volumes](/app/dashboards#/view/kubernetes-3912d9a0-bcb2-11ec-b64f-7dd6e8e82013), [Kubernetes PV/PVC](/app/dashboards#/view/kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Services](/app/dashboards#/view/kubernetes-ff1b3850-bcb1-11ec-b64f-7dd6e8e82013)\n",
+                "markdown": "[Kubernetes Overview](#/view/kubernetes-e0195ce0-bcaf-11ec-b64f-7dd6e8e82013),\n[Kubernetes Nodes](#/view/kubernetes-b945b7b0-bcb1-11ec-b64f-7dd6e8e82013), \n[Kubernetes Pods](#/view/kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013),  [Kubernetes Deployments](#/view/kubernetes-5be46210-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes StatefulSets](#/view/kubernetes-21694370-bcb2-11ec-b64f-7dd6e8e82013),  [Kubernetes DaemonSets](#/view/kubernetes-85879010-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes CronJobs](#/view/kubernetes-0a672d50-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Jobs](#/view/kubernetes-9bf990a0-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Volumes](#/view/kubernetes-3912d9a0-bcb2-11ec-b64f-7dd6e8e82013), [Kubernetes PV/PVC](#/view/kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Services](#/view/kubernetes-ff1b3850-bcb1-11ec-b64f-7dd6e8e82013),\n[Kubernetes Api Server](#/view/e706b4a0-ee30-11ec-bb3e-1bec5bcfeb8c)\n",
                 "max_lines_legend": 1,
                 "series": [
                     {
@@ -66,7 +66,7 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "0797edf0-db40-11ec-a23d-5dd6249f86b6",
     "migrationVersion": {
         "visualization": "8.3.0"
@@ -79,6 +79,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-24T09:00:59.354Z",
-    "version": "Wzk5NzEsMV0="
+    "updated_at": "2022-06-28T07:00:57.783Z",
+    "version": "WzYzODIsM10="
 }

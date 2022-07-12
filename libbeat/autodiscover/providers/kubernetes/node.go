@@ -24,19 +24,20 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/gofrs/uuid"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 type node struct {
@@ -85,7 +86,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish
 	}, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Node{}, err)
 	}
 
 	p := &node{
@@ -153,7 +154,7 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := builder.GenerateHints(annotations, "", n.config.Prefix)
+	hints := utils.GenerateHints(annotations, "", n.config.Prefix)
 	n.logger.Debugf("Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
@@ -196,7 +197,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		ShouldPut(annotations, k, v, n.logger)
 	}
 	kubemeta["annotations"] = annotations
 	event := bus.Event{
