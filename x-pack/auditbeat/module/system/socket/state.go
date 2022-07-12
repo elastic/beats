@@ -844,22 +844,23 @@ func (f *flow) updateWith(ref flow, s *state) {
 	f.remote.updateWith(ref.remote)
 }
 
-func (s *state) reportFlow(f *flow) {
+func (s *state) reportFlow(f *flow) (reported bool) {
 	if f != nil && f.isValid() && int(f.pid) != s.currentPID {
-		ev, err := f.toEvent(true)
-		if err != nil {
+		if ev, err := f.toEvent(true); err == nil {
+			reported = s.reporter.Event(ev)
+		} else {
 			s.log.Errorf("Failed to convert flow=%v err=%v", f, err)
-			return
 		}
-		s.reporter.Event(ev)
 	}
+	return reported
 }
 
 func (s *state) reportFlows(l *helper.LinkedList) (count int) {
 	for item := l.Get(); item != nil; item = l.Get() {
 		if f, ok := item.(*flow); ok {
-			s.reportFlow(f)
-			count++
+			if s.reportFlow(f) {
+				count++
+			}
 		}
 	}
 	return count
