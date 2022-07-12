@@ -225,7 +225,7 @@ func PythonIntegTest(ctx context.Context) error {
 
 	passThroughEnvVars := append(
 		[]string{"ELASTICSEARCH_VERSION", "KIBANA_VERSION", "BEAT_VERSION"},
-		devtools.ListMatchingEnvVars("PYTEST_")...
+		devtools.ListMatchingEnvVars("PYTEST_")...,
 	)
 	runner, err := devtools.NewDockerIntegrationRunner(passThroughEnvVars...)
 	if err != nil {
