@@ -110,7 +110,7 @@ func (r *runner) Start() {
 
 	go func() {
 		defer r.wg.Done()
-		log.Infof("Input '%s' - '%s' starting", name, r.id)
+		log.Infof("Input '%s' starting", name)
 		err := r.input.Run(
 			v2.Context{
 				ID:          r.id,
@@ -121,9 +121,9 @@ func (r *runner) Start() {
 			r.connector,
 		)
 		if err != nil {
-			log.Errorf("Input '%s' - '%s' failed with: %+v", name, r.id, err)
+			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
-			log.Infof("Input '%s' - '%s' stopped (goroutine)", name, r.id)
+			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
 	}()
 }
@@ -131,7 +131,7 @@ func (r *runner) Start() {
 func (r *runner) Stop() {
 	r.sig.Cancel()
 	r.wg.Wait()
-	r.log.Infof("Input '%s' - '%s' stopped (runner)", r.input.Name(), r.id)
+	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
 }
 
 func configID(config *conf.C) (string, error) {
