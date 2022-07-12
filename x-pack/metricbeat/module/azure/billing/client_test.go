@@ -7,11 +7,12 @@ package billing
 import (
 	"errors"
 	"testing"
+	"time"
 
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
@@ -21,14 +22,16 @@ var (
 )
 
 func TestClient(t *testing.T) {
+	startTime, endTime := previousDayFrom(time.Now())
+
 	t.Run("return error not valid query", func(t *testing.T) {
 		client := NewMockClient()
 		client.Config = config
 		m := &MockService{}
-		m.On("GetForcast", mock.Anything).Return(consumption.ForecastsListResult{}, errors.New("invalid query"))
-		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(prevConsumption.UsageDetailsListResultPage{}, nil)
+		m.On("GetForecast", mock.Anything).Return([]consumption.Forecast{}, errors.New("invalid query"))
+		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
 		client.BillingService = m
-		results, err := client.GetMetrics()
+		results, err := client.GetMetrics(startTime, endTime)
 		assert.Error(t, err)
 		assert.Equal(t, len(results.ActualCosts), 0)
 		m.AssertExpectations(t)
@@ -38,10 +41,10 @@ func TestClient(t *testing.T) {
 		client.Config = config
 		m := &MockService{}
 		forecasts := []consumption.Forecast{{}, {}}
-		m.On("GetForcast", mock.Anything).Return(consumption.ForecastsListResult{Value: &forecasts}, nil)
-		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(prevConsumption.UsageDetailsListResultPage{}, nil)
+		m.On("GetForecast", mock.Anything).Return(forecasts, nil)
+		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
 		client.BillingService = m
-		results, err := client.GetMetrics()
+		results, err := client.GetMetrics(startTime, endTime)
 		assert.NoError(t, err)
 		assert.Equal(t, len(results.ActualCosts), 2)
 		assert.Equal(t, len(results.ForecastCosts), 2)

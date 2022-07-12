@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -406,6 +407,56 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, expSignals, batch.Signals)
 	})
+}
+
+// BenchmarkToShipperEvent is used to detect performance regression when the conversion function is changed.
+func BenchmarkToShipperEvent(b *testing.B) {
+	ts := time.Date(2022, time.July, 8, 16, 00, 00, 00, time.UTC)
+	str := strings.Repeat("somelongstring", 100)
+
+	// This event causes to go through every code path during the event conversion
+	e := publisher.Event{Content: beat.Event{
+		Timestamp: ts,
+		Meta: mapstr.M{
+			"input_id":  "someinputid",
+			"stream_id": "somestreamid",
+			"data_stream": mapstr.M{
+				"type":      "logs",
+				"namespace": "default",
+				"dataset":   "default",
+			},
+			"number": 42,
+			"string": str,
+			"time":   ts,
+			"bytes":  []byte(str),
+			"list":   []interface{}{str, str, str},
+			"nil":    nil,
+		},
+		Fields: mapstr.M{
+			"inner": mapstr.M{
+				"number": 42,
+				"string": str,
+				"time":   ts,
+				"bytes":  []byte(str),
+				"list":   []interface{}{str, str, str},
+				"nil":    nil,
+			},
+			"number": 42,
+			"string": str,
+			"time":   ts,
+			"bytes":  []byte(str),
+			"list":   []interface{}{str, str, str},
+			"nil":    nil,
+		},
+	}}
+
+	for i := 0; i < b.N; i++ {
+		pe, err := toShipperEvent(e)
+		require.NoError(b, err)
+		bytes, err := proto.Marshal(pe)
+		require.NoError(b, err)
+		require.NotEmpty(b, bytes)
+	}
 }
 
 // runServer mocks the shipper mock server for testing
