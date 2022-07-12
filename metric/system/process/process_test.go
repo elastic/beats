@@ -127,6 +127,7 @@ func TestSelfPersist(t *testing.T) {
 
 	// The first process fetch shouldn't have percentages, since we don't have >1 procs to compare
 	assert.False(t, first.CPU.Total.Pct.Exists(), "total.pct should not exist")
+	// Create a proper time delay so the CPU percentage delta calculations don't fail
 	time.Sleep(time.Millisecond * 5)
 	second, err := stat.GetSelf()
 	require.NoError(t, err, "Second GetSelf()")
