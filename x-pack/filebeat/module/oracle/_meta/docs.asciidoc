@@ -6,6 +6,8 @@
 
 == Oracle module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for ingesting Audit Trail logs from Oracle Databases.
 
 The module expects an *.aud audit file that is generated from Oracle Databases by default. If this has been disabled then please see the https://docs.oracle.com/en/database/oracle/oracle-database/19/dbseg/introduction-to-auditing.html#GUID-8D96829C-9151-4FA4-BED9-831D088F12FF[Oracle Database Audit Trail Documentation].
