@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
+- Fix race condition when reloading runners {pull}32309[32309]
 
 *Auditbeat*
 
@@ -44,6 +45,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
+- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
+- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
+- Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
 
 *Heartbeat*
 
