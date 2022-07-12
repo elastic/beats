@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.3]
+
+## Fixed
+
+- Add IsZero to CPU Totals, report value for monitoring #40
+
 ## [0.4.2]
 
 ## Fixed

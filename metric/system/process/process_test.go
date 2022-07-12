@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -116,6 +117,23 @@ func TestProcessList(t *testing.T) {
 		assert.NotEmpty(t, proc.State)
 		assert.True(t, proc.Pid.Exists())
 	}
+}
+
+func TestSelfPersist(t *testing.T) {
+	stat, err := initTestResolver()
+	require.NoError(t, err, "Init()")
+	first, err := stat.GetSelf()
+	require.NoError(t, err, "First GetSelf()")
+
+	// The first process fetch shouldn't have percentages, since we don't have >1 procs to compare
+	assert.False(t, first.CPU.Total.Pct.Exists(), "total.pct should not exist")
+	// Create a proper time delay so the CPU percentage delta calculations don't fail
+	time.Sleep(time.Millisecond * 5)
+	second, err := stat.GetSelf()
+	require.NoError(t, err, "Second GetSelf()")
+
+	// now it should exist
+	assert.True(t, second.CPU.Total.Pct.Exists(), "total.pct should exist")
 }
 
 func TestGetProcess(t *testing.T) {
@@ -227,7 +245,6 @@ func TestProcCpuPercentage(t *testing.T) {
 
 	assert.EqualValues(t, 0.0721, normalizedTest)
 	assert.EqualValues(t, 3.459, newState.CPU.Total.Pct.ValueOr(0))
-	assert.EqualValues(t, 14841, newState.CPU.Total.Value.ValueOr(0))
 }
 
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching

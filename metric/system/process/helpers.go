@@ -94,7 +94,6 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 
 	s1.CPU.Total.Norm.Pct = opt.FloatWith(metric.Round(normalizedPct))
 	s1.CPU.Total.Pct = opt.FloatWith(metric.Round(pct))
-	s1.CPU.Total.Value = opt.FloatWith(metric.Round(float64(s1.CPU.Total.Ticks.ValueOr(0))))
 
 	return s1
 

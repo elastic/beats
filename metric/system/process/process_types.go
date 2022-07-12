@@ -103,6 +103,10 @@ type ProcLimits struct {
 
 // Implementations
 
+func (t CPUTotal) IsZero() bool {
+	return t.Value.IsZero() && t.Ticks.IsZero() && t.Pct.IsZero() && t.Norm.IsZero()
+}
+
 // IsZero returns true if the underlying value nil
 func (t CPUTicks) IsZero() bool {
 	return t.Ticks.IsZero()

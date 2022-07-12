@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
@@ -133,7 +134,7 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	if err != nil {
 		return ProcState{}, fmt.Errorf("error fetching PID %d: %w", self, err)
 	}
-
+	procStats.ProcsMap[self] = pidStat
 	return pidStat, nil
 }
 
@@ -202,6 +203,9 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		}
 	} // end cgroups processor
 
+	if status.CPU.Total.Ticks.Exists() {
+		status.CPU.Total.Value = opt.FloatWith(metric.Round(float64(status.CPU.Total.Ticks.ValueOr(0))))
+	}
 	if ok {
 		status = GetProcCPUPercentage(last, status)
 	}
