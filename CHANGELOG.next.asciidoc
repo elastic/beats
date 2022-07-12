@@ -75,6 +75,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value
+- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 
 *Packetbeat*
 
