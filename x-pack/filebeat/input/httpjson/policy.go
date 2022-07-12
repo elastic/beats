@@ -38,7 +38,7 @@ var (
 // containing a field "status" under the field "body" , and value status should be equal to the string "completed"
 type Evaluate func(expression *valueTpl, data []byte, log *logp.Logger) (bool, error)
 
-// Responsible for maintaining different http client policies
+// Policy is responsible for maintaining different http client policies
 // Currently just contains a retry policy function
 type Policy struct {
 	fn         Evaluate
