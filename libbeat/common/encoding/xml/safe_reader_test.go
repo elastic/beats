@@ -22,6 +22,7 @@ package xml
 
 import (
 	"encoding/xml"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -109,6 +110,18 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 					"Name": map[string]interface{}{
 						"#text": "John",
 						"ID":    "\\ufffd123",
+					},
+				},
+			},
+		},
+		{
+			name:  "unhappy",
+			input: []byte(`<person><Name ID="123">John is` + strings.Repeat(" ", 223) + ` 😞</Name></person>`),
+			want: map[string]interface{}{
+				"person": map[string]interface{}{
+					"Name": map[string]interface{}{
+						"#text": "John is" + strings.Repeat(" ", 223) + " 😞",
+						"ID":    "123",
 					},
 				},
 			},
