@@ -165,6 +165,7 @@ func runCmd(
 		if err != nil {
 			logp.Warn("could not scan stdout events from synthetics: %s", err)
 		}
+
 		wg.Done()
 	}()
 
@@ -184,10 +185,25 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		err := scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			logp.Warn("could not scan JSON events from synthetics: %s", err)
+		defer jsonReader.Close()
+
+		// We don't use scanToSynthEvents here because all lines here will be JSON
+		// It's more efficient to let the json decoder handle the ndjson than
+		// using the scanner
+		decoder := json.NewDecoder(jsonReader)
+		for {
+			var se SynthEvent
+			err := decoder.Decode(&se)
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				logp.L().Warn("error decoding json for test json results: %w", err)
+			}
+
+			mpx.writeSynthEvent(&se)
 		}
+
 		wg.Done()
 	}()
 	err = cmd.Start()
@@ -209,7 +225,6 @@ func runCmd(
 	go func() {
 		err := cmd.Wait()
 		jsonWriter.Close()
-		jsonReader.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
 		var cmdError *SynthError = nil
@@ -234,9 +249,10 @@ func runCmd(
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
+	defer rdr.Close()
 	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2)  // 2MiB initial buffer (images can be big!)
-	scanner.Buffer(buf, 1024*1024*40) // Max 50MiB Buffer
+	buf := make([]byte, 1024*10)      // 10KiB initial buffer
+	scanner.Buffer(buf, 1024*1024*10) // Max 10MiB Buffer
 
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())
