@@ -232,9 +232,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 // StopInput peforms all necessary clean up when an input finishes.
 func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Lock()
-	if _, exists := cim.ids[id]; exists {
-		delete(cim.ids, id)
-	}
+	delete(cim.ids, id)
 	cim.idsMux.Unlock()
 }
 
