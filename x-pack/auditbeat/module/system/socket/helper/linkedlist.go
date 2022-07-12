@@ -121,7 +121,7 @@ func (l *LinkedList) Remove(e LinkedElement) {
 //
 // This callback is expected to return true if it removed the element from
 // the Linked list. Otherwise, it will be removed by this function.
-func (l *LinkedList) RemoveOlder(deadline time.Time, callback func(LinkedElement) bool) {
+func (l *LinkedList) RemoveOlder(deadline time.Time, callback func(LinkedElement) (removed bool)) {
 	for l.head != nil && l.head.Timestamp().Before(deadline) {
 		if !callback(l.head) {
 			l.Get()
