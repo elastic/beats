@@ -86,6 +86,7 @@ func (l *LinkedList) Get() LinkedElement {
 }
 
 // Remove removes the given LinkedElement from the LinkedList.
+// The element `e` must be in `l` before this call.
 func (l *LinkedList) Remove(e LinkedElement) {
 	l.size--
 	if e.Prev() != nil {
