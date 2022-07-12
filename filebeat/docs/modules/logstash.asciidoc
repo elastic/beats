@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Logstash module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ modules parse logstash regular logs and the slow log, it will support the plain text format
 and the JSON format.
 

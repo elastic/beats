@@ -9,6 +9,10 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-logstash]]
 == Logstash module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 The `logstash` module collects metrics about {ls}.
 
 [float]
