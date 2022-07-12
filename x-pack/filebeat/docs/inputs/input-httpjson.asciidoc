@@ -1103,7 +1103,7 @@ maximum wait time in between such requests. If `request.retry.max_attempts` is n
 [float]
 ==== `chain[].while.request`
 
-Please refer <<request-parameters,request parameters>>. Required.
+Please refer to <<request-parameters,request parameters>> for more information. Required.
 
 Example:
 
