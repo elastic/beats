@@ -4948,6 +4948,26 @@ type: keyword
 
 --
 
+*`awsfargate.task_stats.task_desired_status`*::
++
+--
+The desired status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
+*`awsfargate.task_stats.task_known_status`*::
++
+--
+The known status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
