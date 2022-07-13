@@ -11,7 +11,6 @@ require (
 	github.com/Azure/azure-sdk-for-go v59.0.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest v0.11.19
-	github.com/Azure/go-autorest/autorest/adal v0.9.15
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.5.0
@@ -160,6 +159,7 @@ require (
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
+	github.com/Azure/go-autorest/autorest/adal v0.9.14
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.2.1
 	github.com/elastic/elastic-agent-libs v0.2.9
@@ -220,6 +220,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
+	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -228,7 +229,6 @@ require (
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.6 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/gofuzz v1.2.0 // indirect

@@ -7,7 +7,10 @@
 
 package azureblobstorage
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type config struct {
 	AccountName string      `config:"account_name"`
@@ -16,15 +19,15 @@ type config struct {
 }
 
 type container struct {
-	Name           string `config:"name" validate:"required"`
-	BatchSize      int32  `config:"batch_size"`
-	Poll           bool   `config:"poll"`
-	PollIntervalMs int32  `config:"poll_interval_ms"`
+	Name         string        `config:"name" validate:"required"`
+	MaxWorkers   int           `config:"max_workers"`
+	Poll         bool          `config:"poll"`
+	PollInterval time.Duration `config:"poll_interval"`
 }
 
 func (c config) Validate() error {
 	for _, v := range c.Containers {
-		if v.BatchSize > 10000 {
+		if v.MaxWorkers > 10000 {
 			return fmt.Errorf("batch size should be less than 10000")
 		}
 	}
@@ -33,11 +36,11 @@ func (c config) Validate() error {
 
 func defaultConfig() config {
 	return config{
-		AccountName: "beatsblobstorage",
-		AccountKey:  "61A0frq/mFUSw6BGivRB8jhOiElUwGcMlI5lCbXruJokvYIWUcwvpp9ln6v7MPBzwsfvprCEt2qA+AStH+iVXw==",
+		AccountName: "beatsblobstorage1",
+		AccountKey:  "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
 		Containers: []container{
-			{Name: "beatscontainer", BatchSize: 10, Poll: true, PollIntervalMs: 5000},
-			{Name: "blobcontainer", BatchSize: 10, Poll: true, PollIntervalMs: 5000},
+			{Name: "beatscontainer", MaxWorkers: 10, Poll: true, PollInterval: time.Duration(time.Second * 5)},
+			{Name: "blobcontainer", MaxWorkers: 10, Poll: true, PollInterval: time.Duration(time.Second * 5)},
 		},
 	}
 }

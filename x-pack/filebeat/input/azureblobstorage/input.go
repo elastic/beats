@@ -10,6 +10,7 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -22,11 +23,11 @@ import (
 )
 
 type source struct {
-	containerName  string
-	accountName    string
-	batchSize      int32
-	poll           bool
-	pollIntervalMs int32
+	containerName string
+	accountName   string
+	maxWorkers    int
+	poll          bool
+	pollInterval  time.Duration
 }
 
 type azurebsInput struct {
@@ -59,11 +60,11 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	var sources []cursor.Source
 	for _, c := range config.Containers {
 		sources = append(sources, &source{
-			accountName:    config.AccountName,
-			containerName:  c.Name,
-			batchSize:      c.BatchSize,
-			poll:           c.Poll,
-			pollIntervalMs: c.PollIntervalMs,
+			accountName:   config.AccountName,
+			containerName: c.Name,
+			maxWorkers:    c.MaxWorkers,
+			poll:          c.Poll,
+			pollInterval:  c.PollInterval,
 		})
 	}
 
@@ -88,26 +89,14 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 	var cp *state.Checkpoint
 	st := state.NewState()
 	currentSource := src.(*source)
-	ctx := context.Background()
+
 	log := inputCtx.Logger.With("account_name", currentSource.accountName).With("container", currentSource.containerName)
 	log.Info("Running azure blob storage for account %s", input.config.AccountName)
-
-	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
-	if err != nil {
-		return err
-	}
-	containerClient, err := fetchContainerClient(serviceClient, currentSource.containerName, log)
-	if err != nil {
-		return err
-	}
 
 	if !cursor.IsNew() {
 		cursor.Unpack(&cp)
 		st.SetCheckpoint(cp)
 	}
-
-	scheduler := newAzureInputScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
-	scheduler.schedule(ctx)
 
 	ctx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
@@ -118,5 +107,21 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 		}
 	}()
 	defer cancelInputCtx()
+
+	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
+	if err != nil {
+		return err
+	}
+	containerClient, err := fetchContainerClient(serviceClient, currentSource.containerName, log)
+	if err != nil {
+		return err
+	}
+
+	scheduler := newAzureInputScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
+	err = scheduler.schedule(ctx)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -10,8 +10,6 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
-	"sync"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
@@ -55,20 +53,29 @@ func newAzureInputScheduler(publisher cursor.Publisher, client *azblob.Container
 
 func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 	var pager *azblob.ContainerListBlobFlatPager
+	var availableWorkers int32
+
+	workerPool := NewWorkerPool(ctx, ais.src.maxWorkers, ais.log)
+	availableWorkers = workerPool.AvailableWorkers()
+
 	if !ais.src.poll {
-		pager = ais.fetchBlobPager()
-		return ais.scheduleOnce(ctx, pager)
+		pager = ais.fetchBlobPager(availableWorkers)
+		return ais.scheduleOnce(ctx, pager, workerPool)
 	}
 
 	for {
 
-		pager = ais.fetchBlobPager()
-		err := ais.scheduleOnce(ctx, pager)
+		availableWorkers = workerPool.AvailableWorkers()
+		if availableWorkers == 0 {
+			continue
+		}
+		pager = ais.fetchBlobPager(availableWorkers)
+		err := ais.scheduleOnce(ctx, pager, workerPool)
 		if err != nil {
 			return err
 		}
 
-		err = timed.Wait(ctx, time.Millisecond*time.Duration(ais.src.pollIntervalMs))
+		err = timed.Wait(ctx, ais.src.pollInterval)
 		if err != nil {
 			return err
 		}
@@ -77,17 +84,7 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 
 }
 
-func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager) error {
-	var wg sync.WaitGroup
-	errs := make(chan error)
-	jobCounter := 0
-
-	// Iterate over the error channel in a go routine and print errors as and when they come
-	go func() {
-		for e := range errs {
-			ais.log.Errorf("Scheduler error : %v ", e)
-		}
-	}()
+func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool Pool) error {
 
 	for pager.NextPage(ctx) {
 		jobs, err := ais.createJobs(pager)
@@ -101,22 +98,17 @@ func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.
 			jobs = ais.moveToLastSeenJob(jobs)
 		}
 
-		pageMarker := pager.PageResponse().Marker
+		// Submits job to worker pool for further processing
 		for _, job := range jobs {
-			wg.Add(1)
-			jobID := fetchJobID(jobCounter, ais.src.containerName, job.Name())
-			go job.Do(ctx, jobID, pageMarker, &wg, errs)
-			fmt.Printf("JOB WITH ID %v and timeStamp %v EXECUTED\n", jobID, job.Timestamp().String())
-			jobCounter++
+			workerPool.Submit(job)
 		}
-		wg.Wait()
 	}
-	close(errs)
 	return nil
 }
 
 func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]Job, error) {
 	var jobs []Job
+	pageMarker := pager.PageResponse().Marker
 
 	for _, v := range pager.PageResponse().Segment.BlobItems {
 		blobURL := fmt.Sprintf("%s%s/%s", ais.serviceURL, ais.src.containerName, *v.Name)
@@ -125,21 +117,21 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 			return nil, err
 		}
 
-		job := newAzureInputJob(blobClient, v, ais.state, ais.src, ais.publisher)
+		job := newAzureInputJobV2(blobClient, v, pageMarker, ais.state, ais.src, ais.publisher)
 		jobs = append(jobs, job)
 	}
 
 	return jobs, nil
 }
 
-func (ais *azureInputScheduler) fetchBlobPager() *azblob.ContainerListBlobFlatPager {
+func (ais *azureInputScheduler) fetchBlobPager(batchSize int32) *azblob.ContainerListBlobFlatPager {
 	pager := ais.client.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
 		Include: []azblob.ListBlobsIncludeItem{
 			azblob.ListBlobsIncludeItemMetadata,
 			azblob.ListBlobsIncludeItemTags,
 		},
 		Marker:     ais.state.Checkpoint().Marker,
-		MaxResults: &ais.src.batchSize,
+		MaxResults: &batchSize,
 	})
 
 	return pager
