@@ -27,13 +27,27 @@ func containsHistogram(d *distribution.Distribution) bool {
 	return d.Count == sum
 }
 
+// Explicit: You list all the boundaries for the buckets in the bounds array.
+// Bucket i has these boundaries:
+// Upper bound: bounds[i] for (0 <= i < N-1)
+// Lower bound: bounds[i - 1] for (1 <= i < N)
+// https://cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Explicit
+
 func calcExplicitUpperBound(bucket *distribution.Distribution_BucketOptions_Explicit, i int) float64 {
 	return bucket.Bounds[i]
 }
 
+// Exponential(scale, growth_factor, i): Bucket widths increase for higher values.
+// The boundaries are scale * growth_factor**i, for i=0,1,2,...,N.
+// https://cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Exponential
+
 func calcExponentialUpperBound(bucket *distribution.Distribution_BucketOptions_Exponential, i int) float64 {
 	return bucket.Scale * (math.Pow(bucket.GrowthFactor, float64(i)))
 }
+
+// Linear(offset, width, i): Every bucket has the same width.
+// The boundaries are offset + width * i, for i=0,1,2,...,N.
+// https://cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Linear
 
 func calcLinearUpperBound(bucket *distribution.Distribution_BucketOptions_Linear, i int) float64 {
 	return bucket.Offset + (bucket.Width * float64(i))
