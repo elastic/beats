@@ -346,7 +346,7 @@ func TestEql(t *testing.T) {
 	}
 }
 
-func debug(expression string) {
+func debug(t *testing.T, expression string) {
 	raw := antlr.NewInputStream(expression)
 
 	lexer := parser.NewEqlLexer(raw)
