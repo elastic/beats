@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
@@ -135,4 +136,35 @@ func TestToMap(t *testing.T) {
 			testslike.Test(t, llvalidator, m)
 		})
 	}
+}
+
+func TestSynthErrConversion(t *testing.T) {
+	name := "myname"
+	message := "mymessage"
+	stack := "mystack"
+	code := "mycode"
+
+	t.Run("SynthErr -> ECS", func(t *testing.T) {
+		se := &SynthError{
+			Name:    name,
+			Code:    code,
+			Message: message,
+			Stack:   stack,
+		}
+
+		ecse := se.toECSErr()
+		require.Equal(t, name, ecse.Type)
+		require.Equal(t, code, ecse.Code)
+		require.Equal(t, message, ecse.Message)
+		require.Equal(t, stack, *ecse.StackTrace)
+	})
+
+	t.Run("ECS Err -> SynthErr", func(t *testing.T) {
+		ecse := ecserr.NewECSErrWithStack(name, code, message, &stack)
+		se := ECSErrToSynthError(ecse)
+		require.Equal(t, name, se.Type)
+		require.Equal(t, code, se.Code)
+		require.Equal(t, message, se.Message)
+		require.Equal(t, stack, se.Stack)
+	})
 }

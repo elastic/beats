@@ -71,7 +71,7 @@
             "type": "input_control_vis"
         }
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-0c6fb540-bcb6-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "visualization": "8.3.0"
@@ -94,6 +94,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2022-05-24T08:31:03.991Z",
-    "version": "Wzg0NTEsMV0="
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MjIsM10="
 }

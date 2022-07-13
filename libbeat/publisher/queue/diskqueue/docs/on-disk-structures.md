@@ -58,11 +58,20 @@ a count of the number of frames in the segment, which is an unsigned
 flags, which signify options.  The size of options is 32-bits in
 little-endian format.
 
-If the options field has the first bit set, then encryption is enabled.  In
-which case, the next 128-bits are the initialization vector and the
-rest of the file is encrypted frames.  If the field is not set,
-un-encrypted frames follow the header.
+If no fields are set in the options field, then un-encrypted frames
+follow the header.
 
+If the options field has the first bit set, then encryption is
+enabled.  In which case, the next 128-bits are the initialization
+vector and the rest of the file is encrypted frames.
+
+If the options field has the second bit set, then compression is
+enabled.  In which case, LZ4 compressed frames follow the header.
+
+If both the first and second bit of the options field are set, then
+both compression and encryption are enabled.  The next 128-bits are
+the initialization vector and the rest of the file is LZ4 compressed
+frames.
 
 ![Segment Schema Version 2](./schemaV2.svg)
 

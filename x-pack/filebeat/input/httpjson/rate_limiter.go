@@ -77,14 +77,15 @@ func (r *rateLimiter) applyRateLimit(ctx context.Context, resp *http.Response) e
 		return nil
 	}
 	r.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
-	ticker := time.NewTicker(w)
-	defer ticker.Stop()
-
+	timer := time.NewTimer(w)
 	select {
 	case <-ctx.Done():
+		if !timer.Stop() {
+			<-timer.C
+		}
 		r.log.Info("Context done.")
 		return nil
-	case <-ticker.C:
+	case <-timer.C:
 		r.log.Debug("Rate Limit: time is up.")
 		return nil
 	}

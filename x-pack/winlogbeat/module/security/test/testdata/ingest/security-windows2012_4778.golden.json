@@ -1,0 +1,78 @@
+[
+  {
+    "@timestamp": "2020-04-05T16:33:32.3888253Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-reconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4778",
+      "ingested": "2022-06-08T06:21:08.218876200Z",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "start"
+      ]
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A session was reconnected to a Window Station.\n\nSubject:\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x76FEA87\n\nSession:\n\tSession Name:\t\tRDP-Tcp#127\n\nAdditional Information:\n\tClient Name:\t\tEQP01777\n\tClient Address:\t\t10.100.150.9\n\nThis event is generated when a user reconnects to an existing Terminal Services session, or when a user switches to an existing desktop using Fast User Switching.",
+    "related": {
+      "ip": [
+        "10.100.150.9"
+      ],
+      "user": [
+        "at_adm"
+      ]
+    },
+    "source": {
+      "domain": "EQP01777",
+      "ip": "10.100.150.9"
+    },
+    "user": {
+      "domain": "TEST",
+      "name": "at_adm"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "AccountDomain": "TEST",
+        "AccountName": "at_adm",
+        "ClientAddress": "10.100.150.9",
+        "ClientName": "EQP01777",
+        "LogonID": "0x76fea87",
+        "SessionName": "RDP-Tcp#127"
+      },
+      "event_id": "4778",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x76fea87"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 4184
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "5101675",
+      "task": "Other Logon/Logoff Events"
+    }
+  }
+]

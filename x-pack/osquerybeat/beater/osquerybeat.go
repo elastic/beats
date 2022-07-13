@@ -164,6 +164,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	// Set reseable action handler
+	rah := newResetableActionHandler(bt.log)
+	defer rah.Clear()
+
 	g, ctx := errgroup.WithContext(ctx)
 
 	// Start osquery runner.
@@ -172,7 +176,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	runner := newOsqueryRunner(bt.log)
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, inputCh)
+			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah)
 		})
 	})
 
@@ -221,10 +225,20 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	})
 
 	// Wait for clean exit
-	return g.Wait()
+	err = g.Wait()
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			bt.log.Debugf("osquerybeat Run exited, context cancelled")
+		} else {
+			bt.log.Errorf("osquerybeat Run exited with error: %v", err)
+		}
+	} else {
+		bt.log.Debugf("osquerybeat Run exited")
+	}
+	return err
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler) error {
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
@@ -285,8 +299,8 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		})
 
 		// Register action handler
-		ah := bt.registerActionHandler(b, cli, configPlugin)
-		defer bt.unregisterActionHandler(b, ah)
+		bt.registerActionHandler(b, cli, configPlugin, rah)
+		defer bt.unregisterActionHandler(b, rah)
 
 		// Process input
 		for {
@@ -304,7 +318,19 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 			}
 		}
 	})
-	return g.Wait()
+
+	err = g.Wait()
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			bt.log.Debugf("runOsquery exited, context cancelled")
+		} else {
+			bt.log.Errorf("runOsquery exited with error: %v", err)
+		}
+		bt.log.Errorf("runOsquery exited with error: %v", err)
+	} else {
+		bt.log.Debugf("runOsquery exited")
+	}
+	return err
 }
 
 func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration) (err error) {
@@ -372,9 +398,9 @@ func (bt *osquerybeat) Stop() {
 	bt.close()
 }
 
-func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin) *actionHandler {
+func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin, rah *resetableActionHandler) {
 	if b.Manager == nil {
-		return nil
+		return
 	}
 
 	ah := &actionHandler{
@@ -384,12 +410,12 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 		queryExec: cli,
 		np:        configPlugin,
 	}
-	b.Manager.RegisterAction(ah)
-	return ah
+	rah.Attach(ah)
+	b.Manager.RegisterAction(rah)
 }
 
-func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) {
-	if b.Manager != nil && ah != nil {
-		b.Manager.UnregisterAction(ah)
+func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, rah *resetableActionHandler) {
+	if b.Manager != nil && rah != nil {
+		b.Manager.UnregisterAction(rah)
 	}
 }
